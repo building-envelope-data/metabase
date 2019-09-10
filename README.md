@@ -1,2 +1,25 @@
-# icon
+The product identifier service should provide the following endpoints:
+* Obtain a new product identifier possibly associating internal meta information with it, like a custom string or a JSON blob
+* Update the meta information of one of your product identifiers
+* Get meta information of one of your product identifiers
+* Get the owner of a product identifier (needed, for example, by the IGSDB to check that the user adding product data with a product identifier owns the identifier)
+* List all your product identifiers
+* Request the transferal of the ownership of one or all of your product identifiers to another (once the receiving user agrees, the transferal is made)
+* Respond to a transferal request
 
+How to obtain a unique product identifier and add product data to some database:
+1. Create an account at a central authentication service, that is, a domain specific and lightweight service like [Auth0](https://auth0.com) managed by us (the details of how users prove to be a certain manufacturer are still open)
+2. Authenticate yourself at the authentication service receiving a [JSON web token](https://jwt.io) (this could be a simple username/password authentication scheme)
+3. Obtain a new product identifier from the respective service passing your JSON web token as means of authentication
+4. Add product data to some database like IGSDB passing the product identifier and your JSON web token
+
+JSON web tokens are used for authentication across different requests, services, and domains.
+
+Product identifiers are randomly chosen and verified to be unique 32, 48, or 64 bit numbers, which can be communicated for easy human use as [proquints](https://arxiv.org/html/0901.4016) [there are implementations in various languages](https://github.com/dsw/proquint). We could alternatively use [version 4 universally-unique identifiers](https://tools.ietf.org/html/rfc4122); I consider this to be overkill as it comes with a performance penalty and our identifiers do not need to be universally unique. Either way, [those identifiers do _not_ replace primary keys](https://tomharrisonjr.com/uuid-or-guid-as-primary-keys-be-careful-7b2aa3dcb439).
+
+Randomness of identifiers ensures that
+* the product identifier does not encode any information regarding the product, like its manufacturer, which would, for example, be problematic when one manufacturer is bought by another
+* a user cannot run out of product identifiers, because there is no fixed range of possible identifiers per user
+* it's unlikely that flipping one bit or replacing one letter in the proquint representation by another results in a valid identifier owned by the same user
+
+We may add some error detection and correction capabilities by, for example, generating all but the last 4 bits randomly and using the last 4 bits as [some sort of checksum](https://en.wikipedia.org/wiki/Checksum).
