@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  database:
+    image: postgres:11.5-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgress
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+  web:
+    build:
+      context: .
+      args:
+        GROUP_ID: ${GROUP_ID}
+        GROUP_NAME: ${GROUP_NAME}
+        USER_ID: ${USER_ID}
+        USER_NAME: ${USER_NAME}
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+
+volumes:
+  data:
