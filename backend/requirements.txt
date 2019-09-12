@@ -1,0 +1,2 @@
+# -r requirements/${ENVIRONMENT}.txt
+-r requirements/production.txt

@@ -23,3 +23,8 @@ Randomness of identifiers ensures that
 * it's unlikely that flipping one bit or replacing one letter in the proquint representation by another results in a valid identifier owned by the same user
 
 We may add some error detection and correction capabilities by, for example, generating all but the last 4 bits randomly and using the last 4 bits as [some sort of checksum](https://en.wikipedia.org/wiki/Checksum).
+
+# ...
+
+- [Should You Use The Same Dockerfile For Dev, Staging And Production Builds?](https://vsupalov.com/same-dockerfile-dev-staging-production/)
+- [Dockerizing a React App](https://mherman.org/blog/dockerizing-a-react-app/)

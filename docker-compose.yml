@@ -1,4 +1,7 @@
-version: '3'
+# Inspired by https://mherman.org/blog/dockerizing-a-react-app/
+# TODO Have a separate `docker-compose`-file for production (see also https://docs.docker.com/compose/production/)
+
+version: '3.7'
 
 services:
   database:
@@ -11,21 +14,40 @@ services:
       - "5432:5432"
     volumes:
       - data:/var/lib/postgresql/data
-  web:
+
+  backend:
     build:
-      context: .
+      context: ./backend
+      dockerfile: ./Dockerfile-${ENVIRONMENT}
       args:
         GROUP_ID: ${GROUP_ID}
         GROUP_NAME: ${GROUP_NAME}
         USER_ID: ${USER_ID}
         USER_NAME: ${USER_NAME}
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:5001
     volumes:
-      - .:/app
+      - ./backend:/app
     ports:
-      - "8000:8000"
+      - "3001:3001"
     depends_on:
       - database
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile-${ENVIRONMENT}
+    command: pnpm start
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Keep the `node_modules` of the image
+      # - node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${ENVIRONMENT}
+    depends_on:
+      - backend
+
 volumes:
   data:
+  # node_modules:

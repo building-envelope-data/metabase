@@ -15,15 +15,18 @@ RUN addgroup -S -g ${GROUP_ID} ${GROUP_NAME} && \
 
 ENV PYTHONUNBUFFERED 1
 
-RUN mkdir /app
+RUN mkdir /app && \
+    mkdir /app/requirements
 
 WORKDIR /app
 
-COPY requirements.txt .
+# COPY requirements.txt .
+COPY requirements/* ./requirements/
 
 # Inspired by https://stackoverflow.com/questions/46711990/error-pg-config-executable-not-found-when-installing-psycopg2-on-alpine-in-dock/47871121#47871121
 RUN apk add --no-cache \
       dumb-init \
+      make \
       postgresql-libs && \
     apk add --no-cache \
       --virtual .build-deps \
@@ -31,7 +34,7 @@ RUN apk add --no-cache \
       musl-dev \
       postgresql-dev && \
     pip install --no-cache-dir \
-      -r requirements.txt && \
+      -r requirements/development.txt && \
     apk del --purge .build-deps
 
 ENV HOME=/home/${USER_NAME}

@@ -42,16 +42,28 @@ up : build ## Build, (re)create, start, and attach to containers
 down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
 	docker-compose down
 
-run : ## Run the one-time command `${COMMAND}` against the service `web`
-	docker-compose run \
-		--user $(shell id --user):$(shell id --group) \
-		web \
-		${COMMAND}
+run : build ## Build the service `web` and run the one-time command `${COMMAND}` against it
+	GROUP_ID=$(shell id --group) \
+		GROUP_NAME=$(shell id --group --name) \
+		USER_ID=$(shell id --user) \
+		USER_NAME=$(shell id --user --name) \
+		docker-compose run \
+			--user $(shell id --user):$(shell id --group) \
+			web \
+			${COMMAND}
 .PHONY : run
 
 shell : COMMAND = ash
 shell : run ## Enter shell
 .PHONY : shell
+
+migrations : COMMAND = python manage.py makemigrations
+migrations : run ## Make migrations based on changes made to models
+.PHONY : generate-migrations
+
+migrate : COMMAND = python manage.py migrate
+migrate : run ## Make and run migrations based on changes made to models
+.PHONY : migrate
 
 # ------------------------------------------------ #
 # Tasks to run, for example, in a Docker container #
@@ -60,3 +72,11 @@ shell : run ## Enter shell
 tests : ## Run tests, for example, from a shell in a Docker container
 	python -m pytest tests
 .PHONY : tests
+
+coverage : ## Generate test coverage report
+	coverage run --source='.' manage.py test
+	coverage report
+.PHONY : coverage
+
+seed : ## Seed the database
+	python manage.py loaddata icon
