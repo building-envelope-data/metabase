@@ -1,55 +1,18 @@
-FROM python:3.7.4-alpine3.10
+# Inspired by https://mherman.org/blog/dockerizing-a-react-app/
 
-ARG GROUP_ID=1000
-ARG GROUP_NAME=me
-ARG USER_ID=1000
-ARG USER_NAME=me
+FROM node:12.10.0-alpine
 
-# Create non-root user to run commands in (see https://medium.com/@mccode/processes-in-containers-should-not-run-as-root-2feae3f0df3b)
-RUN addgroup -S -g ${GROUP_ID} ${GROUP_NAME} && \
-    adduser -S -D -u ${USER_ID} -G ${GROUP_NAME} ${USER_NAME}
+# Although we bind `/app/node_modules` to a named volume in `docker-compose`,
+# the permissions we set here persist; by default they are `root:root`. See
+# https://github.com/docker/compose/issues/3270#issuecomment-206214034
+RUN mkdir -p /app/node_modules && \
+    chown node:node /app && \
+    chown node:node /app/node_modules
 
-#############
-# As `root` #
-#############
-
-ENV PYTHONUNBUFFERED 1
-
-RUN mkdir /app && \
-    mkdir /app/requirements
+RUN apk --no-cache add \
+      make
 
 WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
 
-# COPY requirements.txt .
-COPY requirements/* ./requirements/
-
-# Inspired by https://stackoverflow.com/questions/46711990/error-pg-config-executable-not-found-when-installing-psycopg2-on-alpine-in-dock/47871121#47871121
-RUN apk add --no-cache \
-      dumb-init \
-      make \
-      postgresql-libs && \
-    apk add --no-cache \
-      --virtual .build-deps \
-      gcc \
-      musl-dev \
-      postgresql-dev && \
-    pip install --no-cache-dir \
-      -r requirements/development.txt && \
-    apk del --purge .build-deps
-
-ENV HOME=/home/${USER_NAME}
-
-RUN ln -fs ${HOME}/app /app
-
-#####################
-# As `${USER_NAME}` #
-#####################
-
-USER ${USER_NAME}
-
-WORKDIR /app
-
-VOLUME /app
-
-ENTRYPOINT [ "/usr/bin/dumb-init", "--" ]
-CMD [ "ash" ]
+CMD ["npm", "run", "start:dev"]

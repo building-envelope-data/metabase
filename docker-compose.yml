@@ -7,9 +7,9 @@ services:
   database:
     image: postgres:11.5-alpine
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgress
-      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres#${TYPEORM_USERNAME}
+      - POSTGRES_PASSWORD=postgres#${TYPEORM_PASSWORD}
+      - POSTGRES_DB=postgres#${TYPEORM_DATABASE}postgres
     ports:
       - "5432:5432"
     volumes:
@@ -18,36 +18,36 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: ./Dockerfile-${ENVIRONMENT}
-      args:
-        GROUP_ID: ${GROUP_ID}
-        GROUP_NAME: ${GROUP_NAME}
-        USER_ID: ${USER_ID}
-        USER_NAME: ${USER_NAME}
-    command: python manage.py runserver 0.0.0.0:5001
+      dockerfile: ./Dockerfile-development
+    command: npm run start:dev
     volumes:
       - ./backend:/app
+      # - /app/node_modules # Keep the `node_modules` of the image
+      - backend_node_modules:/app/node_modules
     ports:
       - "3001:3001"
+    environment:
+      NODE_ENV: development
     depends_on:
       - database
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: ./Dockerfile-${ENVIRONMENT}
-    command: pnpm start
+      dockerfile: ./Dockerfile-development
+    command: pnpm run start
     volumes:
       - ./frontend:/app
-      - /app/node_modules # Keep the `node_modules` of the image
-      # - node_modules:/app/node_modules
+      # - /app/node_modules # Keep the `node_modules` of the image
+      - frontend_node_modules:/app/node_modules
     ports:
       - "3000:3000"
     environment:
-      NODE_ENV: ${ENVIRONMENT}
+      NODE_ENV: development
     depends_on:
       - backend
 
 volumes:
   data:
-  # node_modules:
+  frontend_node_modules:
+  backend_node_modules:

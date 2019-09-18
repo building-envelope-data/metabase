@@ -1,0 +1,17 @@
+# Inspired by https://mherman.org/blog/dockerizing-a-react-app/
+
+# Build-time environment
+FROM node:12.10.0-alpine as build
+WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+COPY package.json ./package.json
+RUN npm add -g pnpm && \
+    pnpm install
+COPY . /app
+RUN pnpm run build
+
+# Run-time environment
+FROM nginx:1.17.3-alpine
+COPY --from=build /app/build /app
+EXPOSE 80
+CMD ["pnpm", "run", "start:prod"]
