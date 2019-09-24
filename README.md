@@ -28,3 +28,5 @@ We may add some error detection and correction capabilities by, for example, gen
 
 - [Should You Use The Same Dockerfile For Dev, Staging And Production Builds?](https://vsupalov.com/same-dockerfile-dev-staging-production/)
 - [Dockerizing a React App](https://mherman.org/blog/dockerizing-a-react-app/)
+- [A starting point for Clean Architecture with ASP.NET Core](https://github.com/ardalis/CleanArchitecture)
+dotnet ef migrations add CreateIdentitySchema

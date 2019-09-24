@@ -1,0 +1,130 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Icon.Models;
+using Microsoft.AspNetCore.Authorization;
+
+namespace Icon.Controllers
+{
+    // [Route("api/[controller]")]
+    [Route("api/products")]
+    [ApiController]
+    [Authorize]
+    public class ProductsController : ControllerBase
+    {
+        private const String hexDigitCount = "16";
+        private const String idRegex = "^[[a-f0-9]]{{" + hexDigitCount + "}}$";
+        private const String idRouteParameter = "{id:regex(" + idRegex + ")}";
+
+        private static long hexToLong(string hexNumber)
+        {
+            return Int64.Parse(hexNumber, System.Globalization.NumberStyles.HexNumber);
+        }
+
+        private static string longToHex(long number)
+        {
+            return number.ToString("x" + hexDigitCount);
+        }
+
+        private readonly IconDbContext _dbContext;
+
+        public ProductsController(IconDbContext context)
+        {
+            _dbContext = context;
+        }
+
+        // GET: api/products
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        {
+            return await _dbContext.Products.ToListAsync();
+        }
+
+        // GET: api/products/5
+        [HttpGet(idRouteParameter)]
+        [AllowAnonymous]
+        public async Task<ActionResult<Product>> GetProduct(string id)
+        {
+            var product = await _dbContext.Products.FindAsync(hexToLong(id));
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return product;
+        }
+
+        // TODO Use PATCH for partial updates!
+
+        // PUT: api/products/5
+        // To protect from overpostring attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPut(idRouteParameter)]
+        public async Task<IActionResult> PutProduct(string id, Product product)
+        {
+            var longId = hexToLong(id);
+            if (longId != product.Id)
+            {
+                return BadRequest();
+            }
+
+            _dbContext.Entry(product).State = EntityState.Modified;
+
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/products
+        // To protect from overpostring attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPost]
+        public async Task<ActionResult<Product>> PostProduct(Product product)
+        {
+            _dbContext.Products.Add(product);
+            await _dbContext.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetProduct), new { id = longToHex(product.Id) }, product);
+        }
+
+        // DELETE: api/products/5
+        [HttpDelete(idRouteParameter)]
+        public async Task<ActionResult<Product>> DeleteProduct(string id)
+        {
+            var product = await _dbContext.Products.FindAsync(hexToLong(id));
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.Products.Remove(product);
+            await _dbContext.SaveChangesAsync();
+
+            return product;
+        }
+
+        private bool ProductExists(string id)
+        {
+            return _dbContext.Products.Any(e => e.Id == hexToLong(id));
+        }
+    }
+}

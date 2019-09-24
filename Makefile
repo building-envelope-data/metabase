@@ -20,19 +20,28 @@ name : ## Print value of variable `name`
 .PHONY : name
 
 build : ## Build images
-	docker-compose build
-.PHONY : build
-
+	docker-compose build \
+		--build-arg GROUP_ID=$(shell id --group) \
+		--build-arg USER_ID=$(shell id --user)
 remove : ## Remove stopped containers
 	docker-compose rm
 .PHONY : remove
 
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
 up : build ## Build, (re)create, start, and attach to containers
-	docker-compose up --remove-orphans
+	docker-compose up \
+		--remove-orphans \
+		--detach
 
 down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
 	docker-compose down
+
+restart : ## Restart all stopped and running containers
+	docker-compose restart
+
+logs : ## Follow logs
+	docker-compose logs \
+		--follow
 
 run : build ## Build the service `backend` and run the one-time command `${COMMAND}` against it
 	docker-compose run \
