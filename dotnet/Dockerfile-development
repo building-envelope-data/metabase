@@ -15,7 +15,8 @@ RUN addgroup -S -g ${GROUP_ID} us && \
 RUN \
   apk add --no-cache \
     dumb-init \
-    make
+    make \
+    npm
 
 ENV HOME=/home/me
 RUN \
@@ -45,7 +46,7 @@ RUN \
 
 COPY \
   --chown=me:us \
-  Icon.csproj .
+  Icon.csproj ./
 
 # TODO Is this really what we want? It is inspired by
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/aspnetapp/aspnetcore-docker-https-development.md#linux
@@ -60,15 +61,17 @@ RUN \
   dotnet clean && \
   dotnet restore
 
+COPY \
+  --chown=me:us \
+  package.json package-lock.json ./
+RUN npm install
+
 # Create empty directories `/app/bin` and `/app/obj` for user `me` and group
 # `us` to make the respective mounted volumes be owned by the user `me` and the
 # group `us`.
 RUN \
   mkdir -p bin && \
   mkdir -p obj
-
-# Makes the volume mount `/app/core` mount a single file
-# RUN touch core
 
 EXPOSE 5000
 EXPOSE 5001

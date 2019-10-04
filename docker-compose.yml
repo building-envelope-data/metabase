@@ -16,48 +16,6 @@ services:
     volumes:
       - data:/var/lib/postgresql/data
 
-  # backend:
-  #   restart: always
-  #   build:
-  #     context: ./backend
-  #     dockerfile: ./Dockerfile-development
-  #   command: npm run start:dev
-  #   volumes:
-  #     - ./backend:/app
-  #     # - /app/node_modules # Keep the `node_modules` of the image
-  #     - backend_node_modules:/app/node_modules
-  #   ports:
-  #     - 3001:3001
-  #   environment:
-  #     NODE_ENV: development
-  #   depends_on:
-  #     - database
-
-  # nginx:
-  #   restart: always
-  #   image: nginx:1.17.3-alpine
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   volumes:
-  #     - ./nginx/conf.d:/etc/nginx/conf.d
-  #   depends_on:
-  #     - java
-
-  # java:
-  #   restart: always
-  #   build:
-  #     context: ./java
-  #     dockerfile: ./Dockerfile-development
-  #   command: ...
-  #   volumes:
-  #     - ./java:/app
-  #   ports:
-  #     - 3002:3002
-  #     - 5002:5002
-  #   depends_on:
-  #     - database
-
   backend:
     build:
       context: ./dotnet
@@ -65,7 +23,7 @@ services:
     # user: 1000:1000
     volumes:
       - ./dotnet:/app
-      # - /app/core # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding file on the file system that was bound by the preceding binding
+      - node_modules:/app/node_modules
       - /app/bin # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding
       - /app/obj # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding
     ports:
@@ -97,5 +55,5 @@ services:
 
 volumes:
   data:
+  node_modules:
   frontend_node_modules:
-  backend_node_modules:
