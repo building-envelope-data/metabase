@@ -13,8 +13,10 @@ help : ## Print this help
 # Tasks to run, for example, in a Docker container #
 # ------------------------------------------------ #
 
+# TODO Strip the byte-order mark, aka, BOM
 dos2unix : ## Remove carriage returns
-	find src/ -type f -exec sed -i -e "1s/^\xEF\xBB\xBF//" -e "s/\r//" {} +
+	find src/ -type f -exec sed -i -e "s/\r//" {} +
+	# find src/ -type f -exec sed -i -e "1s/^\xFEFF//" -e "s/\r//" {} +
 	# find . -type f -exec dos2unix {} \;
 	# find . \( -name "*.cs" -o -name "*.cshtml" \) ...
 
