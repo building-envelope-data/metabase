@@ -28,7 +28,7 @@ format : ## Format code
 migrations : ## Add migration with name ${NAME}, for example, `make NAME=CreateProducts migrations`
 	dotnet ef migrations add \
 		--context ApplicationDbContext \
-		--output-dir src/Migrations \
+		--output-dir src/Data/Migrations/ApplicationDb \
 		${NAME}
 
 migrate : ## Run migrations

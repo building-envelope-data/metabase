@@ -28,7 +28,7 @@ remove : ## Remove stopped containers
 .PHONY : remove
 
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
-up : build ## Build, (re)create, start, and attach to containers
+up : ## (Re)create and start containers
 	docker-compose up \
 		--remove-orphans \
 		--detach
@@ -43,7 +43,7 @@ logs : ## Follow logs
 	docker-compose logs \
 		--follow
 
-run : build ## Build the service `backend` and run the one-time command `${COMMAND}` against it
+run : ## Run the one-time command `${COMMAND}` against it
 	docker-compose run \
 		--user $(shell id --user):$(shell id --group) \
 		backend \

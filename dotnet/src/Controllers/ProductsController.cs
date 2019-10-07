@@ -7,13 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Icon.Models;
 using Icon.Data;
 using Microsoft.AspNetCore.Authorization;
+using static IdentityServer4.IdentityServerConstants;
 
 namespace Icon.Controllers
 {
     // [Route("api/[controller]")]
     [Route("api/products")]
     [ApiController]
-    [Authorize]
+    [Authorize(LocalApi.PolicyName)]
     public class ProductsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
@@ -52,7 +53,7 @@ namespace Icon.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(Guid id, Product product)
+        public async Task<IActionResult> PutProduct([FromRoute] Guid id, [FromBody] Product product)
         {
             if (id != product.Id)
             {
@@ -85,7 +86,7 @@ namespace Icon.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<ActionResult<Product>> PostProduct([FromBody] Product product)
         {
             _dbContext.Products.Add(product);
             await _dbContext.SaveChangesAsync();
@@ -95,7 +96,7 @@ namespace Icon.Controllers
 
         // DELETE: api/products/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Product>> DeleteProduct(Guid id)
+        public async Task<ActionResult<Product>> DeleteProduct([FromRoute] Guid id)
         {
             var product = await _dbContext.Products.FindAsync(id);
             if (product == null)

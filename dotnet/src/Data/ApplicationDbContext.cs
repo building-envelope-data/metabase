@@ -13,49 +13,21 @@ using Icon.Models;
 namespace Icon.Data
 {
     // Inspired by
-    // [ApiAuthorizationDbContext](https://github.com/aspnet/AspNetCore/blob/master/src/Identity/ApiAuthorization.IdentityServer/src/Data/ApiAuthorizationDbContext.cs)
+    // [Authentication and authorization for SPAs](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-3.0)
     // [Customize Identity Model](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-3.0)
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>, IPersistedGrantDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
-        private readonly IOptions<OperationalStoreOptions> _operationalStoreOptions;
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="ApplicationDbContext"/>.
-        /// </summary>
-        /// <param name="options">The <see cref="DbContextOptions"/>.</param>
-        /// <param name="operationalStoreOptions">The <see cref="IOptions{OperationalStoreOptions}"/>.</param>
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IOptions<OperationalStoreOptions> operationalStoreOptions)
-            : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+          : base(options)
         {
-            _operationalStoreOptions = operationalStoreOptions;
         }
-
-        /// <summary>
-        /// Gets or sets the <see cref="DbSet{PersistedGrant}"/>.
-        /// </summary>
-        public DbSet<PersistedGrant> PersistedGrants { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="DbSet{DeviceFlowCodes}"/>.
-        /// </summary>
-        public DbSet<DeviceFlowCodes> DeviceFlowCodes { get; set; }
-
-        Task<int> IPersistedGrantDbContext.SaveChangesAsync() => base.SaveChangesAsync();
 
         public DbSet<Product> Products { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
-        {
-            base.OnConfiguring(builder);
-            builder.UseNpgsql("Host=database;Database=postgres;Username=postgres;Password=postgres", o => o.UseNodaTime());
-        }
-
-        /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             builder.HasPostgresExtension("pgcrypto");
-            builder.ConfigurePersistedGrantContext(_operationalStoreOptions.Value);
             builder
               .Entity<Product>()
               .UseXminAsConcurrencyToken()
