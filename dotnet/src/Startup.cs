@@ -1,4 +1,3 @@
-using Icon.Models;
 using NSwag.Generation.Processors.Security;
 using IdentityServer4.AccessTokenValidation;
 using Icon.Data;
@@ -23,6 +22,11 @@ using IdentityServer4.AspNetIdentity;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using Command = Icon.Infrastructure.Command;
+using Query = Icon.Infrastructure.Query;
+using Event = Icon.Infrastructure.Event;
+using Domain = Icon.Domain;
+using Component = Icon.Domain.Component;
 using System.Threading.Tasks;
 using System;
 using WebPWrecover.Services;
@@ -55,13 +59,18 @@ namespace Icon
 {
     public class Startup
     {
-        public IWebHostEnvironment Environment { get; }
-        public IConfiguration Configuration { get; }
+        private IWebHostEnvironment Environment { get; }
+        private IConfiguration Configuration { get; }
 
-        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
+        public Startup(IWebHostEnvironment environment)
         {
             Environment = environment;
-            Configuration = configuration;
+            Configuration = new ConfigurationBuilder()
+                .SetBasePath(environment.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false)
+                .AddEnvironmentVariables()
+              .Build();
         }
 
         private string GetHost()
@@ -71,7 +80,13 @@ namespace Icon
 
         private string GetConnectionString()
         {
-            return Configuration.GetConnectionString("ApplicationDbContext");
+            return Configuration.GetValue<string>("ConnectionString");
+            /* return Configuration.GetConnectionString("ApplicationDbContext"); */
+        }
+
+        private string GetSchema()
+        {
+          return Configuration.GetValue<string>("Schema");
         }
 
         private string GetMigrationsAssembly()
@@ -87,6 +102,10 @@ namespace Icon
             ConfigureRequestResponseServices(services);
             ConfigureApiServices(services);
             ConfigureAuthServices(services);
+
+            ConfigureMediator(services);
+            ConfigureMarten(services);
+            ConfigureCQRS(services);
         }
 
         private void ConfigureDatabaseServices(IServiceCollection services)
@@ -200,7 +219,7 @@ namespace Icon
         {
             // https://fullstackmark.com/post/21/user-authentication-and-identity-with-angular-aspnet-core-and-identityserver
             // https://www.scottbrady91.com/Identity-Server/ASPNET-Core-Swagger-UI-Authorization-using-IdentityServer4
-            services.AddIdentity<User, IdentityRole<Guid>>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentity<Domain.User, IdentityRole<Guid>>(options => options.SignIn.RequireConfirmedAccount = true)
               .AddEntityFrameworkStores<ApplicationDbContext>()
               .AddDefaultTokenProviders();
             // services.AddDbContext<ApplicationDbContext>(options =>
@@ -256,8 +275,8 @@ namespace Icon
                 })
             .AddSecretParser<JwtBearerClientAssertionSecretParser>()
               .AddSecretValidator<PrivateKeyJwtSecretValidator>() // https://identityserver4.readthedocs.io/en/latest/topics/secrets.html#beyond-shared-secrets
-              .AddAspNetIdentity<User>()
-              .AddProfileService<ProfileService<User>>();
+              .AddAspNetIdentity<Domain.User>()
+              .AddProfileService<ProfileService<Domain.User>>();
             /* builder.AddApiAuthorization<User, ApplicationDbContext>(); */
             if (Environment.IsDevelopment())
             {
@@ -328,6 +347,53 @@ namespace Icon
             services.AddLocalApiAuthentication();
         }
 
+        private static void ConfigureCQRS(IServiceCollection services)
+        {
+            services.AddScoped<Command.ICommandBus, Command.CommandBus>();
+            services.AddScoped<Query.IQueryBus, Query.QueryBus>();
+            services.AddScoped<Event.IEventBus, Event.EventBus>();
+
+            services.AddScoped<MediatR.IRequestHandler<Component.Create.Command, Domain.ComponentAggregate>, Component.Create.CommandHandler>();
+
+            /* services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>(); */
+
+            /* services.AddScoped<IRequestHandler<CreateClient, Unit>, ClientsCommandHandler>(); */
+
+            /* services.AddScoped<IRequestHandler<GetClientView, ClientView>, ClientsQueryHandler>(); */
+        }
+
+        private void ConfigureMarten(IServiceCollection services)
+        {
+            services.AddScoped(sp =>
+            {
+                var documentStore = Marten.DocumentStore.For(options =>
+                {
+                    var connectionString = GetConnectionString();
+                    var schemaName = GetSchema();
+
+                    options.Connection(connectionString);
+                    options.AutoCreateSchemaObjects = Marten.AutoCreate.All;
+                    options.Events.DatabaseSchemaName = schemaName;
+                    options.DatabaseSchemaName = schemaName;
+
+                    options.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentAggregate>();
+                    /* options.Events.InlineProjections.Add(new AllAccountsSummaryViewProjection()); */
+                    /* options.Events.InlineProjections.Add(new AccountSummaryViewProjection()); */
+                    /* options.Events.InlineProjections.Add(new ClientsViewProjection()); */
+
+                    options.Events.AddEventType(typeof(Component.Create.Event));
+                });
+
+                return documentStore.OpenSession();
+            });
+        }
+
+        private static void ConfigureMediator(IServiceCollection services)
+        {
+            services.AddScoped<MediatR.IMediator, MediatR.Mediator>();
+            services.AddTransient<MediatR.ServiceFactory>(sp => t => sp.GetService(t));
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.0
         public void Configure(IApplicationBuilder app)
@@ -375,6 +441,7 @@ namespace Icon
             app.UseReDoc(); // serve ReDoc UI
 
 
+            /* app.UseIdentity(); */
             app.UseIdentityServer();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -389,6 +456,9 @@ namespace Icon
                         endpoints.MapDefaultControllerRoute();
                         endpoints.MapRazorPages();
                     });
+
+            // TODO Shall we do migrations here or in Program.cs?
+            /* app.ApplicationServices.GetService<ClientsDbContext>().Database.Migrate(); */
         }
     }
 }

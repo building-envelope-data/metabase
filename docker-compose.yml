@@ -38,24 +38,24 @@ services:
     depends_on:
       - database
 
-  openid-swagger-frontend:
-    image: swaggerapi/swagger-ui
-    ports:
-      - 5002:80
-    environment:
-      # https://github.com/schickling/dockerfiles/tree/master/swagger-ui
-      - API_URL=https://localhost:5001/.well-known/openid-configuration
-    depends_on:
-      - backend
+  # openid-swagger-frontend:
+  #   image: swaggerapi/swagger-ui
+  #   ports:
+  #     - 5002:80
+  #   environment:
+  #     # https://github.com/schickling/dockerfiles/tree/master/swagger-ui
+  #     - API_URL=https://localhost:5001/.well-known/openid-configuration
+  #   depends_on:
+  #     - backend
 
-  openid-redoc-frontend:
-    image: redocly/redoc
-    ports:
-      - 5003:80
-    environment:
-      - SPEC_URL=https://localhost:5001/swagger/OpenAPI%203/swagger.json
-    depends_on:
-      - backend
+  # openid-redoc-frontend:
+  #   image: redocly/redoc
+  #   ports:
+  #     - 5003:80
+  #   environment:
+  #     - SPEC_URL=https://localhost:5001/swagger/OpenAPI%203/swagger.json
+  #   depends_on:
+  #     - backend
 
   # frontend:
   #   build:

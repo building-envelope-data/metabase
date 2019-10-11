@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using Directory = System.IO.Directory;
 using Icon.Data;
 
 namespace Icon
@@ -38,7 +39,8 @@ namespace Icon
             return Host.CreateDefaultBuilder(args)
               .ConfigureWebHostDefaults(webBuilder =>
                   {
-                      webBuilder.UseStartup<Startup>();
+                      webBuilder.UseKestrel().UseContentRoot(Directory.GetCurrentDirectory()).UseStartup<Startup>();
+                /* TODO? .UseIISIntegration() */
                   });
         }
     }

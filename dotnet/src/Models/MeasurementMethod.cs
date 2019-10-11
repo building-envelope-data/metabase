@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Icon.Models
+namespace Icon.Domain
 {
     public class MeasurementMethod
     {

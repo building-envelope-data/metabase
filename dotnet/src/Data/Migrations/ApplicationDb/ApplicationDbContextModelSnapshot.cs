@@ -20,7 +20,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                 .HasAnnotation("ProductVersion", "3.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("Icon.Models.MeasurementMethod", b =>
+            modelBuilder.Entity("Icon.Domain.MeasurementMethod", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,7 +44,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                     b.ToTable("MeasurementMethod");
                 });
 
-            modelBuilder.Entity("Icon.Models.Product", b =>
+            modelBuilder.Entity("Icon.Domain.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -74,7 +74,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Icon.Models.User", b =>
+            modelBuilder.Entity("Icon.Domain.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -267,18 +267,18 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                     b.ToTable("UserTokens");
                 });
 
-            modelBuilder.Entity("Icon.Models.MeasurementMethod", b =>
+            modelBuilder.Entity("Icon.Domain.MeasurementMethod", b =>
                 {
-                    b.HasOne("Icon.Models.User", "User")
+                    b.HasOne("Icon.Domain.User", "User")
                         .WithMany("MeasurementMethods")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Icon.Models.Product", b =>
+            modelBuilder.Entity("Icon.Domain.Product", b =>
                 {
-                    b.HasOne("Icon.Models.User", "User")
+                    b.HasOne("Icon.Domain.User", "User")
                         .WithMany("Products")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -296,7 +296,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Icon.Models.User", null)
+                    b.HasOne("Icon.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -305,7 +305,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("Icon.Models.User", null)
+                    b.HasOne("Icon.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -320,7 +320,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Icon.Models.User", null)
+                    b.HasOne("Icon.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -329,7 +329,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("Icon.Models.User", null)
+                    b.HasOne("Icon.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
