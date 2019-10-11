@@ -6,8 +6,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Icon.Models
 {
-    public class ApplicationUser : IdentityUser<Guid>
+    public class User : IdentityUser<Guid>
     {
-      public ICollection<Product> Products { get; set; }
+        public ICollection<Product> Products { get; set; }
+        public ICollection<MeasurementMethod> MeasurementMethods { get; set; }
     }
 }

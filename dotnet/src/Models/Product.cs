@@ -15,8 +15,8 @@ namespace Icon.Models
         public string Description { get; set; }
 
         [Required]
-        public Guid ApplicationUserId { get; set; }
+        public Guid UserId { get; set; }
 
-        public ApplicationUser ApplicationUser { get; set; }
+        public User User { get; set; }
     }
 }

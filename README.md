@@ -29,4 +29,6 @@ We may add some error detection and correction capabilities by, for example, gen
 - [Should You Use The Same Dockerfile For Dev, Staging And Production Builds?](https://vsupalov.com/same-dockerfile-dev-staging-production/)
 - [Dockerizing a React App](https://mherman.org/blog/dockerizing-a-react-app/)
 - [A starting point for Clean Architecture with ASP.NET Core](https://github.com/ardalis/CleanArchitecture)
+  [Clean Architecture Mange](https://github.com/ivanpaulovich/clean-architecture-manga)
+- [Use a third-party dependency injection (DI) container or pure DI](https://stackoverflow.com/questions/30681477/why-would-one-use-a-third-party-di-container-over-the-built-in-asp-net-core-di-c/30682214#30682214), maybe use [Autofac](https://autofac.org/), for others see [ultimate list](Shttps://www.claudiobernasconi.ch/2019/01/24/the-ultimate-list-of-net-dependency-injection-frameworks/)
 dotnet ef migrations add CreateIdentitySchema

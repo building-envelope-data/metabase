@@ -23,7 +23,7 @@ namespace Icon
 
         public static IEnumerable<ApiResource> GetApis()
         {
-          return new ApiResource[] {
+            return new ApiResource[] {
             new ApiResource(IdentityServerConstants.LocalApi.ScopeName),
             new ApiResource(ApiName, "Icon")
             {
@@ -34,7 +34,7 @@ namespace Icon
 
         public static IEnumerable<Client> GetClients()
         {
-          return new Client[] {
+            return new Client[] {
             new Client
             {
               ClientId = "client",

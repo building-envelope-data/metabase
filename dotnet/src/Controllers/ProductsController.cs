@@ -14,6 +14,7 @@ namespace Icon.Controllers
     // [Route("api/[controller]")]
     [Route("api/products")]
     [ApiController]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     [Authorize(LocalApi.PolicyName)]
     public class ProductsController : ControllerBase
     {
