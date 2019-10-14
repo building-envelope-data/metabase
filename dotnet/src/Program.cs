@@ -40,7 +40,8 @@ namespace Icon
               .ConfigureWebHostDefaults(webBuilder =>
                   {
                       webBuilder.UseKestrel().UseContentRoot(Directory.GetCurrentDirectory()).UseStartup<Startup>();
-                /* TODO? .UseIISIntegration() */
+                      /* TODO? .UseIISIntegration()
+       */
                   });
         }
     }

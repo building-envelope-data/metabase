@@ -32,8 +32,10 @@ using System;
 using WebPWrecover.Services;
 using IdentityServer4.Validation;
 
-namespace Icon.Configuration {
-  class Session {
+namespace Icon.Configuration
+{
+    class Session
+    {
         public static void ConfigureServices(IServiceCollection services)
         {
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-3.0#session-state
@@ -48,9 +50,10 @@ namespace Icon.Configuration {
                 });
         }
 
-            public static void Configure(IApplicationBuilder app) {
+        public static void Configure(IApplicationBuilder app)
+        {
             app.UseCookiePolicy();
             app.UseSession();
-           }
-  }
+        }
+    }
 }

@@ -25,6 +25,7 @@ using System.Linq;
 using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
 using Event = Icon.Infrastructure.Event;
+using Aggregate = Icon.Infrastructure.Aggregate;
 using Domain = Icon.Domain;
 using Component = Icon.Domain.Component;
 using System.Threading.Tasks;
@@ -32,27 +33,31 @@ using System;
 using WebPWrecover.Services;
 using IdentityServer4.Validation;
 
-namespace Icon.Configuration {
-  class EventStore {
-    public static void ConfigureServices(IServiceCollection services, string connectionString, string schemaName) {
-      services.AddScoped(sp =>
-          {
-          var documentStore = Marten.DocumentStore.For(_ =>
-              {
-              _.Connection(connectionString);
-              _.AutoCreateSchemaObjects = Marten.AutoCreate.None;
-              _.Events.DatabaseSchemaName = schemaName;
-              _.DatabaseSchemaName = schemaName;
+namespace Icon.Configuration
+{
+    class EventStore
+    {
+        public static void ConfigureServices(IServiceCollection services, string connectionString, string schemaName)
+        {
+            services.AddScoped(typeof(Marten.IDocumentStore), serviceProvider =>
+                {
+                    return Marten.DocumentStore.For(_ =>
+                  {
+                      _.Connection(connectionString);
+                      _.AutoCreateSchemaObjects = Marten.AutoCreate.All; // TODO If we set it to `None`, we have to set-up some tables manually, but also have more control. Which option is better?
+                      _.Events.UseAggregatorLookup(Marten.Services.Events.AggregationLookupStrategy.UsePrivateApply);
+                      _.Events.DatabaseSchemaName = schemaName;
+                      _.DatabaseSchemaName = schemaName;
 
-              _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentAggregate>();
-              /* options.Events.InlineProjections.Add(new AllAccountsSummaryViewProjection()); */
-              /* options.Events.InlineProjections.Add(new AccountSummaryViewProjection()); */
-              /* options.Events.InlineProjections.Add(new ClientsViewProjection()); */
+                      _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentAggregate>();
+                      /* _.Events.InlineProjections.Add(new AllAccountsSummaryViewProjection()); */
+                      /* _.Events.InlineProjections.Add(new AccountSummaryViewProjection()); */
+                      /* _.Events.InlineProjections.Add(new ClientsViewProjection()); */
 
-              _.Events.AddEventType(typeof(Component.Create.Event));
-              });
-          return documentStore.OpenSession();
-          });
+                      _.Events.AddEventType(typeof(Component.Create.Event));
+                  });
+                });
+            services.AddScoped<Aggregate.IAggregateRepository, Aggregate.AggregateRepository>();
+        }
     }
-  }
 }

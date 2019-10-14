@@ -32,9 +32,12 @@ using System;
 using WebPWrecover.Services;
 using IdentityServer4.Validation;
 
-namespace Icon.Configuration {
-  class RequestResponse {
-    public static void ConfigureServices(IServiceCollection services) {
+namespace Icon.Configuration
+{
+    class RequestResponse
+    {
+        public static void ConfigureServices(IServiceCollection services)
+        {
             services.AddResponseCompression();
 
             // Using `AddControllersAsServices` makes controller custructors
@@ -65,7 +68,8 @@ namespace Icon.Configuration {
                 );
         }
 
-    public static void ConfigureRouting(IApplicationBuilder app, bool isDevelopmentEnvironment) {
+        public static void ConfigureRouting(IApplicationBuilder app, bool isDevelopmentEnvironment)
+        {
 
             if (isDevelopmentEnvironment)
             {
@@ -89,9 +93,10 @@ namespace Icon.Configuration {
             app.UseRouting();
             app.UseCors();
             app.UseResponseCompression(); // TODO Using the server-based compression of, for example, Nginx is much faster. See https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-3.0
-    }
+        }
 
-            public static void ConfigureEndpoints(IApplicationBuilder app) {
+        public static void ConfigureEndpoints(IApplicationBuilder app)
+        {
             app.UseEndpoints(endpoints =>
                     {
                         /* endpoints.MapHealthChecks("/health").RequireAuthorization(); // TODO Add healtch check services as described in https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.0 */
@@ -99,6 +104,6 @@ namespace Icon.Configuration {
                         endpoints.MapDefaultControllerRoute();
                         endpoints.MapRazorPages();
                     });
-}
-  }
+        }
+    }
 }

@@ -32,20 +32,24 @@ using System;
 using WebPWrecover.Services;
 using IdentityServer4.Validation;
 
-namespace Icon.Configuration {
-  class QueryCommandAndEventBusses {
-    public static void ConfigureServices(IServiceCollection services) {
-      services.AddScoped<MediatR.IMediator, MediatR.Mediator>();
-      services.AddTransient<MediatR.ServiceFactory>(sp => t => sp.GetService(t));
+namespace Icon.Configuration
+{
+    class QueryCommandAndEventBusses
+    {
+        public static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddScoped<MediatR.IMediator, MediatR.Mediator>();
+            services.AddTransient<MediatR.ServiceFactory>(sp => t => sp.GetService(t));
 
-      services.AddScoped<Command.ICommandBus, Command.CommandBus>();
-      services.AddScoped<Query.IQueryBus, Query.QueryBus>();
-      services.AddScoped<Event.IEventBus, Event.EventBus>();
+            services.AddScoped<Query.IQueryBus, Query.QueryBus>();
+            services.AddScoped<Command.ICommandBus, Command.CommandBus>();
+            services.AddScoped<Event.IEventBus, Event.EventBus>();
 
-      services.AddScoped<MediatR.IRequestHandler<Component.Create.Command, Domain.ComponentAggregate>, Component.Create.CommandHandler>();
-      /* services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>(); */
-      /* services.AddScoped<IRequestHandler<CreateClient, Unit>, ClientsCommandHandler>(); */
-      /* services.AddScoped<IRequestHandler<GetClientView, ClientView>, ClientsQueryHandler>(); */
+            services.AddScoped<MediatR.IRequestHandler<Component.List.Query, IEnumerable<Domain.ComponentAggregate>>, Component.List.QueryHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Component.Create.Command, Domain.ComponentAggregate>, Component.Create.CommandHandler>();
+            /* services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>(); */
+            /* services.AddScoped<IRequestHandler<CreateClient, Unit>, ClientsCommandHandler>(); */
+            /* services.AddScoped<IRequestHandler<GetClientView, ClientView>, ClientsQueryHandler>(); */
+        }
     }
-  }
 }

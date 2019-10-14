@@ -32,9 +32,12 @@ using System;
 using WebPWrecover.Services;
 using IdentityServer4.Validation;
 
-namespace Icon.Configuration {
-  class Api {
-    public static void ConfigureServices(IServiceCollection services) {
+namespace Icon.Configuration
+{
+    class Api
+    {
+        public static void ConfigureServices(IServiceCollection services)
+        {
             services.AddOpenApiDocument(document =>
                 {
                     document.DocumentName = "OpenAPI 3";
@@ -85,8 +88,9 @@ namespace Icon.Configuration {
 
                 });
 
-    }
-            public static void Configure(IApplicationBuilder app) {
+        }
+        public static void Configure(IApplicationBuilder app)
+        {
             app.UseOpenApi(); // serve OpenAPI specification documents
             app.UseSwaggerUi3(settings =>
                     {
@@ -104,6 +108,6 @@ namespace Icon.Configuration {
                         };
                     }); // serve Swagger UI
             app.UseReDoc(); // serve ReDoc UI
-            }
-  }
+        }
+    }
 }

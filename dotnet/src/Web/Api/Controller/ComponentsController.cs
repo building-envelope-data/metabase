@@ -33,23 +33,24 @@ namespace Icon.Web.Api.Controller
         {
             _commandBus = commandBus;
             _queryBus = queryBus;
-          _userManager = userManager;
+            _userManager = userManager;
         }
 
         // GET: api/components
-        /* [HttpGet] */
-        /* [AllowAnonymous] */
-        /* public async Task<ActionResult<IEnumerable<Component>>> GetComponents() */
-        /* { */
-        /*     return await _dbContext.Components.ToListAsync(); */
-        /* } */
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<ComponentAggregate>>> GetComponents()
+        {
+            var components = await _queryBus.Send<Component.List.Query, IEnumerable<ComponentAggregate>>(new Component.List.Query());
+            return Ok(components);
+        }
 
         // GET: api/components/5
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<ComponentAggregate>> Get(Guid id)
         {
-          return NotFound();
+            return NotFound();
             /* var component = await _dbContext.Components.FindAsync(id); */
 
             /* if (component == null) */
@@ -100,8 +101,8 @@ namespace Icon.Web.Api.Controller
         [HttpPost]
         public async Task<ActionResult<Guid>> Post()
         {
-          var user = await _userManager.GetUserAsync(User);
-            var component = await _commandBus.Send<Component.Create.Command, ComponentAggregate>(new Component.Create.Command{CreatorId = user.Id});
+            var user = await _userManager.GetUserAsync(User);
+            var component = await _commandBus.Send<Component.Create.Command, ComponentAggregate>(new Component.Create.Command { CreatorId = user.Id });
             return CreatedAtAction(nameof(Get), new { id = component.Id }, component.Id);
         }
 

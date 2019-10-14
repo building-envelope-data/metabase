@@ -3,49 +3,40 @@ using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure.Command;
 using Icon.Infrastructure.Event;
+using Icon.Infrastructure.Aggregate;
 using Icon.Domain;
 
 namespace Icon.Domain.Component.Create
 {
-    public class Event: IEvent
+    public class Event : IEvent
     {
         public Guid ComponentId { get; set; }
 
         public Guid CreatorId { get; set; }
     }
 
-    public class Command: ICommand<ComponentAggregate>
+    public class Command : ICommand<ComponentAggregate>
     {
         public Guid CreatorId { get; set; }
     }
 
-    public class CommandHandler: ICommandHandler<Command, ComponentAggregate>{
-        private readonly Marten.IDocumentSession _session;
-        private readonly IEventBus _eventBus;
+    public class CommandHandler : ICommandHandler<Command, ComponentAggregate>
+    {
+        private readonly IAggregateRepository _repository;
 
-        private Marten.Events.IEventStore store => _session.Events;
-
-        public CommandHandler(
-            Marten.IDocumentSession session,
-            IEventBus eventBus)
+        public CommandHandler(IAggregateRepository repository)
         {
-            _session = session;
-            _eventBus = eventBus;
+            _repository = repository;
         }
 
-    public async Task<ComponentAggregate> Handle(Command command, CancellationToken cancellationToken = default(CancellationToken))
-    {
-      // TODO Do we want to throw an exception here? (was ClientView in original code base)
-      /* if (!_session.Query<UserView>().Any(c => c.Id == command.CreatorId)) */
-      /*   throw new ArgumentException("Creator does not exist!", nameof(command.CreatorId)); */
+        public async Task<ComponentAggregate> Handle(Command command, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            // TODO Do we want to throw an exception here? (was ClientView in original code base)
+            /* if (!_session.Query<UserView>().Any(c => c.Id == command.CreatorId)) */
+            /*   throw new ArgumentException("Creator does not exist!", nameof(command.CreatorId)); */
 
-      var component = ComponentAggregate.Create(command.CreatorId);
-
-      store.Append(component.Id, component.PendingEvents.ToArray());
-      await _session.SaveChangesAsync(cancellationToken);
-      await _eventBus.Publish(component.PendingEvents.ToArray());
-
-      return component;
-    }
+          var component = ComponentAggregate.Create(command.CreatorId);
+          return await _repository.Store(component, cancellationToken);
+        }
     }
 }

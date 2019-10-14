@@ -87,7 +87,7 @@ namespace Icon
 
         private string GetSchemaName()
         {
-          return _configuration.GetValue<string>("SchemaName");
+            return _configuration.GetValue<string>("SchemaName");
         }
 
         private string GetMigrationsAssembly()
@@ -103,8 +103,8 @@ namespace Icon
             Configuration.RequestResponse.ConfigureServices(services);
             Configuration.Api.ConfigureServices(services);
             Configuration.Auth.ConfigureServices(services, GetConnectionString(), GetMigrationsAssembly(), GetHost(), _environment, _configuration);
-            Configuration.QueryCommandAndEventBusses.ConfigureServices(services);
             Configuration.EventStore.ConfigureServices(services, GetConnectionString(), GetSchemaName());
+            Configuration.QueryCommandAndEventBusses.ConfigureServices(services);
         }
 
         private void ConfigureDatabaseServices(IServiceCollection services)
