@@ -8,18 +8,18 @@ namespace Icon.Domain
 {
     public class ComponentAggregate : EventSourcedAggregate
     {
-      public static ComponentAggregate Create(Guid creatorId)
-      {
-        var component = new ComponentAggregate();
+        public static ComponentAggregate Create(Guid creatorId)
+        {
+            var component = new ComponentAggregate();
             var @event = new Component.Create.Event
             {
                 ComponentId = Guid.NewGuid(),
                 CreatorId = creatorId,
             };
-        component.Apply(@event);
-        component.AppendUncommittedEvent(@event);
-        return component;
-      }
+            component.Apply(@event);
+            component.AppendUncommittedEvent(@event);
+            return component;
+        }
 
         public ComponentAggregate()
         {

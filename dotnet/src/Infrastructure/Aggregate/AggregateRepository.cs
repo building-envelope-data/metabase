@@ -8,50 +8,50 @@ using System.Threading.Tasks;
 using Icon.Infrastructure.Event;
 using CancellationToken = System.Threading.CancellationToken;
 
-namespace Icon.Infrastructure.Aggregate {
-public sealed class AggregateRepository : IAggregateRepository
+namespace Icon.Infrastructure.Aggregate
 {
-    private readonly IDocumentStore _store;
-    private readonly IEventBus _eventBus;
-
-    public AggregateRepository(IDocumentStore store, IEventBus eventBus)
+    public sealed class AggregateRepository : IAggregateRepository
     {
-        _store = store;
-        _eventBus = eventBus;
-    }
+        private readonly IDocumentSession _session;
+        private readonly IEventBus _eventBus;
 
-    public async Task<T> Store<T>(T aggregate, CancellationToken cancellationToken = default(CancellationToken)) where T : IEventSourcedAggregate
-    {
-        using (var session = _store.OpenSession())
+        public AggregateRepository(IDocumentSession session, IEventBus eventBus)
+        {
+            _session = session;
+            _eventBus = eventBus;
+        }
+
+        public async Task<T> Store<T>(T aggregate, CancellationToken cancellationToken) where T : IEventSourcedAggregate
         {
             // Take non-persisted events, push them to the event stream, indexed by the aggregate ID
             var events = aggregate.GetUncommittedEvents().ToArray();
-            session.Events.Append(aggregate.Id, aggregate.Version, events, cancellationToken);
-            await session.SaveChangesAsync();
+            AssertExistenceOfCreators(events.Select(@event => @event.CreatorId), cancellationToken);
+            _session.Events.Append(aggregate.Id, aggregate.Version, events, cancellationToken);
+            await _session.SaveChangesAsync();
             await _eventBus.Publish(events);
+            return aggregate;
         }
-        // Once successfully persisted, clear events from list of uncommitted events
-        aggregate.ClearUncommittedEvents();
-        return aggregate;
-    }
 
-    public async Task<T> Load<T>(Guid id, int? version = null, CancellationToken cancellationToken = default(CancellationToken)) where T : IEventSourcedAggregate, new()
-    {
-        using (var session = _store.LightweightSession())
+        private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)
         {
-          T aggregate = default(T); // TODO ...
-            /* var aggregate = await session.Events.AggregateStreamAsync<T>(id, version ?? 0, default(DateTime), default(T), cancellationToken); */
+            // TODO
+            /* foreach (var creatorId in creatorIds) */
+            /* { */
+            /*   if (!_session.Query<UserAggregate>().AnyAsync(user => user.Id == creatorId, cancellationToken)) */
+            /*     throw new ArgumentException("Creator does not exist!", nameof(creatorId)); */
+            /* } */
+        }
+
+        public async Task<T> Load<T>(Guid id, int? version = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
+        {
+            var aggregate = await _session.Events.AggregateStreamAsync<T>(id, version ?? 0, default(DateTime), default(T), cancellationToken);
             return aggregate ?? throw new InvalidOperationException($"No aggregate by id {id.ToString()}.");
         }
-    }
 
-    public async Task<IEnumerable<T>> LoadAll<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : IEventSourcedAggregate, new()
-    {
-        using (var session = _store.QuerySession())
+        public async Task<IEnumerable<T>> LoadAll<T>(CancellationToken cancellationToken) where T : IEventSourcedAggregate, new()
         {
-          // https://jasperfx.github.io/marten/documentation/documents/querying/async/
-            return await session.Query<T>().ToListAsync(cancellationToken);
+            // https://jasperfx.github.io/marten/documentation/documents/querying/async/
+            return await _session.Query<T>().ToListAsync(cancellationToken);
         }
     }
-}
 }

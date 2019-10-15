@@ -10,14 +10,14 @@ using Icon.Domain;
 
 namespace Icon.Domain.Component.List
 {
-    public class Query: IQuery<IEnumerable<ComponentAggregate>>
+    public class Query : IQuery<IEnumerable<ComponentAggregate>>
     {
     }
 
-    public class QueryHandler:
+    public class QueryHandler :
         IQueryHandler<Query, IEnumerable<ComponentAggregate>>
     {
-      private readonly IAggregateRepository _repository;
+        private readonly IAggregateRepository _repository;
 
         public QueryHandler(IAggregateRepository repository)
         {
@@ -26,7 +26,7 @@ namespace Icon.Domain.Component.List
 
         public async Task<IEnumerable<ComponentAggregate>> Handle(Query query, CancellationToken cancellationToken = default(CancellationToken))
         {
-          return await _repository.LoadAll<ComponentAggregate>(cancellationToken);
+            return await _repository.LoadAll<ComponentAggregate>(cancellationToken);
         }
     }
 }

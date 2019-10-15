@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Icon.Web.Api.Controller
 {
-    // [Route("api/[controller]")]
     [Route("api/components")]
     [ApiController]
     [ApiConventionType(typeof(DefaultApiConventions))]
@@ -41,14 +40,16 @@ namespace Icon.Web.Api.Controller
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ComponentAggregate>>> GetComponents()
         {
-            var components = await _queryBus.Send<Component.List.Query, IEnumerable<ComponentAggregate>>(new Component.List.Query());
+            var components = await _queryBus.Send<Component.List.Query, IEnumerable<ComponentAggregate>>(
+                new Component.List.Query()
+                );
             return Ok(components);
         }
 
         // GET: api/components/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:Guid}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ComponentAggregate>> Get(Guid id)
+        public async Task<ActionResult<ComponentAggregate>> Get([FromRoute] Guid id)
         {
             return NotFound();
             /* var component = await _dbContext.Components.FindAsync(id); */
@@ -102,7 +103,9 @@ namespace Icon.Web.Api.Controller
         public async Task<ActionResult<Guid>> Post()
         {
             var user = await _userManager.GetUserAsync(User);
-            var component = await _commandBus.Send<Component.Create.Command, ComponentAggregate>(new Component.Create.Command { CreatorId = user.Id });
+            var component = await _commandBus.Send<Component.Create.Command, ComponentAggregate>(
+                new Component.Create.Command { CreatorId = user.Id }
+                );
             return CreatedAtAction(nameof(Get), new { id = component.Id }, component.Id);
         }
 

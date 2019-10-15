@@ -9,11 +9,11 @@ namespace Icon.Infrastructure.Aggregate
 {
     public abstract class EventSourcedAggregate : IEventSourcedAggregate
     {
-      // For indexing our event streams
-      public Guid Id { get; protected set; }
+        // For indexing our event streams
+        public Guid Id { get; protected set; }
 
-      // For protecting the state, i.e. conflict prevention
-      public int Version { get; protected set; }
+        // For protecting the state, i.e. conflict prevention
+        public int Version { get; protected set; }
 
         // JsonIgnore - for making sure that it won't be stored in inline projection
         [JsonIgnore]
@@ -26,12 +26,12 @@ namespace Icon.Infrastructure.Aggregate
 
         public IEnumerable<IEvent> GetUncommittedEvents()
         {
-          return _uncommittedEvents;
+            return _uncommittedEvents;
         }
 
         public void ClearUncommittedEvents()
         {
-          _uncommittedEvents.Clear();
+            _uncommittedEvents.Clear();
         }
 
         protected void AppendUncommittedEvent(IEvent @event)

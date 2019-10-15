@@ -4,7 +4,7 @@ namespace Icon.Infrastructure.Aggregate
 {
     public interface IAggregate
     {
-      // For indexing our event streams
+        // For indexing our event streams
         public Guid Id { get; }
     }
 }

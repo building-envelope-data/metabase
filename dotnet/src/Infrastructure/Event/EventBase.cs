@@ -1,9 +1,8 @@
-using MediatR;
 using Guid = System.Guid;
 
 namespace Icon.Infrastructure.Event
 {
-    public interface IEvent : INotification
+    public abstract class EventBase : IEvent
     {
         public Guid CreatorId { get; set; }
     }
