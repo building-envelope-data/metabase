@@ -1,17 +1,29 @@
-# Inspired by https://mherman.org/blog/dockerizing-a-react-app/
+# Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 
-# Build-time environment
-FROM node:12.10.0-alpine as build
+###########
+# BUILDTIME
+###########
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0-alpine AS buildtime
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json ./package.json
-RUN npm add -g pnpm && \
-    pnpm install
-COPY . /app
-RUN pnpm run build
 
-# Run-time environment
-FROM nginx:1.17.3-alpine
-COPY --from=build /app/build /app
-EXPOSE 80
-CMD ["pnpm", "run", "start:prod"]
+# copy csproj and restore as distinct layers
+COPY *.csproj .
+RUN dotnet restore
+
+# copy everything else and build app
+COPY . .
+WORKDIR /app
+RUN dotnet publish -c Release -o out
+
+#########
+# RUNTIME
+#########
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-alpine AS runtime
+WORKDIR /app
+COPY --from=buildtime /app/out ./
+RUN apk add --no-cache \
+      dumb-init
+# RUN dotnet user-secrets set SendGridUser myuser && \
+#     dotnet user-secrets set SendGridKey mykey
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["dotnet", "aspnetapp.dll"]

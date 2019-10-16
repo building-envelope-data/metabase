@@ -33,5 +33,8 @@ We may add some error detection and correction capabilities by, for example, gen
   [Clean Architecture Manga](https://github.com/ivanpaulovich/clean-architecture-manga)
   [Northwind Traders](https://github.com/JasonGT/NorthwindTraders)
   [Building ASP.NET Core Web APIs with Clean Architecture](https://fullstackmark.com/post/18/building-aspnet-core-web-apis-with-clean-architecture)
+  [The Equinox Project](https://github.com/EduardoPires/EquinoxProject)
 - [Use a third-party dependency injection (DI) container or pure DI](https://stackoverflow.com/questions/30681477/why-would-one-use-a-third-party-di-container-over-the-built-in-asp-net-core-di-c/30682214#30682214), maybe use [Autofac](https://autofac.org/), for others see [ultimate list](Shttps://www.claudiobernasconi.ch/2019/01/24/the-ultimate-list-of-net-dependency-injection-frameworks/)
-dotnet ef migrations add CreateIdentitySchema
+- [API design best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
+  [API implementation best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-implementation)
+  [Shallow Nesting](https://guides.rubyonrails.org/routing.html#shallow-nesting)

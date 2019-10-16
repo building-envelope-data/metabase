@@ -9,14 +9,36 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-migrations : ## Make migrations according to ${ARGS} based on changes made to models
-	npm run -- migration:generate ${ARGS}
-.PHONY : migrations
+# ------------------------------------------------ #
+# Tasks to run, for example, in a Docker container #
+# ------------------------------------------------ #
 
-migrate : ## Run migrations based on changes made to models
-	npm run -- migration:run
+# TODO Strip the byte-order mark, aka, BOM
+dos2unix : ## Remove carriage returns
+	find src/ -type f -exec sed -i -e "s/\r//" {} +
+	# find src/ -type f -exec sed -i -e "1s/^\xFEFF//" -e "s/\r//" {} +
+	# find . -type f -exec dos2unix {} \;
+	# find . \( -name "*.cs" -o -name "*.cshtml" \) ...
+
+format : ## Format code
+	dotnet-format --workspace Icon.csproj
+
+# TODO Shortcuts for `dotnet aspnet-codegenerator`?
+
+# List of commands
+# https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet
+
+migrations : ## Add migration with name ${NAME}, for example, `make NAME=CreateProducts migrations`
+	dotnet ef migrations add \
+		--context ApplicationDbContext \
+		--output-dir src/Data/Migrations/ApplicationDb \
+		${NAME}
+
+migrate : ## Run migrations
+	dotnet ef database update \
+		--context ApplicationDbContext
+	dotnet ef database update \
+		--context PersistedGrantDbContext
+	dotnet ef database update \
+		--context ConfigurationDbContext
 .PHONY : migrate
-
-rollback : ## Rollback migrations
-	npm run -- migration:revert
-.PHONY : rollback

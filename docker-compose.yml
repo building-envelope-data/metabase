@@ -18,11 +18,11 @@ services:
 
   backend:
     build:
-      context: ./dotnet
+      context: ./backend
       dockerfile: ./Dockerfile-development
     # user: 1000:1000
     volumes:
-      - ./dotnet:/app
+      - ./backend:/app
       - node_modules:/app/node_modules
       - /app/bin # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding
       - /app/obj # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding

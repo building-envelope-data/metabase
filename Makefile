@@ -23,6 +23,8 @@ build : ## Build images
 	docker-compose build \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user)
+.PHONY : build
+
 remove : ## Remove stopped containers
 	docker-compose rm
 .PHONY : remove
@@ -32,40 +34,39 @@ up : ## (Re)create and start containers
 	docker-compose up \
 		--remove-orphans \
 		--detach
+.PHONY : up
 
 down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
 	docker-compose down
+.PHONY : down
 
 restart : ## Restart all stopped and running containers
 	docker-compose restart
+.PHONY : restart
 
 logs : ## Follow logs
 	docker-compose logs \
 		--follow
+.PHONY : logs
 
-run : ## Run the one-time command `${COMMAND}` against it
+runf : ## Run the one-time command `${COMMAND}` against the `frontend` container
+	docker-compose run \
+		--user $(shell id --user):$(shell id --group) \
+		frontend \
+		${COMMAND}
+.PHONY : runf
+
+runb : ## Run the one-time command `${COMMAND}` against the `backend` container
 	docker-compose run \
 		--user $(shell id --user):$(shell id --group) \
 		backend \
 		${COMMAND}
-.PHONY : run
+.PHONY : runb
 
-shell : COMMAND = ash
-shell : run ## Enter shell
-.PHONY : shell
+shellf : COMMAND = ash
+shellf : runf ## Enter shell in the `frontend` container
+.PHONY : shellf
 
-# ------------------------------------------------ #
-# Tasks to run, for example, in a Docker container #
-# ------------------------------------------------ #
-
-tests : ## Run tests, for example, from a shell in a Docker container
-	python -m pytest tests
-.PHONY : tests
-
-coverage : ## Generate test coverage report
-	coverage run --source='.' manage.py test
-	coverage report
-.PHONY : coverage
-
-seed : ## Seed the database
-	python manage.py loaddata icon
+shellb : COMMAND = ash
+shellb : runb ## Enter shell in the `backend` container
+.PHONY : shellb
