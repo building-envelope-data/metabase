@@ -30,9 +30,9 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
 
         public Event(Guid componentVersionOwnershipId, Command command) : base(command.CreatorId)
         {
-                ComponentVersionOwnershipId = componentVersionOwnershipId;
-                ComponentVersionId = command.ComponentVersionId;
-                Data = command.Data;
+            ComponentVersionOwnershipId = componentVersionOwnershipId;
+            ComponentVersionId = command.ComponentVersionId;
+            Data = command.Data;
         }
     }
 
@@ -43,12 +43,12 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
 
         public static Command From(Guid componentVersionId, Data data, Guid creatorId)
         {
-          return new Command
-          {
-            ComponentVersionId = componentVersionId,
-            Data = data,
-            CreatorId = creatorId,
-          };
+            return new Command
+            {
+                ComponentVersionId = componentVersionId,
+                Data = data,
+                CreatorId = creatorId,
+            };
         }
     }
 

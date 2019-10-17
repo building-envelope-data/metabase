@@ -10,7 +10,7 @@ namespace Icon.Domain
 
         public ComponentView()
         {
-          Versions = new List<ComponentVersionView>();
+            Versions = new List<ComponentVersionView>();
         }
     }
 }

@@ -71,14 +71,14 @@ namespace Icon.Configuration
             // Change Default Location Of Views And Razor Pages In ASP.NET Core
             // http://www.binaryintellect.net/articles/c50d3f14-7048-4b4f-84f4-1b28cb0f9d96.aspx
             services.AddControllersWithViews();
-services.Configure<RazorViewEngineOptions>(o =>
-    {
-        o.ViewLocationFormats.Clear();
-        o.ViewLocationFormats.Add
-("/src/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
-        o.ViewLocationFormats.Add
-("/src/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
-    });
+            services.Configure<RazorViewEngineOptions>(o =>
+                {
+                    o.ViewLocationFormats.Clear();
+                    o.ViewLocationFormats.Add
+            ("/src/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
+                    o.ViewLocationFormats.Add
+            ("/src/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
+                });
             services.AddRazorPages(
                 options =>
                 {
@@ -126,7 +126,7 @@ services.Configure<RazorViewEngineOptions>(o =>
                             name: "default",
                             pattern: "{controller=Home}/{action=Index}/{id?}");
                         endpoints.MapRazorPages();
-                        });
+                    });
         }
     }
 }

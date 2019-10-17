@@ -44,18 +44,19 @@ namespace Icon.Configuration
         {
             services.AddScoped(typeof(Marten.IDocumentSession), serviceProvider =>
                 {
+                    var logger = serviceProvider.GetRequiredService<ILogger<EventStore>>();
                     // The dependency injection container will take care of
                     // closing the session, because it implements the
                     // `IDisposable` interface, see
                     // https://andrewlock.net/four-ways-to-dispose-idisposables-in-asp-net-core/#automatically-disposing-services-leveraging-the-built-in-di-container
-                    return GetDocumentStore(connectionString, schemaName, isProductionEnvironment).OpenSession();
+                    return GetDocumentStore(connectionString, schemaName, isProductionEnvironment, logger).OpenSession();
                 });
             services.AddScoped<Aggregate.IAggregateRepository, Aggregate.AggregateRepository>();
         }
 
-        private static Marten.IDocumentStore GetDocumentStore(string connectionString, string schemaName, bool isProductionEnvironment)
+        private static Marten.IDocumentStore GetDocumentStore(string connectionString, string schemaName, bool isProductionEnvironment, ILogger<EventStore> logger)
         {
-          // TODO Declare `creatorId` of events as foreign key to `User`, see https://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/
+            // TODO Declare `creatorId` of events as foreign key to `User`, see https://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/
             return Marten.DocumentStore.For(_ =>
                   {
                       _.Connection(connectionString);
@@ -73,6 +74,7 @@ namespace Icon.Configuration
                           _.AutoCreateSchemaObjects = Marten.AutoCreate.All;
                       }
                       _.Events.UseAggregatorLookup(Marten.Services.Events.AggregationLookupStrategy.UsePrivateApply);
+                      _.Logger(new MartenLogger(logger));
 
                       _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentAggregate>();
                       _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentVersionAggregate>();

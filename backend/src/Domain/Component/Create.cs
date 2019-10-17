@@ -15,7 +15,7 @@ namespace Icon.Domain.Component.Create
 
         public Event(Guid componentId, Command command) : base(command.CreatorId)
         {
-          ComponentId = componentId;
+            ComponentId = componentId;
         }
     }
 

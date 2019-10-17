@@ -15,8 +15,8 @@ namespace Icon.Domain.Component.Get
 {
     public class Query : IQuery<ComponentView>
     {
-      public Guid ComponentId { get; set; }
-      public DateTime Timestamp { get; set; } // TODO ZonedDateTime
+        public Guid ComponentId { get; set; }
+        public DateTime Timestamp { get; set; } // TODO ZonedDateTime
     }
 
     public class QueryHandler :

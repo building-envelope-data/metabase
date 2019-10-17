@@ -52,9 +52,10 @@ namespace Icon.Web.Api.Controller
         public async Task<ActionResult<ComponentView>> Get([FromRoute] Guid id, [FromQuery] DateTime timestamp) // TODO Use `ZonedDateTime` here. Problem: Its (de)serialization is rather complex.
         {
             var component = await _queryBus.Send<Component.Get.Query, ComponentView>(
-                new Component.Get.Query() {
-                ComponentId = id,
-                Timestamp = timestamp,
+                new Component.Get.Query()
+                {
+                    ComponentId = id,
+                    Timestamp = timestamp,
                 }
                 );
             if (component == null)
