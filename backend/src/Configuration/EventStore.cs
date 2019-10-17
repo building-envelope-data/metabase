@@ -56,6 +56,7 @@ namespace Icon.Configuration
 
         private static Marten.IDocumentStore GetDocumentStore(string connectionString, string schemaName, bool isProductionEnvironment, ILogger<EventStore> logger)
         {
+            var martenLogger = new MartenLogger(logger);
             // TODO Declare `creatorId` of events as foreign key to `User`, see https://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/
             return Marten.DocumentStore.For(_ =>
                   {
@@ -74,7 +75,9 @@ namespace Icon.Configuration
                           _.AutoCreateSchemaObjects = Marten.AutoCreate.All;
                       }
                       _.Events.UseAggregatorLookup(Marten.Services.Events.AggregationLookupStrategy.UsePrivateApply);
-                      _.Logger(new MartenLogger(logger));
+
+                      _.Logger(martenLogger);
+                      _.Listeners.Add(martenLogger);
 
                       _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentAggregate>();
                       _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentVersionAggregate>();
