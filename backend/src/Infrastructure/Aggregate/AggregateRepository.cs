@@ -26,8 +26,8 @@ namespace Icon.Infrastructure.Aggregate
             // Take non-persisted events, push them to the event stream, indexed by the aggregate ID
             var events = aggregate.GetUncommittedEvents().ToArray();
             AssertExistenceOfCreators(events.Select(@event => @event.CreatorId), cancellationToken);
-            _session.Events.Append(aggregate.Id, aggregate.Version, events, cancellationToken);
-            await _session.SaveChangesAsync();
+            _session.Events.Append(aggregate.Id, aggregate.Version, events);
+            await _session.SaveChangesAsync(cancellationToken);
             await _eventBus.Publish(events);
             return aggregate;
         }

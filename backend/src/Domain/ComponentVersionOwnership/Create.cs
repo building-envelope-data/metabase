@@ -6,7 +6,8 @@ using Icon.Infrastructure.Command;
 using Icon.Infrastructure.Event;
 using Icon.Infrastructure.Aggregate;
 using Icon.Domain;
-using DateInterval = NodaTime.DateInterval;
+/* using DateInterval = NodaTime.DateInterval; */
+using DateTime = System.DateTime;
 
 namespace Icon.Domain.ComponentVersionOwnership.Create
 {
@@ -16,7 +17,9 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
         public string Name { get; set; }
         public string Description { get; set; }
         public string Abbreviation { get; set; }
-        public DateInterval Availability { get; set; }
+        /* public DateInterval Availability { get; set; } */ // TODO This is what we actually want, a proper date interval and it should be persisted as PostgreSQL date range
+        public DateTime AvailableFrom { get; set; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
+        public DateTime AvailableUntil { get; set; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
     }
 
     public sealed class Event : EventBase

@@ -102,7 +102,7 @@ namespace Icon.Configuration
                         settings.OAuth2Client = new OAuth2ClientSettings
                         {
                             ClientId = "swagger",
-                            ClientSecret = Config.ApiSecret,
+                            ClientSecret = Auth.ApiSecret,
                             AppName = "icon",
                             Realm = "icon",
                             AdditionalQueryStringParameters = {}

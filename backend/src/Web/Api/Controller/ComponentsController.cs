@@ -16,7 +16,7 @@ using static IdentityServer4.IdentityServerConstants;
 /* using Microsoft.AspNetCore.Identity; */
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using ZonedDateTime = NodaTime.ZonedDateTime;
+/* using ZonedDateTime = NodaTime.ZonedDateTime; */
 
 namespace Icon.Web.Api.Controller
 {
@@ -49,7 +49,7 @@ namespace Icon.Web.Api.Controller
 
         [HttpGet("{id:guid}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ComponentView>> Get([FromRoute] Guid id, [FromQuery] ZonedDateTime timestamp)
+        public async Task<ActionResult<ComponentView>> Get([FromRoute] Guid id, [FromQuery] DateTime timestamp) // TODO Use `ZonedDateTime` here. Problem: Its (de)serialization is rather complex.
         {
             var component = await _queryBus.Send<Component.Get.Query, ComponentView>(
                 new Component.Get.Query() {

@@ -61,7 +61,7 @@ namespace Icon.Configuration
                       _.Connection(connectionString);
                       _.DatabaseSchemaName = schemaName;
                       _.Events.DatabaseSchemaName = schemaName;
-                      _.UseNodaTime();
+                      /* _.UseNodaTime(); */
                       // For a full list auf auto-create options, see
                       // https://jasperfx.github.io/marten/documentation/schema/
                       if (isProductionEnvironment)

@@ -31,10 +31,11 @@ USER me
 WORKDIR /app
 
 # For a comprehensive list of tools see https://github.com/natemcmaster/dotnet-tools
-# Diagnostics is provided by `counter`, `dump`, and `trace`, see https://devblogs.microsoft.com/dotnet/introducing-diagnostics-improvements-in-net-core-3-0/
+# Diagnostics is provided by `counters`, `dump`, and `trace`, see https://devblogs.microsoft.com/dotnet/introducing-diagnostics-improvements-in-net-core-3-0/
 # Code formatting is provided by `format`
 # Code generation is provided by `aspnet-codegenerator`
 # Database migrations are provided by `ef`
+# Read-Evaluate-Print-Loop (REPL) is provided by `script`, see https://github.com/filipw/dotnet-script#repl
 ENV PATH=$PATH:/home/me/.dotnet/tools
 RUN \
   dotnet tool install --global dotnet-aspnet-codegenerator && \
@@ -42,6 +43,7 @@ RUN \
   dotnet tool install --global dotnet-dump && \
   dotnet tool install --global dotnet-ef && \
   dotnet tool install --global dotnet-format && \
+  dotnet tool install --global dotnet-script && \
   dotnet tool install --global dotnet-trace
 
 COPY \

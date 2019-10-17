@@ -49,14 +49,14 @@ logs : ## Follow logs
 		--follow
 .PHONY : logs
 
-runf : ## Run the one-time command `${COMMAND}` against the `frontend` container
+runf : ## Run the one-time command `${COMMAND}` against a fresh `frontend` container
 	docker-compose run \
 		--user $(shell id --user):$(shell id --group) \
 		frontend \
 		${COMMAND}
 .PHONY : runf
 
-runb : ## Run the one-time command `${COMMAND}` against the `backend` container
+runb : ## Run the one-time command `${COMMAND}` against a fresh `backend` container
 	docker-compose run \
 		--user $(shell id --user):$(shell id --group) \
 		backend \
@@ -64,9 +64,14 @@ runb : ## Run the one-time command `${COMMAND}` against the `backend` container
 .PHONY : runb
 
 shellf : COMMAND = ash
-shellf : runf ## Enter shell in the `frontend` container
+shellf : runf ## Enter shell in a fresh `frontend` container
 .PHONY : shellf
 
 shellb : COMMAND = ash
-shellb : runb ## Enter shell in the `backend` container
+shellb : runb ## Enter shell in a fresh `backend` container
 .PHONY : shellb
+
+psql : ## Enter PostgreSQL interactive terminal in the running `database` container
+	docker-compose exec \
+		database \
+		psql -U postgres

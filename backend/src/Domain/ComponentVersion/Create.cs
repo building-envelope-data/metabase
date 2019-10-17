@@ -13,6 +13,16 @@ namespace Icon.Domain.ComponentVersion.Create
     {
         public Guid ComponentVersionId { get; set; }
         public Guid ComponentId { get; set; }
+
+        public static Event From(Guid componentVersionId, Command command)
+        {
+           return new Event
+           {
+                ComponentVersionId = componentVersionId,
+                ComponentId = command.ComponentId,
+                CreatorId = command.CreatorId,
+           };
+        }
     }
 
     public class Command : CommandBase<ComponentVersionAggregate>
@@ -31,12 +41,7 @@ namespace Icon.Domain.ComponentVersion.Create
 
         public async Task<ComponentVersionAggregate> Handle(Command command, CancellationToken cancellationToken)
         {
-            var @event = new Event
-            {
-                ComponentVersionId = Guid.NewGuid(),
-                ComponentId = command.ComponentId,
-                CreatorId = command.CreatorId,
-            };
+            var @event = Event.From(Guid.NewGuid(), command);
             var componentVersion = ComponentVersionAggregate.Create(@event);
             return await _repository.Store(componentVersion, cancellationToken);
         }

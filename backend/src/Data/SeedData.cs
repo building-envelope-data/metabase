@@ -31,7 +31,7 @@ namespace Icon.Data
             if (!context.Clients.Any())
             {
                 logger.LogDebug("Clients being populated");
-                foreach (var client in Config.GetClients().ToList())
+                foreach (var client in Seeds.Auth.GetClients().ToList())
                 {
                     context.Clients.Add(client.ToEntity());
                 }
@@ -45,7 +45,7 @@ namespace Icon.Data
             if (!context.IdentityResources.Any())
             {
                 logger.LogDebug("IdentityResources being populated");
-                foreach (var resource in Config.GetIdentityResources().ToList())
+                foreach (var resource in Seeds.Auth.GetIdentityResources().ToList())
                 {
                     context.IdentityResources.Add(resource.ToEntity());
                 }
@@ -59,7 +59,7 @@ namespace Icon.Data
             if (!context.ApiResources.Any())
             {
                 logger.LogDebug("ApiResources being populated");
-                foreach (var resource in Config.GetApis().ToList())
+                foreach (var resource in Seeds.Auth.GetApis().ToList())
                 {
                     context.ApiResources.Add(resource.ToEntity());
                 }

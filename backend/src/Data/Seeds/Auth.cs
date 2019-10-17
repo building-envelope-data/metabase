@@ -3,12 +3,10 @@ using IdentityServer4;
 using System.Collections.Generic;
 
 // TODO Fine proper place and name!
-namespace Icon
+namespace Icon.Data.Seeds
 {
-    public static class Config
+    public static class Auth
     {
-        public static readonly string ApiName = "api";
-        public static readonly string ApiSecret = "secret"; // TODO Put in environment variable.
 
         public static IEnumerable<IdentityResource> GetIdentityResources()
         {
@@ -25,10 +23,9 @@ namespace Icon
         public static IEnumerable<ApiResource> GetApis()
         {
             return new ApiResource[] {
-            new ApiResource(IdentityServerConstants.LocalApi.ScopeName),
-            new ApiResource(ApiName, "Icon")
+            new ApiResource(Configuration.Auth.ApiName, "Icon")
             {
-              ApiSecrets = { new Secret(ApiSecret.Sha256()) }
+              ApiSecrets = { new Secret(Configuration.Auth.ApiSecret.Sha256()) }
             }
           };
         }
@@ -53,13 +50,12 @@ namespace Icon
               // scopes that client has access to
                 AllowedScopes =
                 {
-                  IdentityServerConstants.LocalApi.ScopeName,
                   IdentityServerConstants.StandardScopes.Address,
                   IdentityServerConstants.StandardScopes.Email,
                   IdentityServerConstants.StandardScopes.OpenId,
                   IdentityServerConstants.StandardScopes.Phone,
                   IdentityServerConstants.StandardScopes.Profile,
-                  ApiName
+                  Configuration.Auth.ApiName
                 }
             },
               // resource owner password grant client
@@ -74,13 +70,12 @@ namespace Icon
                 },
                 AllowedScopes =
                 {
-                  IdentityServerConstants.LocalApi.ScopeName,
                   IdentityServerConstants.StandardScopes.Address,
                   IdentityServerConstants.StandardScopes.Email,
                   IdentityServerConstants.StandardScopes.OpenId,
                   IdentityServerConstants.StandardScopes.Phone,
                   IdentityServerConstants.StandardScopes.Profile,
-                  ApiName
+                  Configuration.Auth.ApiName
                 }
               },
               // OpenID Connect hybrid flow client (MVC)
@@ -100,13 +95,12 @@ namespace Icon
 
                 AllowedScopes =
                 {
-                  IdentityServerConstants.LocalApi.ScopeName,
                   IdentityServerConstants.StandardScopes.Address,
                   IdentityServerConstants.StandardScopes.Email,
                   IdentityServerConstants.StandardScopes.OpenId,
                   IdentityServerConstants.StandardScopes.Phone,
                   IdentityServerConstants.StandardScopes.Profile,
-                  ApiName
+                  Configuration.Auth.ApiName
                 },
 
                 AllowOfflineAccess = true
@@ -126,13 +120,12 @@ namespace Icon
 
                 AllowedScopes =
                 {
-                  IdentityServerConstants.LocalApi.ScopeName,
                   IdentityServerConstants.StandardScopes.Address,
                   IdentityServerConstants.StandardScopes.Email,
                   IdentityServerConstants.StandardScopes.OpenId,
                   IdentityServerConstants.StandardScopes.Phone,
                   IdentityServerConstants.StandardScopes.Profile,
-                  ApiName
+                  Configuration.Auth.ApiName
                 }
               },
               // https://identityserver4.readthedocs.io/en/latest/topics/secrets.html#beyond-shared-secrets
@@ -150,8 +143,7 @@ namespace Icon
 
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 AllowedScopes = {
-                  IdentityServerConstants.LocalApi.ScopeName,
-                  ApiName,
+                  Configuration.Auth.ApiName,
                 }
               },
               new Client
@@ -161,7 +153,7 @@ namespace Icon
                 AllowedGrantTypes = GrantTypes.Implicit,
                 AllowAccessTokensViaBrowser = true,
                 RedirectUris = {"https://localhost:5001/swagger/oauth2-redirect.html"},
-                AllowedScopes = { ApiName }
+                AllowedScopes = { Configuration.Auth.ApiName }
               }
           };
         }

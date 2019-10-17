@@ -18,11 +18,12 @@ namespace Icon.Infrastructure.Aggregate
 
         // JsonIgnore - for making sure that it won't be stored in inline projection
         [JsonIgnore]
-        public readonly Queue<IEvent> _uncommittedEvents;
+        private readonly Queue<IEvent> _uncommittedEvents;
 
         protected EventSourcedAggregate()
         {
             _uncommittedEvents = new Queue<IEvent>();
+            Version = 0;
         }
 
         public IEnumerable<IEvent> GetUncommittedEvents()

@@ -31,6 +31,8 @@ using System.Threading.Tasks;
 using System;
 using WebPWrecover.Services;
 using IdentityServer4.Validation;
+using RazorViewEngineOptions = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions;
+using RazorViewEngine = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine;
 
 namespace Icon.Configuration
 {
@@ -39,6 +41,14 @@ namespace Icon.Configuration
         public static void ConfigureServices(IServiceCollection services)
         {
             services.AddResponseCompression();
+            // add CORS policy for non-IdentityServer endpoints
+            services.AddCors(options =>
+            {
+                options.AddPolicy(Auth.ApiName, policy =>
+                {
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
 
             // Using `AddControllersAsServices` makes controller custructors
             // being validated on startup with respect to the dependency
@@ -58,6 +68,17 @@ namespace Icon.Configuration
                   }
                   );
 
+            // Change Default Location Of Views And Razor Pages In ASP.NET Core
+            // http://www.binaryintellect.net/articles/c50d3f14-7048-4b4f-84f4-1b28cb0f9d96.aspx
+            services.AddControllersWithViews();
+services.Configure<RazorViewEngineOptions>(o =>
+    {
+        o.ViewLocationFormats.Clear();
+        o.ViewLocationFormats.Add
+("/src/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
+        o.ViewLocationFormats.Add
+("/src/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
+    });
             services.AddRazorPages(
                 options =>
                 {
@@ -91,7 +112,7 @@ namespace Icon.Configuration
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseCors();
+            app.UseCors(Auth.ApiName);
             app.UseResponseCompression(); // TODO Using the server-based compression of, for example, Nginx is much faster. See https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-3.0
         }
 
@@ -101,9 +122,11 @@ namespace Icon.Configuration
                     {
                         /* endpoints.MapHealthChecks("/health").RequireAuthorization(); // TODO Add healtch check services as described in https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.0 */
                         endpoints.MapControllers();
-                        endpoints.MapDefaultControllerRoute();
+                        endpoints.MapControllerRoute(
+                            name: "default",
+                            pattern: "{controller=Home}/{action=Index}/{id?}");
                         endpoints.MapRazorPages();
-                    });
+                        });
         }
     }
 }

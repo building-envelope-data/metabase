@@ -7,6 +7,11 @@ namespace Icon.Domain
     {
         public Guid Id { get; set; }
         public Guid ComponentId { get; set; }
-        public List<ComponentVersionOwnershipView> Ownerships { get; set; }
+        public ICollection<ComponentVersionOwnershipView> Ownerships { get; private set; }
+
+        public ComponentVersionView()
+        {
+          Ownerships = new List<ComponentVersionOwnershipView>();
+        }
     }
 }

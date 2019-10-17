@@ -16,6 +16,10 @@ namespace Icon.Domain
         {
             view.Id = @event.ComponentVersionOwnershipId;
             view.ComponentVersionId = @event.ComponentVersionId;
+            view.Name = @event.Data.Name;
+            view.Description = @event.Data.Description;
+            view.AvailableFrom = @event.Data.AvailableFrom;
+            view.AvailableUntil = @event.Data.AvailableUntil;
         }
     }
 }
