@@ -5,6 +5,6 @@ namespace Icon.Infrastructure.Event
 {
     public interface IEvent : INotification
     {
-        public Guid CreatorId { get; set; }
+        public Guid CreatorId { get; }
     }
 }

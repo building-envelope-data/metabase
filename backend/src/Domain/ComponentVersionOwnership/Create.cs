@@ -28,15 +28,11 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
         public Guid ComponentVersionId { get; private set; }
         public Data Data { get; private set; }
 
-        public static Event From(Guid componentVersionOwnershipId, Command command)
+        public Event(Guid componentVersionOwnershipId, Command command) : base(command.CreatorId)
         {
-           return new Event
-           {
-                ComponentVersionOwnershipId = componentVersionOwnershipId,
-                ComponentVersionId = command.ComponentVersionId,
-                Data = command.Data,
-                CreatorId = command.CreatorId,
-           };
+                ComponentVersionOwnershipId = componentVersionOwnershipId;
+                ComponentVersionId = command.ComponentVersionId;
+                Data = command.Data;
         }
     }
 
@@ -67,7 +63,7 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
 
         public async Task<ComponentVersionOwnershipAggregate> Handle(Command command, CancellationToken cancellationToken)
         {
-            var @event = Event.From(Guid.NewGuid(), command);
+            var @event = new Event(Guid.NewGuid(), command);
             var componentVersionOwnership = ComponentVersionOwnershipAggregate.Create(@event);
             return await _repository.Store(componentVersionOwnership, cancellationToken);
         }
