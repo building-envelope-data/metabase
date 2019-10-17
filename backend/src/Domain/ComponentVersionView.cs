@@ -11,7 +11,7 @@ namespace Icon.Domain
 
         public ComponentVersionView()
         {
-          Ownerships = new List<ComponentVersionOwnershipView>();
+            Ownerships = new List<ComponentVersionOwnershipView>();
         }
     }
 }
