@@ -25,6 +25,10 @@ format : ## Format code
 	dotnet-format
 .PHONY : format
 
+assets : ## Build assets
+	npm run all
+.PHONY : assets
+
 # TODO Shortcuts for `dotnet aspnet-codegenerator`?
 
 # List of commands
