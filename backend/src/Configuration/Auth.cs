@@ -75,11 +75,11 @@ namespace Icon.Configuration
             .AddEntityFrameworkStores<ApplicationDbContext>()
               .AddDefaultTokenProviders();
 
-            services.ConfigureApplicationCookie(options =>
+            services.ConfigureApplicationCookie(_ =>
                 {
-                    options.LoginPath = $"/Account/Login";
-                    options.LogoutPath = $"/Account/Logout";
-                    options.AccessDeniedPath = $"/Account/AccessDenied";
+                    _.LoginPath = $"/Account/Login";
+                    _.LogoutPath = $"/Account/Logout";
+                    _.AccessDeniedPath = $"/Account/AccessDenied";
                 });
 
             services.AddTransient<IEmailSender, EmailSender>(); // TODO Put somewhere else.
@@ -117,12 +117,12 @@ namespace Icon.Configuration
             .AddOperationalStore(_ =>
                 {
                     _.ConfigureDbContext = builder =>
-                  builder.UseNpgsql(connectionString,
-                      sql =>
-                      {
-                          /* sql.UseNodaTime(); */
-                          sql.MigrationsAssembly(migrationsAssembly);
-                      });
+                      builder.UseNpgsql(connectionString,
+                          sql =>
+                          {
+                              /* sql.UseNodaTime(); */
+                              sql.MigrationsAssembly(migrationsAssembly);
+                          });
                     // TODO enable token cleanup in production
                     // this enables automatic token cleanup. this is optional.
                     /* _.EnableTokenCleanup = true; */
@@ -163,13 +163,13 @@ namespace Icon.Configuration
                     _.ExpectedScope = ApiName;
                 });
             services.AddAuthorization(_ =>
-  {
-      _.AddPolicy(IdentityServerConstants.LocalApi.PolicyName, policy =>
-      {
-          policy.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme);
-          policy.RequireAuthenticatedUser();
-      });
-  });
+                {
+                    _.AddPolicy(IdentityServerConstants.LocalApi.PolicyName, policy =>
+                    {
+                        policy.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme);
+                        policy.RequireAuthenticatedUser();
+                    });
+                });
             // TODO? dotnet add package Microsoft.AspNetCore.Authentication.Cookies
             /* .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, _ => */
             /* 		{ */
