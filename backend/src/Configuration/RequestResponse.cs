@@ -75,15 +75,15 @@ namespace Icon.Configuration
                 {
                     o.ViewLocationFormats.Clear();
                     o.ViewLocationFormats.Add
-            ("/src/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
+            ("/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
                     o.ViewLocationFormats.Add
-            ("/src/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
+            ("/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
                 });
             services.AddRazorPages(
                 options =>
                 {
                     // https://docs.microsoft.com/en-us/aspnet/core/razor-pages/?view=aspnetcore-3.0&tabs=visual-studio-code
-                    options.RootDirectory = "/src/Pages";
+                    options.RootDirectory = "/Pages";
                     /* options.Conventions.AuthorizeFolder("/MyPages/Admin"); */
                 }
                 );

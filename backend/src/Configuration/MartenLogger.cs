@@ -73,30 +73,30 @@ namespace Icon.Configuration
         //////////////////////////////
         public void DocumentLoaded(object id, object document)
         {
-          _logger.LogDebug(
-              $"Document with id {id} loaded: {document}");
+            _logger.LogDebug(
+                $"Document with id {id} loaded: {document}");
         }
 
         public void DocumentAddedForStorage(object id, object document)
         {
-          _logger.LogDebug(
-              $"Document with id {id} added for storage: {document}");
+            _logger.LogDebug(
+                $"Document with id {id} added for storage: {document}");
         }
 
         public void BeforeSaveChanges(IDocumentSession session)
         {
-          _logger.LogDebug(
-              $"About to append the following pending changes to the event store:");
-          session.PendingChanges.Streams()
-                .Each(s => _logger.LogDebug(s.ToString()));
+            _logger.LogDebug(
+                $"About to append the following pending changes to the event store:");
+            session.PendingChanges.Streams()
+                  .Each(s => _logger.LogDebug(s.ToString()));
         }
 
         public Task BeforeSaveChangesAsync(IDocumentSession session, CancellationToken token)
         {
-          _logger.LogDebug(
-              $"About to append the following pending asynchronous changes to the event store:");
-          session.PendingChanges.Streams()
-                .Each(s => _logger.LogDebug(s.ToString()));
+            _logger.LogDebug(
+                $"About to append the following pending asynchronous changes to the event store:");
+            session.PendingChanges.Streams()
+                  .Each(s => _logger.LogDebug(s.ToString()));
             return Task.CompletedTask;
         }
 

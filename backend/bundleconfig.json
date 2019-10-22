@@ -1,15 +1,15 @@
 [
   {
-    "outputFileName": "wwwroot/css/site.min.css",
+    "outputFileName": "src/wwwroot/css/site.min.css",
     "inputFiles": [
-      "wwwroot/css/site.css",
-      "wwwroot/css/custom.css"
+      "src/wwwroot/css/site.css",
+      "src/wwwroot/css/custom.css"
     ]
   },
   {
-    "outputFileName": "wwwroot/js/site.min.js",
+    "outputFileName": "src/wwwroot/js/site.min.js",
     "inputFiles": [
-      "wwwroot/js/site.js"
+      "src/wwwroot/js/site.js"
     ],
     "minify": {
       "enabled": true,
