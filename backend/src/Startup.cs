@@ -76,7 +76,7 @@ namespace Icon
 
         private string GetHost()
         {
-            return "https://icon.com"; // TODO Read from environment.
+            return _configuration.GetValue<string>("Host");
         }
 
         private string GetConnectionString()
