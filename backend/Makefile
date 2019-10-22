@@ -21,7 +21,7 @@ dos2unix : ## Remove carriage returns
 	# find . \( -name "*.cs" -o -name "*.cshtml" \) ...
 
 format : ## Format code
-	dotnet-format --workspace Icon.csproj
+	dotnet-format
 
 # TODO Shortcuts for `dotnet aspnet-codegenerator`?
 
