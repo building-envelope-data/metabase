@@ -75,3 +75,4 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 	docker-compose exec \
 		database \
 		psql -U postgres
+.PHONY : psql
