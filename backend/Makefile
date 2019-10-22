@@ -19,9 +19,15 @@ dos2unix : ## Remove carriage returns
 	# find src/ -type f -exec sed -i -e "1s/^\xFEFF//" -e "s/\r//" {} +
 	# find . -type f -exec dos2unix {} \;
 	# find . \( -name "*.cs" -o -name "*.cshtml" \) ...
+.PHONY : dos2unix
 
 format : ## Format code
-	dotnet-format --workspace Icon.csproj
+	dotnet-format
+.PHONY : format
+
+assets : ## Build assets
+	npm run all
+.PHONY : assets
 
 # TODO Shortcuts for `dotnet aspnet-codegenerator`?
 
@@ -33,6 +39,7 @@ migrations : ## Add migration with name ${NAME}, for example, `make NAME=CreateP
 		--context ApplicationDbContext \
 		--output-dir src/Data/Migrations/ApplicationDb \
 		${NAME}
+.PHONY : migrations
 
 migrate : ## Run migrations
 	dotnet ef database update \
