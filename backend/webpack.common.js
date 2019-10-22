@@ -74,7 +74,7 @@ module.exports = {
     }),
   ],
   output: {
-    path: path.resolve(__dirname, 'wwwroot', 'assets'),
+    path: path.resolve(__dirname, 'src', 'wwwroot', 'assets'),
     filename: '[name].js', // TODO .[contenthash]
     publicPath: '/assets/',
   },
