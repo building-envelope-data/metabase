@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Icon", "src/Icon.csproj", "{F72B77F5-D7CB-4E2A-A7C2-977443FC8390}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Icon", "src\Icon.csproj", "{F72B77F5-D7CB-4E2A-A7C2-977443FC8390}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "test\Test.csproj", "{B467E845-22A0-4AA5-9876-DE800B29DA1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +32,17 @@ Global
 		{F72B77F5-D7CB-4E2A-A7C2-977443FC8390}.Release|x64.Build.0 = Release|Any CPU
 		{F72B77F5-D7CB-4E2A-A7C2-977443FC8390}.Release|x86.ActiveCfg = Release|Any CPU
 		{F72B77F5-D7CB-4E2A-A7C2-977443FC8390}.Release|x86.Build.0 = Release|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Debug|x64.Build.0 = Debug|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Debug|x86.Build.0 = Debug|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Release|x64.ActiveCfg = Release|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Release|x64.Build.0 = Release|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Release|x86.ActiveCfg = Release|Any CPU
+		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
