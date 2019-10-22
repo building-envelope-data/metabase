@@ -14,6 +14,10 @@ help : ## Print this help
 # ------------------------------------------------ #
 
 # TODO Strip the byte-order mark, aka, BOM
+# TODO Apply not only to `src` folder but ignore files and directories within .gitignore.
+#      With git installed there are various options, which all have some
+#      disadvantages, see
+#      https://unix.stackexchange.com/questions/358270/find-files-that-are-not-in-gitignore
 dos2unix : ## Remove carriage returns
 	find src/ -type f -exec sed -i -e "s/\r//" {} +
 	# find src/ -type f -exec sed -i -e "1s/^\xFEFF//" -e "s/\r//" {} +
