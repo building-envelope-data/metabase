@@ -35,7 +35,7 @@ using IdentityServer4;
 
 namespace Icon.Configuration
 {
-    class Auth
+    public class Auth
     {
         public static readonly string ApiName = "api";
         public static readonly string ApiSecret = "secret"; // TODO Put in environment variable.

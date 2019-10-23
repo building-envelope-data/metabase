@@ -38,7 +38,7 @@ using Marten.NodaTime;
 
 namespace Icon.Configuration
 {
-    class EventStore
+    public class EventStore
     {
         public static void ConfigureServices(IServiceCollection services, string connectionString, string schemaName, bool isProductionEnvironment)
         {
@@ -54,7 +54,7 @@ namespace Icon.Configuration
             services.AddScoped<Aggregate.IAggregateRepository, Aggregate.AggregateRepository>();
         }
 
-        private static Marten.IDocumentStore GetDocumentStore(string connectionString, string schemaName, bool isProductionEnvironment, ILogger<EventStore> logger)
+        public static Marten.IDocumentStore GetDocumentStore(string connectionString, string schemaName, bool isProductionEnvironment, ILogger<EventStore> logger)
         {
             var martenLogger = new MartenLogger(logger);
             // TODO Declare `creatorId` of events as foreign key to `User`, see https://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/
