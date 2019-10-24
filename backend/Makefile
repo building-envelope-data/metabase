@@ -38,18 +38,37 @@ assets : ## Build assets
 # List of commands
 # https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet
 
-migrations : ## Add migration with name ${NAME}, for example, `make NAME=CreateProducts migrations`
+appmigrations : ## Add migration with name ${NAME} of application database context, for example, `make NAME=CreateProducts migrations`
 	dotnet ef migrations add \
+		--project src/Icon.csproj \
 		--context ApplicationDbContext \
-		--output-dir src/Data/Migrations/ApplicationDb \
+		--output-dir Data/Migrations/ApplicationDb \
 		${NAME}
 .PHONY : migrations
 
+pgmigrations : ## Add migration with name ${NAME} of identity server's persisted grant database context, for example, `make NAME=CreateX migrations`
+	dotnet ef migrations add \
+		--project src/Icon.csproj \
+		--context PersistedGrantDbContext \
+		--output-dir Data/Migrations/IdentityServer/PersistedGrantDb \
+		${NAME}
+.PHONY : pgmigrations
+
+cnfmigrations : ## Add migration with name ${NAME} of identity server's configuration database context, for example, `make NAME=CreateY migrations`
+	dotnet ef migrations add \
+		--project src/Icon.csproj \
+		--context ConfigurationDbContext \
+		--output-dir Data/Migrations/IdentityServer/ConfigurationDb \
+		${NAME}
+
 migrate : ## Run migrations
 	dotnet ef database update \
+		--project src/Icon.csproj \
 		--context ApplicationDbContext
 	dotnet ef database update \
+		--project src/Icon.csproj \
 		--context PersistedGrantDbContext
 	dotnet ef database update \
+		--project src/Icon.csproj \
 		--context ConfigurationDbContext
 .PHONY : migrate

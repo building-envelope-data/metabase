@@ -30,6 +30,22 @@ namespace Icon.Data.Seeds
           };
         }
 
+        // TODO Add a client that corresponds to the following configuration in `appsettings.json`
+        // "IdentityServer": {
+        //   "Clients": {
+        //     "Icon": {
+        //       "Profile": "IdentityServerSPA"
+        //     }
+        //   }
+        // },
+        // and the following in `appsettings.Development.json`
+        // "IdentityServer": {
+        //   "Key": {
+        //     "Type": "Development"
+        //   }
+        // },
+        // see https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-3.0#appsettingsjson
+        // and https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-3.0#other-configuration-options
         public static IEnumerable<Client> GetClients()
         {
             return new Client[] {
