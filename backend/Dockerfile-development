@@ -76,12 +76,14 @@ COPY \
   package.json package-lock.json ./
 RUN npm install
 
-# Create empty directories `/app/bin` and `/app/obj` for user `me` and group
+# Create empty directories `/app/*/bin` and `/app/*/obj` for user `me` and group
 # `us` to make the respective mounted volumes be owned by the user `me` and the
 # group `us`.
 RUN \
-  mkdir -p ./bin && \
-  mkdir -p ./obj
+  mkdir -p ./src/bin && \
+  mkdir -p ./src/obj && \
+  mkdir -p ./test/bin && \
+  mkdir -p ./test/obj
 
 EXPOSE 5000
 EXPOSE 5001
