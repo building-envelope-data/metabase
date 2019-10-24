@@ -46,10 +46,14 @@ RUN \
   dotnet tool install --global dotnet-script && \
   dotnet tool install --global dotnet-trace
 
-RUN mkdir -p ./src
+RUN mkdir -p ./src && \
+    mkdir -p ./test
 COPY \
   --chown=me:us \
-  src/Icon.csproj ./src
+  src/Icon.csproj ./src/
+COPY \
+  --chown=me:us \
+  test/Test.csproj ./test/
 
 # TODO Is this really what we want? It is inspired by
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/aspnetapp/aspnetcore-docker-https-development.md#linux

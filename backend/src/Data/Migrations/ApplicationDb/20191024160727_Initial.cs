@@ -2,17 +2,21 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Icon.src.Data.Migrations.ApplicationDb
+namespace Icon.Data.Migrations.ApplicationDb
 {
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "application");
+
             migrationBuilder.AlterDatabase()
                 .Annotation("Npgsql:PostgresExtension:pgcrypto", ",,");
 
             migrationBuilder.CreateTable(
                 name: "Roles",
+                schema: "application",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -27,6 +31,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
 
             migrationBuilder.CreateTable(
                 name: "Users",
+                schema: "application",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -52,6 +57,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
 
             migrationBuilder.CreateTable(
                 name: "RoleClaims",
+                schema: "application",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -66,34 +72,15 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                     table.ForeignKey(
                         name: "FK_RoleClaims_Roles_RoleId",
                         column: x => x.RoleId,
+                        principalSchema: "application",
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    Name = table.Column<string>(nullable: false),
-                    Description = table.Column<string>(nullable: false),
-                    UserId = table.Column<Guid>(nullable: false),
-                    xmin = table.Column<uint>(type: "xid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Products_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserClaims",
+                schema: "application",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -108,6 +95,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                     table.ForeignKey(
                         name: "FK_UserClaims_Users_UserId",
                         column: x => x.UserId,
+                        principalSchema: "application",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -115,6 +103,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
 
             migrationBuilder.CreateTable(
                 name: "UserLogins",
+                schema: "application",
                 columns: table => new
                 {
                     LoginProvider = table.Column<string>(nullable: false),
@@ -128,6 +117,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                     table.ForeignKey(
                         name: "FK_UserLogins_Users_UserId",
                         column: x => x.UserId,
+                        principalSchema: "application",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -135,6 +125,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
 
             migrationBuilder.CreateTable(
                 name: "UserRoles",
+                schema: "application",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(nullable: false),
@@ -146,12 +137,14 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                     table.ForeignKey(
                         name: "FK_UserRoles_Roles_RoleId",
                         column: x => x.RoleId,
+                        principalSchema: "application",
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserRoles_Users_UserId",
                         column: x => x.UserId,
+                        principalSchema: "application",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -159,6 +152,7 @@ namespace Icon.src.Data.Migrations.ApplicationDb
 
             migrationBuilder.CreateTable(
                 name: "UserTokens",
+                schema: "application",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(nullable: false),
@@ -172,49 +166,52 @@ namespace Icon.src.Data.Migrations.ApplicationDb
                     table.ForeignKey(
                         name: "FK_UserTokens_Users_UserId",
                         column: x => x.UserId,
+                        principalSchema: "application",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_UserId",
-                table: "Products",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
+                schema: "application",
                 table: "RoleClaims",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
+                schema: "application",
                 table: "Roles",
                 column: "NormalizedName",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_UserId",
+                schema: "application",
                 table: "UserClaims",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLogins_UserId",
+                schema: "application",
                 table: "UserLogins",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_RoleId",
+                schema: "application",
                 table: "UserRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
+                schema: "application",
                 table: "Users",
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
+                schema: "application",
                 table: "Users",
                 column: "NormalizedUserName",
                 unique: true);
@@ -223,28 +220,32 @@ namespace Icon.src.Data.Migrations.ApplicationDb
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "RoleClaims",
+                schema: "application");
 
             migrationBuilder.DropTable(
-                name: "RoleClaims");
+                name: "UserClaims",
+                schema: "application");
 
             migrationBuilder.DropTable(
-                name: "UserClaims");
+                name: "UserLogins",
+                schema: "application");
 
             migrationBuilder.DropTable(
-                name: "UserLogins");
+                name: "UserRoles",
+                schema: "application");
 
             migrationBuilder.DropTable(
-                name: "UserRoles");
+                name: "UserTokens",
+                schema: "application");
 
             migrationBuilder.DropTable(
-                name: "UserTokens");
+                name: "Roles",
+                schema: "application");
 
             migrationBuilder.DropTable(
-                name: "Roles");
-
-            migrationBuilder.DropTable(
-                name: "Users");
+                name: "Users",
+                schema: "application");
         }
     }
 }

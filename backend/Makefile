@@ -46,6 +46,7 @@ appmigrations : ## Add migration with name ${NAME} of application database conte
 		${NAME}
 .PHONY : migrations
 
+# http://docs.identityserver.io/en/latest/quickstarts/7_entity_framework.html
 pgmigrations : ## Add migration with name ${NAME} of identity server's persisted grant database context, for example, `make NAME=CreateX migrations`
 	dotnet ef migrations add \
 		--project src/Icon.csproj \
@@ -54,6 +55,7 @@ pgmigrations : ## Add migration with name ${NAME} of identity server's persisted
 		${NAME}
 .PHONY : pgmigrations
 
+# http://docs.identityserver.io/en/latest/quickstarts/7_entity_framework.html
 cnfmigrations : ## Add migration with name ${NAME} of identity server's configuration database context, for example, `make NAME=CreateY migrations`
 	dotnet ef migrations add \
 		--project src/Icon.csproj \
