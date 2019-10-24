@@ -21,7 +21,8 @@ namespace Test.Integration.Web.Api
 
         protected Base(CustomWebApplicationFactory factory)
         {
-            Factory = factory.SetUp();
+            Factory = factory;
+            Factory.SetUp();
             HttpClient = CreateHttpClient();
         }
 

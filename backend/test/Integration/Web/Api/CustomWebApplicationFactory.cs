@@ -63,7 +63,7 @@ namespace Test.Integration.Web.Api
             });
         }
 
-        public CustomWebApplicationFactory SetUp()
+        public void SetUp()
         {
             Do(
                 services =>
@@ -74,7 +74,6 @@ namespace Test.Integration.Web.Api
                         SetUpEventStore();
                     }
             );
-            return this;
         }
 
         private void SetUpDatabase(DbContext dbContext)
