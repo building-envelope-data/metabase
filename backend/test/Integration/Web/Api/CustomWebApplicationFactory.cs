@@ -3,6 +3,9 @@
 // https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/TestsInfrasructure/MartenTest.cs
 // https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-3.0#customize-webapplicationfactory
 
+using PersistedGrantDbContext = IdentityServer4.EntityFramework.DbContexts.PersistedGrantDbContext;
+using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
+using Microsoft.Extensions.Configuration;
 using Guid = System.Guid;
 using System;
 using Exception = System.Exception;
@@ -19,16 +22,13 @@ using Microsoft.AspNetCore.Identity;
 using User = Icon.Domain.User;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Configuration = Icon.Configuration;
+using Startup = Icon.Startup;
+using AppSettings = Icon.AppSettings;
 
 namespace Test.Integration.Web.Api
 {
-    public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup>, IDisposable where TStartup : class
+    public class CustomWebApplicationFactory : WebApplicationFactory<Startup>
     {
-        private static readonly string ConnectionString = "Host=database;Port=5432;Database=postgres;User Id=postgres;Password=postgres;";
-
-        private readonly string _applicationDbName = "Application" + Guid.NewGuid().ToString().Replace("-", string.Empty);
-        private readonly string _eventStoreSchemaName = "event_store_" + Guid.NewGuid().ToString().Replace("-", string.Empty);
-
         private void Do(Action<IServiceProvider> what)
         {
             using (var scope = Services.CreateScope())
@@ -37,57 +37,50 @@ namespace Test.Integration.Web.Api
             }
         }
 
+				private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
+				{
+            using (var scope = Services.CreateScope())
+            {
+                return what(scope.ServiceProvider);
+            }
+				}
+
+				private AppSettings AppSettings {
+					get {
+						return Get(
+								services =>
+									services.GetRequiredService<AppSettings>()
+							);
+					}
+				}
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            // TODO builder.UseStartup<Startup>().UseEnvironment("Test");
+            /* builder.UseStartup<Startup>().UseEnvironment("Test"); */
+            builder.UseEnvironment("Test");
             builder.ConfigureServices(services =>
             {
-                ReplaceApplicationDbContext(services);
-                ReplaceAuthStores(services);
-                ReplaceEventStore(services);
             });
         }
 
-        private void ReplaceApplicationDbContext(IServiceCollection services)
-        {
-            services.RemoveAll(typeof(DbContextOptions<ApplicationDbContext>));
-            services.AddDbContext<ApplicationDbContext>((options, context) =>
-            {
-                context.UseInMemoryDatabase(_applicationDbName);
-            });
-        }
-
-        private void ReplaceAuthStores(IServiceCollection services)
-        {
-            // TODO .AddInMemoryApiResources, .AddInMemoryClients, and more?
-        }
-
-        private void ReplaceEventStore(IServiceCollection services)
-        {
-            services.RemoveAll(typeof(Marten.IDocumentSession));
-            services.AddScoped(typeof(Marten.IDocumentSession), serviceProvider =>
-            {
-                var logger = serviceProvider.GetRequiredService<ILogger<Configuration.EventStore>>();
-                return Configuration.EventStore.GetDocumentStore(ConnectionString, _eventStoreSchemaName, false, logger).OpenSession();
-            });
-        }
-
-        public CustomWebApplicationFactory<TStartup> SetUp()
+        public CustomWebApplicationFactory SetUp()
         {
             Do(
                 services =>
                     {
-                        SetUpApplicationDb(services.GetRequiredService<ApplicationDbContext>());
+                        SetUpDatabase(services.GetRequiredService<ApplicationDbContext>());
+                        SetUpDatabase(services.GetRequiredService<PersistedGrantDbContext>());
+                        SetUpDatabase(services.GetRequiredService<ConfigurationDbContext>());
                         SetUpEventStore();
                     }
             );
             return this;
         }
 
-        private void SetUpApplicationDb(ApplicationDbContext applicationDbContext)
+        private void SetUpDatabase(DbContext dbContext)
         {
-            applicationDbContext.Database.EnsureDeleted();
-            applicationDbContext.Database.EnsureCreated();
+            dbContext.Database.EnsureDeleted();
+            dbContext.Database.EnsureCreated();
         }
 
         private void SetUpEventStore()
@@ -116,31 +109,34 @@ namespace Test.Integration.Web.Api
             );
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             Do(
                     services =>
                     {
-                        DisposeApplicationDb(services.GetRequiredService<ApplicationDbContext>());
+                        DisposeDatabase(services.GetRequiredService<ApplicationDbContext>());
+                        DisposeDatabase(services.GetRequiredService<PersistedGrantDbContext>());
+                        DisposeDatabase(services.GetRequiredService<ConfigurationDbContext>());
                         DisposeEventStore();
                     }
             );
+						base.Dispose();
         }
 
-        private void DisposeApplicationDb(ApplicationDbContext applicationDbContext)
+        private void DisposeDatabase(DbContext dbContext)
         {
-            applicationDbContext.Database.EnsureDeleted();
+            dbContext.Database.EnsureDeleted();
         }
 
         private void DisposeEventStore()
         {
-            using (var connection = new NpgsqlConnection(ConnectionString))
+            using (var connection = new NpgsqlConnection(AppSettings.Database.ConnectionString))
             {
                 connection.Open();
                 using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     var command = connection.CreateCommand();
-                    command.CommandText = $"DROP SCHEMA IF EXISTS {_eventStoreSchemaName} CASCADE;";
+                    command.CommandText = $"DROP SCHEMA IF EXISTS {AppSettings.Database.SchemaName.EventStore} CASCADE;";
                     command.ExecuteNonQuery();
                     transaction.Commit();
                 }

@@ -14,12 +14,12 @@ using IdentityModel.Client;
 
 namespace Test.Integration.Web.Api
 {
-    public class Base : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class Base : IClassFixture<CustomWebApplicationFactory>
     {
-        protected CustomWebApplicationFactory<Startup> Factory { get; }
+        protected CustomWebApplicationFactory Factory { get; }
         protected HttpClient HttpClient { get; }
 
-        protected Base(CustomWebApplicationFactory<Startup> factory)
+        protected Base(CustomWebApplicationFactory factory)
         {
             Factory = factory.SetUp();
             HttpClient = CreateHttpClient();

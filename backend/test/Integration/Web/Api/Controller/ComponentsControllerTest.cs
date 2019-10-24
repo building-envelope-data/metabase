@@ -1,4 +1,3 @@
-using Startup = Icon.Startup;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -14,7 +13,7 @@ namespace Test.Integration.Web.Api.Controller
 {
     public class ComponentsControllerTest : Base
     {
-        public ComponentsControllerTest(CustomWebApplicationFactory<Startup> factory) : base(factory)
+        public ComponentsControllerTest(CustomWebApplicationFactory factory) : base(factory)
         {
         }
 
@@ -32,7 +31,7 @@ namespace Test.Integration.Web.Api.Controller
             // Assert
             httpResponse.EnsureSuccessStatusCode();
             var components = JsonSerializer.Deserialize<IEnumerable<GetListComponent>>(await httpResponse.Content.ReadAsStringAsync());
-            Assert.Equal(0, components.Count());
+            Assert.Empty(components);
         }
 
         private class PostComponent

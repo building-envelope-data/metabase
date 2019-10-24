@@ -40,15 +40,15 @@ namespace Icon.Configuration
         public static readonly string ApiName = "api";
         public static readonly string ApiSecret = "secret"; // TODO Put in environment variable.
 
-        public static void ConfigureServices(IServiceCollection services, string connectionString, string migrationsAssembly, string host, IWebHostEnvironment environment, IConfiguration configuration)
+        public static void ConfigureServices(IServiceCollection services, IWebHostEnvironment environment, IConfiguration configuration, AppSettings appSettings, string migrationsAssembly)
         {
             // https://fullstackmark.com/post/21/user-authentication-and-identity-with-angular-aspnet-core-and-identityserver
             // https://www.scottbrady91.com/Identity-Server/ASPNET-Core-Swagger-UI-Authorization-using-IdentityServer4
             ConfigureIdentityServices(services, configuration);
-            ConfigureIdentityServerServices(services, connectionString, migrationsAssembly, host, environment, configuration);
+            ConfigureIdentityServerServices(services, environment, appSettings, migrationsAssembly);
         }
 
-        public static void ConfigureIdentityServices(IServiceCollection services, IConfiguration configuration)
+        private static void ConfigureIdentityServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddIdentity<Domain.User, IdentityRole<Guid>>(_ =>
                 {
@@ -88,7 +88,7 @@ namespace Icon.Configuration
 
         // https://github.com/IdentityServer/IdentityServer4.Demo
         // http://docs.identityserver.io/en/latest/topics/startup.html
-        public static void ConfigureIdentityServerServices(IServiceCollection services, string connectionString, string migrationsAssembly, string host, IWebHostEnvironment environment, IConfiguration configuration)
+        private static void ConfigureIdentityServerServices(IServiceCollection services, IWebHostEnvironment environment, AppSettings appSettings, string migrationsAssembly)
         {
             var builder = services.AddIdentityServer(_ =>
                 {
@@ -105,8 +105,9 @@ namespace Icon.Configuration
             // this adds the config data from DB (clients, resources)
             .AddConfigurationStore(_ =>
                 {
-                    _.ConfigureDbContext = builder =>
-                  builder.UseNpgsql(connectionString,
+                  _.DefaultSchema = appSettings.Database.SchemaName.IdentityServerConfiguration;
+                  _.ConfigureDbContext = builder =>
+                  builder.UseNpgsql(appSettings.Database.ConnectionString,
                       sql =>
                       {
                           /* sql.UseNodaTime(); */
@@ -116,8 +117,9 @@ namespace Icon.Configuration
             // this adds the operational data from DB (codes, tokens, consents)
             .AddOperationalStore(_ =>
                 {
+                    _.DefaultSchema = appSettings.Database.SchemaName.IdentityServerPersistedGrant;
                     _.ConfigureDbContext = builder =>
-                      builder.UseNpgsql(connectionString,
+                      builder.UseNpgsql(appSettings.Database.ConnectionString,
                           sql =>
                           {
                               /* sql.UseNodaTime(); */
@@ -133,7 +135,7 @@ namespace Icon.Configuration
               .AddAspNetIdentity<Domain.User>()
               .AddProfileService<ProfileService<Domain.User>>();
             /* builder.AddApiAuthorization<User, ApplicationDbContext>(); */
-            if (environment.IsDevelopment())
+            if (environment.IsDevelopment() || environment.IsEnvironment("Test"))
             {
                 builder.AddDeveloperSigningCredential();
             }
@@ -148,8 +150,8 @@ namespace Icon.Configuration
               .AddIdentityServerAuthentication(_ =>
                   {
                       // base-address of your identityserver
-                      _.Authority = host;
-                      _.RequireHttpsMetadata = environment.IsProduction();
+                      _.Authority = appSettings.Host;
+                      _.RequireHttpsMetadata = !(environment.IsDevelopment() || environment.IsEnvironment("Test"));
 
                       // name of the API resource
                       _.ApiName = ApiName;

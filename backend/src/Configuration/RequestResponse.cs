@@ -89,10 +89,9 @@ namespace Icon.Configuration
                 );
         }
 
-        public static void ConfigureRouting(IApplicationBuilder app, bool isDevelopmentEnvironment)
+        public static void ConfigureRouting(IApplicationBuilder app, IWebHostEnvironment environment)
         {
-
-            if (isDevelopmentEnvironment)
+            if (environment.IsDevelopment() || environment.IsEnvironment("Test"))
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();

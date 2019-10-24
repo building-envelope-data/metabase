@@ -40,7 +40,7 @@ namespace Icon.Configuration
 {
     public class EventStore
     {
-        public static void ConfigureServices(IServiceCollection services, string connectionString, string schemaName, bool isProductionEnvironment)
+        public static void ConfigureServices(IServiceCollection services, IWebHostEnvironment environment, AppSettings.DatabaseSettings databaseSettings)
         {
             services.AddScoped(typeof(Marten.IDocumentSession), serviceProvider =>
                 {
@@ -49,30 +49,30 @@ namespace Icon.Configuration
                     // closing the session, because it implements the
                     // `IDisposable` interface, see
                     // https://andrewlock.net/four-ways-to-dispose-idisposables-in-asp-net-core/#automatically-disposing-services-leveraging-the-built-in-di-container
-                    return GetDocumentStore(connectionString, schemaName, isProductionEnvironment, logger).OpenSession();
+                    return GetDocumentStore(environment, databaseSettings, logger).OpenSession();
                 });
             services.AddScoped<Aggregate.IAggregateRepository, Aggregate.AggregateRepository>();
         }
 
-        public static Marten.IDocumentStore GetDocumentStore(string connectionString, string schemaName, bool isProductionEnvironment, ILogger<EventStore> logger)
+        public static Marten.IDocumentStore GetDocumentStore(IWebHostEnvironment environment, AppSettings.DatabaseSettings databaseSettings, ILogger<EventStore> logger)
         {
             var martenLogger = new MartenLogger(logger);
             // TODO Declare `creatorId` of events as foreign key to `User`, see https://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/
             return Marten.DocumentStore.For(_ =>
                   {
-                      _.Connection(connectionString);
-                      _.DatabaseSchemaName = schemaName;
-                      _.Events.DatabaseSchemaName = schemaName;
+                      _.Connection(databaseSettings.ConnectionString);
+                      _.DatabaseSchemaName = databaseSettings.SchemaName.EventStore;
+                      _.Events.DatabaseSchemaName = databaseSettings.SchemaName.EventStore;
                       /* _.UseNodaTime(); */
                       // For a full list auf auto-create options, see
                       // https://jasperfx.github.io/marten/documentation/schema/
-                      if (isProductionEnvironment)
+                      if (environment.IsDevelopment() || environment.IsEnvironment("Test"))
                       {
-                          _.AutoCreateSchemaObjects = Marten.AutoCreate.CreateOrUpdate;
+                          _.AutoCreateSchemaObjects = Marten.AutoCreate.All;
                       }
                       else
                       {
-                          _.AutoCreateSchemaObjects = Marten.AutoCreate.All;
+                          _.AutoCreateSchemaObjects = Marten.AutoCreate.CreateOrUpdate;
                       }
                       _.Events.UseAggregatorLookup(Marten.Services.Events.AggregationLookupStrategy.UsePrivateApply);
 

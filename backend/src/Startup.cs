@@ -62,6 +62,7 @@ namespace Icon
     {
         private IWebHostEnvironment _environment;
         private IConfiguration _configuration;
+        private AppSettings _appSettings;
 
         public Startup(IWebHostEnvironment environment)
         {
@@ -69,25 +70,10 @@ namespace Icon
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(environment.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false)
+                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
               .Build();
-        }
-
-        private string GetHost()
-        {
-            return _configuration.GetValue<string>("Host");
-        }
-
-        private string GetConnectionString()
-        {
-            return _configuration.GetValue<string>("ConnectionString");
-            /* return _configuration.GetConnectionString("ApplicationDbContext"); */
-        }
-
-        private string GetSchemaName()
-        {
-            return _configuration.GetValue<string>("SchemaName");
+            _appSettings = _configuration.Get<AppSettings>();
         }
 
         private string GetMigrationsAssembly()
@@ -98,21 +84,24 @@ namespace Icon
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<AppSettings>(_appSettings);
             ConfigureDatabaseServices(services);
             Configuration.Session.ConfigureServices(services);
             Configuration.RequestResponse.ConfigureServices(services);
             Configuration.Api.ConfigureServices(services);
-            Configuration.Auth.ConfigureServices(services, GetConnectionString(), GetMigrationsAssembly(), GetHost(), _environment, _configuration);
-            Configuration.EventStore.ConfigureServices(services, GetConnectionString(), GetSchemaName(), _environment.IsProduction());
+            Configuration.Auth.ConfigureServices(services, _environment, _configuration, _appSettings, GetMigrationsAssembly());
+            Configuration.EventStore.ConfigureServices(services, _environment, _appSettings.Database);
             Configuration.QueryCommandAndEventBusses.ConfigureServices(services);
         }
 
         private void ConfigureDatabaseServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(GetConnectionString() /* , o => o.UseNodaTime() */)
-                  .EnableSensitiveDataLogging(_configuration.GetValue<bool>("Logging:EnableSqlParameterLogging"))
-                );
+            services.AddDbContext<ApplicationDbContext>(_ =>
+                {
+                  _.UseNpgsql(_appSettings.Database.ConnectionString /* , o => o.UseNodaTime() */)
+                    .EnableSensitiveDataLogging(_appSettings.Logging.EnableSensitiveDataLogging);
+                }
+              );
         }
 
 
@@ -120,7 +109,7 @@ namespace Icon
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.0
         public void Configure(IApplicationBuilder app)
         {
-            Configuration.RequestResponse.ConfigureRouting(app, _environment.IsDevelopment());
+            Configuration.RequestResponse.ConfigureRouting(app, _environment);
             Configuration.Api.Configure(app);
             Configuration.Auth.Configure(app);
             Configuration.Session.Configure(app);
