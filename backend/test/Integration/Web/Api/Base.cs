@@ -23,6 +23,29 @@ namespace Test.Integration.Web.Api
             return result;
         }
 
+        protected static async Task<TokenResponse> RequestAuthToken(HttpClient httpClient, string emailAddress, string password)
+        {
+            var response = await httpClient.RequestPasswordTokenAsync(new PasswordTokenRequest
+            {
+                Address = "https://localhost:5001/connect/token",
+
+                ClientId = "test",
+                ClientSecret = "secret",
+                Scope = "api",
+
+                UserName = emailAddress,
+                Password = password,
+            });
+            if (response.IsError) throw new Exception(response.Error); // TODO Is this exception propagated?
+            return response;
+        }
+
+        protected static async Task Authorize(HttpClient httpClient)
+        {
+            var tokenResponse = await RequestAuthToken(httpClient, "simon@icon.com", "simonSIMON123@");
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+        }
+
         protected CustomWebApplicationFactory Factory { get; }
         protected HttpClient HttpClient { get; }
 
@@ -44,23 +67,6 @@ namespace Test.Integration.Web.Api
                 MaxAutomaticRedirections = 3,
             }
             );
-        }
-
-        protected async Task<TokenResponse> RequestAuthToken(string emailAddress, string password)
-        {
-            var response = await HttpClient.RequestPasswordTokenAsync(new PasswordTokenRequest
-            {
-                Address = "https://localhost:5001/connect/token",
-
-                ClientId = "test",
-                ClientSecret = "secret",
-                Scope = "api",
-
-                UserName = emailAddress,
-                Password = password,
-            });
-            if (response.IsError) throw new Exception(response.Error);
-            return response;
         }
     }
 }

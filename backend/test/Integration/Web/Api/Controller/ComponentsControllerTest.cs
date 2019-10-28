@@ -9,6 +9,7 @@ using System;
 using Xunit;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 using IdentityModel.Client;
+using FluentAssertions;
 
 namespace Test.Integration.Web.Api.Controller
 {
@@ -21,67 +22,109 @@ namespace Test.Integration.Web.Api.Controller
 
         public static async Task<HttpResponseMessage> Post(HttpClient httpClient)
         {
-            return await httpClient.PostAsync("/api/components", MakeJsonHttpContent(new PostComponent()));
+            return await httpClient.PostAsync("/api/components", MakeJsonHttpContent(new PostTest.Component()));
         }
 
         public ComponentsControllerTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-        private class GetListComponent
-        {
-            Guid Id;
-        }
-
         public class GetListTest : Base
         {
+            internal class Component
+            {
+                internal Guid Id;
+            }
+
+            internal static async Task<IEnumerable<Component>> Deserialize(HttpResponseMessage httpResponse)
+            {
+                httpResponse.EnsureSuccessStatusCode();
+                return JsonSerializer.Deserialize<IEnumerable<Component>>(
+                    await httpResponse.Content.ReadAsStringAsync()
+                );
+            }
+
             public GetListTest(CustomWebApplicationFactory factory) : base(factory) { }
 
             [Fact]
             public async Task WhenEmpty()
             {
                 // Act
-                var httpResponse = await GetList(HttpClient);
-
+                var components = await Deserialize(await GetList(HttpClient));
                 // Assert
-                httpResponse.EnsureSuccessStatusCode();
-                var components = JsonSerializer.Deserialize<IEnumerable<GetListComponent>>(
-                    await httpResponse.Content.ReadAsStringAsync()
-                );
-                Assert.Empty(components);
+                components.Should().BeEmpty();
+            }
+
+            [Fact]
+            public async Task WhenSingle()
+            {
+                // Arrange
+                await Factory.SeedUsers();
+                Factory.SeedAuth();
+                await Authorize(HttpClient);
+                var component = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
+                // Act
+                var components = await Deserialize(await GetList(HttpClient));
+                // Assert
+                components.Should().BeEquivalentTo(component);
+            }
+
+            [Fact]
+            public async Task WhenMultiple()
+            {
+                // Arrange
+                await Factory.SeedUsers();
+                Factory.SeedAuth();
+                await Authorize(HttpClient);
+                var component1 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
+                var component2 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
+                var component3 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
+                var component4 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
+                var component5 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
+                // Act
+                var components = await Deserialize(await GetList(HttpClient));
+                // Assert
+                components.Should().BeEquivalentTo(component1, component2, component3, component4, component5);
             }
         }
 
-        private class PostComponent
+
+        public class PostTest : Base
         {
-        }
+            internal class Component
+            {
+            }
 
-        [Fact]
-        public async Task CannotPostAnonymously()
-        {
-            // Act
-            var httpResponse = await Post(HttpClient);
-            // Assert
-            Assert.Equal(HttpStatusCode.Unauthorized, httpResponse.StatusCode);
-        }
+            internal static async Task<Guid> Deserialize(HttpResponseMessage httpResponse)
+            {
+                httpResponse.EnsureSuccessStatusCode();
+                return JsonSerializer.Deserialize<Guid>(
+                    await httpResponse.Content.ReadAsStringAsync()
+                );
+            }
 
-        [Fact]
-        public async Task CanPost()
-        {
-            // Arrange
-            // TODO Instead of seeds we should use the public API as much as possible. Otherwise the state of the database may not be a possible state in production.
-            await Factory.SeedUsers();
-            Factory.SeedAuth();
-            var tokenResponse = await RequestAuthToken("simon@icon.com", "simonSIMON123@");
-            HttpClient.SetBearerToken(tokenResponse.AccessToken);
+            public PostTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-            // Act
-            var httpResponse = await Post(HttpClient);
+            [Fact]
+            public async Task CannotAnonymously()
+            {
+                // Act
+                var httpResponse = await Post(HttpClient);
+                // Assert
+                httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            }
 
-            // Assert
-            httpResponse.EnsureSuccessStatusCode();
-            var id = JsonSerializer.Deserialize<Guid>(
-                await httpResponse.Content.ReadAsStringAsync()
-            );
-            Assert.NotNull(id);
+            [Fact]
+            public async Task CanAuthorized()
+            {
+                // Arrange
+                // TODO Instead of seeds we should use the public API as much as possible. Otherwise the state of the database may not be a possible state in production.
+                await Factory.SeedUsers();
+                Factory.SeedAuth();
+                await Authorize(HttpClient);
+                // Act
+                var id = await Deserialize(await Post(HttpClient));
+                // Assert
+                id.Should().NotBeEmpty();
+            }
         }
     }
 }
