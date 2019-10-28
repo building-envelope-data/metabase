@@ -3,6 +3,7 @@
 // https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/TestsInfrasructure/MartenTest.cs
 // https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-3.0#customize-webapplicationfactory
 
+using System.Threading.Tasks;
 using IRelationalDatabaseCreator = Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator;
 using PersistedGrantDbContext = IdentityServer4.EntityFramework.DbContexts.PersistedGrantDbContext;
 using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
@@ -39,6 +40,14 @@ namespace Test.Integration.Web.Api
             }
         }
 
+        private async Task DoAsync(Func<IServiceProvider, Task> what)
+        {
+            using (var scope = Services.CreateScope())
+            {
+                await what(scope.ServiceProvider);
+            }
+        }
+
 				private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
 				{
             using (var scope = Services.CreateScope())
@@ -56,6 +65,23 @@ namespace Test.Integration.Web.Api
 					}
 				}
 
+        // To run tests in parallel without conflicting each other by working
+        // on the same tables, each test must have its own schemas. How can
+        // these schemas be initialized?
+        // private readonly string _applicationSchemaName;
+        // private readonly string _eventStoreSchemaName;
+        // private readonly string _identityServerPersistedGrantSchemaName;
+        // private readonly string _identityServerConfigurationSchemaName;
+
+        public CustomWebApplicationFactory()
+        {
+            // var prefix = Guid.NewGuid().ToString();
+            // _applicationSchemaName = prefix + AppSettings.Database.SchemaName.Application;
+            // _eventStoreSchemaName = prefix + AppSettings.Database.SchemaName.EventStore;
+            // _identityServerPersistedGrantSchemaName = prefix + AppSettings.Database.SchemaName.IdentityServerPersistedGrant;
+            // _identityServerConfigurationSchemaName = prefix + AppSettings.Database.SchemaName.IdentityServerConfiguration;
+        }
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             /* builder.UseStartup<Startup>().UseEnvironment("Test"); */
@@ -70,17 +96,18 @@ namespace Test.Integration.Web.Api
             Do(
                 services =>
                     {
-                        SetUpDatabase(services.GetRequiredService<ApplicationDbContext>());
-                        SetUpDatabase(services.GetRequiredService<PersistedGrantDbContext>());
-                        SetUpDatabase(services.GetRequiredService<ConfigurationDbContext>());
+                        SetUpDatabase(services.GetRequiredService<ApplicationDbContext>()/*, _applicationSchemaName */);
+                        SetUpDatabase(services.GetRequiredService<PersistedGrantDbContext>()/*, _identityServerPersistedGrantSchemaName */);
+                        SetUpDatabase(services.GetRequiredService<ConfigurationDbContext>()/*, _identityServerConfigurationSchemaName */);
                         SetUpEventStore();
                     }
             );
         }
 
-        private void SetUpDatabase(DbContext dbContext)
+        private void SetUpDatabase(DbContext dbContext/*, string schemaName */)
         {
             // https://docs.microsoft.com/en-us/ef/core/managing-schemas/ensure-created#multiple-dbcontext-classes
+            // dbContext.Model.SetDefaultSchema(schemaName);
             var databaseCreator = dbContext.Database.GetService<IRelationalDatabaseCreator>();
             if (!databaseCreator.Exists()) databaseCreator.Create();
             DropDatabaseSchema(dbContext.Model.GetDefaultSchema());
@@ -93,12 +120,12 @@ namespace Test.Integration.Web.Api
             // The schema is re-created on the fly
         }
 
-        public void SeedUsers()
+        public async Task SeedUsers()
         {
-            Do(
-                    services =>
+            await DoAsync(
+                    async services =>
                     {
-                        SeedData.SeedUsers(services.GetRequiredService<UserManager<User>>());
+                        await SeedData.SeedUsers(services.GetRequiredService<UserManager<User>>());
                     }
             );
         }

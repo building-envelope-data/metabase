@@ -17,23 +17,27 @@ using IdentityServer4.EntityFramework.Storage;
 using IdentityServer4.Models;
 using IdentityServer4;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Configuration = Icon.Configuration;
 
 namespace Test.Integration.Web.Api
 {
 	public static class SeedData
 	{
-		public static void SeedUsers(UserManager<User> userManager)
+		public static async Task SeedUsers(UserManager<User> userManager)
 		{
-			userManager.CreateAsync(
+			var identityResult = await userManager.CreateAsync(
 					new User()
 					{
 					/* Id = 1, */
-					Email = "simon@icon.com"
+					UserName = "simon@icon.com",
+					Email = "simon@icon.com",
+					EmailConfirmed = true,
 					/* Created = DateTime.UtcNow, */
 					},
 					"simonSIMON123@"
 					);
+			// TODO fail if `!identityResult.Succeeded` and report `identityResult.Errors`, see https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.identityresult?view=aspnetcore-3.0
 		}
 
 		public static void SeedAuth(ConfigurationDbContext dbContext)

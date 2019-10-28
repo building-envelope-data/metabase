@@ -16,6 +16,13 @@ namespace Test.Integration.Web.Api
 {
     public class Base : IClassFixture<CustomWebApplicationFactory>
     {
+        protected static HttpContent MakeJsonHttpContent<TContent>(TContent content)
+        {
+            var result = new ByteArrayContent(JsonSerializer.SerializeToUtf8Bytes<TContent>(content));
+            result.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return result;
+        }
+
         protected CustomWebApplicationFactory Factory { get; }
         protected HttpClient HttpClient { get; }
 
@@ -54,13 +61,6 @@ namespace Test.Integration.Web.Api
             });
             if (response.IsError) throw new Exception(response.Error);
             return response;
-        }
-
-        protected HttpContent MakeJsonHttpContent<TContent>(TContent content)
-        {
-            var result = new ByteArrayContent(JsonSerializer.SerializeToUtf8Bytes<TContent>(content));
-            result.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            return result;
         }
     }
 }
