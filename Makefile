@@ -74,5 +74,7 @@ shellb : runb ## Enter shell in a fresh `backend` container
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	docker-compose exec \
 		database \
-		psql -U postgres
+		psql \
+		--username postgres \
+		--dbname icon_development
 .PHONY : psql
