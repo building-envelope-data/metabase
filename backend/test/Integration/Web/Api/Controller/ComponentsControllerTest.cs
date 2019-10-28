@@ -52,6 +52,7 @@ namespace Test.Integration.Web.Api.Controller
         {
             // Arrange
             Factory.SeedUsers();
+            Factory.SeedAuth();
             var tokenResponse = await RequestAuthToken("simon@icon.com", "simonSIMON123@");
             HttpClient.SetBearerToken(tokenResponse.AccessToken);
 

@@ -41,24 +41,16 @@ namespace Test.Integration.Web.Api
 
         protected async Task<TokenResponse> RequestAuthToken(string emailAddress, string password)
         {
-            var response = await HttpClient.RequestTokenAsync(new TokenRequest
+            var response = await HttpClient.RequestPasswordTokenAsync(new PasswordTokenRequest
             {
-                Address = "https://localhost:5001/connect/authorize",
-                GrantType = GrantType.Implicit,
+                Address = "https://localhost:5001/connect/token",
 
-                ClientId = "swagger",
-                ClientSecret = Configuration.Auth.ApiSecret,
+                ClientId = "test",
+                ClientSecret = "secret",
+                Scope = "api",
 
-                Parameters =
-                  {
-                  {"scope", Configuration.Auth.ApiName},
-                  {"redirect_uri", "https://localhost:5001/swagger/oauth2-redirect.html"},
-                  {"response_type", "token"},
-                  {"response_mode", "fragment"},
-                  {"realm", "icon"}
-                  /* {"email", emailAddress}, */
-                  /* {"password", password} */
-                  }
+                UserName = emailAddress,
+                Password = password,
             });
             if (response.IsError) throw new Exception(response.Error);
             return response;

@@ -3,9 +3,11 @@
 // https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/TestsInfrasructure/MartenTest.cs
 // https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-3.0#customize-webapplicationfactory
 
+using IRelationalDatabaseCreator = Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator;
 using PersistedGrantDbContext = IdentityServer4.EntityFramework.DbContexts.PersistedGrantDbContext;
 using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Guid = System.Guid;
 using System;
 using Exception = System.Exception;
@@ -78,13 +80,16 @@ namespace Test.Integration.Web.Api
 
         private void SetUpDatabase(DbContext dbContext)
         {
-            dbContext.Database.EnsureDeleted();
-            dbContext.Database.EnsureCreated();
+            // https://docs.microsoft.com/en-us/ef/core/managing-schemas/ensure-created#multiple-dbcontext-classes
+            var databaseCreator = dbContext.Database.GetService<IRelationalDatabaseCreator>();
+            if (!databaseCreator.Exists()) databaseCreator.Create();
+            DropDatabaseSchema(dbContext.Model.GetDefaultSchema());
+            databaseCreator.CreateTables();
         }
 
         private void SetUpEventStore()
         {
-            DisposeEventStore();
+            DropDatabaseSchema(AppSettings.Database.SchemaName.EventStore);
             // The schema is re-created on the fly
         }
 
@@ -93,41 +98,42 @@ namespace Test.Integration.Web.Api
             Do(
                     services =>
                     {
-                        SeedData.PopulateUsers(services.GetRequiredService<UserManager<User>>());
+                        SeedData.SeedUsers(services.GetRequiredService<UserManager<User>>());
                     }
             );
         }
 
-        public void SeedTestData()
+        public void SeedAuth()
         {
             Do(
                     services =>
                     {
-                        SeedData.PopulateTestData(services.GetRequiredService<ApplicationDbContext>());
+                        SeedData.SeedAuth(services.GetRequiredService<ConfigurationDbContext>());
                     }
             );
         }
 
         public new void Dispose()
         {
+            // We could alternatively just drop the one and only database the connection string refers to
             Do(
-                    services =>
+                services =>
                     {
-                        DisposeDatabase(services.GetRequiredService<ApplicationDbContext>());
-                        DisposeDatabase(services.GetRequiredService<PersistedGrantDbContext>());
-                        DisposeDatabase(services.GetRequiredService<ConfigurationDbContext>());
-                        DisposeEventStore();
+                        DropDatabaseSchema(services.GetRequiredService<ApplicationDbContext>());
+                        DropDatabaseSchema(services.GetRequiredService<PersistedGrantDbContext>());
+                        DropDatabaseSchema(services.GetRequiredService<ConfigurationDbContext>());
+                        DropDatabaseSchema(AppSettings.Database.SchemaName.EventStore);
                     }
             );
 						base.Dispose();
         }
 
-        private void DisposeDatabase(DbContext dbContext)
+        private void DropDatabaseSchema(DbContext dbContext)
         {
-            dbContext.Database.EnsureDeleted();
+            DropDatabaseSchema(dbContext.Model.GetDefaultSchema());
         }
 
-        private void DisposeEventStore()
+        private void DropDatabaseSchema(string schemaName)
         {
             using (var connection = new NpgsqlConnection(AppSettings.Database.ConnectionString))
             {
@@ -135,12 +141,11 @@ namespace Test.Integration.Web.Api
                 using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     var command = connection.CreateCommand();
-                    command.CommandText = $"DROP SCHEMA IF EXISTS {AppSettings.Database.SchemaName.EventStore} CASCADE;";
+                    command.CommandText = $"DROP SCHEMA IF EXISTS {schemaName} CASCADE;";
                     command.ExecuteNonQuery();
                     transaction.Commit();
                 }
             }
         }
-
     }
 }
