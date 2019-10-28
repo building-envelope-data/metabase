@@ -105,14 +105,14 @@ namespace Icon.Configuration
             // this adds the config data from DB (clients, resources)
             .AddConfigurationStore(_ =>
                 {
-                  _.DefaultSchema = appSettings.Database.SchemaName.IdentityServerConfiguration;
-                  _.ConfigureDbContext = builder =>
-                  builder.UseNpgsql(appSettings.Database.ConnectionString,
-                      sql =>
-                      {
-                          /* sql.UseNodaTime(); */
-                          sql.MigrationsAssembly(migrationsAssembly);
-                      });
+                    _.DefaultSchema = appSettings.Database.SchemaName.IdentityServerConfiguration;
+                    _.ConfigureDbContext = builder =>
+                    builder.UseNpgsql(appSettings.Database.ConnectionString,
+                        sql =>
+                        {
+                            /* sql.UseNodaTime(); */
+                            sql.MigrationsAssembly(migrationsAssembly);
+                        });
                 })
             // this adds the operational data from DB (codes, tokens, consents)
             .AddOperationalStore(_ =>

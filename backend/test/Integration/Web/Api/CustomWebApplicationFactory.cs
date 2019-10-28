@@ -48,22 +48,24 @@ namespace Test.Integration.Web.Api
             }
         }
 
-				private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
-				{
+        private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
+        {
             using (var scope = Services.CreateScope())
             {
                 return what(scope.ServiceProvider);
             }
-				}
+        }
 
-				private AppSettings AppSettings {
-					get {
-						return Get(
-								services =>
-									services.GetRequiredService<AppSettings>()
-							);
-					}
-				}
+        private AppSettings AppSettings
+        {
+            get
+            {
+                return Get(
+                        services =>
+                            services.GetRequiredService<AppSettings>()
+                    );
+            }
+        }
 
         // To run tests in parallel without conflicting each other by working
         // on the same tables, each test must have its own schemas. How can
@@ -152,7 +154,7 @@ namespace Test.Integration.Web.Api
                         DropDatabaseSchema(AppSettings.Database.SchemaName.EventStore);
                     }
             );
-						base.Dispose();
+            base.Dispose();
         }
 
         private void DropDatabaseSchema(DbContext dbContext)

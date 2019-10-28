@@ -98,8 +98,8 @@ namespace Icon
         {
             services.AddDbContext<ApplicationDbContext>(_ =>
                 {
-                  _.UseNpgsql(_appSettings.Database.ConnectionString /* , o => o.UseNodaTime() */)
-                    .EnableSensitiveDataLogging(_appSettings.Logging.EnableSensitiveDataLogging);
+                    _.UseNpgsql(_appSettings.Database.ConnectionString /* , o => o.UseNodaTime() */)
+                      .EnableSensitiveDataLogging(_appSettings.Logging.EnableSensitiveDataLogging);
                 }
               );
         }

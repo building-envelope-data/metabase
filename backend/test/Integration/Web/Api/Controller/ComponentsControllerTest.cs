@@ -33,21 +33,21 @@ namespace Test.Integration.Web.Api.Controller
 
         public class GetListTest : Base
         {
-        public GetListTest(CustomWebApplicationFactory factory) : base(factory) { }
+            public GetListTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-        [Fact]
-        public async Task WhenEmpty()
-        {
-            // Act
-            var httpResponse = await GetList(HttpClient);
+            [Fact]
+            public async Task WhenEmpty()
+            {
+                // Act
+                var httpResponse = await GetList(HttpClient);
 
-            // Assert
-            httpResponse.EnsureSuccessStatusCode();
-            var components = JsonSerializer.Deserialize<IEnumerable<GetListComponent>>(
-                await httpResponse.Content.ReadAsStringAsync()
-            );
-            Assert.Empty(components);
-        }
+                // Assert
+                httpResponse.EnsureSuccessStatusCode();
+                var components = JsonSerializer.Deserialize<IEnumerable<GetListComponent>>(
+                    await httpResponse.Content.ReadAsStringAsync()
+                );
+                Assert.Empty(components);
+            }
         }
 
         private class PostComponent
