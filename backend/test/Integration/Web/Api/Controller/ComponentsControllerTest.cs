@@ -86,7 +86,6 @@ namespace Test.Integration.Web.Api.Controller
             }
         }
 
-
         public class PostTest : Base
         {
             internal class Component
