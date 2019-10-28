@@ -8,9 +8,9 @@ services:
     restart: always
     image: postgres:11.5-alpine
     environment:
-      - POSTGRES_USER=postgres # ${TYPEORM_USERNAME}
-      - POSTGRES_PASSWORD=postgres # ${TYPEORM_PASSWORD} # We can use docker-compose `secrets` for that
-      - POSTGRES_DB=postgres # ${TYPEORM_DATABASE}postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres # We can use docker-compose `secrets` for that
+      - POSTGRES_DB=postgres
     ports:
       - 5432:5432
     volumes:
