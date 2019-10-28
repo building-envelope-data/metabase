@@ -39,7 +39,10 @@ namespace Icon
             return Host.CreateDefaultBuilder(args)
               .ConfigureWebHostDefaults(webBuilder =>
                   {
-                      webBuilder.UseKestrel().UseContentRoot(Directory.GetCurrentDirectory()).UseStartup<Startup>();
+                      webBuilder
+                        .UseKestrel()
+                        .UseContentRoot(Directory.GetCurrentDirectory())
+                        .UseStartup<Startup>();
                       /* TODO? .UseIISIntegration()
        */
                   });
