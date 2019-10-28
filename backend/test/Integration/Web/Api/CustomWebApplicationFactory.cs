@@ -68,8 +68,8 @@ namespace Test.Integration.Web.Api
         }
 
         // To run tests in parallel without conflicting each other by working
-        // on the same tables, each test must have its own schemas. How can
-        // these schemas be initialized?
+        // on the same tables, each test must have its own database or schemas.
+        // How can the database or schemas be changed?
         // private readonly string _applicationSchemaName;
         // private readonly string _eventStoreSchemaName;
         // private readonly string _identityServerPersistedGrantSchemaName;
