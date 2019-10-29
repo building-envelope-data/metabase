@@ -14,7 +14,7 @@ using IdentityModel.Client;
 
 namespace Test.Integration.Web.Api
 {
-    public class TestBase : IClassFixture<CustomWebApplicationFactory>
+    public abstract class TestBase : IClassFixture<CustomWebApplicationFactory>
     {
         protected static async Task<TokenResponse> RequestAuthToken(HttpClient httpClient, string emailAddress, string password)
         {
