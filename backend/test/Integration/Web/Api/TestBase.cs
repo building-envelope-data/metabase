@@ -14,7 +14,7 @@ using IdentityModel.Client;
 
 namespace Test.Integration.Web.Api
 {
-    public class Base : IClassFixture<CustomWebApplicationFactory>
+    public class TestBase : IClassFixture<CustomWebApplicationFactory>
     {
         protected static async Task<TokenResponse> RequestAuthToken(HttpClient httpClient, string emailAddress, string password)
         {
@@ -33,16 +33,16 @@ namespace Test.Integration.Web.Api
             return response;
         }
 
-        protected static async Task Authorize(HttpClient httpClient)
+        protected static async Task Authorize(HttpClient httpClient, string username, string password)
         {
-            var tokenResponse = await RequestAuthToken(httpClient, "simon@icon.com", "simonSIMON123@");
+            var tokenResponse = await RequestAuthToken(httpClient, username, password);
             httpClient.SetBearerToken(tokenResponse.AccessToken);
         }
 
         protected CustomWebApplicationFactory Factory { get; }
         protected HttpClient HttpClient { get; }
 
-        protected Base(CustomWebApplicationFactory factory)
+        protected TestBase(CustomWebApplicationFactory factory)
         {
             Factory = factory;
             Factory.SetUp();

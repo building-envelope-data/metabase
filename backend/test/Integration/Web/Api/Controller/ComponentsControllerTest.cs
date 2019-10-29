@@ -13,23 +13,23 @@ using FluentAssertions;
 
 namespace Test.Integration.Web.Api.Controller
 {
-    public class ComponentsControllerTest : Base
+    public class ComponentsControllerTest : TestBase
     {
         public ComponentsControllerTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-				public class ComponentsBase : Base
+				public class ComponentsTestBase : TestBase
 				{
 						protected Components.Client ComponentsClient { get; }
 
-						public ComponentsBase(CustomWebApplicationFactory factory) : base(factory)
+						public ComponentsTestBase(CustomWebApplicationFactory factory) : base(factory)
 						{
 								ComponentsClient = new Components.Client(HttpClient);
 						}
 				}
 
-        public class GetListTest : ComponentsBase
+        public class ListTest : ComponentsTestBase
         {
-					public GetListTest(CustomWebApplicationFactory factory) : base(factory) {
+					public ListTest(CustomWebApplicationFactory factory) : base(factory) {
 					}
 
             [Fact]
@@ -47,7 +47,7 @@ namespace Test.Integration.Web.Api.Controller
                 // Arrange
                 await Factory.SeedUsers();
                 Factory.SeedAuth();
-                await Authorize(HttpClient);
+                await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
                 var component = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
                 // Act
                 var components = await ComponentsClient.List.Deserialized();
@@ -61,7 +61,7 @@ namespace Test.Integration.Web.Api.Controller
                 // Arrange
                 await Factory.SeedUsers();
                 Factory.SeedAuth();
-                await Authorize(HttpClient);
+                await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
                 var component1 = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
                 var component2 = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
                 var component3 = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
@@ -74,7 +74,7 @@ namespace Test.Integration.Web.Api.Controller
             }
         }
 
-        public class PostTest : ComponentsBase
+        public class PostTest : ComponentsTestBase
         {
             public PostTest(CustomWebApplicationFactory factory) : base(factory) { }
 
@@ -94,7 +94,7 @@ namespace Test.Integration.Web.Api.Controller
                 // TODO Instead of seeds we should use the public API as much as possible. Otherwise the state of the database may not be a possible state in production.
                 await Factory.SeedUsers();
                 Factory.SeedAuth();
-                await Authorize(HttpClient);
+                await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
                 // Act
                 var id = await ComponentsClient.Post.Deserialized();
                 // Assert
