@@ -75,12 +75,42 @@ namespace Test.Integration.Web.Api.Controller
             }
         }
 
+        public class GetTest : ComponentsTestBase
+      {
+            public GetTest(CustomWebApplicationFactory factory) : base(factory) { }
+
+            [Fact]
+            public async Task NonExistent()
+            {
+                // Arrange
+                var componentId = Guid.NewGuid();
+                // Act
+                var httpResponse = await ComponentsClient.Get.Raw(componentId);
+                // Assert
+                httpResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+
+            [Fact]
+            public async Task Existent()
+            {
+                // Arrange
+                await Factory.SeedUsers();
+                Factory.SeedAuth();
+                await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
+                var componentId = await ComponentsClient.Post.Deserialized();
+                // Act
+                var component = await ComponentsClient.Get.Deserialized(componentId);
+                // Assert
+                component.Id.Should().Be(componentId);
+            }
+      }
+
         public class PostTest : ComponentsTestBase
         {
             public PostTest(CustomWebApplicationFactory factory) : base(factory) { }
 
             [Fact]
-            public async Task CannotAnonymously()
+            public async Task Anonymously()
             {
                 // Act
                 var httpResponse = await ComponentsClient.Post.Raw();
@@ -89,7 +119,7 @@ namespace Test.Integration.Web.Api.Controller
             }
 
             [Fact]
-            public async Task CanAuthorized()
+            public async Task Authorized()
             {
                 // Arrange
                 // TODO Instead of seeds we should use the public API as much as possible. Otherwise the state of the database may not be a possible state in production.
