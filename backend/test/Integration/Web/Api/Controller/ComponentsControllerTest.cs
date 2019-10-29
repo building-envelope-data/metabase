@@ -17,20 +17,21 @@ namespace Test.Integration.Web.Api.Controller
     {
         public ComponentsControllerTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-				public class ComponentsTestBase : TestBase
-				{
-						protected Components.Client ComponentsClient { get; }
+        public class ComponentsTestBase : TestBase
+        {
+            protected Components.Client ComponentsClient { get; }
 
-						public ComponentsTestBase(CustomWebApplicationFactory factory) : base(factory)
-						{
-								ComponentsClient = new Components.Client(HttpClient);
-						}
-				}
+            public ComponentsTestBase(CustomWebApplicationFactory factory) : base(factory)
+            {
+                ComponentsClient = new Components.Client(HttpClient);
+            }
+        }
 
         public class ListTest : ComponentsTestBase
         {
-					public ListTest(CustomWebApplicationFactory factory) : base(factory) {
-					}
+            public ListTest(CustomWebApplicationFactory factory) : base(factory)
+            {
+            }
 
             [Fact]
             public async Task WhenEmpty()

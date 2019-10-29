@@ -21,68 +21,68 @@ namespace Test.Integration.Web.Api.Controller.Components
 
         public Client(HttpClient httpClient) : base(httpClient)
         {
-          List = new ListClient(httpClient);
-          Post = new PostClient(httpClient);
+            List = new ListClient(httpClient);
+            Post = new PostClient(httpClient);
         }
     }
 
-        public class ListClient : ClientBase
+    public class ListClient : ClientBase
+    {
+        public class Output
         {
-            public class Output
-            {
-                public Guid Id;
-            }
+            public Guid Id;
+        }
 
         public ListClient(HttpClient httpClient) : base(httpClient)
         {
         }
 
-            public async Task<HttpResponseMessage> Raw()
-            {
-                return await HttpClient.GetAsync("/api/components");
-            }
-
-            public async Task<IEnumerable<Output>> Deserialized()
-            {
-                return await Deserialize(await Raw());
-            }
-
-            public async Task<IEnumerable<Output>> Deserialize(HttpResponseMessage httpResponse)
-            {
-                httpResponse.EnsureSuccessStatusCode();
-                return JsonSerializer.Deserialize<IEnumerable<Output>>(
-                    await httpResponse.Content.ReadAsStringAsync()
-                );
-            }
+        public async Task<HttpResponseMessage> Raw()
+        {
+            return await HttpClient.GetAsync("/api/components");
         }
 
-        public class PostClient : ClientBase
+        public async Task<IEnumerable<Output>> Deserialized()
         {
-            public class Input
-            {
-            }
+            return await Deserialize(await Raw());
+        }
+
+        public async Task<IEnumerable<Output>> Deserialize(HttpResponseMessage httpResponse)
+        {
+            httpResponse.EnsureSuccessStatusCode();
+            return JsonSerializer.Deserialize<IEnumerable<Output>>(
+                await httpResponse.Content.ReadAsStringAsync()
+            );
+        }
+    }
+
+    public class PostClient : ClientBase
+    {
+        public class Input
+        {
+        }
 
         public PostClient(HttpClient httpClient) : base(httpClient)
         {
         }
 
-          public async Task<HttpResponseMessage> Raw()
-          {
+        public async Task<HttpResponseMessage> Raw()
+        {
             return await HttpClient.PostAsync("/api/components", MakeJsonHttpContent(new Input()));
-          }
-
-            public async Task<Guid> Deserialized()
-            {
-                return await Deserialize(await Raw());
-            }
-
-            public async Task<Guid> Deserialize(HttpResponseMessage httpResponse)
-            {
-                httpResponse.EnsureSuccessStatusCode();
-                return JsonSerializer.Deserialize<Guid>(
-                    await httpResponse.Content.ReadAsStringAsync()
-                );
-            }
-
         }
+
+        public async Task<Guid> Deserialized()
+        {
+            return await Deserialize(await Raw());
+        }
+
+        public async Task<Guid> Deserialize(HttpResponseMessage httpResponse)
+        {
+            httpResponse.EnsureSuccessStatusCode();
+            return JsonSerializer.Deserialize<Guid>(
+                await httpResponse.Content.ReadAsStringAsync()
+            );
+        }
+
+    }
 }

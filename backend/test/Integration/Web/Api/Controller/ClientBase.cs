@@ -27,7 +27,7 @@ namespace Test.Integration.Web.Api.Controller
 
         public ClientBase(HttpClient httpClient)
         {
-          HttpClient = httpClient;
+            HttpClient = httpClient;
         }
     }
 }
