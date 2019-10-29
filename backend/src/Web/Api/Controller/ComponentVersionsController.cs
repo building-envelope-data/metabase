@@ -63,10 +63,9 @@ namespace Icon.Web.Api.Controller
         {
             var user = await _userManager.GetUserAsync(User);
             var componentVersion = await _commandBus.Send<ComponentVersion.Create.Command, ComponentVersionAggregate>(
-                new ComponentVersion.Create.Command
+                new ComponentVersion.Create.Command(creatorId: user.Id)
                 {
                     ComponentId = componentId,
-                    CreatorId = user.Id
                 }
                 );
             return CreatedAtAction(

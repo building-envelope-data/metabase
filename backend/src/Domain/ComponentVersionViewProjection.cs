@@ -9,17 +9,17 @@ namespace Icon.Domain
     {
         public ComponentVersionViewProjection()
         {
-            ProjectEvent<ComponentVersion.Create.Event>(e => e.ComponentVersionId, Apply);
-            ProjectEventAsync<ComponentVersionOwnership.Create.Event>(e => e.ComponentVersionId, Apply);
+            ProjectEvent<ComponentVersion.Create.ComponentVersionCreateEvent>(e => e.ComponentVersionId, Apply);
+            ProjectEventAsync<ComponentVersionOwnership.Create.ComponentVersionOwnershipEvent>(e => e.ComponentVersionId, Apply);
         }
 
-        private void Apply(ComponentVersionView view, ComponentVersion.Create.Event @event)
+        private void Apply(ComponentVersionView view, ComponentVersion.Create.ComponentVersionCreateEvent @event)
         {
             view.Id = @event.ComponentVersionId;
             view.ComponentId = @event.ComponentId;
         }
 
-        private async Task Apply(IDocumentSession session, ComponentVersionView view, ComponentVersionOwnership.Create.Event @event)
+        private async Task Apply(IDocumentSession session, ComponentVersionView view, ComponentVersionOwnership.Create.ComponentVersionOwnershipEvent @event)
         {
             var ownership = await session.LoadAsync<ComponentVersionOwnershipView>(@event.ComponentVersionOwnershipId);
             view.Ownerships.Add(ownership);

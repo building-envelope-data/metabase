@@ -22,13 +22,15 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
         public DateTime AvailableUntil { get; set; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
     }
 
-    public sealed class Event : EventBase
+    public sealed class ComponentVersionOwnershipEvent : EventBase
     {
-        public Guid ComponentVersionOwnershipId { get; private set; }
-        public Guid ComponentVersionId { get; private set; }
-        public Data Data { get; private set; }
+        public Guid ComponentVersionOwnershipId { get; set; }
+        public Guid ComponentVersionId { get; set; }
+        public Data Data { get; set; }
 
-        public Event(Guid componentVersionOwnershipId, Command command) : base(command.CreatorId)
+        public ComponentVersionOwnershipEvent() {}
+
+        public ComponentVersionOwnershipEvent(Guid componentVersionOwnershipId, Command command) : base(command.CreatorId)
         {
             ComponentVersionOwnershipId = componentVersionOwnershipId;
             ComponentVersionId = command.ComponentVersionId;
@@ -38,16 +40,17 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
 
     public sealed class Command : CommandBase<ComponentVersionOwnershipAggregate>
     {
+        public Command(Guid creatorId) : base(creatorId) {}
+
         public Guid ComponentVersionId { get; private set; }
         public Data Data { get; private set; }
 
         public static Command From(Guid componentVersionId, Data data, Guid creatorId)
         {
-            return new Command
+            return new Command(creatorId)
             {
                 ComponentVersionId = componentVersionId,
                 Data = data,
-                CreatorId = creatorId,
             };
         }
     }
@@ -63,7 +66,7 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
 
         public async Task<ComponentVersionOwnershipAggregate> Handle(Command command, CancellationToken cancellationToken)
         {
-            var @event = new Event(Guid.NewGuid(), command);
+            var @event = new ComponentVersionOwnershipEvent(Guid.NewGuid(), command);
             var componentVersionOwnership = ComponentVersionOwnershipAggregate.Create(@event);
             return await _repository.Store(componentVersionOwnership, cancellationToken);
         }

@@ -9,7 +9,7 @@ namespace Icon.Domain
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; private set; }
 
-        public static ComponentVersionAggregate Create(ComponentVersion.Create.Event @event)
+        public static ComponentVersionAggregate Create(ComponentVersion.Create.ComponentVersionCreateEvent @event)
         {
             var version = new ComponentVersionAggregate();
             version.Apply(@event);
@@ -21,7 +21,7 @@ namespace Icon.Domain
         {
         }
 
-        private void Apply(ComponentVersion.Create.Event @event)
+        private void Apply(ComponentVersion.Create.ComponentVersionCreateEvent @event)
         {
             Id = @event.ComponentVersionId;
             ComponentId = @event.ComponentId;

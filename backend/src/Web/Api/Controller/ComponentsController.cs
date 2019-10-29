@@ -105,7 +105,7 @@ namespace Icon.Web.Api.Controller
         {
             var user = await _userManager.GetUserAsync(User);
             var component = await _commandBus.Send<Component.Create.Command, ComponentAggregate>(
-                new Component.Create.Command { CreatorId = user.Id }
+                new Component.Create.Command(creatorId: user.Id)
                 );
             return CreatedAtAction(nameof(Get), new { id = component.Id }, component.Id);
         }

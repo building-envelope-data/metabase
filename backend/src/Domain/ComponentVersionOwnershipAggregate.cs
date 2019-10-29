@@ -18,7 +18,7 @@ namespace Icon.Domain
         public DateTime AvailableFrom { get; set; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
         public DateTime AvailableUntil { get; set; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
 
-        public static ComponentVersionOwnershipAggregate Create(ComponentVersionOwnership.Create.Event @event)
+        public static ComponentVersionOwnershipAggregate Create(ComponentVersionOwnership.Create.ComponentVersionOwnershipEvent @event)
         {
             var ownership = new ComponentVersionOwnershipAggregate();
             ownership.Apply(@event);
@@ -30,7 +30,7 @@ namespace Icon.Domain
         {
         }
 
-        private void Apply(ComponentVersionOwnership.Create.Event @event)
+        private void Apply(ComponentVersionOwnership.Create.ComponentVersionOwnershipEvent @event)
         {
             Id = @event.ComponentVersionOwnershipId;
             ComponentVersionId = @event.ComponentVersionId;
