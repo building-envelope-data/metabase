@@ -7,7 +7,7 @@ namespace Icon.Domain
     public sealed class ComponentVersionAggregate : EventSourcedAggregate
     {
         [ForeignKey(typeof(ComponentAggregate))]
-        public Guid ComponentId { get; private set; }
+        public Guid ComponentId { get; set; }
 
         public static ComponentVersionAggregate Create(ComponentVersion.Create.ComponentVersionCreateEvent @event)
         {
