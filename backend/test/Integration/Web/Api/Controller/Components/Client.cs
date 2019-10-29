@@ -32,7 +32,7 @@ namespace Test.Integration.Web.Api.Controller.Components
     {
         public class Output
         {
-            public Guid Id;
+            public Guid id { get; set; }
         }
 
         public ListClient(HttpClient httpClient) : base(httpClient)
@@ -62,26 +62,26 @@ namespace Test.Integration.Web.Api.Controller.Components
     {
         public class Output
         {
-            public Guid Id;
-            public IEnumerable<VersionOutput> Versions;
+            public Guid id { get; set; }
+            public IEnumerable<VersionOutput> versions { get; set; }
         }
 
         public class VersionOutput
         {
-          public Guid Id;
-          public Guid ComponentId;
-          public IEnumerable<OwnershipOutput> Ownerships;
+          public Guid id { get; set; }
+          public Guid component_id { get; set; }
+          public IEnumerable<OwnershipOutput> ownerships { get; set; }
         }
 
         public class OwnershipOutput
         {
-          public Guid Id;
-          public Guid ComponentVersionId;
-          public string Name;
-          public string Description;
-          public string Abbreviation;
-          public DateTime AvailableFrom;
-          public DateTime AvailableUntil;
+          public Guid id { get; set; }
+          public Guid component_version_id { get; set; }
+          public string name { get; set; }
+          public string description { get; set; }
+          public string abbreviation { get; set; }
+          public DateTime available_from { get; set; }
+          public DateTime available_until { get; set; }
         }
 
         public GetClient(HttpClient httpClient) : base(httpClient)

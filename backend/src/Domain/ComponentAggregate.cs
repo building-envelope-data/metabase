@@ -8,7 +8,7 @@ namespace Icon.Domain
 {
     public sealed class ComponentAggregate : EventSourcedAggregate
     {
-        public static ComponentAggregate Create(Component.Create.Event @event)
+        public static ComponentAggregate Create(Component.Create.ComponentCreateEvent @event)
         {
             var component = new ComponentAggregate();
             component.Apply(@event);
@@ -20,7 +20,7 @@ namespace Icon.Domain
         {
         }
 
-        private void Apply(Component.Create.Event @event)
+        private void Apply(Component.Create.ComponentCreateEvent @event)
         {
             Id = @event.ComponentId;
             Version++; // Ensure to update version on every Apply method.

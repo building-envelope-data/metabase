@@ -87,9 +87,9 @@ namespace Icon.Configuration
                       _.Events.InlineProjections.Add(new Domain.ComponentVersionViewProjection());
                       _.Events.InlineProjections.Add(new Domain.ComponentVersionOwnershipViewProjection());
 
-                      _.Events.AddEventType(typeof(Component.Create.Event));
-                      _.Events.AddEventType(typeof(ComponentVersion.Create.Event));
-                      _.Events.AddEventType(typeof(ComponentVersionOwnership.Create.Event));
+                      _.Events.AddEventType(typeof(Component.Create.ComponentCreateEvent));
+                      _.Events.AddEventType(typeof(ComponentVersion.Create.ComponentVersionCreateEvent));
+                      _.Events.AddEventType(typeof(ComponentVersionOwnership.Create.ComponentVersionOwnershipEvent));
                   });
         }
     }

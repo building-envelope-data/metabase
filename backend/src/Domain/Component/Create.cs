@@ -9,11 +9,13 @@ using Icon.Domain;
 
 namespace Icon.Domain.Component.Create
 {
-    public sealed class Event : EventBase
+    public sealed class ComponentCreateEvent : EventBase
     {
-        public Guid ComponentId { get; private set; }
+        public Guid ComponentId { get; set; }
 
-        public Event(Guid componentId, Command command) : base(command.CreatorId)
+        public ComponentCreateEvent() {}
+
+        public ComponentCreateEvent(Guid componentId, Command command) : base(command.CreatorId)
         {
             ComponentId = componentId;
         }
@@ -21,6 +23,7 @@ namespace Icon.Domain.Component.Create
 
     public sealed class Command : CommandBase<ComponentAggregate>
     {
+        public Command(Guid creatorId) : base(creatorId) {}
     }
 
     public sealed class CommandHandler : ICommandHandler<Command, ComponentAggregate>
@@ -34,7 +37,7 @@ namespace Icon.Domain.Component.Create
 
         public async Task<ComponentAggregate> Handle(Command command, CancellationToken cancellationToken)
         {
-            var @event = new Event(Guid.NewGuid(), command);
+            var @event = new ComponentCreateEvent(Guid.NewGuid(), command);
             var component = ComponentAggregate.Create(@event);
             return await _repository.Store(component, cancellationToken);
         }

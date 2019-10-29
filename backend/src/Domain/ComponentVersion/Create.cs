@@ -9,12 +9,14 @@ using Icon.Domain;
 
 namespace Icon.Domain.ComponentVersion.Create
 {
-    public sealed class Event : EventBase
+    public sealed class ComponentVersionCreateEvent : EventBase
     {
-        public Guid ComponentVersionId { get; private set; }
-        public Guid ComponentId { get; private set; }
+        public Guid ComponentVersionId { get; set; }
+        public Guid ComponentId { get; set; }
 
-        public Event(Guid componentVersionId, Command command) : base(command.CreatorId)
+        public ComponentVersionCreateEvent() {}
+
+        public ComponentVersionCreateEvent(Guid componentVersionId, Command command) : base(command.CreatorId)
         {
             ComponentVersionId = componentVersionId;
             ComponentId = command.ComponentId;
@@ -23,6 +25,8 @@ namespace Icon.Domain.ComponentVersion.Create
 
     public sealed class Command : CommandBase<ComponentVersionAggregate>
     {
+        public Command(Guid creatorId) : base(creatorId) {}
+
         public Guid ComponentId { get; set; }
     }
 
@@ -37,7 +41,7 @@ namespace Icon.Domain.ComponentVersion.Create
 
         public async Task<ComponentVersionAggregate> Handle(Command command, CancellationToken cancellationToken)
         {
-            var @event = new Event(Guid.NewGuid(), command);
+            var @event = new ComponentVersionCreateEvent(Guid.NewGuid(), command);
             var componentVersion = ComponentVersionAggregate.Create(@event);
             return await _repository.Store(componentVersion, cancellationToken);
         }

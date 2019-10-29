@@ -9,10 +9,10 @@ namespace Icon.Domain
     {
         public ComponentVersionOwnershipViewProjection()
         {
-            ProjectEvent<ComponentVersionOwnership.Create.Event>(e => e.ComponentVersionId, Apply);
+            ProjectEvent<ComponentVersionOwnership.Create.ComponentVersionOwnershipEvent>(e => e.ComponentVersionId, Apply);
         }
 
-        private void Apply(ComponentVersionOwnershipView view, ComponentVersionOwnership.Create.Event @event)
+        private void Apply(ComponentVersionOwnershipView view, ComponentVersionOwnership.Create.ComponentVersionOwnershipEvent @event)
         {
             view.Id = @event.ComponentVersionOwnershipId;
             view.ComponentVersionId = @event.ComponentVersionId;
