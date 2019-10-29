@@ -38,3 +38,4 @@ We may add some error detection and correction capabilities by, for example, gen
 - [API design best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
   [API implementation best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-implementation)
   [Shallow Nesting](https://guides.rubyonrails.org/routing.html#shallow-nesting)
+- [Implicit Flow](https://auth0.com/docs/flows/concepts/implicit)

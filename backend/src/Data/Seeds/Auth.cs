@@ -30,54 +30,27 @@ namespace Icon.Data.Seeds
           };
         }
 
+        // TODO Add a client that corresponds to the following configuration in `appsettings.json`
+        // "IdentityServer": {
+        //   "Clients": {
+        //     "Icon": {
+        //       "Profile": "IdentityServerSPA"
+        //     }
+        //   }
+        // },
+        // and the following in `appsettings.Development.json`
+        // "IdentityServer": {
+        //   "Key": {
+        //     "Type": "Development"
+        //   }
+        // },
+        // see https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-3.0#appsettingsjson
+        // and https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-3.0#other-configuration-options
+
+        // https://identityserver4.readthedocs.io/en/latest/topics/grant_types.html
         public static IEnumerable<Client> GetClients()
         {
             return new Client[] {
-            new Client
-            {
-              ClientId = "client",
-
-              // https://identityserver4.readthedocs.io/en/latest/topics/grant_types.html
-              // no interactive user, use the clientid/secret for authentication
-              AllowedGrantTypes = GrantTypes.ClientCredentials,
-
-              // secret for authentication
-              ClientSecrets =
-              {
-                new Secret("secret".Sha256())
-              },
-
-              // scopes that client has access to
-                AllowedScopes =
-                {
-                  IdentityServerConstants.StandardScopes.Address,
-                  IdentityServerConstants.StandardScopes.Email,
-                  IdentityServerConstants.StandardScopes.OpenId,
-                  IdentityServerConstants.StandardScopes.Phone,
-                  IdentityServerConstants.StandardScopes.Profile,
-                  Configuration.Auth.ApiName
-                }
-            },
-              // resource owner password grant client
-              new Client
-              {
-                ClientId = "ro.client",
-                AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-
-                ClientSecrets =
-                {
-                  new Secret("secret".Sha256())
-                },
-                AllowedScopes =
-                {
-                  IdentityServerConstants.StandardScopes.Address,
-                  IdentityServerConstants.StandardScopes.Email,
-                  IdentityServerConstants.StandardScopes.OpenId,
-                  IdentityServerConstants.StandardScopes.Phone,
-                  IdentityServerConstants.StandardScopes.Profile,
-                  Configuration.Auth.ApiName
-                }
-              },
               // OpenID Connect hybrid flow client (MVC)
               new Client
               {
@@ -90,8 +63,8 @@ namespace Icon.Data.Seeds
                   new Secret("secret".Sha256())
                 },
 
-                RedirectUris           = { "http://localhost:5002/signin-oidc" },
-                PostLogoutRedirectUris = { "http://localhost:5002/signout-callback-oidc" },
+                RedirectUris           = { "https://localhost:5001/signin-oidc" },
+                PostLogoutRedirectUris = { "https://localhost:5001/signout-callback-oidc" },
 
                 AllowedScopes =
                 {
@@ -114,9 +87,9 @@ namespace Icon.Data.Seeds
                 RequirePkce = true,
                 RequireClientSecret = false,
 
-                RedirectUris =           { "http://localhost:5003/callback.html" },
-                PostLogoutRedirectUris = { "http://localhost:5003/index.html" },
-                AllowedCorsOrigins =     { "http://localhost:5003" },
+                RedirectUris =           { "https://localhost:5001/callback.html" },
+                PostLogoutRedirectUris = { "https://localhost:5001/index.html" },
+                AllowedCorsOrigins =     { "https://localhost:5001" },
 
                 AllowedScopes =
                 {

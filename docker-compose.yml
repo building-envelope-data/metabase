@@ -8,9 +8,9 @@ services:
     restart: always
     image: postgres:11.5-alpine
     environment:
-      - POSTGRES_USER=postgres # ${TYPEORM_USERNAME}
-      - POSTGRES_PASSWORD=postgres # ${TYPEORM_PASSWORD} # We can use docker-compose `secrets` for that
-      - POSTGRES_DB=postgres # ${TYPEORM_DATABASE}postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres # We can use docker-compose `secrets` for that
+      - POSTGRES_DB=postgres
     ports:
       - 5432:5432
     volumes:
@@ -24,8 +24,10 @@ services:
     volumes:
       - ./backend:/app
       - node_modules:/app/node_modules
-      - /app/bin # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding
-      - /app/obj # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding
+      - /app/src/bin # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding
+      - /app/src/obj # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding
+      - /app/test/bin # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding
+      - /app/test/obj # makes the engine create a volume for the specified path with the effect that the service does not write temporary files into the corresponding directory on the file system that was bound by the preceding binding
     ports:
       - 5000:5000 # In production: 8000:80
       - 5001:5001 # In production: 8001:443

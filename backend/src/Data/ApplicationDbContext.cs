@@ -17,14 +17,18 @@ namespace Icon.Data
     // [Customize Identity Model](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-3.0)
     public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        private readonly string _schemaName;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, AppSettings appSettings)
           : base(options)
         {
+            _schemaName = appSettings.Database.SchemaName.Application;
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.HasDefaultSchema(_schemaName);
             builder.HasPostgresExtension("pgcrypto");
             /* builder */
             /*   .Entity<Product>() */
