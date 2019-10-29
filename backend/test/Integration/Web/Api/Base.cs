@@ -16,13 +16,6 @@ namespace Test.Integration.Web.Api
 {
     public class Base : IClassFixture<CustomWebApplicationFactory>
     {
-        protected static HttpContent MakeJsonHttpContent<TContent>(TContent content)
-        {
-            var result = new ByteArrayContent(JsonSerializer.SerializeToUtf8Bytes<TContent>(content));
-            result.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            return result;
-        }
-
         protected static async Task<TokenResponse> RequestAuthToken(HttpClient httpClient, string emailAddress, string password)
         {
             var response = await httpClient.RequestPasswordTokenAsync(new PasswordTokenRequest

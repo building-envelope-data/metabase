@@ -15,40 +15,28 @@ namespace Test.Integration.Web.Api.Controller
 {
     public class ComponentsControllerTest : Base
     {
-        public static async Task<HttpResponseMessage> GetList(HttpClient httpClient)
-        {
-            return await httpClient.GetAsync("/api/components");
-        }
-
-        public static async Task<HttpResponseMessage> Post(HttpClient httpClient)
-        {
-            return await httpClient.PostAsync("/api/components", MakeJsonHttpContent(new PostTest.Component()));
-        }
-
         public ComponentsControllerTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-        public class GetListTest : Base
+				public class ComponentsBase : Base
+				{
+						protected Components.Client ComponentsClient { get; }
+
+						public ComponentsBase(CustomWebApplicationFactory factory) : base(factory)
+						{
+								ComponentsClient = new Components.Client(HttpClient);
+						}
+				}
+
+        public class GetListTest : ComponentsBase
         {
-            internal class Component
-            {
-                internal Guid Id;
-            }
-
-            internal static async Task<IEnumerable<Component>> Deserialize(HttpResponseMessage httpResponse)
-            {
-                httpResponse.EnsureSuccessStatusCode();
-                return JsonSerializer.Deserialize<IEnumerable<Component>>(
-                    await httpResponse.Content.ReadAsStringAsync()
-                );
-            }
-
-            public GetListTest(CustomWebApplicationFactory factory) : base(factory) { }
+					public GetListTest(CustomWebApplicationFactory factory) : base(factory) {
+					}
 
             [Fact]
             public async Task WhenEmpty()
             {
                 // Act
-                var components = await Deserialize(await GetList(HttpClient));
+                var components = await ComponentsClient.List.Deserialized();
                 // Assert
                 components.Should().BeEmpty();
             }
@@ -60,9 +48,9 @@ namespace Test.Integration.Web.Api.Controller
                 await Factory.SeedUsers();
                 Factory.SeedAuth();
                 await Authorize(HttpClient);
-                var component = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
+                var component = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
                 // Act
-                var components = await Deserialize(await GetList(HttpClient));
+                var components = await ComponentsClient.List.Deserialized();
                 // Assert
                 components.Should().BeEquivalentTo(component);
             }
@@ -74,39 +62,27 @@ namespace Test.Integration.Web.Api.Controller
                 await Factory.SeedUsers();
                 Factory.SeedAuth();
                 await Authorize(HttpClient);
-                var component1 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
-                var component2 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
-                var component3 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
-                var component4 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
-                var component5 = new Component { Id = await PostTest.Deserialize(await Post(HttpClient)) };
+                var component1 = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
+                var component2 = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
+                var component3 = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
+                var component4 = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
+                var component5 = new Components.ListClient.Output { Id = await ComponentsClient.Post.Deserialized() };
                 // Act
-                var components = await Deserialize(await GetList(HttpClient));
+                var components = await ComponentsClient.List.Deserialized();
                 // Assert
                 components.Should().BeEquivalentTo(component1, component2, component3, component4, component5);
             }
         }
 
-        public class PostTest : Base
+        public class PostTest : ComponentsBase
         {
-            internal class Component
-            {
-            }
-
-            internal static async Task<Guid> Deserialize(HttpResponseMessage httpResponse)
-            {
-                httpResponse.EnsureSuccessStatusCode();
-                return JsonSerializer.Deserialize<Guid>(
-                    await httpResponse.Content.ReadAsStringAsync()
-                );
-            }
-
             public PostTest(CustomWebApplicationFactory factory) : base(factory) { }
 
             [Fact]
             public async Task CannotAnonymously()
             {
                 // Act
-                var httpResponse = await Post(HttpClient);
+                var httpResponse = await ComponentsClient.Post.Raw();
                 // Assert
                 httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -120,7 +96,7 @@ namespace Test.Integration.Web.Api.Controller
                 Factory.SeedAuth();
                 await Authorize(HttpClient);
                 // Act
-                var id = await Deserialize(await Post(HttpClient));
+                var id = await ComponentsClient.Post.Deserialized();
                 // Assert
                 id.Should().NotBeEmpty();
             }
