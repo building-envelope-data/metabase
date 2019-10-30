@@ -49,7 +49,7 @@ namespace Test.Integration.Web.Api.Controller
                 await Factory.SeedUsers();
                 Factory.SeedAuth();
                 await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
-                var component = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized() };
+                var component = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized(), version = 1 };
                 // Act
                 var components = await ComponentsClient.List.Deserialized();
                 // Assert
@@ -63,11 +63,11 @@ namespace Test.Integration.Web.Api.Controller
                 await Factory.SeedUsers();
                 Factory.SeedAuth();
                 await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
-                var component1 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized() };
-                var component2 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized() };
-                var component3 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized() };
-                var component4 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized() };
-                var component5 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized() };
+                var component1 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized(), version = 1 };
+                var component2 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized(), version = 1 };
+                var component3 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized(), version = 1 };
+                var component4 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized(), version = 1 };
+                var component5 = new Components.ListClient.Output { id = await ComponentsClient.Post.Deserialized(), version = 1 };
                 // Act
                 var components = await ComponentsClient.List.Deserialized();
                 // Assert
@@ -76,7 +76,7 @@ namespace Test.Integration.Web.Api.Controller
         }
 
         public class GetTest : ComponentsTestBase
-      {
+        {
             public GetTest(CustomWebApplicationFactory factory) : base(factory) { }
 
             [Fact]
@@ -97,13 +97,13 @@ namespace Test.Integration.Web.Api.Controller
                 await Factory.SeedUsers();
                 Factory.SeedAuth();
                 await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
-                var componentId = await ComponentsClient.Post.Deserialized();
+                var postedComponent = new Components.GetClient.Output { id = await ComponentsClient.Post.Deserialized(), versions = new List<Components.GetClient.VersionOutput>() };
                 // Act
-                var component = await ComponentsClient.Get.Deserialized(componentId);
+                var component = await ComponentsClient.Get.Deserialized(postedComponent.id);
                 // Assert
-                component.id.Should().Be(componentId);
+                component.Should().BeEquivalentTo(postedComponent);
             }
-      }
+        }
 
         public class PostTest : ComponentsTestBase
         {
