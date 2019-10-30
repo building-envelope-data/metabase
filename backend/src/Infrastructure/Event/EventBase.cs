@@ -6,7 +6,7 @@ namespace Icon.Infrastructure.Event
     {
         public Guid CreatorId { get; set; }
 
-        public EventBase() {}
+        public EventBase() { }
 
         public EventBase(Guid creatorId)
         {

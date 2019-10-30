@@ -10,10 +10,10 @@ using System.Linq;
 namespace Icon.Domain
 {
     public sealed class ComponentAggregateTest : TestBase
-  {
-    [Fact]
-    public async Task Test()
     {
+        [Fact]
+        public async Task Test()
+        {
             // Arrange
             var @event = new Component.Create.ComponentCreateEvent(Guid.NewGuid(), new Component.Create.Command(creatorId: Guid.NewGuid()));
             var component = ComponentAggregate.Create(@event);
@@ -24,6 +24,6 @@ namespace Icon.Domain
             var aggregate = await Session.Events.AggregateStreamAsync<ComponentAggregate>(component.Id);
             // Assert
             aggregate.Should().BeEquivalentTo(component);
+        }
     }
-  }
 }

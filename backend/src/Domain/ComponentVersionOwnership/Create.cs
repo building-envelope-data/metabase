@@ -28,7 +28,7 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
         public Guid ComponentVersionId { get; set; }
         public Data Data { get; set; }
 
-        public ComponentVersionOwnershipEvent() {}
+        public ComponentVersionOwnershipEvent() { }
 
         public ComponentVersionOwnershipEvent(Guid componentVersionOwnershipId, Command command) : base(command.CreatorId)
         {
@@ -40,7 +40,7 @@ namespace Icon.Domain.ComponentVersionOwnership.Create
 
     public sealed class Command : CommandBase<ComponentVersionOwnershipAggregate>
     {
-        public Command(Guid creatorId) : base(creatorId) {}
+        public Command(Guid creatorId) : base(creatorId) { }
 
         public Guid ComponentVersionId { get; private set; }
         public Data Data { get; private set; }

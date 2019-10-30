@@ -14,7 +14,7 @@ namespace Icon.Domain.ComponentVersion.Create
         public Guid ComponentVersionId { get; set; }
         public Guid ComponentId { get; set; }
 
-        public ComponentVersionCreateEvent() {}
+        public ComponentVersionCreateEvent() { }
 
         public ComponentVersionCreateEvent(Guid componentVersionId, Command command) : base(command.CreatorId)
         {
@@ -25,7 +25,7 @@ namespace Icon.Domain.ComponentVersion.Create
 
     public sealed class Command : CommandBase<ComponentVersionAggregate>
     {
-        public Command(Guid creatorId) : base(creatorId) {}
+        public Command(Guid creatorId) : base(creatorId) { }
 
         public Guid ComponentId { get; set; }
     }
