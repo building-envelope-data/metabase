@@ -10,6 +10,11 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="FluentValidation" Version="8.5.0" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="10.1.1" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.1.1" />
+    <PackageReference Include="HotChocolate.AspNetCore.GraphiQL" Version="10.1.1" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.1.1" />
+    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.1.1" />
+    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="10.1.1" />
     <PackageReference Include="IdentityServer4" Version="3.0.1" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
     <PackageReference Include="IdentityServer4.EntityFramework" Version="3.0.1" />
