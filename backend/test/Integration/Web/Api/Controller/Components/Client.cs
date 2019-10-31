@@ -33,7 +33,7 @@ namespace Test.Integration.Web.Api.Controller.Components
         public class Output : OutputBase
         {
             public Guid id { get; set; }
-						public int version { get; set; }
+            public int version { get; set; }
         }
 
         public ListClient(HttpClient httpClient) : base(httpClient)
