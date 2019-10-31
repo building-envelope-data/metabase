@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UserSecretsId>31666837686487542159</UserSecretsId>
     <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
+    <LangVersion>8.0</LangVersion>
+    <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
   </PropertyGroup>
 
   <ItemGroup>
