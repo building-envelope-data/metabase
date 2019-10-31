@@ -20,10 +20,12 @@ namespace Test.Integration.Web.Api.Controller
         public class ComponentsTestBase : TestBase
         {
             protected Components.Client ComponentsClient { get; }
+            protected ComponentVersions.Client ComponentVersionsClient { get; }
 
             public ComponentsTestBase(CustomWebApplicationFactory factory) : base(factory)
             {
                 ComponentsClient = new Components.Client(HttpClient);
+                ComponentVersionsClient = new ComponentVersions.Client(HttpClient);
             }
         }
 
@@ -91,13 +93,80 @@ namespace Test.Integration.Web.Api.Controller
             }
 
             [Fact]
-            public async Task Existent()
+            public async Task ExistentNoVersions()
             {
                 // Arrange
                 await Factory.SeedUsers();
                 Factory.SeedAuth();
                 await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
-                var postedComponent = new Components.GetClient.Output { id = await ComponentsClient.Post.Deserialized(), versions = new List<Components.GetClient.VersionOutput>() };
+                var postedComponent = new Components.GetClient.Output {
+                  id = await ComponentsClient.Post.Deserialized(),
+                  versions = new List<Components.GetClient.VersionOutput>()
+                };
+                // Act
+                var component = await ComponentsClient.Get.Deserialized(postedComponent.id);
+                // Assert
+                component.Should().BeEquivalentTo(postedComponent);
+            }
+
+            [Fact]
+            public async Task ExistentSingleVersion()
+            {
+                // Arrange
+                await Factory.SeedUsers();
+                Factory.SeedAuth();
+                await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
+                var postedVersions = new List<Components.GetClient.VersionOutput>();
+                var postedComponent = new Components.GetClient.Output {
+                  id = await ComponentsClient.Post.Deserialized(),
+                  versions = postedVersions,
+                };
+                postedVersions.Add(
+                  new Components.GetClient.VersionOutput {
+                    id = await ComponentVersionsClient.Post.Deserialized(postedComponent.id),
+                    componentId = postedComponent.id,
+                    ownerships = new List<Components.GetClient.OwnershipOutput>(),
+                  }
+                );
+                // Act
+                var component = await ComponentsClient.Get.Deserialized(postedComponent.id);
+                // Assert
+                component.Should().BeEquivalentTo(postedComponent);
+            }
+
+            [Fact]
+            public async Task ExistentMultipleVersions()
+            {
+                // Arrange
+                await Factory.SeedUsers();
+                Factory.SeedAuth();
+                await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
+                var postedVersions = new List<Components.GetClient.VersionOutput>();
+                var postedComponent = new Components.GetClient.Output {
+                  id = await ComponentsClient.Post.Deserialized(),
+                  versions = postedVersions,
+                };
+                postedVersions.Add(
+                  new Components.GetClient.VersionOutput {
+                    id = await ComponentVersionsClient.Post.Deserialized(postedComponent.id),
+                    componentId = postedComponent.id,
+                    ownerships = new List<Components.GetClient.OwnershipOutput>(),
+                  }
+                );
+                postedVersions.Add(
+                  new Components.GetClient.VersionOutput {
+                    id = await ComponentVersionsClient.Post.Deserialized(postedComponent.id),
+                    componentId = postedComponent.id,
+                    ownerships = new List<Components.GetClient.OwnershipOutput>(),
+                  }
+                );
+                postedVersions.Add(
+                  new Components.GetClient.VersionOutput {
+                    id = await ComponentVersionsClient.Post.Deserialized(postedComponent.id),
+                    componentId = postedComponent.id,
+                    ownerships = new List<Components.GetClient.OwnershipOutput>(),
+                  }
+                );
                 // Act
                 var component = await ComponentsClient.Get.Deserialized(postedComponent.id);
                 // Assert

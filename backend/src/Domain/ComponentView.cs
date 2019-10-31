@@ -6,7 +6,7 @@ namespace Icon.Domain
     public sealed class ComponentView
     {
         public Guid Id { get; set; }
-        public ICollection<ComponentVersionView> Versions { get; private set; }
+        public ICollection<ComponentVersionView> Versions { get; set; }
 
         public ComponentView()
         {

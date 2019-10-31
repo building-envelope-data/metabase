@@ -1,3 +1,4 @@
+using System;
 using Marten.Events.Projections;
 using Guid = System.Guid;
 using Marten;
@@ -21,6 +22,13 @@ namespace Icon.Domain
 
         private async Task Apply(IDocumentSession documentSession, ComponentView view, ComponentVersion.Create.ComponentVersionCreateEvent @event)
         {
+            // TODO This relies on the order in which the views are persisted
+            // in the database, which is the order in which the views are
+            // registered in the event store configuration, which is error
+            // prone. We should not rely on that! One option is to listen to
+            // all component version events and build the component versions
+            // here by hand or to add only the version identifiers and load
+            // the corresponding objects later.
             var version = await documentSession.LoadAsync<ComponentVersionView>(@event.ComponentVersionId);
             view.Versions.Add(version);
         }
