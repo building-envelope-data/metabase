@@ -90,6 +90,7 @@ namespace Icon
             Configuration.RequestResponse.ConfigureServices(services);
             Configuration.Api.ConfigureServices(services);
             Configuration.Auth.ConfigureServices(services, _environment, _configuration, _appSettings, GetMigrationsAssembly());
+            Configuration.GraphQl.ConfigureServices(services);
             Configuration.EventStore.ConfigureServices(services, _environment, _appSettings.Database);
             Configuration.QueryCommandAndEventBusses.ConfigureServices(services);
         }
@@ -113,6 +114,7 @@ namespace Icon
             Configuration.Api.Configure(app);
             Configuration.Auth.Configure(app);
             Configuration.Session.Configure(app);
+            Configuration.GraphQl.Configure(app);
             Configuration.RequestResponse.ConfigureEndpoints(app);
 
             // TODO Shall we do migrations here or in Program.cs?
