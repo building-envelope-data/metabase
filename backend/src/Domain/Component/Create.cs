@@ -13,7 +13,7 @@ namespace Icon.Domain.Component.Create
     {
         public Guid ComponentId { get; set; }
 
-        public ComponentCreateEvent() {}
+        public ComponentCreateEvent() { }
 
         public ComponentCreateEvent(Guid componentId, Command command) : base(command.CreatorId)
         {
@@ -23,7 +23,7 @@ namespace Icon.Domain.Component.Create
 
     public sealed class Command : CommandBase<ComponentAggregate>
     {
-        public Command(Guid creatorId) : base(creatorId) {}
+        public Command(Guid creatorId) : base(creatorId) { }
     }
 
     public sealed class CommandHandler : ICommandHandler<Command, ComponentAggregate>

@@ -30,8 +30,9 @@ namespace Test.Integration.EventStore
               .Get<AppSettings>();
             ConnectionString = appSettings.Database.ConnectionString;
             SchemaName = appSettings.Database.SchemaName.EventStore + Guid.NewGuid().ToString().Replace("-", "_");
-            if (shouldCreateSession) {
-              Session = CreateSession();
+            if (shouldCreateSession)
+            {
+                Session = CreateSession();
             }
         }
 
@@ -50,7 +51,8 @@ namespace Test.Integration.EventStore
                 _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentVersionAggregate>();
                 _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentVersionOwnershipAggregate>();
 
-                if (setStoreOptions != null) {
+                if (setStoreOptions != null)
+                {
                     setStoreOptions(_);
                 }
             }).OpenSession();
