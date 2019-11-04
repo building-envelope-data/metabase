@@ -26,15 +26,14 @@ using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
 using Event = Icon.Infrastructure.Event;
 using Aggregate = Icon.Infrastructure.Aggregate;
-using Domain = Icon.Domain;
-using Component = Icon.Domain.Component;
-using ComponentVersion = Icon.Domain.ComponentVersion;
-using ComponentVersionOwnership = Icon.Domain.ComponentVersionOwnership;
+using Models = Icon.Models;
 using System.Threading.Tasks;
 using System;
 using WebPWrecover.Services;
 using IdentityServer4.Validation;
 using Marten.NodaTime;
+using Events = Icon.Events;
+using Aggregates = Icon.Aggregates;
 
 namespace Icon.Configuration
 {
@@ -79,17 +78,17 @@ namespace Icon.Configuration
                       _.Logger(martenLogger);
                       _.Listeners.Add(martenLogger);
 
-                      _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentAggregate>();
-                      _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentVersionAggregate>();
-                      _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentVersionOwnershipAggregate>();
+                      _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentAggregate>();
+                      _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionAggregate>();
+                      _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionManufacturerAggregate>();
 
-                      _.Events.InlineProjections.Add(new Domain.ComponentVersionOwnershipViewProjection());
-                      _.Events.InlineProjections.Add(new Domain.ComponentVersionViewProjection());
-                      _.Events.InlineProjections.Add(new Domain.ComponentViewProjection());
+                      /* _.Events.InlineProjections.Add(new Domain.ComponentVersionManufacturerViewProjection()); */
+                      /* _.Events.InlineProjections.Add(new Domain.ComponentVersionViewProjection()); */
+                      /* _.Events.InlineProjections.Add(new Domain.ComponentViewProjection()); */
 
-                      _.Events.AddEventType(typeof(Component.Create.ComponentCreateEvent));
-                      _.Events.AddEventType(typeof(ComponentVersion.Create.ComponentVersionCreateEvent));
-                      _.Events.AddEventType(typeof(ComponentVersionOwnership.Create.ComponentVersionOwnershipEvent));
+                      _.Events.AddEventType(typeof(Events.ComponentCreated));
+                      _.Events.AddEventType(typeof(Events.ComponentVersionCreated));
+                      _.Events.AddEventType(typeof(Events.ComponentVersionManufacturerCreated));
                   });
         }
     }

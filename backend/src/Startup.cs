@@ -25,8 +25,6 @@ using System.Linq;
 using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
 using Event = Icon.Infrastructure.Event;
-using Domain = Icon.Domain;
-using Component = Icon.Domain.Component;
 using System.Threading.Tasks;
 using System;
 using WebPWrecover.Services;

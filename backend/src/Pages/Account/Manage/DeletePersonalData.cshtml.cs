@@ -1,4 +1,4 @@
-using Icon.Domain;
+using Icon.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;

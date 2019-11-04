@@ -2,13 +2,13 @@
 
 using System;
 using Icon.Infrastructure.Aggregate;
-using Icon.Domain;
+using Events = Icon.Events;
 
-namespace Icon.Domain
+namespace Icon.Aggregates
 {
     public sealed class ComponentAggregate : EventSourcedAggregate
     {
-        public static ComponentAggregate Create(Component.Create.ComponentCreateEvent @event)
+        public static ComponentAggregate Create(Events.ComponentCreated @event)
         {
             var component = new ComponentAggregate();
             component.Apply(@event);
@@ -20,10 +20,18 @@ namespace Icon.Domain
         {
         }
 
-        private void Apply(Component.Create.ComponentCreateEvent @event)
+        private void Apply(Events.ComponentCreated @event)
         {
             Id = @event.ComponentId;
             Version++; // Ensure to update version on every Apply method.
+        }
+
+        public Models.Component ToModel()
+        {
+          return new Models.Component(
+            id: Id,
+            version: Version
+          );
         }
     }
 }

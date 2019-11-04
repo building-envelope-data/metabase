@@ -6,7 +6,7 @@ using Npgsql;
 using Xunit;
 using Microsoft.Extensions.Configuration;
 using AppSettings = Icon.AppSettings;
-using Domain = Icon.Domain;
+using Aggregates = Icon.Aggregates;
 
 namespace Test.Integration.EventStore
 {
@@ -47,9 +47,9 @@ namespace Test.Integration.EventStore
                 _.Events.UseAggregatorLookup(Marten.Services.Events.AggregationLookupStrategy.UsePrivateApply);
 
                 // TODO Add those inline projections to the tests where they are needed.
-                _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentAggregate>();
-                _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentVersionAggregate>();
-                _.Events.InlineProjections.AggregateStreamsWith<Domain.ComponentVersionOwnershipAggregate>();
+                _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentAggregate>();
+                _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionAggregate>();
+                _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionManufacturerAggregate>();
 
                 if (setStoreOptions != null)
                 {

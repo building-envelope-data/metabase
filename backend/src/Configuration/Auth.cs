@@ -25,8 +25,7 @@ using System.Linq;
 using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
 using Event = Icon.Infrastructure.Event;
-using Domain = Icon.Domain;
-using Component = Icon.Domain.Component;
+using Models = Icon.Models;
 using System.Threading.Tasks;
 using System;
 using WebPWrecover.Services;
@@ -50,7 +49,7 @@ namespace Icon.Configuration
 
         private static void ConfigureIdentityServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddIdentity<Domain.User, IdentityRole<Guid>>(_ =>
+            services.AddIdentity<Models.User, IdentityRole<Guid>>(_ =>
                 {
                     _.SignIn.RequireConfirmedAccount = true;
 
@@ -132,8 +131,8 @@ namespace Icon.Configuration
                 })
               .AddSecretParser<JwtBearerClientAssertionSecretParser>()
               .AddSecretValidator<PrivateKeyJwtSecretValidator>() // https://identityserver4.readthedocs.io/en/latest/topics/secrets.html#beyond-shared-secrets
-              .AddAspNetIdentity<Domain.User>()
-              .AddProfileService<ProfileService<Domain.User>>();
+              .AddAspNetIdentity<Models.User>()
+              .AddProfileService<ProfileService<Models.User>>();
             /* builder.AddApiAuthorization<User, ApplicationDbContext>(); */
             if (environment.IsDevelopment() || environment.IsEnvironment("Test"))
             {

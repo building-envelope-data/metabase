@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Icon.Domain
+namespace Icon.Models
 {
     public class User : IdentityUser<Guid>
     {

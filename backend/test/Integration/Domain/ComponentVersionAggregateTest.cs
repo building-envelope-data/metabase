@@ -3,9 +3,10 @@ using Xunit;
 using System.Threading.Tasks;
 using System;
 using FluentAssertions;
-using ComponentVersionAggregate = Icon.Domain.ComponentVersionAggregate;
-using ComponentVersion = Icon.Domain.ComponentVersion;
 using System.Linq;
+using Aggregates = Icon.Aggregates;
+using Commands = Icon.Commands;
+using Events = Icon.Events;
 
 namespace Icon.Domain
 {
@@ -18,7 +19,7 @@ namespace Icon.Domain
             var component = await CreateComponent();
             var componentVersion = await CreateComponentVersion(component.Id);
             // Act
-            var aggregate = await Session.Events.AggregateStreamAsync<ComponentVersionAggregate>(componentVersion.Id);
+            var aggregate = await Session.Events.AggregateStreamAsync<Aggregates.ComponentVersionAggregate>(componentVersion.Id);
             // Assert
             aggregate.Should().BeEquivalentTo(componentVersion);
         }
@@ -33,27 +34,27 @@ namespace Icon.Domain
             var componentVersion3 = await CreateComponentVersion(component.Id);
             // Act
             // TODO Shall we use a fresh session in other test too? It really makes a difference, because it does not use cached aggregates!
-            var aggregates = CreateSession().Query<ComponentVersionAggregate>().ToList();
+            var aggregates = CreateSession().Query<Aggregates.ComponentVersionAggregate>().ToList();
             // Assert
             aggregates.Should().BeEquivalentTo(componentVersion1, componentVersion2, componentVersion3);
         }
 
-        private async Task<ComponentVersionAggregate> CreateComponentVersion(Guid componentId)
+        private async Task<Aggregates.ComponentVersionAggregate> CreateComponentVersion(Guid componentId)
         {
-            var command = new ComponentVersion.Create.Command(creatorId: Guid.NewGuid());
+            var command = new Commands.CreateComponentVersion(creatorId: Guid.NewGuid());
             command.ComponentId = componentId;
-            var @event = new ComponentVersion.Create.ComponentVersionCreateEvent(Guid.NewGuid(), command);
-            var componentVersion = ComponentVersionAggregate.Create(@event);
+            var @event = new Events.ComponentVersionCreated(Guid.NewGuid(), command);
+            var componentVersion = Aggregates.ComponentVersionAggregate.Create(@event);
             var events = componentVersion.GetUncommittedEvents().ToArray();
             Session.Events.Append(componentVersion.Id, componentVersion.Version, events);
             await Session.SaveChangesAsync();
             return componentVersion;
         }
 
-        private async Task<ComponentAggregate> CreateComponent()
+        private async Task<Aggregates.ComponentAggregate> CreateComponent()
         {
-            var @event = new Component.Create.ComponentCreateEvent(Guid.NewGuid(), new Component.Create.Command(creatorId: Guid.NewGuid()));
-            var component = ComponentAggregate.Create(@event);
+            var @event = new Events.ComponentCreated(Guid.NewGuid(), new Commands.CreateComponent(creatorId: Guid.NewGuid()));
+            var component = Aggregates.ComponentAggregate.Create(@event);
             var events = component.GetUncommittedEvents().ToArray();
             Session.Events.Append(component.Id, component.Version, events);
             await Session.SaveChangesAsync();

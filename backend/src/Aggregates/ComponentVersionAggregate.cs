@@ -1,15 +1,17 @@
 using System;
 using Icon.Infrastructure.Aggregate;
 using Marten.Schema;
+using Events = Icon.Events;
 
-namespace Icon.Domain
+namespace Icon.Aggregates
 {
-    public sealed class ComponentVersionAggregate : EventSourcedAggregate
+    public sealed class ComponentVersionAggregate
+      : EventSourcedAggregate
     {
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; set; }
 
-        public static ComponentVersionAggregate Create(ComponentVersion.Create.ComponentVersionCreateEvent @event)
+        public static ComponentVersionAggregate Create(Events.ComponentVersionCreated @event)
         {
             var version = new ComponentVersionAggregate();
             version.Apply(@event);
@@ -21,11 +23,20 @@ namespace Icon.Domain
         {
         }
 
-        private void Apply(ComponentVersion.Create.ComponentVersionCreateEvent @event)
+        private void Apply(Events.ComponentVersionCreated @event)
         {
             Id = @event.ComponentVersionId;
             ComponentId = @event.ComponentId;
             Version++; // Ensure to update version on every Apply method.
+        }
+
+        public Models.ComponentVersion ToModel()
+        {
+          return new Models.ComponentVersion(
+            id: Id,
+            componentId: ComponentId,
+            version: Version
+          );
         }
     }
 }

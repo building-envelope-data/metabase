@@ -25,14 +25,14 @@ using System.Linq;
 using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
 using Event = Icon.Infrastructure.Event;
-using Domain = Icon.Domain;
-using Component = Icon.Domain.Component;
-using ComponentVersion = Icon.Domain.ComponentVersion;
-using ComponentVersionOwnership = Icon.Domain.ComponentVersionOwnership;
+using Models = Icon.Models;
 using System.Threading.Tasks;
 using System;
 using WebPWrecover.Services;
 using IdentityServer4.Validation;
+using Queries = Icon.Queries;
+using Commands = Icon.Commands;
+using Handlers = Icon.Handlers;
 
 namespace Icon.Configuration
 {
@@ -47,12 +47,14 @@ namespace Icon.Configuration
             services.AddScoped<Command.ICommandBus, Command.CommandBus>();
             services.AddScoped<Event.IEventBus, Event.EventBus>();
 
-            services.AddScoped<MediatR.IRequestHandler<Component.List.Query, IEnumerable<Domain.ComponentAggregate>>, Component.List.QueryHandler>();
-            services.AddScoped<MediatR.IRequestHandler<Component.Get.Query, Domain.ComponentView>, Component.Get.QueryHandler>();
-            services.AddScoped<MediatR.IRequestHandler<Component.Create.Command, Domain.ComponentAggregate>, Component.Create.CommandHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Queries.ListComponents, IEnumerable<Models.Component>>, Handlers.ListComponentsHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Queries.GetComponent, Models.Component>, Handlers.GetComponentHandler>();
 
-            services.AddScoped<MediatR.IRequestHandler<ComponentVersion.Create.Command, Domain.ComponentVersionAggregate>, ComponentVersion.Create.CommandHandler>();
-            services.AddScoped<MediatR.IRequestHandler<ComponentVersionOwnership.Create.Command, Domain.ComponentVersionOwnershipAggregate>, ComponentVersionOwnership.Create.CommandHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponent, Models.Component>, Handlers.CreateComponentHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponentVersion, Models.ComponentVersion>, Handlers.CreateComponentVersionHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponentVersionManufacturer, Models.ComponentVersionManufacturer>, Handlers.CreateComponentVersionManufacturerHandler>();
+
+            // TODO Shall we broadcast events?
             /* services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>(); */
             /* services.AddScoped<IRequestHandler<CreateClient, Unit>, ClientsCommandHandler>(); */
             /* services.AddScoped<IRequestHandler<GetClientView, ClientView>, ClientsQueryHandler>(); */
