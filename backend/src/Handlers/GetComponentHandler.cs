@@ -25,15 +25,32 @@ namespace Icon.Handlers
             _session = session;
         }
 
-        public async Task<Models.Component> Handle(Queries.GetComponent query, CancellationToken cancellationToken)
+        public async Task<Models.Component> Handle(
+            Queries.GetComponent query,
+            CancellationToken cancellationToken
+            )
         {
-            // TODO Use `query.Timestamp` to load state at the specified point in time
-            // This works for aggregates as explained in the section `Live Aggregation via .Net` on
-            // https://jasperfx.github.io/marten/documentation/events/projections/
-            // And it should work in general with something called `Live
-            // Projections` which are mentioned on
-            // https://jasperfx.github.io/marten/documentation/events/projections/
-            return (await _session.LoadAsync<Aggregates.ComponentAggregate>(query.ComponentId, cancellationToken)).ToModel();
+            if (query.Timestamp == null)
+            {
+                return
+                  (await _session
+                   .LoadAsync<Aggregates.ComponentAggregate>(
+                     query.ComponentId,
+                     token: cancellationToken
+                     )
+                  ).ToModel();
+            }
+            else
+            {
+                return
+                  (await _session.Events
+                   .AggregateStreamAsync<Aggregates.ComponentAggregate>(
+                     query.ComponentId,
+                     timestamp: query.Timestamp,
+                     token: cancellationToken
+                     )
+                  ).ToModel();
+            }
         }
     }
 }

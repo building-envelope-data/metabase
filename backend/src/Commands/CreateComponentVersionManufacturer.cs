@@ -10,35 +10,36 @@ using DateTime = System.DateTime;
 
 namespace Icon.Commands
 {
-  public sealed class CreateComponentVersionManufacturer : CommandBase<Models.ComponentVersionManufacturer>
-  {
-    public Guid ComponentVersionId { get; }
-    public Guid UserId { get; }
-    public string Name { get; }
-    public string Description { get; }
-    public string Abbreviation { get; }
-    /* public DateInterval Availability { get; } */ // TODO This is what we actually want, a proper date interval and it should be persisted as PostgreSQL date range
-    public DateTime AvailableFrom { get; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
-    public DateTime AvailableUntil { get; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
+    public sealed class CreateComponentVersionManufacturer : CommandBase<Models.ComponentVersionManufacturer>
+    {
+        public Guid ComponentVersionId { get; }
+        public Guid UserId { get; }
+        public string Name { get; }
+        public string Description { get; }
+        public string Abbreviation { get; }
+        /* public DateInterval Availability { get; } */ // TODO This is what we actually want, a proper date interval and it should be persisted as PostgreSQL date range
+        public DateTime AvailableFrom { get; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
+        public DateTime AvailableUntil { get; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
 
-    public CreateComponentVersionManufacturer(
-        Guid componentVersionId,
-        Guid userId,
-        string name,
-        string description,
-        string abbreviation,
-        /* public DateInterval Availability { get; set; } */ // TODO This is what we actually want, a proper date interval and it should be persisted as PostgreSQL date range
-        DateTime availableFrom,
-        DateTime availableUntil,
-        Guid creatorId
-        ) : base(creatorId) {
-      ComponentVersionId = componentVersionId;
-      UserId = userId;
-      Name = name;
-      Description = description;
-      Abbreviation = abbreviation;
-      AvailableFrom = availableFrom;
-      AvailableUntil = availableUntil;
+        public CreateComponentVersionManufacturer(
+            Guid componentVersionId,
+            Guid userId,
+            string name,
+            string description,
+            string abbreviation,
+            /* public DateInterval Availability { get; set; } */ // TODO This is what we actually want, a proper date interval and it should be persisted as PostgreSQL date range
+            DateTime availableFrom,
+            DateTime availableUntil,
+            Guid creatorId
+            ) : base(creatorId)
+        {
+            ComponentVersionId = componentVersionId;
+            UserId = userId;
+            Name = name;
+            Description = description;
+            Abbreviation = abbreviation;
+            AvailableFrom = availableFrom;
+            AvailableUntil = availableUntil;
+        }
     }
-  }
 }

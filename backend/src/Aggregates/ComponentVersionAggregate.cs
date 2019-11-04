@@ -32,11 +32,11 @@ namespace Icon.Aggregates
 
         public Models.ComponentVersion ToModel()
         {
-          return new Models.ComponentVersion(
-            id: Id,
-            componentId: ComponentId,
-            version: Version
-          );
+            return new Models.ComponentVersion(
+              id: Id,
+              componentId: ComponentId,
+              version: Version
+            );
         }
     }
 }

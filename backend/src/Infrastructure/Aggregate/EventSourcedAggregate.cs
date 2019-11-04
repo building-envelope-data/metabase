@@ -12,7 +12,6 @@ namespace Icon.Infrastructure.Aggregate
         // For indexing our event streams
         public Guid Id { get; set; }
 
-        // TODO Use attribute `[Version]`? See https://github.com/JasperFx/marten/blob/master/src/Marten/Schema/VersionAttribute.cs
         // For protecting the state, i.e. conflict prevention
         public int Version { get; set; }
 

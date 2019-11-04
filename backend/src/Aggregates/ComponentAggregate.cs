@@ -28,10 +28,10 @@ namespace Icon.Aggregates
 
         public Models.Component ToModel()
         {
-          return new Models.Component(
-            id: Id,
-            version: Version
-          );
+            return new Models.Component(
+              id: Id,
+              version: Version
+            );
         }
     }
 }

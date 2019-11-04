@@ -12,6 +12,9 @@ namespace Icon.GraphQl
                 .Type<NonNullType<ListType<NonNullType<ComponentType>>>>();
             /* .Argument("episode", a => a.DefaultValue(Episode.NewHope)); */
 
+            descriptor.Field(t => t.GetComponent(default, default))
+                .Type<NonNullType<ComponentType>>();
+
             /* descriptor.Field(t => t.GetCharacter(default, default)) */
             /*     .Type<NonNullType<ListType<NonNullType<CharacterType>>>>(); */
 

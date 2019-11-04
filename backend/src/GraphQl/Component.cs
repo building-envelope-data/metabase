@@ -3,21 +3,22 @@ using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {
-  public sealed class Component
-  {
-    public static Component FromModel(Models.Component component)
+    public sealed class Component
     {
-      return new Component {
-        Id = component.Id,
-        Version = component.Version
-      };
-    }
+        public static Component FromModel(Models.Component component)
+        {
+            return new Component
+            {
+                Id = component.Id,
+                Version = component.Version
+            };
+        }
 
-    public Guid Id { get; set; }
-    public int Version { get; set; }
+        public Guid Id { get; set; }
+        public int Version { get; set; }
 
-    public Component()
-    {
+        public Component()
+        {
+        }
     }
-  }
 }

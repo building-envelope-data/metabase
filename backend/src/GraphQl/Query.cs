@@ -1,3 +1,4 @@
+using System;
 using Icon.Infrastructure.Query;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
@@ -21,8 +22,25 @@ namespace Icon.GraphQl
 
         public async Task<IEnumerable<Component>> GetComponents()
         {
-            return (await _queryBus.Send<Queries.ListComponents, IEnumerable<Models.Component>>(new Queries.ListComponents()))
+            return
+              (await _queryBus
+               .Send<
+                  Queries.ListComponents,
+                  IEnumerable<Models.Component>
+                  >(new Queries.ListComponents()))
               .Select(c => Component.FromModel(c));
+        }
+
+        public async Task<Component> GetComponent(Guid id, DateTime? timestamp)
+        {
+            return
+              Component.FromModel(
+                  (await _queryBus
+                    .Send<
+                       Queries.GetComponent,
+                       Models.Component
+                       >(new Queries.GetComponent(id, timestamp))
+                  ));
         }
 
         /* public async Task<ActionResult<ComponentAggregate>> Get(Guid id, DateTime? timestamp) // TODO Use `ZonedDateTime` here. Problem: Its (de)serialization is rather complex. */

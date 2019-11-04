@@ -13,20 +13,20 @@ using System.Linq;
 
 namespace Icon.Handlers
 {
-  public class ListComponentsHandler :
-    IQueryHandler<Queries.ListComponents, IEnumerable<Models.Component>>
-  {
-    private readonly IAggregateRepository _repository;
-
-    public ListComponentsHandler(IAggregateRepository repository)
+    public class ListComponentsHandler :
+      IQueryHandler<Queries.ListComponents, IEnumerable<Models.Component>>
     {
-      _repository = repository;
-    }
+        private readonly IAggregateRepository _repository;
 
-    public async Task<IEnumerable<Models.Component>> Handle(Queries.ListComponents query, CancellationToken cancellationToken)
-    {
-      return (await _repository.LoadAll<Aggregates.ComponentAggregate>(cancellationToken))
-        .Select(a => a.ToModel());
+        public ListComponentsHandler(IAggregateRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public async Task<IEnumerable<Models.Component>> Handle(Queries.ListComponents query, CancellationToken cancellationToken)
+        {
+            return (await _repository.LoadAll<Aggregates.ComponentAggregate>(cancellationToken))
+              .Select(a => a.ToModel());
+        }
     }
-  }
 }

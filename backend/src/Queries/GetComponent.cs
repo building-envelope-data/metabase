@@ -9,11 +9,11 @@ namespace Icon.Queries
     public class GetComponent : IQuery<Models.Component>
     {
         public Guid ComponentId { get; }
-        public DateTime Timestamp { get; } // TODO ZonedDateTime
+        public DateTime? Timestamp { get; } // TODO ZonedDateTime
 
         public GetComponent(
             Guid componentId,
-            DateTime timestamp
+            DateTime? timestamp
             )
         {
             ComponentId = componentId;

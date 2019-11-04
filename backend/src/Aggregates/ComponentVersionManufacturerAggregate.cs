@@ -46,16 +46,16 @@ namespace Icon.Aggregates
 
         public Models.ComponentVersionManufacturer ToModel()
         {
-          return new Models.ComponentVersionManufacturer(
-            id: Id,
-            componentVersionId: ComponentVersionId,
-            name: Name,
-            description: Description,
-            abbreviation: Abbreviation,
-            availableFrom: AvailableFrom,
-            availableUntil: AvailableUntil,
-            version: Version
-          );
+            return new Models.ComponentVersionManufacturer(
+              id: Id,
+              componentVersionId: ComponentVersionId,
+              name: Name,
+              description: Description,
+              abbreviation: Abbreviation,
+              availableFrom: AvailableFrom,
+              availableUntil: AvailableUntil,
+              version: Version
+            );
         }
     }
 }

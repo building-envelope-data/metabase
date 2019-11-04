@@ -13,21 +13,21 @@ using System.Linq;
 
 namespace Icon.Handlers
 {
-  public sealed class CreateComponentHandler
-    : ICommandHandler<Commands.CreateComponent, Models.Component>
-  {
-    private readonly IAggregateRepository _repository;
-
-    public CreateComponentHandler(IAggregateRepository repository)
+    public sealed class CreateComponentHandler
+      : ICommandHandler<Commands.CreateComponent, Models.Component>
     {
-      _repository = repository;
-    }
+        private readonly IAggregateRepository _repository;
 
-    public async Task<Models.Component> Handle(Commands.CreateComponent command, CancellationToken cancellationToken)
-    {
-      var @event = new Events.ComponentCreated(Guid.NewGuid(), command);
-      var component = Aggregates.ComponentAggregate.Create(@event);
-      return (await _repository.Store(component, cancellationToken)).ToModel();
+        public CreateComponentHandler(IAggregateRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public async Task<Models.Component> Handle(Commands.CreateComponent command, CancellationToken cancellationToken)
+        {
+            var @event = new Events.ComponentCreated(Guid.NewGuid(), command);
+            var component = Aggregates.ComponentAggregate.Create(@event);
+            return (await _repository.Store(component, cancellationToken)).ToModel();
+        }
     }
-  }
 }
