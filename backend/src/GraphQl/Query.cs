@@ -1,7 +1,6 @@
 using Icon.Infrastructure.Query;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
-using User = Icon.Models.User;
 using System.Threading.Tasks;
 using Models = Icon.Models;
 using Queries = Icon.Queries;
@@ -12,9 +11,9 @@ namespace Icon.GraphQl
     public sealed class Query
     {
         private readonly IQueryBus _queryBus;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<Models.User> _userManager;
 
-        public Query(IQueryBus queryBus, UserManager<User> userManager)
+        public Query(IQueryBus queryBus, UserManager<Models.User> userManager)
         {
             _queryBus = queryBus;
             _userManager = userManager;

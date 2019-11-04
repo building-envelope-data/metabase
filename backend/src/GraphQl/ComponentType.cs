@@ -10,10 +10,13 @@ namespace Icon.GraphQl
             descriptor.Name("Component");
 
             descriptor.Field(f => f.Id)
-                .Type<NonNullType<IdType>>();
+                .Type<NonNullType<UuidType>>();
 
             descriptor.Field(f => f.Version)
                 .Type<NonNullType<IntType>>();
+
+            descriptor.Field<ComponentResolvers>(f => f.GetVersions(default))
+                .Type<NonNullType<ListType<NonNullType<ComponentVersionType>>>>();
         }
     }
 }

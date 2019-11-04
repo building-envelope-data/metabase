@@ -8,7 +8,16 @@ namespace Icon.Queries
 {
     public class GetComponent : IQuery<Models.Component>
     {
-        public Guid ComponentId { get; set; }
-        public DateTime Timestamp { get; set; } // TODO ZonedDateTime
+        public Guid ComponentId { get; }
+        public DateTime Timestamp { get; } // TODO ZonedDateTime
+
+        public GetComponent(
+            Guid componentId,
+            DateTime timestamp
+            )
+        {
+            ComponentId = componentId;
+            Timestamp = timestamp;
+        }
     }
 }

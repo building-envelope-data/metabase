@@ -49,6 +49,8 @@ namespace Icon.Configuration
 
             services.AddScoped<MediatR.IRequestHandler<Queries.ListComponents, IEnumerable<Models.Component>>, Handlers.ListComponentsHandler>();
             services.AddScoped<MediatR.IRequestHandler<Queries.GetComponent, Models.Component>, Handlers.GetComponentHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Queries.ListComponentVersions, IEnumerable<Models.ComponentVersion>>, Handlers.ListComponentVersionsHandler>();
+            /* services.AddScoped<MediatR.IRequestHandler<Queries.GetComponentVersion, Models.ComponentVersion>, Handlers.GetComponentVersionHandler>(); */
 
             services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponent, Models.Component>, Handlers.CreateComponentHandler>();
             services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponentVersion, Models.ComponentVersion>, Handlers.CreateComponentVersionHandler>();
