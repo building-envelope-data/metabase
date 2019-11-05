@@ -9,10 +9,14 @@ using Models = Icon.Models;
 
 namespace Icon.Commands
 {
-    public sealed class CreateComponentVersion : CommandBase<Models.ComponentVersion>
-    {
-        public CreateComponentVersion(Guid creatorId) : base(creatorId) { }
+  public sealed class CreateComponentVersion
+    : CommandBase<Models.ComponentVersion>
+  {
+    public Guid ComponentId { get; }
 
-        public Guid ComponentId { get; set; }
+    public CreateComponentVersion(Guid componentId, Guid creatorId)
+      : base(creatorId) {
+      ComponentId = componentId;
     }
+  }
 }

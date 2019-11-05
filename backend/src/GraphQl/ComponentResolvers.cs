@@ -6,6 +6,7 @@ using HotChocolate.Types.Relay;
 using HotChocolate;
 using Icon.Infrastructure.Query;
 using System.Linq;
+using HotChocolate.Resolvers;
 
 namespace Icon.GraphQl
 {
@@ -14,8 +15,12 @@ namespace Icon.GraphQl
     {
         public ComponentResolvers(IQueryBus queryBus) : base(queryBus) { }
 
-        public async Task<IEnumerable<ComponentVersion>> GetVersions(Component component, DateTime? timestamp)
+        public async Task<IEnumerable<ComponentVersion>> GetVersions(
+            [Parent] Component component,
+            IResolverContext context
+            )
         {
+            var timestamp = (System.DateTime?) context.ScopedContextData["timestamp"];
             return (await QueryBus.Send<
                   Queries.ListComponentVersions,
                   IEnumerable<Models.ComponentVersion>

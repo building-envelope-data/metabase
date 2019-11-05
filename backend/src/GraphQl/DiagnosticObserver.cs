@@ -44,15 +44,15 @@ namespace Icon.GraphQl
         [DiagnosticName("HotChocolate.Execution.Query.Stop")]
         public void EndQueryExecute(IQueryContext context)
         {
-            using (var stream = new MemoryStream())
-            {
-                var resultSerializer = new JsonQueryResultSerializer();
-                resultSerializer.SerializeAsync(
-                    (IReadOnlyQueryResult)context.Result,
-                    stream).Wait();
-                _logger.LogInformation(
-                    Encoding.UTF8.GetString(stream.ToArray()));
-            }
+            // using (var stream = new MemoryStream())
+            // {
+            //     var resultSerializer = new JsonQueryResultSerializer();
+            //     resultSerializer.SerializeAsync(
+            //         (IReadOnlyQueryResult)context.Result,
+            //         stream).Wait();
+            //     _logger.LogInformation(
+            //         Encoding.UTF8.GetString(stream.ToArray()));
+            // }
         }
 
         [DiagnosticName("HotChocolate.Execution.Query.Error")]

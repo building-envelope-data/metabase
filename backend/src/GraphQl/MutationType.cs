@@ -7,10 +7,13 @@ namespace Icon.GraphQl
     {
         protected override void Configure(IObjectTypeDescriptor<Mutation> descriptor)
         {
-            /* descriptor.Field(t => t.CreateReview(default, default, default)) */
-            /*     .Type<NonNullType<ReviewType>>() */
-            /*     .Argument("episode", a => a.Type<NonNullType<EpisodeType>>()) */
-            /*     .Argument("review", a => a.Type<NonNullType<ReviewInputType>>()); */
+            descriptor.Field(f => f.CreateComponent())
+                .Type<NonNullType<ComponentType>>();
+                /* .Argument("component", a => a.Type<NonNullType<ComponentInputType>>()); */
+
+            descriptor.Field(f => f.CreateComponentVersion(default))
+                .Type<NonNullType<ComponentVersionType>>()
+                .Argument("componentVersionInput", a => a.Type<NonNullType<ComponentVersionInputType>>());
         }
     }
 }

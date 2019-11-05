@@ -10,6 +10,7 @@ using Models = Icon.Models;
 using Queries = Icon.Queries;
 using Aggregates = Icon.Aggregates;
 using System.Linq;
+using Marten;
 
 namespace Icon.Handlers
 {
@@ -25,8 +26,31 @@ namespace Icon.Handlers
 
         public async Task<IEnumerable<Models.Component>> Handle(Queries.ListComponents query, CancellationToken cancellationToken)
         {
-            return (await _repository.LoadAll<Aggregates.ComponentAggregate>(cancellationToken))
-              .Select(a => a.ToModel());
+            if (query.Timestamp == null)
+            {
+              return (await _repository.LoadAll<Aggregates.ComponentAggregate>(cancellationToken))
+                .Select(a => a.ToModel());
+            }
+            else
+            {
+                var allComponentIds = await _session.Events.QueryRawEventDataOnly<Events.ComponentCreated>()
+                  .Select(e => e.ComponentId)
+                  .ToListAsync();
+
+                var components = new List<Models.Component>();
+                foreach (var componentId in allComponentIds) {
+                  var aggregate =
+                      await _session.Events
+                       .AggregateStreamAsync<Aggregates.ComponentAggregate>(
+                         componentId,
+                         timestamp: query.Timestamp,
+                         token: cancellationToken
+                         );
+                  if (aggregate.Version >= 1)
+                    components.Add(aggregate.ToModel());
+                }
+                return components;
+            }
         }
     }
 }

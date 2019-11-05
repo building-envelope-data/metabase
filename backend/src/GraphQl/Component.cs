@@ -7,6 +7,7 @@ namespace Icon.GraphQl
     {
         public static Component FromModel(Models.Component component)
         {
+            if (component == null) return null;
             return new Component
             {
                 Id = component.Id,

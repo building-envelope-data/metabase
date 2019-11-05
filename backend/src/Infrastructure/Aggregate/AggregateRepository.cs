@@ -44,7 +44,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<T> Load<T>(Guid id, int? version = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
         {
-            var aggregate = await _session.Events.AggregateStreamAsync<T>(id, version ?? 0, default(DateTime), default(T), cancellationToken);
+            var aggregate = await _session.Events.AggregateStreamAsync<T>(id, version ?? 0, token: cancellationToken);
             return aggregate ?? throw new InvalidOperationException($"No aggregate by id {id.ToString()}.");
         }
 

@@ -7,6 +7,7 @@ namespace Icon.GraphQl
     {
         public static ComponentVersion FromModel(Models.ComponentVersion componentVersion)
         {
+            if (componentVersion == null) return null;
             return new ComponentVersion
             {
                 Id = componentVersion.Id,

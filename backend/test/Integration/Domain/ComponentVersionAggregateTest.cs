@@ -41,8 +41,7 @@ namespace Icon.Domain
 
         private async Task<Aggregates.ComponentVersionAggregate> CreateComponentVersion(Guid componentId)
         {
-            var command = new Commands.CreateComponentVersion(creatorId: Guid.NewGuid());
-            command.ComponentId = componentId;
+            var command = new Commands.CreateComponentVersion(componentId, creatorId: Guid.NewGuid());
             var @event = new Events.ComponentVersionCreated(Guid.NewGuid(), command);
             var componentVersion = Aggregates.ComponentVersionAggregate.Create(@event);
             var events = componentVersion.GetUncommittedEvents().ToArray();

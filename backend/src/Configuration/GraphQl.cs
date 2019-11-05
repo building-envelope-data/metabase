@@ -37,11 +37,11 @@ namespace Icon.Configuration
                   // enable the authorization middleware.
                   .AddAuthorizeDirectiveType()
                   .AddQueryType<GraphQlX.QueryType>()
-                  /* .AddMutationType<GraphQlX.MutationType>() */
+                  .AddMutationType<GraphQlX.MutationType>()
                   /* .AddSubscriptionType<SubscriptionType>() */
                   .AddType<GraphQlX.ComponentType>()
-                  /* .AddType<DroidType>() */
-                  /* .AddType<EpisodeType>() */
+                  .AddType<GraphQlX.ComponentVersionType>()
+                  .AddType<GraphQlX.ComponentVersionInputType>()
                   .Create(),
                   new QueryExecutionOptions
                   {

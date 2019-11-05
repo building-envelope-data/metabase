@@ -32,6 +32,7 @@ namespace Icon.Aggregates
 
         public Models.ComponentVersion ToModel()
         {
+          if (Version == 0) return null;
             return new Models.ComponentVersion(
               id: Id,
               componentId: ComponentId,

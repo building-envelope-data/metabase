@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Models = Icon.Models;
 using Queries = Icon.Queries;
 using System.Linq;
+using HotChocolate.Resolvers;
 
 namespace Icon.GraphQl
 {
@@ -20,19 +21,21 @@ namespace Icon.GraphQl
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<Component>> GetComponents()
+        public async Task<IEnumerable<Component>> GetComponents(DateTime? timestamp, IResolverContext context)
         {
+          context.ScopedContextData = context.ScopedContextData.SetItem("timestamp", timestamp);
             return
               (await _queryBus
                .Send<
                   Queries.ListComponents,
                   IEnumerable<Models.Component>
-                  >(new Queries.ListComponents()))
+                  >(new Queries.ListComponents(timestamp)))
               .Select(c => Component.FromModel(c));
         }
 
-        public async Task<Component> GetComponent(Guid id, DateTime? timestamp)
+        public async Task<Component> GetComponent(Guid id, DateTime? timestamp, IResolverContext context)
         {
+          context.ScopedContextData = context.ScopedContextData.SetItem("timestamp", timestamp);
             return
               Component.FromModel(
                   (await _queryBus

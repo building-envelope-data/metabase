@@ -8,12 +8,14 @@ namespace Icon.GraphQl
     {
         protected override void Configure(IObjectTypeDescriptor<Query> descriptor)
         {
-            descriptor.Field(t => t.GetComponents())
-                .Type<NonNullType<ListType<NonNullType<ComponentType>>>>();
-            /* .Argument("episode", a => a.DefaultValue(Episode.NewHope)); */
+            descriptor.Field(t => t.GetComponents(default, default))
+                .Type<NonNullType<ListType<NonNullType<ComponentType>>>>()
+                .Argument("timestamp", a => a.Type<DateTimeType>());
 
-            descriptor.Field(t => t.GetComponent(default, default))
-                .Type<NonNullType<ComponentType>>();
+            descriptor.Field(t => t.GetComponent(default, default, default))
+                .Type<ComponentType>()
+                .Argument("id", a => a.Type<NonNullType<UuidType>>())
+                .Argument("timestamp", a => a.Type<DateTimeType>());
 
             /* descriptor.Field(t => t.GetCharacter(default, default)) */
             /*     .Type<NonNullType<ListType<NonNullType<CharacterType>>>>(); */
