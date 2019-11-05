@@ -28,28 +28,13 @@ namespace Icon.Handlers
         {
             if (query.Timestamp == null)
             {
-              return (await _repository.LoadAll<Aggregates.ComponentAggregate>(cancellationToken))
+              return (await _repository.LoadAll<Aggregates.ComponentAggregate>(cancellationToken: cancellationToken))
                 .Select(a => a.ToModel());
             }
             else
             {
-                var allComponentIds = await _session.Events.QueryRawEventDataOnly<Events.ComponentCreated>()
-                  .Select(e => e.ComponentId)
-                  .ToListAsync();
-
-                var components = new List<Models.Component>();
-                foreach (var componentId in allComponentIds) {
-                  var aggregate =
-                      await _session.Events
-                       .AggregateStreamAsync<Aggregates.ComponentAggregate>(
-                         componentId,
-                         timestamp: query.Timestamp,
-                         token: cancellationToken
-                         );
-                  if (aggregate.Version >= 1)
-                    components.Add(aggregate.ToModel());
-                }
-                return components;
+                return (await _repository.LoadAll<Aggregates.ComponentAggregate>(query.Timestamp, cancellationToken))
+                  .Select(a => a.ToModel());
             }
         }
     }

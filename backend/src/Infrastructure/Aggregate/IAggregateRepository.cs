@@ -10,8 +10,10 @@ namespace Icon.Infrastructure.Aggregate
     {
         public Task<T> Store<T>(T aggregate, CancellationToken cancellationToken = default(CancellationToken)) where T : IEventSourcedAggregate;
 
-        public Task<T> Load<T>(Guid id, int? version = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new();
+        public Task<T> Load<T>(Guid id, DateTime? timestamp = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new();
 
-        public Task<IEnumerable<T>> LoadAll<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : IEventSourcedAggregate, new();
+        public Task<IEnumerable<T>> LoadAll<T>(DateTime? timestamp = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<T>> LoadAll<T>(IEnumerable<Guid> ids, DateTime? timestamp = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new();
     }
 }

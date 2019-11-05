@@ -21,10 +21,12 @@ namespace Icon.Handlers
       IQueryHandler<Queries.ListComponentVersions, IEnumerable<Models.ComponentVersion>>
     {
         private readonly IDocumentSession _session;
+        private readonly IAggregateRepository _repository;
 
-        public ListComponentVersionsHandler(IDocumentSession session)
+        public ListComponentVersionsHandler(IDocumentSession session, IAggregateRepository repository)
         {
             _session = session;
+            _repository = repository;
         }
 
         public async Task<IEnumerable<Models.ComponentVersion>> Handle(
@@ -56,42 +58,21 @@ namespace Icon.Handlers
 
                 /* // The stream id is equal to the component version id. */
                 /* var versionIds = await _session.Events.QueryAllRawEvents() */
-                /*   // .Where(e => allVersionIds.Contains(e.StreamId)) // TODO Why does this not work? */
-                /*   // .Where(e => e.MatchesSql("d.stream_id in ?", allVersionIds)) // TODO Why does this not work? */
+                /*   // .Where(e => allVersionIds.Contains(e.StreamId)) // Why does this not work? */
+                /*   // .Where(e => e.MatchesSql("d.stream_id in ?", allVersionIds)) // Why does this not work? */
                 /*   .Where(e => e.Timestamp <= query.Timestamp) */
                 /*   .Select(e => e.StreamId) */
                 /*   .ToListAsync(cancellationToken); */
 
-                // The following does sadly not work because the various asynchronous database operations come in conflict with each other
-                /* var getAggregateTasks = new List<Task<Aggregates.ComponentVersionAggregate>>(); */
-                /* foreach (var versionId in allVersionIds) { */
-                /*   getAggregateTasks.Add( */
-                /*       _session.Events */
-                /*        .AggregateStreamAsync<Aggregates.ComponentVersionAggregate>( */
-                /*          versionId, */
-                /*          timestamp: query.Timestamp, */
-                /*          token: cancellationToken */
-                /*          ) */
-                /*       ); */
-                /* } */
-                /* return */
-                /*   (await Task.WhenAll(getAggregateTasks)) */
-                /*   .Where(v => v.Version >= 1) */
-                /*   .Select(v => v.ToModel()); */
-
-                var versions = new List<Models.ComponentVersion>();
-                foreach (var versionId in allVersionIds) {
-                  var aggregate =
-                      await _session.Events
-                       .AggregateStreamAsync<Aggregates.ComponentVersionAggregate>(
-                         versionId,
-                         timestamp: query.Timestamp,
-                         token: cancellationToken
-                         );
-                  if (aggregate.Version >= 1)
-                    versions.Add(aggregate.ToModel());
-                }
-                return versions;
+                return
+                  (await
+                   _repository.LoadAll<Aggregates.ComponentVersionAggregate>(
+                     allVersionIds,
+                     query.Timestamp,
+                     cancellationToken
+                     )
+                  )
+                  .Select(a => a.ToModel());
             }
         }
     }
