@@ -9,7 +9,7 @@ namespace Icon.GraphQl
         {
             descriptor.Field(f => f.CreateComponent())
                 .Type<NonNullType<ComponentType>>();
-                /* .Argument("component", a => a.Type<NonNullType<ComponentInputType>>()); */
+            /* .Argument("component", a => a.Type<NonNullType<ComponentInputType>>()); */
 
             descriptor.Field(f => f.CreateComponentVersion(default))
                 .Type<NonNullType<ComponentVersionType>>()

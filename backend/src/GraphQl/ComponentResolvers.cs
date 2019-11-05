@@ -20,7 +20,7 @@ namespace Icon.GraphQl
             IResolverContext context
             )
         {
-            var timestamp = (System.DateTime?) context.ScopedContextData["timestamp"];
+            var timestamp = (System.DateTime?)context.ScopedContextData["timestamp"];
             return (await QueryBus.Send<
                   Queries.ListComponentVersions,
                   IEnumerable<Models.ComponentVersion>

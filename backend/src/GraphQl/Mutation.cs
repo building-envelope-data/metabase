@@ -27,29 +27,29 @@ namespace Icon.GraphQl
 
         public async Task<Component> CreateComponent()
         {
-          return
-            Component.FromModel(
-                (await _commandBus
-                 .Send<
-                    Commands.CreateComponent,
-                    Models.Component
-                    >(new Commands.CreateComponent(creatorId: Guid.NewGuid()))) // TODO Use current user!
-                );
+            return
+              Component.FromModel(
+                  (await _commandBus
+                   .Send<
+                      Commands.CreateComponent,
+                      Models.Component
+                      >(new Commands.CreateComponent(creatorId: Guid.NewGuid()))) // TODO Use current user!
+                  );
         }
 
         public async Task<ComponentVersion> CreateComponentVersion(ComponentVersionInput componentVersionInput)
         {
-          return
-            ComponentVersion.FromModel(
-                (await _commandBus
-                 .Send<
-                    Commands.CreateComponentVersion,
-                    Models.ComponentVersion
-                    >(new Commands.CreateComponentVersion(
-                        componentVersionInput.ComponentId,
-                        creatorId: Guid.NewGuid()) // TODO Use current user!
-                     ))
-                );
+            return
+              ComponentVersion.FromModel(
+                  (await _commandBus
+                   .Send<
+                      Commands.CreateComponentVersion,
+                      Models.ComponentVersion
+                      >(new Commands.CreateComponentVersion(
+                          componentVersionInput.ComponentId,
+                          creatorId: Guid.NewGuid()) // TODO Use current user!
+                       ))
+                  );
         }
     }
 }

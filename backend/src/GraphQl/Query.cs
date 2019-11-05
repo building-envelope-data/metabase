@@ -23,7 +23,8 @@ namespace Icon.GraphQl
 
         public async Task<IEnumerable<Component>> GetComponents(DateTime? timestamp, IResolverContext context)
         {
-          context.ScopedContextData = context.ScopedContextData.SetItem("timestamp", timestamp);
+            // TODO Is there a better way to pass data down the tree to resolvers?
+            context.ScopedContextData = context.ScopedContextData.SetItem("timestamp", timestamp);
             return
               (await _queryBus
                .Send<
@@ -35,7 +36,8 @@ namespace Icon.GraphQl
 
         public async Task<Component> GetComponent(Guid id, DateTime? timestamp, IResolverContext context)
         {
-          context.ScopedContextData = context.ScopedContextData.SetItem("timestamp", timestamp);
+            // TODO Is there a better way to pass data down the tree to resolvers?
+            context.ScopedContextData = context.ScopedContextData.SetItem("timestamp", timestamp);
             return
               Component.FromModel(
                   (await _queryBus

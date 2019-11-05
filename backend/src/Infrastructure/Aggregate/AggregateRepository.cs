@@ -52,54 +52,55 @@ namespace Icon.Infrastructure.Aggregate
         {
             if (timestamp == null)
             {
-              // https://jasperfx.github.io/marten/documentation/documents/querying/async/
-              return await _session.Query<T>()
-                .ToListAsync(cancellationToken);
+                // https://jasperfx.github.io/marten/documentation/documents/querying/async/
+                return await _session.Query<T>()
+                  .ToListAsync(cancellationToken);
             }
             else
             {
-              var aggregateIds = await _session.Query<T>()
-                .Select(a => a.Id)
-                .ToListAsync(cancellationToken);
-              return await LoadAll<T>(aggregateIds, timestamp, cancellationToken);
+                var aggregateIds = await _session.Query<T>()
+                  .Select(a => a.Id)
+                  .ToListAsync(cancellationToken);
+                return await LoadAll<T>(aggregateIds, timestamp, cancellationToken);
             }
         }
 
         public async Task<IEnumerable<T>> LoadAll<T>(IEnumerable<Guid> ids, DateTime? timestamp = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
         {
-          if (timestamp == null)
-          {
-              return await _session.Query<T>()
-                .Where(a => ids.Contains(a.Id))
-                .ToListAsync(cancellationToken);
-          }
-          else
-          {
-            var aggregates = new List<T>();
-            foreach (var id in ids) {
-              var aggregate = await _session.Events.AggregateStreamAsync<T>(id, timestamp: timestamp, token: cancellationToken);
-              if (aggregate.Version >= 1)
-              {
-                aggregates.Add(aggregate);
-              }
+            if (timestamp == null)
+            {
+                return await _session.Query<T>()
+                  .Where(a => ids.Contains(a.Id))
+                  .ToListAsync(cancellationToken);
             }
-            return aggregates.AsReadOnly();
-            /* // The following does sadly not work because the various asynchronous database operations come in conflict with each other */
-            /* var getAggregateTasks = new List<Task<T>>(); */
-            /* foreach (var Id in allIds) { */
-            /*   getAggregateTasks.Add( */
-            /*       _session.Events */
-            /*       .AggregateStreamAsync<T>( */
-            /*         Id, */
-            /*         timestamp: timestamp, */
-            /*         token: cancellationToken */
-            /*         ) */
-            /*       ); */
-            /* } */
-            /* return */
-            /*   (await Task.WhenAll(getAggregateTasks)) */
-            /*   .Where(v => v.Version >= 1); */
-          }
+            else
+            {
+                var aggregates = new List<T>();
+                foreach (var id in ids)
+                {
+                    var aggregate = await _session.Events.AggregateStreamAsync<T>(id, timestamp: timestamp, token: cancellationToken);
+                    if (aggregate.Version >= 1)
+                    {
+                        aggregates.Add(aggregate);
+                    }
+                }
+                return aggregates.AsReadOnly();
+                /* // The following does sadly not work because the various asynchronous database operations come in conflict with each other */
+                /* var getAggregateTasks = new List<Task<T>>(); */
+                /* foreach (var Id in allIds) { */
+                /*   getAggregateTasks.Add( */
+                /*       _session.Events */
+                /*       .AggregateStreamAsync<T>( */
+                /*         Id, */
+                /*         timestamp: timestamp, */
+                /*         token: cancellationToken */
+                /*         ) */
+                /*       ); */
+                /* } */
+                /* return */
+                /*   (await Task.WhenAll(getAggregateTasks)) */
+                /*   .Where(v => v.Version >= 1); */
+            }
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Icon.Aggregates
 
         public Models.ComponentVersionManufacturer ToModel()
         {
-          if (Version == 0) return null;
+            if (Version == 0) return null;
             return new Models.ComponentVersionManufacturer(
               id: Id,
               componentVersionId: ComponentVersionId,

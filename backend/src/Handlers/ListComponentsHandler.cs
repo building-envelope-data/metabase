@@ -28,8 +28,8 @@ namespace Icon.Handlers
         {
             if (query.Timestamp == null)
             {
-              return (await _repository.LoadAll<Aggregates.ComponentAggregate>(cancellationToken: cancellationToken))
-                .Select(a => a.ToModel());
+                return (await _repository.LoadAll<Aggregates.ComponentAggregate>(cancellationToken: cancellationToken))
+                  .Select(a => a.ToModel());
             }
             else
             {
