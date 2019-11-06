@@ -63,31 +63,18 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<IEnumerable<T>> LoadAll<T>(IEnumerable<Guid> possibleIds, DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
         {
-                var aggregates = new List<T>();
+							var batch = _session.CreateBatchQuery();
+                var aggregateStreamTasks = new List<Task<T>>();
                 foreach (var id in possibleIds)
                 {
-                    var aggregate = await _session.Events.AggregateStreamAsync<T>(id, timestamp: timestamp, token: cancellationToken);
-                    if (aggregate.Version >= 1)
-                    {
-                        aggregates.Add(aggregate);
-                    }
+                    aggregateStreamTasks.Add(
+											batch.Events.AggregateStream<T>(id, timestamp: timestamp)
+											);
                 }
-                return aggregates.AsReadOnly();
-                /* // The following does sadly not work because the various asynchronous database operations come in conflict with each other */
-                /* var getAggregateTasks = new List<Task<T>>(); */
-                /* foreach (var Id in allIds) { */
-                /*   getAggregateTasks.Add( */
-                /*       _session.Events */
-                /*       .AggregateStreamAsync<T>( */
-                /*         Id, */
-                /*         timestamp: timestamp, */
-                /*         token: cancellationToken */
-                /*         ) */
-                /*       ); */
-                /* } */
-                /* return */
-                /*   (await Task.WhenAll(getAggregateTasks)) */
-                /*   .Where(v => v.Version >= 1); */
+								await batch.Execute(cancellationToken);
+								return
+									(await Task.WhenAll(aggregateStreamTasks))
+									  .Where(a => a.Version >= 1);
         }
 
 				public IMartenQueryable<E> Query<E>() where E : IEvent
