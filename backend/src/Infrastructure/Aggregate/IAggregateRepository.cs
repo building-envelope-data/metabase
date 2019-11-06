@@ -10,7 +10,11 @@ namespace Icon.Infrastructure.Aggregate
 {
     public interface IAggregateRepository
     {
-        public Task<T> Store<T>(T aggregate, CancellationToken cancellationToken = default(CancellationToken)) where T : IEventSourcedAggregate;
+				public Task<int> FetchVersion<T>(Guid streamId, DateTime timestamp, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new();
+
+				public Task<Guid> Store<E>(Guid streamId, int expectedVersion, E @event, CancellationToken cancellationToken) where E : IEvent;
+
+				public Task<Guid> Store<E>(Guid streamId, int expectedVersion, IEnumerable<E> events, CancellationToken cancellationToken) where E : IEvent;
 
         public Task<T> Load<T>(Guid id, DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new();
 

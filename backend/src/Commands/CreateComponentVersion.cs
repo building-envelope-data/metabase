@@ -10,7 +10,7 @@ using Models = Icon.Models;
 namespace Icon.Commands
 {
     public sealed class CreateComponentVersion
-      : CommandBase<Models.ComponentVersion>
+      : CommandBase<Guid>
     {
         public Guid ComponentId { get; }
 

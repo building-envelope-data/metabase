@@ -6,12 +6,12 @@ namespace Icon.Models
     public sealed class Component
     {
         public Guid Id { get; }
-        public int Version { get; }
+        public DateTime Timestamp { get; }
 
-        public Component(Guid id, int version)
+        public Component(Guid id, DateTime timestamp)
         {
             Id = id;
-            Version = version;
+            Timestamp = timestamp;
         }
     }
 }

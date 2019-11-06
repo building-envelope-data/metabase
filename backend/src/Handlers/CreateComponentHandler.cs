@@ -14,7 +14,7 @@ using System.Linq;
 namespace Icon.Handlers
 {
     public sealed class CreateComponentHandler
-      : ICommandHandler<Commands.CreateComponent, Models.Component>
+      : ICommandHandler<Commands.CreateComponent, Guid>
     {
         private readonly IAggregateRepository _repository;
 
@@ -23,11 +23,12 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<Models.Component> Handle(Commands.CreateComponent command, CancellationToken cancellationToken)
+        public Task<Guid> Handle(Commands.CreateComponent command, CancellationToken cancellationToken)
         {
-            var @event = new Events.ComponentCreated(Guid.NewGuid(), command);
-            var component = Aggregates.ComponentAggregate.Create(@event);
-            return (await _repository.Store(component, cancellationToken)).ToModel();
+            // TODO Handle conflicting IDs
+            var id = Guid.NewGuid();
+            var @event = new Events.ComponentCreated(id, command);
+            return _repository.Store(id, 0, @event, cancellationToken);
         }
     }
 }

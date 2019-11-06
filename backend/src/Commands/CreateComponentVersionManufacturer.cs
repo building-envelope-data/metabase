@@ -10,7 +10,8 @@ using DateTime = System.DateTime;
 
 namespace Icon.Commands
 {
-    public sealed class CreateComponentVersionManufacturer : CommandBase<Models.ComponentVersionManufacturer>
+    public sealed class CreateComponentVersionManufacturer
+      : CommandBase<Guid>
     {
         public Guid ComponentVersionId { get; }
         public Guid UserId { get; }

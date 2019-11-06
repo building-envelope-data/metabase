@@ -1,4 +1,5 @@
 using Guid = System.Guid;
+using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
@@ -6,13 +7,13 @@ namespace Icon.Models
     {
         public Guid Id { get; }
         public Guid ComponentId { get; }
-        public int Version { get; }
+        public DateTime Timestamp { get; }
 
-        public ComponentVersion(Guid id, Guid componentId, int version)
+        public ComponentVersion(Guid id, Guid componentId, DateTime timestamp)
         {
             Id = id;
             ComponentId = componentId;
-            Version = version;
+            Timestamp = timestamp;
         }
     }
 }

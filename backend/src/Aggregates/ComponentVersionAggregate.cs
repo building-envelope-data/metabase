@@ -11,14 +11,6 @@ namespace Icon.Aggregates
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; set; }
 
-        public static ComponentVersionAggregate Create(Events.ComponentVersionCreated @event)
-        {
-            var version = new ComponentVersionAggregate();
-            version.Apply(@event);
-            version.AppendUncommittedEvent(@event);
-            return version;
-        }
-
         public ComponentVersionAggregate()
         {
         }
@@ -32,11 +24,10 @@ namespace Icon.Aggregates
 
         public Models.ComponentVersion ToModel()
         {
-            if (Version == 0) return null;
             return new Models.ComponentVersion(
               id: Id,
               componentId: ComponentId,
-              version: Version
+              timestamp: Timestamp
             );
         }
     }

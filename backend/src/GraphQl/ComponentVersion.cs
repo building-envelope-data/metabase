@@ -1,5 +1,6 @@
 using Guid = System.Guid;
 using Models = Icon.Models;
+using DateTime = System.DateTime;
 
 namespace Icon.GraphQl
 {
@@ -7,18 +8,17 @@ namespace Icon.GraphQl
     {
         public static ComponentVersion FromModel(Models.ComponentVersion componentVersion)
         {
-            if (componentVersion == null) return null;
             return new ComponentVersion
             {
                 Id = componentVersion.Id,
                 ComponentId = componentVersion.ComponentId,
-                Version = componentVersion.Version
+                Timestamp = componentVersion.Timestamp
             };
         }
 
         public Guid Id { get; set; }
         public Guid ComponentId { get; set; }
-        public int Version { get; set; }
+        public DateTime Timestamp { get; set; }
 
         public ComponentVersion()
         {

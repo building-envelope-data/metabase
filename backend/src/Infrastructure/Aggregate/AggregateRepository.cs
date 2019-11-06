@@ -22,16 +22,36 @@ namespace Icon.Infrastructure.Aggregate
             _eventBus = eventBus;
         }
 
-        public async Task<T> Store<T>(T aggregate, CancellationToken cancellationToken) where T : IEventSourcedAggregate
-        {
-            // Take non-persisted events, push them to the event stream, indexed by the aggregate ID
-            var events = aggregate.GetUncommittedEvents().ToArray();
-            AssertExistenceOfCreators(events.Select(@event => @event.CreatorId), cancellationToken);
-            _session.Events.Append(aggregate.Id, aggregate.Version, events);
+				public IMartenQueryable<E> Query<E>() where E : IEvent
+				{
+                return _session.Events.QueryRawEventDataOnly<E>();
+				}
+
+				public async Task<int> FetchVersion<T>(Guid streamId, DateTime timestamp, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new()
+				{
+						// TODO For performance reasons it would be great if we could use (the parameter `timestamp` is not implemented though)
+						// var expectedVersion = (await _session.Events.FetchStreamStateAsync(streamId, timestamp: timestamp, token: cancellationToken)).Version;
+						// Ask on https://github.com/JasperFx/marten/issues for the parameter `timestamp` to be implemented
+            return (await _session.Events.AggregateStreamAsync<T>(streamId, timestamp: timestamp, token: cancellationToken)).Version;
+				}
+
+				public Task<Guid> Store<E>(Guid streamId, int expectedVersion, E @event, CancellationToken cancellationToken) where E : IEvent
+				{
+						return Store(streamId, expectedVersion, new E[] { @event }, cancellationToken);
+				}
+
+				public async Task<Guid> Store<E>(Guid streamId, int expectedVersion, IEnumerable<E> events, CancellationToken cancellationToken) where E : IEvent
+				{
+            AssertExistenceOfCreators(
+								events.Select(@event => @event.CreatorId),
+								cancellationToken
+								);
+						var eventArray = events.ToArray();
+            _session.Events.Append(streamId, expectedVersion, eventArray);
             await _session.SaveChangesAsync(cancellationToken);
-            await _eventBus.Publish(events);
-            return aggregate;
-        }
+            await _eventBus.Publish(eventArray);
+						return streamId;
+				}
 
         private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)
         {
@@ -50,6 +70,7 @@ namespace Icon.Infrastructure.Aggregate
 						{
 							throw new InvalidOperationException($"There is no aggregate with id {id} at time {timestamp}.");
 						}
+            aggregate.Timestamp = timestamp;
             return aggregate;
         }
 
@@ -72,14 +93,14 @@ namespace Icon.Infrastructure.Aggregate
 											);
                 }
 								await batch.Execute(cancellationToken);
-								return
+                var aggregates =
 									(await Task.WhenAll(aggregateStreamTasks))
 									  .Where(a => a.Version >= 1);
+                foreach (var aggregate in aggregates)
+                {
+                  aggregate.Timestamp = timestamp;
+                }
+								return aggregates;
         }
-
-				public IMartenQueryable<E> Query<E>() where E : IEvent
-				{
-                return _session.Events.QueryRawEventDataOnly<E>();
-				}
     }
 }

@@ -35,7 +35,7 @@ namespace Icon.Handlers
             )
         {
                 var ids =
-                  await _session.Events.QueryRawEventDataOnly<Events.ComponentVersionCreated>()
+                  await _repository.Query<Events.ComponentVersionCreated>()
                   .Where(e => e.ComponentId == query.ComponentId)
                   .Select(e => e.ComponentVersionId)
                   .ToListAsync();

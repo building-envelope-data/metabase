@@ -6,11 +6,9 @@ namespace Icon.Infrastructure.Aggregate
 {
     public interface IEventSourcedAggregate : IAggregate
     {
+        public DateTime Timestamp { get; set; }
+
         // For protecting the state, i.e. conflict prevention
         public int Version { get; }
-
-        public IEnumerable<IEvent> GetUncommittedEvents();
-
-        public void ClearUncommittedEvents();
     }
 }

@@ -12,7 +12,7 @@ using Aggregates = Icon.Aggregates;
 namespace Icon.Handlers
 {
     public sealed class CreateComponentVersionHandler
-      : ICommandHandler<Commands.CreateComponentVersion, Models.ComponentVersion>
+      : ICommandHandler<Commands.CreateComponentVersion, Guid>
     {
         private readonly IAggregateRepository _repository;
 
@@ -21,11 +21,11 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<Models.ComponentVersion> Handle(Commands.CreateComponentVersion command, CancellationToken cancellationToken)
+        public Task<Guid> Handle(Commands.CreateComponentVersion command, CancellationToken cancellationToken)
         {
-            var @event = new Events.ComponentVersionCreated(Guid.NewGuid(), command);
-            var componentVersion = Aggregates.ComponentVersionAggregate.Create(@event);
-            return (await _repository.Store(componentVersion, cancellationToken)).ToModel();
+            var id = Guid.NewGuid();
+            var @event = new Events.ComponentVersionCreated(id, command);
+            return _repository.Store(id, 0, @event, cancellationToken);
         }
     }
 }

@@ -13,6 +13,7 @@ using HotChocolate.Resolvers;
 namespace Icon.GraphQl
 {
     public sealed class Mutation
+      : QueryAndMutationBase
     {
         private readonly ICommandBus _commandBus;
         private readonly IQueryBus _queryBus;
@@ -25,31 +26,53 @@ namespace Icon.GraphQl
             _userManager = userManager;
         }
 
-        public async Task<Component> CreateComponent()
+        public async Task<Component> CreateComponent(
+            IResolverContext context
+            )
         {
+                  var componentId =
+                    await _commandBus
+                      .Send<
+                         Commands.CreateComponent,
+                         Guid
+                       >(new Commands.CreateComponent(creatorId: Guid.NewGuid())); // TODO Use current user!
+          var timestamp = SetTimestamp(DateTime.UtcNow, context);
             return
               Component.FromModel(
-                  (await _commandBus
-                   .Send<
-                      Commands.CreateComponent,
-                      Models.Component
-                      >(new Commands.CreateComponent(creatorId: Guid.NewGuid()))) // TODO Use current user!
+                  await _queryBus
+                    .Send<
+                       Queries.GetComponent,
+                       Models.Component
+                       >(new Queries.GetComponent(componentId, timestamp))
                   );
         }
 
-        public async Task<ComponentVersion> CreateComponentVersion(ComponentVersionInput componentVersionInput)
+        public async Task<ComponentVersion> CreateComponentVersion(
+            ComponentVersionInput componentVersionInput,
+            IResolverContext context
+            )
         {
+                 var versionId =
+                   await _commandBus
+                    .Send<
+                       Commands.CreateComponentVersion,
+                       Guid
+                     >(new Commands.CreateComponentVersion(
+                         componentVersionInput.ComponentId,
+                         creatorId: Guid.NewGuid()
+                         )
+                         ); // TODO Use current user!
+          var timestamp = SetTimestamp(DateTime.UtcNow, context);
             return
               ComponentVersion.FromModel(
-                  (await _commandBus
-                   .Send<
-                      Commands.CreateComponentVersion,
-                      Models.ComponentVersion
-                      >(new Commands.CreateComponentVersion(
-                          componentVersionInput.ComponentId,
-                          creatorId: Guid.NewGuid()) // TODO Use current user!
-                       ))
+                  await _queryBus
+                    .Send<
+                       Queries.GetComponentVersion,
+                       Models.ComponentVersion
+                       >(new Queries.GetComponentVersion(versionId, timestamp))
                   );
         }
+
+        /* lastRead */
     }
 }

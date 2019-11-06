@@ -52,9 +52,9 @@ namespace Icon.Configuration
             services.AddScoped<MediatR.IRequestHandler<Queries.ListComponentVersions, IEnumerable<Models.ComponentVersion>>, Handlers.ListComponentVersionsHandler>();
             /* services.AddScoped<MediatR.IRequestHandler<Queries.GetComponentVersion, Models.ComponentVersion>, Handlers.GetComponentVersionHandler>(); */
 
-            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponent, Models.Component>, Handlers.CreateComponentHandler>();
-            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponentVersion, Models.ComponentVersion>, Handlers.CreateComponentVersionHandler>();
-            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponentVersionManufacturer, Models.ComponentVersionManufacturer>, Handlers.CreateComponentVersionManufacturerHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponent, Guid>, Handlers.CreateComponentHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponentVersion, Guid>, Handlers.CreateComponentVersionHandler>();
+            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponentVersionManufacturer, Guid>, Handlers.CreateComponentVersionManufacturerHandler>();
 
             // TODO Shall we broadcast events?
             /* services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>(); */

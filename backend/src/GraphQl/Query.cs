@@ -11,6 +11,7 @@ using HotChocolate.Resolvers;
 namespace Icon.GraphQl
 {
     public sealed class Query
+      : QueryAndMutationBase
     {
         private readonly IQueryBus _queryBus;
         private readonly UserManager<Models.User> _userManager;
@@ -23,7 +24,7 @@ namespace Icon.GraphQl
 
         public async Task<IEnumerable<Component>> GetComponents(DateTime? timestamp, IResolverContext context)
         {
-          var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.Now, context);
+          var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.UtcNow, context);
             return
               (await _queryBus
                .Send<
@@ -35,7 +36,7 @@ namespace Icon.GraphQl
 
         public async Task<Component> GetComponent(Guid id, DateTime? timestamp, IResolverContext context)
         {
-          var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.Now, context);
+          var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.UtcNow, context);
             return
               Component.FromModel(
                   (await _queryBus
@@ -44,16 +45,6 @@ namespace Icon.GraphQl
                        Models.Component
                        >(new Queries.GetComponent(id, nonNullTimestamp))
                   ));
-        }
-
-        private DateTime SetTimestamp(DateTime timestamp, IResolverContext context)
-        {
-          // TODO Is there a better way to pass data down the tree to resolvers?
-            context.ScopedContextData = context.ScopedContextData.SetItem(
-                "timestamp",
-                timestamp
-                );
-            return timestamp;
         }
 
         /* public async Task<ActionResult<ComponentAggregate>> Get(Guid id, DateTime? timestamp) // TODO Use `ZonedDateTime` here. Problem: Its (de)serialization is rather complex. */

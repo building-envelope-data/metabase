@@ -12,8 +12,8 @@ namespace Icon.GraphQl
             descriptor.Field(f => f.Id)
                 .Type<NonNullType<UuidType>>();
 
-            descriptor.Field(f => f.Version)
-                .Type<NonNullType<IntType>>();
+            descriptor.Field(f => f.Timestamp)
+                .Type<NonNullType<DateTimeType>>();
 
             descriptor.Field<ComponentResolvers>(f => f.GetVersions(default, default))
                 .Type<NonNullType<ListType<NonNullType<ComponentVersionType>>>>();

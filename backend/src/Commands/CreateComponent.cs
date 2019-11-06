@@ -10,7 +10,7 @@ using Models = Icon.Models;
 namespace Icon.Commands
 {
     public sealed class CreateComponent
-      : CommandBase<Models.Component>
+      : CommandBase<Guid>
     {
         public CreateComponent(Guid creatorId) : base(creatorId) { }
     }

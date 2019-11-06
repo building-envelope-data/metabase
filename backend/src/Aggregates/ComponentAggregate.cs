@@ -8,14 +8,6 @@ namespace Icon.Aggregates
 {
     public sealed class ComponentAggregate : EventSourcedAggregate
     {
-        public static ComponentAggregate Create(Events.ComponentCreated @event)
-        {
-            var component = new ComponentAggregate();
-            component.Apply(@event);
-            component.AppendUncommittedEvent(@event);
-            return component;
-        }
-
         public ComponentAggregate()
         {
         }
@@ -28,10 +20,9 @@ namespace Icon.Aggregates
 
         public Models.Component ToModel()
         {
-            if (Version == 0) return null;
             return new Models.Component(
                 id: Id,
-                version: Version
+                timestamp: Timestamp
                 );
         }
     }
