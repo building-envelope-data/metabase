@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Marten;
+using Marten.Linq;
 using System.Threading.Tasks;
 using Icon.Infrastructure.Event;
 using CancellationToken = System.Threading.CancellationToken;
@@ -42,41 +43,28 @@ namespace Icon.Infrastructure.Aggregate
             /* } */
         }
 
-        public async Task<T> Load<T>(Guid id, DateTime? timestamp = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
+        public async Task<T> Load<T>(Guid id, DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
         {
             var aggregate = await _session.Events.AggregateStreamAsync<T>(id, timestamp: timestamp, token: cancellationToken);
-            return aggregate ?? throw new InvalidOperationException($"There is no aggregate with id {id.ToString()}.");
+						if (aggregate == null || aggregate.Version == 0)
+						{
+							throw new InvalidOperationException($"There is no aggregate with id {id} at time {timestamp}.");
+						}
+            return aggregate;
         }
 
-        public async Task<IEnumerable<T>> LoadAll<T>(DateTime? timestamp = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
-        {
-            if (timestamp == null)
-            {
-                // https://jasperfx.github.io/marten/documentation/documents/querying/async/
-                return await _session.Query<T>()
-                  .ToListAsync(cancellationToken);
-            }
-            else
-            {
-                var aggregateIds = await _session.Query<T>()
-                  .Select(a => a.Id)
-                  .ToListAsync(cancellationToken);
-                return await LoadAll<T>(aggregateIds, timestamp, cancellationToken);
-            }
-        }
+        /* public async Task<IEnumerable<T>> LoadAll<T>(DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new() */
+        /* { */
+        /*         var aggregateIds = await _session.Query<T>() */
+        /*           .Select(a => a.Id) */
+        /*           .ToListAsync(cancellationToken); */
+        /*         return await LoadAll<T>(aggregateIds, timestamp, cancellationToken); */
+        /* } */
 
-        public async Task<IEnumerable<T>> LoadAll<T>(IEnumerable<Guid> ids, DateTime? timestamp = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
+        public async Task<IEnumerable<T>> LoadAll<T>(IEnumerable<Guid> possibleIds, DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
         {
-            if (timestamp == null)
-            {
-                return await _session.Query<T>()
-                  .Where(a => ids.Contains(a.Id))
-                  .ToListAsync(cancellationToken);
-            }
-            else
-            {
                 var aggregates = new List<T>();
-                foreach (var id in ids)
+                foreach (var id in possibleIds)
                 {
                     var aggregate = await _session.Events.AggregateStreamAsync<T>(id, timestamp: timestamp, token: cancellationToken);
                     if (aggregate.Version >= 1)
@@ -100,7 +88,11 @@ namespace Icon.Infrastructure.Aggregate
                 /* return */
                 /*   (await Task.WhenAll(getAggregateTasks)) */
                 /*   .Where(v => v.Version >= 1); */
-            }
         }
+
+				public IMartenQueryable<E> Query<E>() where E : IEvent
+				{
+                return _session.Events.QueryRawEventDataOnly<E>();
+				}
     }
 }

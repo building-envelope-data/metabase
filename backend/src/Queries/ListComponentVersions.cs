@@ -9,11 +9,11 @@ namespace Icon.Queries
       IQuery<IEnumerable<Models.ComponentVersion>>
     {
         public Guid ComponentId { get; }
-        public DateTime? Timestamp { get; }
+        public DateTime Timestamp { get; }
 
         public ListComponentVersions(
             Guid componentId,
-            DateTime? timestamp
+            DateTime timestamp
             )
         {
             ComponentId = componentId;

@@ -18,11 +18,11 @@ namespace Icon.Handlers
     public class GetComponentHandler
       : IQueryHandler<Queries.GetComponent, Models.Component>
     {
-        private readonly IDocumentSession _session;
+        private readonly IAggregateRepository _repository;
 
-        public GetComponentHandler(IDocumentSession session)
+        public GetComponentHandler(IAggregateRepository repository)
         {
-            _session = session;
+            _repository = repository;
         }
 
         public async Task<Models.Component> Handle(
@@ -30,27 +30,14 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            if (query.Timestamp == null)
-            {
                 return
-                  (await _session
-                   .LoadAsync<Aggregates.ComponentAggregate>(
-                     query.ComponentId,
-                     token: cancellationToken
-                     )
-                  ).ToModel();
-            }
-            else
-            {
-                return
-                  (await _session.Events
-                   .AggregateStreamAsync<Aggregates.ComponentAggregate>(
+                  (await _repository
+                   .Load<Aggregates.ComponentAggregate>(
                      query.ComponentId,
                      timestamp: query.Timestamp,
-                     token: cancellationToken
+                     cancellationToken: cancellationToken
                      )
                   ).ToModel();
-            }
         }
     }
 }

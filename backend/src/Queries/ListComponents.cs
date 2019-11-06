@@ -8,10 +8,10 @@ namespace Icon.Queries
     public class ListComponents :
       IQuery<IEnumerable<Models.Component>>
     {
-        public DateTime? Timestamp { get; }
+        public DateTime Timestamp { get; }
 
         public ListComponents(
-            DateTime? timestamp
+            DateTime timestamp
             )
         {
             Timestamp = timestamp;

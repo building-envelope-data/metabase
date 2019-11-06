@@ -23,29 +23,37 @@ namespace Icon.GraphQl
 
         public async Task<IEnumerable<Component>> GetComponents(DateTime? timestamp, IResolverContext context)
         {
-            // TODO Is there a better way to pass data down the tree to resolvers?
-            context.ScopedContextData = context.ScopedContextData.SetItem("timestamp", timestamp);
+          var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.Now, context);
             return
               (await _queryBus
                .Send<
                   Queries.ListComponents,
                   IEnumerable<Models.Component>
-                  >(new Queries.ListComponents(timestamp)))
+                  >(new Queries.ListComponents(nonNullTimestamp)))
               .Select(c => Component.FromModel(c));
         }
 
         public async Task<Component> GetComponent(Guid id, DateTime? timestamp, IResolverContext context)
         {
-            // TODO Is there a better way to pass data down the tree to resolvers?
-            context.ScopedContextData = context.ScopedContextData.SetItem("timestamp", timestamp);
+          var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.Now, context);
             return
               Component.FromModel(
                   (await _queryBus
                     .Send<
                        Queries.GetComponent,
                        Models.Component
-                       >(new Queries.GetComponent(id, timestamp))
+                       >(new Queries.GetComponent(id, nonNullTimestamp))
                   ));
+        }
+
+        private DateTime SetTimestamp(DateTime timestamp, IResolverContext context)
+        {
+          // TODO Is there a better way to pass data down the tree to resolvers?
+            context.ScopedContextData = context.ScopedContextData.SetItem(
+                "timestamp",
+                timestamp
+                );
+            return timestamp;
         }
 
         /* public async Task<ActionResult<ComponentAggregate>> Get(Guid id, DateTime? timestamp) // TODO Use `ZonedDateTime` here. Problem: Its (de)serialization is rather complex. */
