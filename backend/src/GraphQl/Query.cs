@@ -24,7 +24,7 @@ namespace Icon.GraphQl
 
         public async Task<IEnumerable<Component>> GetComponents(DateTime? timestamp, IResolverContext context)
         {
-          var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.UtcNow, context);
+            var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.UtcNow, context);
             return
               (await _queryBus
                .Send<
@@ -36,7 +36,7 @@ namespace Icon.GraphQl
 
         public async Task<Component> GetComponent(Guid id, DateTime? timestamp, IResolverContext context)
         {
-          var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.UtcNow, context);
+            var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.UtcNow, context);
             return
               Component.FromModel(
                   (await _queryBus

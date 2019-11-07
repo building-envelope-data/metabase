@@ -34,21 +34,21 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-                var ids =
-                  await _repository.Query<Events.ComponentVersionCreated>()
-                  .Where(e => e.ComponentId == query.ComponentId)
-                  .Select(e => e.ComponentVersionId)
-                  .ToListAsync();
+            var ids =
+              await _repository.Query<Events.ComponentVersionCreated>()
+              .Where(e => e.ComponentId == query.ComponentId)
+              .Select(e => e.ComponentVersionId)
+              .ToListAsync();
 
-                return
-                  (await
-                   _repository.LoadAll<Aggregates.ComponentVersionAggregate>(
-                     ids,
-                     query.Timestamp,
-                     cancellationToken
-                     )
-                  )
-                  .Select(a => a.ToModel());
+            return
+              (await
+               _repository.LoadAll<Aggregates.ComponentVersionAggregate>(
+                 ids,
+                 query.Timestamp,
+                 cancellationToken
+                 )
+              )
+              .Select(a => a.ToModel());
         }
     }
 }

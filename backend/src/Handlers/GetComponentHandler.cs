@@ -30,14 +30,14 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-                return
-                  (await _repository
-                   .Load<Aggregates.ComponentAggregate>(
-                     query.ComponentId,
-                     timestamp: query.Timestamp,
-                     cancellationToken: cancellationToken
-                     )
-                  ).ToModel();
+            return
+              (await _repository
+               .Load<Aggregates.ComponentAggregate>(
+                 query.ComponentId,
+                 timestamp: query.Timestamp,
+                 cancellationToken: cancellationToken
+                 )
+              ).ToModel();
         }
     }
 }

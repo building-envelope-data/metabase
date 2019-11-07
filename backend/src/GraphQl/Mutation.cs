@@ -30,13 +30,13 @@ namespace Icon.GraphQl
             IResolverContext context
             )
         {
-                  var componentId =
-                    await _commandBus
-                      .Send<
-                         Commands.CreateComponent,
-                         Guid
-                       >(new Commands.CreateComponent(creatorId: Guid.NewGuid())); // TODO Use current user!
-          var timestamp = SetTimestamp(DateTime.UtcNow, context);
+            var componentId =
+              await _commandBus
+                .Send<
+                   Commands.CreateComponent,
+                   Guid
+                 >(new Commands.CreateComponent(creatorId: Guid.NewGuid())); // TODO Use current user!
+            var timestamp = SetTimestamp(DateTime.UtcNow, context);
             return
               Component.FromModel(
                   await _queryBus
@@ -52,17 +52,17 @@ namespace Icon.GraphQl
             IResolverContext context
             )
         {
-                 var versionId =
-                   await _commandBus
-                    .Send<
-                       Commands.CreateComponentVersion,
-                       Guid
-                     >(new Commands.CreateComponentVersion(
-                         componentVersionInput.ComponentId,
-                         creatorId: Guid.NewGuid()
-                         )
-                         ); // TODO Use current user!
-          var timestamp = SetTimestamp(DateTime.UtcNow, context);
+            var versionId =
+              await _commandBus
+               .Send<
+                  Commands.CreateComponentVersion,
+                  Guid
+                >(new Commands.CreateComponentVersion(
+                    componentVersionInput.ComponentId,
+                    creatorId: Guid.NewGuid()
+                    )
+                    ); // TODO Use current user!
+            var timestamp = SetTimestamp(DateTime.UtcNow, context);
             return
               ComponentVersion.FromModel(
                   await _queryBus

@@ -27,19 +27,19 @@ namespace Icon.Handlers
 
         public async Task<IEnumerable<Models.Component>> Handle(Queries.ListComponents query, CancellationToken cancellationToken)
         {
-              var ids =
-                await _repository.Query<Events.ComponentCreated>()
-                .Select(e => e.ComponentId)
-                .ToListAsync();
+            var ids =
+              await _repository.Query<Events.ComponentCreated>()
+              .Select(e => e.ComponentId)
+              .ToListAsync();
 
-                return
-                  (await _repository
-                   .LoadAll<Aggregates.ComponentAggregate>(
-                     ids,
-                     query.Timestamp,
-                     cancellationToken
-                     )
-                   ).Select(a => a.ToModel());
+            return
+              (await _repository
+               .LoadAll<Aggregates.ComponentAggregate>(
+                 ids,
+                 query.Timestamp,
+                 cancellationToken
+                 )
+               ).Select(a => a.ToModel());
         }
     }
 }
