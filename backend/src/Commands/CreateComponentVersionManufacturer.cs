@@ -11,7 +11,7 @@ using DateTime = System.DateTime;
 namespace Icon.Commands
 {
     public sealed class CreateComponentVersionManufacturer
-      : CommandBase<Guid>
+      : CommandBase<(Guid Id, DateTime Timestamp)>
     {
         public Guid ComponentVersionId { get; }
         public Guid UserId { get; }

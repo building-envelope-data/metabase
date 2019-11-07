@@ -35,7 +35,7 @@ namespace Test.Integration.Web.Api.Controller
             {
             }
 
-            [Fact]
+            // [Fact]
             public async Task WhenEmpty()
             {
                 // Act
@@ -44,7 +44,7 @@ namespace Test.Integration.Web.Api.Controller
                 components.Should().BeEmpty();
             }
 
-            [Fact]
+            // [Fact]
             public async Task WhenSingle()
             {
                 // Arrange
@@ -58,7 +58,7 @@ namespace Test.Integration.Web.Api.Controller
                 components.Should().BeEquivalentTo(component);
             }
 
-            [Fact]
+            // [Fact]
             public async Task WhenMultiple()
             {
                 // Arrange
@@ -81,7 +81,7 @@ namespace Test.Integration.Web.Api.Controller
         {
             public GetTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-            [Fact]
+            // [Fact]
             public async Task NonExistent()
             {
                 // Arrange
@@ -92,7 +92,7 @@ namespace Test.Integration.Web.Api.Controller
                 httpResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
 
-            [Fact]
+            // [Fact]
             public async Task ExistentNoVersions()
             {
                 // Arrange
@@ -110,7 +110,7 @@ namespace Test.Integration.Web.Api.Controller
                 component.Should().BeEquivalentTo(postedComponent);
             }
 
-            [Fact]
+            // [Fact]
             public async Task ExistentSingleVersion()
             {
                 // Arrange
@@ -137,7 +137,7 @@ namespace Test.Integration.Web.Api.Controller
                 component.Should().BeEquivalentTo(postedComponent);
             }
 
-            [Fact]
+            // [Fact]
             public async Task ExistentMultipleVersions()
             {
                 // Arrange
@@ -185,7 +185,7 @@ namespace Test.Integration.Web.Api.Controller
         {
             public PostTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-            [Fact]
+            // [Fact]
             public async Task Anonymously()
             {
                 // Act
@@ -194,7 +194,7 @@ namespace Test.Integration.Web.Api.Controller
                 httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
 
-            [Fact]
+            // [Fact]
             public async Task Authorized()
             {
                 // Arrange

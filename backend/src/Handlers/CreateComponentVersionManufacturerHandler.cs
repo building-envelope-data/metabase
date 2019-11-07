@@ -13,7 +13,7 @@ using Events = Icon.Events;
 namespace Icon.Handlers
 {
     public sealed class CreateComponentVersionManufacturerHandler
-      : ICommandHandler<Commands.CreateComponentVersionManufacturer, Guid>
+      : ICommandHandler<Commands.CreateComponentVersionManufacturer, (Guid Id, DateTime Timestamp)>
     {
         private readonly IAggregateRepository _repository;
 
@@ -22,11 +22,11 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public Task<Guid> Handle(Commands.CreateComponentVersionManufacturer command, CancellationToken cancellationToken)
+        public Task<(Guid Id, DateTime Timestamp)> Handle(Commands.CreateComponentVersionManufacturer command, CancellationToken cancellationToken)
         {
             var id = Guid.NewGuid();
             var @event = new Events.ComponentVersionManufacturerCreated(id, command);
-            return _repository.Store(id, 0, @event, cancellationToken);
+            return _repository.Store<Aggregates.ComponentVersionManufacturerAggregate>(id, 1, @event, cancellationToken);
         }
     }
 }

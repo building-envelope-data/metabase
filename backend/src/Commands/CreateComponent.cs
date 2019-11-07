@@ -1,4 +1,4 @@
-using Guid = System.Guid;
+using System;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
@@ -10,7 +10,7 @@ using Models = Icon.Models;
 namespace Icon.Commands
 {
     public sealed class CreateComponent
-      : CommandBase<Guid>
+      : CommandBase<(Guid Id, DateTime Timestamp)>
     {
         public CreateComponent(Guid creatorId) : base(creatorId) { }
     }

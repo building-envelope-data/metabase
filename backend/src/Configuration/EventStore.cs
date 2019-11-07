@@ -82,10 +82,6 @@ namespace Icon.Configuration
                       _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionAggregate>();
                       _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionManufacturerAggregate>();
 
-                      /* _.Events.InlineProjections.Add(new Domain.ComponentVersionManufacturerViewProjection()); */
-                      /* _.Events.InlineProjections.Add(new Domain.ComponentVersionViewProjection()); */
-                      /* _.Events.InlineProjections.Add(new Domain.ComponentViewProjection()); */
-
                       _.Events.AddEventType(typeof(Events.ComponentCreated));
                       _.Events.AddEventType(typeof(Events.ComponentVersionCreated));
                       _.Events.AddEventType(typeof(Events.ComponentVersionManufacturerCreated));

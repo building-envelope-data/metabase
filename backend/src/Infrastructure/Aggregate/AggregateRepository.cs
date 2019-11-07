@@ -29,18 +29,24 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<int> FetchVersion<T>(Guid streamId, DateTime timestamp, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new()
         {
-            // TODO For performance reasons it would be great if we could use (the parameter `timestamp` is not implemented though)
+            // TODO For performance reasons it would be great if we could use
             // var expectedVersion = (await _session.Events.FetchStreamStateAsync(streamId, timestamp: timestamp, token: cancellationToken)).Version;
+            // (the parameter `timestamp` is not implemented though)
             // Ask on https://github.com/JasperFx/marten/issues for the parameter `timestamp` to be implemented
             return (await _session.Events.AggregateStreamAsync<T>(streamId, timestamp: timestamp, token: cancellationToken)).Version;
         }
 
-        public Task<Guid> Store<E>(Guid streamId, int expectedVersion, E @event, CancellationToken cancellationToken) where E : IEvent
+        public async Task<DateTime> FetchTimestamp<T>(Guid streamId, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new()
         {
-            return Store(streamId, expectedVersion, new E[] { @event }, cancellationToken);
+            return (await _session.Events.FetchStreamStateAsync(streamId, token: cancellationToken)).LastTimestamp;
         }
 
-        public async Task<Guid> Store<E>(Guid streamId, int expectedVersion, IEnumerable<E> events, CancellationToken cancellationToken) where E : IEvent
+        public Task<(Guid Id, DateTime Timestamp)> Store<T>(Guid streamId, int expectedVersion, IEvent @event, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new()
+        {
+            return Store<T>(streamId, expectedVersion, new IEvent[] { @event }, cancellationToken);
+        }
+
+        public async Task<(Guid Id, DateTime Timestamp)> Store<T>(Guid streamId, int expectedVersion, IEnumerable<IEvent> events, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new()
         {
             AssertExistenceOfCreators(
                                 events.Select(@event => @event.CreatorId),
@@ -50,7 +56,10 @@ namespace Icon.Infrastructure.Aggregate
             _session.Events.Append(streamId, expectedVersion, eventArray);
             await _session.SaveChangesAsync(cancellationToken);
             await _eventBus.Publish(eventArray);
-            return streamId;
+            return (
+                Id: streamId,
+                Timestamp: await FetchTimestamp<T>(streamId, cancellationToken)
+                );
         }
 
         private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)

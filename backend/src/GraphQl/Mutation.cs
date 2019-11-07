@@ -30,20 +30,19 @@ namespace Icon.GraphQl
             IResolverContext context
             )
         {
-            var componentId =
+            var (id, timestamp) =
               await _commandBus
                 .Send<
                    Commands.CreateComponent,
-                   Guid
+                   (Guid Id, DateTime Timestamp)
                  >(new Commands.CreateComponent(creatorId: Guid.NewGuid())); // TODO Use current user!
-            var timestamp = SetTimestamp(DateTime.UtcNow, context);
             return
               Component.FromModel(
                   await _queryBus
                     .Send<
                        Queries.GetComponent,
                        Models.Component
-                       >(new Queries.GetComponent(componentId, timestamp))
+                       >(new Queries.GetComponent(id, timestamp))
                   );
         }
 
@@ -52,24 +51,23 @@ namespace Icon.GraphQl
             IResolverContext context
             )
         {
-            var versionId =
+            var (id, timestamp) =
               await _commandBus
                .Send<
                   Commands.CreateComponentVersion,
-                  Guid
+                  (Guid Id, DateTime Timestamp)
                 >(new Commands.CreateComponentVersion(
                     componentVersionInput.ComponentId,
                     creatorId: Guid.NewGuid()
                     )
                     ); // TODO Use current user!
-            var timestamp = SetTimestamp(DateTime.UtcNow, context);
             return
               ComponentVersion.FromModel(
                   await _queryBus
                     .Send<
                        Queries.GetComponentVersion,
                        Models.ComponentVersion
-                       >(new Queries.GetComponentVersion(versionId, timestamp))
+                       >(new Queries.GetComponentVersion(id, timestamp))
                   );
         }
 

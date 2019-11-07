@@ -12,9 +12,9 @@ namespace Icon.Infrastructure.Aggregate
     {
         public Task<int> FetchVersion<T>(Guid streamId, DateTime timestamp, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new();
 
-        public Task<Guid> Store<E>(Guid streamId, int expectedVersion, E @event, CancellationToken cancellationToken) where E : IEvent;
+        public Task<(Guid Id, DateTime Timestamp)> Store<T>(Guid streamId, int expectedVersion, IEvent @event, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new();
 
-        public Task<Guid> Store<E>(Guid streamId, int expectedVersion, IEnumerable<E> events, CancellationToken cancellationToken) where E : IEvent;
+        public Task<(Guid Id, DateTime Timestamp)> Store<T>(Guid streamId, int expectedVersion, IEnumerable<IEvent> events, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new();
 
         public Task<T> Load<T>(Guid id, DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new();
 

@@ -12,19 +12,22 @@ namespace Icon.Domain
 {
     public sealed class ComponentAggregateTest : TestBase
     {
-        /* [Fact] */
-        /* public async Task Test() */
-        /* { */
-        /*     // Arrange */
-        /*     var @event = new Events.ComponentCreated(Guid.NewGuid(), new Commands.CreateComponent(creatorId: Guid.NewGuid())); */
-        /*     var component = Aggregates.ComponentAggregate.Create(@event); */
-        /*     var events = component.GetUncommittedEvents().ToArray(); */
-        /*     Session.Events.Append(component.Id, component.Version, events); */
-        /*     await Session.SaveChangesAsync(); */
-        /*     // Act */
-        /*     var aggregate = await Session.Events.AggregateStreamAsync<Aggregates.ComponentAggregate>(component.Id); */
-        /*     // Assert */
-        /*     aggregate.Should().BeEquivalentTo(component); */
-        /* } */
+        [Fact]
+        public async Task Test()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            var @event = new Events.ComponentCreated(
+                id,
+                new Commands.CreateComponent(creatorId: Guid.NewGuid())
+                );
+            Session.Events.Append(id, 1, @event);
+            await Session.SaveChangesAsync();
+            // Act
+            var aggregate = await Session.Events.AggregateStreamAsync<Aggregates.ComponentAggregate>(id);
+            // Assert
+            aggregate.Id.Should().Be(id);
+            aggregate.Version.Should().Be(1);
+        }
     }
 }

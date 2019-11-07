@@ -1,4 +1,5 @@
 using Guid = System.Guid;
+using DateTime = System.DateTime;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
@@ -12,7 +13,7 @@ using Aggregates = Icon.Aggregates;
 namespace Icon.Handlers
 {
     public sealed class CreateComponentVersionHandler
-      : ICommandHandler<Commands.CreateComponentVersion, Guid>
+      : ICommandHandler<Commands.CreateComponentVersion, (Guid Id, DateTime Timestamp)>
     {
         private readonly IAggregateRepository _repository;
 
@@ -21,11 +22,11 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public Task<Guid> Handle(Commands.CreateComponentVersion command, CancellationToken cancellationToken)
+        public Task<(Guid Id, DateTime Timestamp)> Handle(Commands.CreateComponentVersion command, CancellationToken cancellationToken)
         {
             var id = Guid.NewGuid();
             var @event = new Events.ComponentVersionCreated(id, command);
-            return _repository.Store(id, 0, @event, cancellationToken);
+            return _repository.Store<Aggregates.ComponentVersionAggregate>(id, 1, @event, cancellationToken);
         }
     }
 }

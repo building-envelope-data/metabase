@@ -1,4 +1,5 @@
 using Guid = System.Guid;
+using DateTime = System.DateTime;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
@@ -10,7 +11,7 @@ using Models = Icon.Models;
 namespace Icon.Commands
 {
     public sealed class CreateComponentVersion
-      : CommandBase<Guid>
+      : CommandBase<(Guid Id, DateTime Timestamp)>
     {
         public Guid ComponentId { get; }
 
