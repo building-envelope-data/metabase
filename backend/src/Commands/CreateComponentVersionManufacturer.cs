@@ -7,11 +7,13 @@ using Icon.Infrastructure.Event;
 using Icon.Infrastructure.Aggregate;
 /* using DateInterval = NodaTime.DateInterval; */
 using DateTime = System.DateTime;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Commands
 {
     public sealed class CreateComponentVersionManufacturer
-      : CommandBase<(Guid Id, DateTime Timestamp)>
+      : CommandBase<Result<(Guid Id, DateTime Timestamp), IError>>
     {
         public Guid ComponentVersionId { get; }
         public Guid UserId { get; }

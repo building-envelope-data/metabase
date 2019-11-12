@@ -1,4 +1,5 @@
 // Inspired by https://chillicream.com/blog/2019/04/11/integration-tests
+// TODO When mature, use the client https://github.com/ChilliCream/hotchocolate/issues/1011
 
 using System.Collections.Generic;
 using System.Linq;
@@ -68,6 +69,7 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
         var response = await new ResponseParser().Parse<Response<AuthorizedData>>(httpResponse);
         response.EnsureNoOverflow();
         response.EnsureNoErrors();
+        response.data.EnsureNoOverflow();
         response.data.createComponent.id
           .Should().NotBeEmpty();
         response.data.createComponent.timestamp

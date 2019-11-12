@@ -9,11 +9,13 @@ using DateTime = System.DateTime;
 using Commands = Icon.Commands;
 using Aggregates = Icon.Aggregates;
 using Events = Icon.Events;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
     public sealed class CreateComponentVersionManufacturerHandler
-      : ICommandHandler<Commands.CreateComponentVersionManufacturer, (Guid Id, DateTime Timestamp)>
+      : ICommandHandler<Commands.CreateComponentVersionManufacturer, Result<(Guid Id, DateTime Timestamp), IError>>
     {
         private readonly IAggregateRepository _repository;
 
@@ -22,7 +24,10 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public Task<(Guid Id, DateTime Timestamp)> Handle(Commands.CreateComponentVersionManufacturer command, CancellationToken cancellationToken)
+        public Task<Result<(Guid Id, DateTime Timestamp), IError>> Handle(
+            Commands.CreateComponentVersionManufacturer command,
+            CancellationToken cancellationToken
+            )
         {
             var id = Guid.NewGuid();
             var @event = new Events.ComponentVersionManufacturerCreated(id, command);

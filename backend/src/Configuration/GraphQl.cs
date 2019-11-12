@@ -33,6 +33,7 @@ namespace Icon.Configuration
             services.AddGraphQL(serviceProvider =>
                 SchemaBuilder.New()
                   .AddServices(serviceProvider)
+                  /* .EnableRelaySupport() */
                   // Adds the authorize directive and
                   // enable the authorization middleware.
                   .AddAuthorizeDirectiveType()

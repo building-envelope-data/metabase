@@ -12,7 +12,7 @@ namespace Icon.GraphQl
                 .Type<NonNullType<ListType<NonNullType<ComponentType>>>>()
                 .Argument("timestamp", a => a.Type<DateTimeType>());
 
-            descriptor.Field(t => t.GetComponent(default, default, default))
+            descriptor.Field(t => t.GetComponent(default, default, default, default))
                 .Type<NonNullType<ComponentType>>()
                 .Argument("id", a => a.Type<NonNullType<UuidType>>())
                 .Argument("timestamp", a => a.Type<DateTimeType>());

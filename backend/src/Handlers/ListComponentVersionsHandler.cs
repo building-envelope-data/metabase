@@ -13,12 +13,13 @@ using Aggregates = Icon.Aggregates;
 using System.Linq;
 using Marten;
 using Marten.Linq.MatchesSql;
-/* using Projections = Icon.Projections; */
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
     public sealed class ListComponentVersionsHandler :
-      IQueryHandler<Queries.ListComponentVersions, IEnumerable<Models.ComponentVersion>>
+      IQueryHandler<Queries.ListComponentVersions, IEnumerable<Result<Models.ComponentVersion, IError>>>
     {
         private readonly IDocumentSession _session;
         private readonly IAggregateRepository _repository;
@@ -29,7 +30,7 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Models.ComponentVersion>> Handle(
+        public async Task<IEnumerable<Result<Models.ComponentVersion, IError>>> Handle(
             Queries.ListComponentVersions query,
             CancellationToken cancellationToken
             )
@@ -42,13 +43,14 @@ namespace Icon.Handlers
 
             return
               (await
-               _repository.LoadAll<Aggregates.ComponentVersionAggregate>(
+               _repository.LoadAllThatExisted<Aggregates.ComponentVersionAggregate>(
                  ids,
                  query.Timestamp,
                  cancellationToken
                  )
-              )
-              .Select(a => a.ToModel());
+              ).Select(result =>
+                result.Map(a => a.ToModel())
+                );
         }
     }
 }

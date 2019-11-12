@@ -3,10 +3,12 @@ using Icon.Infrastructure.Query;
 /* using ZonedDateTime = NodaTime.ZonedDateTime; */
 using DateTime = System.DateTime;
 using Models = Icon.Models;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Queries
 {
-    public class GetComponent : IQuery<Models.Component>
+    public class GetComponent : IQuery<Result<Models.Component, IError>>
     {
         public Guid ComponentId { get; }
         public DateTime Timestamp { get; } // TODO ZonedDateTime

@@ -1,3 +1,4 @@
+using System;
 using Guid = System.Guid;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,11 +13,13 @@ using Events = Icon.Events;
 using Aggregates = Icon.Aggregates;
 using System.Linq;
 using Marten;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
     public class ListComponentsHandler :
-      IQueryHandler<Queries.ListComponents, IEnumerable<Models.Component>>
+      IQueryHandler<Queries.ListComponents, IEnumerable<Result<Models.Component, IError>>>
     {
         private readonly IAggregateRepository _repository;
 
@@ -25,7 +28,7 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Models.Component>> Handle(Queries.ListComponents query, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Result<Models.Component, IError>>> Handle(Queries.ListComponents query, CancellationToken cancellationToken)
         {
             var ids =
               await _repository.Query<Events.ComponentCreated>()
@@ -34,12 +37,14 @@ namespace Icon.Handlers
 
             return
               (await _repository
-               .LoadAll<Aggregates.ComponentAggregate>(
+               .LoadAllThatExisted<Aggregates.ComponentAggregate>(
                  ids,
                  query.Timestamp,
                  cancellationToken
                  )
-               ).Select(a => a.ToModel());
+               ).Select(result =>
+                 result.Map(a => a.ToModel())
+                 );
         }
     }
 }

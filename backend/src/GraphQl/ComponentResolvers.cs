@@ -7,6 +7,8 @@ using HotChocolate;
 using Icon.Infrastructure.Query;
 using System.Linq;
 using HotChocolate.Resolvers;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.GraphQl
 {
@@ -20,11 +22,12 @@ namespace Icon.GraphQl
             IResolverContext context
             )
         {
-            var timestamp = (System.DateTime)context.ScopedContextData["timestamp"];
-            return (await QueryBus.Send<
+            return ResultHelpers.HandleFailures<Models.ComponentVersion>(
+                await QueryBus.Send<
                   Queries.ListComponentVersions,
-                  IEnumerable<Models.ComponentVersion>
-                >(new Queries.ListComponentVersions(component.Id, timestamp)))
+                  IEnumerable<Result<Models.ComponentVersion, IError>>
+                >(new Queries.ListComponentVersions(component.Id, Timestamp.Fetch(context)))
+                )
               .Select(c => ComponentVersion.FromModel(c));
         }
     }

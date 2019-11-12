@@ -5,7 +5,7 @@ using HotChocolate.Types.Relay;
 
 namespace Icon.GraphQl
 {
-    public class ResolversBase
+    public abstract class ResolversBase
     {
         protected IQueryBus QueryBus { get; }
 

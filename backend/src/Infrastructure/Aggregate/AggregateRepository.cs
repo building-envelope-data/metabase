@@ -8,11 +8,15 @@ using Marten.Linq;
 using System.Threading.Tasks;
 using Icon.Infrastructure.Event;
 using CancellationToken = System.Threading.CancellationToken;
+using ErrorCodes = Icon.ErrorCodes;
+using HotChocolate;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Infrastructure.Aggregate
 {
     public sealed class AggregateRepository : IAggregateRepository
     {
+
         private readonly IDocumentSession _session;
         private readonly IEventBus _eventBus;
 
@@ -22,65 +26,117 @@ namespace Icon.Infrastructure.Aggregate
             _eventBus = eventBus;
         }
 
+        private IError BuildNonExistentModelError(Guid id) =>
+          ErrorBuilder.New()
+          .SetMessage($"There is no model with id {id}.")
+          .SetCode(ErrorCodes.NonExistentModel)
+          .Build();
+
         public IMartenQueryable<E> Query<E>() where E : IEvent
         {
-            return _session.Events.QueryRawEventDataOnly<E>();
+          return _session.Events.QueryRawEventDataOnly<E>();
         }
 
-        public async Task<int> FetchVersion<T>(Guid streamId, DateTime timestamp, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new()
+        public async Task<Result<int, IError>> FetchVersion<T>(
+            Guid id,
+            DateTime timestamp,
+            CancellationToken cancellationToken
+            ) where T : class, IEventSourcedAggregate, new()
         {
-            // TODO For performance reasons it would be great if we could use
-            // var expectedVersion = (await _session.Events.FetchStreamStateAsync(streamId, timestamp: timestamp, token: cancellationToken)).Version;
-            // (the parameter `timestamp` is not implemented though)
-            // Ask on https://github.com/JasperFx/marten/issues for the parameter `timestamp` to be implemented
-            return (await _session.Events.AggregateStreamAsync<T>(streamId, timestamp: timestamp, token: cancellationToken)).Version;
-        }
-
-        public async Task<DateTime> FetchTimestamp<T>(Guid streamId, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new()
-        {
-            return (await _session.Events.FetchStreamStateAsync(streamId, token: cancellationToken)).LastTimestamp;
-        }
-
-        public Task<(Guid Id, DateTime Timestamp)> Store<T>(Guid streamId, int expectedVersion, IEvent @event, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new()
-        {
-            return Store<T>(streamId, expectedVersion, new IEvent[] { @event }, cancellationToken);
-        }
-
-        public async Task<(Guid Id, DateTime Timestamp)> Store<T>(Guid streamId, int expectedVersion, IEnumerable<IEvent> events, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new()
-        {
-            AssertExistenceOfCreators(
-                                events.Select(@event => @event.CreatorId),
-                                cancellationToken
-                                );
-            var eventArray = events.ToArray();
-            _session.Events.Append(streamId, expectedVersion, eventArray);
-            await _session.SaveChangesAsync(cancellationToken);
-            await _eventBus.Publish(eventArray);
-            return (
-                Id: streamId,
-                Timestamp: await FetchTimestamp<T>(streamId, cancellationToken)
+          // TODO For performance reasons it would be great if we could use
+          // var expectedVersion = (await _session.Events.FetchStreamStateAsync(id, timestamp: timestamp, token: cancellationToken)).Version;
+          // (the parameter `timestamp` is not implemented though)
+          // Ask on https://github.com/JasperFx/marten/issues for the parameter `timestamp` to be implemented
+          var aggregate =
+            await _session.Events.AggregateStreamAsync<T>(
+                id,
+                timestamp: timestamp,
+                token: cancellationToken
                 );
+          if (aggregate == null) {
+            return Result.Failure<int, IError>(BuildNonExistentModelError(id));
+          }
+          return Result.Success<int, IError>(aggregate.Version);
+        }
+
+        public async Task<Result<DateTime, IError>> FetchTimestamp<T>(
+            Guid id,
+            CancellationToken cancellationToken
+            ) where T : class, IEventSourcedAggregate, new()
+        {
+          var streamState =
+            await _session.Events.FetchStreamStateAsync(
+                id,
+                token: cancellationToken
+                );
+          if (streamState == null) {
+            return Result.Failure<DateTime, IError>(BuildNonExistentModelError(id));
+          }
+          return Result.Success<DateTime, IError>(streamState.LastTimestamp);
+        }
+
+        public Task<Result<(Guid Id, DateTime Timestamp), IError>> Store<T>(
+            Guid id,
+            int expectedVersion,
+            IEvent @event,
+            CancellationToken cancellationToken
+            ) where T : class, IEventSourcedAggregate, new()
+        {
+          return Store<T>(
+              id,
+              expectedVersion,
+              new IEvent[] { @event },
+              cancellationToken
+              );
+        }
+
+        public async Task<Result<(Guid Id, DateTime Timestamp), IError>> Store<T>(
+            Guid id,
+            int expectedVersion,
+            IEnumerable<IEvent> events,
+            CancellationToken cancellationToken
+            ) where T : class, IEventSourcedAggregate, new()
+        {
+          AssertExistenceOfCreators(
+              events.Select(@event => @event.CreatorId),
+              cancellationToken
+              );
+          var eventArray = events.ToArray();
+          _session.Events.Append(id, expectedVersion, eventArray);
+          await _session.SaveChangesAsync(cancellationToken);
+          await _eventBus.Publish(eventArray);
+          var timestampResult = await FetchTimestamp<T>(id, cancellationToken);
+          return timestampResult.Map(
+              timestamp => (
+                Id: id,
+                Timestamp: timestamp
+                )
+              );
         }
 
         private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)
         {
-            // TODO
-            /* foreach (var creatorId in creatorIds) */
-            /* { */
-            /*   if (!_session.Query<UserAggregate>().AnyAsync(user => user.Id == creatorId, cancellationToken)) */
-            /*     throw new ArgumentException("Creator does not exist!", nameof(creatorId)); */
-            /* } */
+          // TODO
+          /* foreach (var creatorId in creatorIds) */
+          /* { */
+          /*   if (!_session.Query<UserAggregate>().AnyAsync(user => user.Id == creatorId, cancellationToken)) */
+          /*     throw new ArgumentException("Creator does not exist!", nameof(creatorId)); */
+          /* } */
         }
 
-        public async Task<T> Load<T>(Guid id, DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
+        public async Task<Result<T, IError>> Load<T>(
+            Guid id,
+            DateTime timestamp,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new()
         {
-            var aggregate = await _session.Events.AggregateStreamAsync<T>(id, timestamp: timestamp, token: cancellationToken);
-            if (aggregate == null || aggregate.Version == 0)
-            {
-                throw new InvalidOperationException($"There is no aggregate with id {id} at time {timestamp}.");
-            }
-            aggregate.Timestamp = timestamp;
-            return aggregate;
+          var aggregate =
+            await _session.Events.AggregateStreamAsync<T>(
+                id,
+                timestamp: timestamp,
+                token: cancellationToken
+                );
+          return BuildResult(id, timestamp, aggregate);
         }
 
         /* public async Task<IEnumerable<T>> LoadAll<T>(DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new() */
@@ -91,25 +147,69 @@ namespace Icon.Infrastructure.Aggregate
         /*         return await LoadAll<T>(aggregateIds, timestamp, cancellationToken); */
         /* } */
 
-        public async Task<IEnumerable<T>> LoadAll<T>(IEnumerable<Guid> possibleIds, DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
+        public async Task<IEnumerable<Result<T, IError>>> LoadAll<T>(
+            IEnumerable<(Guid Id, DateTime timestamp)> idsAndTimestamps,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new()
         {
-            var batch = _session.CreateBatchQuery();
-            var aggregateStreamTasks = new List<Task<T>>();
-            foreach (var id in possibleIds)
-            {
-                aggregateStreamTasks.Add(
-                                        batch.Events.AggregateStream<T>(id, timestamp: timestamp)
-                                        );
-            }
-            await batch.Execute(cancellationToken);
-            var aggregates =
-                                (await Task.WhenAll(aggregateStreamTasks))
-                                  .Where(a => a.Version >= 1);
-            foreach (var aggregate in aggregates)
-            {
-                aggregate.Timestamp = timestamp;
-            }
-            return aggregates;
+          var batch = _session.CreateBatchQuery();
+          var aggregateStreamTasks =
+            idsAndTimestamps
+            .Select(
+                // There sadly is no proper tuple deconstruction in lambdas yet. For details see https://github.com/dotnet/csharplang/issues/258
+                ((Guid id, DateTime timestamp) t)
+                => batch.Events.AggregateStream<T>(t.id, timestamp: t.timestamp)
+                )
+            // Turning the `System.Linq.Enumerable+SelectListIterator` into a list is necessary for `await Task.WhenAll(aggregateStreamTasks) to finish`
+            .ToList();
+          await batch.Execute(cancellationToken);
+          var aggregates = await Task.WhenAll(aggregateStreamTasks);
+          return
+            idsAndTimestamps
+            .Zip(aggregates, BuildResult);
         }
+
+        public Task<IEnumerable<Result<T, IError>>> LoadAll<T>(
+            IEnumerable<Guid> ids,
+            DateTime timestamp,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new()
+        {
+          return LoadAll<T>(
+              ids.Select(id => (Id: id, Timestamp: timestamp)),
+              cancellationToken
+              );
+        }
+
+        public async Task<IEnumerable<Result<T, IError>>> LoadAllThatExisted<T>(
+            IEnumerable<Guid> possibleIds,
+            DateTime timestamp,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new()
+        {
+           return
+             (await LoadAll<T>(
+                              possibleIds.Select(id => (Id: id, Timestamp: timestamp)),
+                              cancellationToken
+                             )
+            ).Where(r => r.IsFailure || r.Value.Version >= 1);
+        }
+
+        private Result<T, IError> BuildResult<T>((Guid Id, DateTime Timestamp) idAndTimestamp, T aggregate)
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return BuildResult(idAndTimestamp.Id, idAndTimestamp.Timestamp, aggregate);
+        }
+
+        private Result<T, IError> BuildResult<T>(Guid id, DateTime timestamp, T aggregate)
+          where T : class, IEventSourcedAggregate, new()
+          {
+            if (aggregate == null || aggregate.Version == 0)
+            {
+              return Result.Failure<T, IError>(BuildNonExistentModelError(id));
+            }
+            aggregate.Timestamp = timestamp; // TODO This is a problem when aggregates are cached!
+            return Result.Success<T, IError>(aggregate);
+          }
     }
 }

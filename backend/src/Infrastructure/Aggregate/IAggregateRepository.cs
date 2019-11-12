@@ -5,23 +5,61 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure.Event;
+using HotChocolate;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Infrastructure.Aggregate
 {
     public interface IAggregateRepository
     {
-        public Task<int> FetchVersion<T>(Guid streamId, DateTime timestamp, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new();
-
-        public Task<(Guid Id, DateTime Timestamp)> Store<T>(Guid streamId, int expectedVersion, IEvent @event, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new();
-
-        public Task<(Guid Id, DateTime Timestamp)> Store<T>(Guid streamId, int expectedVersion, IEnumerable<IEvent> events, CancellationToken cancellationToken) where T : class, IEventSourcedAggregate, new();
-
-        public Task<T> Load<T>(Guid id, DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new();
-
-        /* public Task<IEnumerable<T>> LoadAll<T>(DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new(); */
-
-        public Task<IEnumerable<T>> LoadAll<T>(IEnumerable<Guid> ids, DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new();
-
         public IMartenQueryable<E> Query<E>() where E : IEvent;
+
+        public Task<Result<int, IError>> FetchVersion<T>(
+            Guid id,
+            DateTime timestamp,
+            CancellationToken cancellationToken
+            ) where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<DateTime, IError>> FetchTimestamp<T>(
+            Guid id,
+            CancellationToken cancellationToken
+            ) where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<(Guid Id, DateTime Timestamp), IError>> Store<T>(
+            Guid id,
+            int expectedVersion,
+            IEvent @event,
+            CancellationToken cancellationToken
+            ) where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<(Guid Id, DateTime Timestamp), IError>> Store<T>(
+            Guid id,
+            int expectedVersion,
+            IEnumerable<IEvent> events,
+            CancellationToken cancellationToken
+            ) where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<T, IError>> Load<T>(
+            Guid id,
+            DateTime timestamp,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<Result<T, IError>>> LoadAll<T>(
+            IEnumerable<(Guid Id, DateTime timestamp)> possibleIdsAndTimestamps,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<Result<T, IError>>> LoadAll<T>(
+            IEnumerable<Guid> possibleIds,
+            DateTime timestamp,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<Result<T, IError>>> LoadAllThatExisted<T>(
+            IEnumerable<Guid> possibleIds,
+            DateTime timestamp,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new();
     }
 }

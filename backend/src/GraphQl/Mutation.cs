@@ -9,6 +9,9 @@ using Commands = Icon.Commands;
 using Queries = Icon.Queries;
 using System.Linq;
 using HotChocolate.Resolvers;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
+using QueryException = HotChocolate.Execution.QueryException;
 
 namespace Icon.GraphQl
 {
@@ -30,19 +33,22 @@ namespace Icon.GraphQl
             IResolverContext context
             )
         {
-            var (id, timestamp) =
+            var result =
               await _commandBus
                 .Send<
                    Commands.CreateComponent,
-                   (Guid Id, DateTime Timestamp)
+                   Result<(Guid Id, DateTime Timestamp), IError>
                  >(new Commands.CreateComponent(creatorId: Guid.NewGuid())); // TODO Use current user!
+            var (id, timestamp) = ResultHelpers.HandleFailure(result);
             return
               Component.FromModel(
-                  await _queryBus
-                    .Send<
-                       Queries.GetComponent,
-                       Models.Component
-                       >(new Queries.GetComponent(id, timestamp))
+                  ResultHelpers.HandleFailure(
+                    await _queryBus
+                      .Send<
+                         Queries.GetComponent,
+                         Result<Models.Component, IError>
+                         >(new Queries.GetComponent(id, timestamp))
+                    )
                   );
         }
 
@@ -51,23 +57,26 @@ namespace Icon.GraphQl
             IResolverContext context
             )
         {
-            var (id, timestamp) =
+            var result =
               await _commandBus
                .Send<
                   Commands.CreateComponentVersion,
-                  (Guid Id, DateTime Timestamp)
+                  Result<(Guid Id, DateTime Timestamp), IError>
                 >(new Commands.CreateComponentVersion(
                     componentVersionInput.ComponentId,
                     creatorId: Guid.NewGuid()
                     )
                     ); // TODO Use current user!
+            var (id, timestamp) = ResultHelpers.HandleFailure(result);
             return
               ComponentVersion.FromModel(
-                  await _queryBus
-                    .Send<
-                       Queries.GetComponentVersion,
-                       Models.ComponentVersion
-                       >(new Queries.GetComponentVersion(id, timestamp))
+                  ResultHelpers.HandleFailure(
+                    await _queryBus
+                      .Send<
+                         Queries.GetComponentVersion,
+                         Result<Models.ComponentVersion, IError>
+                         >(new Queries.GetComponentVersion(id, timestamp))
+                    )
                   );
         }
 

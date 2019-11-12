@@ -33,6 +33,8 @@ using IdentityServer4.Validation;
 using Queries = Icon.Queries;
 using Commands = Icon.Commands;
 using Handlers = Icon.Handlers;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Configuration
 {
@@ -47,14 +49,54 @@ namespace Icon.Configuration
             services.AddScoped<Command.ICommandBus, Command.CommandBus>();
             services.AddScoped<Event.IEventBus, Event.EventBus>();
 
-            services.AddScoped<MediatR.IRequestHandler<Queries.ListComponents, IEnumerable<Models.Component>>, Handlers.ListComponentsHandler>();
-            services.AddScoped<MediatR.IRequestHandler<Queries.GetComponent, Models.Component>, Handlers.GetComponentHandler>();
-            services.AddScoped<MediatR.IRequestHandler<Queries.ListComponentVersions, IEnumerable<Models.ComponentVersion>>, Handlers.ListComponentVersionsHandler>();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.ListComponents,
+              IEnumerable<Result<Models.Component, IError>>
+                >,
+              Handlers.ListComponentsHandler
+                >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetComponent,
+              Result<Models.Component, IError>
+                >,
+              Handlers.GetComponentHandler
+                >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetComponentBatch,
+              IEnumerable<Result<Models.Component, IError>>
+                >,
+              Handlers.GetComponentBatchHandler
+                >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.ListComponentVersions,
+              IEnumerable<Result<Models.ComponentVersion, IError>>
+                >,
+              Handlers.ListComponentVersionsHandler
+                >();
             /* services.AddScoped<MediatR.IRequestHandler<Queries.GetComponentVersion, Models.ComponentVersion>, Handlers.GetComponentVersionHandler>(); */
 
-            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponent, (Guid Id, DateTime Timestamp)>, Handlers.CreateComponentHandler>();
-            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponentVersion, (Guid Id, DateTime Timestamp)>, Handlers.CreateComponentVersionHandler>();
-            services.AddScoped<MediatR.IRequestHandler<Commands.CreateComponentVersionManufacturer, (Guid Id, DateTime Timestamp)>, Handlers.CreateComponentVersionManufacturerHandler>();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Commands.CreateComponent,
+              Result<(Guid Id, DateTime Timestamp), IError>
+                >,
+              Handlers.CreateComponentHandler>();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Commands.CreateComponentVersion,
+              Result<(Guid Id, DateTime Timestamp), IError>
+                >,
+              Handlers.CreateComponentVersionHandler>();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Commands.CreateComponentVersionManufacturer,
+              Result<(Guid Id, DateTime Timestamp), IError>
+                >,
+              Handlers.CreateComponentVersionManufacturerHandler>();
 
             // TODO Shall we broadcast events?
             /* services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>(); */

@@ -12,11 +12,13 @@ using DateTime = System.DateTime;
 using Models = Icon.Models;
 using Queries = Icon.Queries;
 using Aggregates = Icon.Aggregates;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
     public class GetComponentHandler
-      : IQueryHandler<Queries.GetComponent, Models.Component>
+      : IQueryHandler<Queries.GetComponent, Result<Models.Component, IError>>
     {
         private readonly IAggregateRepository _repository;
 
@@ -25,7 +27,7 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<Models.Component> Handle(
+        public async Task<Result<Models.Component, IError>> Handle(
             Queries.GetComponent query,
             CancellationToken cancellationToken
             )
@@ -37,7 +39,7 @@ namespace Icon.Handlers
                  timestamp: query.Timestamp,
                  cancellationToken: cancellationToken
                  )
-              ).ToModel();
+              ).Map(a => a.ToModel());
         }
     }
 }

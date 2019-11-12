@@ -9,13 +9,13 @@ namespace Icon.GraphQl
         {
             descriptor.Name("Component");
 
-            descriptor.Field(f => f.Id)
+            descriptor.Field(t => t.Id)
                 .Type<NonNullType<UuidType>>();
 
-            descriptor.Field(f => f.Timestamp)
+            descriptor.Field(t => t.Timestamp)
                 .Type<NonNullType<DateTimeType>>();
 
-            descriptor.Field<ComponentResolvers>(f => f.GetVersions(default, default))
+            descriptor.Field<ComponentResolvers>(t => t.GetVersions(default, default))
                 .Type<NonNullType<ListType<NonNullType<ComponentVersionType>>>>();
         }
     }

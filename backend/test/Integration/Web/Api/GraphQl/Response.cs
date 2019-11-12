@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Startup = Icon.Startup;
-using System.Collections.Generic;
 using GrantType = IdentityServer4.Models.GrantType;
 using System.Text.Json;
 using System.Net.Http.Headers;

@@ -7,6 +7,12 @@ using Models = Icon.Models;
 using Queries = Icon.Queries;
 using System.Linq;
 using HotChocolate.Resolvers;
+using HotChocolate;
+using HotChocolate.Execution;
+using GreenDonut;
+using QueryException = HotChocolate.Execution.QueryException;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.GraphQl
 {
@@ -24,27 +30,29 @@ namespace Icon.GraphQl
 
         public async Task<IEnumerable<Component>> GetComponents(DateTime? timestamp, IResolverContext context)
         {
-            var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.UtcNow, context);
-            return
-              (await _queryBus
+            var nonNullTimestamp = HandleTimestamp(timestamp, context);
+            return ResultHelpers.HandleFailures<Models.Component>(
+              await _queryBus
                .Send<
                   Queries.ListComponents,
-                  IEnumerable<Models.Component>
-                  >(new Queries.ListComponents(nonNullTimestamp)))
+                  IEnumerable<Result<Models.Component, IError>>
+                  >(new Queries.ListComponents(nonNullTimestamp))
+              )
               .Select(c => Component.FromModel(c));
         }
 
-        public async Task<Component> GetComponent(Guid id, DateTime? timestamp, IResolverContext context)
+        public Task<Component> GetComponent(Guid id, DateTime? timestamp, IResolverContext context, [DataLoader] ComponentDataLoader componentLoader)
         {
-            var nonNullTimestamp = SetTimestamp(timestamp ?? DateTime.UtcNow, context);
-            return
-              Component.FromModel(
-                  (await _queryBus
-                    .Send<
-                       Queries.GetComponent,
-                       Models.Component
-                       >(new Queries.GetComponent(id, nonNullTimestamp))
-                  ));
+            var nonNullTimestamp = HandleTimestamp(timestamp, context);
+            return componentLoader.LoadAsync((id, nonNullTimestamp));
+            /* return */
+            /*   Component.FromModel( */
+            /*       (await _queryBus */
+            /*         .Send< */
+            /*            Queries.GetComponent, */
+            /*            Models.Component */
+            /*            >(new Queries.GetComponent(id, nonNullTimestamp)) */
+            /*       )); */
         }
 
         /* public async Task<ActionResult<ComponentAggregate>> Get(Guid id, DateTime? timestamp) // TODO Use `ZonedDateTime` here. Problem: Its (de)serialization is rather complex. */

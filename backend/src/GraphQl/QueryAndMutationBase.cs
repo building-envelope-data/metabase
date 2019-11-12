@@ -7,22 +7,22 @@ using Models = Icon.Models;
 using Queries = Icon.Queries;
 using System.Linq;
 using HotChocolate.Resolvers;
+using QueryException = HotChocolate.Execution.QueryException;
+using IError = HotChocolate.IError;
+using CSharpFunctionalExtensions;
 
 namespace Icon.GraphQl
 {
     public abstract class QueryAndMutationBase
     {
-        protected DateTime SetTimestamp(DateTime timestamp, IResolverContext context)
+        protected DateTime HandleTimestamp(DateTime? timestamp, IResolverContext context)
         {
-          if (timestamp > DateTime.UtcNow) {
-            throw new Exception($"The timestamp {timestamp} lies in the future");
-          }
-            // TODO Is there a better way to pass data down the tree to resolvers? Something with proper types? See https://hotchocolate.io/docs/custom-context
-            context.ScopedContextData = context.ScopedContextData.SetItem(
-                "timestamp",
-                timestamp
-                );
-            return timestamp;
+            var timestampResult = Timestamp.Sanitize(timestamp);
+            if (timestampResult.IsFailure) {
+              throw new QueryException(timestampResult.Error);
+            }
+            Timestamp.Store(timestampResult.Value, context);
+            return timestampResult.Value;
         }
     }
 }
