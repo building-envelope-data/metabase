@@ -32,8 +32,9 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
+      using (var session = _repository.OpenReadOnlySession()) {
             return
-              (await _repository
+              (await session
                .LoadAll<Aggregates.ComponentAggregate>(
                  query.ComponentIdsAndTimestamps,
                  cancellationToken: cancellationToken
@@ -41,6 +42,7 @@ namespace Icon.Handlers
               ).Select(result =>
                 result.Map(a => a.ToModel())
                 );
+        }
         }
     }
 }

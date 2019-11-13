@@ -31,7 +31,9 @@ namespace Icon.Handlers
         {
             var id = Guid.NewGuid();
             var @event = new Events.ComponentVersionManufacturerCreated(id, command);
-            return _repository.Store<Aggregates.ComponentVersionManufacturerAggregate>(id, 1, @event, cancellationToken);
+            using (var session = _repository.OpenSession()) {
+            return session.Store<Aggregates.ComponentVersionManufacturerAggregate>(id, 1, @event, cancellationToken);
+        }
         }
     }
 }

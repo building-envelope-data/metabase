@@ -41,19 +41,19 @@ namespace Icon.Configuration
     {
         public static void ConfigureServices(IServiceCollection services, IWebHostEnvironment environment, AppSettings.DatabaseSettings databaseSettings)
         {
-            services.AddScoped(typeof(Marten.IDocumentSession), serviceProvider =>
-                {
-                    var logger = serviceProvider.GetRequiredService<ILogger<EventStore>>();
-                    // The dependency injection container will take care of
-                    // closing the session, because it implements the
-                    // `IDisposable` interface, see
-                    // https://andrewlock.net/four-ways-to-dispose-idisposables-in-asp-net-core/#automatically-disposing-services-leveraging-the-built-in-di-container
-                    return GetDocumentStore(environment, databaseSettings, logger).OpenSession();
-                });
+            services.AddSingleton(
+                typeof(Marten.IDocumentStore),
+                serviceProvider =>
+                BuildDocumentStore(
+                  environment,
+                  databaseSettings,
+                  serviceProvider.GetRequiredService<ILogger<EventStore>>()
+                  )
+                );
             services.AddScoped<Aggregate.IAggregateRepository, Aggregate.AggregateRepository>();
         }
 
-        public static Marten.IDocumentStore GetDocumentStore(IWebHostEnvironment environment, AppSettings.DatabaseSettings databaseSettings, ILogger<EventStore> logger)
+        public static Marten.IDocumentStore BuildDocumentStore(IWebHostEnvironment environment, AppSettings.DatabaseSettings databaseSettings, ILogger<EventStore> logger)
         {
             var martenLogger = new MartenLogger(logger);
             // TODO Declare `creatorId` of events as foreign key to `User`, see https://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/

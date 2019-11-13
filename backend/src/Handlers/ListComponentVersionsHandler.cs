@@ -21,12 +21,10 @@ namespace Icon.Handlers
     public sealed class ListComponentVersionsHandler :
       IQueryHandler<Queries.ListComponentVersions, IEnumerable<Result<Models.ComponentVersion, IError>>>
     {
-        private readonly IDocumentSession _session;
         private readonly IAggregateRepository _repository;
 
-        public ListComponentVersionsHandler(IDocumentSession session, IAggregateRepository repository)
+        public ListComponentVersionsHandler(IAggregateRepository repository)
         {
-            _session = session;
             _repository = repository;
         }
 
@@ -35,15 +33,16 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
+      using (var session = _repository.OpenReadOnlySession()) {
             var ids =
-              await _repository.Query<Events.ComponentVersionCreated>()
+              await session.Query<Events.ComponentVersionCreated>()
               .Where(e => e.ComponentId == query.ComponentId)
               .Select(e => e.ComponentVersionId)
               .ToListAsync();
 
             return
               (await
-               _repository.LoadAllThatExisted<Aggregates.ComponentVersionAggregate>(
+               session.LoadAllThatExisted<Aggregates.ComponentVersionAggregate>(
                  ids,
                  query.Timestamp,
                  cancellationToken
@@ -51,6 +50,7 @@ namespace Icon.Handlers
               ).Select(result =>
                 result.Map(a => a.ToModel())
                 );
+        }
         }
     }
 }

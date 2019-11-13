@@ -32,14 +32,16 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
+          using (var session = _repository.OpenReadOnlySession()) {
             return
-              (await _repository
+              (await session
                .Load<Aggregates.ComponentAggregate>(
                  query.ComponentId,
                  timestamp: query.Timestamp,
                  cancellationToken: cancellationToken
                  )
               ).Map(a => a.ToModel());
+          }
         }
     }
 }
