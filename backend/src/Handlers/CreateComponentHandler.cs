@@ -32,10 +32,10 @@ namespace Icon.Handlers
             )
         {
             // TODO Handle conflicting IDs
-            var id = Guid.NewGuid();
-            var @event = new Events.ComponentCreated(id, command);
             using (var session = _repository.OpenSession())
             {
+                var id = await session.GenerateNewId(cancellationToken);
+                var @event = new Events.ComponentCreated(id, command);
                 return await session.Store<Aggregates.ComponentAggregate>(id, 1, @event, cancellationToken);
             }
         }
