@@ -26,7 +26,7 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public Task<Result<(Guid Id, DateTime Timestamp), IError>> Handle(
+        public async Task<Result<(Guid Id, DateTime Timestamp), IError>> Handle(
             Commands.CreateComponent command,
             CancellationToken cancellationToken
             )
@@ -36,7 +36,7 @@ namespace Icon.Handlers
             var @event = new Events.ComponentCreated(id, command);
             using (var session = _repository.OpenSession())
             {
-                return session.Store<Aggregates.ComponentAggregate>(id, 1, @event, cancellationToken);
+                return await session.Store<Aggregates.ComponentAggregate>(id, 1, @event, cancellationToken);
             }
         }
     }
