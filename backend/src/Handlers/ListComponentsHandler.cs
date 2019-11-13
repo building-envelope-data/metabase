@@ -18,37 +18,38 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
-  public class ListComponentsHandler :
-    IQueryHandler<Queries.ListComponents, IEnumerable<Result<Models.Component, IError>>>
-  {
-    private readonly IAggregateRepository _repository;
-
-    public ListComponentsHandler(IAggregateRepository repository)
+    public class ListComponentsHandler :
+      IQueryHandler<Queries.ListComponents, IEnumerable<Result<Models.Component, IError>>>
     {
-      _repository = repository;
+        private readonly IAggregateRepository _repository;
+
+        public ListComponentsHandler(IAggregateRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public async Task<IEnumerable<Result<Models.Component, IError>>> Handle(Queries.ListComponents query, CancellationToken cancellationToken)
+        {
+            using (var session = _repository.OpenReadOnlySession())
+            {
+                var ids =
+                  await session
+                  .Query<Events.ComponentCreated>()
+                  .Select(e => e.ComponentId)
+                  .ToListAsync();
+
+                return
+                  (await session
+                   .LoadAllThatExisted<Aggregates.ComponentAggregate>(
+                     ids,
+                     query.Timestamp,
+                     cancellationToken
+                     )
+                  ).Select(result =>
+                    result.Map(a => a.ToModel())
+                    );
+
+            }
+        }
     }
-
-    public async Task<IEnumerable<Result<Models.Component, IError>>> Handle(Queries.ListComponents query, CancellationToken cancellationToken)
-    {
-      using (var session = _repository.OpenReadOnlySession()) {
-        var ids =
-          await session
-          .Query<Events.ComponentCreated>()
-          .Select(e => e.ComponentId)
-          .ToListAsync();
-
-        return
-          (await session
-           .LoadAllThatExisted<Aggregates.ComponentAggregate>(
-             ids,
-             query.Timestamp,
-             cancellationToken
-             )
-          ).Select(result =>
-            result.Map(a => a.ToModel())
-            );
-
-      }
-    }
-  }
 }

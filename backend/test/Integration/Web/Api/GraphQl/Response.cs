@@ -16,12 +16,12 @@ using JsonExtensionDataAttribute = System.Text.Json.Serialization.JsonExtensionD
 
 namespace Test.Integration.Web.Api.GraphQl
 {
-      public class Response<TData>
-        : ResponseBase
-        where TData : ResponseBase
-      {
-          public TData data { get; set; }
-          public IEnumerable<Dictionary<string, object>> errors { get; set; }
+    public class Response<TData>
+      : ResponseBase
+      where TData : ResponseBase
+    {
+        public TData data { get; set; }
+        public IEnumerable<Dictionary<string, object>> errors { get; set; }
 
         public void EnsureNoData()
         {
@@ -38,5 +38,5 @@ namespace Test.Integration.Web.Api.GraphQl
                 throw new JsonException($"The errors dictionary is not empty but contains '{JsonSerializer.Serialize(errors)}'");
             }
         }
-      }
+    }
 }

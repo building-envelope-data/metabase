@@ -33,24 +33,25 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-      using (var session = _repository.OpenReadOnlySession()) {
-            var ids =
-              await session.Query<Events.ComponentVersionCreated>()
-              .Where(e => e.ComponentId == query.ComponentId)
-              .Select(e => e.ComponentVersionId)
-              .ToListAsync();
+            using (var session = _repository.OpenReadOnlySession())
+            {
+                var ids =
+                  await session.Query<Events.ComponentVersionCreated>()
+                  .Where(e => e.ComponentId == query.ComponentId)
+                  .Select(e => e.ComponentVersionId)
+                  .ToListAsync();
 
-            return
-              (await
-               session.LoadAllThatExisted<Aggregates.ComponentVersionAggregate>(
-                 ids,
-                 query.Timestamp,
-                 cancellationToken
-                 )
-              ).Select(result =>
-                result.Map(a => a.ToModel())
-                );
-        }
+                return
+                  (await
+                   session.LoadAllThatExisted<Aggregates.ComponentVersionAggregate>(
+                     ids,
+                     query.Timestamp,
+                     cancellationToken
+                     )
+                  ).Select(result =>
+                    result.Map(a => a.ToModel())
+                    );
+            }
         }
     }
 }

@@ -16,130 +16,132 @@ using FluentAssertions;
 
 namespace Test.Integration.Web.Api.GraphQl.Mutation
 {
-  public class GetComponentsTest : TestBase
-  {
-    public GetComponentsTest(CustomWebApplicationFactory factory) : base(factory) { }
-
-    /* [Fact] */
-    /* public async Task Anonymously() */
-    /* { */
-    /*   // Act */
-    /*   var httpResponse = await ComponentsClient.Post.Raw(); */
-    /*   // Assert */
-    /*   httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized); */
-    /* } */
-
-    public class Data : ResponseBase
+    public class GetComponentsTest : TestBase
     {
-      public IEnumerable<ComponentData> components { get; set; }
+        public GetComponentsTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-      public class ComponentData : ResponseBase
-      {
-        public Guid id { get; set; }
-      }
-    }
+        /* [Fact] */
+        /* public async Task Anonymously() */
+        /* { */
+        /*   // Act */
+        /*   var httpResponse = await ComponentsClient.Post.Raw(); */
+        /*   // Assert */
+        /*   httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized); */
+        /* } */
 
-    [Fact]
-      public async Task Empty()
-      {
-        // Act
-        var response = await GetComponents();
-        // Assert
-        response.data.components
-          .Should().BeEmpty();
-      }
+        public class Data : ResponseBase
+        {
+            public IEnumerable<ComponentData> components { get; set; }
 
-    [Fact]
-      public async Task Single()
-      {
-        // Arrange
-        var component = new Data.ComponentData { id = await CreateComponent() };
-        // Act
-        var response = await GetComponents();
-        // Assert
-        response.data.components
-          .Should().NotBeEmpty()
-          .And.HaveCount(1)
-          .And.BeEquivalentTo(component);
-      }
+            public class ComponentData : ResponseBase
+            {
+                public Guid id { get; set; }
+            }
+        }
 
-    [Fact]
-      public async Task Multiple()
-      {
-        // Arrange
-        var component1 = new Data.ComponentData { id = await CreateComponent() };
-        var component2 = new Data.ComponentData { id = await CreateComponent() };
-        var component3 = new Data.ComponentData { id = await CreateComponent() };
-        var component4 = new Data.ComponentData { id = await CreateComponent() };
-        var component5 = new Data.ComponentData { id = await CreateComponent() };
-        // Act
-        var response = await GetComponents();
-        // Assert
-        response.data.components
-          .Should().NotBeEmpty()
-          .And.HaveCount(5)
-          .And.BeEquivalentTo(
-              component1,
-              component2,
-              component3,
-              component4,
-              component5
-              );
-      }
+        [Fact]
+        public async Task Empty()
+        {
+            // Act
+            var response = await GetComponents();
+            // Assert
+            response.data.components
+              .Should().BeEmpty();
+        }
 
-    private async Task<Response<Data>> GetComponents()
-    {
-        // Act
-        var httpResponse = await HttpClient.PostAsync(
-            "/graphql",
-            MakeJsonHttpContent(
-              new Request() {
-                query =
-                  @"query {
+        [Fact]
+        public async Task Single()
+        {
+            // Arrange
+            var component = new Data.ComponentData { id = await CreateComponent() };
+            // Act
+            var response = await GetComponents();
+            // Assert
+            response.data.components
+              .Should().NotBeEmpty()
+              .And.HaveCount(1)
+              .And.BeEquivalentTo(component);
+        }
+
+        [Fact]
+        public async Task Multiple()
+        {
+            // Arrange
+            var component1 = new Data.ComponentData { id = await CreateComponent() };
+            var component2 = new Data.ComponentData { id = await CreateComponent() };
+            var component3 = new Data.ComponentData { id = await CreateComponent() };
+            var component4 = new Data.ComponentData { id = await CreateComponent() };
+            var component5 = new Data.ComponentData { id = await CreateComponent() };
+            // Act
+            var response = await GetComponents();
+            // Assert
+            response.data.components
+              .Should().NotBeEmpty()
+              .And.HaveCount(5)
+              .And.BeEquivalentTo(
+                  component1,
+                  component2,
+                  component3,
+                  component4,
+                  component5
+                  );
+        }
+
+        private async Task<Response<Data>> GetComponents()
+        {
+            // Act
+            var httpResponse = await HttpClient.PostAsync(
+                "/graphql",
+                MakeJsonHttpContent(
+                  new Request()
+                  {
+                      query =
+                      @"query {
                     components {
                       id
                     }
                   }"
-                }
-              )
-            );
-        // Assert
-        httpResponse.EnsureSuccessStatusCode();
-        var response = await new ResponseParser().Parse<Response<Data>>(httpResponse);
-        response.EnsureNoOverflow();
-        response.EnsureNoErrors();
-        response.data.EnsureNoOverflow();
-        return response;
-    }
+                  }
+                  )
+                );
+            // Assert
+            httpResponse.EnsureSuccessStatusCode();
+            var response = await new ResponseParser().Parse<Response<Data>>(httpResponse);
+            response.EnsureNoOverflow();
+            response.EnsureNoErrors();
+            response.data.EnsureNoOverflow();
+            return response;
+        }
 
-    public class XYData : ResponseBase
-    {
-      public CreateComponentData createComponent { get; set; }
+        public class XYData : ResponseBase
+        {
+            public CreateComponentData createComponent { get; set; }
 
-      public class CreateComponentData : ResponseBase
-      {
-        public Guid id { get; set; }
-      }
-    }
+            public class CreateComponentData : ResponseBase
+            {
+                public Guid id { get; set; }
+            }
+        }
 
-    private async Task<Guid> CreateComponent()
-    {
-        var httpResponse = await HttpClient.PostAsync(
-            "/graphql",
-            MakeJsonHttpContent(
-              new Request() {
-                query =
-                  @"mutation {
+        private async Task<Guid> CreateComponent()
+        {
+            var httpResponse = await HttpClient.PostAsync(
+                "/graphql",
+                MakeJsonHttpContent(
+                  new Request()
+                  {
+                      query =
+                      @"mutation {
                     createComponent {
                       id
                     }
                   }"
-                }
-              )
-            );
-        httpResponse.EnsureSuccessStatusCode();
-        var response = await new ResponseParser().Parse<Response<XYData>>(httpResponse);
-        return response.data.createComponent.id;
+                  }
+                  )
+                );
+            httpResponse.EnsureSuccessStatusCode();
+            var response = await new ResponseParser().Parse<Response<XYData>>(httpResponse);
+            return response.data.createComponent.id;
+        }
     }
-  }
 }

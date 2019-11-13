@@ -23,18 +23,20 @@ namespace Icon.GraphQl
 
         internal static IEnumerable<T> HandleFailures<T>(IEnumerable<Result<T, IError>> results)
         {
-          if (HasErrors(results)) {
-              throw new QueryException(ExtractErrors(results));
-          }
-          return results.Select(r => r.Value);
+            if (HasErrors(results))
+            {
+                throw new QueryException(ExtractErrors(results));
+            }
+            return results.Select(r => r.Value);
         }
 
         internal static GreenDonut.Result<T> ToDataLoaderResult<T>(Result<T, IError> result)
         {
-          if (result.IsFailure) {
-            return GreenDonut.Result<T>.Reject(new QueryException(result.Error));
-          }
-          return GreenDonut.Result<T>.Resolve(result.Value);
+            if (result.IsFailure)
+            {
+                return GreenDonut.Result<T>.Reject(new QueryException(result.Error));
+            }
+            return GreenDonut.Result<T>.Resolve(result.Value);
         }
 
         internal static IReadOnlyList<GreenDonut.Result<T>> ToDataLoaderResults<T>(IEnumerable<Result<T, IError>> results)
@@ -44,14 +46,14 @@ namespace Icon.GraphQl
 
         internal static bool HasErrors<T>(IEnumerable<Result<T, IError>> results)
         {
-          return results.Any(r => r.IsFailure);
+            return results.Any(r => r.IsFailure);
         }
 
         internal static IEnumerable<IError> ExtractErrors<T>(IEnumerable<Result<T, IError>> results)
         {
-          return results
-            .Where(r => r.IsFailure)
-            .Select(r => r.Error);
+            return results
+              .Where(r => r.IsFailure)
+              .Select(r => r.Error);
         }
     }
 }

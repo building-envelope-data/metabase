@@ -31,9 +31,9 @@ namespace Icon.Infrastructure.Aggregate
 
         public IAggregateRepositoryReadOnlySession OpenReadOnlySession()
         {
-          // TODO We sould like to use `QuerySession` here, which however does
-          // not provide access to an `IEventStore`.
-          return new AggregateRepositoryReadOnlySession(_store.OpenSession());
+            // TODO We sould like to use `QuerySession` here, which however does
+            // not provide access to an `IEventStore`.
+            return new AggregateRepositoryReadOnlySession(_store.OpenSession());
         }
     }
 }

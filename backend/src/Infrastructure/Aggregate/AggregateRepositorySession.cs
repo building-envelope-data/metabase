@@ -33,13 +33,13 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             ) where T : class, IEventSourcedAggregate, new()
         {
-          AssertNotDisposed();
-          return Store<T>(
-              id,
-              expectedVersion,
-              new IEvent[] { @event },
-              cancellationToken
-              );
+            AssertNotDisposed();
+            return Store<T>(
+                id,
+                expectedVersion,
+                new IEvent[] { @event },
+                cancellationToken
+                );
         }
 
         public async Task<Result<(Guid Id, DateTime Timestamp), IError>> Store<T>(
@@ -49,32 +49,32 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             ) where T : class, IEventSourcedAggregate, new()
         {
-          AssertNotDisposed();
-          AssertExistenceOfCreators(
-              events.Select(@event => @event.CreatorId),
-              cancellationToken
-              );
-          var eventArray = events.ToArray();
-          _session.Events.Append(id, expectedVersion, eventArray);
-          await _session.SaveChangesAsync(cancellationToken);
-          await _eventBus.Publish(eventArray);
-          var timestampResult = await FetchTimestamp<T>(id, cancellationToken);
-          return timestampResult.Map(
-              timestamp => (
-                Id: id,
-                Timestamp: timestamp
-                )
-              );
+            AssertNotDisposed();
+            AssertExistenceOfCreators(
+                events.Select(@event => @event.CreatorId),
+                cancellationToken
+                );
+            var eventArray = events.ToArray();
+            _session.Events.Append(id, expectedVersion, eventArray);
+            await _session.SaveChangesAsync(cancellationToken);
+            await _eventBus.Publish(eventArray);
+            var timestampResult = await FetchTimestamp<T>(id, cancellationToken);
+            return timestampResult.Map(
+                timestamp => (
+                  Id: id,
+                  Timestamp: timestamp
+                  )
+                );
         }
 
         private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)
         {
-          // TODO
-          /* foreach (var creatorId in creatorIds) */
-          /* { */
-          /*   if (!_session.Query<UserAggregate>().AnyAsync(user => user.Id == creatorId, cancellationToken)) */
-          /*     throw new ArgumentException("Creator does not exist!", nameof(creatorId)); */
-          /* } */
+            // TODO
+            /* foreach (var creatorId in creatorIds) */
+            /* { */
+            /*   if (!_session.Query<UserAggregate>().AnyAsync(user => user.Id == creatorId, cancellationToken)) */
+            /*     throw new ArgumentException("Creator does not exist!", nameof(creatorId)); */
+            /* } */
         }
     }
 }

@@ -18,8 +18,9 @@ namespace Icon.GraphQl
         protected DateTime HandleTimestamp(DateTime? timestamp, IResolverContext context)
         {
             var timestampResult = Timestamp.Sanitize(timestamp);
-            if (timestampResult.IsFailure) {
-              throw new QueryException(timestampResult.Error);
+            if (timestampResult.IsFailure)
+            {
+                throw new QueryException(timestampResult.Error);
             }
             Timestamp.Store(timestampResult.Value, context);
             return timestampResult.Value;

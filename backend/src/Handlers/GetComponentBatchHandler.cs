@@ -32,17 +32,18 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-      using (var session = _repository.OpenReadOnlySession()) {
-            return
-              (await session
-               .LoadAll<Aggregates.ComponentAggregate>(
-                 query.ComponentIdsAndTimestamps,
-                 cancellationToken: cancellationToken
-                 )
-              ).Select(result =>
-                result.Map(a => a.ToModel())
-                );
-        }
+            using (var session = _repository.OpenReadOnlySession())
+            {
+                return
+                  (await session
+                   .LoadAll<Aggregates.ComponentAggregate>(
+                     query.ComponentIdsAndTimestamps,
+                     cancellationToken: cancellationToken
+                     )
+                  ).Select(result =>
+                    result.Map(a => a.ToModel())
+                    );
+            }
         }
     }
 }
