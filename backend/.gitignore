@@ -1,4 +1,7 @@
 /core
+/src/core
+/tempkey.rsa
+/src/tempkey.rsa
 /src/wwwroot/assets/
 
 # Created by https://www.gitignore.io/api/csharp

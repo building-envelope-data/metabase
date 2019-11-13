@@ -1,10 +1,8 @@
 using System;
-using Icon.Domain;
 using ApplicationDbContext = Icon.Data.ApplicationDbContext;
 using PersistedGrantDbContext = IdentityServer4.EntityFramework.DbContexts.PersistedGrantDbContext;
 using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
 using Microsoft.AspNetCore.Identity;
-using User = Icon.Domain.User;
 using Seeds = Icon.Data.Seeds;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -19,15 +17,16 @@ using IdentityServer4;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Configuration = Icon.Configuration;
+using Models = Icon.Models;
 
 namespace Test.Integration.Web.Api
 {
     public static class SeedData
     {
-        public static async Task SeedUsers(UserManager<User> userManager)
+        public static async Task SeedUsers(UserManager<Models.User> userManager)
         {
             var identityResult = await userManager.CreateAsync(
-                    new User()
+                    new Models.User()
                     {
                         /* Id = 1, */
                         UserName = "simon@icon.com",

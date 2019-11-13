@@ -25,8 +25,6 @@ using System.Linq;
 using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
 using Event = Icon.Infrastructure.Event;
-using Domain = Icon.Domain;
-using Component = Icon.Domain.Component;
 using System.Threading.Tasks;
 using System;
 using WebPWrecover.Services;
@@ -90,6 +88,7 @@ namespace Icon
             Configuration.RequestResponse.ConfigureServices(services);
             Configuration.Api.ConfigureServices(services);
             Configuration.Auth.ConfigureServices(services, _environment, _configuration, _appSettings, GetMigrationsAssembly());
+            Configuration.GraphQl.ConfigureServices(services);
             Configuration.EventStore.ConfigureServices(services, _environment, _appSettings.Database);
             Configuration.QueryCommandAndEventBusses.ConfigureServices(services);
         }
@@ -113,6 +112,7 @@ namespace Icon
             Configuration.Api.Configure(app);
             Configuration.Auth.Configure(app);
             Configuration.Session.Configure(app);
+            Configuration.GraphQl.Configure(app, _environment);
             Configuration.RequestResponse.ConfigureEndpoints(app);
 
             // TODO Shall we do migrations here or in Program.cs?

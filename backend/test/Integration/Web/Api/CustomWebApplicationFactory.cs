@@ -22,11 +22,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ApplicationDbContext = Icon.Data.ApplicationDbContext;
 using Microsoft.AspNetCore.Identity;
-using User = Icon.Domain.User;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Configuration = Icon.Configuration;
 using Startup = Icon.Startup;
 using AppSettings = Icon.AppSettings;
+using Models = Icon.Models;
 
 namespace Test.Integration.Web.Api
 {
@@ -127,7 +127,7 @@ namespace Test.Integration.Web.Api
             await DoAsync(
                     async services =>
                     {
-                        await SeedData.SeedUsers(services.GetRequiredService<UserManager<User>>());
+                        await SeedData.SeedUsers(services.GetRequiredService<UserManager<Models.User>>());
                     }
             );
         }

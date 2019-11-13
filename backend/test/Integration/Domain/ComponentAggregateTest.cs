@@ -3,9 +3,10 @@ using Xunit;
 using System.Threading.Tasks;
 using System;
 using FluentAssertions;
-using ComponentAggregate = Icon.Domain.ComponentAggregate;
-using Component = Icon.Domain.Component;
 using System.Linq;
+using Aggregates = Icon.Aggregates;
+using Commands = Icon.Commands;
+using Events = Icon.Events;
 
 namespace Icon.Domain
 {
@@ -15,15 +16,18 @@ namespace Icon.Domain
         public async Task Test()
         {
             // Arrange
-            var @event = new Component.Create.ComponentCreateEvent(Guid.NewGuid(), new Component.Create.Command(creatorId: Guid.NewGuid()));
-            var component = ComponentAggregate.Create(@event);
-            var events = component.GetUncommittedEvents().ToArray();
-            Session.Events.Append(component.Id, component.Version, events);
+            var id = Guid.NewGuid();
+            var @event = new Events.ComponentCreated(
+                id,
+                new Commands.CreateComponent(creatorId: Guid.NewGuid())
+                );
+            Session.Events.Append(id, 1, @event);
             await Session.SaveChangesAsync();
             // Act
-            var aggregate = await Session.Events.AggregateStreamAsync<ComponentAggregate>(component.Id);
+            var aggregate = await Session.Events.AggregateStreamAsync<Aggregates.ComponentAggregate>(id);
             // Assert
-            aggregate.Should().BeEquivalentTo(component);
+            aggregate.Id.Should().Be(id);
+            aggregate.Version.Should().Be(1);
         }
     }
 }

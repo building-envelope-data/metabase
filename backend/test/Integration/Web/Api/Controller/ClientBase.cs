@@ -34,12 +34,12 @@ namespace Test.Integration.Web.Api.Controller
 
     }
 
-        public abstract class OutputBase
-        {
-            // https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-how-to#handle-overflow-json
-						[JsonExtensionData]
-						public Dictionary<string, JsonElement> ExtensionData { get; set; }
-        }
+    public abstract class OutputBase
+    {
+        // https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-how-to#handle-overflow-json
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement> ExtensionData { get; set; }
+    }
 
     public abstract class ClientBase<TOutput> : ClientBase
     {
@@ -54,11 +54,11 @@ namespace Test.Integration.Web.Api.Controller
 
         public static IEnumerable<T> EnsureEmptyExtensionData<T>(IEnumerable<T> outputs) where T : OutputBase
         {
-						foreach (var output in outputs)
-						{
-								EnsureEmptyExtensionData(output);
-						}
-						return outputs;
+            foreach (var output in outputs)
+            {
+                EnsureEmptyExtensionData(output);
+            }
+            return outputs;
         }
 
         protected JsonSerializerOptions JsonSerializerOptions { get; }
@@ -77,7 +77,7 @@ namespace Test.Integration.Web.Api.Controller
                 IgnoreReadOnlyProperties = true,
                 // MaxDepth
                 PropertyNameCaseInsensitive = false,
-                PropertyNamingPolicy =  JsonNamingPolicy.CamelCase,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 ReadCommentHandling = JsonCommentHandling.Disallow,
                 WriteIndented = false,
             };

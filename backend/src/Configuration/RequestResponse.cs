@@ -25,8 +25,7 @@ using System.Linq;
 using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
 using Event = Icon.Infrastructure.Event;
-using Domain = Icon.Domain;
-using Component = Icon.Domain.Component;
+using Models = Icon.Models;
 using System.Threading.Tasks;
 using System;
 using WebPWrecover.Services;
@@ -42,9 +41,10 @@ namespace Icon.Configuration
         {
             services.AddResponseCompression();
             // add CORS policy for non-IdentityServer endpoints
+            // https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-3.0
             services.AddCors(options =>
             {
-                options.AddPolicy(Auth.ApiName, policy =>
+                options.AddDefaultPolicy(policy =>
                 {
                     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });

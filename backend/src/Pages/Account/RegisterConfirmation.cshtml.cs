@@ -1,4 +1,4 @@
-using Icon.Domain;
+using Icon.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Text;
 using System.Threading.Tasks;

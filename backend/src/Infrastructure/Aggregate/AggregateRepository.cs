@@ -1,57 +1,39 @@
-// Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
-
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using Marten;
+using Marten.Linq;
 using System.Threading.Tasks;
 using Icon.Infrastructure.Event;
 using CancellationToken = System.Threading.CancellationToken;
+using ErrorCodes = Icon.ErrorCodes;
+using HotChocolate;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Infrastructure.Aggregate
 {
     public sealed class AggregateRepository : IAggregateRepository
     {
-        private readonly IDocumentSession _session;
+        private readonly IDocumentStore _store;
         private readonly IEventBus _eventBus;
 
-        public AggregateRepository(IDocumentSession session, IEventBus eventBus)
+        public AggregateRepository(IDocumentStore store, IEventBus eventBus)
         {
-            _session = session;
+            _store = store;
             _eventBus = eventBus;
         }
 
-        public async Task<T> Store<T>(T aggregate, CancellationToken cancellationToken) where T : IEventSourcedAggregate
+        // For the different kinds of Marten sessions see http://jasperfx.github.io/marten/documentation/troubleshoot/
+        public IAggregateRepositorySession OpenSession()
         {
-            // Take non-persisted events, push them to the event stream, indexed by the aggregate ID
-            var events = aggregate.GetUncommittedEvents().ToArray();
-            AssertExistenceOfCreators(events.Select(@event => @event.CreatorId), cancellationToken);
-            _session.Events.Append(aggregate.Id, aggregate.Version, events);
-            await _session.SaveChangesAsync(cancellationToken);
-            await _eventBus.Publish(events);
-            return aggregate;
+            return new AggregateRepositorySession(_store.OpenSession(), _eventBus);
         }
 
-        private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)
+        public IAggregateRepositoryReadOnlySession OpenReadOnlySession()
         {
-            // TODO
-            /* foreach (var creatorId in creatorIds) */
-            /* { */
-            /*   if (!_session.Query<UserAggregate>().AnyAsync(user => user.Id == creatorId, cancellationToken)) */
-            /*     throw new ArgumentException("Creator does not exist!", nameof(creatorId)); */
-            /* } */
-        }
-
-        public async Task<T> Load<T>(Guid id, int? version = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new()
-        {
-            var aggregate = await _session.Events.AggregateStreamAsync<T>(id, version ?? 0, default(DateTime), default(T), cancellationToken);
-            return aggregate ?? throw new InvalidOperationException($"No aggregate by id {id.ToString()}.");
-        }
-
-        public async Task<IEnumerable<T>> LoadAll<T>(CancellationToken cancellationToken) where T : IEventSourcedAggregate, new()
-        {
-            // https://jasperfx.github.io/marten/documentation/documents/querying/async/
-            return await _session.Query<T>().ToListAsync(cancellationToken);
+            // TODO We sould like to use `QuerySession` here, which however does
+            // not provide access to an `IEventStore`.
+            return new AggregateRepositoryReadOnlySession(_store.OpenSession());
         }
     }
 }
