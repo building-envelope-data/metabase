@@ -14,6 +14,15 @@ namespace Icon.Infrastructure.Aggregate
     {
         public IMartenQueryable<E> Query<E>() where E : IEvent;
 
+        public Task<Guid> GenerateNewId(
+            CancellationToken cancellationToken
+            );
+
+        public Task<bool> Exists(
+            Guid id,
+            CancellationToken cancellationToken
+            );
+
         public Task<Result<int, IError>> FetchVersion<T>(
             Guid id,
             DateTime timestamp,

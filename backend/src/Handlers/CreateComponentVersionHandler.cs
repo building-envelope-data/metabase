@@ -29,10 +29,10 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            var id = Guid.NewGuid();
-            var @event = new Events.ComponentVersionCreated(id, command);
             using (var session = _repository.OpenSession())
             {
+                var id = await session.GenerateNewId(cancellationToken);
+                var @event = new Events.ComponentVersionCreated(id, command);
                 return await session.Store<Aggregates.ComponentVersionAggregate>(id, 1, @event, cancellationToken);
             }
         }

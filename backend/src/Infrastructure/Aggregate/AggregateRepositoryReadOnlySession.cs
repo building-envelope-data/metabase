@@ -63,6 +63,32 @@ namespace Icon.Infrastructure.Aggregate
             return _session.Events.QueryRawEventDataOnly<E>();
         }
 
+        public async Task<Guid> GenerateNewId(
+            CancellationToken cancellationToken
+            )
+        {
+            AssertNotDisposed();
+            var id = Guid.NewGuid();
+            while (await Exists(id, cancellationToken))
+            {
+                id = Guid.NewGuid();
+            }
+            return id;
+        }
+
+        public async Task<bool> Exists(
+            Guid id,
+            CancellationToken cancellationToken
+            )
+        {
+            var streamState =
+              await _session.Events.FetchStreamStateAsync(
+                  id,
+                  token: cancellationToken
+                  );
+            return streamState != null;
+        }
+
         public async Task<Result<int, IError>> FetchVersion<T>(
             Guid id,
             DateTime timestamp,
