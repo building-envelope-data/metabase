@@ -1,4 +1,6 @@
 /core
+/src/core
+/tempkey.rsa
 /src/tempkey.rsa
 /src/wwwroot/assets/
 
