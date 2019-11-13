@@ -24,7 +24,7 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public Task<Result<(Guid Id, DateTime Timestamp), IError>> Handle(
+        public async Task<Result<(Guid Id, DateTime Timestamp), IError>> Handle(
             Commands.CreateComponentVersion command,
             CancellationToken cancellationToken
             )
@@ -33,7 +33,7 @@ namespace Icon.Handlers
             var @event = new Events.ComponentVersionCreated(id, command);
             using (var session = _repository.OpenSession())
             {
-                return session.Store<Aggregates.ComponentVersionAggregate>(id, 1, @event, cancellationToken);
+                return await session.Store<Aggregates.ComponentVersionAggregate>(id, 1, @event, cancellationToken);
             }
         }
     }
