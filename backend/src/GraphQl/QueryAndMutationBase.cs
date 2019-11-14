@@ -22,7 +22,8 @@ namespace Icon.GraphQl
             )
         {
             var timestampResult = Timestamp.Sanitize(
-                timestamp ?? DateTime.UtcNow // TODO Set timestamp in IQueryContext when the request arrives and use it here.
+                timestamp,
+                Timestamp.FetchRequest(resolverContext)
                 );
             if (timestampResult.IsFailure)
             {

@@ -1,5 +1,7 @@
 // Inspired by https://hotchocolate.io/docs/aspnet#asp-net-core-
 
+using System;
+using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
@@ -44,8 +46,20 @@ namespace Icon.Configuration
                   {
                       // https://hotchocolate.io/docs/options#members
                       MaxOperationComplexity = 10,
-                      UseComplexityMultipliers = true
+                      UseComplexityMultipliers = true,
+                      /* TracingPreference = TracingPreference.Always */
                   });
+
+            services.AddQueryRequestInterceptor(
+                (httpContext, requestBuilder, cancellationToken) =>
+            {
+                /* var identity = new ClaimsIdentity("abc"); */
+                /* identity.AddClaim(new Claim(ClaimTypes.Country, "us")); */
+                /* ctx.User = new ClaimsPrincipal(identity); */
+                /* builder.SetProperty(nameof(ClaimsPrincipal), ctx.User); */
+                GraphQlX.Timestamp.StoreRequest(DateTime.UtcNow, requestBuilder);
+                return Task.CompletedTask;
+            });
 
             services.AddDiagnosticObserver<GraphQlX.DiagnosticObserver>();
         }
