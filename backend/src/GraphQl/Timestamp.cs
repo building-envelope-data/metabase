@@ -10,14 +10,16 @@ using HotChocolate.Resolvers;
 using HotChocolate;
 using CSharpFunctionalExtensions;
 using ErrorCodes = Icon.ErrorCodes;
+using HotChocolate.Execution;
 
 namespace Icon.GraphQl
 {
     public sealed class Timestamp
     {
-        public static Result<DateTime, IError> Sanitize(DateTime timestamp)
+        public static Result<DateTime, IError> Sanitize(DateTime? maybeTimestamp, DateTime requestTimestamp)
         {
-            if (timestamp > DateTime.UtcNow)
+            var timestamp = maybeTimestamp ?? requestTimestamp;
+            if (timestamp > requestTimestamp)
             {
                 return Result.Failure<DateTime, IError>(
                     ErrorBuilder.New()
@@ -27,6 +29,16 @@ namespace Icon.GraphQl
                     );
             }
             return Result.Success<DateTime, IError>(timestamp);
+        }
+
+        public static void StoreRequest(DateTime timestamp, IQueryRequestBuilder requestBuilder)
+        {
+                requestBuilder.SetProperty("requestTimestamp", timestamp);
+        }
+
+        public static DateTime FetchRequest(IResolverContext context)
+        {
+            return (System.DateTime)context.ContextData["requestTimestamp"];
         }
 
         public static void Store(DateTime timestamp, IResolverContext context)

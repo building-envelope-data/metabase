@@ -8,7 +8,6 @@ using Queries = Icon.Queries;
 using System.Linq;
 using HotChocolate.Resolvers;
 using HotChocolate;
-using HotChocolate.Execution;
 using GreenDonut;
 using QueryException = HotChocolate.Execution.QueryException;
 using IError = HotChocolate.IError;
