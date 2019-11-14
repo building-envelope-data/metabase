@@ -22,7 +22,7 @@ namespace Icon.GraphQl
             )
         {
             var timestampResult = Timestamp.Sanitize(
-                timestamp ?? DateTime.UtcNow // TODO Set timestamp in IQueryContext when the request arrives and use it here.
+                timestamp ?? DateTime.UtcNow // TODO Set timestamp in IQueryContext when the request arrives and use it here instead of `UtcNow`. It should be possible to use a request interceptor for this as told in https://github.com/ChilliCream/hotchocolate/issues/1054#issuecomment-527206145 Maybe it would also be possible to use a middleware as in https://hotchocolate.io/docs/custom-context
                 );
             if (timestampResult.IsFailure)
             {
