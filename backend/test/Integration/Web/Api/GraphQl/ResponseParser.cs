@@ -40,12 +40,13 @@ namespace Test.Integration.Web.Api.GraphQl
             };
         }
 
-        public async Task<Response<TData>> Parse<TData>(HttpResponseMessage httpResponse)
+        public async Task<Response<TData, TError>> Parse<TData, TError>(HttpResponseMessage httpResponse)
           where TData : ResponseBase
+          where TError : ResponseBase
         {
             httpResponse.EnsureSuccessStatusCode();
             var response =
-              await JsonSerializer.DeserializeAsync<Response<TData>>(
+              await JsonSerializer.DeserializeAsync<Response<TData, TError>>(
                 await httpResponse.Content.ReadAsStreamAsync(),
                 JsonSerializerOptions
             );

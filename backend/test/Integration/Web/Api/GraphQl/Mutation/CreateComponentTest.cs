@@ -20,14 +20,15 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
     {
         public CreateComponentTest(CustomWebApplicationFactory factory) : base(factory) { }
 
-        /* [Fact] */
-        /* public async Task Anonymously() */
-        /* { */
-        /*   // Act */
-        /*   var httpResponse = await ComponentsClient.Post.Raw(); */
-        /*   // Assert */
-        /*   httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized); */
-        /* } */
+        [Fact]
+        public async Task Anonymously()
+        {
+          // Act
+          var errors = await Client.CreateComponentErroneously();
+          // Assert
+          errors[0].extensions.code.Should().Be("AUTH_NOT_AUTHENTICATED");
+        }
+
 
         [Fact]
         public async Task Authorized()
