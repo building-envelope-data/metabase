@@ -39,6 +39,25 @@ namespace Test.Integration.Web.Api.GraphQl
             _httpClient = httpClient;
         }
 
+        public class Error : ResponseBase
+      {
+        public string message { get; set; }
+        public IReadOnlyList<Location> locations { get; set; }
+        public IReadOnlyList<string> path { get; set; }
+        public Extensions extensions { get; set; }
+
+        public class Location : ResponseBase
+        {
+          public int line { get; set; }
+          public int column { get; set; }
+        }
+
+        public class Extensions : ResponseBase
+        {
+          public string code { get; set; }
+        }
+      }
+
         public class ComponentData : ResponseBase
         {
             public Guid id { get; set; }
@@ -58,7 +77,7 @@ namespace Test.Integration.Web.Api.GraphQl
             public ComponentData createComponent { get; set; }
         }
 
-        public async Task<Response<T>> Request<T>(
+        public async Task<Response<T, Error>> Request<T>(
             string query,
             string operationName = null,
             Dictionary<string, object> variables = null
@@ -78,11 +97,11 @@ namespace Test.Integration.Web.Api.GraphQl
                 );
             var response =
               await new ResponseParser()
-              .Parse<T>(httpResponse);
+              .Parse<T, Error>(httpResponse);
             return response;
         }
 
-        public Task<Response<CreateComponentData>> CreateComponent()
+        public Task<Response<CreateComponentData, Error>> CreateComponent()
         {
             return Request<CreateComponentData>(
                  @"mutation {
@@ -108,12 +127,27 @@ namespace Test.Integration.Web.Api.GraphQl
               .createComponent;
         }
 
+        public async Task<IReadOnlyList<Error>> CreateComponentErroneously()
+        {
+            var response =
+              (await CreateComponent())
+              .EnsureFailure();
+            foreach (var error in response.errors) {
+              error.EnsureNoOverflow();
+              error.extensions.EnsureNoOverflow();
+              foreach (var location in error.locations) {
+                location.EnsureNoOverflow();
+              }
+            }
+            return response.errors;
+        }
+
         public class GetComponentsData : ResponseBase
         {
             public IEnumerable<ComponentData> components { get; set; }
         }
 
-        public Task<Response<GetComponentsData>> GetComponents()
+        public Task<Response<GetComponentsData, Error>> GetComponents()
         {
             return Request<GetComponentsData>(
                   @"query {

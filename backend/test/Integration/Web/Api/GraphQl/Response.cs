@@ -16,21 +16,24 @@ using JsonExtensionDataAttribute = System.Text.Json.Serialization.JsonExtensionD
 
 namespace Test.Integration.Web.Api.GraphQl
 {
-    public class Response<TData>
+    public class Response<TData, TError>
       : ResponseBase
       where TData : ResponseBase
+      where TError : ResponseBase
     {
         public TData data { get; set; }
-        public IEnumerable<Dictionary<string, object>> errors { get; set; }
+        public IReadOnlyList<TError> errors { get; set; }
 
-        public Response<TData> EnsureSuccess()
+        public Response<TData, TError> EnsureSuccess()
         {
             EnsureData();
             EnsureNoErrors();
+            EnsureNoOverflow();
+            data.EnsureNoOverflow();
             return this;
         }
 
-        public Response<TData> EnsureData()
+        public Response<TData, TError> EnsureData()
         {
             if (data == null)
             {
@@ -39,7 +42,7 @@ namespace Test.Integration.Web.Api.GraphQl
             return this;
         }
 
-        public Response<TData> EnsureNoData()
+        public Response<TData, TError> EnsureNoData()
         {
             if (data != null)
             {
@@ -48,14 +51,18 @@ namespace Test.Integration.Web.Api.GraphQl
             return this;
         }
 
-        public Response<TData> EnsureFailure()
+        public Response<TData, TError> EnsureFailure()
         {
             EnsureErrors();
             EnsureNoData();
+            EnsureNoOverflow();
+            foreach (var error in errors) {
+              error.EnsureNoOverflow();
+            }
             return this;
         }
 
-        public Response<TData> EnsureErrors()
+        public Response<TData, TError> EnsureErrors()
         {
             if (errors == null)
             {
@@ -64,7 +71,7 @@ namespace Test.Integration.Web.Api.GraphQl
             return this;
         }
 
-        public Response<TData> EnsureNoErrors()
+        public Response<TData, TError> EnsureNoErrors()
         {
             if (errors != null)
             {
