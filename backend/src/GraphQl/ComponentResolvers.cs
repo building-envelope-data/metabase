@@ -22,13 +22,14 @@ namespace Icon.GraphQl
             IResolverContext context
             )
         {
+            var timestamp = Timestamp.Fetch(context);
             return ResultHelpers.HandleFailures<Models.ComponentVersion>(
                 await QueryBus.Send<
                   Queries.ListComponentVersions,
                   IEnumerable<Result<Models.ComponentVersion, IError>>
-                >(new Queries.ListComponentVersions(component.Id, Timestamp.Fetch(context)))
+                >(new Queries.ListComponentVersions(component.Id, timestamp))
                 )
-              .Select(c => ComponentVersion.FromModel(c));
+              .Select(c => ComponentVersion.FromModel(c, timestamp));
         }
     }
 }

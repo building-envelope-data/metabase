@@ -41,7 +41,7 @@ namespace Icon.Configuration
     {
         public static void ConfigureServices(IServiceCollection services, IWebHostEnvironment environment, AppSettings.DatabaseSettings databaseSettings)
         {
-            services.AddSingleton(
+            services.AddScoped( // TODO Using `AddSingleton` here makes Marten not create schema objects in tests. Why?
                 typeof(Marten.IDocumentStore),
                 serviceProvider =>
                 BuildDocumentStore(

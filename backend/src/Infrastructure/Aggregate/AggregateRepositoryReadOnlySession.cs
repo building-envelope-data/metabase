@@ -144,7 +144,7 @@ namespace Icon.Infrastructure.Aggregate
                   timestamp: timestamp,
                   token: cancellationToken
                   );
-            return BuildResult(id, timestamp, aggregate);
+            return BuildResult(id, aggregate);
         }
 
         /* public async Task<IEnumerable<T>> LoadAll<T>(DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new() */
@@ -209,17 +209,16 @@ namespace Icon.Infrastructure.Aggregate
         private Result<T, IError> BuildResult<T>((Guid Id, DateTime Timestamp) idAndTimestamp, T aggregate)
           where T : class, IEventSourcedAggregate, new()
         {
-            return BuildResult(idAndTimestamp.Id, idAndTimestamp.Timestamp, aggregate);
+            return BuildResult(idAndTimestamp.Id, aggregate);
         }
 
-        private Result<T, IError> BuildResult<T>(Guid id, DateTime timestamp, T aggregate)
+        private Result<T, IError> BuildResult<T>(Guid id, T aggregate)
           where T : class, IEventSourcedAggregate, new()
         {
             if (aggregate == null || aggregate.Version == 0)
             {
                 return Result.Failure<T, IError>(BuildNonExistentModelError(id));
             }
-            aggregate.Timestamp = timestamp; // TODO This is a problem when aggregates are cached!
             return Result.Success<T, IError>(aggregate);
         }
     }

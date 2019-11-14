@@ -30,7 +30,7 @@ namespace Icon.GraphQl
         }
 
         public async Task<Component> CreateComponent(
-            IResolverContext context
+            IResolverContext resolverContext
             )
         {
             var result =
@@ -40,6 +40,7 @@ namespace Icon.GraphQl
                    Result<(Guid Id, DateTime Timestamp), IError>
                  >(new Commands.CreateComponent(creatorId: Guid.NewGuid())); // TODO Use current user!
             var (id, timestamp) = ResultHelpers.HandleFailure(result);
+            Timestamp.Store(timestamp, resolverContext);
             return
               Component.FromModel(
                   ResultHelpers.HandleFailure(
@@ -48,13 +49,14 @@ namespace Icon.GraphQl
                          Queries.GetComponent,
                          Result<Models.Component, IError>
                          >(new Queries.GetComponent(id, timestamp))
-                    )
+                    ),
+                  timestamp
                   );
         }
 
         public async Task<ComponentVersion> CreateComponentVersion(
             ComponentVersionInput componentVersionInput,
-            IResolverContext context
+            IResolverContext resolverContext
             )
         {
             var result =
@@ -68,6 +70,7 @@ namespace Icon.GraphQl
                     )
                     ); // TODO Use current user!
             var (id, timestamp) = ResultHelpers.HandleFailure(result);
+            Timestamp.Store(timestamp, resolverContext);
             return
               ComponentVersion.FromModel(
                   ResultHelpers.HandleFailure(
@@ -76,7 +79,8 @@ namespace Icon.GraphQl
                          Queries.GetComponentVersion,
                          Result<Models.ComponentVersion, IError>
                          >(new Queries.GetComponentVersion(id, timestamp))
-                    )
+                    ),
+                  timestamp
                   );
         }
 
