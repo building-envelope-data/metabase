@@ -28,23 +28,31 @@ namespace Icon.GraphQl
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<Component>> GetComponents(DateTime? timestamp, IResolverContext context)
+        public async Task<IEnumerable<Component>> GetComponents(
+            DateTime? timestamp,
+            IResolverContext resolverContext
+            )
         {
-            var nonNullTimestamp = HandleTimestamp(timestamp, context);
+            var requestTimestamp = HandleTimestamp(timestamp, resolverContext);
             return ResultHelpers.HandleFailures<Models.Component>(
               await _queryBus
                .Send<
                   Queries.ListComponents,
                   IEnumerable<Result<Models.Component, IError>>
-                  >(new Queries.ListComponents(nonNullTimestamp))
+                  >(new Queries.ListComponents(requestTimestamp))
               )
-              .Select(c => Component.FromModel(c));
+              .Select(c => Component.FromModel(c, requestTimestamp));
         }
 
-        public Task<Component> GetComponent(Guid id, DateTime? timestamp, IResolverContext context, [DataLoader] ComponentDataLoader componentLoader)
+        public Task<Component> GetComponent(
+            Guid id,
+            DateTime? timestamp,
+            [DataLoader] ComponentDataLoader componentLoader,
+            IResolverContext resolverContext
+            )
         {
-            var nonNullTimestamp = HandleTimestamp(timestamp, context);
-            return componentLoader.LoadAsync((id, nonNullTimestamp));
+            var requestTimestamp = HandleTimestamp(timestamp, resolverContext);
+            return componentLoader.LoadAsync((id, requestTimestamp));
             /* return */
             /*   Component.FromModel( */
             /*       (await _queryBus */

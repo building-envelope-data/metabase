@@ -15,9 +15,8 @@ namespace Icon.GraphQl
 {
     public sealed class Timestamp
     {
-        public static Result<DateTime, IError> Sanitize(DateTime? maybeTimestamp)
+        public static Result<DateTime, IError> Sanitize(DateTime timestamp)
         {
-            var timestamp = maybeTimestamp ?? DateTime.UtcNow;
             if (timestamp > DateTime.UtcNow)
             {
                 return Result.Failure<DateTime, IError>(

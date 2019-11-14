@@ -23,20 +23,54 @@ namespace Test.Integration.Web.Api.GraphQl
         public TData data { get; set; }
         public IEnumerable<Dictionary<string, object>> errors { get; set; }
 
-        public void EnsureNoData()
+        public Response<TData> EnsureSuccess()
+        {
+            EnsureData();
+            EnsureNoErrors();
+            return this;
+        }
+
+        public Response<TData> EnsureData()
+        {
+            if (data == null)
+            {
+                throw new JsonException("The data value is empty'");
+            }
+            return this;
+        }
+
+        public Response<TData> EnsureNoData()
         {
             if (data != null)
             {
                 throw new JsonException($"The data value is not empty but contains '{JsonSerializer.Serialize(data)}'");
             }
+            return this;
         }
 
-        public void EnsureNoErrors()
+        public Response<TData> EnsureFailure()
+        {
+            EnsureErrors();
+            EnsureNoData();
+            return this;
+        }
+
+        public Response<TData> EnsureErrors()
+        {
+            if (errors == null)
+            {
+                throw new JsonException("The errors dictionary is empty'");
+            }
+            return this;
+        }
+
+        public Response<TData> EnsureNoErrors()
         {
             if (errors != null)
             {
                 throw new JsonException($"The errors dictionary is not empty but contains '{JsonSerializer.Serialize(errors)}'");
             }
+            return this;
         }
     }
 }

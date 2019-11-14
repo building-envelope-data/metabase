@@ -17,6 +17,9 @@ namespace Icon.GraphQl
 
             descriptor.Field<ComponentResolvers>(t => t.GetVersions(default, default))
                 .Type<NonNullType<ListType<NonNullType<ComponentVersionType>>>>();
+
+            descriptor.Field(f => f.RequestTimestamp)
+                .Type<NonNullType<DateTimeType>>();
         }
     }
 }

@@ -16,7 +16,7 @@ using FluentAssertions;
 
 namespace Test.Integration.Web.Api.GraphQl.Mutation
 {
-    public class CreateComponentTest : TestBase
+    public class CreateComponentTest : GraphQlTestBase
     {
         public CreateComponentTest(CustomWebApplicationFactory factory) : base(factory) { }
 
@@ -29,17 +29,6 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
         /*   httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized); */
         /* } */
 
-        public class AuthorizedData : ResponseBase
-        {
-            public CreateComponentData createComponent { get; set; }
-
-            public class CreateComponentData : ResponseBase
-            {
-                public Guid id { get; set; }
-                public DateTime timestamp { get; set; }
-            }
-        }
-
         [Fact]
         public async Task Authorized()
         {
@@ -48,32 +37,12 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
             await Factory.SeedUsers();
             Factory.SeedAuth();
             await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
-            // Act
             var beforeTimestamp = DateTime.UtcNow;
-            var httpResponse = await HttpClient.PostAsync(
-                "/graphql",
-                MakeJsonHttpContent(
-                  new Request()
-                  {
-                      query =
-                      @"mutation {
-                    createComponent {
-                      id
-                      timestamp
-                    }
-                  }"
-                  }
-                  )
-                );
+            // Act
+            var component = await Client.CreateComponentSuccessfully();
             // Assert
-            httpResponse.EnsureSuccessStatusCode();
-            var response = await new ResponseParser().Parse<Response<AuthorizedData>>(httpResponse);
-            response.EnsureNoOverflow();
-            response.EnsureNoErrors();
-            response.data.EnsureNoOverflow();
-            response.data.createComponent.id
-              .Should().NotBeEmpty();
-            response.data.createComponent.timestamp
+            component.id.Should().NotBeEmpty();
+            component.timestamp
               .Should().BeAfter(beforeTimestamp)
               .And.BeBefore(DateTime.UtcNow);
         }

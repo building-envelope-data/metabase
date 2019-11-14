@@ -17,6 +17,9 @@ namespace Icon.GraphQl
 
             descriptor.Field(f => f.Timestamp)
                 .Type<NonNullType<DateTimeType>>();
+
+            descriptor.Field(f => f.RequestTimestamp)
+                .Type<NonNullType<DateTimeType>>();
         }
     }
 }

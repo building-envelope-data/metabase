@@ -20,10 +20,6 @@ namespace Icon.Configuration
     {
         public static void ConfigureServices(IServiceCollection services)
         {
-            // Add the custom services like repositories etc ...
-            /* services.AddSingleton<CharacterRepository>(); */
-            /* services.AddSingleton<ReviewRepository>(); */
-
             // Add in-memory event provider
             services.AddInMemorySubscriptionProvider();
 

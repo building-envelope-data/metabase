@@ -23,17 +23,19 @@ namespace Icon.Aggregates
         {
         }
 
-        private void Apply(Events.ComponentVersionManufacturerCreated @event)
+        private void Apply(Marten.Events.Event<Events.ComponentVersionManufacturerCreated> @event)
         {
-            Id = @event.ComponentVersionManufacturerId;
-            ComponentVersionId = @event.ComponentVersionId;
-            Name = @event.Name;
-            Description = @event.Description;
-            Abbreviation = @event.Abbreviation;
-            /* Availability = @event.Availability; */
-            AvailableFrom = @event.AvailableFrom;
-            AvailableUntil = @event.AvailableUntil;
-            Version++; // Ensure to update version on every Apply method.
+            var data = @event.Data;
+            Id = data.ComponentVersionManufacturerId;
+            ComponentVersionId = data.ComponentVersionId;
+            Name = data.Name;
+            Description = data.Description;
+            Abbreviation = data.Abbreviation;
+            /* Availability = data.Availability; */
+            AvailableFrom = data.AvailableFrom;
+            AvailableUntil = data.AvailableUntil;
+            Timestamp = @event.Timestamp.UtcDateTime;
+            Version = @event.Version;
         }
 
         public Models.ComponentVersionManufacturer ToModel()

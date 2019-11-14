@@ -15,11 +15,13 @@ namespace Icon.Aggregates
         {
         }
 
-        private void Apply(Events.ComponentVersionCreated @event)
+        private void Apply(Marten.Events.Event<Events.ComponentVersionCreated> @event)
         {
-            Id = @event.ComponentVersionId;
-            ComponentId = @event.ComponentId;
-            Version++; // Ensure to update version on every Apply method.
+            var data = @event.Data;
+            Id = data.ComponentVersionId;
+            ComponentId = data.ComponentId;
+            Timestamp = @event.Timestamp.UtcDateTime;
+            Version = @event.Version;
         }
 
         public Models.ComponentVersion ToModel()
