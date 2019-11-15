@@ -7,20 +7,20 @@ namespace Icon.Models
     public sealed class Institution
       : Stakeholder
     {
-        public Guid InformationId { get; }
+        public InstitutionInformation Information { get; }
         public string? PublicKey { get; }
         public InstitutionState State { get; }
 
         public Institution(
             Guid id,
-            Guid informationId,
+            InstitutionInformation information,
             string? publicKey,
             InstitutionState state,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
-            InformationId = informationId;
+            Information = information;
             PublicKey = publicKey;
             State = state;
         }

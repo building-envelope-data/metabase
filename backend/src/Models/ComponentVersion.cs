@@ -8,18 +8,18 @@ namespace Icon.Models
       : Model
     {
         public Guid ComponentId { get; }
-        public Guid InformationId { get; }
+        public ComponentInformation Information { get; }
 
         public ComponentVersion(
             Guid id,
             Guid componentId,
-            Guid informationId,
+            ComponentInformation information,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
             ComponentId = componentId;
-            InformationId = informationId;
+            Information = information;
         }
     }
 }

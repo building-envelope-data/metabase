@@ -7,16 +7,16 @@ namespace Icon.Models
     public sealed class Component
       : Model
     {
-        public Guid InformationId { get; }
+        public ComponentInformation Information { get; }
 
         public Component(
             Guid id,
-            Guid informationId,
+            ComponentInformation information,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
-            InformationId = informationId;
+            Information = information;
         }
     }
 }

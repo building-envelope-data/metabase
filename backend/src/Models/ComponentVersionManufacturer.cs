@@ -7,19 +7,22 @@ namespace Icon.Models
     public sealed class ComponentVersionManufacturer
       : Model
     {
-        public Guid ComponentId { get; }
+        public Guid ComponentVersionId { get; }
         public Guid InstitutionId { get; }
+        public ComponentVersionManufacturerMarketingInformation? MarketingInformation { get; }
 
         public ComponentVersionManufacturer(
             Guid id,
-            Guid componentId,
+            Guid componentVersionId,
             Guid institutionId,
+            ComponentVersionManufacturerMarketingInformation? marketingInformation,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
-            ComponentId = componentId;
+            ComponentVersionId = componentVersionId;
             InstitutionId = institutionId;
+            MarketingInformation = marketingInformation;
         }
     }
 }

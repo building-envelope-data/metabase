@@ -41,7 +41,7 @@ namespace Icon.Events
               description: information.Description,
               availableFrom: information.AvailableFrom,
               availableUntil: information.AvailableUntil,
-              categories: information.Categories.Select(c => c.FromModel())
+              categories: information.Categories.Select(c => c.FromModel()).ToList()
               )
           { }
     }

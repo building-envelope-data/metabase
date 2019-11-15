@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Icon.Infrastructure.Aggregate;
 using Marten.Schema;
 using Events = Icon.Events;
@@ -11,17 +12,17 @@ namespace Icon.Aggregates
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; set; }
 
-        public ComponentVersionAggregate()
-        {
-        }
+        public ComponentInformationAggregateData Information { get; set; }
+
+        public ComponentVersionAggregate() { }
 
         private void Apply(Marten.Events.Event<Events.ComponentVersionCreated> @event)
         {
+            ApplyMeta(@event);
             var data = @event.Data;
             Id = data.ComponentVersionId;
             ComponentId = data.ComponentId;
-            Timestamp = @event.Timestamp.UtcDateTime;
-            Version = @event.Version;
+            Information = new ComponentInformationAggregateData(data.Information);
         }
 
         public Models.ComponentVersion ToModel()
@@ -29,6 +30,7 @@ namespace Icon.Aggregates
             return new Models.ComponentVersion(
               id: Id,
               componentId: ComponentId,
+              information: Information.ToModel(),
               timestamp: Timestamp
             );
         }

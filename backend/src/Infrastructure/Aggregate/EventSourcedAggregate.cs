@@ -17,9 +17,12 @@ namespace Icon.Infrastructure.Aggregate
         // For protecting the state, i.e. conflict prevention
         public int Version { get; set; }
 
-        protected EventSourcedAggregate()
+        protected EventSourcedAggregate() { }
+
+        protected void ApplyMeta(Marten.Events.IEvent @event)
         {
-            Version = 0;
+            Timestamp = @event.Timestamp.UtcDateTime;
+            Version = @event.Version;
         }
     }
 }

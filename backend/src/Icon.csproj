@@ -6,6 +6,9 @@
     <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
     <LangVersion>8.0</LangVersion>
     <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
+    <!-- <Nullable>enable</Nullable> -->
+    <!-- <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild> -->
+    <!-- <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis> -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,6 +46,6 @@
   </ItemGroup>
 
   <!-- <Target Name="PreCompileTarget" BeforeTargets="Build"> -->
-  <!--   <Exec Command="npm run all" /> -->
-  <!-- </Target> -->
+    <!--   <Exec Command="npm run all" /> -->
+    <!-- </Target> -->
 </Project>

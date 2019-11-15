@@ -7,18 +7,18 @@ namespace Icon.Models
     public sealed class ComponentManufacturerMarketingInformation
     {
         public Guid ComponentManufacturerId { get; }
-        public Guid ComponentInformationId { get; }
-        public Guid InstitutionInformationId { get; }
+        public ComponentInformation ComponentInformation { get; }
+        public InstitutionInformation InstitutionInformation { get; }
 
         public ComponentManufacturerMarketingInformation(
             Guid componentManufacturerId,
-            Guid componentInformationId,
-            Guid institutionInformationId
+            ComponentInformation componentInformation,
+            InstitutionInformation institutionInformation
             )
         {
             ComponentManufacturerId = componentManufacturerId;
-            ComponentInformationId = componentInformationId;
-            InstitutionInformationId = institutionInformationId;
+            ComponentInformation = componentInformation;
+            InstitutionInformation = institutionInformation;
         }
     }
 }

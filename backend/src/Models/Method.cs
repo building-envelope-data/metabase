@@ -9,16 +9,16 @@ namespace Icon.Models
     public class Method
       : Model
     {
-        public Guid InformationId { get; }
+        public MethodInformation Information { get; }
 
         public Method(
             Guid id,
-            Guid informationId,
+            MethodInformation information,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
-            InformationId = informationId;
+            Information = information;
         }
     }
 }

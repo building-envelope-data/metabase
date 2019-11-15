@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
@@ -9,11 +10,20 @@ using Models = Icon.Models;
 using IError = HotChocolate.IError;
 using CSharpFunctionalExtensions;
 
+#nullable enable
 namespace Icon.Commands
 {
     public sealed class CreateComponent
       : CommandBase<Result<(Guid Id, DateTime Timestamp), IError>>
     {
-        public CreateComponent(Guid creatorId) : base(creatorId) { }
+        public Models.ComponentInformation Information { get; }
+
+        public CreateComponent(
+            Models.ComponentInformation information,
+            Guid creatorId
+            )
+          : base(creatorId) {
+            Information = information;
+          }
     }
 }

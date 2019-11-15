@@ -5,16 +5,15 @@ using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {
-    public sealed class ComponentVersionInput
+    public sealed class ComponentInput
     {
-        public Guid ComponentId { get; set; }
         public string Name { get; set; }
         public string Abbreviation { get; set; }
         public string Description { get; set; }
-        public DateTime AvailableFrom { get; set; }
-        public DateTime AvailableUntil { get; set; }
+        public DateTime? AvailableFrom { get; set; }
+        public DateTime? AvailableUntil { get; set; }
         public IEnumerable<Models.ComponentCategory> Categories { get; set; }
 
-        public ComponentVersionInput() { }
+        public ComponentInput() { }
     }
 }

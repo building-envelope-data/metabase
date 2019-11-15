@@ -6,19 +6,16 @@ namespace Icon.Models
 {
     public sealed class ComponentVersionManufacturerMarketingInformation
     {
-        public Guid ComponentVersionManufacturerId { get; }
-        public Guid ComponentVersionInformationId { get; }
-        public Guid InstitutionInformationId { get; }
+        public ComponentInformation ComponentVersionInformation { get; }
+        public InstitutionInformation InstitutionInformation { get; }
 
         public ComponentVersionManufacturerMarketingInformation(
-            Guid componentVersionManufacturerId,
-            Guid componentVersionInformationId,
-            Guid institutionInformationId
+            ComponentInformation componentVersionInformation,
+            InstitutionInformation institutionInformation
             )
         {
-            ComponentVersionManufacturerId = componentVersionManufacturerId;
-            ComponentVersionInformationId = componentVersionInformationId;
-            InstitutionInformationId = institutionInformationId;
+            ComponentVersionInformation = componentVersionInformation;
+            InstitutionInformation = institutionInformation;
         }
     }
 }

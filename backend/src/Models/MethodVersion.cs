@@ -9,18 +9,18 @@ namespace Icon.Models
       : Model
     {
         public Guid MethodId { get; }
-        public Guid InformationId { get; }
+        public MethodInformation Information { get; }
 
         public MethodVersion(
             Guid id,
             Guid methodId,
-            Guid informationId,
+            MethodInformation information,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
             MethodId = methodId;
-            InformationId = informationId;
+            Information = information;
         }
     }
 }

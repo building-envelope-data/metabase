@@ -7,6 +7,7 @@ using System.Linq;
 using Aggregates = Icon.Aggregates;
 using Commands = Icon.Commands;
 using Events = Icon.Events;
+using System.Collections.Generic;
 
 namespace Icon.Domain
 {
@@ -19,7 +20,15 @@ namespace Icon.Domain
             var id = Guid.NewGuid();
             var @event = new Events.ComponentCreated(
                 id,
-                new Commands.CreateComponent(creatorId: Guid.NewGuid())
+                information: new Events.ComponentInformationEventData(
+                  name: "My Name",
+                  abbreviation: null,
+                  description: "My Description",
+                  availableFrom: null,
+                  availableUntil: null,
+                  categories: new List<Events.ComponentCategoryEventData>()
+                  ),
+                creatorId: Guid.NewGuid()
                 );
             Session.Events.Append(id, 1, @event);
             await Session.SaveChangesAsync();

@@ -38,6 +38,7 @@ namespace Icon.Configuration
                   .AddQueryType<GraphQlX.QueryType>()
                   .AddMutationType<GraphQlX.MutationType>()
                   /* .AddSubscriptionType<SubscriptionType>() */
+                  .AddType<GraphQlX.INode>()
                   .AddType<GraphQlX.ComponentType>()
                   .AddType<GraphQlX.ComponentVersionType>()
                   .AddType<GraphQlX.ComponentVersionInputType>()
