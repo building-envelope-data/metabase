@@ -3,6 +3,7 @@ using Uri = System.Uri;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 
+#nullable enable
 namespace Icon.Models
 {
     public class Method

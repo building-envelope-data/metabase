@@ -2,6 +2,8 @@ using Uri = System.Uri;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 
+#nullable enable
+#nullable enable
 namespace Icon.Models
 {
     public sealed class ContactInformation

@@ -1,6 +1,7 @@
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 
+#nullable enable
 namespace Icon.Models
 {
     public sealed class ComponentVersionManufacturerMarketingInformation

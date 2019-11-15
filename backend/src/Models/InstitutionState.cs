@@ -1,3 +1,4 @@
+#nullable enable
 namespace Icon.Models
 {
     public enum InstitutionState
