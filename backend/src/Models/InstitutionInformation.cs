@@ -5,7 +5,6 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class InstitutionInformation
-      : Model
     {
         public string Name { get; }
         public string Abbreviation { get; }
@@ -13,14 +12,11 @@ namespace Icon.Models
         public Uri? WebsiteLocator { get; }
 
         public InstitutionInformation(
-            Guid id,
             string name,
             string abbreviation,
             string? description,
-            Uri? websiteLocator,
-            DateTime timestamp
+            Uri? websiteLocator
             )
-          : base(id, timestamp)
         {
             Name = name;
             Abbreviation = abbreviation;

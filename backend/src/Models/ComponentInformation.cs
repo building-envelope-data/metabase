@@ -6,7 +6,6 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class ComponentInformation
-      : Model
     {
         public string Name { get; }
         public string Abbreviation { get; }
@@ -17,16 +16,13 @@ namespace Icon.Models
         public IEnumerable<ComponentCategory> Categories { get; }
 
         public ComponentInformation(
-            Guid id,
             string name,
             string abbreviation,
             string description,
             DateTime? availableFrom,
             DateTime? availableUntil,
-            IEnumerable<ComponentCategory> categories,
-            DateTime timestamp
+            IEnumerable<ComponentCategory> categories
             )
-          : base(id, timestamp)
         {
             Name = name;
             Abbreviation = abbreviation;

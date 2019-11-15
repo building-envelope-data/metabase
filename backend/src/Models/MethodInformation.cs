@@ -3,10 +3,10 @@ using Uri = System.Uri;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 
+#nullable enable
 namespace Icon.Models
 {
     public class MethodInformation
-      : Model
     {
         public string Name { get; }
         public string Description { get; }
@@ -16,16 +16,13 @@ namespace Icon.Models
         public IEnumerable<MethodCategory> Categories { get; }
 
         public MethodInformation(
-            Guid id,
             string name,
             string description,
             Guid? standardId,
             Uri? publicationLocator,
             Uri? codeLocator,
-            IEnumerable<MethodCategory> categories,
-            DateTime timestamp
+            IEnumerable<MethodCategory> categories
             )
-          : base(id, timestamp)
         {
             Name = name;
             Description = description;

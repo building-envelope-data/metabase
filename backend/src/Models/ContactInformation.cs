@@ -5,7 +5,6 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class ContactInformation
-      : Model
     {
         public string PhoneNumber { get; }
         public string PostalAddress { get; }
@@ -13,14 +12,11 @@ namespace Icon.Models
         public Uri WebsiteLocator { get; }
 
         public ContactInformation(
-            Guid id,
             string phoneNumber,
             string postalAddress,
             string emailAddress,
-            Uri websiteLocator,
-            DateTime timestamp
+            Uri websiteLocator
             )
-          : base(id, timestamp)
         {
             PhoneNumber = phoneNumber;
             PostalAddress = postalAddress;
