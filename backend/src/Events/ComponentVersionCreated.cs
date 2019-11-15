@@ -1,4 +1,5 @@
 using Guid = System.Guid;
+using DateTime = System.DateTime;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
@@ -6,6 +7,7 @@ using Icon.Infrastructure.Command;
 using Icon.Infrastructure.Event;
 using Icon.Infrastructure.Aggregate;
 using Commands = Icon.Commands;
+using System.Collections.Generic;
 
 namespace Icon.Events
 {
@@ -14,13 +16,33 @@ namespace Icon.Events
     {
         public Guid ComponentVersionId { get; set; }
         public Guid ComponentId { get; set; }
+        public ComponentInformationEventData Information { get; }
 
         public ComponentVersionCreated() { }
 
-        public ComponentVersionCreated(Guid componentVersionId, Commands.CreateComponentVersion command) : base(command.CreatorId)
+        public ComponentVersionCreated(
+            Guid componentVersionId,
+            Guid componentId,
+            ComponentInformationEventData information,
+            Guid creatorId
+            )
+          : base(creatorId)
         {
             ComponentVersionId = componentVersionId;
-            ComponentId = command.ComponentId;
+            ComponentId = componentId;
+            Information = information;
         }
+
+        public ComponentVersionCreated(
+            Guid componentVersionId,
+            Commands.CreateComponentVersion command
+            )
+          : this(
+              componentVersionId: componentVersionId,
+              componentId: command.ComponentId,
+              information: new ComponentInformationEventData(command.Information),
+              creatorId: command.CreatorId
+              )
+      { }
     }
 }
