@@ -56,8 +56,9 @@ namespace Test.Integration.Web.Api.GraphQl
             EnsureErrors();
             EnsureNoData();
             EnsureNoOverflow();
-            foreach (var error in errors) {
-              error.EnsureNoOverflow();
+            foreach (var error in errors)
+            {
+                error.EnsureNoOverflow();
             }
             return this;
         }

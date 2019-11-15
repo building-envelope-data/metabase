@@ -40,23 +40,23 @@ namespace Test.Integration.Web.Api.GraphQl
         }
 
         public class Error : ResponseBase
-      {
-        public string message { get; set; }
-        public IReadOnlyList<Location> locations { get; set; }
-        public IReadOnlyList<string> path { get; set; }
-        public Extensions extensions { get; set; }
-
-        public class Location : ResponseBase
         {
-          public int line { get; set; }
-          public int column { get; set; }
-        }
+            public string message { get; set; }
+            public IReadOnlyList<Location> locations { get; set; }
+            public IReadOnlyList<string> path { get; set; }
+            public Extensions extensions { get; set; }
 
-        public class Extensions : ResponseBase
-        {
-          public string code { get; set; }
+            public class Location : ResponseBase
+            {
+                public int line { get; set; }
+                public int column { get; set; }
+            }
+
+            public class Extensions : ResponseBase
+            {
+                public string code { get; set; }
+            }
         }
-      }
 
         public class ComponentData : ResponseBase
         {
@@ -132,12 +132,14 @@ namespace Test.Integration.Web.Api.GraphQl
             var response =
               (await CreateComponent())
               .EnsureFailure();
-            foreach (var error in response.errors) {
-              error.EnsureNoOverflow();
-              error.extensions.EnsureNoOverflow();
-              foreach (var location in error.locations) {
-                location.EnsureNoOverflow();
-              }
+            foreach (var error in response.errors)
+            {
+                error.EnsureNoOverflow();
+                error.extensions.EnsureNoOverflow();
+                foreach (var location in error.locations)
+                {
+                    location.EnsureNoOverflow();
+                }
             }
             return response.errors;
         }

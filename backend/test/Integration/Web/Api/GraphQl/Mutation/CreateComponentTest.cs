@@ -23,10 +23,10 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
         [Fact]
         public async Task Anonymously()
         {
-          // Act
-          var errors = await Client.CreateComponentErroneously();
-          // Assert
-          errors[0].extensions.code.Should().Be("AUTH_NOT_AUTHENTICATED");
+            // Act
+            var errors = await Client.CreateComponentErroneously();
+            // Assert
+            errors[0].extensions.code.Should().Be("AUTH_NOT_AUTHENTICATED");
         }
 
 
