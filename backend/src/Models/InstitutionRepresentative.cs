@@ -3,22 +3,25 @@ using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
-    public sealed class ComponentVersionManufacturer
+    public sealed class InstitutionRepresentative
       : Model
     {
-        public Guid ComponentId { get; }
         public Guid InstitutionId { get; }
+        public Guid UserId { get; }
+        public InstitutionRepresentativeRole Role { get; }
 
-        public ComponentVersionManufacturer(
+        public InstitutionRepresentative(
             Guid id,
-            Guid componentId,
             Guid institutionId,
+            Guid userId,
+            InstitutionRepresentativeRole role,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
-            ComponentId = componentId;
             InstitutionId = institutionId;
+            UserId = userId;
+            Role = role;
         }
     }
 }

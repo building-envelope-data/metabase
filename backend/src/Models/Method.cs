@@ -1,23 +1,22 @@
+using System.Collections.Generic;
+using Uri = System.Uri;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
-    public sealed class ComponentVersion
+    public class Method
       : Model
     {
-        public Guid ComponentId { get; }
         public Guid InformationId { get; }
 
-        public ComponentVersion(
+        public Method(
             Guid id,
-            Guid componentId,
             Guid informationId,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
-            ComponentId = componentId;
             InformationId = informationId;
         }
     }

@@ -3,19 +3,14 @@ using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
-    public sealed class Component
+    public abstract class Stakeholder
       : Model
     {
-        public Guid InformationId { get; }
-
-        public Component(
+        public Stakeholder(
             Guid id,
-            Guid informationId,
             DateTime timestamp
             )
           : base(id, timestamp)
-        {
-            InformationId = informationId;
-        }
+        { }
     }
 }

@@ -3,22 +3,22 @@ using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
-    public sealed class ComponentVersion
+    public sealed class ComponentManufacturer
       : Model
     {
         public Guid ComponentId { get; }
-        public Guid InformationId { get; }
+        public Guid InstitutionId { get; }
 
-        public ComponentVersion(
+        public ComponentManufacturer(
             Guid id,
             Guid componentId,
-            Guid informationId,
+            Guid institutionId,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
             ComponentId = componentId;
-            InformationId = informationId;
+            InstitutionId = institutionId;
         }
     }
 }
