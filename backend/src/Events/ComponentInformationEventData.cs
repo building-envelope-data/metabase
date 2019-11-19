@@ -51,7 +51,6 @@ namespace Icon.Events
         public bool IsValid()
         {
             return Name != null &&
-              Abbreviation != null &&
               Description != null &&
               Categories != null;
         }
