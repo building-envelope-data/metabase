@@ -42,7 +42,9 @@ namespace Icon.Events
 
         public override bool IsValid()
         {
-            return ComponentId != Guid.Empty &&
+            return
+              base.IsValid() &&
+              ComponentId != Guid.Empty &&
               Information.IsValid();
         }
     }

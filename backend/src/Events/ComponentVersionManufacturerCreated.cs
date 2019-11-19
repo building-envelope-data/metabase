@@ -51,7 +51,9 @@ namespace Icon.Events
 
         public override bool IsValid()
         {
-            return ComponentVersionManufacturerId != Guid.Empty &&
+            return
+              base.IsValid() &&
+              ComponentVersionManufacturerId != Guid.Empty &&
               ComponentVersionId != Guid.Empty &&
               InstitutionId != Guid.Empty &&
               MarketingInformation.IsValid();
