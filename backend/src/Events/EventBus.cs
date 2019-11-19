@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Icon.Infrastructure.Event
+namespace Icon.Events
 {
     public class EventBus : IEventBus
     {

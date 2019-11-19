@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using Icon.Infrastructure.Event;
+using Icon.Events;
 using Newtonsoft.Json;
 
 namespace Icon.Infrastructure.Aggregate

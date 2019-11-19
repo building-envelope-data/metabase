@@ -1,7 +1,7 @@
 using MediatR;
 using Guid = System.Guid;
 
-namespace Icon.Infrastructure.Event
+namespace Icon.Events
 {
     public interface IEvent : INotification, IValidatable
     {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
 using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Event;
+using Icon.Events;
 using Icon.Infrastructure.Aggregate;
 using Commands = Icon.Commands;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Collections.Generic;
 namespace Icon.Events
 {
     public sealed class ComponentVersionCreated
-      : EventBase
+      : Event
     {
         public static ComponentVersionCreated From(
             Guid componentVersionId,

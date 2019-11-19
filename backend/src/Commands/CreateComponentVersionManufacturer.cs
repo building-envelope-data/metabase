@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
 using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Event;
+using Icon.Events;
 using Icon.Infrastructure.Aggregate;
 /* using DateInterval = NodaTime.DateInterval; */
 using DateTime = System.DateTime;

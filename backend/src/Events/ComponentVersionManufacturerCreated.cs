@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
 using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Event;
+using Icon.Events;
 using Icon.Infrastructure.Aggregate;
 using Commands = Icon.Commands;
 using DateTime = System.DateTime;
 
 namespace Icon.Events
 {
-    public sealed class ComponentVersionManufacturerCreated : EventBase
+    public sealed class ComponentVersionManufacturerCreated : Event
     {
         public static ComponentVersionManufacturerCreated From(
               Guid componentVersionManufacturerId,
