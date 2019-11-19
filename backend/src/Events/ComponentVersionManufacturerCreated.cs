@@ -47,6 +47,7 @@ namespace Icon.Events
             ComponentVersionId = componentVersionId;
             InstitutionId = institutionId;
             MarketingInformation = marketingInformation;
+            EnsureValid();
         }
 
         public override bool IsValid()

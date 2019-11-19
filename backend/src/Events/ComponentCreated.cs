@@ -38,6 +38,7 @@ namespace Icon.Events
         {
             ComponentId = componentId;
             Information = information;
+            EnsureValid();
         }
 
         public override bool IsValid()

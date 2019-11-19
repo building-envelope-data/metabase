@@ -44,6 +44,7 @@ namespace Icon.Events
             ComponentVersionId = componentVersionId;
             ComponentId = componentId;
             Information = information;
+            EnsureValid();
         }
 
         public override bool IsValid()

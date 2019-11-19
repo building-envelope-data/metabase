@@ -19,8 +19,10 @@ namespace Icon.Infrastructure.Aggregate
 
         protected EventSourcedAggregate() { }
 
-        protected void ApplyMeta(Marten.Events.IEvent @event)
+        protected void ApplyMeta<E>(Marten.Events.Event<E> @event)
+          where E : IEvent
         {
+            @event.Data.EnsureValid();
             Timestamp = @event.Timestamp.UtcDateTime;
             Version = @event.Version;
         }

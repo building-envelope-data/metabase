@@ -3,7 +3,7 @@ using Guid = System.Guid;
 
 namespace Icon.Events
 {
-    public abstract class Event : IEvent
+    public abstract class Event : Validatable, IEvent
     {
         public static void EnsureValid(IEnumerable<IEvent> events)
         {
@@ -22,7 +22,7 @@ namespace Icon.Events
             CreatorId = creatorId;
         }
 
-        public virtual bool IsValid()
+        public override bool IsValid()
         {
             return CreatorId != Guid.Empty;
         }

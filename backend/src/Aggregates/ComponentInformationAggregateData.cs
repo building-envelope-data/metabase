@@ -14,16 +14,16 @@ namespace Icon.Aggregates
             )
         {
             return new ComponentInformationAggregateData(
-            name: information.Name,
-            abbreviation: information.Abbreviation,
-            description: information.Description,
-            availableFrom: information.AvailableFrom,
-            availableUntil: information.AvailableUntil,
-            categories:
-              information.Categories
-              .Select(Events.ComponentCategoryEventDataExtensions.ToModel)
-              .ToList()
-              );
+                name: information.Name,
+                abbreviation: information.Abbreviation,
+                description: information.Description,
+                availableFrom: information.AvailableFrom,
+                availableUntil: information.AvailableUntil,
+                categories:
+                information.Categories
+                .Select(Events.ComponentCategoryEventDataExtensions.ToModel)
+                .ToList()
+                );
         }
 
         public string Name { get; set; }
