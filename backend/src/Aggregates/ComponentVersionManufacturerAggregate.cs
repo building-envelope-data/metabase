@@ -25,7 +25,7 @@ namespace Icon.Aggregates
             var data = @event.Data;
             Id = data.ComponentVersionManufacturerId;
             ComponentVersionId = data.ComponentVersionId;
-            MarketingInformation = new ComponentVersionManufacturerMarketingInformationAggregateData(data.MarketingInformation);
+            MarketingInformation = ComponentVersionManufacturerMarketingInformationAggregateData.From(data.MarketingInformation);
         }
 
         public Models.ComponentVersionManufacturer ToModel()

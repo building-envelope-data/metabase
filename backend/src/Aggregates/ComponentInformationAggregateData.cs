@@ -9,6 +9,23 @@ namespace Icon.Aggregates
 {
     public sealed class ComponentInformationAggregateData
     {
+        public static ComponentInformationAggregateData From(
+            Events.ComponentInformationEventData information
+            )
+        {
+            return new ComponentInformationAggregateData(
+            name: information.Name,
+            abbreviation: information.Abbreviation,
+            description: information.Description,
+            availableFrom: information.AvailableFrom,
+            availableUntil: information.AvailableUntil,
+            categories:
+              information.Categories
+              .Select(Events.ComponentCategoryEventDataExtensions.ToModel)
+              .ToList()
+              );
+        }
+
         public string Name { get; set; }
         public string Abbreviation { get; set; }
         public string Description { get; set; }
@@ -18,17 +35,21 @@ namespace Icon.Aggregates
 
         public ComponentInformationAggregateData() { }
 
-        public ComponentInformationAggregateData(Events.ComponentInformationEventData information)
+        public ComponentInformationAggregateData(
+            string name,
+            string abbreviation,
+            string description,
+            DateTime? availableFrom,
+            DateTime? availableUntil,
+            ICollection<Models.ComponentCategory> categories
+            )
         {
-            Name = information.Name;
-            Abbreviation = information.Abbreviation;
-            Description = information.Description;
-            AvailableFrom = information.AvailableFrom;
-            AvailableUntil = information.AvailableUntil;
-            Categories =
-              information.Categories
-              .Select(Events.ComponentCategoryEventDataExtensions.ToModel)
-              .ToList();
+            Name = name;
+            Abbreviation = abbreviation;
+            Description = description;
+            AvailableFrom = availableFrom;
+            AvailableUntil = availableUntil;
+            Categories = categories;
         }
 
         public Models.ComponentInformation ToModel()

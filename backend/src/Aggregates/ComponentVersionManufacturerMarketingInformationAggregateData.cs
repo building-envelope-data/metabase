@@ -6,15 +6,28 @@ namespace Icon.Aggregates
 {
     public sealed class ComponentVersionManufacturerMarketingInformationAggregateData
     {
+        public static ComponentVersionManufacturerMarketingInformationAggregateData From(
+            Events.ComponentVersionManufacturerMarketingInformationEventData information
+            )
+        {
+            return new ComponentVersionManufacturerMarketingInformationAggregateData(
+                componentVersionInformation: ComponentInformationAggregateData.From(information.ComponentVersionInformation),
+                institutionInformation: InstitutionInformationAggregateData.From(information.InstitutionInformation)
+            );
+        }
+
         public ComponentInformationAggregateData ComponentVersionInformation { get; set; }
         public InstitutionInformationAggregateData InstitutionInformation { get; set; }
 
         public ComponentVersionManufacturerMarketingInformationAggregateData() { }
 
-        public ComponentVersionManufacturerMarketingInformationAggregateData(Events.ComponentVersionManufacturerMarketingInformationEventData information)
+        public ComponentVersionManufacturerMarketingInformationAggregateData(
+                ComponentInformationAggregateData componentVersionInformation,
+                InstitutionInformationAggregateData institutionInformation
+            )
         {
-            ComponentVersionInformation = new ComponentInformationAggregateData(information.ComponentVersionInformation);
-            InstitutionInformation = new InstitutionInformationAggregateData(information.InstitutionInformation);
+            ComponentVersionInformation = componentVersionInformation;
+            InstitutionInformation = institutionInformation;
         }
 
         public Models.ComponentVersionManufacturerMarketingInformation ToModel()

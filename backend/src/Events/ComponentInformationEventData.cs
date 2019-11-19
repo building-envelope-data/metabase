@@ -27,7 +27,7 @@ namespace Icon.Events
         public string Description { get; set; }
         public DateTime? AvailableFrom { get; set; }
         public DateTime? AvailableUntil { get; set; }
-        public IReadOnlyList<ComponentCategoryEventData> Categories { get; set; }
+        public IReadOnlyCollection<ComponentCategoryEventData> Categories { get; set; }
 
         public ComponentInformationEventData() { }
 
@@ -37,7 +37,7 @@ namespace Icon.Events
             string description,
             DateTime? availableFrom,
             DateTime? availableUntil,
-            IReadOnlyList<ComponentCategoryEventData> categories
+            IReadOnlyCollection<ComponentCategoryEventData> categories
             )
         {
             Name = name;

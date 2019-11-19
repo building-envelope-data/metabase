@@ -7,6 +7,18 @@ namespace Icon.Aggregates
 {
     public sealed class InstitutionInformationAggregateData
     {
+        public static InstitutionInformationAggregateData From(
+            Events.InstitutionInformationEventData information
+            )
+        {
+            return new InstitutionInformationAggregateData(
+                name: information.Name,
+                abbreviation: information.Abbreviation,
+                description: information.Description,
+                websiteLocator: information.WebsiteLocator
+                );
+        }
+
         public string Name { get; set; }
         public string Abbreviation { get; set; }
         public string Description { get; set; }
@@ -14,12 +26,17 @@ namespace Icon.Aggregates
 
         public InstitutionInformationAggregateData() { }
 
-        public InstitutionInformationAggregateData(Events.InstitutionInformationEventData information)
+        public InstitutionInformationAggregateData(
+            string name,
+            string abbreviation,
+            string description,
+            Uri websiteLocator
+            )
         {
-            Name = information.Name;
-            Abbreviation = information.Abbreviation;
-            Description = information.Description;
-            WebsiteLocator = information.WebsiteLocator;
+            Name = name;
+            Abbreviation = abbreviation;
+            Description = description;
+            WebsiteLocator = websiteLocator;
         }
 
         public Models.InstitutionInformation ToModel()

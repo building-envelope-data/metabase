@@ -22,7 +22,7 @@ namespace Icon.Aggregates
             var data = @event.Data;
             Id = data.ComponentVersionId;
             ComponentId = data.ComponentId;
-            Information = new ComponentInformationAggregateData(data.Information);
+            Information = ComponentInformationAggregateData.From(data.Information);
         }
 
         public Models.ComponentVersion ToModel()

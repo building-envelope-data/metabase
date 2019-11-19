@@ -18,7 +18,7 @@ namespace Icon.Aggregates
             ApplyMeta(@event);
             var data = @event.Data;
             Id = data.ComponentId;
-            Information = new ComponentInformationAggregateData(data.Information);
+            Information = ComponentInformationAggregateData.From(data.Information);
         }
 
         public Models.Component ToModel()
