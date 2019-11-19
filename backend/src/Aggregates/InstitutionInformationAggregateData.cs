@@ -16,20 +16,20 @@ namespace Icon.Aggregates
 
         public InstitutionInformationAggregateData(Events.InstitutionInformationEventData information)
         {
-          Name = information.Name;
-          Abbreviation = information.Abbreviation;
-          Description = information.Description;
-          WebsiteLocator = information.WebsiteLocator;
+            Name = information.Name;
+            Abbreviation = information.Abbreviation;
+            Description = information.Description;
+            WebsiteLocator = information.WebsiteLocator;
         }
 
         public Models.InstitutionInformation ToModel()
         {
-          return new Models.InstitutionInformation(
-              name: Name,
-              abbreviation: Abbreviation,
-              description: Description,
-              websiteLocator: WebsiteLocator
-              );
+            return new Models.InstitutionInformation(
+                name: Name,
+                abbreviation: Abbreviation,
+                description: Description,
+                websiteLocator: WebsiteLocator
+                );
         }
     }
 }

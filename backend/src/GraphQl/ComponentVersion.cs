@@ -12,13 +12,13 @@ namespace Icon.GraphQl
             DateTime requestTimestamp
             )
         {
-          return new ComponentVersion(
-              model.Id,
-              componentId: model.ComponentId,
-              information: ComponentInformation.FromModel(model.Information),
-              timestamp: model.Timestamp,
-              requestTimestamp: requestTimestamp
-              );
+            return new ComponentVersion(
+                model.Id,
+                componentId: model.ComponentId,
+                information: ComponentInformation.FromModel(model.Information),
+                timestamp: model.Timestamp,
+                requestTimestamp: requestTimestamp
+                );
         }
 
         public Guid ComponentId { get; set; }
@@ -38,9 +38,9 @@ namespace Icon.GraphQl
               timestamp: timestamp,
               requestTimestamp: requestTimestamp
               )
-      {
-        ComponentId = componentId;
-        Information = information;
-      }
+        {
+            ComponentId = componentId;
+            Information = information;
+        }
     }
 }

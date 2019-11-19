@@ -14,6 +14,19 @@ namespace Icon.Events
     public sealed class ComponentVersionCreated
       : EventBase
     {
+        public static ComponentVersionCreated From(
+            Guid componentVersionId,
+            Commands.CreateComponentVersion command
+            )
+        {
+            return new ComponentVersionCreated(
+                  componentVersionId: componentVersionId,
+                  componentId: command.ComponentId,
+                  information: ComponentInformationEventData.From(command.Information),
+                  creatorId: command.CreatorId
+                );
+        }
+
         public Guid ComponentVersionId { get; set; }
         public Guid ComponentId { get; set; }
         public ComponentInformationEventData Information { get; }
@@ -33,16 +46,11 @@ namespace Icon.Events
             Information = information;
         }
 
-        public ComponentVersionCreated(
-            Guid componentVersionId,
-            Commands.CreateComponentVersion command
-            )
-          : this(
-              componentVersionId: componentVersionId,
-              componentId: command.ComponentId,
-              information: new ComponentInformationEventData(command.Information),
-              creatorId: command.CreatorId
-              )
-      { }
+        public override bool IsValid()
+        {
+            return ComponentVersionId != Guid.Empty &&
+              ComponentId != Guid.Empty &&
+              Information.IsValid();
+        }
     }
 }

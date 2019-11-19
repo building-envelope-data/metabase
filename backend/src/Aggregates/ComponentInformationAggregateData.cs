@@ -20,27 +20,27 @@ namespace Icon.Aggregates
 
         public ComponentInformationAggregateData(Events.ComponentInformationEventData information)
         {
-          Name = information.Name;
-          Abbreviation = information.Abbreviation;
-          Description = information.Description;
-          AvailableFrom = information.AvailableFrom;
-          AvailableUntil = information.AvailableUntil;
-          Categories =
-            information.Categories
-            .Select(Events.ComponentCategoryEventDataExtensions.ToModel)
-            .ToList();
+            Name = information.Name;
+            Abbreviation = information.Abbreviation;
+            Description = information.Description;
+            AvailableFrom = information.AvailableFrom;
+            AvailableUntil = information.AvailableUntil;
+            Categories =
+              information.Categories
+              .Select(Events.ComponentCategoryEventDataExtensions.ToModel)
+              .ToList();
         }
 
         public Models.ComponentInformation ToModel()
         {
-              return new Models.ComponentInformation(
-                    name: Name,
-                    abbreviation: Abbreviation,
-                    description: Description,
-                    availableFrom: AvailableFrom,
-                    availableUntil: AvailableUntil,
-                    categories: Categories
-                  );
+            return new Models.ComponentInformation(
+                  name: Name,
+                  abbreviation: Abbreviation,
+                  description: Description,
+                  availableFrom: AvailableFrom,
+                  availableUntil: AvailableUntil,
+                  categories: Categories
+                );
         }
     }
 }

@@ -11,17 +11,18 @@ namespace Icon.Aggregates
 
         public ComponentVersionManufacturerMarketingInformationAggregateData() { }
 
-        public ComponentVersionManufacturerMarketingInformationAggregateData(Events.ComponentVersionManufacturerMarketingInformationEventData information) {
+        public ComponentVersionManufacturerMarketingInformationAggregateData(Events.ComponentVersionManufacturerMarketingInformationEventData information)
+        {
             ComponentVersionInformation = new ComponentInformationAggregateData(information.ComponentVersionInformation);
             InstitutionInformation = new InstitutionInformationAggregateData(information.InstitutionInformation);
         }
 
         public Models.ComponentVersionManufacturerMarketingInformation ToModel()
         {
-          return new Models.ComponentVersionManufacturerMarketingInformation(
-              componentVersionInformation: ComponentVersionInformation.ToModel(),
-              institutionInformation: InstitutionInformation.ToModel()
-              );
+            return new Models.ComponentVersionManufacturerMarketingInformation(
+                componentVersionInformation: ComponentVersionInformation.ToModel(),
+                institutionInformation: InstitutionInformation.ToModel()
+                );
         }
     }
 }

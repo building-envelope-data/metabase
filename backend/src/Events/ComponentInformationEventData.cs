@@ -8,12 +8,26 @@ namespace Icon.Events
 {
     public sealed class ComponentInformationEventData
     {
+        public static ComponentInformationEventData From(
+            Models.ComponentInformation information
+            )
+        {
+            return new ComponentInformationEventData(
+                  name: information.Name,
+                  abbreviation: information.Abbreviation,
+                  description: information.Description,
+                  availableFrom: information.AvailableFrom,
+                  availableUntil: information.AvailableUntil,
+                  categories: information.Categories.Select(c => c.FromModel()).ToList()
+                );
+        }
+
         public string Name { get; set; }
         public string Abbreviation { get; set; }
         public string Description { get; set; }
         public DateTime? AvailableFrom { get; set; }
         public DateTime? AvailableUntil { get; set; }
-        public IEnumerable<ComponentCategoryEventData> Categories { get; set; }
+        public IReadOnlyList<ComponentCategoryEventData> Categories { get; set; }
 
         public ComponentInformationEventData() { }
 
@@ -23,7 +37,7 @@ namespace Icon.Events
             string description,
             DateTime? availableFrom,
             DateTime? availableUntil,
-            IEnumerable<ComponentCategoryEventData> categories
+            IReadOnlyList<ComponentCategoryEventData> categories
             )
         {
             Name = name;
@@ -34,15 +48,12 @@ namespace Icon.Events
             Categories = categories;
         }
 
-        public ComponentInformationEventData(Models.ComponentInformation information)
-          : this(
-              name: information.Name,
-              abbreviation: information.Abbreviation,
-              description: information.Description,
-              availableFrom: information.AvailableFrom,
-              availableUntil: information.AvailableUntil,
-              categories: information.Categories.Select(c => c.FromModel()).ToList()
-              )
-          { }
+        public bool IsValid()
+        {
+            return Name != null &&
+              Abbreviation != null &&
+              Description != null &&
+              Categories != null;
+        }
     }
 }

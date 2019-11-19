@@ -32,8 +32,11 @@ namespace Icon.Handlers
             using (var session = _repository.OpenSession())
             {
                 var id = await session.GenerateNewId(cancellationToken);
-                var @event = new Events.ComponentVersionManufacturerCreated(id, command);
-                return await session.Store<Aggregates.ComponentVersionManufacturerAggregate>(id, 1, @event, cancellationToken);
+                var @event = Events.ComponentVersionManufacturerCreated.From(id, command);
+                return
+                  await session.Store<Aggregates.ComponentVersionManufacturerAggregate>(
+                      id, 1, @event, cancellationToken
+                      );
             }
         }
     }

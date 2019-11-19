@@ -12,5 +12,7 @@ namespace Icon.Infrastructure.Event
         {
             CreatorId = creatorId;
         }
+
+        public abstract bool IsValid();
     }
 }

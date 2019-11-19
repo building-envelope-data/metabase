@@ -13,6 +13,20 @@ namespace Icon.Events
 {
     public sealed class ComponentVersionManufacturerCreated : EventBase
     {
+        public static ComponentVersionManufacturerCreated From(
+              Guid componentVersionManufacturerId,
+              Commands.CreateComponentVersionManufacturer command
+            )
+        {
+            return new ComponentVersionManufacturerCreated(
+                componentVersionManufacturerId: componentVersionManufacturerId,
+                componentVersionId: command.ComponentVersionId,
+                institutionId: command.InstitutionId,
+                marketingInformation: ComponentVersionManufacturerMarketingInformationEventData.From(command.MarketingInformation),
+                creatorId: command.CreatorId
+                );
+        }
+
         public Guid ComponentVersionManufacturerId { get; set; }
         public Guid ComponentVersionId { get; set; }
         public Guid InstitutionId { get; set; }
@@ -35,17 +49,12 @@ namespace Icon.Events
             MarketingInformation = marketingInformation;
         }
 
-        public ComponentVersionManufacturerCreated(
-            Guid componentVersionManufacturerId,
-            Commands.CreateComponentVersionManufacturer command
-            )
-          : this(
-              componentVersionManufacturerId: componentVersionManufacturerId,
-              componentVersionId: command.ComponentVersionId,
-              institutionId: command.InstitutionId,
-              marketingInformation: new ComponentVersionManufacturerMarketingInformationEventData(command.MarketingInformation),
-              creatorId: command.CreatorId
-              )
-      { }
+        public override bool IsValid()
+        {
+            return ComponentVersionManufacturerId != Guid.Empty &&
+              ComponentVersionId != Guid.Empty &&
+              InstitutionId != Guid.Empty &&
+              MarketingInformation.IsValid();
+        }
     }
 }

@@ -11,14 +11,14 @@ namespace Icon.GraphQl
             Models.ComponentInformation model
             )
         {
-          return new ComponentInformation(
-              name: model.Name,
-              abbreviation: model.Abbreviation,
-              description: model.Description,
-              availableFrom: model.AvailableFrom,
-              availableUntil: model.AvailableUntil,
-              categories: model.Categories
-              );
+            return new ComponentInformation(
+                name: model.Name,
+                abbreviation: model.Abbreviation,
+                description: model.Description,
+                availableFrom: model.AvailableFrom,
+                availableUntil: model.AvailableUntil,
+                categories: model.Categories
+                );
         }
 
         public string Name { get; set; }
@@ -39,12 +39,12 @@ namespace Icon.GraphQl
             IEnumerable<Models.ComponentCategory> categories
             )
         {
-          Name = name;
-          Abbreviation = abbreviation;
-          Description = description;
-          AvailableFrom = availableFrom;
-          AvailableUntil = availableUntil;
-          Categories = categories;
+            Name = name;
+            Abbreviation = abbreviation;
+            Description = description;
+            AvailableFrom = availableFrom;
+            AvailableUntil = availableUntil;
+            Categories = categories;
         }
     }
 }

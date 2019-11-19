@@ -22,8 +22,9 @@ namespace Icon.Commands
             Models.ComponentInformation information,
             Guid creatorId
             )
-          : base(creatorId) {
+          : base(creatorId)
+        {
             Information = information;
-          }
+        }
     }
 }
