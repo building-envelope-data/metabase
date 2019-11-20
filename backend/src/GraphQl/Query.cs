@@ -51,7 +51,7 @@ namespace Icon.GraphQl
             )
         {
             var requestTimestamp = HandleTimestamp(timestamp, resolverContext);
-            return componentLoader.LoadAsync((id, requestTimestamp));
+            return componentLoader.LoadAsync((id.NotEmpty(), requestTimestamp));
             /* return */
             /*   Component.FromModel( */
             /*       (await _queryBus */
@@ -71,7 +71,7 @@ namespace Icon.GraphQl
         /*             Timestamp = timestamp, */
         /*         } */
         /*         ); */
-        /*     if (component == null) */
+        /*     if (component is null) */
         /*     { */
         /*         return NotFound(); */
         /*     } */

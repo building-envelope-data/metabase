@@ -33,10 +33,9 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
         public async Task Empty()
         {
             // Act
-            var response = await Client.GetComponents();
+            var components = await Client.GetComponentsSuccessfully();
             // Assert
-            response.data.components
-              .Should().BeEmpty();
+            components.Should().BeEmpty();
         }
 
         [Fact]

@@ -8,36 +8,37 @@ using Events = Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class ComponentInformationAggregateData
+      : Validatable
     {
         public static ComponentInformationAggregateData From(
             Events.ComponentInformationEventData information
             )
         {
             return new ComponentInformationAggregateData(
-                name: information.Name,
+                name: information.Name.NotNull(),
                 abbreviation: information.Abbreviation,
-                description: information.Description,
+                description: information.Description.NotNull(),
                 availableFrom: information.AvailableFrom,
                 availableUntil: information.AvailableUntil,
                 categories:
-                information.Categories
+                information.Categories.NotNull()
                 .Select(Events.ComponentCategoryEventDataExtensions.ToModel)
                 .ToList()
                 );
         }
 
-        public string Name { get; set; }
-        public string Abbreviation { get; set; }
-        public string Description { get; set; }
+        public string? Name { get; set; }
+        public string? Abbreviation { get; set; }
+        public string? Description { get; set; }
         public DateTime? AvailableFrom { get; set; }
         public DateTime? AvailableUntil { get; set; }
-        public ICollection<Models.ComponentCategory> Categories { get; set; }
+        public ICollection<Models.ComponentCategory>? Categories { get; set; }
 
         public ComponentInformationAggregateData() { }
 
         public ComponentInformationAggregateData(
             string name,
-            string abbreviation,
+            string? abbreviation,
             string description,
             DateTime? availableFrom,
             DateTime? availableUntil,
@@ -52,15 +53,23 @@ namespace Icon.Aggregates
             Categories = categories;
         }
 
+        public override bool IsValid()
+        {
+            return
+              !(Name is null) &&
+              !(Description is null) &&
+              !(Categories is null);
+        }
+
         public Models.ComponentInformation ToModel()
         {
             return new Models.ComponentInformation(
-                  name: Name,
+                  name: Name.NotNull(),
                   abbreviation: Abbreviation,
-                  description: Description,
+                  description: Description.NotNull(),
                   availableFrom: AvailableFrom,
                   availableUntil: AvailableUntil,
-                  categories: Categories
+                  categories: Categories.NotNull()
                 );
         }
     }

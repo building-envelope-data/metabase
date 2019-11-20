@@ -2,7 +2,6 @@ using Exception = System.Exception;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 
-#nullable enable
 namespace Icon.Events
 {
     public enum ComponentCategoryEventData

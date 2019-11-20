@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
     <UserSecretsId>31666837686487542159</UserSecretsId>
     <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
-    <LangVersion>8.0</LangVersion>
     <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
-    <!-- <Nullable>enable</Nullable> -->
-    <!-- <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild> -->
-    <!-- <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis> -->
+    <Nullable>enable</Nullable>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
   <ItemGroup>

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Icon.Infrastructure.Aggregate
 {
-    public abstract class EventSourcedAggregate : IEventSourcedAggregate
+    public abstract class EventSourcedAggregate : Validatable, IEventSourcedAggregate
     {
         // For indexing our event streams
         public Guid Id { get; set; }
@@ -17,7 +17,11 @@ namespace Icon.Infrastructure.Aggregate
         // For protecting the state, i.e. conflict prevention
         public int Version { get; set; }
 
-        protected EventSourcedAggregate() { }
+        protected EventSourcedAggregate() {
+          Id = Guid.Empty;
+          Timestamp = DateTime.MinValue;
+          Version = 0;
+        }
 
         protected void ApplyMeta<E>(Marten.Events.Event<E> @event)
           where E : IEvent
@@ -25,6 +29,23 @@ namespace Icon.Infrastructure.Aggregate
             @event.Data.EnsureValid();
             Timestamp = @event.Timestamp.UtcDateTime;
             Version = @event.Version;
+        }
+
+        public bool IsVirgin()
+        {
+            return
+               Id == Guid.Empty &&
+               Timestamp == DateTime.MinValue &&
+               Version is 0;
+        }
+
+        public override bool IsValid()
+        {
+            return IsVirgin() || (
+               Id != Guid.Empty &&
+               Timestamp != DateTime.MinValue &&
+               !(Version is 0)
+               );
         }
     }
 }

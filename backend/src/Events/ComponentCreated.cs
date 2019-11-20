@@ -1,3 +1,4 @@
+using Icon;
 using Guid = System.Guid;
 using System.Collections.Generic;
 using DateTime = System.DateTime;
@@ -25,9 +26,11 @@ namespace Icon.Events
         }
 
         public Guid ComponentId { get; set; }
-        public ComponentInformationEventData Information { get; set; }
+        public ComponentInformationEventData? Information { get; set; }
 
-        public ComponentCreated() { }
+        public ComponentCreated() {
+          ComponentId = Guid.Empty;
+        }
 
         public ComponentCreated(
             Guid componentId,
@@ -46,7 +49,7 @@ namespace Icon.Events
             return
               base.IsValid() &&
               ComponentId != Guid.Empty &&
-              Information.IsValid();
+              (Information?.IsValid() ?? false);
         }
     }
 }

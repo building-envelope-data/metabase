@@ -76,7 +76,7 @@ namespace Icon
 
         private string GetMigrationsAssembly()
         {
-            return typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            return typeof(Startup).GetTypeInfo().Assembly.GetName().Name.NotNull();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

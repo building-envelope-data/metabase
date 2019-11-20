@@ -1,6 +1,7 @@
 // Inspired by https://chillicream.com/blog/2019/04/11/integration-tests
 // TODO When mature, use the client https://github.com/ChilliCream/hotchocolate/issues/1011
 
+using Icon;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -26,9 +27,8 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
             // Act
             var errors = await Client.CreateComponentErroneously();
             // Assert
-            errors[0].extensions.code.Should().Be("AUTH_NOT_AUTHENTICATED");
+            errors[0]?.extensions?.code?.Should().Be("AUTH_NOT_AUTHENTICATED");
         }
-
 
         [Fact]
         public async Task Authorized()

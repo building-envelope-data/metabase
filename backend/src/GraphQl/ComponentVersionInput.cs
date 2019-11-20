@@ -8,13 +8,15 @@ namespace Icon.GraphQl
     public sealed class ComponentVersionInput
     {
         public Guid ComponentId { get; set; }
-        public string Name { get; set; }
-        public string Abbreviation { get; set; }
-        public string Description { get; set; }
-        public DateTime AvailableFrom { get; set; }
-        public DateTime AvailableUntil { get; set; }
-        public IEnumerable<Models.ComponentCategory> Categories { get; set; }
+        public string? Name { get; set; }
+        public string? Abbreviation { get; set; }
+        public string? Description { get; set; }
+        public DateTime? AvailableFrom { get; set; }
+        public DateTime? AvailableUntil { get; set; }
+        public IReadOnlyCollection<Models.ComponentCategory>? Categories { get; set; }
 
-        public ComponentVersionInput() { }
+        public ComponentVersionInput() {
+            ComponentId = Guid.Empty;
+        }
     }
 }

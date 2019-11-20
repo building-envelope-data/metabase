@@ -10,7 +10,6 @@ using Models = Icon.Models;
 using IError = HotChocolate.IError;
 using CSharpFunctionalExtensions;
 
-#nullable enable
 namespace Icon.Commands
 {
     public sealed class CreateComponent

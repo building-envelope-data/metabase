@@ -1,3 +1,4 @@
+using Icon;
 using System;
 using System.Collections.Generic;
 using Icon.Infrastructure.Aggregate;
@@ -12,7 +13,7 @@ namespace Icon.Aggregates
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; set; }
 
-        public ComponentInformationAggregateData Information { get; set; }
+        public ComponentInformationAggregateData? Information { get; set; }
 
         public ComponentVersionAggregate() { }
 
@@ -20,17 +21,31 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.ComponentVersionId;
-            ComponentId = data.ComponentId;
-            Information = ComponentInformationAggregateData.From(data.Information);
+            Id = data.ComponentVersionId.NotEmpty();
+            ComponentId = data.ComponentId.NotEmpty();
+            Information = ComponentInformationAggregateData.From(data.Information.NotNull());
+        }
+
+        public override bool IsValid()
+        {
+            return base.IsValid() && (
+                IsVirgin() &&
+                ComponentId == Guid.Empty &&
+                Information is null
+                ) || (
+                  !IsVirgin() &&
+                  ComponentId != Guid.Empty &&
+                  (Information?.IsValid() ?? false)
+                  );
         }
 
         public Models.ComponentVersion ToModel()
         {
+            EnsureValid();
             return new Models.ComponentVersion(
               id: Id,
               componentId: ComponentId,
-              information: Information.ToModel(),
+              information: Information.NotNull().ToModel(),
               timestamp: Timestamp
             );
         }

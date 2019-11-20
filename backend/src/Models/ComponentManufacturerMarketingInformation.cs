@@ -1,19 +1,18 @@
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 
-#nullable enable
 namespace Icon.Models
 {
     public sealed class ComponentManufacturerMarketingInformation
     {
         public Guid ComponentManufacturerId { get; }
-        public ComponentInformation ComponentInformation { get; }
-        public InstitutionInformation InstitutionInformation { get; }
+        public ComponentInformation? ComponentInformation { get; }
+        public InstitutionInformation? InstitutionInformation { get; }
 
         public ComponentManufacturerMarketingInformation(
             Guid componentManufacturerId,
-            ComponentInformation componentInformation,
-            InstitutionInformation institutionInformation
+            ComponentInformation? componentInformation,
+            InstitutionInformation? institutionInformation
             )
         {
             ComponentManufacturerId = componentManufacturerId;

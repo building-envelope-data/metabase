@@ -37,12 +37,12 @@ namespace Icon.GraphQl
             var command =
               new Commands.CreateComponent(
                   information: new Models.ComponentInformation(
-                    name: input.Name,
+                    name: input.Name.NotNull(),
                     abbreviation: input.Abbreviation,
-                    description: input.Description,
+                    description: input.Description.NotNull(),
                     availableFrom: input.AvailableFrom,
                     availableUntil: input.AvailableUntil,
-                    categories: input.Categories
+                    categories: input.Categories.NotNull()
                     ),
                     creatorId: Guid.NewGuid() // TODO Use current user!
                   );
@@ -74,14 +74,14 @@ namespace Icon.GraphQl
         {
             var command =
               new Commands.CreateComponentVersion(
-                  input.ComponentId,
+                  componentId: input.ComponentId.NotEmpty(),
                   information: new Models.ComponentInformation(
-                    name: input.Name,
+                    name: input.Name.NotNull(),
                     abbreviation: input.Abbreviation,
-                    description: input.Description,
+                    description: input.Description.NotNull(),
                     availableFrom: input.AvailableFrom,
                     availableUntil: input.AvailableUntil,
-                    categories: input.Categories
+                    categories: input.Categories.NotNull()
                     ),
                     creatorId: Guid.NewGuid() // TODO Use current user!
                   );

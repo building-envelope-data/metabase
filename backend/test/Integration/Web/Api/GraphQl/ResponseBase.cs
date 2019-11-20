@@ -7,7 +7,10 @@ namespace Test.Integration.Web.Api.GraphQl
 {
     public abstract class ResponseBase
     {
-        public static IEnumerable<T> EnsureNoOverflow<T>(IEnumerable<T> responses) where T : ResponseBase
+        public static IEnumerable<T> EnsureNoOverflow<T>(
+            IEnumerable<T> responses
+            )
+          where T : ResponseBase
         {
             foreach (var response in responses)
             {
@@ -18,9 +21,9 @@ namespace Test.Integration.Web.Api.GraphQl
 
         // https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-how-to#handle-overflow-json
         [JsonExtensionDataAttribute]
-        public Dictionary<string, JsonElement> OverflowData { get; set; }
+        public Dictionary<string, JsonElement>? OverflowData { get; set; }
 
-        public void EnsureNoOverflow()
+        public virtual void EnsureNoOverflow()
         {
             if (OverflowData != null && OverflowData.Count != 0)
             {

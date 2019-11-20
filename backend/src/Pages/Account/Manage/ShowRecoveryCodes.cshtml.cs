@@ -20,7 +20,7 @@ namespace Icon.Pages.Account.Manage
 
         public IActionResult OnGet()
         {
-            if (RecoveryCodes == null || RecoveryCodes.Length == 0)
+            if (RecoveryCodes is null || RecoveryCodes.Length == 0)
             {
                 return RedirectToPage("./TwoFactorAuthentication");
             }

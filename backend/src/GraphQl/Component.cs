@@ -13,14 +13,14 @@ namespace Icon.GraphQl
             )
         {
             return new Component(
-                model.Id,
+                id: model.Id,
                 information: ComponentInformation.FromModel(model.Information),
                 timestamp: model.Timestamp,
                 requestTimestamp: requestTimestamp
                 );
         }
 
-        public ComponentInformation Information { get; set; }
+        public ComponentInformation? Information { get; set; }
 
         public Component() { }
 

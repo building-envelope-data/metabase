@@ -30,13 +30,13 @@ namespace Icon.Pages.Account
 
         public async Task<IActionResult> OnGetAsync(string email)
         {
-            if (email == null)
+            if (email is null)
             {
                 return RedirectToPage("/Index");
             }
 
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            if (user is null)
             {
                 return NotFound($"Unable to load user with email '{email}'.");
             }

@@ -1,6 +1,5 @@
 using Guid = System.Guid;
 
-#nullable enable
 namespace Icon.Infrastructure.Command
 {
     public abstract class CommandBase<TResponse> : ICommand<TResponse>

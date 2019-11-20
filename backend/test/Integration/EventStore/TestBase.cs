@@ -17,11 +17,7 @@ namespace Test.Integration.EventStore
         protected string SchemaName { get; }
         protected IDocumentSession Session { get; }
 
-        protected TestBase() : this(true)
-        {
-        }
-
-        protected TestBase(bool shouldCreateSession)
+        protected TestBase()
         {
             var appSettings = new ConfigurationBuilder()
               .AddJsonFile("appsettings.json", optional: false)
@@ -30,13 +26,10 @@ namespace Test.Integration.EventStore
               .Get<AppSettings>();
             ConnectionString = appSettings.Database.ConnectionString;
             SchemaName = appSettings.Database.SchemaName.EventStore + Guid.NewGuid().ToString().Replace("-", "_");
-            if (shouldCreateSession)
-            {
-                Session = CreateSession();
-            }
+            Session = CreateSession();
         }
 
-        protected virtual IDocumentSession CreateSession(Action<StoreOptions> setStoreOptions = null)
+        protected virtual IDocumentSession CreateSession(Action<StoreOptions>? setStoreOptions = null)
         {
             return DocumentStore.For(_ =>
             {
@@ -51,7 +44,7 @@ namespace Test.Integration.EventStore
                 _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionAggregate>();
                 _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionManufacturerAggregate>();
 
-                if (setStoreOptions != null)
+                if (!(setStoreOptions is null))
                 {
                     setStoreOptions(_);
                 }

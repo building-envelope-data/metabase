@@ -106,7 +106,7 @@ namespace Icon.Infrastructure.Aggregate
                   timestamp: timestamp,
                   token: cancellationToken
                   );
-            if (aggregate == null)
+            if (aggregate is null)
             {
                 return Result.Failure<int, IError>(BuildNonExistentModelError(id));
             }
@@ -124,7 +124,7 @@ namespace Icon.Infrastructure.Aggregate
                   id,
                   token: cancellationToken
                   );
-            if (streamState == null)
+            if (streamState is null)
             {
                 return Result.Failure<DateTime, IError>(BuildNonExistentModelError(id));
             }
@@ -215,7 +215,7 @@ namespace Icon.Infrastructure.Aggregate
         private Result<T, IError> BuildResult<T>(Guid id, T aggregate)
           where T : class, IEventSourcedAggregate, new()
         {
-            if (aggregate == null || aggregate.Version == 0)
+            if (aggregate is null || aggregate.Version == 0)
             {
                 return Result.Failure<T, IError>(BuildNonExistentModelError(id));
             }

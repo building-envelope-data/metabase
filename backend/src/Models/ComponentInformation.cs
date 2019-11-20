@@ -3,7 +3,6 @@ using Guid = System.Guid;
 using DateTime = System.DateTime;
 /* using DateInterval = NodaTime.DateInterval; */
 
-#nullable enable
 namespace Icon.Models
 {
     public sealed class ComponentInformation

@@ -1,5 +1,6 @@
 // Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
 
+using Icon;
 using System;
 using System.Collections.Generic;
 using Icon.Infrastructure.Aggregate;
@@ -7,9 +8,10 @@ using Events = Icon.Events;
 
 namespace Icon.Aggregates
 {
-    public sealed class ComponentAggregate : EventSourcedAggregate
+    public sealed class ComponentAggregate
+      : EventSourcedAggregate
     {
-        public ComponentInformationAggregateData Information { get; set; }
+        public ComponentInformationAggregateData? Information { get; set; }
 
         public ComponentAggregate() { }
 
@@ -17,15 +19,26 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.ComponentId;
-            Information = ComponentInformationAggregateData.From(data.Information);
+            Id = data.ComponentId.NotEmpty();
+            Information = ComponentInformationAggregateData.From(data.Information.NotNull());
+        }
+
+        public override bool IsValid()
+        {
+            return base.IsValid() && (
+                IsVirgin()
+                ) || (
+                  !IsVirgin() &&
+                  (Information?.IsValid() ?? false)
+                  );
         }
 
         public Models.Component ToModel()
         {
+            EnsureValid();
             return new Models.Component(
                 id: Id,
-                information: Information.ToModel(),
+                information: Information.NotNull().ToModel(),
                 timestamp: Timestamp
                 );
         }

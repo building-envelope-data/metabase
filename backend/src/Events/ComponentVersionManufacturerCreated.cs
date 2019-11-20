@@ -22,7 +22,7 @@ namespace Icon.Events
                 componentVersionManufacturerId: componentVersionManufacturerId,
                 componentVersionId: command.ComponentVersionId,
                 institutionId: command.InstitutionId,
-                marketingInformation: ComponentVersionManufacturerMarketingInformationEventData.From(command.MarketingInformation),
+                marketingInformation: command.MarketingInformation is null ? null : ComponentVersionManufacturerMarketingInformationEventData.From(command.MarketingInformation.NotNull()),
                 creatorId: command.CreatorId
                 );
         }
@@ -30,15 +30,19 @@ namespace Icon.Events
         public Guid ComponentVersionManufacturerId { get; set; }
         public Guid ComponentVersionId { get; set; }
         public Guid InstitutionId { get; set; }
-        public ComponentVersionManufacturerMarketingInformationEventData MarketingInformation { get; set; }
+        public ComponentVersionManufacturerMarketingInformationEventData? MarketingInformation { get; set; }
 
-        public ComponentVersionManufacturerCreated() { }
+        public ComponentVersionManufacturerCreated() {
+          ComponentVersionManufacturerId = Guid.Empty;
+          ComponentVersionId = Guid.Empty;
+          InstitutionId = Guid.Empty;
+        }
 
         public ComponentVersionManufacturerCreated(
             Guid componentVersionManufacturerId,
             Guid componentVersionId,
             Guid institutionId,
-            ComponentVersionManufacturerMarketingInformationEventData marketingInformation,
+            ComponentVersionManufacturerMarketingInformationEventData? marketingInformation,
             Guid creatorId
             )
           : base(creatorId)
@@ -57,7 +61,7 @@ namespace Icon.Events
               ComponentVersionManufacturerId != Guid.Empty &&
               ComponentVersionId != Guid.Empty &&
               InstitutionId != Guid.Empty &&
-              MarketingInformation.IsValid();
+              (MarketingInformation?.IsValid() ?? true);
         }
     }
 }

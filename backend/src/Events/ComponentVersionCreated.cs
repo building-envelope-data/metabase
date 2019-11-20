@@ -29,9 +29,12 @@ namespace Icon.Events
 
         public Guid ComponentVersionId { get; set; }
         public Guid ComponentId { get; set; }
-        public ComponentInformationEventData Information { get; }
+        public ComponentInformationEventData? Information { get; }
 
-        public ComponentVersionCreated() { }
+        public ComponentVersionCreated() {
+          ComponentVersionId = Guid.Empty;
+          ComponentId = Guid.Empty;
+        }
 
         public ComponentVersionCreated(
             Guid componentVersionId,
@@ -53,7 +56,7 @@ namespace Icon.Events
               base.IsValid() &&
               ComponentVersionId != Guid.Empty &&
               ComponentId != Guid.Empty &&
-              Information.IsValid();
+              (Information?.IsValid() ?? false);
         }
     }
 }

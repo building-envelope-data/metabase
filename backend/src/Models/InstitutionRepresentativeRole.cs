@@ -1,7 +1,6 @@
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 
-#nullable enable
 namespace Icon.Models
 {
     // What enums are is explained in https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/enum

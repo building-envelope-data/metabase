@@ -7,6 +7,7 @@ using System.Linq;
 namespace Icon.Events
 {
     public sealed class ComponentInformationEventData
+      : Validatable
     {
         public static ComponentInformationEventData From(
             Models.ComponentInformation information
@@ -22,18 +23,18 @@ namespace Icon.Events
                 );
         }
 
-        public string Name { get; set; }
-        public string Abbreviation { get; set; }
-        public string Description { get; set; }
+        public string? Name { get; set; }
+        public string? Abbreviation { get; set; }
+        public string? Description { get; set; }
         public DateTime? AvailableFrom { get; set; }
         public DateTime? AvailableUntil { get; set; }
-        public IReadOnlyCollection<ComponentCategoryEventData> Categories { get; set; }
+        public IReadOnlyCollection<ComponentCategoryEventData>? Categories { get; set; }
 
         public ComponentInformationEventData() { }
 
         public ComponentInformationEventData(
             string name,
-            string abbreviation,
+            string? abbreviation,
             string description,
             DateTime? availableFrom,
             DateTime? availableUntil,
@@ -46,13 +47,14 @@ namespace Icon.Events
             AvailableFrom = availableFrom;
             AvailableUntil = availableUntil;
             Categories = categories;
+            EnsureValid();
         }
 
-        public bool IsValid()
+        public override bool IsValid()
         {
-            return Name != null &&
-              Description != null &&
-              Categories != null;
+            return !(Name is null) &&
+              !(Description is null) &&
+              !(Categories is null);
         }
     }
 }
