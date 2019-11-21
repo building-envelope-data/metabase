@@ -13,8 +13,9 @@ using Xunit;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 using IdentityModel.Client;
 using FluentAssertions;
+using Models = Icon.Models;
 
-namespace Test.Integration.Web.Api.GraphQl.Mutation
+namespace Test.Integration.Web.Api.GraphQl.Query
 {
     public class GetComponentsTest : GraphQlTestBase
     {
@@ -42,7 +43,16 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
         public async Task Single()
         {
             // Arrange
-            var component = await Client.CreateComponentSuccessfully();
+          var component = await Client.CreateComponentSuccessfully(
+              new GraphQlClient.ComponentInputData(
+                name: "Component A",
+                abbreviation: "C!A",
+                description: "Best component ever!",
+                availableFrom: null,
+                availableUntil: null,
+                categories: new Models.ComponentCategory[0] {}
+                )
+              );
             // Act
             var components = await Client.GetComponentsSuccessfully();
             // Assert
@@ -56,11 +66,67 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
         public async Task Multiple()
         {
             // Arrange
-            var component1 = await Client.CreateComponentSuccessfully();
-            var component2 = await Client.CreateComponentSuccessfully();
-            var component3 = await Client.CreateComponentSuccessfully();
-            var component4 = await Client.CreateComponentSuccessfully();
-            var component5 = await Client.CreateComponentSuccessfully();
+          var component1 = await Client.CreateComponentSuccessfully(
+              new GraphQlClient.ComponentInputData(
+                name: "Component A",
+                abbreviation: "C!A",
+                description: "Best component ever!",
+                availableFrom: null,
+                availableUntil: null,
+                categories: new Models.ComponentCategory[0] {}
+                )
+              );
+              var component2 = await Client.CreateComponentSuccessfully(
+              new GraphQlClient.ComponentInputData(
+                name: "Component B",
+                abbreviation: "C!B",
+                description: "Second best component ever!",
+                availableFrom: DateTime.UtcNow,
+                availableUntil: null,
+                categories: new Models.ComponentCategory[2]
+                {
+                Models.ComponentCategory.Layer,
+                Models.ComponentCategory.Unit
+                }
+                )
+                  );
+              var component3 = await Client.CreateComponentSuccessfully(
+              new GraphQlClient.ComponentInputData(
+                name: "Component C",
+                abbreviation: "C!C",
+                description: "Third best component ever!",
+                availableFrom: null,
+                availableUntil: DateTime.UtcNow,
+                categories: new Models.ComponentCategory[2]
+                {
+                Models.ComponentCategory.Material,
+                Models.ComponentCategory.Layer
+                }
+                )
+                  );
+              var component4 = await Client.CreateComponentSuccessfully(
+              new GraphQlClient.ComponentInputData(
+                name: "Component D",
+                abbreviation: "C!D",
+                description: "Fourth best component ever!",
+                availableFrom: null,
+                availableUntil: null,
+                categories: new Models.ComponentCategory[0] {}
+                )
+                  );
+              var component5 = await Client.CreateComponentSuccessfully(
+              new GraphQlClient.ComponentInputData(
+                name: "Component E",
+                abbreviation: "C!E",
+                description: "Fifth best component ever!",
+                availableFrom: DateTime.UtcNow.AddDays(2),
+                availableUntil: DateTime.UtcNow.AddDays(10),
+                categories: new Models.ComponentCategory[1]
+                {
+                Models.ComponentCategory.Material
+                }
+                )
+                  );
             // Act
             var components = await Client.GetComponentsSuccessfully();
             // Assert
