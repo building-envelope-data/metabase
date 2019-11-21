@@ -31,6 +31,7 @@ namespace Icon.Models
             AvailableFrom = availableFrom;
             AvailableUntil = availableUntil;
             Categories = categories;
+          EnsureValid();
         }
 
         public override bool IsValid()

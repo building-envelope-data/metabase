@@ -22,6 +22,15 @@ namespace Icon.Models
             InstitutionId = institutionId;
             UserId = userId;
             Role = role;
+          EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              InstitutionId != Guid.Empty &&
+              UserId != Guid.Empty;
         }
     }
 }

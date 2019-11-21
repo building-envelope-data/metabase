@@ -1,3 +1,4 @@
+using Validatable = Icon.Validatable;
 using Uri = System.Uri;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
@@ -5,6 +6,7 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class ContactInformation
+      : Validatable
     {
         public string PhoneNumber { get; }
         public string PostalAddress { get; }
@@ -22,6 +24,16 @@ namespace Icon.Models
             PostalAddress = postalAddress;
             EmailAddress = emailAddress;
             WebsiteLocator = websiteLocator;
+          EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              !string.IsNullOrWhiteSpace(PhoneNumber) &&
+              !string.IsNullOrWhiteSpace(PostalAddress) &&
+              !string.IsNullOrWhiteSpace(EmailAddress) &&
+              WebsiteLocator.IsAbsoluteUri;
         }
     }
 }

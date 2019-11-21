@@ -23,6 +23,16 @@ namespace Icon.Models
             Name = name;
             ContactInformationId = contactInformationId;
             Affiliations = affiliations;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              !string.IsNullOrWhiteSpace(Name) &&
+              ContactInformationId != Guid.Empty &&
+              !(Affiliations is null);
         }
     }
 }

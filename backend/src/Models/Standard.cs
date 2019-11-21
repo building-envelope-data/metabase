@@ -15,7 +15,7 @@ namespace Icon.Models
         public string? Prefix { get; }
         public string MainNumber { get; }
         public string? Suffix { get; }
-        public IEnumerable<Standardizer> Standardizers { get; }
+        public IReadOnlyCollection<Standardizer> Standardizers { get; }
         public Uri? Locator { get; }
 
         public Standard(
@@ -27,7 +27,7 @@ namespace Icon.Models
             string? prefix,
             string mainNumber,
             string? suffix,
-            IEnumerable<Standardizer> standardizers,
+            IReadOnlyCollection<Standardizer> standardizers,
             Uri? locator,
             DateTime timestamp
             )
@@ -42,6 +42,22 @@ namespace Icon.Models
             Suffix = suffix;
             Standardizers = standardizers;
             Locator = locator;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              !string.IsNullOrWhiteSpace(Title) &&
+              !string.IsNullOrWhiteSpace(Abstract) &&
+              !string.IsNullOrWhiteSpace(Section) &&
+              Year != DateTime.MinValue &&
+              !(Prefix is null ? true : string.IsNullOrWhiteSpace(Prefix)) &&
+              !string.IsNullOrWhiteSpace(MainNumber) &&
+              !(Suffix is null ? true : string.IsNullOrWhiteSpace(Suffix)) &&
+              !(Standardizers is null) &&
+              (Locator?.IsAbsoluteUri ?? true);
         }
     }
 }

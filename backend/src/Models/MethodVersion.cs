@@ -20,6 +20,15 @@ namespace Icon.Models
         {
             MethodId = methodId;
             Information = information;
+          EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              MethodId != Guid.Empty &&
+              Information.IsValid();
         }
     }
 }

@@ -27,6 +27,17 @@ namespace Icon.Models
             Description = description;
             Locator = locator;
             InstitutionId = institutionId;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              !string.IsNullOrWhiteSpace(Name) &&
+              !string.IsNullOrWhiteSpace(Description) &&
+              Locator.IsAbsoluteUri &&
+              InstitutionId != Guid.Empty;
         }
     }
 }

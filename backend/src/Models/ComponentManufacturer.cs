@@ -19,6 +19,15 @@ namespace Icon.Models
         {
             ComponentId = componentId;
             InstitutionId = institutionId;
+          EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              ComponentId != Guid.Empty &&
+              InstitutionId != Guid.Empty;
         }
     }
 }

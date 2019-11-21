@@ -7,18 +7,27 @@ namespace Icon.Models
       : Model
     {
         public Guid MethodId { get; }
-        public Guid StackholderId { get; }
+        public Guid StakeholderId { get; }
 
         public MethodDeveloper(
             Guid id,
             Guid methodId,
-            Guid stackholderId,
+            Guid stakeholderId,
             DateTime timestamp
             )
           : base(id, timestamp)
         {
             MethodId = methodId;
-            StackholderId = stackholderId;
+            StakeholderId = stakeholderId;
+          EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              MethodId != Guid.Empty &&
+              StakeholderId != Guid.Empty;
         }
     }
 }
