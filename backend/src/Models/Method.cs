@@ -18,6 +18,14 @@ namespace Icon.Models
           : base(id, timestamp)
         {
             Information = information;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              Information.IsValid();
         }
     }
 }

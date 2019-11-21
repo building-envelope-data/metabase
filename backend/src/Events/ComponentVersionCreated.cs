@@ -31,9 +31,9 @@ namespace Icon.Events
         public Guid ComponentId { get; set; }
         public ComponentInformationEventData Information { get; set; }
 
-        #nullable disable
+#nullable disable
         public ComponentVersionCreated() { }
-        #nullable enable
+#nullable enable
 
         public ComponentVersionCreated(
             Guid componentVersionId,

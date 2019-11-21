@@ -15,8 +15,8 @@ namespace Icon.GraphQl
         public DateTime? AvailableUntil { get; set; }
         public IReadOnlyCollection<Models.ComponentCategory> Categories { get; set; }
 
-        #nullable disable
+#nullable disable
         public ComponentVersionInput() { }
-        #nullable enable
+#nullable enable
     }
 }

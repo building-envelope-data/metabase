@@ -22,6 +22,15 @@ namespace Icon.Models
             Information = information;
             PublicKey = publicKey;
             State = state;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              Information.IsValid() &&
+              !string.IsNullOrWhiteSpace(PublicKey);
         }
     }
 }

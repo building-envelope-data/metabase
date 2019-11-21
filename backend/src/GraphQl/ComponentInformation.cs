@@ -28,9 +28,9 @@ namespace Icon.GraphQl
         public DateTime? AvailableUntil { get; set; }
         public IEnumerable<Models.ComponentCategory> Categories { get; set; }
 
-        #nullable disable
+#nullable disable
         public ComponentInformation() { }
-        #nullable enable
+#nullable enable
 
         public ComponentInformation(
             string name,

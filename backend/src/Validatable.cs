@@ -4,14 +4,14 @@ namespace Icon
 {
     public abstract class Validatable : IValidatable
     {
-      public abstract bool IsValid();
+        public abstract bool IsValid();
 
-      public void EnsureValid()
-      {
-        if (!IsValid())
+        public void EnsureValid()
         {
-          throw new InvalidOperationException($"The instance {this} is invalid.");
+            if (!IsValid())
+            {
+                throw new InvalidOperationException($"The instance {this} is invalid.");
+            }
         }
-      }
     }
 }

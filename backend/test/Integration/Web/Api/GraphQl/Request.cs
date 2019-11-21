@@ -14,9 +14,9 @@ namespace Test.Integration.Web.Api.GraphQl
             Dictionary<string, object>? variables
             )
         {
-          this.query = query;
-          this.operationName = operationName;
-          this.variables = variables;
+            this.query = query;
+            this.operationName = operationName;
+            this.variables = variables;
         }
     }
 }

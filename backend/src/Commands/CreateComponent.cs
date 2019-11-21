@@ -24,6 +24,14 @@ namespace Icon.Commands
           : base(creatorId)
         {
             Information = information;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              Information.IsValid();
         }
     }
 }

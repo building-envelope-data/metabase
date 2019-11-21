@@ -25,9 +25,9 @@ namespace Icon.Events
         public string? Description { get; set; }
         public Uri? WebsiteLocator { get; set; }
 
-        #nullable disable
+#nullable disable
         public InstitutionInformationEventData() { }
-        #nullable enable
+#nullable enable
 
         public InstitutionInformationEventData(
             string name,

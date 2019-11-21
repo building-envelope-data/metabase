@@ -28,6 +28,15 @@ namespace Icon.Commands
         {
             ComponentId = componentId;
             Information = information;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              ComponentId != Guid.Empty &&
+              Information.IsValid();
         }
     }
 }

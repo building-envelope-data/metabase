@@ -27,7 +27,7 @@ namespace Test.Integration.Web.Api.GraphQl
         {
             if (OverflowData != null && OverflowData.Count != 0)
             {
-                throw new JsonException($"The extension data dictionary is not empty but contains the key(s) '{String.Join("', '", OverflowData.Keys)}'");
+                throw new JsonException($"The extension data dictionary is not empty but contains the key(s) '{string.Join("', '", OverflowData.Keys)}'");
             }
         }
     }

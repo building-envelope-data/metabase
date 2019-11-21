@@ -11,6 +11,8 @@ namespace Icon.Models
             DateTime timestamp
             )
           : base(id, timestamp)
-        { }
+        {
+            EnsureValid();
+        }
     }
 }

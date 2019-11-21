@@ -32,9 +32,9 @@ namespace Icon.Events
         public Guid InstitutionId { get; set; }
         public ComponentVersionManufacturerMarketingInformationEventData? MarketingInformation { get; set; }
 
-        #nullable disable
+#nullable disable
         public ComponentVersionManufacturerCreated() { }
-        #nullable enable
+#nullable enable
 
         public ComponentVersionManufacturerCreated(
             Guid componentVersionManufacturerId,

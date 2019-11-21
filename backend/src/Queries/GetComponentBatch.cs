@@ -1,3 +1,4 @@
+using Validatable = Icon.Validatable;
 using System.Collections.Generic;
 using Guid = System.Guid;
 using Icon.Infrastructure.Query;
@@ -6,11 +7,12 @@ using DateTime = System.DateTime;
 using Models = Icon.Models;
 using IError = HotChocolate.IError;
 using CSharpFunctionalExtensions;
+using System.Linq;
 
 namespace Icon.Queries
 {
     public class GetComponentBatch
-      : IQuery<IEnumerable<Result<Models.Component, IError>>>
+      : Validatable, IQuery<IEnumerable<Result<Models.Component, IError>>>
     {
         public IEnumerable<(Guid Id, DateTime Timestamp)> ComponentIdsAndTimestamps { get; }
 
@@ -19,6 +21,17 @@ namespace Icon.Queries
             )
         {
             ComponentIdsAndTimestamps = componentIdsAndTimestamps;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              ComponentIdsAndTimestamps.All(
+                  ((Guid Id, DateTime Timestamp) idAndTimestamp)
+                  => idAndTimestamp.Id != Guid.Empty &&
+                     idAndTimestamp.Timestamp != DateTime.MinValue
+                  );
         }
     }
 }

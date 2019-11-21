@@ -19,6 +19,15 @@ namespace Icon.Models
         {
             SuperComponentId = superComponentId;
             SubComponentId = subComponentId;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              SuperComponentId != Guid.Empty &&
+              SubComponentId != Guid.Empty;
         }
     }
 }

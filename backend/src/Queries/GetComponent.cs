@@ -1,3 +1,4 @@
+using Validatable = Icon.Validatable;
 using Guid = System.Guid;
 using Icon.Infrastructure.Query;
 /* using ZonedDateTime = NodaTime.ZonedDateTime; */
@@ -8,7 +9,8 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Queries
 {
-    public class GetComponent : IQuery<Result<Models.Component, IError>>
+    public class GetComponent
+      : Validatable, IQuery<Result<Models.Component, IError>>
     {
         public Guid ComponentId { get; }
         public DateTime Timestamp { get; } // TODO ZonedDateTime
@@ -20,6 +22,14 @@ namespace Icon.Queries
         {
             ComponentId = componentId;
             Timestamp = timestamp;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              ComponentId != Guid.Empty &&
+              Timestamp != DateTime.MinValue;
         }
     }
 }

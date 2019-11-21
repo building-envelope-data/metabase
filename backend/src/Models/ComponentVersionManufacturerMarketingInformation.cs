@@ -1,9 +1,11 @@
+using Validatable = Icon.Validatable;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
     public sealed class ComponentVersionManufacturerMarketingInformation
+      : Validatable
     {
         public ComponentInformation? ComponentVersionInformation { get; }
         public InstitutionInformation? InstitutionInformation { get; }
@@ -15,6 +17,14 @@ namespace Icon.Models
         {
             ComponentVersionInformation = componentVersionInformation;
             InstitutionInformation = institutionInformation;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              (ComponentVersionInformation?.IsValid() ?? true) &&
+              (InstitutionInformation?.IsValid() ?? true);
         }
     }
 }

@@ -25,9 +25,9 @@ namespace Icon.Aggregates
         public string? Description { get; set; }
         public Uri? WebsiteLocator { get; set; }
 
-        #nullable disable
+#nullable disable
         public InstitutionInformationAggregateData() { }
-        #nullable enable
+#nullable enable
 
         public InstitutionInformationAggregateData(
             string name,

@@ -1,3 +1,4 @@
+using Validatable = Icon.Validatable;
 using System;
 using System.Collections.Generic;
 using Models = Icon.Models;
@@ -7,8 +8,8 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Queries
 {
-    public class ListComponents :
-      IQuery<IEnumerable<Result<Models.Component, IError>>>
+    public class ListComponents
+      : Validatable, IQuery<IEnumerable<Result<Models.Component, IError>>>
     {
         public DateTime Timestamp { get; }
 
@@ -17,6 +18,12 @@ namespace Icon.Queries
             )
         {
             Timestamp = timestamp;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return Timestamp != DateTime.MinValue;
         }
     }
 }
