@@ -6,12 +6,12 @@ namespace Test.Integration.Web.Api.GraphQl
     {
         public string query { get; }
         public string? operationName { get; }
-        public Dictionary<string, object>? variables { get; }
+        public Dictionary<string, object?>? variables { get; }
 
         public Request(
             string query,
             string? operationName,
-            Dictionary<string, object>? variables
+            Dictionary<string, object?>? variables
             )
         {
             this.query = query;

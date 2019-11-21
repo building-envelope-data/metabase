@@ -32,6 +32,14 @@ namespace Icon.Infrastructure.Aggregate
             Version = @event.Version;
         }
 
+        public void EnsureNotVirgin()
+        {
+            if (IsVirgin())
+            {
+                throw new InvalidOperationException($"The aggregate {this} is a virgin.");
+            }
+        }
+
         public bool IsVirgin()
         {
             return

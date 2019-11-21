@@ -16,7 +16,6 @@ namespace Icon.Models
         {
             Id = id;
             Timestamp = timestamp;
-            EnsureValid();
         }
 
         public override bool IsValid()

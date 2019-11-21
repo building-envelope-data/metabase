@@ -27,16 +27,21 @@ namespace Icon.Aggregates
 
         public override bool IsValid()
         {
-            return base.IsValid() && (
+            return
+              base.IsValid() &&
+              (
                 IsVirgin()
-                ) || (
-                  !IsVirgin() &&
-                  (Information?.IsValid() ?? false)
-                  );
+              )
+              ||
+              (
+               !IsVirgin() &&
+               (Information?.IsValid() ?? false)
+              );
         }
 
         public Models.Component ToModel()
         {
+            EnsureNotVirgin();
             EnsureValid();
             return new Models.Component(
                 id: Id,

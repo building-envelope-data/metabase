@@ -1,6 +1,7 @@
 // Inspired by https://chillicream.com/blog/2019/04/11/integration-tests
 // TODO When mature, use the client https://github.com/ChilliCream/hotchocolate/issues/1011
 
+using Models = Icon.Models;
 using Icon;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,8 +26,18 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
         public async Task Anonymously()
         {
             // Act
-            var errors = await Client.CreateComponentErroneously();
+          var errors = await Client.CreateComponentErroneously(
+              new GraphQlClient.ComponentInputData(
+                name: "Component A",
+                abbreviation: "C!A",
+                description: "Best component ever!",
+                availableFrom: null,
+                availableUntil: null,
+                categories: new Models.ComponentCategory[0] {}
+                )
+              );
             // Assert
+            errors.Count.Should().Be(1);
             errors[0]?.extensions?.code?.Should().Be("AUTH_NOT_AUTHENTICATED");
         }
 
@@ -40,7 +51,16 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
             await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
             var beforeTimestamp = DateTime.UtcNow;
             // Act
-            var component = await Client.CreateComponentSuccessfully();
+            var component = await Client.CreateComponentSuccessfully(
+              new GraphQlClient.ComponentInputData(
+                name: "Component A",
+                abbreviation: "C!A",
+                description: "Best component ever!",
+                availableFrom: null,
+                availableUntil: null,
+                categories: new Models.ComponentCategory[0] {}
+                )
+                );
             // Assert
             component.id.Should().NotBeEmpty();
             component.timestamp

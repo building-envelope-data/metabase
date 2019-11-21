@@ -47,6 +47,7 @@ namespace Icon.Aggregates
 
         public Models.ComponentVersion ToModel()
         {
+            EnsureNotVirgin();
             EnsureValid();
             return new Models.ComponentVersion(
               id: Id,

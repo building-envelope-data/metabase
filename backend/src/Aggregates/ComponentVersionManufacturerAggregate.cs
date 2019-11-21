@@ -53,6 +53,7 @@ namespace Icon.Aggregates
 
         public Models.ComponentVersionManufacturer ToModel()
         {
+            EnsureNotVirgin();
             EnsureValid();
             return new Models.ComponentVersionManufacturer(
               id: Id,
