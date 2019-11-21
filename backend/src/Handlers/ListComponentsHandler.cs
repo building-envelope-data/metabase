@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Event;
+using Icon.Events;
 using Icon.Infrastructure.Aggregate;
 using Icon.Infrastructure.Query;
 using Models = Icon.Models;

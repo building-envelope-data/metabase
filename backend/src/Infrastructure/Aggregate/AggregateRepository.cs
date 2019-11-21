@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Marten;
 using Marten.Linq;
 using System.Threading.Tasks;
-using Icon.Infrastructure.Event;
+using Icon.Events;
 using CancellationToken = System.Threading.CancellationToken;
 using ErrorCodes = Icon.ErrorCodes;
 using HotChocolate;

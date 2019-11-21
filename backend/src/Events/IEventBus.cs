@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Icon.Infrastructure.Event
+namespace Icon.Events
 {
     public interface IEventBus
     {

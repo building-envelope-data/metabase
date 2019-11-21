@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Icon.Infrastructure.Event
+namespace Icon.Events
 {
     public interface IEventHandler<in TEvent> : INotificationHandler<TEvent>
            where TEvent : IEvent

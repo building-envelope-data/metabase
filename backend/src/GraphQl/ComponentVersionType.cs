@@ -3,23 +3,19 @@ using HotChocolate.Types.Relay;
 
 namespace Icon.GraphQl
 {
-    public class ComponentVersionType : ObjectType<ComponentVersion>
+    public class ComponentVersionType : NodeType<ComponentVersion>
     {
         protected override void Configure(IObjectTypeDescriptor<ComponentVersion> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("ComponentVersion");
 
-            descriptor.Field(f => f.Id)
-                .Type<NonNullType<UuidType>>();
+            descriptor.Field(t => t.Information)
+                .Type<NonNullType<ComponentInformationType>>();
 
             descriptor.Field(f => f.ComponentId)
                 .Type<NonNullType<UuidType>>();
-
-            descriptor.Field(f => f.Timestamp)
-                .Type<NonNullType<DateTimeType>>();
-
-            descriptor.Field(f => f.RequestTimestamp)
-                .Type<NonNullType<DateTimeType>>();
         }
     }
 }

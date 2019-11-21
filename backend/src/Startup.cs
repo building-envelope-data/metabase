@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
-using Event = Icon.Infrastructure.Event;
+using Event = Icon.Events;
 using System.Threading.Tasks;
 using System;
 using WebPWrecover.Services;
@@ -76,7 +76,7 @@ namespace Icon
 
         private string GetMigrationsAssembly()
         {
-            return typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            return typeof(Startup).GetTypeInfo().Assembly.GetName().Name.NotNull();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

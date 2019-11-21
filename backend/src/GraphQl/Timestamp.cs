@@ -33,7 +33,7 @@ namespace Icon.GraphQl
 
         public static void StoreRequest(DateTime timestamp, IQueryRequestBuilder requestBuilder)
         {
-                requestBuilder.SetProperty("requestTimestamp", timestamp);
+            requestBuilder.SetProperty("requestTimestamp", timestamp);
         }
 
         public static DateTime FetchRequest(IResolverContext context)

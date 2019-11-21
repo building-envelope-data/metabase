@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
-using Event = Icon.Infrastructure.Event;
+using Events = Icon.Events;
 using Models = Icon.Models;
 using System.Threading.Tasks;
 using System;
@@ -47,7 +47,7 @@ namespace Icon.Configuration
 
             services.AddScoped<Query.IQueryBus, Query.QueryBus>();
             services.AddScoped<Command.ICommandBus, Command.CommandBus>();
-            services.AddScoped<Event.IEventBus, Event.EventBus>();
+            services.AddScoped<Events.IEventBus, Events.EventBus>();
 
             services.AddScoped<
               MediatR.IRequestHandler<

@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Command = Icon.Infrastructure.Command;
 using Query = Icon.Infrastructure.Query;
-using Event = Icon.Infrastructure.Event;
+using Event = Icon.Events;
 using Models = Icon.Models;
 using System.Threading.Tasks;
 using System;

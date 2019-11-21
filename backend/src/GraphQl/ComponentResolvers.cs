@@ -1,3 +1,4 @@
+using Icon;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -27,7 +28,11 @@ namespace Icon.GraphQl
                 await QueryBus.Send<
                   Queries.ListComponentVersions,
                   IEnumerable<Result<Models.ComponentVersion, IError>>
-                >(new Queries.ListComponentVersions(component.Id, timestamp))
+                >(new Queries.ListComponentVersions(
+                    component.Id.NotEmpty(),
+                    timestamp
+                    )
+                  )
                 )
               .Select(c => ComponentVersion.FromModel(c, timestamp));
         }

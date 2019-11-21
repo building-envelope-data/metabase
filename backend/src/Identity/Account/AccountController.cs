@@ -345,7 +345,7 @@ namespace Icon.Identity
                     var providerSupportsSignout = await HttpContext.GetSchemeSupportsSignOutAsync(idp);
                     if (providerSupportsSignout)
                     {
-                        if (vm.LogoutId == null)
+                        if (vm.LogoutId is null)
                         {
                             // if there's no current logout context, we need to create one
                             // this captures necessary info from the current logged in user

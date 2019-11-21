@@ -21,25 +21,27 @@ namespace Test.Integration.Web.Api.GraphQl
       where TData : ResponseBase
       where TError : ResponseBase
     {
-        public TData data { get; set; }
-        public IReadOnlyList<TError> errors { get; set; }
+        public TData? data { get; set; }
+        public IReadOnlyList<TError>? errors { get; set; }
 
-        public Response<TData, TError> EnsureSuccess()
+        public Response() { }
+
+        public TData EnsureSuccess()
         {
-            EnsureData();
+            var nonNullData = EnsureData();
             EnsureNoErrors();
             EnsureNoOverflow();
-            data.EnsureNoOverflow();
-            return this;
+            nonNullData.EnsureNoOverflow();
+            return nonNullData;
         }
 
-        public Response<TData, TError> EnsureData()
+        public TData EnsureData()
         {
-            if (data == null)
+            if (data is null)
             {
                 throw new JsonException("The data value is empty'");
             }
-            return this;
+            return data!;
         }
 
         public Response<TData, TError> EnsureNoData()
@@ -51,24 +53,25 @@ namespace Test.Integration.Web.Api.GraphQl
             return this;
         }
 
-        public Response<TData, TError> EnsureFailure()
+        public virtual IReadOnlyList<TError> EnsureFailure()
         {
-            EnsureErrors();
+            var nonNullErrors = EnsureErrors();
             EnsureNoData();
             EnsureNoOverflow();
-            foreach (var error in errors) {
-              error.EnsureNoOverflow();
+            foreach (var error in nonNullErrors)
+            {
+                error.EnsureNoOverflow();
             }
-            return this;
+            return nonNullErrors;
         }
 
-        public Response<TData, TError> EnsureErrors()
+        public IReadOnlyList<TError> EnsureErrors()
         {
-            if (errors == null)
+            if (errors is null)
             {
                 throw new JsonException("The errors dictionary is empty'");
             }
-            return this;
+            return errors!;
         }
 
         public Response<TData, TError> EnsureNoErrors()
@@ -78,6 +81,21 @@ namespace Test.Integration.Web.Api.GraphQl
                 throw new JsonException($"The errors dictionary is not empty but contains '{JsonSerializer.Serialize(errors)}'");
             }
             return this;
+        }
+    }
+
+    public sealed class Response<TData>
+      : Response<TData, Error>
+      where TData : ResponseBase
+    {
+        public override IReadOnlyList<Error> EnsureFailure()
+        {
+            var nonNullErrors = base.EnsureFailure();
+            foreach (var error in nonNullErrors)
+            {
+                error.EnsureNoOverflow();
+            }
+            return nonNullErrors;
         }
     }
 }

@@ -1,40 +1,65 @@
 using Guid = System.Guid;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
 using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Event;
+using Icon.Events;
 using Icon.Infrastructure.Aggregate;
 using Commands = Icon.Commands;
-/* using DateInterval = NodaTime.DateInterval; */
 using DateTime = System.DateTime;
 
 namespace Icon.Events
 {
-    public sealed class ComponentVersionManufacturerCreated : EventBase
+    public sealed class ComponentVersionManufacturerCreated : Event
     {
+        public static ComponentVersionManufacturerCreated From(
+              Guid componentVersionManufacturerId,
+              Commands.CreateComponentVersionManufacturer command
+            )
+        {
+            return new ComponentVersionManufacturerCreated(
+                componentVersionManufacturerId: componentVersionManufacturerId,
+                componentVersionId: command.ComponentVersionId,
+                institutionId: command.InstitutionId,
+                marketingInformation: command.MarketingInformation is null ? null : ComponentVersionManufacturerMarketingInformationEventData.From(command.MarketingInformation.NotNull()),
+                creatorId: command.CreatorId
+                );
+        }
+
         public Guid ComponentVersionManufacturerId { get; set; }
         public Guid ComponentVersionId { get; set; }
-        public Guid UserId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Abbreviation { get; set; }
-        /* public DateInterval Availability { get; set; } */ // TODO This is what we actually want, a proper date interval and it should be persisted as PostgreSQL date range
-        public DateTime AvailableFrom { get; set; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
-        public DateTime AvailableUntil { get; set; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
+        public Guid InstitutionId { get; set; }
+        public ComponentVersionManufacturerMarketingInformationEventData? MarketingInformation { get; set; }
 
+        #nullable disable
         public ComponentVersionManufacturerCreated() { }
+        #nullable enable
 
-        public ComponentVersionManufacturerCreated(Guid componentVersionManufacturerId, Commands.CreateComponentVersionManufacturer command) : base(command.CreatorId)
+        public ComponentVersionManufacturerCreated(
+            Guid componentVersionManufacturerId,
+            Guid componentVersionId,
+            Guid institutionId,
+            ComponentVersionManufacturerMarketingInformationEventData? marketingInformation,
+            Guid creatorId
+            )
+          : base(creatorId)
         {
             ComponentVersionManufacturerId = componentVersionManufacturerId;
-            ComponentVersionId = command.ComponentVersionId;
-            UserId = command.UserId;
-            Name = command.Name;
-            Description = command.Description;
-            Abbreviation = command.Abbreviation;
-            AvailableFrom = command.AvailableFrom;
-            AvailableUntil = command.AvailableUntil;
+            ComponentVersionId = componentVersionId;
+            InstitutionId = institutionId;
+            MarketingInformation = marketingInformation;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              ComponentVersionManufacturerId != Guid.Empty &&
+              ComponentVersionId != Guid.Empty &&
+              InstitutionId != Guid.Empty &&
+              (MarketingInformation?.IsValid() ?? true);
         }
     }
 }

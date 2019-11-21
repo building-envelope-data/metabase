@@ -8,21 +8,23 @@ namespace Icon.GraphQl
     {
         protected override void Configure(IObjectTypeDescriptor<Query> descriptor)
         {
-            descriptor.Field(t => t.GetComponents(default, default))
+            descriptor
+                .Field(t => t.GetComponents(default!, default!))
                 .Type<NonNullType<ListType<NonNullType<ComponentType>>>>()
                 .Argument("timestamp", a => a.Type<DateTimeType>());
 
-            descriptor.Field(t => t.GetComponent(default, default, default, default))
+            descriptor
+                .Field(t => t.GetComponent(default!, default!, default!, default!))
                 .Type<NonNullType<ComponentType>>()
                 .Argument("id", a => a.Type<NonNullType<UuidType>>())
                 .Argument("timestamp", a => a.Type<DateTimeType>());
 
-            /* descriptor.Field(t => t.GetCharacter(default, default)) */
+            /* descriptor.Field(t => t.GetCharacter(default!, default!)) */
             /*     .Type<NonNullType<ListType<NonNullType<CharacterType>>>>(); */
 
             // the search can only be executed if the current
             // identity has a country
-            /* descriptor.Field(t => t.Search(default)) */
+            /* descriptor.Field(t => t.Search(default!)) */
             /*     .Type<ListType<SearchResultType>>() */
             /*     .Authorize("HasCountry"); */
         }

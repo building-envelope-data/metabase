@@ -1,41 +1,27 @@
 using Guid = System.Guid;
-/* using DateInterval = NodaTime.DateInterval; */
 using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
     public sealed class ComponentVersionManufacturer
+      : Model
     {
-        public Guid Id { get; }
         public Guid ComponentVersionId { get; }
-        public string Name { get; }
-        public string Description { get; }
-        public string Abbreviation { get; }
-        /* public DateInterval Availability { get; } */ // TODO This is what we actually want, a proper date interval and it should be persisted as PostgreSQL date range
-        public DateTime AvailableFrom { get; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
-        public DateTime AvailableUntil { get; } // TODO We only want a date here without time, but such a type does not exist in ASP.NET. We should use `NodaTime` but that is incompatible with ASP.NET `Identity` at the moment.
-        public DateTime Timestamp { get; }
+        public Guid InstitutionId { get; }
+        public ComponentVersionManufacturerMarketingInformation? MarketingInformation { get; }
 
         public ComponentVersionManufacturer(
             Guid id,
             Guid componentVersionId,
-            string name,
-            string description,
-            string abbreviation,
-            /* public DateInterval Availability { get; set; } */ // TODO This is what we actually want, a proper date interval and it should be persisted as PostgreSQL date range
-            DateTime availableFrom,
-            DateTime availableUntil,
+            Guid institutionId,
+            ComponentVersionManufacturerMarketingInformation? marketingInformation,
             DateTime timestamp
             )
+          : base(id, timestamp)
         {
-            Id = id;
             ComponentVersionId = componentVersionId;
-            Name = name;
-            Description = description;
-            Abbreviation = abbreviation;
-            AvailableFrom = availableFrom;
-            AvailableUntil = availableUntil;
-            Timestamp = timestamp;
+            InstitutionId = institutionId;
+            MarketingInformation = marketingInformation;
         }
     }
 }

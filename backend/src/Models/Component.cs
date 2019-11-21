@@ -4,14 +4,18 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class Component
+      : Model
     {
-        public Guid Id { get; }
-        public DateTime Timestamp { get; }
+        public ComponentInformation Information { get; }
 
-        public Component(Guid id, DateTime timestamp)
+        public Component(
+            Guid id,
+            ComponentInformation information,
+            DateTime timestamp
+            )
+          : base(id, timestamp)
         {
-            Id = id;
-            Timestamp = timestamp;
+            Information = information;
         }
     }
 }

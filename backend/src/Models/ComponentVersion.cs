@@ -4,16 +4,21 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class ComponentVersion
+      : Model
     {
-        public Guid Id { get; }
         public Guid ComponentId { get; }
-        public DateTime Timestamp { get; }
+        public ComponentInformation Information { get; }
 
-        public ComponentVersion(Guid id, Guid componentId, DateTime timestamp)
+        public ComponentVersion(
+            Guid id,
+            Guid componentId,
+            ComponentInformation information,
+            DateTime timestamp
+            )
+          : base(id, timestamp)
         {
-            Id = id;
             ComponentId = componentId;
-            Timestamp = timestamp;
+            Information = information;
         }
     }
 }

@@ -30,15 +30,28 @@ namespace Icon.GraphQl
         }
 
         public async Task<Component> CreateComponent(
+            ComponentInput input,
             IResolverContext resolverContext
             )
         {
+            var command =
+              new Commands.CreateComponent(
+                  information: new Models.ComponentInformation(
+                    name: input.Name,
+                    abbreviation: input.Abbreviation,
+                    description: input.Description,
+                    availableFrom: input.AvailableFrom,
+                    availableUntil: input.AvailableUntil,
+                    categories: input.Categories
+                    ),
+                    creatorId: Guid.NewGuid() // TODO Use current user!
+                  );
             var result =
               await _commandBus
                 .Send<
                    Commands.CreateComponent,
                    Result<(Guid Id, DateTime Timestamp), IError>
-                 >(new Commands.CreateComponent(creatorId: Guid.NewGuid())); // TODO Use current user!
+                 >(command);
             var (id, timestamp) = ResultHelpers.HandleFailure(result);
             Timestamp.Store(timestamp, resolverContext);
             return
@@ -55,20 +68,29 @@ namespace Icon.GraphQl
         }
 
         public async Task<ComponentVersion> CreateComponentVersion(
-            ComponentVersionInput componentVersionInput,
+            ComponentVersionInput input,
             IResolverContext resolverContext
             )
         {
+            var command =
+              new Commands.CreateComponentVersion(
+                  componentId: input.ComponentId.NotEmpty(),
+                  information: new Models.ComponentInformation(
+                    name: input.Name,
+                    abbreviation: input.Abbreviation,
+                    description: input.Description,
+                    availableFrom: input.AvailableFrom,
+                    availableUntil: input.AvailableUntil,
+                    categories: input.Categories
+                    ),
+                    creatorId: Guid.NewGuid() // TODO Use current user!
+                  );
             var result =
               await _commandBus
                .Send<
                   Commands.CreateComponentVersion,
                   Result<(Guid Id, DateTime Timestamp), IError>
-                >(new Commands.CreateComponentVersion(
-                    componentVersionInput.ComponentId,
-                    creatorId: Guid.NewGuid()
-                    )
-                    ); // TODO Use current user!
+                >(command);
             var (id, timestamp) = ResultHelpers.HandleFailure(result);
             Timestamp.Store(timestamp, resolverContext);
             return
@@ -83,7 +105,5 @@ namespace Icon.GraphQl
                   timestamp
                   );
         }
-
-        /* lastRead */
     }
 }

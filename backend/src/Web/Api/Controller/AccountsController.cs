@@ -85,7 +85,7 @@ namespace Icon.Web.Api.Controller
     /* /1*     } *1/ */
 
     /* /1*     var user = await _userManager.FindByEmailAsync(Input.Email); *1/ */
-    /* /1*     if (user == null) *1/ */
+    /* /1*     if (user is null) *1/ */
     /* /1*     { *1/ */
     /* /1*         ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email."); *1/ */
     /* /1*     } *1/ */

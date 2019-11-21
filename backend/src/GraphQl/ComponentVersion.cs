@@ -5,28 +5,44 @@ using DateTime = System.DateTime;
 namespace Icon.GraphQl
 {
     public sealed class ComponentVersion
+      : Node
     {
         public static ComponentVersion FromModel(
-            Models.ComponentVersion componentVersion,
+            Models.ComponentVersion model,
             DateTime requestTimestamp
             )
         {
-            return new ComponentVersion
-            {
-                Id = componentVersion.Id,
-                ComponentId = componentVersion.ComponentId,
-                Timestamp = componentVersion.Timestamp,
-                RequestTimestamp = requestTimestamp
-            };
+            return new ComponentVersion(
+                model.Id,
+                componentId: model.ComponentId,
+                information: ComponentInformation.FromModel(model.Information),
+                timestamp: model.Timestamp,
+                requestTimestamp: requestTimestamp
+                );
         }
 
-        public Guid Id { get; set; }
         public Guid ComponentId { get; set; }
-        public DateTime Timestamp { get; set; }
-        public DateTime RequestTimestamp { get; set; }
+        public ComponentInformation Information { get; set; }
 
-        public ComponentVersion()
+        #nullable disable
+        public ComponentVersion() { }
+        #nullable enable
+
+        public ComponentVersion(
+            Guid id,
+            Guid componentId,
+            ComponentInformation information,
+            DateTime timestamp,
+            DateTime requestTimestamp
+            )
+          : base(
+              id: id,
+              timestamp: timestamp,
+              requestTimestamp: requestTimestamp
+              )
         {
+            ComponentId = componentId;
+            Information = information;
         }
     }
 }
