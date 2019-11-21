@@ -20,12 +20,14 @@ namespace Icon.Events
                 );
         }
 
-        public string? Name { get; set; }
+        public string Name { get; set; }
         public string? Abbreviation { get; set; }
         public string? Description { get; set; }
         public Uri? WebsiteLocator { get; set; }
 
+        #nullable disable
         public InstitutionInformationEventData() { }
+        #nullable enable
 
         public InstitutionInformationEventData(
             string name,

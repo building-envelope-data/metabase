@@ -26,11 +26,11 @@ namespace Icon.Events
         }
 
         public Guid ComponentId { get; set; }
-        public ComponentInformationEventData? Information { get; set; }
+        public ComponentInformationEventData Information { get; set; }
 
-        public ComponentCreated() {
-          ComponentId = Guid.Empty;
-        }
+        #nullable disable
+        public ComponentCreated() { }
+        #nullable enable
 
         public ComponentCreated(
             Guid componentId,

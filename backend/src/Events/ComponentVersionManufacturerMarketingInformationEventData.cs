@@ -33,7 +33,8 @@ namespace Icon.Events
 
         public override bool IsValid()
         {
-            return (ComponentVersionInformation?.IsValid() ?? true) &&
+            return
+              (ComponentVersionInformation?.IsValid() ?? true) &&
               (InstitutionInformation?.IsValid() ?? true);
         }
     }

@@ -29,12 +29,11 @@ namespace Icon.Events
 
         public Guid ComponentVersionId { get; set; }
         public Guid ComponentId { get; set; }
-        public ComponentInformationEventData? Information { get; }
+        public ComponentInformationEventData Information { get; set; }
 
-        public ComponentVersionCreated() {
-          ComponentVersionId = Guid.Empty;
-          ComponentId = Guid.Empty;
-        }
+        #nullable disable
+        public ComponentVersionCreated() { }
+        #nullable enable
 
         public ComponentVersionCreated(
             Guid componentVersionId,

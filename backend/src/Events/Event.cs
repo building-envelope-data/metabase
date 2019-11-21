@@ -15,7 +15,9 @@ namespace Icon.Events
 
         public Guid CreatorId { get; set; }
 
+        #nullable disable
         public Event() { }
+        #nullable enable
 
         public Event(Guid creatorId)
         {

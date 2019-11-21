@@ -23,14 +23,16 @@ namespace Icon.Events
                 );
         }
 
-        public string? Name { get; set; }
+        public string Name { get; set; }
         public string? Abbreviation { get; set; }
-        public string? Description { get; set; }
+        public string Description { get; set; }
         public DateTime? AvailableFrom { get; set; }
         public DateTime? AvailableUntil { get; set; }
-        public IReadOnlyCollection<ComponentCategoryEventData>? Categories { get; set; }
+        public IReadOnlyCollection<ComponentCategoryEventData> Categories { get; set; }
 
+        #nullable disable
         public ComponentInformationEventData() { }
+        #nullable enable
 
         public ComponentInformationEventData(
             string name,
