@@ -22,11 +22,11 @@ namespace Icon.GraphQl
         }
 
         public Guid ComponentId { get; set; }
-        public ComponentInformation? Information { get; set; }
+        public ComponentInformation Information { get; set; }
 
-        public ComponentVersion() {
-            ComponentId = Guid.Empty;
-        }
+        #nullable disable
+        public ComponentVersion() { }
+        #nullable enable
 
         public ComponentVersion(
             Guid id,

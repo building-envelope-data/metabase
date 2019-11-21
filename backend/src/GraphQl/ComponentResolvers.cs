@@ -28,7 +28,11 @@ namespace Icon.GraphQl
                 await QueryBus.Send<
                   Queries.ListComponentVersions,
                   IEnumerable<Result<Models.ComponentVersion, IError>>
-                >(new Queries.ListComponentVersions(component.Id.NotEmpty(), timestamp))
+                >(new Queries.ListComponentVersions(
+                    component.Id.NotEmpty(),
+                    timestamp
+                    )
+                  )
                 )
               .Select(c => ComponentVersion.FromModel(c, timestamp));
         }

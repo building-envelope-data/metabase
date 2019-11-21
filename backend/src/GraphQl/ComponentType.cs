@@ -15,9 +15,7 @@ namespace Icon.GraphQl
                 .Type<NonNullType<ComponentInformationType>>();
 
             descriptor.Field<ComponentResolvers>(
-                #nullable disable
-                t => t.GetVersions(default, default)
-                #nullable enable
+                t => t.GetVersions(default!, default!)
                 )
                 .Type<NonNullType<ListType<NonNullType<ComponentVersionType>>>>();
         }

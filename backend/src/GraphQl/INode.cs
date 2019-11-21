@@ -5,8 +5,8 @@ namespace Icon.GraphQl
 {
     public interface INode
     {
-        public Guid? Id { get; set; }
-        public DateTime? Timestamp { get; set; }
-        public DateTime? RequestTimestamp { get; set; }
+        public Guid Id { get; set; }
+        public DateTime Timestamp { get; set; }
+        public DateTime RequestTimestamp { get; set; }
     }
 }

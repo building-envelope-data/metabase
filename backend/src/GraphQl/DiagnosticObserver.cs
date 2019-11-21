@@ -143,8 +143,12 @@ namespace Icon.GraphQl
         {
             foreach (IError error in errors)
             {
-                string path = string.Join("/",
-                    error.Path.Select(t => t.ToString()));
+                var path = error.Path is null
+                  ? "unknown"
+                  : string.Join(
+                    "/",
+                    error.Path.Select(t => t.ToString())
+                    );
 
                 if (error.Exception is null)
                 {

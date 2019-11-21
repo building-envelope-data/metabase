@@ -51,7 +51,10 @@ namespace Icon.GraphQl
             )
         {
             var requestTimestamp = HandleTimestamp(timestamp, resolverContext);
-            return componentLoader.LoadAsync((id.NotEmpty(), requestTimestamp));
+            return
+              componentLoader.LoadAsync(
+                  (id.NotEmpty(), requestTimestamp)
+                  );
             /* return */
             /*   Component.FromModel( */
             /*       (await _queryBus */
