@@ -215,6 +215,7 @@ namespace Icon.Infrastructure.Aggregate
         private Result<T, IError> BuildResult<T>(Guid id, T aggregate)
           where T : class, IEventSourcedAggregate, new()
         {
+            aggregate?.EnsureValid();
             if (aggregate is null || aggregate.Version == 0)
             {
                 return Result.Failure<T, IError>(BuildNonExistentModelError(id));
