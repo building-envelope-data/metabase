@@ -1,6 +1,7 @@
 // Inspired by https://hotchocolate.io/docs/instrumentation
 // and https://github.com/ChilliCream/hotchocolate-examples/tree/master/Instrumentation
 
+using System.Text.Json;
 using System.Text;
 using System.IO;
 using System;
@@ -25,6 +26,8 @@ namespace Icon.GraphQl
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /* QUERY */
+
         [DiagnosticName("HotChocolate.Execution.Query")]
         public void OnQuery(IQueryContext context)
         {
@@ -33,12 +36,17 @@ namespace Icon.GraphQl
             // end of this event.
         }
 
-        /* QUERY */
-
         [DiagnosticName("HotChocolate.Execution.Query.Start")]
         public void BeginQueryExecute(IQueryContext context)
         {
             _logger.LogInformation(context.Request.Query.ToString());
+            /* _logger.LogInformation(context.Request.QueryName); */
+            /* _logger.LogInformation(context.Request.QueryHash); */
+            _logger.LogInformation(context.Request.OperationName);
+            _logger.LogInformation(JsonSerializer.Serialize(context.Request.VariableValues));
+            /* _logger.LogInformation(context.Request.InitialValue?.ToString()); */
+            /* _logger.LogInformation(JsonSerializer.Serialize(context.Request.Properties)); */
+            /* _logger.LogInformation(JsonSerializer.Serialize(context.Request.Extensions)); */
         }
 
         [DiagnosticName("HotChocolate.Execution.Query.Stop")]
@@ -139,12 +147,14 @@ namespace Icon.GraphQl
             Log(errors);
         }
 
+        /* HELPER */
+
         private void Log(IEnumerable<IError> errors)
         {
             foreach (IError error in errors)
             {
                 var path = error.Path is null
-                  ? "unknown"
+                  ? "unknown-path"
                   : string.Join(
                     "/",
                     error.Path.Select(t => t.ToString())
