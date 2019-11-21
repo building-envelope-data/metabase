@@ -21,7 +21,9 @@ namespace Icon.Aggregates
         public ComponentInformationAggregateData? ComponentVersionInformation { get; set; }
         public InstitutionInformationAggregateData? InstitutionInformation { get; set; }
 
+        #nullable disable
         public ComponentVersionManufacturerMarketingInformationAggregateData() { }
+        #nullable enable
 
         public ComponentVersionManufacturerMarketingInformationAggregateData(
                 ComponentInformationAggregateData? componentVersionInformation,

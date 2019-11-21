@@ -27,14 +27,16 @@ namespace Icon.Aggregates
                 );
         }
 
-        public string? Name { get; set; }
+        public string Name { get; set; }
         public string? Abbreviation { get; set; }
-        public string? Description { get; set; }
+        public string Description { get; set; }
         public DateTime? AvailableFrom { get; set; }
         public DateTime? AvailableUntil { get; set; }
-        public ICollection<Models.ComponentCategory>? Categories { get; set; }
+        public ICollection<Models.ComponentCategory> Categories { get; set; }
 
+        #nullable disable
         public ComponentInformationAggregateData() { }
+        #nullable enable
 
         public ComponentInformationAggregateData(
             string name,
@@ -64,12 +66,12 @@ namespace Icon.Aggregates
         public Models.ComponentInformation ToModel()
         {
             return new Models.ComponentInformation(
-                  name: Name.NotNull(),
+                  name: Name,
                   abbreviation: Abbreviation,
-                  description: Description.NotNull(),
+                  description: Description,
                   availableFrom: AvailableFrom,
                   availableUntil: AvailableUntil,
-                  categories: Categories.NotNull()
+                  categories: Categories
                 );
         }
     }

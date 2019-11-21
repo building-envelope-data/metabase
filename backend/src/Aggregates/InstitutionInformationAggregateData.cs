@@ -13,19 +13,21 @@ namespace Icon.Aggregates
             )
         {
             return new InstitutionInformationAggregateData(
-                name: information.Name.NotNull(),
+                name: information.Name,
                 abbreviation: information.Abbreviation,
                 description: information.Description,
                 websiteLocator: information.WebsiteLocator
                 );
         }
 
-        public string? Name { get; set; }
+        public string Name { get; set; }
         public string? Abbreviation { get; set; }
         public string? Description { get; set; }
         public Uri? WebsiteLocator { get; set; }
 
+        #nullable disable
         public InstitutionInformationAggregateData() { }
+        #nullable enable
 
         public InstitutionInformationAggregateData(
             string name,
@@ -48,7 +50,7 @@ namespace Icon.Aggregates
         public Models.InstitutionInformation ToModel()
         {
             return new Models.InstitutionInformation(
-                name: Name.NotNull(),
+                name: Name,
                 abbreviation: Abbreviation,
                 description: Description,
                 websiteLocator: WebsiteLocator

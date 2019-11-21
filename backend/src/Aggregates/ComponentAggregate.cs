@@ -11,16 +11,18 @@ namespace Icon.Aggregates
     public sealed class ComponentAggregate
       : EventSourcedAggregate
     {
-        public ComponentInformationAggregateData? Information { get; set; }
+        public ComponentInformationAggregateData Information { get; set; }
 
+        #nullable disable
         public ComponentAggregate() { }
+        #nullable enable
 
         private void Apply(Marten.Events.Event<Events.ComponentCreated> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.ComponentId.NotEmpty();
-            Information = ComponentInformationAggregateData.From(data.Information.NotNull());
+            Id = data.ComponentId;
+            Information = ComponentInformationAggregateData.From(data.Information);
         }
 
         public override bool IsValid()
@@ -38,7 +40,7 @@ namespace Icon.Aggregates
             EnsureValid();
             return new Models.Component(
                 id: Id,
-                information: Information.NotNull().ToModel(),
+                information: Information.ToModel(),
                 timestamp: Timestamp
                 );
         }
