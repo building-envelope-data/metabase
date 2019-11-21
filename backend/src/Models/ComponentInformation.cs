@@ -6,6 +6,7 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class ComponentInformation
+      : Validatable
     {
         public string Name { get; }
         public string? Abbreviation { get; }
@@ -30,6 +31,14 @@ namespace Icon.Models
             AvailableFrom = availableFrom;
             AvailableUntil = availableUntil;
             Categories = categories;
+        }
+
+        public override bool IsValid()
+        {
+            return
+              !(Name is null) &&
+              !(Description is null) &&
+              !(Categories is null);
         }
     }
 }

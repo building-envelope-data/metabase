@@ -30,6 +30,16 @@ namespace Icon.Commands
             ComponentVersionId = componentVersionId;
             InstitutionId = institutionId;
             MarketingInformation = marketingInformation;
+            EnsureValid();
+        }
+
+        public override bool IsValid()
+        {
+            return
+              base.IsValid() &&
+              ComponentVersionId != Guid.Empty &&
+              InstitutionId != Guid.Empty &&
+              (MarketingInformation?.IsValid() ?? true);
         }
     }
 }

@@ -5,6 +5,7 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class InstitutionInformation
+      : Validatable
     {
         public string Name { get; }
         public string? Abbreviation { get; }
@@ -22,6 +23,11 @@ namespace Icon.Models
             Abbreviation = abbreviation;
             Description = description;
             WebsiteLocator = websiteLocator;
+        }
+
+        public override bool IsValid()
+        {
+            return !(Name is null);
         }
     }
 }
