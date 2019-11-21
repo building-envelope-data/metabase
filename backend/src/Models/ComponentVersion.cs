@@ -19,7 +19,7 @@ namespace Icon.Models
         {
             ComponentId = componentId;
             Information = information;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()

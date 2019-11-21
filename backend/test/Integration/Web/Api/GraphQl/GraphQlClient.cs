@@ -142,7 +142,7 @@ namespace Test.Integration.Web.Api.GraphQl
               (await GetComponents())
               .EnsureSuccess()
               .components
-							.NotNull();
+                            .NotNull();
         }
     }
 }

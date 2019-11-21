@@ -11,9 +11,9 @@ namespace Icon.GraphQl
         public DateTime Timestamp { get; set; }
         public DateTime RequestTimestamp { get; set; } // TODO? Better name it `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
 
-        #nullable disable
+#nullable disable
         public Node() { }
-        #nullable enable
+#nullable enable
 
         public Node(
             Guid id,

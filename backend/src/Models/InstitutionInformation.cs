@@ -23,7 +23,7 @@ namespace Icon.Models
             Abbreviation = abbreviation;
             Description = description;
             WebsiteLocator = websiteLocator;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()

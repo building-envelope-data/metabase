@@ -22,7 +22,7 @@ namespace Icon.Models
             ComponentVersionId = componentVersionId;
             InstitutionId = institutionId;
             MarketingInformation = marketingInformation;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()

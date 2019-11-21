@@ -17,7 +17,7 @@ namespace Icon.Models
         {
             ComponentVersionInformation = componentVersionInformation;
             InstitutionInformation = institutionInformation;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()

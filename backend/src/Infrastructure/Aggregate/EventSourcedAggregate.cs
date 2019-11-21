@@ -17,10 +17,11 @@ namespace Icon.Infrastructure.Aggregate
         // For protecting the state, i.e. conflict prevention
         public int Version { get; set; }
 
-        protected EventSourcedAggregate() {
-          Id = Guid.Empty;
-          Timestamp = DateTime.MinValue;
-          Version = 0;
+        protected EventSourcedAggregate()
+        {
+            Id = Guid.Empty;
+            Timestamp = DateTime.MinValue;
+            Version = 0;
         }
 
         protected void ApplyMeta<E>(Marten.Events.Event<E> @event)

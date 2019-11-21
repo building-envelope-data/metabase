@@ -19,7 +19,7 @@ namespace Icon.Models
         {
             SuperComponentVersionId = superComponentVersionId;
             SubComponentVersionId = subComponentVersionId;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()

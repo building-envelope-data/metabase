@@ -12,7 +12,7 @@ namespace Icon.Models
             )
           : base(id, timestamp)
         {
-          EnsureValid();
+            EnsureValid();
         }
     }
 }

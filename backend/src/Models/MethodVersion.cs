@@ -20,7 +20,7 @@ namespace Icon.Models
         {
             MethodId = methodId;
             Information = information;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()

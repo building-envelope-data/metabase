@@ -24,7 +24,7 @@ namespace Icon.Models
             PostalAddress = postalAddress;
             EmailAddress = emailAddress;
             WebsiteLocator = websiteLocator;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()

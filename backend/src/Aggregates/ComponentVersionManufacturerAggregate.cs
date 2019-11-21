@@ -19,9 +19,9 @@ namespace Icon.Aggregates
 
         public ComponentVersionManufacturerMarketingInformationAggregateData? MarketingInformation { get; set; }
 
-        #nullable disable
+#nullable disable
         public ComponentVersionManufacturerAggregate() { }
-        #nullable enable
+#nullable enable
 
         private void Apply(Marten.Events.Event<Events.ComponentVersionManufacturerCreated> @event)
         {

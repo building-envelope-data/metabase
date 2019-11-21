@@ -34,9 +34,9 @@ namespace Icon.Aggregates
         public DateTime? AvailableUntil { get; set; }
         public ICollection<Models.ComponentCategory> Categories { get; set; }
 
-        #nullable disable
+#nullable disable
         public ComponentInformationAggregateData() { }
-        #nullable enable
+#nullable enable
 
         public ComponentInformationAggregateData(
             string name,

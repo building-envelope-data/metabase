@@ -30,9 +30,9 @@ namespace Icon.Events
         public DateTime? AvailableUntil { get; set; }
         public IReadOnlyCollection<ComponentCategoryEventData> Categories { get; set; }
 
-        #nullable disable
+#nullable disable
         public ComponentInformationEventData() { }
-        #nullable enable
+#nullable enable
 
         public ComponentInformationEventData(
             string name,

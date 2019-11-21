@@ -8,38 +8,38 @@ using System;
 
 namespace Icon
 {
-  public static class NotNullExtensions
-  {
-    public static T NotNull<T>(this T? @object, string paramName) where T : class
+    public static class NotNullExtensions
     {
-      if (@object is null)
-      {
-        throw new InvalidOperationException(paramName);
-      }
-      return @object!;
-    }
-
-    public static T NotNull<T>(this T? @object) where T : class
-    {
-        return @object.NotNull("unknown");
-    }
-
-    public static Guid NotEmpty(this Guid id)
-    {
-      if (id == Guid.Empty)
-      {
-        throw new InvalidOperationException("Guid is empty");
-      }
-      return id;
-    }
-
-    public static Guid NotEmpty(this Guid? id)
-    {
-        if (id is null)
+        public static T NotNull<T>(this T? @object, string paramName) where T : class
         {
-          throw new InvalidOperationException("Guid is null");
+            if (@object is null)
+            {
+                throw new InvalidOperationException(paramName);
+            }
+            return @object!;
         }
-        return id!.NotEmpty();
+
+        public static T NotNull<T>(this T? @object) where T : class
+        {
+            return @object.NotNull("unknown");
+        }
+
+        public static Guid NotEmpty(this Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                throw new InvalidOperationException("Guid is empty");
+            }
+            return id;
+        }
+
+        public static Guid NotEmpty(this Guid? id)
+        {
+            if (id is null)
+            {
+                throw new InvalidOperationException("Guid is null");
+            }
+            return id!.NotEmpty();
+        }
     }
-  }
 }

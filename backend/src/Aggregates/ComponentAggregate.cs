@@ -13,9 +13,9 @@ namespace Icon.Aggregates
     {
         public ComponentInformationAggregateData Information { get; set; }
 
-        #nullable disable
+#nullable disable
         public ComponentAggregate() { }
-        #nullable enable
+#nullable enable
 
         private void Apply(Marten.Events.Event<Events.ComponentCreated> @event)
         {

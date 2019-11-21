@@ -31,7 +31,7 @@ namespace Icon.Models
             PublicationLocator = publicationLocator;
             CodeLocator = codeLocator;
             Categories = categories;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()

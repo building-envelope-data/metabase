@@ -19,7 +19,7 @@ namespace Icon.Models
         {
             MethodId = methodId;
             StakeholderId = stakeholderId;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()

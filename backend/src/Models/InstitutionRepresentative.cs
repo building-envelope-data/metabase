@@ -22,7 +22,7 @@ namespace Icon.Models
             InstitutionId = institutionId;
             UserId = userId;
             Role = role;
-          EnsureValid();
+            EnsureValid();
         }
 
         public override bool IsValid()
