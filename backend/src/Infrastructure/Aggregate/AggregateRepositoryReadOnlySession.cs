@@ -203,7 +203,10 @@ namespace Icon.Infrastructure.Aggregate
                                possibleIds.Select(id => (Id: id, Timestamp: timestamp)),
                                cancellationToken
                               )
-             ).Where(r => r.IsFailure || r.Value.Version >= 1);
+             ).Where(r =>
+               r.IsSuccess ||
+               (r.IsFailure && r.Error.Code != ErrorCodes.NonExistentModel)
+               );
         }
 
         private Result<T, IError> BuildResult<T>((Guid Id, DateTime Timestamp) idAndTimestamp, T aggregate)
