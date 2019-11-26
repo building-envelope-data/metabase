@@ -15,7 +15,7 @@ using CSharpFunctionalExtensions;
 namespace Icon.Handlers
 {
     public sealed class CreateComponentVersionManufacturerHandler
-      : ICommandHandler<Commands.CreateComponentVersionManufacturer, Result<(Guid Id, DateTime Timestamp), IError>>
+      : ICommandHandler<Commands.CreateComponentVersionManufacturer, Result<(ValueObjects.Id, ValueObjects.Timestamp), IError>>
     {
         private readonly IAggregateRepository _repository;
 
@@ -24,7 +24,7 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<Result<(Guid Id, DateTime Timestamp), IError>> Handle(
+        public async Task<Result<(ValueObjects.Id, ValueObjects.Timestamp), IError>> Handle(
             Commands.CreateComponentVersionManufacturer command,
             CancellationToken cancellationToken
             )

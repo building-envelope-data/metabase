@@ -1,4 +1,6 @@
 using Guid = System.Guid;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 
 namespace Icon.Events
@@ -7,7 +9,7 @@ namespace Icon.Events
       : Validatable
     {
         public static ComponentVersionManufacturerMarketingInformationEventData From(
-            Models.ComponentVersionManufacturerMarketingInformation information
+            ValueObjects.ComponentVersionManufacturerMarketingInformation information
             )
         {
             return new ComponentVersionManufacturerMarketingInformationEventData(
@@ -31,11 +33,13 @@ namespace Icon.Events
             EnsureValid();
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return
-              (ComponentVersionInformation?.IsValid() ?? true) &&
-              (InstitutionInformation?.IsValid() ?? true);
+          return
+            Result.Combine(
+                ComponentVersionInformation?.Validate() ?? Result.Ok<bool, Errors>(true),
+                InstitutionInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                );
         }
     }
 }

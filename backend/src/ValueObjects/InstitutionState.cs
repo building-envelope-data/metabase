@@ -1,4 +1,4 @@
-namespace Icon.Models
+namespace Icon.ValueObjects
 {
     public enum InstitutionState
     {

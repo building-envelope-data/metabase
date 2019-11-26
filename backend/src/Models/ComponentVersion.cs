@@ -1,4 +1,6 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -6,28 +8,37 @@ namespace Icon.Models
     public sealed class ComponentVersion
       : Model
     {
-        public Guid ComponentId { get; }
-        public ComponentInformation Information { get; }
+        public ValueObjects.Id ComponentId { get; }
+        public ValueObjects.ComponentInformation Information { get; }
 
-        public ComponentVersion(
-            Guid id,
-            Guid componentId,
-            ComponentInformation information,
-            DateTime timestamp
+        private ComponentVersion(
+            ValueObjects.Id id,
+            ValueObjects.Id componentId,
+            ValueObjects.ComponentInformation information,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             ComponentId = componentId;
             Information = information;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<ComponentVersion, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Id componentId,
+            ValueObjects.ComponentInformation information,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              ComponentId != Guid.Empty &&
-              Information.IsValid();
+              Result.Ok<ComponentVersion, Errors>(
+                  new ComponentVersion(
+            id: id,
+            componentId: componentId,
+            information: information,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

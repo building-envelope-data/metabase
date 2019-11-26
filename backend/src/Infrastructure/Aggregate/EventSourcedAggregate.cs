@@ -1,13 +1,15 @@
 // Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
 
 using System;
+using CSharpFunctionalExtensions;
 using System.Collections.Generic;
 using Icon.Events;
 using Newtonsoft.Json;
 
 namespace Icon.Infrastructure.Aggregate
 {
-    public abstract class EventSourcedAggregate : Validatable, IEventSourcedAggregate
+    public abstract class EventSourcedAggregate
+      : Validatable, IEventSourcedAggregate
     {
         // For indexing our event streams
         public Guid Id { get; set; }
@@ -32,14 +34,6 @@ namespace Icon.Infrastructure.Aggregate
             Version = @event.Version;
         }
 
-        public void EnsureNotVirgin()
-        {
-            if (IsVirgin())
-            {
-                throw new InvalidOperationException($"The aggregate {this} is a virgin.");
-            }
-        }
-
         public bool IsVirgin()
         {
             return
@@ -48,13 +42,32 @@ namespace Icon.Infrastructure.Aggregate
                Version is 0;
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return IsVirgin() || (
-               Id != Guid.Empty &&
-               Timestamp != DateTime.MinValue &&
-               !(Version is 0)
-               );
+          if (IsVirgin())
+            return Result.Ok<bool, Errors>(true);
+
+          else
+            return
+              Result.Combine<bool, Errors>(
+                ValidateNonEmpty(Id, nameof(Id)),
+                ValidateNotMinValue(Timestamp, nameof(Timestamp)),
+                ValidateNonZero(Version, nameof(Version))
+                );
+        }
+
+        public Result<bool, Errors> ValidateNonVirgin()
+        {
+            if (IsVirgin())
+                return
+                  Result.Failure<bool, Errors>(
+                      Errors.One(
+                        message: $"The aggregate {this} is a virgin",
+                        code: InvalidState.InvalidState
+                        )
+                      );
+
+            return Validate();
         }
     }
 }

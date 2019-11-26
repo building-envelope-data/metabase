@@ -1,7 +1,7 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 
-namespace Icon.Models
+namespace Icon.ValueObjects
 {
     // What enums are is explained in https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/enum
     // How they can be used with PostgreSQL is explained in https://www.npgsql.org/doc/types/enums_and_composites.html

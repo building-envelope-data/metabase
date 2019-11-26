@@ -1,6 +1,10 @@
 using System;
+using Array = System.Array;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using ErrorBuilder = HotChocolate.ErrorBuilder;
+using IError = HotChocolate.IError;
+using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.ValueObjects
 {
@@ -14,17 +18,34 @@ namespace Icon.ValueObjects
       Value = value;
     }
 
-    public static Result<Name> From(string name)
+    public static Result<Name, IError> From(
+        string name,
+        IReadOnlyList<object>? path = null
+        )
     {
       name = name.Trim();
 
       if (name.Length == 0)
-        return Result.Failure<Name>("Name is empty");
+        return Result.Failure<Name, IError>(
+            ErrorBuilder.New()
+            .SetMessage("Name is empty")
+            .SetCode(ErrorCodes.InvalidValue)
+            .SetPath(path)
+            .Build()
+            );
 
-      if (name.Length >= 128)
-        return Result.Failure<Name>("Name is too long");
+      if (name.Length > 128)
+        return Result.Failure<Name, IError>(
+            ErrorBuilder.New()
+            .SetMessage("Name is too long")
+            .SetCode(ErrorCodes.InvalidValue)
+            .SetPath(path)
+            .Build()
+            );
 
-      return Result.Ok(new Name(name));
+      return Result.Ok<Name, IError>(
+          new Name(name)
+          );
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

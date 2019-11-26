@@ -1,4 +1,4 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 
 namespace Icon.Models

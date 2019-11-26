@@ -16,19 +16,17 @@ namespace Icon.GraphQl
 {
     public sealed class Timestamp
     {
-        public static Result<DateTime, IError> Sanitize(DateTime? maybeTimestamp, DateTime requestTimestamp)
+        public static Result<ValueObjects.Timestamp, IError> Sanitize(
+            DateTime? maybeTimestamp,
+            DateTime requestTimestamp
+            )
         {
             var timestamp = maybeTimestamp ?? requestTimestamp;
-            if (timestamp > requestTimestamp)
-            {
-                return Result.Failure<DateTime, IError>(
-                    ErrorBuilder.New()
-                    .SetMessage($"Timestamp {timestamp} is in the future.")
-                    .SetCode(ErrorCodes.InvalidValue)
-                    .Build()
-                    );
-            }
-            return Result.Success<DateTime, IError>(timestamp);
+            return ValueObjects.Timestamp.From(
+                timestamp,
+                now: requestTimestamp,
+                path: Array.Empty<object>() // TODO What is the proper path for variables?
+                );
         }
 
         public static void StoreRequest(DateTime timestamp, IQueryRequestBuilder requestBuilder)

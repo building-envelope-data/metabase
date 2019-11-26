@@ -4,6 +4,7 @@ using Icon.Infrastructure.Aggregate;
 using Marten.Schema;
 /* using DateInterval = NodaTime.DateInterval; */
 using DateTime = System.DateTime;
+using CSharpFunctionalExtensions;
 using Events = Icon.Events;
 
 namespace Icon.Aggregates
@@ -32,36 +33,57 @@ namespace Icon.Aggregates
             MarketingInformation = data.MarketingInformation is null ? null : ComponentVersionManufacturerMarketingInformationAggregateData.From(data.MarketingInformation);
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return
-              base.IsValid() &&
-              (
-                IsVirgin() &&
-                ComponentVersionId == Guid.Empty &&
-                InstitutionId == Guid.Empty &&
-                MarketingInformation is null
-              )
-              ||
-              (
-                  !IsVirgin() &&
-                  ComponentVersionId != Guid.Empty &&
-                  InstitutionId != Guid.Empty &&
-                  (MarketingInformation?.IsValid() ?? false)
-              );
+            if (IsVirgin())
+              return
+                Result.Combine(
+                    base.Validate(),
+                    ValidateEmpty(ComponentId),
+                    ValidateEmpty(InstitutionId),
+                    ValidateNull(MarketingInformation)
+                    );
+
+            else
+              return
+                Result.Combine(
+                    base.Validate(),
+                    ValidateNonEmpty(ComponentId, nameof(ComponentId)),
+                    ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
+                    MarketingInformation.Validate()
+                    );
         }
 
-        public Models.ComponentVersionManufacturer ToModel()
+        public Result<Models.ComponentVersionManufacturer, Errors> ToModel()
         {
-            EnsureNotVirgin();
-            EnsureValid();
-            return new Models.ComponentVersionManufacturer(
-              id: Id,
-              componentVersionId: ComponentVersionId,
-              institutionId: InstitutionId,
-              marketingInformation: MarketingInformation?.ToModel(),
-              timestamp: Timestamp
-            );
+          var virginResult = ValidateNonVirgin();
+          if (virginResult.IsFailure)
+            return Result.Failure<ValueObjects.ComponentVersionManufacturer, Errors>(virginResult.Error);
+
+          var idResult = ValueObjects.Id.From(Id);
+          var componentVersionIdResult = ValueObjects.Id.From(componentVersionId);
+          var institutionIdResult = ValueObjects.Id.From(institutionId);
+          var marketingInformationResult = MarketingInformation.ToValueObject();
+          var timestampResult = ValueObjects.Timestamp.From(Timestamp);
+
+          var errors = Errors.From(
+              idResult,
+              componentVersionIdResult,
+              institutionIdResult,
+              marketingInformationResult,
+              timestampResult
+              );
+
+          if (!errors.IsEmpty())
+            return Result.Failure<ValueObjects.ComponentVersionManufacturer, Errors>(errors);
+
+          return Models.ComponentVersionManufacturer.From(
+              id: idResult.Value,
+              componentVersionId: componentVersionIdResult.Value,
+              institutionId: institutionIdResult.Value,
+              marketingInformation: marketingInformationResult.Value,
+              timestamp: timestampResult.Value
+              );
         }
     }
 }

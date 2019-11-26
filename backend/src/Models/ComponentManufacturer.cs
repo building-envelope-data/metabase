@@ -1,4 +1,6 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -6,28 +8,37 @@ namespace Icon.Models
     public sealed class ComponentManufacturer
       : Model
     {
-        public Guid ComponentId { get; }
-        public Guid InstitutionId { get; }
+        public ValueObjects.Id ComponentId { get; }
+        public ValueObjects.Id InstitutionId { get; }
 
-        public ComponentManufacturer(
-            Guid id,
-            Guid componentId,
-            Guid institutionId,
-            DateTime timestamp
+        private ComponentManufacturer(
+            ValueObjects.Id id,
+            ValueObjects.Id componentId,
+            ValueObjects.Id institutionId,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             ComponentId = componentId;
             InstitutionId = institutionId;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<ComponentManufacturer, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Id componentId,
+            ValueObjects.Id institutionId,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              ComponentId != Guid.Empty &&
-              InstitutionId != Guid.Empty;
+              Result.Ok<ComponentManufacturer, Errors>(
+                  new ComponentManufacturer(
+            id: id,
+            componentId: componentId,
+            institutionId: institutionId,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

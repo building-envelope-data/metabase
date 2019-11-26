@@ -1,4 +1,5 @@
 using Icon;
+using CSharpFunctionalExtensions;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 using Models = Icon.Models;
@@ -34,18 +35,31 @@ namespace Icon.Aggregates
             InstitutionInformation = institutionInformation;
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return
-              (ComponentVersionInformation?.IsValid() ?? true) &&
-              (InstitutionInformation?.IsValid() ?? true);
+          return
+            Result.Combine(
+                ComponentVersionInformation?.Validate() ?? Result.Ok<bool, Errors>(true),
+                InstitutionInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                );
         }
 
-        public Models.ComponentVersionManufacturerMarketingInformation ToModel()
+        public ValueObjects.ComponentVersionManufacturerMarketingInformation ToValueObject()
         {
-            return new Models.ComponentVersionManufacturerMarketingInformation(
-                componentVersionInformation: ComponentVersionInformation?.ToModel(),
-                institutionInformation: InstitutionInformation?.ToModel()
+          var componentVersionInformationResult = ComponentVersionInformation?.ToValueObject();
+          var institutionInformationResult = InstitutionInformation?.ToValueObject();
+
+          var errors = Errors.From(
+              componentVersionInformationResult ?? Result.Ok<bool, Errors>(true),
+              institutionInformationResult ?? Result.Ok<bool, Errors>(true)
+              );
+
+          if (!errors.IsEmpty())
+            return Result.Failure<ValueObjects.ComponentVersionManufacturerMarketingInformation, Errors>(errors);
+
+            return ValueObjects.ComponentVersionManufacturerMarketingInformation.From(
+                componentVersionInformation: componentVersionInformation?.Value,
+                institutionInformation: institutionInformationResult?.Value
                 );
         }
     }

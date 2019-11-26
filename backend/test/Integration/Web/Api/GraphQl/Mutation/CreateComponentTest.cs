@@ -33,7 +33,7 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
                 description: "Best component ever!",
                 availableFrom: null,
                 availableUntil: null,
-                categories: new Models.ComponentCategory[0] {}
+                categories: new ValueObjects.ComponentCategory[0] {}
                 )
               );
             // Assert
@@ -58,7 +58,7 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
                 description: "Best component ever!",
                 availableFrom: null,
                 availableUntil: null,
-                categories: new Models.ComponentCategory[0] {}
+                categories: new ValueObjects.ComponentCategory[0] {}
                 )
                 );
             // Assert

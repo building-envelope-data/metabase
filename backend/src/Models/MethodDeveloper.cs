@@ -1,4 +1,6 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -6,28 +8,37 @@ namespace Icon.Models
     public sealed class MethodDeveloper
       : Model
     {
-        public Guid MethodId { get; }
-        public Guid StakeholderId { get; }
+        public ValueObjects.Id MethodId { get; }
+        public ValueObjects.Id StakeholderId { get; }
 
-        public MethodDeveloper(
-            Guid id,
-            Guid methodId,
-            Guid stakeholderId,
-            DateTime timestamp
+        private MethodDeveloper(
+            ValueObjects.Id id,
+            ValueObjects.Id methodId,
+            ValueObjects.Id stakeholderId,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             MethodId = methodId;
             StakeholderId = stakeholderId;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<MethodDeveloper, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Id methodId,
+            ValueObjects.Id stakeholderId,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              MethodId != Guid.Empty &&
-              StakeholderId != Guid.Empty;
+              Result.Ok<MethodDeveloper, Errors>(
+                  new MethodDeveloper(
+            id: id,
+            methodId: methodId,
+            stakeholderId: stakeholderId,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

@@ -1,28 +1,20 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
     public abstract class Model
-      : Validatable
     {
-        public Guid Id { get; }
-        public DateTime Timestamp { get; }
+        public ValueObjects.Id Id { get; }
+        public ValueObjects.Timestamp Timestamp { get; }
 
         public Model(
-            Guid id,
-            DateTime timestamp
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp
             )
         {
             Id = id;
             Timestamp = timestamp;
-        }
-
-        public override bool IsValid()
-        {
-            return
-              Id != Guid.Empty &&
-              Timestamp != DateTime.MinValue;
         }
     }
 }

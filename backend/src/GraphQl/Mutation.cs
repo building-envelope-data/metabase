@@ -34,26 +34,29 @@ namespace Icon.GraphQl
             IResolverContext resolverContext
             )
         {
+            var validatedInput =
+              ResultHelpers.HandleFailure(
+                  input.Validate(path: Array.Empty<object>()) // TODO What is the proper path for variables?
+                  );
             var command =
-              new Commands.CreateComponent(
-                  information: new Models.ComponentInformation(
-                    name: input.Name,
-                    abbreviation: input.Abbreviation,
-                    description: input.Description,
-                    availableFrom: input.AvailableFrom,
-                    availableUntil: input.AvailableUntil,
-                    categories: input.Categories
-                    ),
-                    creatorId: Guid.NewGuid() // TODO Use current user!
+              ResultHelpers.HandleFailure(
+                  Commands.CreateComponent.From(
+                    input: validatedInput,
+                    creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                    )
                   );
             var result =
               await _commandBus
                 .Send<
                    Commands.CreateComponent,
-                   Result<(Guid Id, DateTime Timestamp), IError>
+                   Result<(ValueObjects.Id, ValueObjects.Timestamp), IError>
                  >(command);
             var (id, timestamp) = ResultHelpers.HandleFailure(result);
             Timestamp.Store(timestamp, resolverContext);
+            var query =
+              ResultHelpers.HandleFailure(
+                Queries.GetComponent.From(id, timestamp)
+                );
             return
               Component.FromModel(
                   ResultHelpers.HandleFailure(
@@ -61,7 +64,7 @@ namespace Icon.GraphQl
                       .Send<
                          Queries.GetComponent,
                          Result<Models.Component, IError>
-                         >(new Queries.GetComponent(id, timestamp))
+                         >(query)
                     ),
                   timestamp
                   );
@@ -72,27 +75,29 @@ namespace Icon.GraphQl
             IResolverContext resolverContext
             )
         {
+            var validatedInput =
+              ResultHelpers.HandleFailure(
+                  input.Validate(path: Array.Empty<object>()) // TODO What is the proper path for variables?
+                  );
             var command =
-              new Commands.CreateComponentVersion(
-                  componentId: input.ComponentId.NotEmpty(),
-                  information: new Models.ComponentInformation(
-                    name: input.Name,
-                    abbreviation: input.Abbreviation,
-                    description: input.Description,
-                    availableFrom: input.AvailableFrom,
-                    availableUntil: input.AvailableUntil,
-                    categories: input.Categories
-                    ),
-                    creatorId: Guid.NewGuid() // TODO Use current user!
+              ResultHelpers.HandleFailure(
+                  Commands.CreateComponentVersion.From(
+                    input: validatedInput,
+                    creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                    )
                   );
             var result =
               await _commandBus
                .Send<
                   Commands.CreateComponentVersion,
-                  Result<(Guid Id, DateTime Timestamp), IError>
+                  Result<(ValueObjects.Id, ValueObjects.Timestamp), IError>
                 >(command);
             var (id, timestamp) = ResultHelpers.HandleFailure(result);
             Timestamp.Store(timestamp, resolverContext);
+            var query =
+              ResultHelpers.HandleFailure(
+                Queries.GetComponentVersion.From(id, timestamp)
+                );
             return
               ComponentVersion.FromModel(
                   ResultHelpers.HandleFailure(
@@ -100,7 +105,7 @@ namespace Icon.GraphQl
                       .Send<
                          Queries.GetComponentVersion,
                          Result<Models.ComponentVersion, IError>
-                         >(new Queries.GetComponentVersion(id, timestamp))
+                         >(query)
                     ),
                   timestamp
                   );

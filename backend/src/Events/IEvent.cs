@@ -1,5 +1,6 @@
 using MediatR;
 using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Events
 {

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
-using Guid = System.Guid;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -7,28 +9,37 @@ namespace Icon.Models
     public class MethodVersion
       : Model
     {
-        public Guid MethodId { get; }
-        public MethodInformation Information { get; }
+        public ValueObjects.Id MethodId { get; }
+        public ValueObjects.MethodInformation Information { get; }
 
-        public MethodVersion(
-            Guid id,
-            Guid methodId,
-            MethodInformation information,
-            DateTime timestamp
+        private MethodVersion(
+            ValueObjects.Id id,
+            ValueObjects.Id methodId,
+            ValueObjects.MethodInformation information,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             MethodId = methodId;
             Information = information;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<MethodVersion, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Id methodId,
+            ValueObjects.MethodInformation information,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              MethodId != Guid.Empty &&
-              Information.IsValid();
+              Result.Ok<MethodVersion, Errors>(
+                  new MethodVersion(
+            id: id,
+            methodId: methodId,
+            information: information,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

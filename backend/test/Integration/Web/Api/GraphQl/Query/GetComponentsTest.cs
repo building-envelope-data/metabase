@@ -50,7 +50,7 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                 description: "Best component ever!",
                 availableFrom: null,
                 availableUntil: null,
-                categories: new Models.ComponentCategory[0] {}
+                categories: new ValueObjects.ComponentCategory[0] {}
                 )
               );
             // Act
@@ -73,7 +73,7 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                 description: "Best component ever!",
                 availableFrom: null,
                 availableUntil: null,
-                categories: new Models.ComponentCategory[0] {}
+                categories: new ValueObjects.ComponentCategory[0] {}
                 )
               );
               var component2 = await Client.CreateComponentSuccessfully(
@@ -83,10 +83,10 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                 description: "Second best component ever!",
                 availableFrom: DateTime.UtcNow,
                 availableUntil: null,
-                categories: new Models.ComponentCategory[2]
+                categories: new ValueObjects.ComponentCategory[2]
                 {
-                Models.ComponentCategory.Layer,
-                Models.ComponentCategory.Unit
+                ValueObjects.ComponentCategory.Layer,
+                ValueObjects.ComponentCategory.Unit
                 }
                 )
                   );
@@ -97,10 +97,10 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                 description: "Third best component ever!",
                 availableFrom: null,
                 availableUntil: DateTime.UtcNow,
-                categories: new Models.ComponentCategory[2]
+                categories: new ValueObjects.ComponentCategory[2]
                 {
-                Models.ComponentCategory.Material,
-                Models.ComponentCategory.Layer
+                ValueObjects.ComponentCategory.Material,
+                ValueObjects.ComponentCategory.Layer
                 }
                 )
                   );
@@ -111,7 +111,7 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                 description: "Fourth best component ever!",
                 availableFrom: null,
                 availableUntil: null,
-                categories: new Models.ComponentCategory[0] {}
+                categories: new ValueObjects.ComponentCategory[0] {}
                 )
                   );
               var component5 = await Client.CreateComponentSuccessfully(
@@ -121,9 +121,9 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                 description: "Fifth best component ever!",
                 availableFrom: DateTime.UtcNow.AddDays(2),
                 availableUntil: DateTime.UtcNow.AddDays(10),
-                categories: new Models.ComponentCategory[1]
+                categories: new ValueObjects.ComponentCategory[1]
                 {
-                Models.ComponentCategory.Material
+                ValueObjects.ComponentCategory.Material
                 }
                 )
                   );

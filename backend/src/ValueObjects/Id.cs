@@ -1,6 +1,10 @@
 using System;
+using Array = System.Array;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using ErrorBuilder = HotChocolate.ErrorBuilder;
+using IError = HotChocolate.IError;
+using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.ValueObjects
 {
@@ -14,12 +18,21 @@ namespace Icon.ValueObjects
       Value = value;
     }
 
-    public static Result<Id> From(Guid id)
+    public static Result<Id, IError> From(
+        Guid id,
+        IReadOnlyList<object>? path = null
+        )
     {
       if (id == Guid.Empty)
-        return Result.Failure<Id>("Id is empty");
+        return Result.Failure<Id, IError>(
+            ErrorBuilder.New()
+            .SetMessage("Id is empty")
+            .SetCode(ErrorCodes.InvalidValue)
+            .SetPath(path)
+            .Build()
+            );
 
-      return Result.Ok(new Id(id));
+      return Result.Ok<Id, IError>(new Id(id));
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

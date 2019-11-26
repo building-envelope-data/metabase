@@ -1,4 +1,6 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -6,31 +8,42 @@ namespace Icon.Models
     public sealed class InstitutionRepresentative
       : Model
     {
-        public Guid InstitutionId { get; }
-        public Guid UserId { get; }
-        public InstitutionRepresentativeRole Role { get; }
+        public ValueObjects.Id InstitutionId { get; }
+        public ValueObjects.Id UserId { get; }
+        public ValueObjects.InstitutionRepresentativeRole Role { get; }
 
-        public InstitutionRepresentative(
-            Guid id,
-            Guid institutionId,
-            Guid userId,
-            InstitutionRepresentativeRole role,
-            DateTime timestamp
+        private InstitutionRepresentative(
+            ValueObjects.Id id,
+            ValueObjects.Id institutionId,
+            ValueObjects.Id userId,
+            ValueObjects.InstitutionRepresentativeRole role,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             InstitutionId = institutionId;
             UserId = userId;
             Role = role;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<InstitutionRepresentative, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Id institutionId,
+            ValueObjects.Id userId,
+            ValueObjects.InstitutionRepresentativeRole role,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              InstitutionId != Guid.Empty &&
-              UserId != Guid.Empty;
+              Result.Ok<InstitutionRepresentative, Errors>(
+                  new InstitutionRepresentative(
+            id: id,
+            institutionId: institutionId,
+            userId: userId,
+            role: role,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

@@ -1,4 +1,5 @@
 using Icon;
+using CSharpFunctionalExtensions;
 using System;
 using System.Collections.Generic;
 using Icon.Infrastructure.Aggregate;
@@ -28,33 +29,52 @@ namespace Icon.Aggregates
             Information = ComponentInformationAggregateData.From(data.Information);
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return
-              base.IsValid() &&
-              (
-                IsVirgin() &&
-                ComponentId == Guid.Empty &&
-                Information is null
-              )
-              ||
-              (
-                  !IsVirgin() &&
-                  ComponentId != Guid.Empty &&
-                  (Information?.IsValid() ?? false)
-              );
+            if (IsVirgin())
+              return
+                Result.Combine(
+                    base.Validate(),
+                    ValidateEmpty(ComponentId),
+                    ValidateNull(Information)
+                    );
+
+            else
+              return
+                Result.Combine(
+                    base.Validate(),
+                    ValidateNonEmpty(ComponentId, nameof(ComponentId)),
+                    Information.Validate()
+                    );
         }
 
-        public Models.ComponentVersion ToModel()
+        public Result<Models.ComponentVersion, Errors> ToModel()
         {
-            EnsureNotVirgin();
-            EnsureValid();
-            return new Models.ComponentVersion(
-              id: Id,
-              componentId: ComponentId,
-              information: Information.ToModel(),
-              timestamp: Timestamp
-            );
+          var virginResult = ValidateNonVirgin();
+          if (virginResult.IsFailure)
+            return Result.Failure<ValueObjects.ComponentVersion, Errors>(virginResult.Error);
+
+          var idResult = ValueObjects.Id.From(Id);
+          var componentIdResult = ValueObjects.Id.From(componentId);
+          var informationResult = Information.ToValueObject();
+          var timestampResult = ValueObjects.Timestamp.From(Timestamp);
+
+          var errors = Errors.From(
+              idResult,
+              componentIdResult,
+              informationResult,
+              timestampResult
+              );
+
+          if (!errors.IsEmpty())
+            return Result.Failure<ValueObjects.ComponentVersion, Errors>(errors);
+
+          return Models.ComponentVersion.From(
+              id: idResult.Value,
+              componentId: componentIdResult.Value,
+              information: informationResult.Value,
+              timestamp: timestampResult.Value
+              );
         }
     }
 }

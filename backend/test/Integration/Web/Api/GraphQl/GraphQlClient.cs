@@ -52,7 +52,7 @@ namespace Test.Integration.Web.Api.GraphQl
       public string description { get; }
       public DateTime? availableFrom { get; }
       public DateTime? availableUntil { get; }
-      public Models.ComponentCategory[] categories { get; }
+      public ValueObjects.ComponentCategory[] categories { get; }
 
       public ComponentInputData(
           string name,
@@ -60,7 +60,7 @@ namespace Test.Integration.Web.Api.GraphQl
           string description,
           DateTime? availableFrom,
           DateTime? availableUntil,
-          Models.ComponentCategory[] categories
+          ValueObjects.ComponentCategory[] categories
           )
       {
         this.name = name;

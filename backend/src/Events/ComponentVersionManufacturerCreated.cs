@@ -1,4 +1,6 @@
 using Guid = System.Guid;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using CancellationToken = System.Threading.CancellationToken;
@@ -52,14 +54,16 @@ namespace Icon.Events
             EnsureValid();
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return
-              base.IsValid() &&
-              ComponentVersionManufacturerId != Guid.Empty &&
-              ComponentVersionId != Guid.Empty &&
-              InstitutionId != Guid.Empty &&
-              (MarketingInformation?.IsValid() ?? true);
+          return
+            Result.Combine(
+                base.Validate(),
+                ValidateNonEmpty(ComponentVersionManufacturerId, nameof(ComponentVersionManufacturerId)),
+                ValidateNonEmpty(ComponentVersionId, nameof(ComponentVersionId)),
+                ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
+                MarketingInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                );
         }
     }
 }

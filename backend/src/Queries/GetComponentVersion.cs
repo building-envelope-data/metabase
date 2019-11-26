@@ -1,7 +1,5 @@
-using Validatable = Icon.Validatable;
-using Guid = System.Guid;
 using Icon.Infrastructure.Query;
-/* using ZonedDateTime = NodaTime.ZonedDateTime; */
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 using Models = Icon.Models;
 using IError = HotChocolate.IError;
@@ -9,27 +7,32 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Queries
 {
-    public class GetComponentVersion
-      : Validatable, IQuery<Result<Models.ComponentVersion, IError>>
+    public sealed class GetComponentVersion
+      : IQuery<Result<Models.ComponentVersion, IError>>
     {
-        public Guid ComponentVersionId { get; }
-        public DateTime Timestamp { get; } // TODO ZonedDateTime
+        public ValueObjects.Id ComponentVersionId { get; }
+        public ValueObjects.Timestamp Timestamp { get; }
 
-        public GetComponentVersion(
-            Guid componentVersionId,
-            DateTime timestamp
+        private GetComponentVersion(
+            ValueObjects.Id componentVersionId,
+            ValueObjects.Timestamp timestamp
             )
         {
             ComponentVersionId = componentVersionId;
             Timestamp = timestamp;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<GetComponentVersion, IError> From(
+            ValueObjects.Id componentVersionId,
+            ValueObjects.Timestamp timestamp
+            )
         {
-            return
-              ComponentVersionId != Guid.Empty &&
-              Timestamp != DateTime.MinValue;
+					return Result.Ok(
+							new GetComponentVersion(
+                componentVersionId: componentVersionId,
+                timestamp: timestamp
+								)
+							);
         }
     }
 }

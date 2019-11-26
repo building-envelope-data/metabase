@@ -1,4 +1,6 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -6,28 +8,37 @@ namespace Icon.Models
     public sealed class ComponentVersionAssembly
       : Model
     {
-        public Guid SuperComponentVersionId { get; }
-        public Guid SubComponentVersionId { get; }
+        public ValueObjects.Id SuperComponentVersionId { get; }
+        public ValueObjects.Id SubComponentVersionId { get; }
 
-        public ComponentVersionAssembly(
-            Guid id,
-            Guid superComponentVersionId,
-            Guid subComponentVersionId,
-            DateTime timestamp
+        private ComponentVersionAssembly(
+            ValueObjects.Id id,
+            ValueObjects.Id superComponentVersionId,
+            ValueObjects.Id subComponentVersionId,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             SuperComponentVersionId = superComponentVersionId;
             SubComponentVersionId = subComponentVersionId;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<ComponentVersionAssembly, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Id superComponentVersionId,
+            ValueObjects.Id subComponentVersionId,
+            ValueObjects.Timestamp timestamp
+            )
         {
-            return
-              base.IsValid() &&
-              SuperComponentVersionId != Guid.Empty &&
-              SubComponentVersionId != Guid.Empty;
+          return
+            Result.Ok<ComponentVersionAssembly, Errors>(
+                new ComponentVersionAssembly(
+                  id: id,
+                  superComponentVersionId: superComponentVersionId,
+                  subComponentVersionId: subComponentVersionId,
+                  timestamp: timestamp
+                  )
+                );
         }
     }
 }

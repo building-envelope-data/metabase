@@ -53,7 +53,7 @@ namespace Icon.Infrastructure.Aggregate
 
         private IError BuildNonExistentModelError(Guid id) =>
           ErrorBuilder.New()
-          .SetMessage($"There is no model with id {id}.")
+          .SetMessage($"There is no model with id {id}")
           .SetCode(ErrorCodes.NonExistentModel)
           .Build();
 

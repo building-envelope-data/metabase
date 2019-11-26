@@ -27,11 +27,15 @@ namespace Icon.GraphQl
             IReadOnlyList<(Guid, DateTime)> idsAndTimestamps,
             CancellationToken cancellationToken)
         {
+            var query =
+              ResultHelpers.HandleFailure(
+                  Queries.GetComponentBatch.From(idsAndTimestamps)
+                  );
             var componentResults =
               await QueryBus.Send<
                   Queries.GetComponentBatch,
                   IEnumerable<Result<Models.Component, IError>>
-               >(new Queries.GetComponentBatch(idsAndTimestamps));
+               >(query);
             return ResultHelpers.ToDataLoaderResults<Component>(
                 idsAndTimestamps.Zip(
                   componentResults,

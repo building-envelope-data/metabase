@@ -1,6 +1,10 @@
 using System;
+using Array = System.Array;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using ErrorBuilder = HotChocolate.ErrorBuilder;
+using IError = HotChocolate.IError;
+using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.ValueObjects
 {
@@ -14,12 +18,21 @@ namespace Icon.ValueObjects
       Value = value;
     }
 
-    public static Result<AbsoluteUri> From(Uri uri)
+    public static Result<AbsoluteUri, IError> From(
+        Uri uri,
+        IReadOnlyList<object>? path = null
+        )
     {
       if (!uri.IsAbsoluteUri)
-        return Result.Failure<AbsoluteUri>("Uri is not absolute");
+        return Result.Failure<AbsoluteUri, IError>(
+            ErrorBuilder.New()
+            .SetMessage("Uri is not absolute")
+            .SetCode(ErrorCodes.InvalidValue)
+            .SetPath(path)
+            .Build()
+            );
 
-      return Result.Ok(new AbsoluteUri(uri));
+      return Result.Ok<AbsoluteUri, IError>(new AbsoluteUri(uri));
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

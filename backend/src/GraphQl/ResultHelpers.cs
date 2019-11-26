@@ -1,4 +1,5 @@
 using System;
+using Errors = Icon.Errors;
 using Icon.Infrastructure.Query;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,12 @@ namespace Icon.GraphQl
     internal static class ResultHelpers
     {
         internal static T HandleFailure<T>(Result<T, IError> result)
+        {
+            if (result.IsFailure) throw new QueryException(result.Error);
+            return result.Value;
+        }
+
+        internal static T HandleFailure<T>(Result<T, Errors> result)
         {
             if (result.IsFailure) throw new QueryException(result.Error);
             return result.Value;

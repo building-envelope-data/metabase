@@ -8,15 +8,15 @@ namespace Icon.GraphQl
     public sealed class ComponentInformation
     {
         public static ComponentInformation FromModel(
-            Models.ComponentInformation model
+            ValueObjects.ComponentInformation model
             )
         {
             return new ComponentInformation(
                 name: model.Name,
                 abbreviation: model.Abbreviation,
                 description: model.Description,
-                availableFrom: model.AvailableFrom,
-                availableUntil: model.AvailableUntil,
+                availableFrom: model.Availability.Start,
+                availableUntil: model.Availability.End,
                 categories: model.Categories
                 );
         }
@@ -26,7 +26,7 @@ namespace Icon.GraphQl
         public string Description { get; set; }
         public DateTime? AvailableFrom { get; set; }
         public DateTime? AvailableUntil { get; set; }
-        public IEnumerable<Models.ComponentCategory> Categories { get; set; }
+        public IEnumerable<ValueObjects.ComponentCategory> Categories { get; set; }
 
 #nullable disable
         public ComponentInformation() { }
@@ -38,7 +38,7 @@ namespace Icon.GraphQl
             string description,
             DateTime? availableFrom,
             DateTime? availableUntil,
-            IEnumerable<Models.ComponentCategory> categories
+            IEnumerable<ValueObjects.ComponentCategory> categories
             )
         {
             Name = name;
