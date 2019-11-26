@@ -1,0 +1,51 @@
+@startuml
+
+skinparam componentStyle uml2
+
+class Component {
+  +Uuid id
+  +String name
+  +String abbreviation
+  +String description
+  +Category categories
+  +Uuid CreatorId
+}
+
+class ComponentManufacturer {
+}
+
+class ComponentManufacturerMarketingInformation
+
+class ComponentVersion {
+  +Uuid id
+  +String name
+}
+
+class ComponentVersionManufacturer {
+}
+
+class ComponentVersionManufacturerMarketingInformation {
+}
+
+class Institution {
+  +Uuid id
+}
+
+class InstitutionRepresentative {
+}
+
+class User {
+  +Uuid id
+}
+
+Component "1" *-up- "*" ComponentVersion
+Component "1" *-up- "*" ComponentManufacturer
+ComponentManufacturer "*" -up- "1" Institution
+ComponentManufacturer "1" -up- "1" ComponentManufacturerMarketingInformation
+ComponentVersion "1" *-up- "*" ComponentVersionManufacturer
+ComponentVersionManufacturer "*" -up- "1" Institution
+ComponentVersionManufacturer "1" *-up- "1" ComponentVersionManufacturerMarketingInformation
+Institution "1" *-up- "*" InstitutionRepresentative
+User "1" *-up- "*" InstitutionRepresentative
+
+@enduml
