@@ -47,19 +47,19 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-          return Result.Ok<MethodInformation, Errors>(
-              new MethodInformation(
-                name: name,
-                description: description,
-                standardId: standardId,
-                publicationLocator: publicationLocator,
-                codeLocator: codeLocator,
-                categories: categories
-                )
-              );
+            return Result.Ok<MethodInformation, Errors>(
+                new MethodInformation(
+                  name: name,
+                  description: description,
+                  standardId: standardId,
+                  publicationLocator: publicationLocator,
+                  codeLocator: codeLocator,
+                  categories: categories
+                  )
+                );
         }
 
-        protected override IEnumerable<object> GetEqualityComponents()
+        protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Name;
             yield return Description;
@@ -68,7 +68,7 @@ namespace Icon.ValueObjects
             yield return CodeLocator;
             foreach (var category in Categories)
             {
-              yield return category;
+                yield return category;
             }
         }
     }

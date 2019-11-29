@@ -9,35 +9,35 @@ namespace Icon
     public abstract class Validatable : IValidatable
     {
         public static Result<bool, Errors> ValidateNull(
-            object @object,
+            object? @object,
             string variableName
             )
         {
             if (!(@object is null))
-              return Result.Failure<bool, Errors>(
-                  Errors.One(
-                    message: $"{variableName} is non-null",
-                    code: ErrorCodes.InvalidValue
-                    )
-                  );
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"{variableName} is non-null",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
 
-            return Result.Ok<bool, Errors>(@object);
+            return Result.Ok<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateNonNull(
-            object @object,
+            object? @object,
             string variableName
             )
         {
             if (@object is null)
-              return Result.Failure<bool, Errors>(
-                  Errors.One(
-                    message: $"{variableName} is null",
-                    code: ErrorCodes.InvalidValue
-                    )
-                  );
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"{variableName} is null",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
 
-            return Result.Ok<bool, Errors>(@object);
+            return Result.Ok<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateEmpty(
@@ -46,14 +46,14 @@ namespace Icon
             )
         {
             if (id != Guid.Empty)
-              return Result.Failure<bool, Errors>(
-                  Errors.One(
-                    message: $"{variableName} is non-empty",
-                    code: ErrorCodes.InvalidValue
-                    )
-                  );
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"{variableName} is non-empty",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
 
-            return Result.Ok<bool, Errors>(id);
+            return Result.Ok<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateNonEmpty(
@@ -62,14 +62,14 @@ namespace Icon
             )
         {
             if (id == Guid.Empty)
-              return Result.Failure<bool, Errors>(
-                  Errors.One(
-                    message: $"{variableName} is empty",
-                    code: ErrorCodes.InvalidValue
-                    )
-                  );
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"{variableName} is empty",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
 
-            return Result.Ok<bool, Errors>(id);
+            return Result.Ok<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateNotMinValue(
@@ -78,14 +78,14 @@ namespace Icon
             )
         {
             if (dateTime == DateTime.MinValue)
-              return Result.Failure<bool, Errors>(
-                  Errors.One(
-                    message: $"{variableName} has the default value",
-                    code: ErrorCodes.InvalidValue
-                    )
-                  );
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"{variableName} has the default value",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
 
-            return Result.Ok<bool, Errors>(dateTime);
+            return Result.Ok<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateNonZero(
@@ -94,14 +94,14 @@ namespace Icon
             )
         {
             if (number == 0)
-              return Result.Failure<bool, Errors>(
-                  Errors.One(
-                    message: $"{variableName} is 0",
-                    code: ErrorCodes.InvalidValue
-                    )
-                  );
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"{variableName} is 0",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
 
-            return Result.Ok<bool, Errors>(number);
+            return Result.Ok<bool, Errors>(true);
         }
 
         public abstract Result<bool, Errors> Validate();

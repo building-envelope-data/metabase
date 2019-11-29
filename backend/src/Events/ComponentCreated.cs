@@ -22,7 +22,7 @@ namespace Icon.Events
         {
             return new ComponentCreated(
                 componentId: componentId,
-                information: ComponentInformationEventData.From(command.Information),
+                information: ComponentInformationEventData.From(command.Input),
                 creatorId: command.CreatorId
                 );
         }
@@ -48,12 +48,12 @@ namespace Icon.Events
 
         public override Result<bool, Errors> Validate()
         {
-          return
-            Result.Combine(
-                base.Validate(),
-                ValidateNonEmpty(ComponentId, nameof(ComponentId)),
-                Information.Validate()
-                );
+            return
+              Result.Combine(
+                  base.Validate(),
+                  ValidateNonEmpty(ComponentId, nameof(ComponentId)),
+                  Information.Validate()
+                  );
         }
     }
 }

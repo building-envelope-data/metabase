@@ -8,62 +8,70 @@ using Array = System.Array;
 
 namespace Icon.ValueObjects
 {
-  public sealed class Abbreviation
-    : ValueObject
-  {
-    public string Value { get; }
-
-    private Abbreviation(string value)
+    public sealed class Abbreviation
+      : ValueObject
     {
-      Value = value;
+        public string Value { get; }
+
+        private Abbreviation(string value)
+        {
+            Value = value;
+        }
+
+        public static Result<Abbreviation, Errors> From(
+            string abbreviation,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            abbreviation = abbreviation.Trim();
+
+            if (abbreviation.Length == 0)
+                return Result.Failure<Abbreviation, Errors>(
+                    Errors.One(
+                    message: "Abbreviation is empty",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
+
+            if (abbreviation.Length > 32)
+                return Result.Failure<Abbreviation, Errors>(
+                    Errors.One(
+                    message: "Abbreviation is too long",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
+
+            return Result.Ok<Abbreviation, Errors>(
+                new Abbreviation(abbreviation)
+                );
+        }
+
+        public static Result<Abbreviation, Errors>? MaybeFrom(
+            string? abbreviation,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (abbreviation is null)
+                return null;
+
+            return From(abbreviation: abbreviation!, path: path);
+        }
+
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Value;
+        }
+
+        public static explicit operator Abbreviation(string abbreviation)
+        {
+            return From(abbreviation).Value;
+        }
+
+        public static implicit operator string(Abbreviation abbreviation)
+        {
+            return abbreviation.Value;
+        }
     }
-
-    public static Result<Abbreviation?, IError> From(
-        string? abbreviation,
-        IReadOnlyList<object>? path = null
-        )
-    {
-      if (abbreviation is null)
-        return Result.Ok<Abbreviation?, IError>(null);
-
-      abbreviation = abbreviation.Trim();
-
-      if (abbreviation.Length == 0)
-        return Result.Failure<Abbreviation?, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Abbreviation is empty")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
-
-      if (abbreviation.Length > 32)
-        return Result.Failure<Abbreviation?, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Abbreviation is too long")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
-
-      return Result.Ok<Abbreviation?, IError>(
-          new Abbreviation(abbreviation)
-          );
-    }
-
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Value;
-    }
-
-    public static explicit operator Abbreviation(string abbreviation)
-    {
-      return From(abbreviation).Value;
-    }
-
-    public static implicit operator string(Abbreviation abbreviation)
-    {
-      return abbreviation.Value;
-    }
-  }
 }

@@ -9,7 +9,7 @@ using CSharpFunctionalExtensions;
 namespace Icon.Queries
 {
     public sealed class ListComponents
-      : IQuery<IEnumerable<Result<Models.Component, IError>>>
+      : IQuery<IEnumerable<Result<Models.Component, Errors>>>
     {
         public ValueObjects.Timestamp Timestamp { get; }
 
@@ -20,15 +20,15 @@ namespace Icon.Queries
             Timestamp = timestamp;
         }
 
-        public static Result<ListComponents, IError> From(
+        public static Result<ListComponents, Errors> From(
             ValueObjects.Timestamp timestamp
             )
         {
-					return Result.Ok(
-							new ListComponents(
-                timestamp: timestamp
-								)
-							);
+            return Result.Ok<ListComponents, Errors>(
+                    new ListComponents(
+                      timestamp
+                      )
+                );
         }
     }
 }

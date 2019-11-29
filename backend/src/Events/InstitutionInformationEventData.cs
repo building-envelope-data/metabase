@@ -16,9 +16,9 @@ namespace Icon.Events
         {
             return new InstitutionInformationEventData(
                 name: information.Name,
-                abbreviation: information.Abbreviation,
-                description: information.Description,
-                websiteLocator: information.WebsiteLocator
+                abbreviation: information.Abbreviation?.Value,
+                description: information.Description?.Value,
+                websiteLocator: information.WebsiteLocator?.Value
                 );
         }
 
@@ -47,11 +47,10 @@ namespace Icon.Events
 
         public override Result<bool, Errors> Validate()
         {
-          return
-            Result.Combine(
-                base.Validate(),
-                ValidateNonNull(Name, nameof(Name))
-                );
+            return
+              Result.Combine(
+                  ValidateNonNull(Name, nameof(Name))
+                  );
         }
     }
 }

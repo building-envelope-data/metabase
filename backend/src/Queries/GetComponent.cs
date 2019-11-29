@@ -8,31 +8,26 @@ using CSharpFunctionalExtensions;
 namespace Icon.Queries
 {
     public sealed class GetComponent
-      : IQuery<Result<Models.Component, IError>>
+      : IQuery<Result<Models.Component, Errors>>
     {
-        public ValueObjects.Id ComponentId { get; }
-        public ValueObjects.Timestamp Timestamp { get; } // TODO ZonedDateTime
+        public ValueObjects.TimestampedId TimestampedComponentId { get; }
 
         private GetComponent(
-            ValueObjects.Id componentId,
-            ValueObjects.Timestamp timestamp
+            ValueObjects.TimestampedId timestampedComponentId
             )
         {
-            ComponentId = componentId;
-            Timestamp = timestamp;
+            TimestampedComponentId = timestampedComponentId;
         }
 
-        public static Result<GetComponent, IError> From(
-            ValueObjects.Id componentId,
-            ValueObjects.Timestamp timestamp
+        public static Result<GetComponent, Errors> From(
+            ValueObjects.TimestampedId timestampedComponentId
             )
         {
-					return Result.Ok(
-							new GetComponent(
-                componentId: componentId,
-                timestamp: timestamp
-								)
-							);
+            return Result.Ok<GetComponent, Errors>(
+                    new GetComponent(
+                      timestampedComponentId
+                        )
+                    );
         }
     }
 }

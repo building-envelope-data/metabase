@@ -29,40 +29,39 @@ namespace Icon.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
-              return base.Validate();
+                return base.Validate();
 
             else
-              return
-                Result.Combine(
-                    base.Validate(),
-                    Information.Validate()
-                    );
+                return
+                  Result.Combine(
+                      base.Validate(),
+                      Information.Validate()
+                      );
         }
 
         public Result<Models.Component, Errors> ToModel()
         {
-          var virginResult = ValidateNonVirgin();
-          if (virginResult.IsFailure)
-            return Result.Failure<ValueObjects.Component, Errors>(virginResult.Error);
+            var virginResult = ValidateNonVirgin();
+            if (virginResult.IsFailure)
+                return Result.Failure<Models.Component, Errors>(virginResult.Error);
 
-          var idResult = ValueObjects.Id.From(Id);
-          var informationResult = Information.ToValueObject();
-          var timestampResult = ValueObjects.Timestamp.From(Timestamp);
+            var idResult = ValueObjects.Id.From(Id);
+            var informationResult = Information.ToValueObject();
+            var timestampResult = ValueObjects.Timestamp.From(Timestamp);
 
-          var errors = Errors.From(
-              idResult,
-              informationResult,
-              timestampResult
-              );
-
-          if (!errors.IsEmpty())
-            return Result.Failure<ValueObjects.ComponentInformation, Errors>(errors);
-
-          return Models.Component.From(
+            return
+              Errors.Combine(
+                  idResult,
+                  informationResult,
+                  timestampResult
+                  )
+              .Bind(_ =>
+                  Models.Component.From(
                     id: idResult.Value,
                     information: informationResult.Value,
                     timestamp: timestampResult.Value
-                    );
+                    )
+                  );
         }
     }
 }

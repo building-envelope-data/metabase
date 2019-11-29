@@ -51,29 +51,28 @@ namespace Icon.Aggregates
                   );
         }
 
-        public ValueObjects.InstitutionInformation ToValueObject()
+        public Result<ValueObjects.InstitutionInformation, Errors> ToValueObject()
         {
-          var nameResult = ValueObjects.Name.From(Name);
-          var abbreviationResult = ValueObjects.Abbreviation.From(Abbreviation);
-          var descriptionResult = ValueObjects.Description.From(Description);
-          var websiteLocatorResult = ValueObjects.AbsoluteUri.From(WebsiteLocator);
+            var nameResult = ValueObjects.Name.From(Name);
+            var abbreviationResult = ValueObjects.Abbreviation.MaybeFrom(Abbreviation);
+            var descriptionResult = ValueObjects.Description.MaybeFrom(Description);
+            var websiteLocatorResult = ValueObjects.AbsoluteUri.MaybeFrom(WebsiteLocator);
 
-          var errors = Errors.From(
-              nameResult,
-              abbreviationResult,
-              descriptionResult,
-              websiteLocatorResult
-              );
-
-          if (!errors.IsEmpty())
-            return Result.Failure<ValueObjects.InstitutionInformation, Errors>(errors);
-
-            return ValueObjects.InstitutionInformation.From(
-              name: nameResult.Value,
-              abbreviation: abbreviationResult.Value,
-              description: descriptionResult.Value,
-                websiteLocator: websiteLocatorResult.Value
-                );
+            return
+              Errors.CombineExistent(
+                  nameResult,
+                  abbreviationResult,
+                  descriptionResult,
+                  websiteLocatorResult
+                  )
+              .Bind(_ =>
+                  ValueObjects.InstitutionInformation.From(
+                    name: nameResult.Value,
+                    abbreviation: abbreviationResult?.Value,
+                    description: descriptionResult?.Value,
+                    websiteLocator: websiteLocatorResult?.Value
+                    )
+                  );
         }
     }
 }

@@ -9,57 +9,57 @@ using Array = System.Array;
 
 namespace Icon.ValueObjects
 {
-  public sealed class EmailAddress
-    : ValueObject
-  {
-    public string Value { get; }
-
-    private EmailAddress(string value)
+    public sealed class EmailAddress
+      : ValueObject
     {
-      Value = value;
+        public string Value { get; }
+
+        private EmailAddress(string value)
+        {
+            Value = value;
+        }
+
+        public static Result<EmailAddress, Errors> From(
+            string emailAddress,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            emailAddress = emailAddress.Trim();
+
+            if (emailAddress.Length == 0)
+                return Result.Failure<EmailAddress, Errors>(
+                    Errors.One(
+                    message: "Email address is empty",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
+
+            if (!Regex.IsMatch(emailAddress, @"^(.+)@(.+)$"))
+                return Result.Failure<EmailAddress, Errors>(
+                    Errors.One(
+                    message: "Email address is invalid",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
+
+            return Result.Ok<EmailAddress, Errors>(new EmailAddress(emailAddress));
+        }
+
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Value;
+        }
+
+        public static explicit operator EmailAddress(string emailAddress)
+        {
+            return From(emailAddress).Value;
+        }
+
+        public static implicit operator string(EmailAddress emailAddress)
+        {
+            return emailAddress.Value;
+        }
     }
-
-    public static Result<EmailAddress, IError> From(
-        string emailAddress,
-        IReadOnlyList<object>? path = null
-        )
-    {
-      emailAddress = emailAddress.Trim();
-
-      if (emailAddress.Length == 0)
-        return Result.Failure<EmailAddress, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Email address is empty")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
-
-      if (!Regex.IsMatch(emailAddress, @"^(.+)@(.+)$"))
-        return Result.Failure<EmailAddress, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Email address is invalid")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
-
-      return Result.Ok<EmailAddress, IError>(new EmailAddress(emailAddress));
-    }
-
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Value;
-    }
-
-    public static explicit operator EmailAddress(string emailAddress)
-    {
-      return From(emailAddress).Value;
-    }
-
-    public static implicit operator string(EmailAddress emailAddress)
-    {
-      return emailAddress.Value;
-    }
-  }
 }

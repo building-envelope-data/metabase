@@ -13,54 +13,54 @@ namespace Icon.ValueObjects
         public Name Name { get; }
         public Abbreviation? Abbreviation { get; }
         public Description Description { get; }
-        public DateInterval Availability { get; }
+        public DateInterval? Availability { get; }
         public IReadOnlyCollection<ComponentCategory> Categories { get; }
 
         private ComponentInput(
             Name name,
             Abbreviation? abbreviation,
             Description description,
-            DateInterval availability,
+            DateInterval? availability,
             IReadOnlyCollection<ComponentCategory> categories
             )
         {
-          Name = name;
-          Abbreviation = abbreviation;
-          Description = description;
-          Availability = availability;
-          Categories = categories;
+            Name = name;
+            Abbreviation = abbreviation;
+            Description = description;
+            Availability = availability;
+            Categories = categories;
         }
 
         public static Result<ComponentInput, Errors> From(
             Name name,
             Abbreviation? abbreviation,
             Description description,
-            DateInterval availability,
+            DateInterval? availability,
             IReadOnlyCollection<ComponentCategory> categories,
             IReadOnlyList<object>? path = null
             )
         {
-          return Result.Ok<ComponentInput, Errors>(
-              new ComponentInput(
-                name: name,
-                abbreviation: abbreviation,
-                description: description,
-                availability: availability,
-                categories: categories
-                )
-              );
+            return Result.Ok<ComponentInput, Errors>(
+                new ComponentInput(
+                  name: name,
+                  abbreviation: abbreviation,
+                  description: description,
+                  availability: availability,
+                  categories: categories
+                  )
+                );
         }
 
-        protected override IEnumerable<object> GetEqualityComponents()
+        protected override IEnumerable<object?> GetEqualityComponents()
         {
-          yield return Name;
-          yield return Abbreviation;
-          yield return Description;
-          yield return Availability;
-          foreach (var category in Categories)
-          {
-            yield return category;
-          }
+            yield return Name;
+            yield return Abbreviation;
+            yield return Description;
+            yield return Availability;
+            foreach (var category in Categories)
+            {
+                yield return category;
+            }
         }
     }
 }

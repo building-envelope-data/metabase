@@ -12,7 +12,7 @@ using CSharpFunctionalExtensions;
 namespace Icon.Commands
 {
     public sealed class CreateComponentVersionManufacturer
-      : CommandBase<Result<(ValueObjects.Id, ValueObjects.Timestamp), IError>>
+      : CommandBase<Result<ValueObjects.TimestampedId, Errors>>
     {
         public ValueObjects.Id ComponentVersionId { get; }
         public ValueObjects.Id InstitutionId { get; }
@@ -31,21 +31,21 @@ namespace Icon.Commands
             MarketingInformation = marketingInformation;
         }
 
-        public static Result<CreateComponentVersionManufacturer, IError> From(
+        public static Result<CreateComponentVersionManufacturer, Errors> From(
             ValueObjects.Id componentVersionId,
             ValueObjects.Id institutionId,
             ValueObjects.ComponentVersionManufacturerMarketingInformation? marketingInformation,
             ValueObjects.Id creatorId
             )
         {
-          return Result.Ok(
-              new CreateComponentVersionManufacturer(
-                componentVersionId: componentVersionId,
-                institutionId: institutionId,
-                marketingInformation: marketingInformation,
-                creatorId: creatorId
-                )
-              );
+            return Result.Ok<CreateComponentVersionManufacturer, Errors>(
+                new CreateComponentVersionManufacturer(
+                  componentVersionId: componentVersionId,
+                  institutionId: institutionId,
+                  marketingInformation: marketingInformation,
+                  creatorId: creatorId
+                  )
+                );
         }
     }
 }

@@ -10,26 +10,26 @@ using System.Linq;
 namespace Icon.Queries
 {
     public sealed class GetComponentBatch
-      : IQuery<IEnumerable<Result<Models.Component, IError>>>
+      : IQuery<IEnumerable<Result<Models.Component, Errors>>>
     {
-        public IReadOnlyCollection<(ValueObjects.Id, ValueObjects.Timestamp)> ComponentIdsAndTimestamps { get; }
+        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedComponentIds { get; }
 
         private GetComponentBatch(
-            IReadOnlyCollection<(ValueObjects.Id, ValueObjects.Timestamp)> componentIdsAndTimestamps
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedComponentIds
             )
         {
-            ComponentIdsAndTimestamps = componentIdsAndTimestamps;
+            TimestampedComponentIds = timestampedComponentIds;
         }
 
-        public static Result<GetComponentBatch, IError> From(
-            IReadOnlyCollection<(ValueObjects.Id, ValueObjects.Timestamp)> componentIdsAndTimestamps
+        public static Result<GetComponentBatch, Errors> From(
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedComponentIds
             )
         {
-					return Result.Ok(
-							new GetComponentBatch(
-                componentIdsAndTimestamps: componentIdsAndTimestamps
-								)
-							);
+            return Result.Ok<GetComponentBatch, Errors>(
+                    new GetComponentBatch(
+                        timestampedComponentIds
+                        )
+                    );
         }
     }
 }

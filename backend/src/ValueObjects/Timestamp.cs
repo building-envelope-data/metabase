@@ -8,50 +8,55 @@ using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.ValueObjects
 {
-  public sealed class Timestamp
-    : ValueObject
-  {
-    // TODO Use `NodaTime.ZonedDateTime`
-    public DateTime Value { get; }
-
-    private Timestamp(DateTime value)
+    public sealed class Timestamp
+      : ValueObject
     {
-      Value = value;
-    }
+        public static Timestamp Now
+        {
+            get { return ValueObjects.Timestamp.From(DateTime.UtcNow).Value; }
+        }
 
-    public static Result<Timestamp, IError> From(
-        DateTime timestamp,
-        DateTime? now = null,
-        IReadOnlyList<object>? path = null
-        )
-    {
-      if (timestamp > now ?? DateTime.UtcNow)
-        return Result.Failure<Timestamp, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Timestamp is in the future")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
+        // TODO Use `NodaTime.ZonedDateTime`
+        public DateTime Value { get; }
 
-      return Result.Ok<Timestamp, IError>(
-          new Timestamp(timestamp)
-          );
-    }
+        private Timestamp(DateTime value)
+        {
+            Value = value;
+        }
 
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-      yield return Value;
-    }
+        public static Result<Timestamp, Errors> From(
+            DateTime timestamp,
+            DateTime? now = null,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (timestamp > (now ?? DateTime.UtcNow))
+                return Result.Failure<Timestamp, Errors>(
+                    Errors.One(
+                    message: "Timestamp is in the future",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
 
-    public static explicit operator Timestamp(DateTime timestamp)
-    {
-      return From(timestamp).Value;
-    }
+            return Result.Ok<Timestamp, Errors>(
+                new Timestamp(timestamp)
+                );
+        }
 
-    public static implicit operator DateTime(Timestamp timestamp)
-    {
-      return timestamp.Value;
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Value;
+        }
+
+        public static explicit operator Timestamp(DateTime timestamp)
+        {
+            return From(timestamp).Value;
+        }
+
+        public static implicit operator DateTime(Timestamp timestamp)
+        {
+            return timestamp.Value;
+        }
     }
-  }
 }

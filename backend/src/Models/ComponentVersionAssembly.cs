@@ -30,15 +30,15 @@ namespace Icon.Models
             ValueObjects.Timestamp timestamp
             )
         {
-          return
-            Result.Ok<ComponentVersionAssembly, Errors>(
-                new ComponentVersionAssembly(
-                  id: id,
-                  superComponentVersionId: superComponentVersionId,
-                  subComponentVersionId: subComponentVersionId,
-                  timestamp: timestamp
-                  )
-                );
+            return
+              Result.Ok<ComponentVersionAssembly, Errors>(
+                  new ComponentVersionAssembly(
+                    id: id,
+                    superComponentVersionId: superComponentVersionId,
+                    subComponentVersionId: subComponentVersionId,
+                    timestamp: timestamp
+                    )
+                  );
         }
     }
 }

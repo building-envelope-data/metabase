@@ -30,27 +30,27 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-          if (componentVersionInformation is null &&
-              institutionInformation is null)
-          {
-            return Result.Failure<ComponentVersionManufacturerMarketingInformation, Errors>(
-                Errors.One(
-                  message: "Both component version and institution information are unspecified",
-                  code: ErrorCodes.InvalidValue,
-                  path: path
+            if (componentVersionInformation is null &&
+                institutionInformation is null)
+            {
+                return Result.Failure<ComponentVersionManufacturerMarketingInformation, Errors>(
+                    Errors.One(
+                      message: "Both component version and institution information are unspecified",
+                      code: ErrorCodes.InvalidValue,
+                      path: path
+                      )
+                    );
+            }
+
+            return Result.Ok<ComponentVersionManufacturerMarketingInformation, Errors>(
+                new ComponentVersionManufacturerMarketingInformation(
+                  componentVersionInformation: componentVersionInformation,
+                  institutionInformation: institutionInformation
                   )
                 );
-          }
-
-          return Result.Ok<ComponentVersionManufacturerMarketingInformation, Errors>(
-              new ComponentVersionManufacturerMarketingInformation(
-                componentVersionInformation: componentVersionInformation,
-                institutionInformation: institutionInformation
-                )
-              );
         }
 
-        protected override IEnumerable<object> GetEqualityComponents()
+        protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return ComponentVersionInformation;
             yield return InstitutionInformation;

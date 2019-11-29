@@ -35,11 +35,11 @@ namespace Icon.Events
 
         public override Result<bool, Errors> Validate()
         {
-          return
-            Result.Combine(
-                ComponentVersionInformation?.Validate() ?? Result.Ok<bool, Errors>(true),
-                InstitutionInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
-                );
+            return
+              Result.Combine(
+                  ComponentVersionInformation?.Validate() ?? Result.Ok<bool, Errors>(true),
+                  InstitutionInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                  );
         }
     }
 }

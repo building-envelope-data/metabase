@@ -8,57 +8,57 @@ using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.ValueObjects
 {
-  public sealed class Title
-    : ValueObject
-  {
-    public string Value { get; }
-
-    private Title(string value)
+    public sealed class Title
+      : ValueObject
     {
-      Value = value;
+        public string Value { get; }
+
+        private Title(string value)
+        {
+            Value = value;
+        }
+
+        public static Result<Title, Errors> From(
+            string title,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            title = title.Trim();
+
+            if (title.Length == 0)
+                return Result.Failure<Title, Errors>(
+                    Errors.One(
+                    message: "Title is empty",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
+
+            if (title.Length > 128)
+                return Result.Failure<Title, Errors>(
+                    Errors.One(
+                    message: "Title is too long",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
+
+            return Result.Ok<Title, Errors>(new Title(title));
+        }
+
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Value;
+        }
+
+        public static explicit operator Title(string title)
+        {
+            return From(title).Value;
+        }
+
+        public static implicit operator string(Title title)
+        {
+            return title.Value;
+        }
     }
-
-    public static Result<Title, IError> From(
-        string title,
-        IReadOnlyList<object>? path = null
-        )
-    {
-      title = title.Trim();
-
-      if (title.Length == 0)
-        return Result.Failure<Title, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Title is empty")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
-
-      if (title.Length > 128)
-        return Result.Failure<Title, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Title is too long")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
-
-      return Result.Ok<Title, IError>(new Title(title));
-    }
-
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Value;
-    }
-
-    public static explicit operator Title(string title)
-    {
-      return From(title).Value;
-    }
-
-    public static implicit operator string(Title title)
-    {
-      return title.Value;
-    }
-  }
 }

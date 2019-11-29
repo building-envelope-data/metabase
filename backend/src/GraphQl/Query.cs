@@ -41,7 +41,7 @@ namespace Icon.GraphQl
               await _queryBus
                .Send<
                   Queries.ListComponents,
-                  IEnumerable<Result<Models.Component, IError>>
+                  IEnumerable<Result<Models.Component, Errors>>
                   >(query)
               )
               .Select(c => Component.FromModel(c, requestTimestamp));
@@ -55,14 +55,14 @@ namespace Icon.GraphQl
             )
         {
             var requestTimestamp = HandleTimestamp(timestamp, resolverContext);
-            var nonEmptyId =
+            var timestampedId =
               ResultHelpers.HandleFailure(
-                  ValueObjects.Id.From(id)
+                  ValueObjects.TimestampedId.From(
+                    id, requestTimestamp
+                    )
                   );
             return
-              componentLoader.LoadAsync(
-                  (nonEmptyId, requestTimestamp)
-                  );
+              componentLoader.LoadAsync(timestampedId);
             /* return */
             /*   Component.FromModel( */
             /*       (await _queryBus */

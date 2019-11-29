@@ -16,28 +16,25 @@ namespace Icon.GraphQl
 {
     internal static class ResultHelpers
     {
-        internal static T HandleFailure<T>(Result<T, IError> result)
-        {
-            if (result.IsFailure) throw new QueryException(result.Error);
-            return result.Value;
-        }
-
         internal static T HandleFailure<T>(Result<T, Errors> result)
         {
             if (result.IsFailure) throw new QueryException(result.Error);
             return result.Value;
         }
 
-        internal static IEnumerable<T> HandleFailures<T>(IEnumerable<Result<T, IError>> results)
+        internal static IEnumerable<T> HandleFailure<T>(Result<IEnumerable<T>, Errors> result)
         {
-            if (HasErrors(results))
-            {
-                throw new QueryException(ExtractErrors(results));
-            }
-            return results.Select(r => r.Value);
+            if (result.IsFailure) throw new QueryException(result.Error);
+            return result.Value;
         }
 
-        internal static GreenDonut.Result<T> ToDataLoaderResult<T>(Result<T, IError> result)
+        internal static IEnumerable<T> HandleFailures<T>(IEnumerable<Result<T, Errors>> results)
+        {
+            var result = results.Combine();
+            return HandleFailure(result);
+        }
+
+        internal static GreenDonut.Result<T> ToDataLoaderResult<T>(Result<T, Errors> result)
         {
             if (result.IsFailure)
             {
@@ -46,21 +43,9 @@ namespace Icon.GraphQl
             return GreenDonut.Result<T>.Resolve(result.Value);
         }
 
-        internal static IReadOnlyList<GreenDonut.Result<T>> ToDataLoaderResults<T>(IEnumerable<Result<T, IError>> results)
+        internal static IReadOnlyList<GreenDonut.Result<T>> ToDataLoaderResults<T>(IEnumerable<Result<T, Errors>> results)
         {
             return results.Select(ToDataLoaderResult).ToList().AsReadOnly();
-        }
-
-        internal static bool HasErrors<T>(IEnumerable<Result<T, IError>> results)
-        {
-            return results.Any(r => r.IsFailure);
-        }
-
-        internal static IEnumerable<IError> ExtractErrors<T>(IEnumerable<Result<T, IError>> results)
-        {
-            return results
-              .Where(r => r.IsFailure)
-              .Select(r => r.Error);
         }
     }
 }

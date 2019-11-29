@@ -69,28 +69,27 @@ namespace Icon.Aggregates
 
         public Result<ValueObjects.ComponentInformation, Errors> ToValueObject()
         {
-          var nameResult = ValueObjects.Name.From(Name);
-          var abbreviationResult = ValueObjects.Abbreviation.From(Abbreviation);
-          var descriptionResult = ValueObjects.Description.From(Description);
-          var availabilityResult = ValueObjects.DateInterval.From(AvailableFrom, AvailableUntil);
+            var nameResult = ValueObjects.Name.From(Name);
+            var abbreviationResult = ValueObjects.Abbreviation.MaybeFrom(Abbreviation);
+            var descriptionResult = ValueObjects.Description.From(Description);
+            var availabilityResult = ValueObjects.DateInterval.MaybeFrom(AvailableFrom, AvailableUntil);
 
-          var errors = Errors.From(
-              nameResult,
-              abbreviationResult,
-              descriptionResult,
-              availabilityResult
-              );
-
-          if (!errors.IsEmpty())
-            return Result.Failure<ValueObjects.ComponentInformation, Errors>(errors);
-
-          return ValueObjects.ComponentInformation.From(
-              name: nameResult.Value,
-              abbreviation: abbreviationResult.Value,
-              description: descriptionResult.Value,
-              availability: availabilityResult.Value,
-              categories: Categories
-              );
+            return
+              Errors.CombineExistent(
+                  nameResult,
+                  abbreviationResult,
+                  descriptionResult,
+                  availabilityResult
+                  )
+              .Bind(_ =>
+                  ValueObjects.ComponentInformation.From(
+                    name: nameResult.Value,
+                    abbreviation: abbreviationResult?.Value,
+                    description: descriptionResult.Value,
+                    availability: availabilityResult?.Value,
+                    categories: Categories
+                    )
+                  );
         }
     }
 }

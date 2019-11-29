@@ -1,6 +1,7 @@
 // Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
 
 using System;
+using ErrorCodes = Icon.ErrorCodes;
 using CSharpFunctionalExtensions;
 using System.Collections.Generic;
 using Icon.Events;
@@ -44,16 +45,16 @@ namespace Icon.Infrastructure.Aggregate
 
         public override Result<bool, Errors> Validate()
         {
-          if (IsVirgin())
-            return Result.Ok<bool, Errors>(true);
+            if (IsVirgin())
+                return Result.Ok<bool, Errors>(true);
 
-          else
-            return
-              Result.Combine<bool, Errors>(
-                ValidateNonEmpty(Id, nameof(Id)),
-                ValidateNotMinValue(Timestamp, nameof(Timestamp)),
-                ValidateNonZero(Version, nameof(Version))
-                );
+            else
+                return
+                  Result.Combine<bool, Errors>(
+                    ValidateNonEmpty(Id, nameof(Id)),
+                    ValidateNotMinValue(Timestamp, nameof(Timestamp)),
+                    ValidateNonZero(Version, nameof(Version))
+                    );
         }
 
         public Result<bool, Errors> ValidateNonVirgin()
@@ -63,7 +64,7 @@ namespace Icon.Infrastructure.Aggregate
                   Result.Failure<bool, Errors>(
                       Errors.One(
                         message: $"The aggregate {this} is a virgin",
-                        code: InvalidState.InvalidState
+                        code: ErrorCodes.InvalidState
                         )
                       );
 

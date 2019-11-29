@@ -49,13 +49,13 @@ namespace Icon.GraphQl
               await _commandBus
                 .Send<
                    Commands.CreateComponent,
-                   Result<(ValueObjects.Id, ValueObjects.Timestamp), IError>
+                   Result<ValueObjects.TimestampedId, Errors>
                  >(command);
-            var (id, timestamp) = ResultHelpers.HandleFailure(result);
-            Timestamp.Store(timestamp, resolverContext);
+            var timestampedId = ResultHelpers.HandleFailure(result);
+            Timestamp.Store(timestampedId.Timestamp, resolverContext);
             var query =
               ResultHelpers.HandleFailure(
-                Queries.GetComponent.From(id, timestamp)
+                Queries.GetComponent.From(timestampedId)
                 );
             return
               Component.FromModel(
@@ -63,10 +63,10 @@ namespace Icon.GraphQl
                     await _queryBus
                       .Send<
                          Queries.GetComponent,
-                         Result<Models.Component, IError>
+                         Result<Models.Component, Errors>
                          >(query)
                     ),
-                  timestamp
+                  timestampedId.Timestamp
                   );
         }
 
@@ -90,13 +90,13 @@ namespace Icon.GraphQl
               await _commandBus
                .Send<
                   Commands.CreateComponentVersion,
-                  Result<(ValueObjects.Id, ValueObjects.Timestamp), IError>
+                  Result<ValueObjects.TimestampedId, Errors>
                 >(command);
-            var (id, timestamp) = ResultHelpers.HandleFailure(result);
-            Timestamp.Store(timestamp, resolverContext);
+            var timestampedId = ResultHelpers.HandleFailure(result);
+            Timestamp.Store(timestampedId.Timestamp, resolverContext);
             var query =
               ResultHelpers.HandleFailure(
-                Queries.GetComponentVersion.From(id, timestamp)
+                Queries.GetComponentVersion.From(timestampedId)
                 );
             return
               ComponentVersion.FromModel(
@@ -104,10 +104,10 @@ namespace Icon.GraphQl
                     await _queryBus
                       .Send<
                          Queries.GetComponentVersion,
-                         Result<Models.ComponentVersion, IError>
+                         Result<Models.ComponentVersion, Errors>
                          >(query)
                     ),
-                  timestamp
+                  timestampedId.Timestamp
                   );
         }
     }

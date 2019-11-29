@@ -8,46 +8,57 @@ using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.ValueObjects
 {
-  public sealed class AbsoluteUri
-    : ValueObject
-  {
-    public Uri Value { get; }
-
-    private AbsoluteUri(Uri value)
+    public sealed class AbsoluteUri
+      : ValueObject
     {
-      Value = value;
-    }
+        public Uri Value { get; }
 
-    public static Result<AbsoluteUri, IError> From(
-        Uri uri,
-        IReadOnlyList<object>? path = null
-        )
-    {
-      if (!uri.IsAbsoluteUri)
-        return Result.Failure<AbsoluteUri, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Uri is not absolute")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
+        private AbsoluteUri(Uri value)
+        {
+            Value = value;
+        }
 
-      return Result.Ok<AbsoluteUri, IError>(new AbsoluteUri(uri));
-    }
+        public static Result<AbsoluteUri, Errors> From(
+            Uri uri,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (!uri.IsAbsoluteUri)
+                return Result.Failure<AbsoluteUri, Errors>(
+                    Errors.One(
+                    message: "Uri is not absolute",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
 
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Value;
-    }
+            return Result.Ok<AbsoluteUri, Errors>(new AbsoluteUri(uri));
+        }
 
-    public static explicit operator AbsoluteUri(Uri absoluteUri)
-    {
-      return From(absoluteUri).Value;
-    }
+        public static Result<AbsoluteUri, Errors>? MaybeFrom(
+            Uri? uri,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (uri is null)
+                return null;
 
-    public static implicit operator Uri(AbsoluteUri absoluteUri)
-    {
-      return absoluteUri.Value;
+            return From(uri: uri!, path: path);
+        }
+
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Value;
+        }
+
+        public static explicit operator AbsoluteUri(Uri absoluteUri)
+        {
+            return From(absoluteUri).Value;
+        }
+
+        public static implicit operator Uri(AbsoluteUri absoluteUri)
+        {
+            return absoluteUri.Value;
+        }
     }
-  }
 }

@@ -36,54 +36,53 @@ namespace Icon.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
-              return
-                Result.Combine(
-                    base.Validate(),
-                    ValidateEmpty(ComponentId),
-                    ValidateEmpty(InstitutionId),
-                    ValidateNull(MarketingInformation)
-                    );
+                return
+                  Result.Combine<bool, Errors>(
+                      base.Validate(),
+                      ValidateEmpty(ComponentVersionId, nameof(ComponentVersionId)),
+                      ValidateEmpty(InstitutionId, nameof(InstitutionId)),
+                      ValidateNull(MarketingInformation, nameof(MarketingInformation))
+                      );
 
             else
-              return
-                Result.Combine(
-                    base.Validate(),
-                    ValidateNonEmpty(ComponentId, nameof(ComponentId)),
-                    ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
-                    MarketingInformation.Validate()
-                    );
+                return
+                  Result.Combine<bool, Errors>(
+                      base.Validate(),
+                      ValidateNonEmpty(ComponentVersionId, nameof(ComponentVersionId)),
+                      ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
+                      MarketingInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                      );
         }
 
         public Result<Models.ComponentVersionManufacturer, Errors> ToModel()
         {
-          var virginResult = ValidateNonVirgin();
-          if (virginResult.IsFailure)
-            return Result.Failure<ValueObjects.ComponentVersionManufacturer, Errors>(virginResult.Error);
+            var virginResult = ValidateNonVirgin();
+            if (virginResult.IsFailure)
+                return Result.Failure<Models.ComponentVersionManufacturer, Errors>(virginResult.Error);
 
-          var idResult = ValueObjects.Id.From(Id);
-          var componentVersionIdResult = ValueObjects.Id.From(componentVersionId);
-          var institutionIdResult = ValueObjects.Id.From(institutionId);
-          var marketingInformationResult = MarketingInformation.ToValueObject();
-          var timestampResult = ValueObjects.Timestamp.From(Timestamp);
+            var idResult = ValueObjects.Id.From(Id);
+            var componentVersionIdResult = ValueObjects.Id.From(ComponentVersionId);
+            var institutionIdResult = ValueObjects.Id.From(InstitutionId);
+            var marketingInformationResult = MarketingInformation?.ToValueObject();
+            var timestampResult = ValueObjects.Timestamp.From(Timestamp);
 
-          var errors = Errors.From(
-              idResult,
-              componentVersionIdResult,
-              institutionIdResult,
-              marketingInformationResult,
-              timestampResult
-              );
-
-          if (!errors.IsEmpty())
-            return Result.Failure<ValueObjects.ComponentVersionManufacturer, Errors>(errors);
-
-          return Models.ComponentVersionManufacturer.From(
-              id: idResult.Value,
-              componentVersionId: componentVersionIdResult.Value,
-              institutionId: institutionIdResult.Value,
-              marketingInformation: marketingInformationResult.Value,
-              timestamp: timestampResult.Value
-              );
+            return
+              Errors.CombineExistent(
+                  idResult,
+                  componentVersionIdResult,
+                  institutionIdResult,
+                  marketingInformationResult,
+                  timestampResult
+                  )
+              .Bind(_ =>
+                  Models.ComponentVersionManufacturer.From(
+                    id: idResult.Value,
+                    componentVersionId: componentVersionIdResult.Value,
+                    institutionId: institutionIdResult.Value,
+                    marketingInformation: marketingInformationResult?.Value,
+                    timestamp: timestampResult.Value
+                    )
+                  );
         }
     }
 }

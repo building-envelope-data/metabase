@@ -7,53 +7,53 @@ using System.Linq;
 
 namespace Icon.ValueObjects
 {
-  public abstract class ValueObject
-  {
-    protected abstract IEnumerable<object> GetEqualityComponents();
-
-    public override bool Equals(object? obj)
+    public abstract class ValueObject
     {
-      if (obj is null)
-        return false;
+        protected abstract IEnumerable<object?> GetEqualityComponents();
 
-      if (GetType() != obj.GetType())
-        return false;
+        public override bool Equals(object? obj)
+        {
+            if (obj is null)
+                return false;
 
-      var valueObject = (ValueObject)obj;
+            if (GetType() != obj.GetType())
+                return false;
 
-      return
-        GetEqualityComponents()
-        .SequenceEqual(
-            valueObject.GetEqualityComponents()
-            );
+            var valueObject = (ValueObject)obj;
+
+            return
+              GetEqualityComponents()
+              .SequenceEqual(
+                  valueObject.GetEqualityComponents()
+                  );
+        }
+
+        public override int GetHashCode()
+        {
+            return GetEqualityComponents()
+              .Aggregate(1, (current, obj) =>
+                  {
+                      unchecked
+                      {
+                          return current * 23 + (obj?.GetHashCode() ?? 0);
+                      }
+                  });
+        }
+
+        public static bool operator ==(ValueObject a, ValueObject b)
+        {
+            if (a is null && b is null)
+                return true;
+
+            if (a is null || b is null)
+                return false;
+
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(ValueObject a, ValueObject b)
+        {
+            return !(a == b);
+        }
     }
-
-    public override int GetHashCode()
-    {
-      return GetEqualityComponents()
-        .Aggregate(1, (current, obj) =>
-            {
-            unchecked
-            {
-            return current * 23 + (obj?.GetHashCode() ?? 0);
-            }
-            });
-    }
-
-    public static bool operator ==(ValueObject a, ValueObject b)
-    {
-      if (a is null && b is null)
-        return true;
-
-      if (a is null || b is null)
-        return false;
-
-      return a.Equals(b);
-    }
-
-    public static bool operator !=(ValueObject a, ValueObject b)
-    {
-      return !(a == b);
-    }
-  }
 }

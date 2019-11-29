@@ -56,14 +56,14 @@ namespace Icon.Events
 
         public override Result<bool, Errors> Validate()
         {
-          return
-            Result.Combine(
-                base.Validate(),
-                ValidateNonEmpty(ComponentVersionManufacturerId, nameof(ComponentVersionManufacturerId)),
-                ValidateNonEmpty(ComponentVersionId, nameof(ComponentVersionId)),
-                ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
-                MarketingInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
-                );
+            return
+              Result.Combine(
+                  base.Validate(),
+                  ValidateNonEmpty(ComponentVersionManufacturerId, nameof(ComponentVersionManufacturerId)),
+                  ValidateNonEmpty(ComponentVersionId, nameof(ComponentVersionId)),
+                  ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
+                  MarketingInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                  );
         }
     }
 }

@@ -37,30 +37,29 @@ namespace Icon.Aggregates
 
         public override Result<bool, Errors> Validate()
         {
-          return
-            Result.Combine(
-                ComponentVersionInformation?.Validate() ?? Result.Ok<bool, Errors>(true),
-                InstitutionInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
-                );
+            return
+              Result.Combine(
+                  ComponentVersionInformation?.Validate() ?? Result.Ok<bool, Errors>(true),
+                  InstitutionInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                  );
         }
 
-        public ValueObjects.ComponentVersionManufacturerMarketingInformation ToValueObject()
+        public Result<ValueObjects.ComponentVersionManufacturerMarketingInformation, Errors> ToValueObject()
         {
-          var componentVersionInformationResult = ComponentVersionInformation?.ToValueObject();
-          var institutionInformationResult = InstitutionInformation?.ToValueObject();
+            var componentVersionInformationResult = ComponentVersionInformation?.ToValueObject();
+            var institutionInformationResult = InstitutionInformation?.ToValueObject();
 
-          var errors = Errors.From(
-              componentVersionInformationResult ?? Result.Ok<bool, Errors>(true),
-              institutionInformationResult ?? Result.Ok<bool, Errors>(true)
-              );
-
-          if (!errors.IsEmpty())
-            return Result.Failure<ValueObjects.ComponentVersionManufacturerMarketingInformation, Errors>(errors);
-
-            return ValueObjects.ComponentVersionManufacturerMarketingInformation.From(
-                componentVersionInformation: componentVersionInformation?.Value,
-                institutionInformation: institutionInformationResult?.Value
-                );
+            return
+              Errors.CombineExistent(
+                  componentVersionInformationResult,
+                  institutionInformationResult
+                  )
+              .Bind(_ =>
+                  ValueObjects.ComponentVersionManufacturerMarketingInformation.From(
+                    componentVersionInformation: componentVersionInformationResult?.Value,
+                    institutionInformation: institutionInformationResult?.Value
+                    )
+                  );
         }
     }
 }

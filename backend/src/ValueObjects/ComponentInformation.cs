@@ -41,18 +41,18 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-          return Result.Ok<ComponentInformation, Errors>(
-              new ComponentInformation(
-                name: name,
-                abbreviation: abbreviation,
-                description: description,
-                availability: availability,
-                categories: categories
-                )
-              );
+            return Result.Ok<ComponentInformation, Errors>(
+                new ComponentInformation(
+                  name: name,
+                  abbreviation: abbreviation,
+                  description: description,
+                  availability: availability,
+                  categories: categories
+                  )
+                );
         }
 
-        protected override IEnumerable<object> GetEqualityComponents()
+        protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Name;
             yield return Abbreviation;
@@ -60,7 +60,7 @@ namespace Icon.ValueObjects
             yield return Availability;
             foreach (var category in Categories)
             {
-              yield return category;
+                yield return category;
             }
         }
     }

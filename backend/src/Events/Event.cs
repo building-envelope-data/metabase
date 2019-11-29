@@ -30,14 +30,7 @@ namespace Icon.Events
 
         public override Result<bool, Errors> Validate()
         {
-          var errors = Errors.One(
-              ValidateNonEmpty(CreatorId, nameof(CreatorId))
-              );
-
-          if (!errors.IsEmpty())
-              return Result.Failure<bool, Errors>(errors);
-
-          return Result.Ok<bool, Errors>(true);
+            return ValidateNonEmpty(CreatorId, nameof(CreatorId));
         }
     }
 }

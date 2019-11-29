@@ -13,10 +13,10 @@ namespace Icon.GraphQl
         {
             return new ComponentInformation(
                 name: model.Name,
-                abbreviation: model.Abbreviation,
+                abbreviation: model.Abbreviation?.Value,
                 description: model.Description,
-                availableFrom: model.Availability.Start,
-                availableUntil: model.Availability.End,
+                availableFrom: model.Availability?.Start,
+                availableUntil: model.Availability?.End,
                 categories: model.Categories
                 );
         }

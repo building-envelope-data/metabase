@@ -38,22 +38,22 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-          return Result.Ok<ContactInformation, Errors>(
-              new ContactInformation(
-                phoneNumber: phoneNumber,
-                postalAddress: postalAddress,
-                emailAddress: emailAddress,
-                websiteLocator: websiteLocator
-                )
-              );
+            return Result.Ok<ContactInformation, Errors>(
+                new ContactInformation(
+                  phoneNumber: phoneNumber,
+                  postalAddress: postalAddress,
+                  emailAddress: emailAddress,
+                  websiteLocator: websiteLocator
+                  )
+                );
         }
 
-        protected override IEnumerable<object> GetEqualityComponents()
+        protected override IEnumerable<object?> GetEqualityComponents()
         {
-          yield return PhoneNumber;
-          yield return PostalAddress;
-          yield return EmailAddress;
-          yield return WebsiteLocator;
+            yield return PhoneNumber;
+            yield return PostalAddress;
+            yield return EmailAddress;
+            yield return WebsiteLocator;
         }
     }
 }

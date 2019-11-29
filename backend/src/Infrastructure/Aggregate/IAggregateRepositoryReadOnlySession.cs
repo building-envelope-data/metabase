@@ -14,7 +14,7 @@ namespace Icon.Infrastructure.Aggregate
     {
         public IMartenQueryable<E> Query<E>() where E : IEvent;
 
-        public Task<Guid> GenerateNewId(
+        public Task<ValueObjects.Id> GenerateNewId(
             CancellationToken cancellationToken
             );
 
@@ -23,38 +23,63 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             );
 
-        public Task<Result<int, IError>> FetchVersion<T>(
+        public Task<Result<int, Errors>> FetchVersion<T>(
             Guid id,
             DateTime timestamp,
             CancellationToken cancellationToken
-            ) where T : class, IEventSourcedAggregate, new();
+            )
+          where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<DateTime, IError>> FetchTimestamp<T>(
+        public Task<Result<ValueObjects.Timestamp, Errors>> FetchTimestamp<T>(
             Guid id,
             CancellationToken cancellationToken
-            ) where T : class, IEventSourcedAggregate, new();
+            )
+          where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<T, IError>> Load<T>(
+        public Task<Result<T, Errors>> Load<T>(
             Guid id,
             DateTime timestamp,
             CancellationToken cancellationToken = default(CancellationToken)
-            ) where T : class, IEventSourcedAggregate, new();
+            )
+          where T : class, IEventSourcedAggregate, new();
 
-        public Task<IEnumerable<Result<T, IError>>> LoadAll<T>(
-            IEnumerable<(Guid Id, DateTime timestamp)> possibleIdsAndTimestamps,
+        public Task<Result<T, Errors>> Load<T>(
+            ValueObjects.TimestampedId timestampedId,
             CancellationToken cancellationToken = default(CancellationToken)
-            ) where T : class, IEventSourcedAggregate, new();
+            )
+          where T : class, IEventSourcedAggregate, new();
 
-        public Task<IEnumerable<Result<T, IError>>> LoadAll<T>(
+        public Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
+            IEnumerable<(Guid, DateTime)> possibleIdsAndTimestamps,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
             IEnumerable<Guid> possibleIds,
             DateTime timestamp,
             CancellationToken cancellationToken = default(CancellationToken)
-            ) where T : class, IEventSourcedAggregate, new();
+            )
+          where T : class, IEventSourcedAggregate, new();
 
-        public Task<IEnumerable<Result<T, IError>>> LoadAllThatExisted<T>(
+        public Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<Result<T, Errors>>> LoadAllThatExisted<T>(
             IEnumerable<Guid> possibleIds,
             DateTime timestamp,
             CancellationToken cancellationToken = default(CancellationToken)
-            ) where T : class, IEventSourcedAggregate, new();
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<Result<T, Errors>>> LoadAllThatExisted<T>(
+            IEnumerable<ValueObjects.Id> possibleIds,
+            DateTime timestamp,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+          where T : class, IEventSourcedAggregate, new();
     }
 }

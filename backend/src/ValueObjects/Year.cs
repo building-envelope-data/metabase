@@ -8,46 +8,46 @@ using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.ValueObjects
 {
-  public sealed class Year
-    : ValueObject
-  {
-    public int Value { get; }
-
-    private Year(int value)
+    public sealed class Year
+      : ValueObject
     {
-      Value = value;
-    }
+        public int Value { get; }
 
-    public static Result<Year, IError> From(
-        int year,
-        IReadOnlyList<object>? path = null
-        )
-    {
-      if (year > DateTime.UtcNow.Year)
-        return Result.Failure<Year, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Year is in the future")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
+        private Year(int value)
+        {
+            Value = value;
+        }
 
-      return Result.Ok<Year, IError>(new Year(year));
-    }
+        public static Result<Year, Errors> From(
+            int year,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (year > DateTime.UtcNow.Year)
+                return Result.Failure<Year, Errors>(
+                    Errors.One(
+                    message: "Year is in the future",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
 
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Value;
-    }
+            return Result.Ok<Year, Errors>(new Year(year));
+        }
 
-    public static explicit operator Year(int year)
-    {
-      return From(year).Value;
-    }
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Value;
+        }
 
-    public static implicit operator int(Year year)
-    {
-      return year.Value;
+        public static explicit operator Year(int year)
+        {
+            return From(year).Value;
+        }
+
+        public static implicit operator int(Year year)
+        {
+            return year.Value;
+        }
     }
-  }
 }

@@ -14,7 +14,7 @@ using CSharpFunctionalExtensions;
 namespace Icon.Commands
 {
     public sealed class CreateComponentVersion
-      : CommandBase<Result<(ValueObjects.Id, ValueObjects.Timestamp), IError>>
+      : CommandBase<Result<ValueObjects.TimestampedId, Errors>>
     {
         public ValueObjects.ComponentVersionInput Input { get; }
 
@@ -24,21 +24,20 @@ namespace Icon.Commands
             )
           : base(creatorId)
         {
-            ComponentId = componentId;
-            Information = information;
+            Input = input;
         }
 
-        public static Result<CreateComponentVersion, IError> From(
+        public static Result<CreateComponentVersion, Errors> From(
             ValueObjects.ComponentVersionInput input,
             ValueObjects.Id creatorId
             )
         {
-					return Result.Ok(
-							new CreateComponentVersion(
-                input: input,
-								creatorId: creatorId
-								)
-							);
+            return Result.Ok<CreateComponentVersion, Errors>(
+                    new CreateComponentVersion(
+        input: input,
+                        creatorId: creatorId
+                        )
+                    );
+        }
     }
-}
 }

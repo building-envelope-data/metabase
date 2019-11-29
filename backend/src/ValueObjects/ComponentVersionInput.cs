@@ -14,7 +14,7 @@ namespace Icon.ValueObjects
         public Name Name { get; }
         public Abbreviation? Abbreviation { get; }
         public Description Description { get; }
-        public DateInterval Availability { get; }
+        public DateInterval? Availability { get; }
         public IReadOnlyCollection<ComponentCategory> Categories { get; }
 
         private ComponentVersionInput(
@@ -22,16 +22,16 @@ namespace Icon.ValueObjects
             Name name,
             Abbreviation? abbreviation,
             Description description,
-            DateInterval availability,
+            DateInterval? availability,
             IReadOnlyCollection<ComponentCategory> categories
             )
         {
-          ComponentId = componentId;
-          Name = name;
-          Abbreviation = abbreviation;
-          Description = description;
-          Availability = availability;
-          Categories = categories;
+            ComponentId = componentId;
+            Name = name;
+            Abbreviation = abbreviation;
+            Description = description;
+            Availability = availability;
+            Categories = categories;
         }
 
         public static Result<ComponentVersionInput, Errors> From(
@@ -39,34 +39,34 @@ namespace Icon.ValueObjects
             Name name,
             Abbreviation? abbreviation,
             Description description,
-            DateInterval availability,
+            DateInterval? availability,
             IReadOnlyCollection<ComponentCategory> categories,
             IReadOnlyList<object>? path = null
             )
         {
-          return Result.Ok<ComponentVersionInput, Errors>(
-              new ComponentVersionInput(
-                componentId: componentId,
-                name: name,
-                abbreviation: abbreviation,
-                description: description,
-                availability: availability,
-                categories: categories
-                )
-              );
+            return Result.Ok<ComponentVersionInput, Errors>(
+                new ComponentVersionInput(
+                  componentId: componentId,
+                  name: name,
+                  abbreviation: abbreviation,
+                  description: description,
+                  availability: availability,
+                  categories: categories
+                  )
+                );
         }
 
-        protected override IEnumerable<object> GetEqualityComponents()
+        protected override IEnumerable<object?> GetEqualityComponents()
         {
-          yield return ComponentId;
-          yield return Name;
-          yield return Abbreviation;
-          yield return Description;
-          yield return Availability;
-          foreach (var category in Categories)
-          {
-            yield return category;
-          }
+            yield return ComponentId;
+            yield return Name;
+            yield return Abbreviation;
+            yield return Description;
+            yield return Availability;
+            foreach (var category in Categories)
+            {
+                yield return category;
+            }
         }
     }
 }

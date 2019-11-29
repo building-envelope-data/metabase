@@ -17,11 +17,39 @@ namespace Icon.Events
         {
             return new ComponentInformationEventData(
                   name: input.Name,
-                  abbreviation: input.Abbreviation,
+                  abbreviation: input.Abbreviation?.Value,
                   description: input.Description,
                   availableFrom: input.Availability?.Start,
                   availableUntil: input.Availability?.End,
                   categories: input.Categories.Select(c => c.FromModel()).ToList()
+                );
+        }
+
+        public static ComponentInformationEventData From(
+            ValueObjects.ComponentVersionInput input
+            )
+        {
+            return new ComponentInformationEventData(
+                  name: input.Name,
+                  abbreviation: input.Abbreviation?.Value,
+                  description: input.Description,
+                  availableFrom: input.Availability?.Start,
+                  availableUntil: input.Availability?.End,
+                  categories: input.Categories.Select(c => c.FromModel()).ToList()
+                );
+        }
+
+        public static ComponentInformationEventData From(
+            ValueObjects.ComponentInformation information
+            )
+        {
+            return new ComponentInformationEventData(
+                  name: information.Name,
+                  abbreviation: information.Abbreviation?.Value,
+                  description: information.Description,
+                  availableFrom: information.Availability?.Start,
+                  availableUntil: information.Availability?.End,
+                  categories: information.Categories.Select(c => c.FromModel()).ToList()
                 );
         }
 
@@ -57,13 +85,12 @@ namespace Icon.Events
 
         public override Result<bool, Errors> Validate()
         {
-          return
-            Result.Combine(
-                base.Validate(),
-                ValidateNonNull(Name, nameof(Name)),
-                ValidateNonNull(Description, nameof(Description)),
-                ValidateNonNull(Categories, nameof(Categories))
-                );
+            return
+              Result.Combine(
+                  ValidateNonNull(Name, nameof(Name)),
+                  ValidateNonNull(Description, nameof(Description)),
+                  ValidateNonNull(Categories, nameof(Categories))
+                  );
         }
     }
 }

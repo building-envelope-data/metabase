@@ -22,51 +22,50 @@ namespace Icon.GraphQl
         public ComponentVersionInput() { }
 #nullable enable
 
-				public Result<ValueObjects.ComponentVersionInput, Errors> Validate(
-						IReadOnlyList<object> path
-						)
-				{
-          var componentIdResult = ValueObjects.Id.From(
-              ComponentId,
-              path.Append("componentId").ToList().AsReadOnly()
-              );
-          var nameResult = ValueObjects.Name.From(
-              Name,
-              path.Append("name").ToList().AsReadOnly()
-              );
-          var abbreviationResult = ValueObjects.Abbreviation.From(
-              Abbreviation,
-              path.Append("abbreviation").ToList().AsReadOnly()
-              );
-          var descriptionResult = ValueObjects.Description.From(
-              Description,
-              path.Append("description").ToList().AsReadOnly()
-              );
-          var availabilityResult = ValueObjects.DateInterval.From(
-              AvailableFrom,
-              AvailableUntil,
-              path.Append("availableUntil").ToList().AsReadOnly()
-              );
+        public Result<ValueObjects.ComponentVersionInput, Errors> Validate(
+                IReadOnlyList<object> path
+                )
+        {
+            var componentIdResult = ValueObjects.Id.From(
+                ComponentId,
+                path.Append("componentId").ToList().AsReadOnly()
+                );
+            var nameResult = ValueObjects.Name.From(
+                Name,
+                path.Append("name").ToList().AsReadOnly()
+                );
+            var abbreviationResult = ValueObjects.Abbreviation.MaybeFrom(
+                Abbreviation,
+                path.Append("abbreviation").ToList().AsReadOnly()
+                );
+            var descriptionResult = ValueObjects.Description.From(
+                Description,
+                path.Append("description").ToList().AsReadOnly()
+                );
+            var availabilityResult = ValueObjects.DateInterval.MaybeFrom(
+                AvailableFrom,
+                AvailableUntil,
+                path.Append("availableUntil").ToList().AsReadOnly()
+                );
 
-					var errors = Errors.From(
-              componentIdResult,
-							nameResult,
-							abbreviationResult,
-							descriptionResult,
-							availabilityResult
-							);
-
-          if (!errors.IsEmpty())
-						return Result.Failure<ValueObjects.ComponentVersionInput, Errors>(errors);
-
-					return ValueObjects.ComponentVersionInput.From(
-                componentId: componentIdResult.Value,
-								name: nameResult.Value,
-								abbreviation: abbreviationResult.Value,
-								description: descriptionResult.Value,
-								availability: availabilityResult.Value,
-								categories: Categories
-								);
-				}
+            return
+    Errors.CombineExistent(
+      componentIdResult,
+                    nameResult,
+                    abbreviationResult,
+                    descriptionResult,
+                    availabilityResult
+                    )
+    .Bind(_ =>
+            ValueObjects.ComponentVersionInput.From(
+        componentId: componentIdResult.Value,
+                        name: nameResult.Value,
+                        abbreviation: abbreviationResult?.Value,
+                        description: descriptionResult.Value,
+                        availability: availabilityResult?.Value,
+                        categories: Categories
+                        )
+  );
+        }
     }
 }

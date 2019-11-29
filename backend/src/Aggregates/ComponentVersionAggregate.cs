@@ -32,49 +32,48 @@ namespace Icon.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
-              return
-                Result.Combine(
-                    base.Validate(),
-                    ValidateEmpty(ComponentId),
-                    ValidateNull(Information)
-                    );
+                return
+                  Result.Combine(
+                      base.Validate(),
+                      ValidateEmpty(ComponentId, nameof(ComponentId)),
+                      ValidateNull(Information, nameof(Information))
+                      );
 
             else
-              return
-                Result.Combine(
-                    base.Validate(),
-                    ValidateNonEmpty(ComponentId, nameof(ComponentId)),
-                    Information.Validate()
-                    );
+                return
+                  Result.Combine(
+                      base.Validate(),
+                      ValidateNonEmpty(ComponentId, nameof(ComponentId)),
+                      Information.Validate()
+                      );
         }
 
         public Result<Models.ComponentVersion, Errors> ToModel()
         {
-          var virginResult = ValidateNonVirgin();
-          if (virginResult.IsFailure)
-            return Result.Failure<ValueObjects.ComponentVersion, Errors>(virginResult.Error);
+            var virginResult = ValidateNonVirgin();
+            if (virginResult.IsFailure)
+                return Result.Failure<Models.ComponentVersion, Errors>(virginResult.Error);
 
-          var idResult = ValueObjects.Id.From(Id);
-          var componentIdResult = ValueObjects.Id.From(componentId);
-          var informationResult = Information.ToValueObject();
-          var timestampResult = ValueObjects.Timestamp.From(Timestamp);
+            var idResult = ValueObjects.Id.From(Id);
+            var componentIdResult = ValueObjects.Id.From(ComponentId);
+            var informationResult = Information.ToValueObject();
+            var timestampResult = ValueObjects.Timestamp.From(Timestamp);
 
-          var errors = Errors.From(
-              idResult,
-              componentIdResult,
-              informationResult,
-              timestampResult
-              );
-
-          if (!errors.IsEmpty())
-            return Result.Failure<ValueObjects.ComponentVersion, Errors>(errors);
-
-          return Models.ComponentVersion.From(
-              id: idResult.Value,
-              componentId: componentIdResult.Value,
-              information: informationResult.Value,
-              timestamp: timestampResult.Value
-              );
+            return
+              Errors.Combine(
+                idResult,
+                componentIdResult,
+                informationResult,
+                timestampResult
+                )
+              .Bind(_ =>
+            Models.ComponentVersion.From(
+                id: idResult.Value,
+                componentId: componentIdResult.Value,
+                information: informationResult.Value,
+                timestamp: timestampResult.Value
+                )
+            );
         }
     }
 }

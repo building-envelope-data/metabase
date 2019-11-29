@@ -8,46 +8,56 @@ using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.ValueObjects
 {
-  public sealed class Id
-    : ValueObject
-  {
-    public Guid Value { get; }
-
-    private Id(Guid value)
+    public sealed class Id
+      : ValueObject
     {
-      Value = value;
-    }
+        public Guid Value { get; }
 
-    public static Result<Id, IError> From(
-        Guid id,
-        IReadOnlyList<object>? path = null
-        )
-    {
-      if (id == Guid.Empty)
-        return Result.Failure<Id, IError>(
-            ErrorBuilder.New()
-            .SetMessage("Id is empty")
-            .SetCode(ErrorCodes.InvalidValue)
-            .SetPath(path)
-            .Build()
-            );
+        private Id(Guid value)
+        {
+            Value = value;
+        }
 
-      return Result.Ok<Id, IError>(new Id(id));
-    }
+        public static Id New()
+        {
+            // Note that `Guid.NewGuid()` is guaranteed to not equal `Guid.Empty`, see
+            // https://docs.microsoft.com/en-us/dotnet/api/system.guid.newguid?view=netframework-4.8#remarks
+            // Therefore, using `Value` is safe here.
+            return From(
+                Guid.NewGuid()
+                ).Value;
+        }
 
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Value;
-    }
+        public static Result<Id, Errors> From(
+            Guid id,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (id == Guid.Empty)
+                return Result.Failure<Id, Errors>(
+                    Errors.One(
+                    message: "Id is empty",
+                    code: ErrorCodes.InvalidValue,
+                    path: path
+                    )
+                    );
 
-    public static explicit operator Id(Guid id)
-    {
-      return From(id).Value;
-    }
+            return Result.Ok<Id, Errors>(new Id(id));
+        }
 
-    public static implicit operator Guid(Id id)
-    {
-      return id.Value;
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Value;
+        }
+
+        public static explicit operator Id(Guid id)
+        {
+            return From(id).Value;
+        }
+
+        public static implicit operator Guid(Id id)
+        {
+            return id.Value;
+        }
     }
-  }
 }

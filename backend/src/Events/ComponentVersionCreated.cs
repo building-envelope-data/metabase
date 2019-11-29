@@ -53,13 +53,13 @@ namespace Icon.Events
 
         public override Result<bool, Errors> Validate()
         {
-          return
-            Result.Combine(
-                base.Validate(),
-                ValidateNonEmpty(ComponentVersionId, nameof(ComponentVersionId)),
-                ValidateNonEmpty(ComponentId, nameof(ComponentId)),
-                Information.Validate()
-                );
+            return
+              Result.Combine(
+                  base.Validate(),
+                  ValidateNonEmpty(ComponentVersionId, nameof(ComponentVersionId)),
+                  ValidateNonEmpty(ComponentId, nameof(ComponentId)),
+                  Information.Validate()
+                  );
         }
     }
 }

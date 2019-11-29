@@ -38,17 +38,17 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-          return Result.Ok<InstitutionInformation, Errors>(
-              new InstitutionInformation(
-                name: name,
-                abbreviation: abbreviation,
-                description: description,
-                websiteLocator: websiteLocator
-                )
-              );
+            return Result.Ok<InstitutionInformation, Errors>(
+                new InstitutionInformation(
+                  name: name,
+                  abbreviation: abbreviation,
+                  description: description,
+                  websiteLocator: websiteLocator
+                  )
+                );
         }
 
-        protected override IEnumerable<object> GetEqualityComponents()
+        protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Name;
             yield return Abbreviation;
