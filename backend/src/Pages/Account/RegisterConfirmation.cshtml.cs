@@ -1,3 +1,4 @@
+#nullable disable
 using Icon.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Text;
