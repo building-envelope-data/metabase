@@ -33,12 +33,16 @@ namespace Icon.GraphQl
             )
         {
             var requestTimestamp = HandleTimestamp(timestamp, resolverContext);
+            var query =
+              ResultHelpers.HandleFailure(
+                  Queries.ListComponents.From(requestTimestamp)
+                  );
             return ResultHelpers.HandleFailures<Models.Component>(
               await _queryBus
                .Send<
                   Queries.ListComponents,
-                  IEnumerable<Result<Models.Component, IError>>
-                  >(new Queries.ListComponents(requestTimestamp))
+                  IEnumerable<Result<Models.Component, Errors>>
+                  >(query)
               )
               .Select(c => Component.FromModel(c, requestTimestamp));
         }
@@ -51,10 +55,14 @@ namespace Icon.GraphQl
             )
         {
             var requestTimestamp = HandleTimestamp(timestamp, resolverContext);
-            return
-              componentLoader.LoadAsync(
-                  (id.NotEmpty(), requestTimestamp)
+            var timestampedId =
+              ResultHelpers.HandleFailure(
+                  ValueObjects.TimestampedId.From(
+                    id, requestTimestamp
+                    )
                   );
+            return
+              componentLoader.LoadAsync(timestampedId);
             /* return */
             /*   Component.FromModel( */
             /*       (await _queryBus */

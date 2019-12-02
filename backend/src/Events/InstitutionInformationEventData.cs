@@ -1,4 +1,6 @@
 using Uri = System.Uri;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 using Models = Icon.Models;
@@ -9,14 +11,14 @@ namespace Icon.Events
       : Validatable
     {
         public static InstitutionInformationEventData From(
-            Models.InstitutionInformation information
+            ValueObjects.InstitutionInformation information
             )
         {
             return new InstitutionInformationEventData(
                 name: information.Name,
-                abbreviation: information.Abbreviation,
-                description: information.Description,
-                websiteLocator: information.WebsiteLocator
+                abbreviation: information.Abbreviation?.Value,
+                description: information.Description?.Value,
+                websiteLocator: information.WebsiteLocator?.Value
                 );
         }
 
@@ -43,9 +45,12 @@ namespace Icon.Events
             EnsureValid();
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return !(Name is null);
+            return
+              Result.Combine(
+                  ValidateNonNull(Name, nameof(Name))
+                  );
         }
     }
 }

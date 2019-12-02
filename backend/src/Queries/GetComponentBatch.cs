@@ -1,8 +1,6 @@
-using Validatable = Icon.Validatable;
 using System.Collections.Generic;
-using Guid = System.Guid;
 using Icon.Infrastructure.Query;
-/* using ZonedDateTime = NodaTime.ZonedDateTime; */
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 using Models = Icon.Models;
 using IError = HotChocolate.IError;
@@ -11,27 +9,27 @@ using System.Linq;
 
 namespace Icon.Queries
 {
-    public class GetComponentBatch
-      : Validatable, IQuery<IEnumerable<Result<Models.Component, IError>>>
+    public sealed class GetComponentBatch
+      : IQuery<IEnumerable<Result<Models.Component, Errors>>>
     {
-        public IEnumerable<(Guid Id, DateTime Timestamp)> ComponentIdsAndTimestamps { get; }
+        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedComponentIds { get; }
 
-        public GetComponentBatch(
-            IEnumerable<(Guid Id, DateTime Timestamp)> componentIdsAndTimestamps
+        private GetComponentBatch(
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedComponentIds
             )
         {
-            ComponentIdsAndTimestamps = componentIdsAndTimestamps;
-            EnsureValid();
+            TimestampedComponentIds = timestampedComponentIds;
         }
 
-        public override bool IsValid()
+        public static Result<GetComponentBatch, Errors> From(
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedComponentIds
+            )
         {
-            return
-              ComponentIdsAndTimestamps.All(
-                  ((Guid Id, DateTime Timestamp) idAndTimestamp)
-                  => idAndTimestamp.Id != Guid.Empty &&
-                     idAndTimestamp.Timestamp != DateTime.MinValue
-                  );
+            return Result.Ok<GetComponentBatch, Errors>(
+                    new GetComponentBatch(
+                        timestampedComponentIds
+                        )
+                    );
         }
     }
 }

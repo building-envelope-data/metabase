@@ -3,6 +3,8 @@ using Guid = System.Guid;
 using DateTime = System.DateTime;
 using Models = Icon.Models;
 using System.Linq;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Events
 {
@@ -10,15 +12,43 @@ namespace Icon.Events
       : Validatable
     {
         public static ComponentInformationEventData From(
-            Models.ComponentInformation information
+            ValueObjects.ComponentInput input
+            )
+        {
+            return new ComponentInformationEventData(
+                  name: input.Name,
+                  abbreviation: input.Abbreviation?.Value,
+                  description: input.Description,
+                  availableFrom: input.Availability?.Start,
+                  availableUntil: input.Availability?.End,
+                  categories: input.Categories.Select(c => c.FromModel()).ToList()
+                );
+        }
+
+        public static ComponentInformationEventData From(
+            ValueObjects.ComponentVersionInput input
+            )
+        {
+            return new ComponentInformationEventData(
+                  name: input.Name,
+                  abbreviation: input.Abbreviation?.Value,
+                  description: input.Description,
+                  availableFrom: input.Availability?.Start,
+                  availableUntil: input.Availability?.End,
+                  categories: input.Categories.Select(c => c.FromModel()).ToList()
+                );
+        }
+
+        public static ComponentInformationEventData From(
+            ValueObjects.ComponentInformation information
             )
         {
             return new ComponentInformationEventData(
                   name: information.Name,
-                  abbreviation: information.Abbreviation,
+                  abbreviation: information.Abbreviation?.Value,
                   description: information.Description,
-                  availableFrom: information.AvailableFrom,
-                  availableUntil: information.AvailableUntil,
+                  availableFrom: information.Availability?.Start,
+                  availableUntil: information.Availability?.End,
                   categories: information.Categories.Select(c => c.FromModel()).ToList()
                 );
         }
@@ -26,6 +56,7 @@ namespace Icon.Events
         public string Name { get; set; }
         public string? Abbreviation { get; set; }
         public string Description { get; set; }
+        /* public DateInterval? Availability { get; } */ // TODO This is what we actually want, a proper date interval and it should be persisted as PostgreSQL date range. This should work with `NodaTime.DateInterval`.
         public DateTime? AvailableFrom { get; set; }
         public DateTime? AvailableUntil { get; set; }
         public IReadOnlyCollection<ComponentCategoryEventData> Categories { get; set; }
@@ -52,11 +83,14 @@ namespace Icon.Events
             EnsureValid();
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return !(Name is null) &&
-              !(Description is null) &&
-              !(Categories is null);
+            return
+              Result.Combine(
+                  ValidateNonNull(Name, nameof(Name)),
+                  ValidateNonNull(Description, nameof(Description)),
+                  ValidateNonNull(Categories, nameof(Categories))
+                  );
         }
     }
 }

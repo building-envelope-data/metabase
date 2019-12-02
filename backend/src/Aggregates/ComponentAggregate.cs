@@ -1,5 +1,6 @@
 // Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
 
+using CSharpFunctionalExtensions;
 using Icon;
 using System;
 using System.Collections.Generic;
@@ -25,29 +26,42 @@ namespace Icon.Aggregates
             Information = ComponentInformationAggregateData.From(data.Information);
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return
-              base.IsValid() &&
-              (
-                IsVirgin()
-              )
-              ||
-              (
-               !IsVirgin() &&
-               (Information?.IsValid() ?? false)
-              );
+            if (IsVirgin())
+                return base.Validate();
+
+            else
+                return
+                  Result.Combine(
+                      base.Validate(),
+                      Information.Validate()
+                      );
         }
 
-        public Models.Component ToModel()
+        public Result<Models.Component, Errors> ToModel()
         {
-            EnsureNotVirgin();
-            EnsureValid();
-            return new Models.Component(
-                id: Id,
-                information: Information.ToModel(),
-                timestamp: Timestamp
-                );
+            var virginResult = ValidateNonVirgin();
+            if (virginResult.IsFailure)
+                return Result.Failure<Models.Component, Errors>(virginResult.Error);
+
+            var idResult = ValueObjects.Id.From(Id);
+            var informationResult = Information.ToValueObject();
+            var timestampResult = ValueObjects.Timestamp.From(Timestamp);
+
+            return
+              Errors.Combine(
+                  idResult,
+                  informationResult,
+                  timestampResult
+                  )
+              .Bind(_ =>
+                  Models.Component.From(
+                    id: idResult.Value,
+                    information: informationResult.Value,
+                    timestamp: timestampResult.Value
+                    )
+                  );
         }
     }
 }

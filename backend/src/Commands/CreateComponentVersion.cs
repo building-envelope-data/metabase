@@ -1,6 +1,6 @@
-using Guid = System.Guid;
 using System.Collections.Generic;
 using DateTime = System.DateTime;
+using ValueObjects = Icon.ValueObjects;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure;
@@ -14,29 +14,30 @@ using CSharpFunctionalExtensions;
 namespace Icon.Commands
 {
     public sealed class CreateComponentVersion
-      : CommandBase<Result<(Guid Id, DateTime Timestamp), IError>>
+      : CommandBase<Result<ValueObjects.TimestampedId, Errors>>
     {
-        public Guid ComponentId { get; }
-        public Models.ComponentInformation Information { get; }
+        public ValueObjects.ComponentVersionInput Input { get; }
 
-        public CreateComponentVersion(
-            Guid componentId,
-            Models.ComponentInformation information,
-            Guid creatorId
+        private CreateComponentVersion(
+            ValueObjects.ComponentVersionInput input,
+            ValueObjects.Id creatorId
             )
           : base(creatorId)
         {
-            ComponentId = componentId;
-            Information = information;
-            EnsureValid();
+            Input = input;
         }
 
-        public override bool IsValid()
+        public static Result<CreateComponentVersion, Errors> From(
+            ValueObjects.ComponentVersionInput input,
+            ValueObjects.Id creatorId
+            )
         {
-            return
-              base.IsValid() &&
-              ComponentId != Guid.Empty &&
-              Information.IsValid();
+            return Result.Ok<CreateComponentVersion, Errors>(
+                    new CreateComponentVersion(
+        input: input,
+                        creatorId: creatorId
+                        )
+                    );
         }
     }
 }

@@ -10,38 +10,38 @@ using HotChocolate.Resolvers;
 using HotChocolate;
 using CSharpFunctionalExtensions;
 using ErrorCodes = Icon.ErrorCodes;
+using ValueObjects = Icon.ValueObjects;
 using HotChocolate.Execution;
 
 namespace Icon.GraphQl
 {
     public sealed class Timestamp
     {
-        public static Result<DateTime, IError> Sanitize(DateTime? maybeTimestamp, DateTime requestTimestamp)
+        public static Result<ValueObjects.Timestamp, Errors> Sanitize(
+            DateTime? maybeTimestamp,
+            ValueObjects.Timestamp requestTimestamp
+            )
         {
-            var timestamp = maybeTimestamp ?? requestTimestamp;
-            if (timestamp > requestTimestamp)
-            {
-                return Result.Failure<DateTime, IError>(
-                    ErrorBuilder.New()
-                    .SetMessage($"Timestamp {timestamp} is in the future.")
-                    .SetCode(ErrorCodes.InvalidValue)
-                    .Build()
-                    );
-            }
-            return Result.Success<DateTime, IError>(timestamp);
+            var timestamp = maybeTimestamp ?? requestTimestamp.Value;
+            return
+              ValueObjects.Timestamp.From(
+                timestamp,
+                now: requestTimestamp.Value,
+                path: Array.Empty<object>() // TODO What is the proper path for variables?
+                );
         }
 
-        public static void StoreRequest(DateTime timestamp, IQueryRequestBuilder requestBuilder)
+        public static void StoreRequest(ValueObjects.Timestamp timestamp, IQueryRequestBuilder requestBuilder)
         {
             requestBuilder.SetProperty("requestTimestamp", timestamp);
         }
 
-        public static DateTime FetchRequest(IResolverContext context)
+        public static ValueObjects.Timestamp FetchRequest(IResolverContext context)
         {
-            return (System.DateTime)context.ContextData["requestTimestamp"];
+            return (ValueObjects.Timestamp)context.ContextData["requestTimestamp"];
         }
 
-        public static void Store(DateTime timestamp, IResolverContext context)
+        public static void Store(ValueObjects.Timestamp timestamp, IResolverContext context)
         {
             // TODO Is there a better way to pass data down the tree to resolvers? Something with proper types? See https://hotchocolate.io/docs/custom-context
             context.ScopedContextData = context.ScopedContextData.SetItem(
@@ -50,9 +50,9 @@ namespace Icon.GraphQl
                 );
         }
 
-        public static DateTime Fetch(IResolverContext context)
+        public static ValueObjects.Timestamp Fetch(IResolverContext context)
         {
-            return (System.DateTime)context.ScopedContextData["timestamp"];
+            return (ValueObjects.Timestamp)context.ScopedContextData["timestamp"];
         }
     }
 }

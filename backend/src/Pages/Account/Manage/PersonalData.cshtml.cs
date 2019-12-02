@@ -1,3 +1,4 @@
+#nullable disable
 using Icon.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;

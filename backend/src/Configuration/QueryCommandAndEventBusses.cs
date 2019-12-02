@@ -52,28 +52,28 @@ namespace Icon.Configuration
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.ListComponents,
-              IEnumerable<Result<Models.Component, IError>>
+              IEnumerable<Result<Models.Component, Errors>>
                 >,
               Handlers.ListComponentsHandler
                 >();
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.GetComponent,
-              Result<Models.Component, IError>
+              Result<Models.Component, Errors>
                 >,
               Handlers.GetComponentHandler
                 >();
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.GetComponentBatch,
-              IEnumerable<Result<Models.Component, IError>>
+              IEnumerable<Result<Models.Component, Errors>>
                 >,
               Handlers.GetComponentBatchHandler
                 >();
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.ListComponentVersions,
-              IEnumerable<Result<Models.ComponentVersion, IError>>
+              IEnumerable<Result<Models.ComponentVersion, Errors>>
                 >,
               Handlers.ListComponentVersionsHandler
                 >();
@@ -82,19 +82,19 @@ namespace Icon.Configuration
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.CreateComponent,
-              Result<(Guid Id, DateTime Timestamp), IError>
+              Result<ValueObjects.TimestampedId, Errors>
                 >,
               Handlers.CreateComponentHandler>();
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.CreateComponentVersion,
-              Result<(Guid Id, DateTime Timestamp), IError>
+              Result<ValueObjects.TimestampedId, Errors>
                 >,
               Handlers.CreateComponentVersionHandler>();
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.CreateComponentVersionManufacturer,
-              Result<(Guid Id, DateTime Timestamp), IError>
+              Result<ValueObjects.TimestampedId, Errors>
                 >,
               Handlers.CreateComponentVersionManufacturerHandler>();
 

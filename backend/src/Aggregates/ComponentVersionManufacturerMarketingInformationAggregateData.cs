@@ -1,4 +1,5 @@
 using Icon;
+using CSharpFunctionalExtensions;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 using Models = Icon.Models;
@@ -34,19 +35,31 @@ namespace Icon.Aggregates
             InstitutionInformation = institutionInformation;
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
             return
-              (ComponentVersionInformation?.IsValid() ?? true) &&
-              (InstitutionInformation?.IsValid() ?? true);
+              Result.Combine(
+                  ComponentVersionInformation?.Validate() ?? Result.Ok<bool, Errors>(true),
+                  InstitutionInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                  );
         }
 
-        public Models.ComponentVersionManufacturerMarketingInformation ToModel()
+        public Result<ValueObjects.ComponentVersionManufacturerMarketingInformation, Errors> ToValueObject()
         {
-            return new Models.ComponentVersionManufacturerMarketingInformation(
-                componentVersionInformation: ComponentVersionInformation?.ToModel(),
-                institutionInformation: InstitutionInformation?.ToModel()
-                );
+            var componentVersionInformationResult = ComponentVersionInformation?.ToValueObject();
+            var institutionInformationResult = InstitutionInformation?.ToValueObject();
+
+            return
+              Errors.CombineExistent(
+                  componentVersionInformationResult,
+                  institutionInformationResult
+                  )
+              .Bind(_ =>
+                  ValueObjects.ComponentVersionManufacturerMarketingInformation.From(
+                    componentVersionInformation: componentVersionInformationResult?.Value,
+                    institutionInformation: institutionInformationResult?.Value
+                    )
+                  );
         }
     }
 }

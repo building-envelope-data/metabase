@@ -1,4 +1,6 @@
 using Icon;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using Guid = System.Guid;
 using System.Collections.Generic;
 using DateTime = System.DateTime;
@@ -20,7 +22,7 @@ namespace Icon.Events
         {
             return new ComponentCreated(
                 componentId: componentId,
-                information: ComponentInformationEventData.From(command.Information),
+                information: ComponentInformationEventData.From(command.Input),
                 creatorId: command.CreatorId
                 );
         }
@@ -44,12 +46,14 @@ namespace Icon.Events
             EnsureValid();
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
             return
-              base.IsValid() &&
-              ComponentId != Guid.Empty &&
-              (Information?.IsValid() ?? false);
+              Result.Combine(
+                  base.Validate(),
+                  ValidateNonEmpty(ComponentId, nameof(ComponentId)),
+                  Information.Validate()
+                  );
         }
     }
 }

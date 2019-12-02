@@ -1,5 +1,7 @@
 using System.Collections.Generic;
-using Guid = System.Guid;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -7,32 +9,42 @@ namespace Icon.Models
     public sealed class Person
       : Stakeholder
     {
-        public string Name { get; }
-        public Guid ContactInformationId { get; }
+        public ValueObjects.Name Name { get; }
+        public ValueObjects.ContactInformation ContactInformation { get; }
         public IEnumerable<Institution> Affiliations { get; }
 
-        public Person(
-            Guid id,
-            string name,
-            Guid contactInformationId,
+        private Person(
+            ValueObjects.Id id,
+            ValueObjects.Name name,
+            ValueObjects.ContactInformation contactInformation,
             IEnumerable<Institution> affiliations,
-            DateTime timestamp
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             Name = name;
-            ContactInformationId = contactInformationId;
+            ContactInformation = contactInformation;
             Affiliations = affiliations;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<Person, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Name name,
+            ValueObjects.ContactInformation contactInformation,
+            IEnumerable<Institution> affiliations,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              !string.IsNullOrWhiteSpace(Name) &&
-              ContactInformationId != Guid.Empty &&
-              !(Affiliations is null);
+              Result.Ok<Person, Errors>(
+                  new Person(
+            id: id,
+            name: name,
+            contactInformation: contactInformation,
+            affiliations: affiliations,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

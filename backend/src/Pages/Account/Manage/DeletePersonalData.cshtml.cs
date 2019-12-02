@@ -1,3 +1,4 @@
+#nullable disable
 using Icon.Models;
 using System;
 using System.ComponentModel.DataAnnotations;

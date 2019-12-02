@@ -1,4 +1,4 @@
-using Validatable = Icon.Validatable;
+using ValueObjects = Icon.ValueObjects;
 using System;
 using System.Collections.Generic;
 using Models = Icon.Models;
@@ -8,22 +8,27 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Queries
 {
-    public class ListComponents
-      : Validatable, IQuery<IEnumerable<Result<Models.Component, IError>>>
+    public sealed class ListComponents
+      : IQuery<IEnumerable<Result<Models.Component, Errors>>>
     {
-        public DateTime Timestamp { get; }
+        public ValueObjects.Timestamp Timestamp { get; }
 
-        public ListComponents(
-            DateTime timestamp
+        private ListComponents(
+            ValueObjects.Timestamp timestamp
             )
         {
             Timestamp = timestamp;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<ListComponents, Errors> From(
+            ValueObjects.Timestamp timestamp
+            )
         {
-            return Timestamp != DateTime.MinValue;
+            return Result.Ok<ListComponents, Errors>(
+                    new ListComponents(
+                      timestamp
+                      )
+                );
         }
     }
 }

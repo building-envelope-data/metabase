@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
+using ValueObjects = Icon.ValueObjects;
 using Icon.Infrastructure;
 using Icon.Infrastructure.Command;
 using Icon.Events;
@@ -13,25 +14,30 @@ using CSharpFunctionalExtensions;
 namespace Icon.Commands
 {
     public sealed class CreateComponent
-      : CommandBase<Result<(Guid Id, DateTime Timestamp), IError>>
+      : CommandBase<Result<ValueObjects.TimestampedId, Errors>>
     {
-        public Models.ComponentInformation Information { get; }
+        public ValueObjects.ComponentInput Input { get; }
 
-        public CreateComponent(
-            Models.ComponentInformation information,
-            Guid creatorId
+        private CreateComponent(
+            ValueObjects.ComponentInput input,
+            ValueObjects.Id creatorId
             )
           : base(creatorId)
         {
-            Information = information;
-            EnsureValid();
+            Input = input;
         }
 
-        public override bool IsValid()
+        public static Result<CreateComponent, Errors> From(
+            ValueObjects.ComponentInput input,
+            ValueObjects.Id creatorId
+            )
         {
-            return
-              base.IsValid() &&
-              Information.IsValid();
+            return Result.Ok<CreateComponent, Errors>(
+                    new CreateComponent(
+                        input: input,
+                        creatorId: creatorId
+                        )
+                    );
         }
     }
 }

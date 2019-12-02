@@ -1,9 +1,13 @@
 using System.Collections.Generic;
+using Errors = Icon.Errors;
 using Guid = System.Guid;
+using Unit = Icon.Unit;
+using CSharpFunctionalExtensions;
 
 namespace Icon.Events
 {
-    public abstract class Event : Validatable, IEvent
+    public abstract class Event
+      : Validatable, IEvent
     {
         public static void EnsureValid(IEnumerable<IEvent> events)
         {
@@ -24,9 +28,9 @@ namespace Icon.Events
             CreatorId = creatorId;
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return CreatorId != Guid.Empty;
+            return ValidateNonEmpty(CreatorId, nameof(CreatorId));
         }
     }
 }

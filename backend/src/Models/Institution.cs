@@ -1,4 +1,6 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -6,31 +8,42 @@ namespace Icon.Models
     public sealed class Institution
       : Stakeholder
     {
-        public InstitutionInformation Information { get; }
-        public string? PublicKey { get; }
-        public InstitutionState State { get; }
+        public ValueObjects.InstitutionInformation Information { get; }
+        public ValueObjects.PublicKey? PublicKey { get; }
+        public ValueObjects.InstitutionState State { get; }
 
-        public Institution(
-            Guid id,
-            InstitutionInformation information,
-            string? publicKey,
-            InstitutionState state,
-            DateTime timestamp
+        private Institution(
+            ValueObjects.Id id,
+            ValueObjects.InstitutionInformation information,
+            ValueObjects.PublicKey? publicKey,
+            ValueObjects.InstitutionState state,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             Information = information;
             PublicKey = publicKey;
             State = state;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<Institution, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.InstitutionInformation information,
+            ValueObjects.PublicKey? publicKey,
+            ValueObjects.InstitutionState state,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              Information.IsValid() &&
-              !string.IsNullOrWhiteSpace(PublicKey);
+              Result.Ok<Institution, Errors>(
+                  new Institution(
+            id: id,
+            information: information,
+            publicKey: publicKey,
+            state: state,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

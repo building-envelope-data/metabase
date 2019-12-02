@@ -18,7 +18,7 @@ using CSharpFunctionalExtensions;
 namespace Icon.Handlers
 {
     public class GetComponentBatchHandler
-      : IQueryHandler<Queries.GetComponentBatch, IEnumerable<Result<Models.Component, IError>>>
+      : IQueryHandler<Queries.GetComponentBatch, IEnumerable<Result<Models.Component, Errors>>>
     {
         private readonly IAggregateRepository _repository;
 
@@ -27,7 +27,7 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Result<Models.Component, IError>>> Handle(
+        public async Task<IEnumerable<Result<Models.Component, Errors>>> Handle(
             Queries.GetComponentBatch query,
             CancellationToken cancellationToken
             )
@@ -37,11 +37,11 @@ namespace Icon.Handlers
                 return
                   (await session
                    .LoadAll<Aggregates.ComponentAggregate>(
-                     query.ComponentIdsAndTimestamps,
+                     query.TimestampedComponentIds,
                      cancellationToken: cancellationToken
                      )
                   ).Select(result =>
-                    result.Map(a => a.ToModel())
+                    result.Bind(a => a.ToModel())
                     );
             }
         }

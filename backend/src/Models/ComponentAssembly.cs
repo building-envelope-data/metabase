@@ -1,4 +1,6 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -6,28 +8,37 @@ namespace Icon.Models
     public sealed class ComponentAssembly
       : Model
     {
-        public Guid SuperComponentId { get; }
-        public Guid SubComponentId { get; }
+        public ValueObjects.Id SuperComponentId { get; }
+        public ValueObjects.Id SubComponentId { get; }
 
-        public ComponentAssembly(
-            Guid id,
-            Guid superComponentId,
-            Guid subComponentId,
-            DateTime timestamp
+        private ComponentAssembly(
+            ValueObjects.Id id,
+            ValueObjects.Id superComponentId,
+            ValueObjects.Id subComponentId,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             SuperComponentId = superComponentId;
             SubComponentId = subComponentId;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<ComponentAssembly, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Id superComponentId,
+            ValueObjects.Id subComponentId,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              SuperComponentId != Guid.Empty &&
-              SubComponentId != Guid.Empty;
+              Result.Ok<ComponentAssembly, Errors>(
+                  new ComponentAssembly(
+            id: id,
+            superComponentId: superComponentId,
+            subComponentId: subComponentId,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

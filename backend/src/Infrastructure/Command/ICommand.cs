@@ -1,12 +1,12 @@
 using Icon;
 using MediatR;
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Infrastructure.Command
 {
     public interface ICommand<out TResponse>
-      : IRequest<TResponse>, IValidatable
+      : IRequest<TResponse>
     {
-        public Guid CreatorId { get; }
+        public ValueObjects.Id CreatorId { get; }
     }
 }

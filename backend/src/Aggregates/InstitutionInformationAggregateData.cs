@@ -1,4 +1,5 @@
 using Uri = System.Uri;
+using CSharpFunctionalExtensions;
 using Guid = System.Guid;
 using DateTime = System.DateTime;
 using Models = Icon.Models;
@@ -42,19 +43,36 @@ namespace Icon.Aggregates
             WebsiteLocator = websiteLocator;
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
-            return !(Name is null);
+            return
+              Result.Combine(
+                  ValidateNonNull(Name, nameof(Name))
+                  );
         }
 
-        public Models.InstitutionInformation ToModel()
+        public Result<ValueObjects.InstitutionInformation, Errors> ToValueObject()
         {
-            return new Models.InstitutionInformation(
-                name: Name,
-                abbreviation: Abbreviation,
-                description: Description,
-                websiteLocator: WebsiteLocator
-                );
+            var nameResult = ValueObjects.Name.From(Name);
+            var abbreviationResult = ValueObjects.Abbreviation.MaybeFrom(Abbreviation);
+            var descriptionResult = ValueObjects.Description.MaybeFrom(Description);
+            var websiteLocatorResult = ValueObjects.AbsoluteUri.MaybeFrom(WebsiteLocator);
+
+            return
+              Errors.CombineExistent(
+                  nameResult,
+                  abbreviationResult,
+                  descriptionResult,
+                  websiteLocatorResult
+                  )
+              .Bind(_ =>
+                  ValueObjects.InstitutionInformation.From(
+                    name: nameResult.Value,
+                    abbreviation: abbreviationResult?.Value,
+                    description: descriptionResult?.Value,
+                    websiteLocator: websiteLocatorResult?.Value
+                    )
+                  );
         }
     }
 }

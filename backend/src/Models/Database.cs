@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using Uri = System.Uri;
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -8,18 +10,18 @@ namespace Icon.Models
     public class Database
       : Model
     {
-        public string Name { get; }
-        public string Description { get; }
-        public Uri Locator { get; }
-        public Guid InstitutionId { get; }
+        public ValueObjects.Name Name { get; }
+        public ValueObjects.Description Description { get; }
+        public ValueObjects.AbsoluteUri Locator { get; }
+        public ValueObjects.Id InstitutionId { get; }
 
-        public Database(
-            Guid id,
-            string name,
-            string description,
-            Uri locator,
-            Guid institutionId,
-            DateTime timestamp
+        private Database(
+            ValueObjects.Id id,
+            ValueObjects.Name name,
+            ValueObjects.Description description,
+            ValueObjects.AbsoluteUri locator,
+            ValueObjects.Id institutionId,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
@@ -27,17 +29,28 @@ namespace Icon.Models
             Description = description;
             Locator = locator;
             InstitutionId = institutionId;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<Database, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Name name,
+            ValueObjects.Description description,
+            ValueObjects.AbsoluteUri locator,
+            ValueObjects.Id institutionId,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              !string.IsNullOrWhiteSpace(Name) &&
-              !string.IsNullOrWhiteSpace(Description) &&
-              Locator.IsAbsoluteUri &&
-              InstitutionId != Guid.Empty;
+              Result.Ok<Database, Errors>(
+                  new Database(
+            id: id,
+            name: name,
+            description: description,
+            locator: locator,
+            institutionId: institutionId,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

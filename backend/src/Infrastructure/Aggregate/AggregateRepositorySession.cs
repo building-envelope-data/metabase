@@ -1,5 +1,7 @@
 // Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
 
+using Errors = Icon.Errors;
+using ValueObjects = Icon.ValueObjects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -26,7 +28,7 @@ namespace Icon.Infrastructure.Aggregate
             _eventBus = eventBus;
         }
 
-        public Task<Result<(Guid Id, DateTime Timestamp), IError>> Store<T>(
+        public Task<Result<ValueObjects.TimestampedId, Errors>> Store<T>(
             Guid id,
             int expectedVersion,
             IEvent @event,
@@ -42,12 +44,13 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public async Task<Result<(Guid Id, DateTime Timestamp), IError>> Store<T>(
+        public async Task<Result<ValueObjects.TimestampedId, Errors>> Store<T>(
             Guid id,
             int expectedVersion,
             IEnumerable<IEvent> events,
             CancellationToken cancellationToken
-            ) where T : class, IEventSourcedAggregate, new()
+            )
+          where T : class, IEventSourcedAggregate, new()
         {
             AssertNotDisposed();
             Event.EnsureValid(events);
@@ -60,12 +63,15 @@ namespace Icon.Infrastructure.Aggregate
             await _session.SaveChangesAsync(cancellationToken);
             await _eventBus.Publish(eventArray);
             var timestampResult = await FetchTimestamp<T>(id, cancellationToken);
-            return timestampResult.Map(
-                timestamp => (
-                  Id: id,
-                  Timestamp: timestamp
-                  )
-                );
+            return ValueObjects.Id.From(id)
+              .Bind(nonEmptyId =>
+                  timestampResult.Bind(
+                    timestamp =>
+                      ValueObjects.TimestampedId.From(
+                        id, timestamp
+                        )
+                    )
+                  );
         }
 
         private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)

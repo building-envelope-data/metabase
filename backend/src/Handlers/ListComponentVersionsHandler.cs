@@ -19,7 +19,7 @@ using CSharpFunctionalExtensions;
 namespace Icon.Handlers
 {
     public sealed class ListComponentVersionsHandler :
-      IQueryHandler<Queries.ListComponentVersions, IEnumerable<Result<Models.ComponentVersion, IError>>>
+      IQueryHandler<Queries.ListComponentVersions, IEnumerable<Result<Models.ComponentVersion, Errors>>>
     {
         private readonly IAggregateRepository _repository;
 
@@ -28,7 +28,7 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Result<Models.ComponentVersion, IError>>> Handle(
+        public async Task<IEnumerable<Result<Models.ComponentVersion, Errors>>> Handle(
             Queries.ListComponentVersions query,
             CancellationToken cancellationToken
             )
@@ -49,7 +49,7 @@ namespace Icon.Handlers
                      cancellationToken
                      )
                   ).Select(result =>
-                    result.Map(a => a.ToModel())
+                    result.Bind(a => a.ToModel())
                     );
             }
         }

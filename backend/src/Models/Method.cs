@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using Uri = System.Uri;
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -8,24 +10,32 @@ namespace Icon.Models
     public class Method
       : Model
     {
-        public MethodInformation Information { get; }
+        public ValueObjects.MethodInformation Information { get; }
 
-        public Method(
-            Guid id,
-            MethodInformation information,
-            DateTime timestamp
+        private Method(
+            ValueObjects.Id id,
+            ValueObjects.MethodInformation information,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             Information = information;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<Method, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.MethodInformation information,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              Information.IsValid();
+              Result.Ok<Method, Errors>(
+                  new Method(
+            id: id,
+            information: information,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

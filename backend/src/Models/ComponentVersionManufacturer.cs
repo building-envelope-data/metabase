@@ -1,4 +1,6 @@
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -6,32 +8,42 @@ namespace Icon.Models
     public sealed class ComponentVersionManufacturer
       : Model
     {
-        public Guid ComponentVersionId { get; }
-        public Guid InstitutionId { get; }
-        public ComponentVersionManufacturerMarketingInformation? MarketingInformation { get; }
+        public ValueObjects.Id ComponentVersionId { get; }
+        public ValueObjects.Id InstitutionId { get; }
+        public ValueObjects.ComponentVersionManufacturerMarketingInformation? MarketingInformation { get; }
 
-        public ComponentVersionManufacturer(
-            Guid id,
-            Guid componentVersionId,
-            Guid institutionId,
-            ComponentVersionManufacturerMarketingInformation? marketingInformation,
-            DateTime timestamp
+        private ComponentVersionManufacturer(
+            ValueObjects.Id id,
+            ValueObjects.Id componentVersionId,
+            ValueObjects.Id institutionId,
+            ValueObjects.ComponentVersionManufacturerMarketingInformation? marketingInformation,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
             ComponentVersionId = componentVersionId;
             InstitutionId = institutionId;
             MarketingInformation = marketingInformation;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<ComponentVersionManufacturer, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Id componentVersionId,
+            ValueObjects.Id institutionId,
+            ValueObjects.ComponentVersionManufacturerMarketingInformation? marketingInformation,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              ComponentVersionId != Guid.Empty &&
-              InstitutionId != Guid.Empty &&
-              (MarketingInformation?.IsValid() ?? true);
+              Result.Ok<ComponentVersionManufacturer, Errors>(
+                  new ComponentVersionManufacturer(
+                    id: id,
+                    componentVersionId: componentVersionId,
+                    institutionId: institutionId,
+                    marketingInformation: marketingInformation,
+                    timestamp: timestamp
+                    )
+                  );
         }
     }
 }

@@ -24,15 +24,22 @@ namespace Icon.GraphQl
             )
         {
             var timestamp = Timestamp.Fetch(context);
+            var id =
+              ResultHelpers.HandleFailure(
+                  ValueObjects.Id.From(component.Id)
+                  );
+            var query =
+              ResultHelpers.HandleFailure(
+                  Queries.ListComponentVersions.From(
+                    id,
+                    timestamp
+                    )
+                  );
             return ResultHelpers.HandleFailures<Models.ComponentVersion>(
                 await QueryBus.Send<
                   Queries.ListComponentVersions,
-                  IEnumerable<Result<Models.ComponentVersion, IError>>
-                >(new Queries.ListComponentVersions(
-                    component.Id.NotEmpty(),
-                    timestamp
-                    )
-                  )
+                  IEnumerable<Result<Models.ComponentVersion, Errors>>
+                >(query)
                 )
               .Select(c => ComponentVersion.FromModel(c, timestamp));
         }

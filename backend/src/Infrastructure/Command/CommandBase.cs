@@ -1,21 +1,16 @@
 using Icon;
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Infrastructure.Command
 {
     public abstract class CommandBase<TResponse>
-      : Validatable, ICommand<TResponse>
+      : ICommand<TResponse>
     {
-        public Guid CreatorId { get; }
+        public ValueObjects.Id CreatorId { get; }
 
-        public CommandBase(Guid creatorId)
+        public CommandBase(ValueObjects.Id creatorId)
         {
             CreatorId = creatorId;
-        }
-
-        public override bool IsValid()
-        {
-            return CreatorId != Guid.Empty;
         }
     }
 }

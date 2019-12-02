@@ -11,12 +11,13 @@ using QueryException = HotChocolate.Execution.QueryException;
 using IError = HotChocolate.IError;
 using CSharpFunctionalExtensions;
 using IHttpContextAccessor = Microsoft.AspNetCore.Http.IHttpContextAccessor;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.GraphQl
 {
     public abstract class QueryAndMutationBase
     {
-        protected DateTime HandleTimestamp(
+        protected ValueObjects.Timestamp HandleTimestamp(
             DateTime? timestamp,
             IResolverContext resolverContext
             )

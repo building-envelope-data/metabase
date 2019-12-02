@@ -1,5 +1,6 @@
 // Inspired by https://hotchocolate.io/docs/aspnet#asp-net-core-
 
+using ValueObjects = Icon.ValueObjects;
 using System;
 using System.Threading.Tasks;
 using HotChocolate;
@@ -58,7 +59,10 @@ namespace Icon.Configuration
                 /* identity.AddClaim(new Claim(ClaimTypes.Country, "us")); */
                 /* ctx.User = new ClaimsPrincipal(identity); */
                 /* builder.SetProperty(nameof(ClaimsPrincipal), ctx.User); */
-                GraphQlX.Timestamp.StoreRequest(DateTime.UtcNow, requestBuilder);
+                GraphQlX.Timestamp.StoreRequest(
+                    ValueObjects.Timestamp.Now,
+                    requestBuilder
+                    );
                 return Task.CompletedTask;
             });
 

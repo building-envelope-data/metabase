@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using Uri = System.Uri;
-using Guid = System.Guid;
+using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 
 namespace Icon.Models
@@ -8,28 +10,28 @@ namespace Icon.Models
     public class Standard
       : Model
     {
-        public string Title { get; }
-        public string Abstract { get; }
-        public string Section { get; }
-        public DateTime Year { get; }
-        public string? Prefix { get; }
-        public string MainNumber { get; }
-        public string? Suffix { get; }
+        public ValueObjects.Title Title { get; }
+        public ValueObjects.Abstract Abstract { get; }
+        public ValueObjects.Section Section { get; }
+        public ValueObjects.Year Year { get; }
+        public ValueObjects.Prefix? Prefix { get; }
+        public ValueObjects.MainNumber MainNumber { get; }
+        public ValueObjects.Suffix? Suffix { get; }
         public IReadOnlyCollection<Standardizer> Standardizers { get; }
-        public Uri? Locator { get; }
+        public ValueObjects.AbsoluteUri? Locator { get; }
 
-        public Standard(
-            Guid id,
-            string title,
-            string @abstract,
-            string section,
-            DateTime year,
-            string? prefix,
-            string mainNumber,
-            string? suffix,
+        private Standard(
+            ValueObjects.Id id,
+            ValueObjects.Title title,
+            ValueObjects.Abstract @abstract,
+            ValueObjects.Section section,
+            ValueObjects.Year year,
+            ValueObjects.Prefix? prefix,
+            ValueObjects.MainNumber mainNumber,
+            ValueObjects.Suffix? suffix,
             IReadOnlyCollection<Standardizer> standardizers,
-            Uri? locator,
-            DateTime timestamp
+            ValueObjects.AbsoluteUri? locator,
+            ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
         {
@@ -42,22 +44,38 @@ namespace Icon.Models
             Suffix = suffix;
             Standardizers = standardizers;
             Locator = locator;
-            EnsureValid();
         }
 
-        public override bool IsValid()
+        public static Result<Standard, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Title title,
+            ValueObjects.Abstract @abstract,
+            ValueObjects.Section section,
+            ValueObjects.Year year,
+            ValueObjects.Prefix? prefix,
+            ValueObjects.MainNumber mainNumber,
+            ValueObjects.Suffix? suffix,
+            IReadOnlyCollection<Standardizer> standardizers,
+            ValueObjects.AbsoluteUri? locator,
+            ValueObjects.Timestamp timestamp
+            )
         {
             return
-              base.IsValid() &&
-              !string.IsNullOrWhiteSpace(Title) &&
-              !string.IsNullOrWhiteSpace(Abstract) &&
-              !string.IsNullOrWhiteSpace(Section) &&
-              Year != DateTime.MinValue &&
-              !(Prefix is null ? true : string.IsNullOrWhiteSpace(Prefix)) &&
-              !string.IsNullOrWhiteSpace(MainNumber) &&
-              !(Suffix is null ? true : string.IsNullOrWhiteSpace(Suffix)) &&
-              !(Standardizers is null) &&
-              (Locator?.IsAbsoluteUri ?? true);
+              Result.Ok<Standard, Errors>(
+                  new Standard(
+            id: id,
+            title: title,
+            @abstract: @abstract,
+            section: section,
+            year: year,
+            prefix: prefix,
+            mainNumber: mainNumber,
+            suffix: suffix,
+            standardizers: standardizers,
+            locator: locator,
+            timestamp: timestamp
+            )
+                  );
         }
     }
 }

@@ -17,7 +17,7 @@ using CSharpFunctionalExtensions;
 namespace Icon.Handlers
 {
     public sealed class CreateComponentHandler
-      : ICommandHandler<Commands.CreateComponent, Result<(Guid Id, DateTime Timestamp), IError>>
+      : ICommandHandler<Commands.CreateComponent, Result<ValueObjects.TimestampedId, Errors>>
     {
         private readonly IAggregateRepository _repository;
 
@@ -26,7 +26,7 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<Result<(Guid Id, DateTime Timestamp), IError>> Handle(
+        public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
             Commands.CreateComponent command,
             CancellationToken cancellationToken
             )

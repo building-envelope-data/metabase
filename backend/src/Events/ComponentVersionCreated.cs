@@ -1,4 +1,6 @@
 using Guid = System.Guid;
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
@@ -21,8 +23,8 @@ namespace Icon.Events
         {
             return new ComponentVersionCreated(
                   componentVersionId: componentVersionId,
-                  componentId: command.ComponentId,
-                  information: ComponentInformationEventData.From(command.Information),
+                  componentId: command.Input.ComponentId,
+                  information: ComponentInformationEventData.From(command.Input),
                   creatorId: command.CreatorId
                 );
         }
@@ -49,13 +51,15 @@ namespace Icon.Events
             EnsureValid();
         }
 
-        public override bool IsValid()
+        public override Result<bool, Errors> Validate()
         {
             return
-              base.IsValid() &&
-              ComponentVersionId != Guid.Empty &&
-              ComponentId != Guid.Empty &&
-              (Information?.IsValid() ?? false);
+              Result.Combine(
+                  base.Validate(),
+                  ValidateNonEmpty(ComponentVersionId, nameof(ComponentVersionId)),
+                  ValidateNonEmpty(ComponentId, nameof(ComponentId)),
+                  Information.Validate()
+                  );
         }
     }
 }

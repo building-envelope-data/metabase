@@ -2,6 +2,7 @@
 // TODO When mature, use the client https://github.com/ChilliCream/hotchocolate/issues/1011
 
 using Models = Icon.Models;
+using ValueObjects = Icon.ValueObjects;
 using Icon;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,32 +46,32 @@ namespace Test.Integration.Web.Api.GraphQl
             _httpClient = httpClient;
         }
 
-    public sealed class ComponentInputData
-    {
-      public string name { get; }
-      public string? abbreviation { get; }
-      public string description { get; }
-      public DateTime? availableFrom { get; }
-      public DateTime? availableUntil { get; }
-      public Models.ComponentCategory[] categories { get; }
+        public sealed class ComponentInputData
+        {
+            public string name { get; }
+            public string? abbreviation { get; }
+            public string description { get; }
+            public DateTime? availableFrom { get; }
+            public DateTime? availableUntil { get; }
+            public ValueObjects.ComponentCategory[] categories { get; }
 
-      public ComponentInputData(
-          string name,
-          string? abbreviation,
-          string description,
-          DateTime? availableFrom,
-          DateTime? availableUntil,
-          Models.ComponentCategory[] categories
-          )
-      {
-        this.name = name;
-        this.abbreviation = abbreviation;
-        this.description = description;
-        this.availableFrom = availableFrom;
-        this.availableUntil = availableUntil;
-        this.categories = categories;
-      }
-    }
+            public ComponentInputData(
+                string name,
+                string? abbreviation,
+                string description,
+                DateTime? availableFrom,
+                DateTime? availableUntil,
+                ValueObjects.ComponentCategory[] categories
+                )
+            {
+                this.name = name;
+                this.abbreviation = abbreviation;
+                this.description = description;
+                this.availableFrom = availableFrom;
+                this.availableUntil = availableUntil;
+                this.categories = categories;
+            }
+        }
 
         public sealed class ComponentData : ResponseBase
         {
@@ -132,7 +133,7 @@ namespace Test.Integration.Web.Api.GraphQl
               }",
                  variables: new Dictionary<string, object?>()
                  {
-                    ["input"] = input
+                     ["input"] = input
                  }
                 );
         }
@@ -181,7 +182,7 @@ namespace Test.Integration.Web.Api.GraphQl
               }",
                   variables: new Dictionary<string, object?>()
                   {
-                     ["timestamp"] = timestamp
+                      ["timestamp"] = timestamp
                   }
                 );
         }
