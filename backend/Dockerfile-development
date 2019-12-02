@@ -36,12 +36,13 @@ WORKDIR /app
 # Code generation is provided by `aspnet-codegenerator`
 # Database migrations are provided by `ef`
 # Read-Evaluate-Print-Loop (REPL) is provided by `script`, see https://github.com/filipw/dotnet-script#repl
+# TODO Specify versions of all tools explicitely as I did vor `dotnet-ef`
 ENV PATH=$PATH:/home/me/.dotnet/tools
 RUN \
   dotnet tool install --global dotnet-aspnet-codegenerator && \
   dotnet tool install --global dotnet-counters && \
   dotnet tool install --global dotnet-dump && \
-  dotnet tool install --global dotnet-ef && \
+  dotnet tool install --global dotnet-ef --version 3.0.0 && \
   dotnet tool install --global dotnet-format && \
   dotnet tool install --global dotnet-script && \
   dotnet tool install --global dotnet-trace
