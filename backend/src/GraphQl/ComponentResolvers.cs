@@ -13,6 +13,7 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.GraphQl
 {
+    [ExtendObjectType(Name = "Component")]
     public class ComponentResolvers
       : ResolversBase
     {

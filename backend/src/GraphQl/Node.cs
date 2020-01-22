@@ -7,13 +7,9 @@ namespace Icon.GraphQl
     public abstract class Node
       : INode
     {
-        public Guid Id { get; set; }
-        public DateTime Timestamp { get; set; }
-        public DateTime RequestTimestamp { get; set; } // TODO? Better name it `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
-
-#nullable disable
-        public Node() { }
-#nullable enable
+        public Guid Id { get; }
+        public DateTime Timestamp { get; }
+        public DateTime RequestTimestamp { get; } // TODO? Better name it `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
 
         public Node(
             Guid id,

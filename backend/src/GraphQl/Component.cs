@@ -20,11 +20,7 @@ namespace Icon.GraphQl
                 );
         }
 
-        public ComponentInformation Information { get; set; }
-
-#nullable disable
-        public Component() { }
-#nullable enable
+        public ComponentInformation Information { get; }
 
         public Component(
             Guid id,

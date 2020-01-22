@@ -36,13 +36,11 @@ namespace Icon.Configuration
                   // Adds the authorize directive and
                   // enable the authorization middleware.
                   .AddAuthorizeDirectiveType()
-                  .AddQueryType<GraphQlX.QueryType>()
-                  .AddMutationType<GraphQlX.MutationType>()
+                  .AddQueryType<GraphQlX.Query>()
+                  .AddMutationType<GraphQlX.Mutation>()
                   /* .AddSubscriptionType<SubscriptionType>() */
                   .AddType<GraphQlX.INode>()
-                  .AddType<GraphQlX.ComponentType>()
-                  .AddType<GraphQlX.ComponentVersionType>()
-                  .AddType<GraphQlX.ComponentVersionInputType>()
+                  .AddType<GraphQlX.ComponentResolvers>()
                   .Create(),
                   new QueryExecutionOptions
                   {
