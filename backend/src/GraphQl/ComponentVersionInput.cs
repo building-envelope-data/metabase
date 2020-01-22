@@ -10,17 +10,31 @@ namespace Icon.GraphQl
 {
     public sealed class ComponentVersionInput
     {
-        public Guid ComponentId { get; set; }
-        public string Name { get; set; }
-        public string? Abbreviation { get; set; }
-        public string Description { get; set; }
-        public DateTime? AvailableFrom { get; set; }
-        public DateTime? AvailableUntil { get; set; }
-        public IReadOnlyCollection<ValueObjects.ComponentCategory> Categories { get; set; }
+        public Guid ComponentId { get; }
+        public string Name { get; }
+        public string? Abbreviation { get; }
+        public string Description { get; }
+        public DateTime? AvailableFrom { get; }
+        public DateTime? AvailableUntil { get; }
+        public IReadOnlyCollection<ValueObjects.ComponentCategory> Categories { get; }
 
-#nullable disable
-        public ComponentVersionInput() { }
-#nullable enable
+        public ComponentVersionInput(
+        Guid componentId,
+        string name,
+        string? abbreviation,
+        string description,
+        DateTime? availableFrom,
+        DateTime? availableUntil,
+        IReadOnlyCollection<ValueObjects.ComponentCategory> categories
+        ) {
+        ComponentId = componentId;
+        Name = name;
+        Abbreviation = abbreviation;
+        Description = description;
+        AvailableFrom = availableFrom;
+        AvailableUntil = availableUntil;
+        Categories = categories;
+        }
 
         public Result<ValueObjects.ComponentVersionInput, Errors> Validate(
                 IReadOnlyList<object> path

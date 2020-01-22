@@ -21,12 +21,8 @@ namespace Icon.GraphQl
                 );
         }
 
-        public Guid ComponentId { get; set; }
-        public ComponentInformation Information { get; set; }
-
-#nullable disable
-        public ComponentVersion() { }
-#nullable enable
+        public Guid ComponentId { get; }
+        public ComponentInformation Information { get; }
 
         public ComponentVersion(
             Guid id,

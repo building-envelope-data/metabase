@@ -21,16 +21,12 @@ namespace Icon.GraphQl
                 );
         }
 
-        public string Name { get; set; }
-        public string? Abbreviation { get; set; }
-        public string Description { get; set; }
-        public DateTime? AvailableFrom { get; set; }
-        public DateTime? AvailableUntil { get; set; }
-        public IEnumerable<ValueObjects.ComponentCategory> Categories { get; set; }
-
-#nullable disable
-        public ComponentInformation() { }
-#nullable enable
+        public string Name { get; }
+        public string? Abbreviation { get; }
+        public string Description { get; }
+        public DateTime? AvailableFrom { get; }
+        public DateTime? AvailableUntil { get; }
+        public IEnumerable<ValueObjects.ComponentCategory> Categories { get; }
 
         public ComponentInformation(
             string name,
