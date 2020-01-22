@@ -47,8 +47,10 @@ namespace Icon.Configuration
                   new QueryExecutionOptions
                   {
                       // https://hotchocolate.io/docs/options#members
-                      MaxOperationComplexity = 10,
-                      UseComplexityMultipliers = true,
+                      // https://github.com/ChilliCream/hotchocolate/blob/master/src/Core/Core/Execution/Configuration/QueryExecutionOptions.cs
+                      /* MaxExecutionDepth = 50, // https://hotchocolate.io/docs/security#query-depth */
+                      /* MaxOperationComplexity = 50, // https://hotchocolate.io/docs/security#query-complexity */
+                      /* UseComplexityMultipliers = true, // https://hotchocolate.io/docs/security#query-complexity */
                       /* TracingPreference = TracingPreference.Always */
                   });
 
