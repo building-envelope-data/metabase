@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <UserSecretsId>31666837686487542159</UserSecretsId>
     <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
@@ -13,36 +13,36 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="CSharpFunctionalExtensions" Version="2.2.2" />
-    <PackageReference Include="FluentValidation" Version="8.5.0" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="10.1.1" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.1.1" />
-    <PackageReference Include="HotChocolate.AspNetCore.GraphiQL" Version="10.1.1" />
-    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.1.1" />
-    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.1.1" />
-    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="10.1.1" />
-    <PackageReference Include="IdentityServer4" Version="3.0.1" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.3.0" />
+    <PackageReference Include="FluentValidation" Version="8.6.1" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="10.3.5" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.3.5" />
+    <PackageReference Include="HotChocolate.AspNetCore.GraphiQL" Version="10.3.5" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.3.5" />
+    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.3.5" />
+    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="10.3.5" />
+    <PackageReference Include="IdentityServer4" Version="3.1.0" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
-    <PackageReference Include="IdentityServer4.EntityFramework" Version="3.0.1" />
-    <PackageReference Include="Marten" Version="3.9.0" />
-    <PackageReference Include="Marten.NodaTime" Version="1.4.0" />
-    <PackageReference Include="MediatR" Version="7.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0">
+    <PackageReference Include="IdentityServer4.EntityFramework" Version="3.1.0" />
+    <PackageReference Include="Marten" Version="3.10.0" />
+    <PackageReference Include="Marten.NodaTime" Version="1.5.0" />
+    <PackageReference Include="MediatR" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
     <PackageReference Include="Microsoft.OpenApi" Version="1.1.4" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="3.0.1" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.1.2" />
-    <PackageReference Include="SendGrid" Version="9.12.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="3.1.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.2.2" />
+    <PackageReference Include="SendGrid" Version="9.12.5" />
   </ItemGroup>
 
   <!-- <Target Name="PreCompileTarget" BeforeTargets="Build"> -->
