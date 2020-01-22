@@ -36,29 +36,33 @@ namespace Icon.GraphQl
         Categories = categories;
         }
 
-        public Result<ValueObjects.ComponentVersionInput, Errors> Validate(
+        // TODO Figure out how methods can be made to be ignored by
+        // HotChocolate and remove the keyword `static` that makes this method
+        // a class method as opposed to an instance method.
+        public static Result<ValueObjects.ComponentVersionInput, Errors> Validate(
+                ComponentVersionInput self,
                 IReadOnlyList<object> path
                 )
         {
             var componentIdResult = ValueObjects.Id.From(
-                ComponentId,
+                self.ComponentId,
                 path.Append("componentId").ToList().AsReadOnly()
                 );
             var nameResult = ValueObjects.Name.From(
-                Name,
+                self.Name,
                 path.Append("name").ToList().AsReadOnly()
                 );
             var abbreviationResult = ValueObjects.Abbreviation.MaybeFrom(
-                Abbreviation,
+                self.Abbreviation,
                 path.Append("abbreviation").ToList().AsReadOnly()
                 );
             var descriptionResult = ValueObjects.Description.From(
-                Description,
+                self.Description,
                 path.Append("description").ToList().AsReadOnly()
                 );
             var availabilityResult = ValueObjects.DateInterval.MaybeFrom(
-                AvailableFrom,
-                AvailableUntil,
+                self.AvailableFrom,
+                self.AvailableUntil,
                 path.Append("availableUntil").ToList().AsReadOnly()
                 );
 
@@ -77,7 +81,7 @@ namespace Icon.GraphQl
                         abbreviation: abbreviationResult?.Value,
                         description: descriptionResult.Value,
                         availability: availabilityResult?.Value,
-                        categories: Categories
+                        categories: self.Categories
                         )
   );
         }

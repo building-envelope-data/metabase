@@ -36,7 +36,7 @@ namespace Icon.GraphQl
         {
             var validatedInput =
               ResultHelpers.HandleFailure(
-                  input.Validate(path: Array.Empty<object>()) // TODO What is the proper path for variables?
+                  ComponentInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
                   );
             var command =
               ResultHelpers.HandleFailure(
@@ -77,7 +77,7 @@ namespace Icon.GraphQl
         {
             var validatedInput =
               ResultHelpers.HandleFailure(
-                  input.Validate(path: Array.Empty<object>()) // TODO What is the proper path for variables?
+                  ComponentVersionInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
                   );
             var command =
               ResultHelpers.HandleFailure(
