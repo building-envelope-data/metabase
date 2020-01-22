@@ -1,7 +1,7 @@
 using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
 
-namespace Icon.Models
+namespace Icon.ValueObjects
 {
     public enum Standardizer
     {
@@ -18,12 +18,12 @@ namespace Icon.Models
         DVWG,
         IEC,
         IES,
-        ift,
+        IFT,
         ISO,
         JIS,
         LEED,
         NFRC,
-        Riba,
+        RIBA,
         UL,
         UNECE,
         VDI,

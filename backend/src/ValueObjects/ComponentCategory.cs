@@ -5,8 +5,8 @@ namespace Icon.ValueObjects
 {
     public enum ComponentCategory
     {
-        Material,
-        Layer,
-        Unit
+        MATERIAL,
+        LAYER,
+        UNIT
     }
 }

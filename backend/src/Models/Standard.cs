@@ -17,7 +17,7 @@ namespace Icon.Models
         public ValueObjects.Prefix? Prefix { get; }
         public ValueObjects.MainNumber MainNumber { get; }
         public ValueObjects.Suffix? Suffix { get; }
-        public IReadOnlyCollection<Standardizer> Standardizers { get; }
+        public IReadOnlyCollection<ValueObjects.Standardizer> Standardizers { get; }
         public ValueObjects.AbsoluteUri? Locator { get; }
 
         private Standard(
@@ -29,7 +29,7 @@ namespace Icon.Models
             ValueObjects.Prefix? prefix,
             ValueObjects.MainNumber mainNumber,
             ValueObjects.Suffix? suffix,
-            IReadOnlyCollection<Standardizer> standardizers,
+            IReadOnlyCollection<ValueObjects.Standardizer> standardizers,
             ValueObjects.AbsoluteUri? locator,
             ValueObjects.Timestamp timestamp
             )
@@ -55,7 +55,7 @@ namespace Icon.Models
             ValueObjects.Prefix? prefix,
             ValueObjects.MainNumber mainNumber,
             ValueObjects.Suffix? suffix,
-            IReadOnlyCollection<Standardizer> standardizers,
+            IReadOnlyCollection<ValueObjects.Standardizer> standardizers,
             ValueObjects.AbsoluteUri? locator,
             ValueObjects.Timestamp timestamp
             )

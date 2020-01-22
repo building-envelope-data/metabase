@@ -2,8 +2,8 @@ namespace Icon.ValueObjects
 {
     public enum InstitutionState
     {
-        Unknown,
-        Operative,
-        Inoperative
+        UNKNOWN,
+        OPERATIVE,
+        INOPERATIVE
     }
 }
