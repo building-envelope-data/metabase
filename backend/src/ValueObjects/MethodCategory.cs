@@ -5,7 +5,7 @@ namespace Icon.ValueObjects
 {
     public enum MethodCategory
     {
-        Measurement,
-        Calculation
+        MEASUREMENT,
+        CALCULATION
     }
 }

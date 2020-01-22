@@ -9,8 +9,8 @@ namespace Icon.ValueObjects
     // A way to turn enum values into strings is detailed in https://stackoverflow.com/a/630900
     public enum InstitutionRepresentativeRole
     {
-        Owner,
-        Maintainer,
-        Assistant
+        OWNER,
+        MAINTAINER,
+        ASSISTANT
     }
 }

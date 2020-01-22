@@ -1,12 +1,14 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0-alpine
+# See https://hub.docker.com/_/microsoft-dotnet-core-sdk
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1.101-alpine3.10
 
 ARG GROUP_ID=1000
 ARG USER_ID=1000
 
 # Create non-root user to run commands in (see https://medium.com/@mccode/processes-in-containers-should-not-run-as-root-2feae3f0df3b)
-RUN addgroup -S -g ${GROUP_ID} us && \
-    adduser -S -D -u ${USER_ID} -G us me
+RUN \
+  addgroup -S -g ${GROUP_ID} us && \
+  adduser -S -D -u ${USER_ID} -G us me
 
 #############
 # As `root` #
@@ -36,19 +38,19 @@ WORKDIR /app
 # Code generation is provided by `aspnet-codegenerator`
 # Database migrations are provided by `ef`
 # Read-Evaluate-Print-Loop (REPL) is provided by `script`, see https://github.com/filipw/dotnet-script#repl
-# TODO Specify versions of all tools explicitely as I did vor `dotnet-ef`
 ENV PATH=$PATH:/home/me/.dotnet/tools
 RUN \
-  dotnet tool install --global dotnet-aspnet-codegenerator && \
-  dotnet tool install --global dotnet-counters && \
-  dotnet tool install --global dotnet-dump && \
-  dotnet tool install --global dotnet-ef --version 3.0.0 && \
-  dotnet tool install --global dotnet-format && \
-  dotnet tool install --global dotnet-script && \
-  dotnet tool install --global dotnet-trace
+  dotnet tool install --global dotnet-aspnet-codegenerator --version 3.1.0 && \
+  dotnet tool install --global dotnet-counters --version 3.1.57502 && \
+  dotnet tool install --global dotnet-dump --version 3.1.57502 && \
+  dotnet tool install --global dotnet-ef --version 3.1.1 && \
+  dotnet tool install --global dotnet-format --version 3.1.37601 && \
+  dotnet tool install --global dotnet-script --version 0.50.1 && \
+  dotnet tool install --global dotnet-trace --version 3.1.57502
 
-RUN mkdir -p ./src && \
-    mkdir -p ./test
+RUN \
+  mkdir -p ./src && \
+  mkdir -p ./test
 COPY \
   --chown=me:us \
   src/Icon.csproj ./src/

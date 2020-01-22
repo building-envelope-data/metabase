@@ -86,8 +86,8 @@ namespace Test.Integration.Web.Api.GraphQl.Query
               availableUntil: null,
               categories: new ValueObjects.ComponentCategory[2]
               {
-                ValueObjects.ComponentCategory.Layer,
-                ValueObjects.ComponentCategory.Unit
+                ValueObjects.ComponentCategory.LAYER,
+                ValueObjects.ComponentCategory.UNIT
               }
               )
                 );
@@ -100,8 +100,8 @@ namespace Test.Integration.Web.Api.GraphQl.Query
               availableUntil: DateTime.UtcNow,
               categories: new ValueObjects.ComponentCategory[2]
               {
-                ValueObjects.ComponentCategory.Material,
-                ValueObjects.ComponentCategory.Layer
+                ValueObjects.ComponentCategory.MATERIAL,
+                ValueObjects.ComponentCategory.LAYER
               }
               )
                 );
@@ -124,7 +124,7 @@ namespace Test.Integration.Web.Api.GraphQl.Query
               availableUntil: DateTime.UtcNow.AddDays(10),
               categories: new ValueObjects.ComponentCategory[1]
               {
-                ValueObjects.ComponentCategory.Material
+                ValueObjects.ComponentCategory.MATERIAL
               }
               )
                 );

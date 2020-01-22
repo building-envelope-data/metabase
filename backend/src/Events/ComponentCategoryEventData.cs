@@ -8,9 +8,9 @@ namespace Icon.Events
 {
     public enum ComponentCategoryEventData
     {
-        Material,
-        Layer,
-        Unit
+        MATERIAL,
+        LAYER,
+        UNIT
     }
 
     public static class ComponentCategoryEventDataExtensions
@@ -19,12 +19,12 @@ namespace Icon.Events
         {
             switch (category)
             {
-                case ValueObjects.ComponentCategory.Material:
-                    return ComponentCategoryEventData.Material;
-                case ValueObjects.ComponentCategory.Layer:
-                    return ComponentCategoryEventData.Layer;
-                case ValueObjects.ComponentCategory.Unit:
-                    return ComponentCategoryEventData.Unit;
+                case ValueObjects.ComponentCategory.MATERIAL:
+                    return ComponentCategoryEventData.MATERIAL;
+                case ValueObjects.ComponentCategory.LAYER:
+                    return ComponentCategoryEventData.LAYER;
+                case ValueObjects.ComponentCategory.UNIT:
+                    return ComponentCategoryEventData.UNIT;
             }
             // God-damned C# does not have switch expression exhaustiveness for
             // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
@@ -35,12 +35,12 @@ namespace Icon.Events
         {
             switch (category)
             {
-                case ComponentCategoryEventData.Material:
-                    return ValueObjects.ComponentCategory.Material;
-                case ComponentCategoryEventData.Layer:
-                    return ValueObjects.ComponentCategory.Layer;
-                case ComponentCategoryEventData.Unit:
-                    return ValueObjects.ComponentCategory.Unit;
+                case ComponentCategoryEventData.MATERIAL:
+                    return ValueObjects.ComponentCategory.MATERIAL;
+                case ComponentCategoryEventData.LAYER:
+                    return ValueObjects.ComponentCategory.LAYER;
+                case ComponentCategoryEventData.UNIT:
+                    return ValueObjects.ComponentCategory.UNIT;
             }
             // God-damned C# does not have switch expression exhaustiveness for
             // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
