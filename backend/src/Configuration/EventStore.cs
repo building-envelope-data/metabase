@@ -37,7 +37,7 @@ using Aggregates = Icon.Aggregates;
 
 namespace Icon.Configuration
 {
-    public class EventStore
+    public sealed class EventStore
     {
         public static void ConfigureServices(IServiceCollection services, IWebHostEnvironment environment, AppSettings.DatabaseSettings databaseSettings)
         {

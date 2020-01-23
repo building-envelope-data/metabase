@@ -39,13 +39,12 @@ namespace Icon.Aggregates
                       ValidateNull(Information, nameof(Information))
                       );
 
-            else
-                return
-                  Result.Combine(
-                      base.Validate(),
-                      ValidateNonEmpty(ComponentId, nameof(ComponentId)),
-                      Information.Validate()
-                      );
+            return
+              Result.Combine(
+                  base.Validate(),
+                  ValidateNonEmpty(ComponentId, nameof(ComponentId)),
+                  Information.Validate()
+                  );
         }
 
         public Result<Models.ComponentVersion, Errors> ToModel()

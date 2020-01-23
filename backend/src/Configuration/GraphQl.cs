@@ -19,7 +19,7 @@ using GraphQlX = Icon.GraphQl;
 
 namespace Icon.Configuration
 {
-    class GraphQl
+    public sealed class GraphQl
     {
         public static void ConfigureServices(IServiceCollection services)
         {
@@ -69,14 +69,14 @@ namespace Icon.Configuration
             services.AddDiagnosticObserver<GraphQlX.DiagnosticObserver>();
         }
 
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment _environment)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment environment)
         {
             // TODO Do we want `UseWebSockets` here?
             var graphQl = app
                   .UseWebSockets()
                   .UseGraphQL("/graphql");
             // TODO Where does `InDevelopment` hide? It must be some kind of extension method.
-            /* if (_environment.InDevelopment()) */
+            /* if (environment.InDevelopment()) */
             /* { */
             graphQl
               .UseGraphiQL("/graphql")

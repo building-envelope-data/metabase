@@ -31,12 +31,11 @@ namespace Icon.Aggregates
             if (IsVirgin())
                 return base.Validate();
 
-            else
-                return
-                  Result.Combine(
-                      base.Validate(),
-                      Information.Validate()
-                      );
+            return
+              Result.Combine(
+                  base.Validate(),
+                  Information.Validate()
+                  );
         }
 
         public Result<Models.Component, Errors> ToModel()

@@ -44,14 +44,13 @@ namespace Icon.Aggregates
                       ValidateNull(MarketingInformation, nameof(MarketingInformation))
                       );
 
-            else
-                return
-                  Result.Combine<bool, Errors>(
-                      base.Validate(),
-                      ValidateNonEmpty(ComponentVersionId, nameof(ComponentVersionId)),
-                      ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
-                      MarketingInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
-                      );
+            return
+              Result.Combine<bool, Errors>(
+                  base.Validate(),
+                  ValidateNonEmpty(ComponentVersionId, nameof(ComponentVersionId)),
+                  ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
+                  MarketingInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                  );
         }
 
         public Result<Models.ComponentVersionManufacturer, Errors> ToModel()

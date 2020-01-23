@@ -83,7 +83,11 @@ namespace Icon
             var errors =
               results
               .Where(r => r.IsFailure)
-              .Select(r => { dynamic x = r; return (Errors)x.Error; }) // TODO This is super unsafe. Get rid of [`dynamic`](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/reference-types#the-dynamic-type) by doing what's been said above
+              .Select(r =>
+              {
+                  dynamic x = r;
+                  return (Errors)x.Error;
+              }) // TODO This is super unsafe. Get rid of [`dynamic`](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/reference-types#the-dynamic-type) by doing what's been said above
               .ToList();
 
             if (errors.Count > 0)
