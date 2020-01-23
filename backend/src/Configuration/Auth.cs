@@ -34,7 +34,7 @@ using IdentityServer4;
 
 namespace Icon.Configuration
 {
-    public class Auth
+    public sealed class Auth
     {
         public static readonly string ApiName = "api";
         public static readonly string ApiSecret = "secret"; // TODO Put in environment variable.
@@ -173,8 +173,8 @@ namespace Icon.Configuration
                 });
             // TODO? dotnet add package Microsoft.AspNetCore.Authentication.Cookies
             /* .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, _ => */
-            /* 		{ */
-            /* 		}); */
+            /*    { */
+            /*    }); */
         }
 
         public static void Configure(IApplicationBuilder app)

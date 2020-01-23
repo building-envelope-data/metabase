@@ -38,7 +38,7 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Configuration
 {
-    class QueryCommandAndEventBusses
+    public sealed class QueryCommandAndEventBusses
     {
         public static void ConfigureServices(IServiceCollection services)
         {

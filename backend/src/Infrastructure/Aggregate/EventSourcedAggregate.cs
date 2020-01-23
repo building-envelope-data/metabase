@@ -48,13 +48,12 @@ namespace Icon.Infrastructure.Aggregate
             if (IsVirgin())
                 return Result.Ok<bool, Errors>(true);
 
-            else
-                return
-                  Result.Combine<bool, Errors>(
-                    ValidateNonEmpty(Id, nameof(Id)),
-                    ValidateNotMinValue(Timestamp, nameof(Timestamp)),
-                    ValidateNonZero(Version, nameof(Version))
-                    );
+            return
+              Result.Combine<bool, Errors>(
+                ValidateNonEmpty(Id, nameof(Id)),
+                ValidateNotMinValue(Timestamp, nameof(Timestamp)),
+                ValidateNonZero(Version, nameof(Version))
+                );
         }
 
         public Result<bool, Errors> ValidateNonVirgin()

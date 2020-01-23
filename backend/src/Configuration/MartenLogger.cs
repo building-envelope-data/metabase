@@ -14,7 +14,7 @@ using Baseline;
 
 namespace Icon.Configuration
 {
-    public class MartenLogger : IMartenLogger, IMartenSessionLogger, IDocumentSessionListener
+    public sealed class MartenLogger : IMartenLogger, IMartenSessionLogger, IDocumentSessionListener
     {
         private readonly ILogger<EventStore> _logger;
 

@@ -26,14 +26,15 @@ namespace Icon.GraphQl
         DateTime? availableFrom,
         DateTime? availableUntil,
         IReadOnlyCollection<ValueObjects.ComponentCategory> categories
-            ) {
-        Name = name;
-        Abbreviation = abbreviation;
-        Description = description;
-        AvailableFrom = availableFrom;
-        AvailableUntil = availableUntil;
-        Categories = categories;
-    }
+            )
+        {
+            Name = name;
+            Abbreviation = abbreviation;
+            Description = description;
+            AvailableFrom = availableFrom;
+            AvailableUntil = availableUntil;
+            Categories = categories;
+        }
 
         // TODO Figure out how methods can be made to be ignored by
         // HotChocolate and remove the keyword `static` that makes this method

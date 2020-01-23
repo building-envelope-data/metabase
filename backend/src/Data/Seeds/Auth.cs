@@ -7,7 +7,6 @@ namespace Icon.Data.Seeds
 {
     public static class Auth
     {
-
         public static IEnumerable<IdentityResource> GetIdentityResources()
         {
             return new IdentityResource[]
@@ -22,12 +21,13 @@ namespace Icon.Data.Seeds
 
         public static IEnumerable<ApiResource> GetApis()
         {
-            return new ApiResource[] {
-            new ApiResource(Configuration.Auth.ApiName, "Icon")
+            return new ApiResource[]
             {
-              ApiSecrets = { new Secret(Configuration.Auth.ApiSecret.Sha256()) }
-            }
-          };
+              new ApiResource(Configuration.Auth.ApiName, "Icon")
+              {
+                ApiSecrets = { new Secret(Configuration.Auth.ApiSecret.Sha256()) }
+              }
+            };
         }
 
         // TODO Add a client that corresponds to the following configuration in `appsettings.json`
@@ -50,7 +50,8 @@ namespace Icon.Data.Seeds
         // https://identityserver4.readthedocs.io/en/latest/topics/grant_types.html
         public static IEnumerable<Client> GetClients()
         {
-            return new Client[] {
+            return new Client[]
+            {
               // OpenID Connect hybrid flow client (MVC)
               new Client
               {
@@ -63,7 +64,7 @@ namespace Icon.Data.Seeds
                   new Secret("secret".Sha256())
                 },
 
-                RedirectUris           = { "https://localhost:5001/signin-oidc" },
+                RedirectUris = { "https://localhost:5001/signin-oidc" },
                 PostLogoutRedirectUris = { "https://localhost:5001/signout-callback-oidc" },
 
                 AllowedScopes =
@@ -87,9 +88,9 @@ namespace Icon.Data.Seeds
                 RequirePkce = true,
                 RequireClientSecret = false,
 
-                RedirectUris =           { "https://localhost:5001/callback.html" },
+                RedirectUris = { "https://localhost:5001/callback.html" },
                 PostLogoutRedirectUris = { "https://localhost:5001/index.html" },
-                AllowedCorsOrigins =     { "https://localhost:5001" },
+                AllowedCorsOrigins = { "https://localhost:5001" },
 
                 AllowedScopes =
                 {
@@ -113,9 +114,9 @@ namespace Icon.Data.Seeds
                     Value = "MIIDATCCAe2gAwIBAgIQoHUYAquk9rBJcq8W+F0FAzAJBgUrDgMCHQUAMBIxEDAOBgNVBAMTB0RldlJvb3QwHhcNMTAwMTIwMjMwMDAwWhcNMjAwMTIwMjMwMDAwWjARMQ8wDQYDVQQDEwZDbGllbnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDSaY4x1eXqjHF1iXQcF3pbFrIbmNw19w/IdOQxbavmuPbhY7jX0IORu/GQiHjmhqWt8F4G7KGLhXLC1j7rXdDmxXRyVJBZBTEaSYukuX7zGeUXscdpgODLQVay/0hUGz54aDZPAhtBHaYbog+yH10sCXgV1Mxtzx3dGelA6pPwiAmXwFxjJ1HGsS/hdbt+vgXhdlzud3ZSfyI/TJAnFeKxsmbJUyqMfoBl1zFKG4MOvgHhBjekp+r8gYNGknMYu9JDFr1ue0wylaw9UwG8ZXAkYmYbn2wN/CpJl3gJgX42/9g87uLvtVAmz5L+rZQTlS1ibv54ScR2lcRpGQiQav/LAgMBAAGjXDBaMBMGA1UdJQQMMAoGCCsGAQUFBwMCMEMGA1UdAQQ8MDqAENIWANpX5DZ3bX3WvoDfy0GhFDASMRAwDgYDVQQDEwdEZXZSb290ghAsWTt7E82DjU1E1p427Qj2MAkGBSsOAwIdBQADggEBADLje0qbqGVPaZHINLn+WSM2czZk0b5NG80btp7arjgDYoWBIe2TSOkkApTRhLPfmZTsaiI3Ro/64q+Dk3z3Kt7w+grHqu5nYhsn7xQFAQUf3y2KcJnRdIEk0jrLM4vgIzYdXsoC6YO+9QnlkNqcN36Y8IpSVSTda6gRKvGXiAhu42e2Qey/WNMFOL+YzMXGt/nDHL/qRKsuXBOarIb++43DV3YnxGTx22llhOnPpuZ9/gnNY7KLjODaiEciKhaKqt/b57mTEz4jTF4kIg6BP03MUfDXeVlM1Qf1jB43G2QQ19n5lUiqTpmQkcfLfyci2uBZ8BkOhXr3Vk9HIk/xBXQ="
                   }
                 },
-
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
-                AllowedScopes = {
+                AllowedScopes =
+                {
                   Configuration.Auth.ApiName,
                 }
               },
@@ -125,10 +126,10 @@ namespace Icon.Data.Seeds
                 ClientName = "Swagger UI",
                 AllowedGrantTypes = GrantTypes.Implicit,
                 AllowAccessTokensViaBrowser = true,
-                RedirectUris = {"https://localhost:5001/swagger/oauth2-redirect.html"},
+                RedirectUris = { "https://localhost:5001/swagger/oauth2-redirect.html" },
                 AllowedScopes = { Configuration.Auth.ApiName }
               }
-          };
+            };
         }
     }
 }

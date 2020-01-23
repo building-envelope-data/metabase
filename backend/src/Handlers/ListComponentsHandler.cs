@@ -48,7 +48,6 @@ namespace Icon.Handlers
                   ).Select(result =>
                     result.Bind(a => a.ToModel())
                     );
-
             }
         }
     }

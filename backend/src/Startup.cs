@@ -43,12 +43,12 @@ using Configuration = Icon.Configuration;
 // OpenIddict is another implementation of OpenId Connect
 
 // IdentityServer4 Demo: https://demo.identityserver.io/
-//											 https://github.com/IdentityServer/IdentityServer4.Demo/blob/master/src/IdentityServer4Demo/Config.cs
+//                       https://github.com/IdentityServer/IdentityServer4.Demo/blob/master/src/IdentityServer4Demo/Config.cs
 
 // TODO IdentityServer4 Admin UI. Available options are:
-//			https://github.com/skoruba/IdentityServer4.Admin
-//			https://github.com/brunohbrito/JPProject.IdentityServer4.AdminUI
-//			https://github.com/zarxor/IdentityServer4.OpenAdmin
+//      https://github.com/skoruba/IdentityServer4.Admin
+//      https://github.com/brunohbrito/JPProject.IdentityServer4.AdminUI
+//      https://github.com/zarxor/IdentityServer4.OpenAdmin
 
 // TODO For client libraries use https://identitymodel.readthedocs.io/en/latest/
 
@@ -102,7 +102,6 @@ namespace Icon
                 }
               );
         }
-
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.0

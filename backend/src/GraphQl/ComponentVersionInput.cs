@@ -26,14 +26,15 @@ namespace Icon.GraphQl
         DateTime? availableFrom,
         DateTime? availableUntil,
         IReadOnlyCollection<ValueObjects.ComponentCategory> categories
-        ) {
-        ComponentId = componentId;
-        Name = name;
-        Abbreviation = abbreviation;
-        Description = description;
-        AvailableFrom = availableFrom;
-        AvailableUntil = availableUntil;
-        Categories = categories;
+        )
+        {
+            ComponentId = componentId;
+            Name = name;
+            Abbreviation = abbreviation;
+            Description = description;
+            AvailableFrom = availableFrom;
+            AvailableUntil = availableUntil;
+            Categories = categories;
         }
 
         // TODO Figure out how methods can be made to be ignored by
@@ -67,23 +68,23 @@ namespace Icon.GraphQl
                 );
 
             return
-    Errors.CombineExistent(
-      componentIdResult,
+                Errors.CombineExistent(
+                    componentIdResult,
                     nameResult,
                     abbreviationResult,
                     descriptionResult,
                     availabilityResult
                     )
-    .Bind(_ =>
-            ValueObjects.ComponentVersionInput.From(
-        componentId: componentIdResult.Value,
-                        name: nameResult.Value,
-                        abbreviation: abbreviationResult?.Value,
-                        description: descriptionResult.Value,
-                        availability: availabilityResult?.Value,
-                        categories: self.Categories
-                        )
-  );
+                    .Bind(_ =>
+                        ValueObjects.ComponentVersionInput.From(
+                            componentId: componentIdResult.Value,
+                            name: nameResult.Value,
+                            abbreviation: abbreviationResult?.Value,
+                            description: descriptionResult.Value,
+                            availability: availabilityResult?.Value,
+                            categories: self.Categories
+                            )
+                    );
         }
     }
 }

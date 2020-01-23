@@ -33,7 +33,7 @@ using IdentityServer4.Validation;
 
 namespace Icon.Configuration
 {
-    class Api
+    public sealed class Api
     {
         public static void ConfigureServices(IServiceCollection services)
         {
@@ -70,7 +70,6 @@ namespace Icon.Configuration
 
                     document.OperationProcessors.Add(
                       new AspNetCoreOperationSecurityScopeProcessor("bearer"));
-
                     // Other types of auth*:
                     // API Key
                     /* document.AddSecurity("apikey", Enumerable.Empty<string>(), new OpenApiSecurityScheme */
@@ -79,7 +78,6 @@ namespace Icon.Configuration
                     /*     Name = "api_key", */
                     /*     In = OpenApiSecurityApiKeyLocation.Header */
                     /*     }); */
-
                     // JWT
                     /* document.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme */
                     /*     { */
@@ -88,10 +86,9 @@ namespace Icon.Configuration
                     /*     In = OpenApiSecurityApiKeyLocation.Header, */
                     /*     Description = "Type into the textbox: Bearer {your JWT token}." */
                     /*     }); */
-
                 });
-
         }
+
         public static void Configure(IApplicationBuilder app)
         {
             app.UseOpenApi(); // serve OpenAPI specification documents

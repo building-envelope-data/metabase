@@ -181,9 +181,7 @@ namespace Icon.Infrastructure.Aggregate
             var batch = _session.CreateBatchQuery();
             var aggregateStreamTasks =
               idsAndTimestamps
-              .Select(
-                  // There sadly is no proper tuple deconstruction in lambdas yet. For details see https://github.com/dotnet/csharplang/issues/258
-                  ((Guid id, DateTime timestamp) t)
+              .Select(((Guid id, DateTime timestamp) t) // There sadly is no proper tuple deconstruction in lambdas yet. For details see https://github.com/dotnet/csharplang/issues/258
                   => batch.Events.AggregateStream<T>(t.id, timestamp: t.timestamp)
                   )
               // Turning the `System.Linq.Enumerable+SelectListIterator` into a list is necessary for `await Task.WhenAll(aggregateStreamTasks) to finish`

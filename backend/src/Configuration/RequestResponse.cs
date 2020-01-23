@@ -35,7 +35,7 @@ using RazorViewEngine = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine;
 
 namespace Icon.Configuration
 {
-    class RequestResponse
+    public sealed class RequestResponse
     {
         public static void ConfigureServices(IServiceCollection services)
         {

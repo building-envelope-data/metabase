@@ -34,7 +34,7 @@ namespace Icon.Commands
         {
             return Result.Ok<CreateComponentVersion, Errors>(
                     new CreateComponentVersion(
-        input: input,
+                        input: input,
                         creatorId: creatorId
                         )
                     );

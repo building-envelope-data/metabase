@@ -33,7 +33,7 @@ using IdentityServer4.Validation;
 
 namespace Icon.Configuration
 {
-    class Session
+    public sealed class Session
     {
         public static void ConfigureServices(IServiceCollection services)
         {
