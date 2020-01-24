@@ -7,7 +7,7 @@ namespace Test.Integration.Web.Api.GraphQl
     {
         public string? message { get; set; }
         public IReadOnlyList<Location>? locations { get; set; }
-        public IReadOnlyList<string>? path { get; set; }
+        public IReadOnlyList<string>? path { get; set; } // TODO `path` is actually a list of strings or ints, see https://graphql.github.io/graphql-spec/June2018/#sec-Errors, how do we represent this in C# which sadly does not have union types as requested in https://github.com/dotnet/csharplang/issues/399
         public Extensions? extensions { get; set; }
 
         public class Location : ResponseBase
