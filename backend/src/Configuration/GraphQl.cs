@@ -14,6 +14,7 @@ using QueryExecutionOptions = HotChocolate.Execution.Configuration.QueryExecutio
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
 using IApplicationBuilder = Microsoft.AspNetCore.Builder.IApplicationBuilder;
 using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
+using Microsoft.Extensions.Hosting; // Provides `IsDevelopment` for `IWebHostEnvironment`, see https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostenvironment?view=dotnet-plat-ext-3.1 and https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.iwebhostenvironment?view=aspnetcore-3.1
 using Microsoft.AspNetCore.Builder; // UseWebSockets
 using GraphQlX = Icon.GraphQl;
 
@@ -74,15 +75,20 @@ namespace Icon.Configuration
             // TODO Do we want `UseWebSockets` here?
             var graphQl = app
                   .UseWebSockets()
-                  .UseGraphQL("/graphql");
-            // TODO Where does `InDevelopment` hide? It must be some kind of extension method.
-            /* if (environment.InDevelopment()) */
-            /* { */
-            graphQl
-              .UseGraphiQL("/graphql")
-            .UsePlayground("/graphql")
-            .UseVoyager("/graphql");
-            /* } */
+                  .UseGraphQL(
+                      new QueryMiddlewareOptions
+                      {
+                          Path = "/graphql",
+                          EnableSubscriptions = false
+                      }
+                      );
+            if (environment.IsDevelopment())
+            {
+                graphQl
+                  .UseGraphiQL("/graphql")
+                .UsePlayground("/graphql")
+                .UseVoyager("/graphql");
+            }
         }
     }
 }
