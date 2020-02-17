@@ -78,3 +78,11 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--username postgres \
 		--dbname icon_development
 .PHONY : psql
+
+# ------------------------------------------------ #
+# Tasks to run, for example, in a Docker container #
+# ------------------------------------------------ #
+
+diagrams : ## Draw images from textual UML diagrams
+	plantuml diagrams/*.uml
+.PHONY : diagrams
