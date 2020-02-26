@@ -1,6 +1,6 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 # See https://hub.docker.com/_/microsoft-dotnet-core-sdk
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1.101-alpine3.10
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1.201-alpine3.11
 
 ARG GROUP_ID=1000
 ARG USER_ID=1000
