@@ -45,6 +45,20 @@ namespace Icon.ValueObjects
             return Result.Ok<Id, Errors>(new Id(id));
         }
 
+        public static Result<Id, Errors>? MaybeFrom(
+            Guid? id,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (id is null)
+                return null;
+
+            // TODO Why can't we use the null-forgiving operator `!` as follows?
+            // return From(id: id!, path: path);
+            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/null-forgiving
+            return From(id: id ?? throw new ArgumentNullException(nameof(id)), path: path);
+        }
+
         protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Value;
@@ -58,6 +72,11 @@ namespace Icon.ValueObjects
         public static implicit operator Guid(Id id)
         {
             return id.Value;
+        }
+
+        public override string ToString()
+        {
+            return $"{GetType()}({Value})";
         }
     }
 }

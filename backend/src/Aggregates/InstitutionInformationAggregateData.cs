@@ -53,26 +53,12 @@ namespace Icon.Aggregates
 
         public Result<ValueObjects.InstitutionInformation, Errors> ToValueObject()
         {
-            var nameResult = ValueObjects.Name.From(Name);
-            var abbreviationResult = ValueObjects.Abbreviation.MaybeFrom(Abbreviation);
-            var descriptionResult = ValueObjects.Description.MaybeFrom(Description);
-            var websiteLocatorResult = ValueObjects.AbsoluteUri.MaybeFrom(WebsiteLocator);
-
-            return
-              Errors.CombineExistent(
-                  nameResult,
-                  abbreviationResult,
-                  descriptionResult,
-                  websiteLocatorResult
-                  )
-              .Bind(_ =>
-                  ValueObjects.InstitutionInformation.From(
-                    name: nameResult.Value,
-                    abbreviation: abbreviationResult?.Value,
-                    description: descriptionResult?.Value,
-                    websiteLocator: websiteLocatorResult?.Value
-                    )
-                  );
+            return ValueObjects.InstitutionInformation.From(
+                name: Name,
+                abbreviation: Abbreviation,
+                description: Description,
+                websiteLocator: WebsiteLocator
+                );
         }
     }
 }

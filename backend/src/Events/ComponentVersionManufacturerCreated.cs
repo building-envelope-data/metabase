@@ -24,7 +24,7 @@ namespace Icon.Events
                 componentVersionManufacturerId: componentVersionManufacturerId,
                 componentVersionId: command.ComponentVersionId,
                 institutionId: command.InstitutionId,
-                marketingInformation: command.MarketingInformation is null ? null : ComponentVersionManufacturerMarketingInformationEventData.From(command.MarketingInformation.NotNull()),
+                marketingInformation: command.MarketingInformation is null ? null : ComponentManufacturerMarketingInformationEventData.From(command.MarketingInformation.NotNull()),
                 creatorId: command.CreatorId
                 );
         }
@@ -32,7 +32,7 @@ namespace Icon.Events
         public Guid ComponentVersionManufacturerId { get; set; }
         public Guid ComponentVersionId { get; set; }
         public Guid InstitutionId { get; set; }
-        public ComponentVersionManufacturerMarketingInformationEventData? MarketingInformation { get; set; }
+        public ComponentManufacturerMarketingInformationEventData? MarketingInformation { get; set; }
 
 #nullable disable
         public ComponentVersionManufacturerCreated() { }
@@ -42,7 +42,7 @@ namespace Icon.Events
             Guid componentVersionManufacturerId,
             Guid componentVersionId,
             Guid institutionId,
-            ComponentVersionManufacturerMarketingInformationEventData? marketingInformation,
+            ComponentManufacturerMarketingInformationEventData? marketingInformation,
             Guid creatorId
             )
           : base(creatorId)

@@ -1,0 +1,109 @@
+using Guid = System.Guid;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using CancellationToken = System.Threading.CancellationToken;
+using Icon.Infrastructure.Command;
+using Icon.Events;
+using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Query;
+using Models = Icon.Models;
+using Queries = Icon.Queries;
+using Events = Icon.Events;
+using Aggregates = Icon.Aggregates;
+using System.Linq;
+using Marten;
+using Marten.Linq.MatchesSql;
+using CSharpFunctionalExtensions;
+using Errors = Icon.Errors;
+
+namespace Icon.Handlers
+{
+    // TODO Refactor this implementation. I'm not happy with it!
+    public sealed class GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
+      : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
+    {
+        private readonly IAggregateRepository _repository;
+        private readonly GetInstitutionDevelopersOfMethodsIdentifiedByTimestampedIdsHandler _getInstitutionDevelopersHandler;
+        private readonly GetPersonDevelopersOfMethodsIdentifiedByTimestampedIdsHandler _getPersonDevelopersHandler;
+
+        public GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
+        {
+            _repository = repository;
+            _getInstitutionDevelopersHandler = new GetInstitutionDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(repository);
+            _getPersonDevelopersHandler = new GetPersonDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(repository);
+        }
+
+        public async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Handle(
+            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Stakeholder> query,
+            CancellationToken cancellationToken
+            )
+        {
+            using (var session = _repository.OpenReadOnlySession())
+            {
+                // TODO Await both results in parallel by using `WhenAll`?  There are sadly no n-tuple overloads of `WhenAll` as discussed in https://github.com/dotnet/runtime/issues/20166
+                var institutionsResults = await _getInstitutionDevelopersHandler.Handle(
+                    Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Institution>.From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
+                    session,
+                    cancellationToken
+                    );
+                var personsResults = await _getPersonDevelopersHandler.Handle(
+                    Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Person>.From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
+                    session,
+                    cancellationToken
+                    );
+                return institutionsResults.Zip(personsResults, (institutionsResult, personsResult) =>
+                    Errors.Combine(institutionsResult, personsResult).Map(_ =>
+                        institutionsResult.Value.Select(r => r.Map(i => (Models.Stakeholder)i))
+                        .Concat(personsResult.Value.Select(r => r.Map(p => (Models.Stakeholder)p)))
+                        )
+                    );
+            }
+        }
+
+        private sealed class GetInstitutionDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
+          : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Institution, Aggregates.InstitutionAggregate>
+        {
+            public GetInstitutionDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
+              : base(repository)
+            {
+            }
+
+            protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
+                IAggregateRepositoryReadOnlySession session,
+                IEnumerable<ValueObjects.Id> modelIds,
+                CancellationToken cancellationToken
+                )
+            {
+                var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
+                return (await session.Query<Events.InstitutionMethodDeveloperAdded>()
+                    .Where(e => e.MethodId.IsOneOf(modelGuids))
+                    .Select(e => new { ModelId = e.MethodId, AssociateId = e.StakeholderId })
+                    .ToListAsync(cancellationToken))
+                  .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociateId));
+            }
+        }
+
+        private sealed class GetPersonDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
+          : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Person, Aggregates.PersonAggregate>
+        {
+            public GetPersonDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
+              : base(repository)
+            {
+            }
+
+            protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
+                IAggregateRepositoryReadOnlySession session,
+                IEnumerable<ValueObjects.Id> modelIds,
+                CancellationToken cancellationToken
+                )
+            {
+                var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
+                return (await session.Query<Events.PersonMethodDeveloperAdded>()
+                    .Where(e => e.MethodId.IsOneOf(modelGuids))
+                    .Select(e => new { ModelId = e.MethodId, AssociateId = e.StakeholderId })
+                    .ToListAsync(cancellationToken))
+                  .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociateId));
+            }
+        }
+    }
+}

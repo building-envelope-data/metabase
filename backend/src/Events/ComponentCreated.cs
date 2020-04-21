@@ -22,7 +22,7 @@ namespace Icon.Events
         {
             return new ComponentCreated(
                 componentId: componentId,
-                information: ComponentInformationEventData.From(command.Input),
+                information: ComponentInformationEventData.From(command.Input.Information),
                 creatorId: command.CreatorId
                 );
         }

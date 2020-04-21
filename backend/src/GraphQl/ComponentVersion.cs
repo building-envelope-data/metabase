@@ -5,11 +5,11 @@ using DateTime = System.DateTime;
 namespace Icon.GraphQl
 {
     public sealed class ComponentVersion
-      : Node
+      : NodeBase
     {
         public static ComponentVersion FromModel(
             Models.ComponentVersion model,
-            DateTime requestTimestamp
+            ValueObjects.Timestamp requestTimestamp
             )
         {
             return new ComponentVersion(

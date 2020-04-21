@@ -10,7 +10,7 @@ using Events = Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class ComponentAggregate
-      : EventSourcedAggregate
+      : EventSourcedAggregate, IConvertible<Models.Component>
     {
         public ComponentInformationAggregateData Information { get; set; }
 
@@ -29,13 +29,16 @@ namespace Icon.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
-                return base.Validate();
+                return Result.Combine(
+                    base.Validate(),
+                    ValidateNull(Information, nameof(Information))
+                    );
 
-            return
-              Result.Combine(
-                  base.Validate(),
-                  Information.Validate()
-                  );
+            return Result.Combine(
+                base.Validate(),
+                ValidateNonNull(Information, nameof(Information))
+                .Bind(_ => Information.Validate())
+                );
         }
 
         public Result<Models.Component, Errors> ToModel()

@@ -18,8 +18,8 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
-    public sealed class ListComponentVersionsHandler :
-      IQueryHandler<Queries.ListComponentVersions, IEnumerable<Result<Models.ComponentVersion, Errors>>>
+    public sealed class ListComponentVersionsHandler
+      : IQueryHandler<Queries.ListComponentVersions, ILookup<ValueObjects.TimestampedId, Result<Models.ComponentVersion, Errors>>>
     {
         private readonly IAggregateRepository _repository;
 
@@ -28,29 +28,32 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Result<Models.ComponentVersion, Errors>>> Handle(
+        public async Task<ILookup<ValueObjects.TimestampedId, Result<Models.ComponentVersion, Errors>>> Handle(
             Queries.ListComponentVersions query,
             CancellationToken cancellationToken
             )
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                var ids =
-                  await session.Query<Events.ComponentVersionCreated>()
-                  .Where(e => e.ComponentId == query.ComponentId)
-                  .Select(e => e.ComponentVersionId)
-                  .ToListAsync();
-
-                return
-                  (await
-                   session.LoadAllThatExisted<Aggregates.ComponentVersionAggregate>(
-                     ids,
-                     query.Timestamp,
-                     cancellationToken
-                     )
-                  ).Select(result =>
-                    result.Bind(a => a.ToModel())
-                    );
+                /* var timestampedComponentIdToVersionIds = (await Task.WhenAll( */
+                /*     query.TimestampedComponentIds.Select(async timestampedComponentId => */
+                /*     { */
+                /*         var ids = */
+                /*       await session.Query<Events.ComponentVersionCreated>() */
+                /*       .Where(e => e.ComponentId == timestampedComponentId.Id) */
+                /*       .Select(e => e.ComponentVersionId) */
+                /*       .ToListAsync(cancellationToken); */
+                /*         return (timestampedComponentId, ids); */
+                /*     }))).ToDictionary(t => t.Item1, t => t.Item2); */
+                /* return (await */
+                /*   session.LoadAllThatExistedGrouped<Aggregates.ComponentVersionAggregate>( */
+                /*       timestampedComponentIdToVersionIds, */
+                /*       cancellationToken */
+                /*       ) */
+                /*   ).Select(result => */
+                /*     result.Bind(a => a.ToModel()) */
+                /*     ); */
+                return null!;
             }
         }
     }

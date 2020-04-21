@@ -48,6 +48,37 @@ namespace Icon.ValueObjects
                 );
         }
 
+        public static Result<InstitutionInformation, Errors> From(
+            string name,
+            string? abbreviation,
+            string? description,
+            Uri? websiteLocator,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            var nameResult = ValueObjects.Name.From(name);
+            var abbreviationResult = ValueObjects.Abbreviation.MaybeFrom(abbreviation);
+            var descriptionResult = ValueObjects.Description.MaybeFrom(description);
+            var websiteLocatorResult = ValueObjects.AbsoluteUri.MaybeFrom(websiteLocator);
+
+            return
+              Errors.CombineExistent(
+                  nameResult,
+                  abbreviationResult,
+                  descriptionResult,
+                  websiteLocatorResult
+                  )
+              .Bind(_ =>
+                  ValueObjects.InstitutionInformation.From(
+                    name: nameResult.Value,
+                    abbreviation: abbreviationResult?.Value,
+                    description: descriptionResult?.Value,
+                    websiteLocator: websiteLocatorResult?.Value,
+                    path: path
+                    )
+                  );
+        }
+
         protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Name;

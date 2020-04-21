@@ -16,10 +16,10 @@ namespace Icon.Commands
     public sealed class CreateComponentVersion
       : CommandBase<Result<ValueObjects.TimestampedId, Errors>>
     {
-        public ValueObjects.ComponentVersionInput Input { get; }
+        public ValueObjects.CreateComponentVersionInput Input { get; }
 
         private CreateComponentVersion(
-            ValueObjects.ComponentVersionInput input,
+            ValueObjects.CreateComponentVersionInput input,
             ValueObjects.Id creatorId
             )
           : base(creatorId)
@@ -28,7 +28,7 @@ namespace Icon.Commands
         }
 
         public static Result<CreateComponentVersion, Errors> From(
-            ValueObjects.ComponentVersionInput input,
+            ValueObjects.CreateComponentVersionInput input,
             ValueObjects.Id creatorId
             )
         {

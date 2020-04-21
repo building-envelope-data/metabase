@@ -58,34 +58,67 @@ namespace Icon.Configuration
             var martenLogger = new MartenLogger(logger);
             // TODO Declare `creatorId` of events as foreign key to `User`, see https://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/
             return Marten.DocumentStore.For(_ =>
-                  {
-                      _.Connection(databaseSettings.ConnectionString);
-                      _.DatabaseSchemaName = databaseSettings.SchemaName.EventStore;
-                      _.Events.DatabaseSchemaName = databaseSettings.SchemaName.EventStore;
-                      /* _.UseNodaTime(); */
-                      // For a full list auf auto-create options, see
-                      // https://jasperfx.github.io/marten/documentation/schema/
-                      if (environment.IsDevelopment() || environment.IsEnvironment("Test"))
-                      {
-                          _.AutoCreateSchemaObjects = Marten.AutoCreate.All;
-                      }
-                      else
-                      {
-                          _.AutoCreateSchemaObjects = Marten.AutoCreate.CreateOrUpdate;
-                      }
-                      _.Events.UseAggregatorLookup(Marten.Services.Events.AggregationLookupStrategy.UsePrivateApply);
+                {
+                    _.Connection(databaseSettings.ConnectionString);
+                    _.DatabaseSchemaName = databaseSettings.SchemaName.EventStore;
+                    _.Events.DatabaseSchemaName = databaseSettings.SchemaName.EventStore;
+                    /* _.UseNodaTime(); */
+                    // For a full list auf auto-create options, see
+                    // https://jasperfx.github.io/marten/documentation/schema/
+                    if (environment.IsDevelopment() || environment.IsEnvironment("Test"))
+                    {
+                        _.AutoCreateSchemaObjects = Marten.AutoCreate.All;
+                    }
+                    else
+                    {
+                        _.AutoCreateSchemaObjects = Marten.AutoCreate.CreateOrUpdate;
+                    }
+                    _.Events.UseAggregatorLookup(Marten.Services.Events.AggregationLookupStrategy.UsePrivateApply);
 
-                      _.Logger(martenLogger);
-                      _.Listeners.Add(martenLogger);
+                    _.Logger(martenLogger);
+                    _.Listeners.Add(martenLogger);
 
-                      _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentAggregate>();
-                      _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionAggregate>();
-                      _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionManufacturerAggregate>();
+                    ProjectAggregatesInline(_);
+                    AddEventTypes(_);
+                });
+        }
 
-                      _.Events.AddEventType(typeof(Events.ComponentCreated));
-                      _.Events.AddEventType(typeof(Events.ComponentVersionCreated));
-                      _.Events.AddEventType(typeof(Events.ComponentVersionManufacturerCreated));
-                  });
+        private static void ProjectAggregatesInline(Marten.StoreOptions options)
+        {
+            // Originally generated from the command line with the command
+            // `ls -1 src/Aggregates/ | grep -E ".*Aggregate.cs$" | sed -e "s/^\(.*\).cs\$/options.Events.InlineProjections.AggregateStreamsWith<Aggregates.\1>();/"`
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentManufacturerAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionManufacturerAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.DatabaseAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.InstitutionAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.InstitutionMethodDeveloperAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.InstitutionRepresentativeAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.MethodAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.PersonAffiliationAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.PersonAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.PersonMethodDeveloperAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.StandardAggregate>();
+        }
+
+        private static void AddEventTypes(Marten.StoreOptions options)
+        {
+            // Originally generated from the command line with the command
+            // `ls -1 src/Events/ | grep "Created\|Added" | sed -e "s/^\(.*\).cs\$/options.Events.AddEventType(typeof(Events.\1));/"`
+            options.Events.AddEventType(typeof(Events.ComponentCreated));
+            options.Events.AddEventType(typeof(Events.ComponentManufacturerAdded));
+            options.Events.AddEventType(typeof(Events.ComponentVersionCreated));
+            options.Events.AddEventType(typeof(Events.ComponentVersionManufacturerCreated));
+            options.Events.AddEventType(typeof(Events.DatabaseCreated));
+            options.Events.AddEventType(typeof(Events.InstitutionCreated));
+            options.Events.AddEventType(typeof(Events.InstitutionMethodDeveloperAdded));
+            options.Events.AddEventType(typeof(Events.InstitutionRepresentativeAdded));
+            options.Events.AddEventType(typeof(Events.MethodCreated));
+            options.Events.AddEventType(typeof(Events.PersonAffiliationAdded));
+            options.Events.AddEventType(typeof(Events.PersonCreated));
+            options.Events.AddEventType(typeof(Events.PersonMethodDeveloperAdded));
+            options.Events.AddEventType(typeof(Events.StandardCreated));
         }
     }
 }

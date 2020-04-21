@@ -10,13 +10,13 @@ namespace Icon.Models
     {
         public ValueObjects.Id ComponentVersionId { get; }
         public ValueObjects.Id InstitutionId { get; }
-        public ValueObjects.ComponentVersionManufacturerMarketingInformation? MarketingInformation { get; }
+        public ValueObjects.ComponentManufacturerMarketingInformation? MarketingInformation { get; }
 
         private ComponentVersionManufacturer(
             ValueObjects.Id id,
             ValueObjects.Id componentVersionId,
             ValueObjects.Id institutionId,
-            ValueObjects.ComponentVersionManufacturerMarketingInformation? marketingInformation,
+            ValueObjects.ComponentManufacturerMarketingInformation? marketingInformation,
             ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
@@ -30,7 +30,7 @@ namespace Icon.Models
             ValueObjects.Id id,
             ValueObjects.Id componentVersionId,
             ValueObjects.Id institutionId,
-            ValueObjects.ComponentVersionManufacturerMarketingInformation? marketingInformation,
+            ValueObjects.ComponentManufacturerMarketingInformation? marketingInformation,
             ValueObjects.Timestamp timestamp
             )
         {

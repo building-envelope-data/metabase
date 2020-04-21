@@ -26,6 +26,11 @@ namespace Icon
             return Concat(this, errors!);
         }
 
+        public override string ToString()
+        {
+            return string.Join(", ", this.Select(e => $"'{e.Message} ({e.Code})'"));
+        }
+
         public static Errors From(IList<IError> errors)
         {
             return new Errors(errors);

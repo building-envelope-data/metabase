@@ -31,10 +31,10 @@ namespace Icon.Models
             return
               Result.Ok<Method, Errors>(
                   new Method(
-            id: id,
-            information: information,
-            timestamp: timestamp
-            )
+                    id: id,
+                    information: information,
+                    timestamp: timestamp
+                    )
                   );
         }
     }

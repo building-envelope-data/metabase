@@ -16,12 +16,12 @@ namespace Icon.Commands
     {
         public ValueObjects.Id ComponentVersionId { get; }
         public ValueObjects.Id InstitutionId { get; }
-        public ValueObjects.ComponentVersionManufacturerMarketingInformation? MarketingInformation { get; }
+        public ValueObjects.ComponentManufacturerMarketingInformation? MarketingInformation { get; }
 
         private CreateComponentVersionManufacturer(
             ValueObjects.Id componentVersionId,
             ValueObjects.Id institutionId,
-            ValueObjects.ComponentVersionManufacturerMarketingInformation? marketingInformation,
+            ValueObjects.ComponentManufacturerMarketingInformation? marketingInformation,
             ValueObjects.Id creatorId
             )
           : base(creatorId)
@@ -34,7 +34,7 @@ namespace Icon.Commands
         public static Result<CreateComponentVersionManufacturer, Errors> From(
             ValueObjects.Id componentVersionId,
             ValueObjects.Id institutionId,
-            ValueObjects.ComponentVersionManufacturerMarketingInformation? marketingInformation,
+            ValueObjects.ComponentManufacturerMarketingInformation? marketingInformation,
             ValueObjects.Id creatorId
             )
         {

@@ -22,6 +22,18 @@ namespace Icon.Events
                 );
         }
 
+        public static InstitutionInformationEventData From(
+            ValueObjects.CreateInstitutionInput input
+            )
+        {
+            return new InstitutionInformationEventData(
+                name: input.Name,
+                abbreviation: input.Abbreviation?.Value,
+                description: input.Description?.Value,
+                websiteLocator: input.WebsiteLocator?.Value
+                );
+        }
+
         public string Name { get; set; }
         public string? Abbreviation { get; set; }
         public string? Description { get; set; }

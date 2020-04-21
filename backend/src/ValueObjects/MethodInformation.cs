@@ -59,6 +59,43 @@ namespace Icon.ValueObjects
                 );
         }
 
+        public static Result<MethodInformation, Errors> From(
+            string name,
+            string description,
+            Guid? standardId,
+            Uri? publicationLocator,
+            Uri? codeLocator,
+            IReadOnlyCollection<MethodCategory> categories,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            var nameResult = ValueObjects.Name.From(name);
+            var descriptionResult = ValueObjects.Description.From(description);
+            var standardIdResult = ValueObjects.Id.MaybeFrom(standardId);
+            var publicationLocatorResult = ValueObjects.AbsoluteUri.MaybeFrom(publicationLocator);
+            var codeLocatorResult = ValueObjects.AbsoluteUri.MaybeFrom(codeLocator);
+
+            return
+              Errors.CombineExistent(
+                  nameResult,
+                  descriptionResult,
+                  standardIdResult,
+                  publicationLocatorResult,
+                  codeLocatorResult
+                  )
+              .Bind(_ =>
+                  From(
+                    name: nameResult.Value,
+                    description: descriptionResult.Value,
+                    standardId: standardIdResult?.Value,
+                    publicationLocator: publicationLocatorResult?.Value,
+                    codeLocator: codeLocatorResult?.Value,
+                    categories: categories,
+                    path: path
+                    )
+                  );
+        }
+
         protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Name;

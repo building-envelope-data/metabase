@@ -5,33 +5,29 @@ using Models = Icon.Models;
 using Icon.Infrastructure.Query;
 using IError = HotChocolate.IError;
 using CSharpFunctionalExtensions;
+using System.Linq;
 
 namespace Icon.Queries
 {
     public sealed class ListComponentVersions
-      : IQuery<IEnumerable<Result<Models.ComponentVersion, Errors>>>
+      : IQuery<ILookup<ValueObjects.TimestampedId, Result<Models.ComponentVersion, Errors>>>
     {
-        public ValueObjects.Id ComponentId { get; }
-        public ValueObjects.Timestamp Timestamp { get; }
+        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedComponentIds { get; }
 
         private ListComponentVersions(
-            ValueObjects.Id componentId,
-            ValueObjects.Timestamp timestamp
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedComponentIds
             )
         {
-            ComponentId = componentId;
-            Timestamp = timestamp;
+            TimestampedComponentIds = timestampedComponentIds;
         }
 
         public static Result<ListComponentVersions, Errors> From(
-            ValueObjects.Id componentId,
-            ValueObjects.Timestamp timestamp
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedComponentIds
             )
         {
             return Result.Ok<ListComponentVersions, Errors>(
                 new ListComponentVersions(
-                  componentId: componentId,
-                  timestamp: timestamp
+                  timestampedComponentIds: timestampedComponentIds
                   )
                 );
         }

@@ -32,16 +32,19 @@ namespace Icon.Configuration
 
             services.AddGraphQL(serviceProvider =>
                 SchemaBuilder.New()
-                  .AddServices(serviceProvider)
                   /* .EnableRelaySupport() */
+                  .AddServices(serviceProvider)
                   // Adds the authorize directive and
                   // enable the authorization middleware.
                   .AddAuthorizeDirectiveType()
+
                   .AddQueryType<GraphQlX.Query>()
                   .AddMutationType<GraphQlX.Mutation>()
                   /* .AddSubscriptionType<SubscriptionType>() */
-                  .AddType<GraphQlX.INode>()
-                  .AddType<GraphQlX.ComponentResolvers>()
+
+                  .AddType<GraphQlX.Node>()
+                  .AddType<GraphQlX.StakeholderBase>()
+
                   .Create(),
                   new QueryExecutionOptions
                   {

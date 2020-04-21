@@ -16,10 +16,10 @@ namespace Icon.Commands
     public sealed class CreateComponent
       : CommandBase<Result<ValueObjects.TimestampedId, Errors>>
     {
-        public ValueObjects.ComponentInput Input { get; }
+        public ValueObjects.CreateComponentInput Input { get; }
 
         private CreateComponent(
-            ValueObjects.ComponentInput input,
+            ValueObjects.CreateComponentInput input,
             ValueObjects.Id creatorId
             )
           : base(creatorId)
@@ -28,7 +28,7 @@ namespace Icon.Commands
         }
 
         public static Result<CreateComponent, Errors> From(
-            ValueObjects.ComponentInput input,
+            ValueObjects.CreateComponentInput input,
             ValueObjects.Id creatorId
             )
         {

@@ -10,7 +10,7 @@ using Events = Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class ComponentVersionManufacturerAggregate
-      : EventSourcedAggregate
+      : EventSourcedAggregate, IConvertible<Models.ComponentVersionManufacturer>
     {
         [ForeignKey(typeof(ComponentVersionAggregate))]
         public Guid ComponentVersionId { get; set; }
@@ -18,7 +18,7 @@ namespace Icon.Aggregates
         /* [ForeignKey(typeof(InstitutionAggregate))] */
         public Guid InstitutionId { get; set; }
 
-        public ComponentVersionManufacturerMarketingInformationAggregateData? MarketingInformation { get; set; }
+        public ComponentManufacturerMarketingInformationAggregateData? MarketingInformation { get; set; }
 
 #nullable disable
         public ComponentVersionManufacturerAggregate() { }
@@ -30,7 +30,7 @@ namespace Icon.Aggregates
             var data = @event.Data;
             Id = data.ComponentVersionManufacturerId.NotEmpty();
             ComponentVersionId = data.ComponentVersionId.NotEmpty();
-            MarketingInformation = data.MarketingInformation is null ? null : ComponentVersionManufacturerMarketingInformationAggregateData.From(data.MarketingInformation);
+            MarketingInformation = data.MarketingInformation is null ? null : ComponentManufacturerMarketingInformationAggregateData.From(data.MarketingInformation);
         }
 
         public override Result<bool, Errors> Validate()

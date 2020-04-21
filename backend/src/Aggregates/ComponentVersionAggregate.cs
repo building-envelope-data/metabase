@@ -9,7 +9,7 @@ using Events = Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class ComponentVersionAggregate
-      : EventSourcedAggregate
+      : EventSourcedAggregate, IConvertible<Models.ComponentVersion>
     {
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; set; }
@@ -32,19 +32,18 @@ namespace Icon.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
-                return
-                  Result.Combine(
-                      base.Validate(),
-                      ValidateEmpty(ComponentId, nameof(ComponentId)),
-                      ValidateNull(Information, nameof(Information))
-                      );
+                return Result.Combine(
+                    base.Validate(),
+                    ValidateEmpty(ComponentId, nameof(ComponentId)),
+                    ValidateNull(Information, nameof(Information))
+                    );
 
-            return
-              Result.Combine(
-                  base.Validate(),
-                  ValidateNonEmpty(ComponentId, nameof(ComponentId)),
-                  Information.Validate()
-                  );
+            return Result.Combine(
+                base.Validate(),
+                ValidateNonEmpty(ComponentId, nameof(ComponentId)),
+                ValidateNonNull(Information, nameof(Information))
+                .Bind(_ => Information.Validate())
+                );
         }
 
         public Result<Models.ComponentVersion, Errors> ToModel()

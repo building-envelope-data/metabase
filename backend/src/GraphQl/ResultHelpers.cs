@@ -47,5 +47,29 @@ namespace Icon.GraphQl
         {
             return results.Select(ToDataLoaderResult).ToList().AsReadOnly();
         }
+
+        internal static IReadOnlyList<GreenDonut.Result<IReadOnlyList<T>>> ToDataLoaderResultsX<T>(IEnumerable<Result<IEnumerable<Result<T, Errors>>, Errors>> results)
+        {
+            return results.Select(result =>
+                {
+                    if (result.IsFailure)
+                    {
+                        return GreenDonut.Result<IReadOnlyList<T>>.Reject(new QueryException(result.Error));
+                    }
+                    // TODO If one of the results in `result.Value` is a failure, then
+                    // `combinedResult` is a failure even if there are many successful
+                    // results. Should we just discard failures and return all successful
+                    // results instead? Or is it possible to return both, failures and
+                    // successful results? The latter would be terrific! See
+                    // https://github.com/vkhorikov/CSharpFunctionalExtensions/blob/master/CSharpFunctionalExtensions/Result/Extensions/Combine.cs
+                    var combinedResult = result.Value.Combine();
+                    if (combinedResult.IsFailure)
+                    {
+                        return GreenDonut.Result<IReadOnlyList<T>>.Reject(new QueryException(combinedResult.Error));
+                    }
+                    return GreenDonut.Result<IReadOnlyList<T>>.Resolve(combinedResult.Value.ToList().AsReadOnly());
+                }
+              ).ToList().AsReadOnly();
+        }
     }
 }

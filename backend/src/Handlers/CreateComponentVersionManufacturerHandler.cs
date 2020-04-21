@@ -34,8 +34,8 @@ namespace Icon.Handlers
                 var id = await session.GenerateNewId(cancellationToken);
                 var @event = Events.ComponentVersionManufacturerCreated.From(id, command);
                 return
-                  await session.Store<Aggregates.ComponentVersionManufacturerAggregate>(
-                      id, 1, @event, cancellationToken
+                  await session.New<Aggregates.ComponentVersionManufacturerAggregate>(
+                      id, @event, cancellationToken
                       );
             }
         }
