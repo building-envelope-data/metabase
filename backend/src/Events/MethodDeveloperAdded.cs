@@ -6,10 +6,10 @@ using Commands = Icon.Commands;
 namespace Icon.Events
 {
     public abstract class MethodDeveloperAdded
-      : CreatedEvent
+      : AddedEvent
     {
-        public Guid MethodId { get; set; }
-        public Guid StakeholderId { get; set; }
+        public Guid MethodId { get => ParentId; set => ParentId = value; }
+        public Guid StakeholderId { get => AssociateId; set => AssociateId = value; }
 
 #nullable disable
         public MethodDeveloperAdded() { }
@@ -23,22 +23,12 @@ namespace Icon.Events
             )
           : base(
               aggregateId: methodDeveloperId,
+              parentId: methodId,
+              associateId: stakeholderId,
               creatorId: creatorId
               )
         {
-            MethodId = methodId;
-            StakeholderId = stakeholderId;
             EnsureValid();
-        }
-
-        public override Result<bool, Errors> Validate()
-        {
-            return
-              Result.Combine(
-                  base.Validate(),
-                  ValidateNonEmpty(MethodId, nameof(MethodId)),
-                  ValidateNonEmpty(StakeholderId, nameof(StakeholderId))
-                  );
         }
     }
 }

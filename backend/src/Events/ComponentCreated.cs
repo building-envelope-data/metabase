@@ -40,7 +40,7 @@ namespace Icon.Events
             Guid creatorId
             )
           : base(
-              componentId: componentId,
+              aggregateId: componentId,
               creatorId: creatorId
               )
         {

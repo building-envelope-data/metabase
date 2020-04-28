@@ -23,14 +23,16 @@ namespace Icon.Handlers
       : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
     {
         private readonly IAggregateRepository _repository;
-        private readonly GetInstitutionDevelopersOfMethodsIdentifiedByTimestampedIdsHandler _getInstitutionDevelopersHandler;
-        private readonly GetPersonDevelopersOfMethodsIdentifiedByTimestampedIdsHandler _getPersonDevelopersHandler;
+        private readonly GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded> _getInstitutionDevelopersHandler;
+        private readonly GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded> _getPersonDevelopersHandler;
 
         public GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
         {
             _repository = repository;
-            _getInstitutionDevelopersHandler = new GetInstitutionDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(repository);
-            _getPersonDevelopersHandler = new GetPersonDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(repository);
+            _getInstitutionDevelopersHandler =
+              new GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>(repository);
+            _getPersonDevelopersHandler =
+              new GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>(repository);
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Handle(
@@ -57,52 +59,6 @@ namespace Icon.Handlers
                         .Concat(personsResult.Value.Select(r => r.Map(p => (Models.Stakeholder)p)))
                         )
                     );
-            }
-        }
-
-        private sealed class GetInstitutionDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
-          : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Institution, Aggregates.InstitutionAggregate>
-        {
-            public GetInstitutionDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
-              : base(repository)
-            {
-            }
-
-            protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
-                IAggregateRepositoryReadOnlySession session,
-                IEnumerable<ValueObjects.Id> modelIds,
-                CancellationToken cancellationToken
-                )
-            {
-                var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
-                return (await session.Query<Events.InstitutionMethodDeveloperAdded>()
-                    .Where(e => e.MethodId.IsOneOf(modelGuids))
-                    .Select(e => new { ModelId = e.MethodId, AssociateId = e.StakeholderId })
-                    .ToListAsync(cancellationToken))
-                  .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociateId));
-            }
-        }
-
-        private sealed class GetPersonDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
-          : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Person, Aggregates.PersonAggregate>
-        {
-            public GetPersonDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
-              : base(repository)
-            {
-            }
-
-            protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
-                IAggregateRepositoryReadOnlySession session,
-                IEnumerable<ValueObjects.Id> modelIds,
-                CancellationToken cancellationToken
-                )
-            {
-                var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
-                return (await session.Query<Events.PersonMethodDeveloperAdded>()
-                    .Where(e => e.MethodId.IsOneOf(modelGuids))
-                    .Select(e => new { ModelId = e.MethodId, AssociateId = e.StakeholderId })
-                    .ToListAsync(cancellationToken))
-                  .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociateId));
             }
         }
     }

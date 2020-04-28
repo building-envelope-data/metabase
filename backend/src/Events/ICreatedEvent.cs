@@ -5,6 +5,6 @@ namespace Icon.Events
     public interface ICreatedEvent
       : IEvent
     {
-      public Guid Id { get; }
+        public Guid AggregateId { get; }
     }
 }

@@ -52,69 +52,48 @@ namespace Icon.Configuration
             services.AddScoped<Command.ICommandBus, Command.CommandBus>();
             services.AddScoped<Events.IEventBus, Events.EventBus>();
 
-            services.AddScoped<
-              MediatR.IRequestHandler<
-              Queries.ListComponentVersions,
-              ILookup<ValueObjects.TimestampedId, Result<Models.ComponentVersion, Errors>>
-                >,
-              Handlers.ListComponentVersionsHandler
-                >();
-            /* services.AddScoped<MediatR.IRequestHandler<Queries.GetComponentVersion, Models.ComponentVersion>, Handlers.GetComponentVersionHandler>(); */
-            services.AddScoped<
-              MediatR.IRequestHandler<
-              Commands.CreateComponentVersion,
-              Result<ValueObjects.TimestampedId, Errors>
-                >,
-              Handlers.CreateComponentVersionHandler>();
-            services.AddScoped<
-              MediatR.IRequestHandler<
-              Commands.CreateComponentVersionManufacturer,
-              Result<ValueObjects.TimestampedId, Errors>
-                >,
-              Handlers.CreateComponentVersionManufacturerHandler>();
-
             // GetModelsAtTimestamps
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.GetModelsAtTimestamps<Models.Component>,
               IEnumerable<Result<IEnumerable<Result<Models.Component, Errors>>, Errors>>
                 >,
-              Handlers.GetComponentsAtTimestampsHandler
+              Handlers.GetModelsAtTimestampsHandler<Models.Component, Aggregates.ComponentAggregate, Events.ComponentCreated>
                 >();
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.GetModelsAtTimestamps<Models.Database>,
               IEnumerable<Result<IEnumerable<Result<Models.Database, Errors>>, Errors>>
                 >,
-              Handlers.GetDatabasesAtTimestampsHandler
+              Handlers.GetModelsAtTimestampsHandler<Models.Database, Aggregates.DatabaseAggregate, Events.DatabaseCreated>
                 >();
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.GetModelsAtTimestamps<Models.Institution>,
               IEnumerable<Result<IEnumerable<Result<Models.Institution, Errors>>, Errors>>
                 >,
-              Handlers.GetInstitutionsAtTimestampsHandler
+              Handlers.GetModelsAtTimestampsHandler<Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionCreated>
                 >();
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.GetModelsAtTimestamps<Models.Method>,
               IEnumerable<Result<IEnumerable<Result<Models.Method, Errors>>, Errors>>
                 >,
-              Handlers.GetMethodsAtTimestampsHandler
+              Handlers.GetModelsAtTimestampsHandler<Models.Method, Aggregates.MethodAggregate, Events.MethodCreated>
                 >();
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.GetModelsAtTimestamps<Models.Person>,
               IEnumerable<Result<IEnumerable<Result<Models.Person, Errors>>, Errors>>
                 >,
-              Handlers.GetPersonsAtTimestampsHandler
+              Handlers.GetModelsAtTimestampsHandler<Models.Person, Aggregates.PersonAggregate, Events.PersonCreated>
                 >();
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.GetModelsAtTimestamps<Models.Standard>,
               IEnumerable<Result<IEnumerable<Result<Models.Standard, Errors>>, Errors>>
                 >,
-              Handlers.GetStandardsAtTimestampsHandler
+              Handlers.GetModelsAtTimestampsHandler<Models.Standard, Aggregates.StandardAggregate, Events.StandardCreated>
                 >();
 
             // GetModelsForTimestampedIdsHandler
@@ -303,83 +282,113 @@ namespace Icon.Configuration
 
         public static void AddComponentManufacturerAssociationHandlers(IServiceCollection services)
         {
-          services.AddScoped<
-            MediatR.IRequestHandler<
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Component, Models.ComponentManufacturer>,
-            IEnumerable<Result<IEnumerable<Result<Models.ComponentManufacturer, Errors>>, Errors>>
-              >,
-            Handlers.GetManufacturerOfComponentsAssociationsIdentifiedByTimestampedIdsHandler
-              >();
-          services.AddScoped<
-            MediatR.IRequestHandler<
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Component, Models.Institution>,
-            IEnumerable<Result<IEnumerable<Result<Models.Institution, Errors>>, Errors>>
-              >,
-            Handlers.GetManufacturersOfComponentsIdentifiedByTimestampedIdsHandler
-              >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Component, Models.ComponentManufacturer>,
+              IEnumerable<Result<IEnumerable<Result<Models.ComponentManufacturer, Errors>>, Errors>>
+                >,
+              Handlers.GetForwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<Models.Component, Models.ComponentManufacturer, Aggregates.ComponentManufacturerAggregate, Events.ComponentManufacturerAdded>
+                >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.ComponentManufacturer>,
+              IEnumerable<Result<IEnumerable<Result<Models.ComponentManufacturer, Errors>>, Errors>>
+                >,
+              Handlers.GetBackwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<Models.Institution, Models.ComponentManufacturer, Aggregates.ComponentManufacturerAggregate, Events.ComponentManufacturerAdded>
+                >();
 
-          services.AddScoped<
-            MediatR.IRequestHandler<
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.ComponentManufacturer>,
-            IEnumerable<Result<IEnumerable<Result<Models.ComponentManufacturer, Errors>>, Errors>>
-              >,
-            Handlers.GetComponentManufacturedByInstitutionsAssociationsIdentifiedByTimestampedIdsHandler
-              >();
-          services.AddScoped<
-            MediatR.IRequestHandler<
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.Component>,
-            IEnumerable<Result<IEnumerable<Result<Models.Component, Errors>>, Errors>>
-              >,
-            Handlers.GetComponentsManufacturedByInstitutionsIdentifiedByTimestampedIdsHandler
-              >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Component, Models.Institution>,
+              IEnumerable<Result<IEnumerable<Result<Models.Institution, Errors>>, Errors>>
+                >,
+              Handlers.GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Component, Models.Institution, Aggregates.InstitutionAggregate, Events.ComponentManufacturerAdded>
+                >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.Component>,
+              IEnumerable<Result<IEnumerable<Result<Models.Component, Errors>>, Errors>>
+                >,
+              Handlers.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Institution, Models.Component, Aggregates.ComponentAggregate, Events.ComponentManufacturerAdded>
+                >();
         }
 
         public static void AddInstitutionRepresentativeAssociationHandlers(IServiceCollection services)
         {
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.InstitutionRepresentative>,
+              IEnumerable<Result<IEnumerable<Result<Models.InstitutionRepresentative, Errors>>, Errors>>
+                >,
+              Handlers.GetForwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<Models.Institution, Models.InstitutionRepresentative, Aggregates.InstitutionRepresentativeAggregate, Events.InstitutionRepresentativeAdded>
+                >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.User, Models.InstitutionRepresentative>,
+              IEnumerable<Result<IEnumerable<Result<Models.InstitutionRepresentative, Errors>>, Errors>>
+                >,
+              Handlers.GetBackwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<Models.User, Models.InstitutionRepresentative, Aggregates.InstitutionRepresentativeAggregate, Events.InstitutionRepresentativeAdded>
+                >();
+
+            // TODO Add the following.
+            /* services.AddScoped< */
+            /*   MediatR.IRequestHandler< */
+            /*   Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.User>, */
+            /*   IEnumerable<Result<IEnumerable<Result<Models.User, Errors>>, Errors>> */
+            /*     >, */
+            /*   Handlers.GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Institution, Models.User, Aggregates.UserAggregate, Events.InstitutionRepresentativeAdded> */
+            /*     >(); */
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.User, Models.Institution>,
+              IEnumerable<Result<IEnumerable<Result<Models.Institution, Errors>>, Errors>>
+                >,
+              Handlers.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.User, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionRepresentativeAdded>
+                >();
         }
 
         public static void AddMethodDeveloperAssociationHandlers(IServiceCollection services)
         {
-          services.AddScoped<
-            MediatR.IRequestHandler<
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Stakeholder>,
-            IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>
-              >,
-            Handlers.GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
-              >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Stakeholder>,
+              IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>
+                >,
+              Handlers.GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
+                >();
 
-          services.AddScoped<
-            MediatR.IRequestHandler<
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Person, Models.Method>,
-            IEnumerable<Result<IEnumerable<Result<Models.Method, Errors>>, Errors>>
-              >,
-            Handlers.GetMethodsDevelopedByStakeholdersIdentifiedByTimestampedIdsHandler<Models.Person, Events.PersonMethodDeveloperAdded>
-              >();
-          services.AddScoped<
-            MediatR.IRequestHandler<
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.Method>,
-            IEnumerable<Result<IEnumerable<Result<Models.Method, Errors>>, Errors>>
-              >,
-            Handlers.GetMethodsDevelopedByStakeholdersIdentifiedByTimestampedIdsHandler<Models.Institution, Events.InstitutionMethodDeveloperAdded>
-              >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Person, Models.Method>,
+              IEnumerable<Result<IEnumerable<Result<Models.Method, Errors>>, Errors>>
+                >,
+              Handlers.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Person, Models.Method, Aggregates.MethodAggregate, Events.PersonMethodDeveloperAdded>
+                >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.Method>,
+              IEnumerable<Result<IEnumerable<Result<Models.Method, Errors>>, Errors>>
+                >,
+              Handlers.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Institution, Models.Method, Aggregates.MethodAggregate, Events.InstitutionMethodDeveloperAdded>
+                >();
         }
 
         public static void AddPersonAffiliationAssociationHandlers(IServiceCollection services)
         {
-          services.AddScoped<
-            MediatR.IRequestHandler<
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.Person>,
-            IEnumerable<Result<IEnumerable<Result<Models.Person, Errors>>, Errors>>
-              >,
-            Handlers.GetPersonsAffiliatedWithInstitutionsIdentifiedByTimestampedIdsHandler
-              >();
-          services.AddScoped<
-            MediatR.IRequestHandler<
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Person, Models.Institution>,
-            IEnumerable<Result<IEnumerable<Result<Models.Institution, Errors>>, Errors>>
-              >,
-            Handlers.GetInstitutionsAffiliatedWithPersonsIdentifiedByTimestampedIdsHandler
-              >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Person, Models.Institution>,
+              IEnumerable<Result<IEnumerable<Result<Models.Institution, Errors>>, Errors>>
+                >,
+              Handlers.GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Person, Models.Institution, Aggregates.InstitutionAggregate, Events.PersonAffiliationAdded>
+                >();
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Institution, Models.Person>,
+              IEnumerable<Result<IEnumerable<Result<Models.Person, Errors>>, Errors>>
+                >,
+              Handlers.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Institution, Models.Person, Aggregates.PersonAggregate, Events.PersonAffiliationAdded>
+                >();
         }
     }
 }

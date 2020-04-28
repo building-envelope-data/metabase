@@ -20,8 +20,7 @@ using System;
 namespace Icon.Handlers
 {
     public abstract class GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociateModel, TAssociateAggregate>
-      : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>,
-        IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+      : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     {
         private readonly IAggregateRepository _repository;

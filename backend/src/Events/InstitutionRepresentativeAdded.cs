@@ -6,7 +6,7 @@ using Commands = Icon.Commands;
 namespace Icon.Events
 {
     public sealed class InstitutionRepresentativeAdded
-      : CreatedEvent
+      : AddedEvent
     {
         public static InstitutionRepresentativeAdded From(
             Guid institutionRepresentativeId,
@@ -22,8 +22,8 @@ namespace Icon.Events
                 );
         }
 
-        public Guid InstitutionId { get; set; }
-        public Guid UserId { get; set; }
+        public Guid InstitutionId { get => ParentId; set => ParentId = value; }
+        public Guid UserId { get => AssociateId; set => AssociateId = value; }
         public InstitutionRepresentativeRoleEventData Role { get; set; }
 
 #nullable disable
@@ -39,11 +39,11 @@ namespace Icon.Events
             )
           : base(
               aggregateId: institutionRepresentativeId,
+              parentId: institutionId,
+              associateId: userId,
               creatorId: creatorId
               )
         {
-            InstitutionId = institutionId;
-            UserId = userId;
             Role = role;
             EnsureValid();
         }
@@ -53,8 +53,6 @@ namespace Icon.Events
             return
               Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
-                  ValidateNonEmpty(UserId, nameof(UserId)),
                   ValidateNonNull(Role, nameof(Role))
                   );
         }

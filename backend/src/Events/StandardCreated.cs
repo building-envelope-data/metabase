@@ -66,7 +66,7 @@ namespace Icon.Events
             Guid creatorId
             )
           : base(
-              standardId: standardId,
+              aggregateId: standardId,
               creatorId: creatorId
               )
         {
