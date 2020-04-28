@@ -24,7 +24,7 @@ namespace Icon.Aggregates
 
         protected void ApplyData(Events.MethodDeveloperAdded data)
         {
-            Id = data.MethodDeveloperId;
+            Id = data.AggregateId;
             MethodId = data.MethodId;
             StakeholderId = data.StakeholderId;
         }

@@ -5,7 +5,8 @@ using Commands = Icon.Commands;
 
 namespace Icon.Events
 {
-    public sealed class ComponentManufacturerAdded : Event
+    public sealed class ComponentManufacturerAdded
+      : CreatedEvent
     {
         public static ComponentManufacturerAdded From(
               Guid componentManufacturerId,
@@ -21,7 +22,6 @@ namespace Icon.Events
                 );
         }
 
-        public Guid ComponentManufacturerId { get; set; }
         public Guid ComponentId { get; set; }
         public Guid InstitutionId { get; set; }
         public ComponentManufacturerMarketingInformationEventData? MarketingInformation { get; set; }
@@ -37,9 +37,11 @@ namespace Icon.Events
             ComponentManufacturerMarketingInformationEventData? marketingInformation,
             Guid creatorId
             )
-          : base(creatorId)
+          : base(
+              aggregateId: componentManufacturerId,
+              creatorId: creatorId
+              )
         {
-            ComponentManufacturerId = componentManufacturerId;
             ComponentId = componentId;
             InstitutionId = institutionId;
             MarketingInformation = marketingInformation;
@@ -51,7 +53,6 @@ namespace Icon.Events
             return
               Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(ComponentManufacturerId, nameof(ComponentManufacturerId)),
                   ValidateNonEmpty(ComponentId, nameof(ComponentId)),
                   ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
                   MarketingInformation?.Validate() ?? Result.Ok<bool, Errors>(true)

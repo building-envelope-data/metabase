@@ -52,7 +52,7 @@ namespace Icon.GraphQl
             State = state;
         }
 
-        public Task<IEnumerable<Component>> GetComponents(
+        public Task<IEnumerable<Component>> GetManufacturedComponents(
             [Parent] Institution institution,
             IResolverContext context
             )
@@ -61,7 +61,7 @@ namespace Icon.GraphQl
         }
 
         [UsePaging]
-        public Task<IReadOnlyList<Method>> GetMethods(
+        public Task<IReadOnlyList<Method>> GetDevelopedMethods(
             [Parent] Institution institution,
             [DataLoader] MethodsDevelopedByInstitutionIdentifiedByTimestampedIdDataLoader methodsLoader,
             IResolverContext context

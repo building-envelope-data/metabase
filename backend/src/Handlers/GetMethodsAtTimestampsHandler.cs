@@ -32,7 +32,7 @@ namespace Icon.Handlers
             )
         {
             return (await session.Query<Events.MethodCreated>()
-              .Select(e => e.MethodId)
+              .Select(e => e.AggregateId)
               .ToListAsync(cancellationToken))
               .Select(id => (ValueObjects.Id)id);
         }

@@ -27,7 +27,7 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.ComponentManufacturerId.NotEmpty();
+            Id = data.AggregateId.NotEmpty();
             ComponentId = data.ComponentId.NotEmpty();
             MarketingInformation = data.MarketingInformation is null ? null : ComponentManufacturerMarketingInformationAggregateData.From(data.MarketingInformation);
         }

@@ -17,9 +17,10 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
-    public abstract class GetModelsAtTimestampsHandler<M, A>
-      : IQueryHandler<Queries.GetModelsAtTimestamps<M>, IEnumerable<Result<IEnumerable<Result<M, Errors>>, Errors>>>
-      where A : class, IEventSourcedAggregate, IConvertible<M>, new()
+    public sealed class GetModelsAtTimestampsHandler<TModel, TAggregate, TCreatedEvent>
+      : IQueryHandler<Queries.GetModelsAtTimestamps<TModel>, IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
+      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TCreatedEvent : ICreatedEvent
     {
         private readonly IAggregateRepository _repository;
 
@@ -28,8 +29,8 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Result<IEnumerable<Result<M, Errors>>, Errors>>> Handle(
-            Queries.GetModelsAtTimestamps<M> query,
+        public async Task<IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>> Handle(
+            Queries.GetModelsAtTimestamps<TModel> query,
             CancellationToken cancellationToken
             )
         {
@@ -38,12 +39,12 @@ namespace Icon.Handlers
                 var possibleIds = await QueryModelIds(session, cancellationToken);
                 return
                   (await session
-                   .LoadAllThatExistedBatched<A>(
+                   .LoadAllThatExistedBatched<TAggregate>(
                      query.Timestamps.Select(timestamp => (timestamp, possibleIds)),
                      cancellationToken
                      )
                     ).Select(results =>
-                      Result.Ok<IEnumerable<Result<M, Errors>>, Errors>(
+                      Result.Ok<IEnumerable<Result<TModel, Errors>>, Errors>(
                         results.Select(result =>
                           result.Bind(a => a.ToModel())
                           )
@@ -52,9 +53,15 @@ namespace Icon.Handlers
             }
         }
 
-        protected abstract Task<IEnumerable<ValueObjects.Id>> QueryModelIds(
+        private async Task<IEnumerable<ValueObjects.Id>> QueryModelIds(
             IAggregateRepositoryReadOnlySession session,
             CancellationToken cancellationToken
-            );
+            )
+        {
+            return (await session.Query<TCreatedEvent>()
+              .Select(e => e.AggregateId)
+              .ToListAsync(cancellationToken))
+              .Select(id => (ValueObjects.Id)id);
+        }
     }
 }

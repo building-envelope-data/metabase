@@ -47,7 +47,7 @@ namespace Icon.GraphQl
             ContactInformation = contactInformation;
         }
 
-        public Task<IReadOnlyList<Method>> GetMethods(
+        public Task<IReadOnlyList<Method>> GetDevelopedMethods(
             [Parent] Person person,
             [DataLoader] MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader methodsLoader,
             IResolverContext context
@@ -64,6 +64,27 @@ namespace Icon.GraphQl
         {
             public MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
               : base(Method.FromModel, queryBus)
+            {
+            }
+        }
+
+        public Task<IReadOnlyList<Institution>> GetAffiliatedInstitutions(
+            [Parent] Person person,
+            [DataLoader] InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader institutionsLoader,
+            IResolverContext context
+            )
+        {
+            return institutionsLoader.LoadAsync(
+                TimestampId(person.Id, GraphQl.Timestamp.Fetch(context)),
+                default(CancellationToken)
+                );
+        }
+
+        public sealed class InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader
+            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.Person, Models.Institution>
+        {
+            public InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+              : base(Institution.FromModel, queryBus)
             {
             }
         }

@@ -15,7 +15,7 @@ using Commands = Icon.Commands;
 namespace Icon.Events
 {
     public sealed class DatabaseCreated
-      : Event
+      : CreatedEvent
     {
         public static DatabaseCreated From(
             Guid databaseId,
@@ -32,7 +32,6 @@ namespace Icon.Events
                 );
         }
 
-        public Guid DatabaseId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public Uri Locator { get; set; }
@@ -50,9 +49,11 @@ namespace Icon.Events
             Guid institutionId,
             Guid creatorId
             )
-          : base(creatorId)
+          : base(
+              aggregateId: databaseId,
+              creatorId: creatorId
+              )
         {
-            DatabaseId = databaseId;
             Name = name;
             Description = description;
             Locator = locator;
@@ -65,7 +66,6 @@ namespace Icon.Events
             return
               Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(DatabaseId, nameof(DatabaseId)),
                   ValidateNonNull(Name, nameof(Name)),
                   ValidateNonNull(Description, nameof(Description)),
                   ValidateNonNull(Locator, nameof(Locator)),

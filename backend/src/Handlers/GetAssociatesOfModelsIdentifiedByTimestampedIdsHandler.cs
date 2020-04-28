@@ -19,9 +19,10 @@ using System;
 
 namespace Icon.Handlers
 {
-    public abstract class GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<M, N, A>
-      : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<M, N>, IEnumerable<Result<IEnumerable<Result<N, Errors>>, Errors>>>
-      where A : class, IEventSourcedAggregate, IConvertible<N>, new()
+    public abstract class GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociateModel, TAssociateAggregate>
+      : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>,
+        IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+      where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     {
         private readonly IAggregateRepository _repository;
 
@@ -30,8 +31,8 @@ namespace Icon.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Result<IEnumerable<Result<N, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<M, N> query,
+        public async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
+            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel> query,
             CancellationToken cancellationToken
             )
         {
@@ -41,8 +42,8 @@ namespace Icon.Handlers
             }
         }
 
-        public async Task<IEnumerable<Result<IEnumerable<Result<N, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<M, N> query,
+        public async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
+            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel> query,
             IAggregateRepositoryReadOnlySession session,
             CancellationToken cancellationToken
             )
@@ -62,12 +63,12 @@ namespace Icon.Handlers
                     )
                   );
             return (await
-                session.LoadAllThatExistedBatched<A>(
+                session.LoadAllThatExistedBatched<TAssociateAggregate>(
                   timestampsAndAssociatesIds,
                   cancellationToken
                   )
                 ).Select(results =>
-                  Result.Ok<IEnumerable<Result<N, Errors>>, Errors>(
+                  Result.Ok<IEnumerable<Result<TAssociateModel, Errors>>, Errors>(
                     results.Select(result =>
                       result.Bind(a => a.ToModel())
                       )

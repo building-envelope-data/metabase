@@ -15,7 +15,8 @@ using Commands = Icon.Commands;
 
 namespace Icon.Events
 {
-    public sealed class StandardCreated : Event
+    public sealed class StandardCreated
+      : CreatedEvent
     {
         public static StandardCreated From(
             Guid standardId,
@@ -37,7 +38,6 @@ namespace Icon.Events
                 );
         }
 
-        public Guid StandardId { get; set; }
         public string Title { get; set; }
         public string Abstract { get; set; }
         public string Section { get; set; }
@@ -65,9 +65,11 @@ namespace Icon.Events
             Uri? locator,
             Guid creatorId
             )
-          : base(creatorId)
+          : base(
+              standardId: standardId,
+              creatorId: creatorId
+              )
         {
-            StandardId = standardId;
             Title = title;
             Abstract = @abstract;
             Section = section;
@@ -85,7 +87,6 @@ namespace Icon.Events
             return
               Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(StandardId, nameof(StandardId)),
                   ValidateNonNull(Title, nameof(Title)),
                   ValidateNonNull(Abstract, nameof(Abstract)),
                   ValidateNonNull(Section, nameof(Section)),

@@ -25,7 +25,7 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.DatabaseId;
+            Id = data.AggregateId;
             Name = data.Name;
             Description = data.Description;
             Locator = data.Locator;

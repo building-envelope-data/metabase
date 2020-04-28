@@ -6,9 +6,8 @@ using Commands = Icon.Commands;
 namespace Icon.Events
 {
     public abstract class MethodDeveloperAdded
-      : Event
+      : CreatedEvent
     {
-        public Guid MethodDeveloperId { get; set; }
         public Guid MethodId { get; set; }
         public Guid StakeholderId { get; set; }
 
@@ -22,9 +21,11 @@ namespace Icon.Events
             Guid stakeholderId,
             Guid creatorId
             )
-          : base(creatorId)
+          : base(
+              aggregateId: methodDeveloperId,
+              creatorId: creatorId
+              )
         {
-            MethodDeveloperId = methodDeveloperId;
             MethodId = methodId;
             StakeholderId = stakeholderId;
             EnsureValid();
@@ -35,7 +36,6 @@ namespace Icon.Events
             return
               Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(MethodDeveloperId, nameof(MethodDeveloperId)),
                   ValidateNonEmpty(MethodId, nameof(MethodId)),
                   ValidateNonEmpty(StakeholderId, nameof(StakeholderId))
                   );

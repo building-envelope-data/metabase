@@ -29,7 +29,7 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.MethodId;
+            Id = data.AggregateId;
             Name = data.Name;
             Description = data.Description;
             StandardId = data.StandardId;

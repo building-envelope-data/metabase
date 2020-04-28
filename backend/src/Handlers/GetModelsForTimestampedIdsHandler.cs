@@ -18,8 +18,8 @@ using CSharpFunctionalExtensions;
 namespace Icon.Handlers
 {
     public sealed class GetModelsForTimestampedIdsHandler<M, A>
-      : IQueryHandler<Queries.GetModelsForTimestampedIds<M>, IEnumerable<Result<M, Errors>>>
-      , IGetModelsForTimestampedIdsHandler
+      : IQueryHandler<Queries.GetModelsForTimestampedIds<M>, IEnumerable<Result<M, Errors>>>,
+        IGetModelsForTimestampedIdsHandler
       where M : Models.IModel
       where A : class, IEventSourcedAggregate, IConvertible<M>, new()
     {

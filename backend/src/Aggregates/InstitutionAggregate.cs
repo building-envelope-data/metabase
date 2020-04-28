@@ -25,7 +25,7 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.InstitutionId;
+            Id = data.AggregateId;
             Information = InstitutionInformationAggregateData.From(data.Information);
             PublicKey = data.PublicKey;
             State = data.State.ToModel();

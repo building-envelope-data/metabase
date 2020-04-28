@@ -14,7 +14,8 @@ using Commands = Icon.Commands;
 
 namespace Icon.Events
 {
-    public sealed class InstitutionCreated : Event
+    public sealed class InstitutionCreated
+      : CreatedEvent
     {
         public static InstitutionCreated From(
             Guid institutionId,
@@ -30,7 +31,6 @@ namespace Icon.Events
                 );
         }
 
-        public Guid InstitutionId { get; set; }
         public InstitutionInformationEventData Information { get; set; }
         public string? PublicKey { get; set; }
         public InstitutionStateEventData State { get; set; }
@@ -46,9 +46,11 @@ namespace Icon.Events
             InstitutionStateEventData state,
             Guid creatorId
             )
-          : base(creatorId)
+          : base(
+              institutionId: institutionId,
+              creatorId: creatorId
+              )
         {
-            InstitutionId = institutionId;
             Information = information;
             PublicKey = publicKey;
             State = state;
@@ -60,7 +62,6 @@ namespace Icon.Events
             return
               Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
                   Information.Validate(),
                   ValidateNonNull(State, nameof(State))
                   );

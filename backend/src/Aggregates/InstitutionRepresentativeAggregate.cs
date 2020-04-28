@@ -25,7 +25,7 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.InstitutionRepresentativeId;
+            Id = data.AggregateId;
             InstitutionId = data.InstitutionId;
             UserId = data.UserId;
             Role = data.Role.ToModel();

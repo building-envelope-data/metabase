@@ -15,7 +15,8 @@ using System.Linq;
 
 namespace Icon.Events
 {
-    public sealed class MethodCreated : Event
+    public sealed class MethodCreated
+      : CreatedEvent
     {
         public static MethodCreated From(
             Guid methodId,
@@ -34,7 +35,6 @@ namespace Icon.Events
                 );
         }
 
-        public Guid MethodId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public Guid? StandardId { get; set; }
@@ -56,9 +56,11 @@ namespace Icon.Events
             IReadOnlyCollection<MethodCategoryEventData> categories,
             Guid creatorId
             )
-          : base(creatorId)
+          : base(
+              aggregateId: methodId,
+              creatorId: creatorId
+              )
         {
-            MethodId = methodId;
             Name = name;
             Description = description;
             StandardId = standardId;
@@ -73,7 +75,6 @@ namespace Icon.Events
             return
               Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(MethodId, nameof(MethodId)),
                   ValidateNonNull(Name, nameof(Name)),
                   ValidateNonNull(Description, nameof(Description)),
                   ValidateNullOrNonEmpty(StandardId, nameof(StandardId)),

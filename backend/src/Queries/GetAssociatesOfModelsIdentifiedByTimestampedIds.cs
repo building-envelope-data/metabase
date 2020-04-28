@@ -9,8 +9,8 @@ using System.Linq;
 
 namespace Icon.Queries
 {
-    public sealed class GetAssociatesOfModelsIdentifiedByTimestampedIds<M, N>
-      : IQuery<IEnumerable<Result<IEnumerable<Result<N, Errors>>, Errors>>>
+    public sealed class GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>
+      : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
     {
         public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedModelIds { get; }
 
@@ -21,12 +21,12 @@ namespace Icon.Queries
             TimestampedModelIds = timestampedModelIds;
         }
 
-        public static Result<GetAssociatesOfModelsIdentifiedByTimestampedIds<M, N>, Errors> From(
+        public static Result<GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>, Errors> From(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
             )
         {
-            return Result.Ok<GetAssociatesOfModelsIdentifiedByTimestampedIds<M, N>, Errors>(
-                new GetAssociatesOfModelsIdentifiedByTimestampedIds<M, N>(
+            return Result.Ok<GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>, Errors>(
+                new GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>(
                   timestampedModelIds: timestampedModelIds
                   )
                 );

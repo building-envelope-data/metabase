@@ -63,45 +63,6 @@ namespace Icon.GraphQl
                 );
         }
 
-        public async Task<ComponentVersion> CreateComponentVersion(
-            CreateComponentVersionInput input,
-            IResolverContext resolverContext
-            )
-        {
-            var command = ResultHelpers.HandleFailure(
-                CreateComponentVersionInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                .Bind(validatedInput =>
-                  Commands.CreateComponentVersion.From(
-                    input: validatedInput,
-                    creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
-                    )
-                  )
-                );
-            var timestampedId = ResultHelpers.HandleFailure(
-                await _commandBus
-                .Send<
-                Commands.CreateComponentVersion,
-                Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            Timestamp.Store(timestampedId.Timestamp, resolverContext);
-            var query =
-              ResultHelpers.HandleFailure(
-                  Queries.GetComponentVersion.From(timestampedId)
-                  );
-            return
-              ComponentVersion.FromModel(
-                  ResultHelpers.HandleFailure(
-                    await _queryBus
-                    .Send<
-                    Queries.GetComponentVersion,
-                    Result<Models.ComponentVersion, Errors>
-                    >(query)
-                    ),
-                  timestampedId.Timestamp
-                  );
-        }
-
         public async Task<Database> CreateDatabase(
             CreateDatabaseInput input,
             [DataLoader] DatabaseForTimestampedIdDataLoader databaseLoader,
@@ -233,9 +194,6 @@ namespace Icon.GraphQl
         }
 
         /* ComponentAssembly */
-        /* ComponentVersionAssembly */
-        /* ComponentVersionManufacturer */
-        /* MethodVersion */
         public async Task<ComponentManufacturer> AddComponentManufacturer(
             AddComponentManufacturerInput input,
             [DataLoader] ComponentManufacturerForTimestampedIdDataLoader componentManufacturerLoader,

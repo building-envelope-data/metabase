@@ -26,7 +26,7 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.PersonId;
+            Id = data.AggregateId;
             Name = data.Name;
             PhoneNumber = data.PhoneNumber;
             PostalAddress = data.PostalAddress;

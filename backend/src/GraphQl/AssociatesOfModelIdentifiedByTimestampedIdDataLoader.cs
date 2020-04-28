@@ -13,13 +13,13 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public class AssociatesOfModelIdentifiedByTimestampedIdDataLoader<T, M, N>
-      : OurDataLoaderBase<ValueObjects.TimestampedId, IReadOnlyList<T>>
+    public class AssociatesOfModelIdentifiedByTimestampedIdDataLoader<TAssociateGraphQlObject, TModel, TAssociateModel>
+      : OurDataLoaderBase<ValueObjects.TimestampedId, IReadOnlyList<TAssociateGraphQlObject>>
     {
-        private readonly Func<N, ValueObjects.Timestamp, T> _mapAssociateModelToGraphQlObject;
+        private readonly Func<TAssociateModel, ValueObjects.Timestamp, TAssociateGraphQlObject> _mapAssociateModelToGraphQlObject;
 
         public AssociatesOfModelIdentifiedByTimestampedIdDataLoader(
-            Func<N, ValueObjects.Timestamp, T> mapAssociateModelToGraphQlObject,
+            Func<TAssociateModel, ValueObjects.Timestamp, TAssociateGraphQlObject> mapAssociateModelToGraphQlObject,
             IQueryBus queryBus
             )
           : base(queryBus)
@@ -27,21 +27,21 @@ namespace Icon.GraphQl
             _mapAssociateModelToGraphQlObject = mapAssociateModelToGraphQlObject;
         }
 
-        protected override async Task<IReadOnlyList<GreenDonut.Result<IReadOnlyList<T>>>> FetchAsync(
+        protected override async Task<IReadOnlyList<GreenDonut.Result<IReadOnlyList<TAssociateGraphQlObject>>>> FetchAsync(
             IReadOnlyList<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<M, N>.From(timestampedIds)
+                  Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>.From(timestampedIds)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<M, N>,
-                  IEnumerable<Result<IEnumerable<Result<N, Errors>>, Errors>>
+                  Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>,
+                  IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>
                >(query);
-            return ResultHelpers.ToDataLoaderResultsX<T>(
+            return ResultHelpers.ToDataLoaderResultsX<TAssociateGraphQlObject>(
                 timestampedIds.Zip(results, (timestampedId, result) =>
                   result.Map(associateResults =>
                     associateResults.Select(associateResult =>

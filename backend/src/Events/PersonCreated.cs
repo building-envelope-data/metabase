@@ -14,7 +14,8 @@ using Commands = Icon.Commands;
 
 namespace Icon.Events
 {
-    public sealed class PersonCreated : Event
+    public sealed class PersonCreated
+      : CreatedEvent
     {
         public static PersonCreated From(
             Guid personId,
@@ -32,7 +33,6 @@ namespace Icon.Events
                 );
         }
 
-        public Guid PersonId { get; set; }
         public string Name { get; set; }
         public string PhoneNumber { get; set; }
         public string PostalAddress { get; set; }
@@ -52,9 +52,11 @@ namespace Icon.Events
             Uri websiteLocator,
             Guid creatorId
             )
-          : base(creatorId)
+          : base(
+              aggregateId: personId,
+              creatorId: creatorId
+              )
         {
-            PersonId = personId;
             Name = name;
             PhoneNumber = phoneNumber;
             PostalAddress = postalAddress;
@@ -68,7 +70,6 @@ namespace Icon.Events
             return
               Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(PersonId, nameof(PersonId)),
                   ValidateNonNull(Name, nameof(Name)),
                   ValidateNonNull(PhoneNumber, nameof(PhoneNumber)),
                   ValidateNonNull(PostalAddress, nameof(PostalAddress)),

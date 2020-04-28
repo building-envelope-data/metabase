@@ -32,7 +32,7 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.StandardId;
+            Id = data.AggregateId;
             Title = data.Title;
             Abstract = data.Abstract;
             Section = data.Section;

@@ -22,7 +22,7 @@ namespace Icon.Aggregates
         {
             ApplyMeta(@event);
             var data = @event.Data;
-            Id = data.ComponentId;
+            Id = data.AggregateId;
             Information = ComponentInformationAggregateData.From(data.Information);
         }
 
