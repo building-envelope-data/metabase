@@ -2,6 +2,7 @@ using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
 using Guid = System.Guid;
 using Commands = Icon.Commands;
+using Newtonsoft.Json;
 
 namespace Icon.Events
 {
@@ -22,8 +23,12 @@ namespace Icon.Events
                 );
         }
 
+        [JsonIgnore]
         public Guid ComponentId { get => ParentId; set => ParentId = value; }
+
+        [JsonIgnore]
         public Guid InstitutionId { get => AssociateId; set => AssociateId = value; }
+
         public ComponentManufacturerMarketingInformationEventData? MarketingInformation { get; set; }
 
 #nullable disable
