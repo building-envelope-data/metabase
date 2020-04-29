@@ -6,12 +6,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Icon.Models
 {
-    public class User : IdentityUser<Guid>, IModel
+    public class User : IdentityUser<Guid>// , IModel
     {
-        public ValueObjects.Id Id { get; }
-        public ValueObjects.Timestamp Timestamp { get; }
+        /* [NotMapped] */
+        /* public ValueObjects.Id Id { get; } */
 
-        /* public ICollection<Product> Products { get; set; } */
-        /* public ICollection<MeasurementMethod> MeasurementMethods { get; set; } */
+        /* [NotMapped] */
+        /* public ValueObjects.Timestamp Timestamp { get; } */
     }
 }
