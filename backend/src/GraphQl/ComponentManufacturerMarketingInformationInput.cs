@@ -3,7 +3,6 @@ using System.Linq;
 using Errors = Icon.Errors;
 using Array = System.Array;
 using Validatable = Icon.Validatable;
-using Guid = System.Guid;
 using DateTime = System.DateTime;
 using CSharpFunctionalExtensions;
 using IError = HotChocolate.IError;

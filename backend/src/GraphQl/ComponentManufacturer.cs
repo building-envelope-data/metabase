@@ -1,4 +1,3 @@
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 
@@ -22,17 +21,17 @@ namespace Icon.GraphQl
                 );
         }
 
-        public Guid ComponentId { get; }
-        public Guid InstitutionId { get; }
+        public ValueObjects.Id ComponentId { get; }
+        public ValueObjects.Id InstitutionId { get; }
         public ComponentManufacturerMarketingInformation? MarketingInformation { get; }
 
         public ComponentManufacturer(
-            Guid id,
-            Guid componentId,
-            Guid institutionId,
+            ValueObjects.Id id,
+            ValueObjects.Id componentId,
+            ValueObjects.Id institutionId,
             ComponentManufacturerMarketingInformation? marketingInformation,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,

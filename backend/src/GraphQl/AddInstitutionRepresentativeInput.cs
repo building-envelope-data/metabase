@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Errors = Icon.Errors;
-using Guid = System.Guid;
 using ValueObjects = Icon.ValueObjects;
 using CSharpFunctionalExtensions;
 
@@ -9,13 +8,13 @@ namespace Icon.GraphQl
 {
     public sealed class AddInstitutionRepresentativeInput
     {
-        public Guid InstitutionId { get; }
-        public Guid UserId { get; }
+        public ValueObjects.Id InstitutionId { get; }
+        public ValueObjects.Id UserId { get; }
         public ValueObjects.InstitutionRepresentativeRole Role { get; }
 
         private AddInstitutionRepresentativeInput(
-            Guid institutionId,
-            Guid userId,
+            ValueObjects.Id institutionId,
+            ValueObjects.Id userId,
             ValueObjects.InstitutionRepresentativeRole role
             )
         {
@@ -29,27 +28,11 @@ namespace Icon.GraphQl
             IReadOnlyList<object> path
             )
         {
-            var institutionIdResult = ValueObjects.Id.From(
-                self.InstitutionId,
-                path.Append("institutionId").ToList().AsReadOnly()
-                );
-            var userIdResult = ValueObjects.Id.From(
-                self.UserId,
-                path.Append("userId").ToList().AsReadOnly()
-                );
-
-            return
-              Errors.CombineExistent(
-                  institutionIdResult,
-                  userIdResult
-                  )
-              .Bind(_ =>
-                  ValueObjects.AddInstitutionRepresentativeInput.From(
-                    institutionId: institutionIdResult.Value,
-                    userId: userIdResult.Value,
+            return ValueObjects.AddInstitutionRepresentativeInput.From(
+                    institutionId: self.InstitutionId,
+                    userId: self.UserId,
                     role: self.Role
-                    )
-                  );
+                    );
         }
     }
 }

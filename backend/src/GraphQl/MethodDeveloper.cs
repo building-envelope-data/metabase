@@ -1,4 +1,3 @@
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 
@@ -21,15 +20,15 @@ namespace Icon.GraphQl
                 );
         }
 
-        public Guid MethodId { get; }
-        public Guid StakeholderId { get; }
+        public ValueObjects.Id MethodId { get; }
+        public ValueObjects.Id StakeholderId { get; }
 
         public MethodDeveloper(
-            Guid id,
-            Guid methodId,
-            Guid stakeholderId,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Id id,
+            ValueObjects.Id methodId,
+            ValueObjects.Id stakeholderId,
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,

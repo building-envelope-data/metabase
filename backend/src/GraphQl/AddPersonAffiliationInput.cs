@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Guid = System.Guid;
 using ValueObjects = Icon.ValueObjects;
 using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
@@ -9,12 +8,12 @@ namespace Icon.GraphQl
 {
     public sealed class AddPersonAffiliationInput
     {
-        public Guid PersonId { get; }
-        public Guid InstitutionId { get; }
+        public ValueObjects.Id PersonId { get; }
+        public ValueObjects.Id InstitutionId { get; }
 
         private AddPersonAffiliationInput(
-            Guid personId,
-            Guid institutionId
+            ValueObjects.Id personId,
+            ValueObjects.Id institutionId
             )
         {
             PersonId = personId;
@@ -26,25 +25,9 @@ namespace Icon.GraphQl
             IReadOnlyList<object> path
             )
         {
-            var personIdResult = ValueObjects.Id.From(
-                self.PersonId,
-                path.Append("personId").ToList().AsReadOnly()
-                );
-            var institutionIdResult = ValueObjects.Id.From(
-                self.InstitutionId,
-                path.Append("institutionId").ToList().AsReadOnly()
-                );
-
-            return
-              Errors.Combine(
-                  personIdResult,
-                  institutionIdResult
-                  )
-              .Bind(_ =>
-                  ValueObjects.AddPersonAffiliationInput.From(
-                    personId: personIdResult.Value,
-                    institutionId: institutionIdResult.Value
-                    )
+            return ValueObjects.AddPersonAffiliationInput.From(
+                    personId: self.PersonId,
+                    institutionId: self.InstitutionId
                   );
         }
     }

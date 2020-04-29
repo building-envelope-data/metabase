@@ -1,12 +1,13 @@
-using DateTime = System.DateTime;
+using GreenDonut;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.GraphQl
 {
     public abstract class Payload
     {
-        public DateTime Timestamp { get; }
+        public ValueObjects.Timestamp Timestamp { get; } // TODO? Better name it `requestTimestamp` or `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
 
-        public Payload(DateTime timestamp)
+        public Payload(ValueObjects.Timestamp timestamp)
         {
             Timestamp = timestamp;
         }

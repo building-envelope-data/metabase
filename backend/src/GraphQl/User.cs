@@ -1,4 +1,3 @@
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 using CancellationToken = System.Threading.CancellationToken;
@@ -7,6 +6,7 @@ using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
 using IResolverContext = HotChocolate.Resolvers.IResolverContext;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GreenDonut;
 
 namespace Icon.GraphQl
 {
@@ -18,18 +18,18 @@ namespace Icon.GraphQl
             ValueObjects.Timestamp requestTimestamp
             )
         {
-            // TODO Event source user and use its timestamp
+            // TODO Event source user, use its safe id, and use its timestamp
             return new User(
-                id: model.Id,
-                timestamp: DateTime.MinValue,
+                id: ValueObjects.Id.From(model.Id).Value, // TODO Don't use `Value` as it may cause run-time errors.
+                timestamp: ValueObjects.Timestamp.Now,
                 requestTimestamp: requestTimestamp
                 );
         }
 
         public User(
-            Guid id,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,
@@ -48,8 +48,7 @@ namespace Icon.GraphQl
             )
         {
             return representedInstitutionsLoader.LoadAsync(
-                TimestampId(user.Id, GraphQl.Timestamp.Fetch(context)),
-                default(CancellationToken)
+                TimestampHelpers.TimestampId(user.Id, TimestampHelpers.Fetch(context))
                 );
         }
 

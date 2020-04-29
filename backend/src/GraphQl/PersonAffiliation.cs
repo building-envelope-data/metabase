@@ -1,4 +1,3 @@
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 
@@ -21,15 +20,15 @@ namespace Icon.GraphQl
                 );
         }
 
-        public Guid PersonId { get; }
-        public Guid InstitutionId { get; }
+        public ValueObjects.Id PersonId { get; }
+        public ValueObjects.Id InstitutionId { get; }
 
         public PersonAffiliation(
-            Guid id,
-            Guid personId,
-            Guid institutionId,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Id id,
+            ValueObjects.Id personId,
+            ValueObjects.Id institutionId,
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,

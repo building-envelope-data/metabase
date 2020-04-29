@@ -13,13 +13,13 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public class ModelsAtTimestampDataLoader<T, M>
-      : OurDataLoaderBase<ValueObjects.Timestamp, IReadOnlyList<T>>
+    public class ModelsAtTimestampDataLoader<TGraphQlObject, TModel>
+      : OurDataLoaderBase<ValueObjects.Timestamp, IReadOnlyList<TGraphQlObject>>
     {
-        private readonly Func<M, ValueObjects.Timestamp, T> _mapModelToGraphQlObject;
+        private readonly Func<TModel, ValueObjects.Timestamp, TGraphQlObject> _mapModelToGraphQlObject;
 
         public ModelsAtTimestampDataLoader(
-            Func<M, ValueObjects.Timestamp, T> mapModelToGraphQlObject,
+            Func<TModel, ValueObjects.Timestamp, TGraphQlObject> mapModelToGraphQlObject,
             IQueryBus queryBus
             )
           : base(queryBus)
@@ -27,21 +27,21 @@ namespace Icon.GraphQl
             _mapModelToGraphQlObject = mapModelToGraphQlObject;
         }
 
-        protected override async Task<IReadOnlyList<GreenDonut.Result<IReadOnlyList<T>>>> FetchAsync(
+        protected override async Task<IReadOnlyList<GreenDonut.Result<IReadOnlyList<TGraphQlObject>>>> FetchAsync(
             IReadOnlyList<ValueObjects.Timestamp> timestamps,
             CancellationToken cancellationToken
             )
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.GetModelsAtTimestamps<M>.From(timestamps)
+                  Queries.GetModelsAtTimestamps<TModel>.From(timestamps)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.GetModelsAtTimestamps<M>,
-                  IEnumerable<Result<IEnumerable<Result<M, Errors>>, Errors>>
+                  Queries.GetModelsAtTimestamps<TModel>,
+                  IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>
                >(query);
-            return ResultHelpers.ToDataLoaderResultsX<T>(
+            return ResultHelpers.ToDataLoaderResultsX<TGraphQlObject>(
                 timestamps.Zip(results, (timestamp, result) =>
                   result.Map(associateResults =>
                     associateResults.Select(associateResult =>

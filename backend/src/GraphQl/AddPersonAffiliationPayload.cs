@@ -1,3 +1,4 @@
+using GreenDonut;
 using DateTime = System.DateTime;
 
 namespace Icon.GraphQl
@@ -11,7 +12,7 @@ namespace Icon.GraphQl
         public AddPersonAffiliationPayload(
             Person person,
             Institution institution,
-            DateTime timestamp
+            ValueObjects.Timestamp timestamp
             )
           : base(timestamp)
         {

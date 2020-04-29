@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Guid = System.Guid;
 using ValueObjects = Icon.ValueObjects;
 using Uri = System.Uri;
 using CSharpFunctionalExtensions;
@@ -11,7 +10,7 @@ namespace Icon.GraphQl
     {
         public string Name { get; }
         public string Description { get; }
-        public Guid? StandardId { get; }
+        public ValueObjects.Id? StandardId { get; }
         public Uri? PublicationLocator { get; }
         public Uri? CodeLocator { get; }
         public IReadOnlyCollection<ValueObjects.MethodCategory> Categories { get; }
@@ -19,7 +18,7 @@ namespace Icon.GraphQl
         public CreateMethodInput(
             string name,
             string description,
-            Guid? standardId,
+            ValueObjects.Id? standardId,
             Uri? publicationLocator,
             Uri? codeLocator,
             IReadOnlyCollection<ValueObjects.MethodCategory> categories
@@ -49,10 +48,6 @@ namespace Icon.GraphQl
                 self.Description,
                 path.Append("description").ToList().AsReadOnly()
                 );
-            var standardIdResult = ValueObjects.Id.MaybeFrom(
-                self.StandardId,
-                path.Append("standardId").ToList().AsReadOnly()
-                );
             var publicationLocatorResult = ValueObjects.AbsoluteUri.MaybeFrom(
                 self.PublicationLocator,
                 path.Append("publicationLocator").ToList().AsReadOnly()
@@ -66,7 +61,6 @@ namespace Icon.GraphQl
               Errors.CombineExistent(
                   nameResult,
                   descriptionResult,
-                  standardIdResult,
                   publicationLocatorResult,
                   codeLocatorResult
                   )
@@ -74,7 +68,7 @@ namespace Icon.GraphQl
                   ValueObjects.CreateMethodInput.From(
                     name: nameResult.Value,
                     description: descriptionResult.Value,
-                    standardId: standardIdResult?.Value,
+                    standardId: self.StandardId,
                     publicationLocator: publicationLocatorResult?.Value,
                     codeLocator: codeLocatorResult?.Value,
                     categories: self.Categories

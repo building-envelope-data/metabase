@@ -1,4 +1,3 @@
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 using Exception = System.Exception;
@@ -9,8 +8,8 @@ namespace Icon.GraphQl
       : Node
     {
         protected static ValueObjects.TimestampedId TimestampId(
-            Guid id,
-            DateTime timestamp
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp
             )
         {
             return ResultHelpers.HandleFailure(
@@ -41,8 +40,6 @@ namespace Icon.GraphQl
                 return Method.FromModel(method, requestTimestamp);
             if (model is Models.MethodDeveloper methodDeveloper)
                 return MethodDeveloper.FromModel(methodDeveloper, requestTimestamp);
-            if (model is Models.MethodVersion methodVersion)
-                return MethodVersion.FromModel(methodVersion, requestTimestamp);
             if (model is Models.PersonAffiliation personAffiliation)
                 return PersonAffiliation.FromModel(personAffiliation, requestTimestamp);
             if (model is Models.Person person)
@@ -54,14 +51,14 @@ namespace Icon.GraphQl
             throw new Exception($"The model {model} fell through");
         }
 
-        public Guid Id { get; }
-        public DateTime Timestamp { get; }
-        public DateTime RequestTimestamp { get; } // TODO? Better name it `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
+        public ValueObjects.Id Id { get; }
+        public ValueObjects.Timestamp Timestamp { get; }
+        public ValueObjects.Timestamp RequestTimestamp { get; } // TODO? Better name it `requestTimestamp` or `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
 
         public NodeBase(
-            Guid id,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
         {
             Id = id;

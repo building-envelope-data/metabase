@@ -43,7 +43,7 @@ namespace Icon.GraphQl
                 .Bind(async validatedInput =>
                   await Commands.CreateComponent.From(
                     input: validatedInput,
-                    creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                    creatorId: ValueObjects.Id.New() // TODO Use current user!
                     )
                   .Bind(async command =>
                     await (await _commandBus
@@ -54,7 +54,7 @@ namespace Icon.GraphQl
                       )
                     .Map(async timestampedId =>
                       {
-                          Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+                          TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
                           return await componentLoader.LoadAsync(timestampedId);
                       }
                       )
@@ -74,7 +74,7 @@ namespace Icon.GraphQl
                 .Bind(validatedInput =>
                   Commands.CreateDatabase.From(
                     input: validatedInput,
-                    creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                    creatorId: ValueObjects.Id.New() // TODO Use current user!
                     )
                   )
                 );
@@ -85,7 +85,7 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await databaseLoader.LoadAsync(timestampedId);
         }
 
@@ -100,7 +100,7 @@ namespace Icon.GraphQl
                 .Bind(validatedInput =>
                   Commands.CreateInstitution.From(
                     input: validatedInput,
-                    creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                    creatorId: ValueObjects.Id.New() // TODO Use current user!
                     )
                   )
                 );
@@ -111,7 +111,7 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await institutionLoader.LoadAsync(timestampedId);
         }
 
@@ -126,7 +126,7 @@ namespace Icon.GraphQl
                 .Bind(validatedInput =>
                   Commands.CreateMethod.From(
                     input: validatedInput,
-                    creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                    creatorId: ValueObjects.Id.New() // TODO Use current user!
                     )
                   )
                 );
@@ -137,7 +137,7 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await methodLoader.LoadAsync(timestampedId);
         }
 
@@ -152,7 +152,7 @@ namespace Icon.GraphQl
                   .Bind(validatedInput =>
                     Commands.CreatePerson.From(
                       input: validatedInput,
-                      creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
                       )
                     )
                   );
@@ -163,7 +163,7 @@ namespace Icon.GraphQl
               Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await personLoader.LoadAsync(timestampedId);
         }
 
@@ -178,7 +178,7 @@ namespace Icon.GraphQl
                   .Bind(validatedInput =>
                     Commands.CreateStandard.From(
                       input: validatedInput,
-                      creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
                       )
                     )
                   );
@@ -189,7 +189,7 @@ namespace Icon.GraphQl
               Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await standardLoader.LoadAsync(timestampedId);
         }
 
@@ -205,7 +205,7 @@ namespace Icon.GraphQl
                   .Bind(validatedInput =>
                     Commands.AddComponentManufacturer.From(
                       input: validatedInput,
-                      creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
                       )
                     )
                   );
@@ -217,7 +217,7 @@ namespace Icon.GraphQl
                 >(command)
                 );
             var timestamp = timestampedId.Timestamp;
-            Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await componentManufacturerLoader.LoadAsync(timestampedId);
         }
 
@@ -232,7 +232,7 @@ namespace Icon.GraphQl
                   .Bind(validatedInput =>
                     Commands.AddInstitutionRepresentative.From(
                       input: validatedInput,
-                      creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
                       )
                     )
                   );
@@ -244,15 +244,13 @@ namespace Icon.GraphQl
                 >(command)
                 );
             var timestamp = timestampedId.Timestamp;
-            Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await institutionRepresentativeLoader.LoadAsync(timestampedId);
         }
 
         public async Task<AddMethodDeveloperPayload> AddMethodDeveloper(
             AddMethodDeveloperInput input,
             [DataLoader] MethodDeveloperForTimestampedIdDataLoader methodDeveloperLoader,
-            [DataLoader] MethodForTimestampedIdDataLoader methodLoader,
-            [DataLoader] StakeholderForTimestampedIdDataLoader stakeholderLoader,
             IResolverContext resolverContext
             )
         {
@@ -261,7 +259,7 @@ namespace Icon.GraphQl
                   .Bind(validatedInput =>
                     Commands.AddMethodDeveloper.From(
                       input: validatedInput,
-                      creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
                       )
                     )
                   );
@@ -273,17 +271,12 @@ namespace Icon.GraphQl
                 >(command)
                 );
             var timestamp = timestampedId.Timestamp;
-            Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             var methodDeveloper = await methodDeveloperLoader.LoadAsync(timestampedId);
-            // We could use a resolver for method and stakeholder of the payload `AddMethodDeveloperPayload` instead of fetching method and payload here. The payload would then only have `methodId` and `stakeholderId` instead of `method` and `stakeholder`.
             return new AddMethodDeveloperPayload(
-                await methodLoader.LoadAsync(
-                  TimestampId(methodDeveloper.MethodId, timestamp)
-                  ),
-                await stakeholderLoader.LoadAsync(
-                  TimestampId(methodDeveloper.StakeholderId, timestamp)
-                  ),
-                timestamp
+                methodId: methodDeveloper.MethodId,
+                stakeholderId: methodDeveloper.StakeholderId,
+                timestamp: timestamp
                 );
         }
 
@@ -300,7 +293,7 @@ namespace Icon.GraphQl
                   .Bind(validatedInput =>
                     Commands.AddPersonAffiliation.From(
                       input: validatedInput,
-                      creatorId: ValueObjects.Id.From(Guid.NewGuid()).Value // TODO Use current user!
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
                       )
                     )
                   );
@@ -312,15 +305,15 @@ namespace Icon.GraphQl
                 >(command)
                 );
             var timestamp = timestampedId.Timestamp;
-            Timestamp.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
+            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             var personAffiliation = await personAffiliationLoader.LoadAsync(timestampedId);
             // We could use a resolver for person and institution of the payload `AddPersonAffiliationPayload` instead of fetching person and payload here. The payload would then only have `personId` and `institutionId` instead of `person` and `institution`.
             return new AddPersonAffiliationPayload(
                 await personLoader.LoadAsync(
-                  TimestampId(personAffiliation.PersonId, timestamp)
+                  TimestampHelpers.TimestampId(personAffiliation.PersonId, timestamp)
                   ),
                 await institutionLoader.LoadAsync(
-                  TimestampId(personAffiliation.InstitutionId, timestamp)
+                  TimestampHelpers.TimestampId(personAffiliation.InstitutionId, timestamp)
                   ),
                 timestamp
                 );

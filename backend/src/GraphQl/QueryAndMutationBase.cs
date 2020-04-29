@@ -22,15 +22,15 @@ namespace Icon.GraphQl
             IResolverContext resolverContext
             )
         {
-            var timestampResult = Timestamp.Sanitize(
+            var timestampResult = TimestampHelpers.Sanitize(
                 timestamp,
-                Timestamp.FetchRequest(resolverContext)
+                TimestampHelpers.FetchRequest(resolverContext)
                 );
             if (timestampResult.IsFailure)
             {
                 throw new QueryException(timestampResult.Error);
             }
-            Timestamp.Store(timestampResult.Value, resolverContext);
+            TimestampHelpers.Store(timestampResult.Value, resolverContext);
             return timestampResult.Value;
         }
 
@@ -39,7 +39,7 @@ namespace Icon.GraphQl
         // in queries, the latter is used in mutations. Make this distinction
         // obvious from the naming.
         protected ValueObjects.TimestampedId TimestampId(
-            Guid id,
+            ValueObjects.Id id,
             DateTime? timestamp,
             IResolverContext resolverContext
             )
@@ -48,18 +48,6 @@ namespace Icon.GraphQl
             return ResultHelpers.HandleFailure(
                 ValueObjects.TimestampedId.From(
                   id, requestTimestamp
-                  )
-                );
-        }
-
-        protected ValueObjects.TimestampedId TimestampId(
-            Guid id,
-            DateTime timestamp
-            )
-        {
-            return ResultHelpers.HandleFailure(
-                ValueObjects.TimestampedId.From(
-                  id, timestamp
                   )
                 );
         }

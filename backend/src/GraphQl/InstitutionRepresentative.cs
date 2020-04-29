@@ -1,5 +1,4 @@
 using ValueObjects = Icon.ValueObjects;
-using Guid = System.Guid;
 using DateTime = System.DateTime;
 
 namespace Icon.GraphQl
@@ -22,17 +21,17 @@ namespace Icon.GraphQl
                 );
         }
 
-        public Guid InstitutionId { get; }
-        public Guid UserId { get; }
+        public ValueObjects.Id InstitutionId { get; }
+        public ValueObjects.Id UserId { get; }
         public ValueObjects.InstitutionRepresentativeRole Role { get; }
 
         public InstitutionRepresentative(
-            Guid id,
-            Guid institutionId,
-            Guid userId,
+            ValueObjects.Id id,
+            ValueObjects.Id institutionId,
+            ValueObjects.Id userId,
             ValueObjects.InstitutionRepresentativeRole role,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,

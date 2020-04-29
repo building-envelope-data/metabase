@@ -1,5 +1,4 @@
 using Icon.Infrastructure.Query;
-using Guid = System.Guid;
 using DateTime = System.DateTime;
 
 namespace Icon.GraphQl
@@ -14,8 +13,8 @@ namespace Icon.GraphQl
         }
 
         protected ValueObjects.TimestampedId TimestampId(
-            Guid id,
-            DateTime timestamp
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp
             )
         {
             return ResultHelpers.HandleFailure(

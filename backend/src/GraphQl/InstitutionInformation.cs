@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Uri = System.Uri;
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 

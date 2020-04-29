@@ -38,6 +38,9 @@ namespace Icon.Configuration
                   // enable the authorization middleware.
                   .AddAuthorizeDirectiveType()
 
+                  .BindClrType<ValueObjects.Id, GraphQlX.NonEmptyUuidType>()
+                  .BindClrType<ValueObjects.Timestamp, GraphQlX.TimestampType>()
+
                   .AddQueryType<GraphQlX.Query>()
                   .AddMutationType<GraphQlX.Mutation>()
                   /* .AddSubscriptionType<SubscriptionType>() */
@@ -63,7 +66,7 @@ namespace Icon.Configuration
                 /* identity.AddClaim(new Claim(ClaimTypes.Country, "us")); */
                 /* ctx.User = new ClaimsPrincipal(identity); */
                 /* builder.SetProperty(nameof(ClaimsPrincipal), ctx.User); */
-                GraphQlX.Timestamp.StoreRequest(
+                GraphQlX.TimestampHelpers.StoreRequest(
                     ValueObjects.Timestamp.Now,
                     requestBuilder
                     );

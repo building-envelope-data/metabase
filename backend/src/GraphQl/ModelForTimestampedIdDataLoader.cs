@@ -13,13 +13,13 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public class ModelForTimestampedIdDataLoader<T, M>
-      : OurDataLoaderBase<ValueObjects.TimestampedId, T>
+    public class ModelForTimestampedIdDataLoader<TGraphQlObject, TModel>
+      : OurDataLoaderBase<ValueObjects.TimestampedId, TGraphQlObject>
     {
-        private readonly Func<M, ValueObjects.Timestamp, T> _mapModelToGraphQlObject;
+        private readonly Func<TModel, ValueObjects.Timestamp, TGraphQlObject> _mapModelToGraphQlObject;
 
         public ModelForTimestampedIdDataLoader(
-            Func<M, ValueObjects.Timestamp, T> mapModelToGraphQlObject,
+            Func<TModel, ValueObjects.Timestamp, TGraphQlObject> mapModelToGraphQlObject,
             IQueryBus queryBus
             )
           : base(queryBus)
@@ -27,24 +27,22 @@ namespace Icon.GraphQl
             _mapModelToGraphQlObject = mapModelToGraphQlObject;
         }
 
-        protected override async Task<IReadOnlyList<GreenDonut.Result<T>>> FetchAsync(
+        protected override async Task<IReadOnlyList<GreenDonut.Result<TGraphQlObject>>> FetchAsync(
             IReadOnlyList<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken)
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.GetModelsForTimestampedIds<M>.From(timestampedIds)
+                  Queries.GetModelsForTimestampedIds<TModel>.From(timestampedIds)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.GetModelsForTimestampedIds<M>,
-                  IEnumerable<Result<M, Errors>>
+                  Queries.GetModelsForTimestampedIds<TModel>,
+                  IEnumerable<Result<TModel, Errors>>
                >(query);
-            return ResultHelpers.ToDataLoaderResults<T>(
-                timestampedIds.Zip(
-                  results,
-                  (timestampedId, result) =>
-                    result.Map(m => _mapModelToGraphQlObject(m, timestampedId.Timestamp))
+            return ResultHelpers.ToDataLoaderResults<TGraphQlObject>(
+                timestampedIds.Zip(results, (timestampedId, result) =>
+                  result.Map(m => _mapModelToGraphQlObject(m, timestampedId.Timestamp))
                   )
                 );
         }

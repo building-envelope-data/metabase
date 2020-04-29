@@ -29,7 +29,7 @@ namespace Icon.GraphQl
 
         // TODO Use `EnableRelaySupport` in `Icon.Configuration.GraphQl` instead
         public Task<Node> GetNode(
-            Guid id,
+            ValueObjects.Id id,
             DateTime? timestamp,
             [DataLoader] NodeForTimestampedIdDataLoader nodeLoader,
             IResolverContext resolverContext
@@ -52,7 +52,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Component> GetComponent(
-            Guid id,
+            ValueObjects.Id id,
             DateTime? timestamp,
             [DataLoader] ComponentForTimestampedIdDataLoader componentLoader,
             IResolverContext resolverContext
@@ -75,7 +75,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Database> GetDatabase(
-            Guid id,
+            ValueObjects.Id id,
             DateTime? timestamp,
             [DataLoader] DatabaseForTimestampedIdDataLoader databaseLoader,
             IResolverContext resolverContext
@@ -98,7 +98,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Institution> GetInstitution(
-            Guid id,
+            ValueObjects.Id id,
             DateTime? timestamp,
             [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader,
             IResolverContext resolverContext
@@ -121,7 +121,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Method> GetMethod(
-            Guid id,
+            ValueObjects.Id id,
             DateTime? timestamp,
             [DataLoader] MethodForTimestampedIdDataLoader methodLoader,
             IResolverContext resolverContext
@@ -144,7 +144,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Person> GetPerson(
-            Guid id,
+            ValueObjects.Id id,
             DateTime? timestamp,
             [DataLoader] PersonForTimestampedIdDataLoader personLoader,
             IResolverContext resolverContext
@@ -155,13 +155,7 @@ namespace Icon.GraphQl
                 );
         }
 
-        /* public Task<IReadOnlyList<StakeholderBase>> GetStakeholders( */
-        /*     DateTime? timestamp, */
-        /*     IResolverContext resolverContext */
-        /*     ) */
-        /* { */
-        /*   return null!; */
-        /* } */
+        // TODO GetStakeholder and GetStakeholders
 
         public Task<IReadOnlyList<Standard>> GetStandards(
             DateTime? timestamp,
@@ -175,7 +169,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Standard> GetStandard(
-            Guid id,
+            ValueObjects.Id id,
             DateTime? timestamp,
             [DataLoader] StandardForTimestampedIdDataLoader standardLoader,
             IResolverContext resolverContext

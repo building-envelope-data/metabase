@@ -1,5 +1,4 @@
 using Uri = System.Uri;
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 
@@ -27,16 +26,16 @@ namespace Icon.GraphQl
         public string Name { get; }
         public string Description { get; }
         public Uri Locator { get; }
-        public Guid InstitutionId { get; }
+        public ValueObjects.Id InstitutionId { get; }
 
         public Database(
-            Guid id,
+            ValueObjects.Id id,
             string name,
             string description,
             Uri locator,
-            Guid institutionId,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Id institutionId,
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,

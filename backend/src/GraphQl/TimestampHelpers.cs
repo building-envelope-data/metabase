@@ -15,7 +15,7 @@ using HotChocolate.Execution;
 
 namespace Icon.GraphQl
 {
-    public sealed class Timestamp
+    public static class TimestampHelpers
     {
         public static Result<ValueObjects.Timestamp, Errors> Sanitize(
             DateTime? maybeTimestamp,
@@ -53,6 +53,18 @@ namespace Icon.GraphQl
         public static ValueObjects.Timestamp Fetch(IResolverContext context)
         {
             return (ValueObjects.Timestamp)context.ScopedContextData["timestamp"];
+        }
+
+        public static ValueObjects.TimestampedId TimestampId(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp
+            )
+        {
+            return ResultHelpers.HandleFailure(
+                ValueObjects.TimestampedId.From(
+                  id, timestamp
+                  )
+                );
         }
     }
 }

@@ -1,5 +1,4 @@
 using Uri = System.Uri;
-using Guid = System.Guid;
 using System.Collections.Generic;
 using System.Linq;
 using ValueObjects = Icon.ValueObjects;
@@ -10,13 +9,13 @@ namespace Icon.GraphQl
 {
     public sealed class AddComponentManufacturerInput
     {
-        public Guid ComponentId { get; }
-        public Guid InstitutionId { get; }
+        public ValueObjects.Id ComponentId { get; }
+        public ValueObjects.Id InstitutionId { get; }
         public ComponentManufacturerMarketingInformationInput? MarketingInformation { get; }
 
         public AddComponentManufacturerInput(
-            Guid componentId,
-            Guid institutionId,
+            ValueObjects.Id componentId,
+            ValueObjects.Id institutionId,
             ComponentManufacturerMarketingInformationInput? marketingInformation
             )
         {
@@ -33,14 +32,6 @@ namespace Icon.GraphQl
             IReadOnlyList<object> path
             )
         {
-            var componentIdResult = ValueObjects.Id.From(
-                self.ComponentId,
-                path.Append("componentId").ToList().AsReadOnly()
-                );
-            var institutionIdResult = ValueObjects.Id.From(
-                self.InstitutionId,
-                path.Append("institutionId").ToList().AsReadOnly()
-                );
             // Why typing `null` is necessary here is explained in
             // https://stackoverflow.com/questions/18260528/type-of-conditional-expression-cannot-be-determined-because-there-is-no-implicit/18260915#18260915
             var marketingInformationResult =
@@ -53,14 +44,12 @@ namespace Icon.GraphQl
 
             return
               Errors.CombineExistent(
-                  componentIdResult,
-                  institutionIdResult,
                   marketingInformationResult
                   )
               .Bind(_ =>
                   ValueObjects.AddComponentManufacturerInput.From(
-                    componentId: componentIdResult.Value,
-                    institutionId: institutionIdResult.Value,
+                    componentId: self.ComponentId,
+                    institutionId: self.InstitutionId,
                     marketingInformation: marketingInformationResult?.Value
                     )
                   );

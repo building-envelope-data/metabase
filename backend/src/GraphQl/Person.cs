@@ -1,5 +1,5 @@
-using Guid = System.Guid;
 using Models = Icon.Models;
+using GreenDonut;
 using DateTime = System.DateTime;
 using CancellationToken = System.Threading.CancellationToken;
 using HotChocolate;
@@ -31,11 +31,11 @@ namespace Icon.GraphQl
         public ContactInformation ContactInformation { get; }
 
         public Person(
-            Guid id,
+            ValueObjects.Id id,
             string name,
             ContactInformation contactInformation,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,
@@ -47,27 +47,6 @@ namespace Icon.GraphQl
             ContactInformation = contactInformation;
         }
 
-        public Task<IReadOnlyList<Method>> GetDevelopedMethods(
-            [Parent] Person person,
-            [DataLoader] MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader methodsLoader,
-            IResolverContext context
-            )
-        {
-            return methodsLoader.LoadAsync(
-                TimestampId(person.Id, GraphQl.Timestamp.Fetch(context)),
-                default(CancellationToken)
-                );
-        }
-
-        public sealed class MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Method, Models.Person, Models.Method>
-        {
-            public MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
-              : base(Method.FromModel, queryBus)
-            {
-            }
-        }
-
         public Task<IReadOnlyList<Institution>> GetAffiliatedInstitutions(
             [Parent] Person person,
             [DataLoader] InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader institutionsLoader,
@@ -75,8 +54,7 @@ namespace Icon.GraphQl
             )
         {
             return institutionsLoader.LoadAsync(
-                TimestampId(person.Id, GraphQl.Timestamp.Fetch(context)),
-                default(CancellationToken)
+                TimestampHelpers.TimestampId(person.Id, TimestampHelpers.Fetch(context))
                 );
         }
 
@@ -85,6 +63,26 @@ namespace Icon.GraphQl
         {
             public InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
               : base(Institution.FromModel, queryBus)
+            {
+            }
+        }
+
+        public Task<IReadOnlyList<Method>> GetDevelopedMethods(
+            [Parent] Person person,
+            [DataLoader] MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader methodsLoader,
+            IResolverContext context
+            )
+        {
+            return methodsLoader.LoadAsync(
+                TimestampHelpers.TimestampId(person.Id, TimestampHelpers.Fetch(context))
+                );
+        }
+
+        public sealed class MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader
+            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Method, Models.Person, Models.Method>
+        {
+            public MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+              : base(Method.FromModel, queryBus)
             {
             }
         }

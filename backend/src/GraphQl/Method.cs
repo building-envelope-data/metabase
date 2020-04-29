@@ -1,9 +1,9 @@
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 using IResolverContext = HotChocolate.Resolvers.IResolverContext;
 using System.Collections.Generic;
 using HotChocolate;
+using GreenDonut;
 using System.Threading.Tasks;
 using CancellationToken = System.Threading.CancellationToken;
 using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
@@ -29,10 +29,10 @@ namespace Icon.GraphQl
         public MethodInformation Information { get; }
 
         public Method(
-            Guid id,
+            ValueObjects.Id id,
             MethodInformation information,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,
@@ -50,8 +50,7 @@ namespace Icon.GraphQl
             )
         {
             return developersLoader.LoadAsync(
-                TimestampId(method.Id, GraphQl.Timestamp.Fetch(context)),
-                default(CancellationToken)
+                TimestampHelpers.TimestampId(method.Id, TimestampHelpers.Fetch(context))
                 );
         }
 

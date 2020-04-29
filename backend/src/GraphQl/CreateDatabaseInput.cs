@@ -3,7 +3,6 @@ using System.Linq;
 using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
 using Uri = System.Uri;
-using Guid = System.Guid;
 using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.GraphQl
@@ -13,13 +12,13 @@ namespace Icon.GraphQl
         public string Name { get; }
         public string Description { get; }
         public Uri Locator { get; }
-        public Guid InstitutionId { get; }
+        public ValueObjects.Id InstitutionId { get; }
 
         private CreateDatabaseInput(
             string name,
             string description,
             Uri locator,
-            Guid institutionId
+            ValueObjects.Id institutionId
             )
         {
             Name = name;
@@ -48,24 +47,19 @@ namespace Icon.GraphQl
                 self.Locator,
                 path.Append("locator").ToList().AsReadOnly()
                 );
-            var institutionIdResult = ValueObjects.Id.From(
-                self.InstitutionId,
-                path.Append("institutionId").ToList().AsReadOnly()
-                );
 
             return
               Errors.Combine(
                   nameResult,
                   descriptionResult,
-                  locatorResult,
-                  institutionIdResult
+                  locatorResult
                   )
               .Bind(_ =>
                   ValueObjects.CreateDatabaseInput.From(
                     name: nameResult.Value,
                     description: descriptionResult.Value,
                     locator: locatorResult.Value,
-                    institutionId: institutionIdResult.Value
+                    institutionId: self.InstitutionId
                     )
                   );
         }

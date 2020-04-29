@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Uri = System.Uri;
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 
@@ -15,7 +14,7 @@ namespace Icon.GraphQl
             return new MethodInformation(
                 name: model.Name,
                 description: model.Description,
-                standardId: model.StandardId?.Value,
+                standardId: model.StandardId,
                 publicationLocator: model.PublicationLocator?.Value,
                 codeLocator: model.CodeLocator?.Value,
                 categories: model.Categories
@@ -24,7 +23,7 @@ namespace Icon.GraphQl
 
         public string Name { get; }
         public string Description { get; }
-        public Guid? StandardId { get; }
+        public ValueObjects.Id? StandardId { get; }
         public Uri? PublicationLocator { get; }
         public Uri? CodeLocator { get; }
         public IEnumerable<ValueObjects.MethodCategory> Categories { get; }
@@ -32,7 +31,7 @@ namespace Icon.GraphQl
         public MethodInformation(
             string name,
             string description,
-            Guid? standardId,
+            ValueObjects.Id? standardId,
             Uri? publicationLocator,
             Uri? codeLocator,
             IEnumerable<ValueObjects.MethodCategory> categories

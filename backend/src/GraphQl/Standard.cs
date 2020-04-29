@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Uri = System.Uri;
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 
@@ -41,7 +40,7 @@ namespace Icon.GraphQl
         public Uri? Locator { get; }
 
         public Standard(
-            Guid id,
+            ValueObjects.Id id,
             string title,
             string @abstract,
             string section,
@@ -51,8 +50,8 @@ namespace Icon.GraphQl
             string? suffix,
             IEnumerable<ValueObjects.Standardizer> standardizers,
             Uri? locator,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,

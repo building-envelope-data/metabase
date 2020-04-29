@@ -1,5 +1,5 @@
-using Guid = System.Guid;
 using Models = Icon.Models;
+using GreenDonut;
 using DateTime = System.DateTime;
 using CancellationToken = System.Threading.CancellationToken;
 using HotChocolate;
@@ -29,10 +29,10 @@ namespace Icon.GraphQl
         public ComponentInformation Information { get; }
 
         public Component(
-            Guid id,
+            ValueObjects.Id id,
             ComponentInformation information,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,
@@ -43,53 +43,24 @@ namespace Icon.GraphQl
             Information = information;
         }
 
-        public Task<ComponentVersion[]> GetVersions(
+        public Task<IReadOnlyList<Institution>> GetManufacturers(
             [Parent] Component component,
+            [DataLoader] ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader manufacturersLoader,
             IResolverContext context
             )
         {
-            return null!;
-            /* var timestamp = Timestamp.Fetch(context); */
-            /* var timestampedComponentId = */
-            /*   ResultHelpers.HandleFailure( */
-            /*       ValueObjects.TimestampedId.From( */
-            /*         component.Id, timestamp */
-            /*         ) */
-            /*       ); */
-            /* return MakeGroupDataLoader(context) */
-            /*   .LoadAsync(timestampedComponentId, default(CancellationToken)); */
+            return manufacturersLoader.LoadAsync(
+                TimestampHelpers.TimestampId(component.Id, TimestampHelpers.Fetch(context))
+                );
         }
 
-        /* private GreenDonut.IDataLoader<ValueObjects.TimestampedId, ComponentVersion[]> MakeGroupDataLoader(IResolverContext context) */
-        /* { */
-        /*     return context.GroupDataLoader<ValueObjects.TimestampedId, ComponentVersion>( */
-        /*         "componentVersionsGroupedByTimestampedComponentId", */
-        /*         async timestampedComponentIds => */
-        /*         { */
-        /*             var query = */
-        /*         ResultHelpers.HandleFailure( */
-        /*             Queries.ListComponentVersions.From( */
-        /*               timestampedComponentIds */
-        /*               ) */
-        /*             ); */
-        /*             return ResultHelpers.HandleFailures<ValueObjects.TimestampedId, Models.ComponentVersion>( */
-        /*             await QueryBus.Send< */
-        /*             Queries.ListComponentVersions, */
-        /*             ILookup<ValueObjects.TimestampedId, Result<Models.ComponentVersion, Errors>> */
-        /*             >(query) */
-        /*             ) */
-        /*         .Select(grouping => (grouping.Key, grouping.Select(c => ComponentVersion.FromModel(c, grouping.Key.Timestamp)))) */
-        /*         .ToLookup(t => t.Item1, t => t.Item2); */
-        /*         } */
-        /*         ); */
-        /* } */
-
-        public Task<IEnumerable<ComponentManufacturer>> GetManufacturers(
-            [Parent] Component component,
-            IResolverContext context
-            )
+        public sealed class ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader
+            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.Component, Models.Institution>
         {
-            return null!;
+            public ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+              : base(Institution.FromModel, queryBus)
+            {
+            }
         }
 
         public Task<IEnumerable<Component>> GetSuperComponents(

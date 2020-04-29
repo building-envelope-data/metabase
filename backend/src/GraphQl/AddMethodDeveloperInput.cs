@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Guid = System.Guid;
 using ValueObjects = Icon.ValueObjects;
 using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
@@ -9,12 +8,12 @@ namespace Icon.GraphQl
 {
     public sealed class AddMethodDeveloperInput
     {
-        public Guid MethodId { get; }
-        public Guid StakeholderId { get; }
+        public ValueObjects.Id MethodId { get; }
+        public ValueObjects.Id StakeholderId { get; }
 
         private AddMethodDeveloperInput(
-            Guid methodId,
-            Guid stakeholderId
+            ValueObjects.Id methodId,
+            ValueObjects.Id stakeholderId
             )
         {
             MethodId = methodId;
@@ -29,25 +28,9 @@ namespace Icon.GraphQl
             IReadOnlyList<object> path
             )
         {
-            var methodIdResult = ValueObjects.Id.From(
-                self.MethodId,
-                path.Append("methodId").ToList().AsReadOnly()
-                );
-            var stakeholderIdResult = ValueObjects.Id.From(
-                self.StakeholderId,
-                path.Append("stakeholderId").ToList().AsReadOnly()
-                );
-
-            return
-              Errors.Combine(
-                  methodIdResult,
-                  stakeholderIdResult
-                  )
-              .Bind(_ =>
-                  ValueObjects.AddMethodDeveloperInput.From(
-                    methodId: methodIdResult.Value,
-                    stakeholderId: stakeholderIdResult.Value
-                    )
+            return ValueObjects.AddMethodDeveloperInput.From(
+                    methodId: self.MethodId,
+                    stakeholderId: self.StakeholderId
                   );
         }
     }
