@@ -89,8 +89,6 @@ namespace Icon.Configuration
             // `ls -1 src/Aggregates/ | grep -E ".*Aggregate.cs$" | sed -e "s/^\(.*\).cs\$/options.Events.InlineProjections.AggregateStreamsWith<Aggregates.\1>();/"`
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentManufacturerAggregate>();
-            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionAggregate>();
-            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionManufacturerAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.DatabaseAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.InstitutionAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.InstitutionMethodDeveloperAggregate>();
@@ -108,8 +106,6 @@ namespace Icon.Configuration
             // `ls -1 src/Events/ | grep "Created\|Added" | sed -e "s/^\(.*\).cs\$/options.Events.AddEventType(typeof(Events.\1));/"`
             options.Events.AddEventType(typeof(Events.ComponentCreated));
             options.Events.AddEventType(typeof(Events.ComponentManufacturerAdded));
-            options.Events.AddEventType(typeof(Events.ComponentVersionCreated));
-            options.Events.AddEventType(typeof(Events.ComponentVersionManufacturerCreated));
             options.Events.AddEventType(typeof(Events.DatabaseCreated));
             options.Events.AddEventType(typeof(Events.InstitutionCreated));
             options.Events.AddEventType(typeof(Events.InstitutionMethodDeveloperAdded));

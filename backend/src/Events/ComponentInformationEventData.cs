@@ -12,20 +12,6 @@ namespace Icon.Events
       : Validatable
     {
         public static ComponentInformationEventData From(
-            ValueObjects.CreateComponentVersionInput input
-            )
-        {
-            return new ComponentInformationEventData(
-                  name: input.Name,
-                  abbreviation: input.Abbreviation?.Value,
-                  description: input.Description,
-                  availableFrom: input.Availability?.Start,
-                  availableUntil: input.Availability?.End,
-                  categories: input.Categories.Select(c => c.FromModel()).ToList().AsReadOnly()
-                );
-        }
-
-        public static ComponentInformationEventData From(
             ValueObjects.ComponentInformation information
             )
         {
