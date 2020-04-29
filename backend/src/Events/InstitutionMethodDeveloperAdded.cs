@@ -21,6 +21,10 @@ namespace Icon.Events
                 );
         }
 
+#nullable disable
+        public InstitutionMethodDeveloperAdded() { }
+#nullable enable
+
         public InstitutionMethodDeveloperAdded(
             Guid methodDeveloperId,
             Guid methodId,
@@ -34,6 +38,7 @@ namespace Icon.Events
               creatorId: creatorId
               )
         {
+            EnsureValid();
         }
     }
 }

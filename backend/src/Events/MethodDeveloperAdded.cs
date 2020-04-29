@@ -32,7 +32,6 @@ namespace Icon.Events
               creatorId: creatorId
               )
         {
-            EnsureValid();
         }
     }
 }
