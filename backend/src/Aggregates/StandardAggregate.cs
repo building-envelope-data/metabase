@@ -13,7 +13,6 @@ namespace Icon.Aggregates
     public sealed class StandardAggregate
       : EventSourcedAggregate, IConvertible<Models.Standard>
     {
-        public Guid StandardId { get; set; }
         public string Title { get; set; }
         public string Abstract { get; set; }
         public string Section { get; set; }
@@ -51,7 +50,6 @@ namespace Icon.Aggregates
             if (IsVirgin())
                 return Result.Combine(
                       base.Validate(),
-                      ValidateEmpty(StandardId, nameof(StandardId)),
                       ValidateNull(Title, nameof(Title)),
                       ValidateNull(Abstract, nameof(Abstract)),
                       ValidateNull(Section, nameof(Section)),
@@ -65,7 +63,6 @@ namespace Icon.Aggregates
 
             return Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(StandardId, nameof(StandardId)),
                   ValidateNonNull(Title, nameof(Title)),
                   ValidateNonNull(Abstract, nameof(Abstract)),
                   ValidateNonNull(Section, nameof(Section)),

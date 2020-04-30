@@ -1,6 +1,7 @@
 // Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
 
 using CSharpFunctionalExtensions;
+using Marten.Schema;
 using Icon;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace Icon.Aggregates
         public string Name { get; set; }
         public string Description { get; set; }
         public Uri Locator { get; set; }
+
+        [ForeignKey(typeof(InstitutionAggregate))]
         public Guid InstitutionId { get; set; }
 
 #nullable disable

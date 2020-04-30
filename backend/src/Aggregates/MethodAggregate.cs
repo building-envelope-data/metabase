@@ -8,6 +8,7 @@ using Icon.Infrastructure.Aggregate;
 using Events = Icon.Events;
 using Icon.Events;
 using System.Linq;
+using Marten.Schema;
 
 namespace Icon.Aggregates
 {
@@ -16,7 +17,10 @@ namespace Icon.Aggregates
     {
         public string Name { get; set; }
         public string Description { get; set; }
+
+        [ForeignKey(typeof(StandardAggregate))]
         public Guid? StandardId { get; set; }
+
         public Uri? PublicationLocator { get; set; }
         public Uri? CodeLocator { get; set; }
         public ICollection<ValueObjects.MethodCategory> Categories { get; set; }

@@ -3,6 +3,7 @@
 using CSharpFunctionalExtensions;
 using Icon;
 using System;
+using Marten.Schema;
 using System.Collections.Generic;
 using Icon.Infrastructure.Aggregate;
 using Events = Icon.Events;
@@ -13,8 +14,12 @@ namespace Icon.Aggregates
     public sealed class InstitutionRepresentativeAggregate
       : EventSourcedAggregate, IConvertible<Models.InstitutionRepresentative>
     {
+        [ForeignKey(typeof(InstitutionAggregate))]
         public Guid InstitutionId { get; set; }
+
+        /* TODO [ForeignKey(typeof(UserAggregate))] */
         public Guid UserId { get; set; }
+
         public ValueObjects.InstitutionRepresentativeRole Role { get; set; }
 
 #nullable disable
