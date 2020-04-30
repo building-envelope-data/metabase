@@ -3,7 +3,7 @@ using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
 
 namespace Icon.GraphQl
 {
-    public class MethodDeveloperForTimestampedIdDataLoader
+    public sealed class MethodDeveloperForTimestampedIdDataLoader
       : ModelForTimestampedIdDataLoader<MethodDeveloper, Models.MethodDeveloper>
     {
         public MethodDeveloperForTimestampedIdDataLoader(IQueryBus queryBus)

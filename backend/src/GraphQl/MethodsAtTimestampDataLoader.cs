@@ -3,7 +3,7 @@ using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {
-    public class MethodsAtTimestampDataLoader
+    public sealed class MethodsAtTimestampDataLoader
       : ModelsAtTimestampDataLoader<Method, Models.Method>
     {
         public MethodsAtTimestampDataLoader(IQueryBus queryBus)
