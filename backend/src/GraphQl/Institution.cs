@@ -91,33 +91,20 @@ namespace Icon.GraphQl
             }
         }
 
-        public ManufacturedComponentsConnection GetManufacturedComponents(
-            [Parent] Institution institution,
-            IResolverContext context
+        public ManufacturedComponentConnection GetManufacturedComponents(
+            [Parent] Institution institution
             )
         {
-            return new ManufacturedComponentsConnection();
+            return new ManufacturedComponentConnection(institution);
         }
 
-        // TODO Return role information associated with representatives!
-        public Task<IReadOnlyList<User>> GetRepresentatives(
+        public InstitutionRepresentativeConnection GetRepresentatives(
             IEnumerable<ValueObjects.InstitutionRepresentativeRole>? roles,
-            [Parent] Institution institution,
-            [DataLoader] RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader representativesLoader
+            [Parent] Institution institution
             )
         {
-            return representativesLoader.LoadAsync(
-                TimestampHelpers.TimestampId(institution.Id, institution.RequestTimestamp)
-                );
-        }
-
-        public sealed class RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<User, Models.Institution, Models.User>
-        {
-            public RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
-              : base(User.FromModel, queryBus)
-            {
-            }
+            // TODO Filter by roles
+            return new InstitutionRepresentativeConnection(institution);
         }
     }
 }

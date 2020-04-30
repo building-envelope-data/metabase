@@ -1,14 +1,16 @@
-using GreenDonut;
-using ValueObjects = Icon.ValueObjects;
-
 namespace Icon.GraphQl
 {
-    public abstract class Payload
+    public abstract class Edge
     {
+        public ValueObjects.Id NodeId { get; }
         public ValueObjects.Timestamp RequestTimestamp { get; } // TODO? Better name it `timestamp` or `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
 
-        public Payload(ValueObjects.Timestamp requestTimestamp)
+        public Edge(
+            ValueObjects.Id nodeId,
+            ValueObjects.Timestamp requestTimestamp
+            )
         {
+            NodeId = nodeId;
             RequestTimestamp = requestTimestamp;
         }
     }

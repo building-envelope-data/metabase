@@ -43,23 +43,11 @@ namespace Icon.GraphQl
             Information = information;
         }
 
-        public Task<IReadOnlyList<Institution>> GetManufacturers(
-            [Parent] Component component,
-            [DataLoader] ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader manufacturersLoader
+        public ComponentManufacturerConnection GetManufacturers(
+            [Parent] Component component
             )
         {
-            return manufacturersLoader.LoadAsync(
-                TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp)
-                );
-        }
-
-        public sealed class ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.Component, Models.Institution>
-        {
-            public ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
-              : base(Institution.FromModel, queryBus)
-            {
-            }
+            return new ComponentManufacturerConnection(component);
         }
 
         public Task<IEnumerable<Component>> GetSuperComponents(

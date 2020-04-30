@@ -1,23 +1,42 @@
 using GreenDonut;
-using DateTime = System.DateTime;
+using System.Collections.Generic;
+using HotChocolate;
+using System.Threading.Tasks;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.GraphQl
 {
     public sealed class AddPersonAffiliationPayload
       : Payload
     {
-        public Person Person { get; }
-        public Institution Institution { get; }
+        public ValueObjects.Id PersonId { get; }
+        public ValueObjects.Id InstitutionId { get; }
 
         public AddPersonAffiliationPayload(
-            Person person,
-            Institution institution,
-            ValueObjects.Timestamp timestamp
+            PersonAffiliation personAffiliation
             )
-          : base(timestamp)
+          : base(personAffiliation.RequestTimestamp)
         {
-            Person = person;
-            Institution = institution;
+            PersonId = personAffiliation.PersonId;
+            InstitutionId = personAffiliation.InstitutionId;
+        }
+
+        public Task<Person> GetPerson(
+            [DataLoader] PersonForTimestampedIdDataLoader personLoader
+            )
+        {
+            return personLoader.LoadAsync(
+              TimestampHelpers.TimestampId(PersonId, RequestTimestamp)
+              );
+        }
+
+        public Task<Institution> GetInstitution(
+            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader
+            )
+        {
+            return institutionLoader.LoadAsync(
+              TimestampHelpers.TimestampId(InstitutionId, RequestTimestamp)
+              );
         }
     }
 }

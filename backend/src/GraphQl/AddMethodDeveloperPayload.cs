@@ -13,14 +13,12 @@ namespace Icon.GraphQl
         public ValueObjects.Id StakeholderId { get; }
 
         public AddMethodDeveloperPayload(
-            ValueObjects.Id methodId,
-            ValueObjects.Id stakeholderId,
-            ValueObjects.Timestamp timestamp
+            MethodDeveloper methodDeveloper
             )
-          : base(timestamp)
+          : base(methodDeveloper.RequestTimestamp)
         {
-            MethodId = methodId;
-            StakeholderId = stakeholderId;
+            MethodId = methodDeveloper.MethodId;
+            StakeholderId = methodDeveloper.StakeholderId;
         }
 
         public Task<Method> GetMethod(
@@ -28,7 +26,7 @@ namespace Icon.GraphQl
             )
         {
             return methodLoader.LoadAsync(
-                TimestampHelpers.TimestampId(MethodId, Timestamp)
+                TimestampHelpers.TimestampId(MethodId, RequestTimestamp)
                 );
         }
 
@@ -37,7 +35,7 @@ namespace Icon.GraphQl
             )
         {
             return stakeholderLoader.LoadAsync(
-                TimestampHelpers.TimestampId(StakeholderId, Timestamp)
+                TimestampHelpers.TimestampId(StakeholderId, RequestTimestamp)
                 );
         }
     }
