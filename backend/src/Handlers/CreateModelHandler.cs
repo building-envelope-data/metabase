@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using System; // Func
+using DateTime = System.DateTime;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure.Command;
 using Icon.Infrastructure.Aggregate;
@@ -9,20 +11,25 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
-    public abstract class CreateModelHandler<C, A>
-      : ICommandHandler<C, Result<ValueObjects.TimestampedId, Errors>>
-      where C : ICommand<Result<ValueObjects.TimestampedId, Errors>>
-      where A : class, IEventSourcedAggregate, new()
+    public sealed class CreateModelHandler<TCommand, TAggregate>
+      : ICommandHandler<TCommand, Result<ValueObjects.TimestampedId, Errors>>
+      where TCommand : ICommand<Result<ValueObjects.TimestampedId, Errors>>
+      where TAggregate : class, IEventSourcedAggregate, new()
     {
         private readonly IAggregateRepository _repository;
+        private readonly Func<Guid, TCommand, Events.IEvent> _newCreatedEvent;
 
-        public CreateModelHandler(IAggregateRepository repository)
+        public CreateModelHandler(
+            IAggregateRepository repository,
+            Func<Guid, TCommand, Events.IEvent> newCreatedEvent
+            )
         {
             _repository = repository;
+            _newCreatedEvent = newCreatedEvent;
         }
 
         public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            C command,
+            TCommand command,
             CancellationToken cancellationToken
             )
         {
@@ -33,19 +40,17 @@ namespace Icon.Handlers
         }
 
         public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            C command,
+            TCommand command,
             IAggregateRepositorySession session,
             CancellationToken cancellationToken
             )
         {
             var id = await session.GenerateNewId(cancellationToken);
-            var @event = NewCreatedEvent(id, command);
+            var @event = _newCreatedEvent(id, command);
             return
-              await session.New<A>(
+              await session.New<TAggregate>(
                   id, @event, cancellationToken
                   );
         }
-
-        protected abstract Events.IEvent NewCreatedEvent(ValueObjects.Id id, C command);
     }
 }

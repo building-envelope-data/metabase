@@ -13,14 +13,22 @@ namespace Icon.Handlers
       : ICommandHandler<Commands.AddMethodDeveloper, Result<ValueObjects.TimestampedId, Errors>>
     {
         private readonly IAggregateRepository _repository;
-        private readonly AddInstitutionMethodDeveloperHandler _addInstitutionMethodDeveloperHandler;
-        private readonly AddPersonMethodDeveloperHandler _addPersonMethodDeveloperHandler;
+        private readonly CreateModelHandler<Commands.AddMethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate> _addInstitutionMethodDeveloperHandler;
+        private readonly CreateModelHandler<Commands.AddMethodDeveloper, Aggregates.PersonMethodDeveloperAggregate> _addPersonMethodDeveloperHandler;
 
         public AddMethodDeveloperHandler(IAggregateRepository repository)
         {
             _repository = repository;
-            _addInstitutionMethodDeveloperHandler = new AddInstitutionMethodDeveloperHandler(repository);
-            _addPersonMethodDeveloperHandler = new AddPersonMethodDeveloperHandler(repository);
+            _addInstitutionMethodDeveloperHandler =
+              new CreateModelHandler<Commands.AddMethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate>(
+                  repository,
+                  Events.InstitutionMethodDeveloperAdded.From
+                  );
+            _addPersonMethodDeveloperHandler =
+              new CreateModelHandler<Commands.AddMethodDeveloper, Aggregates.PersonMethodDeveloperAggregate>(
+                  repository,
+                  Events.PersonMethodDeveloperAdded.From
+                  );
         }
 
         public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
@@ -49,34 +57,6 @@ namespace Icon.Handlers
                         );
                     }
                     );
-            }
-        }
-
-        public sealed class AddInstitutionMethodDeveloperHandler
-          : CreateModelHandler<Commands.AddMethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate>
-        {
-            public AddInstitutionMethodDeveloperHandler(IAggregateRepository repository)
-              : base(repository)
-            {
-            }
-
-            protected override Events.IEvent NewCreatedEvent(ValueObjects.Id id, Commands.AddMethodDeveloper command)
-            {
-                return Events.InstitutionMethodDeveloperAdded.From(id, command);
-            }
-        }
-
-        public sealed class AddPersonMethodDeveloperHandler
-          : CreateModelHandler<Commands.AddMethodDeveloper, Aggregates.PersonMethodDeveloperAggregate>
-        {
-            public AddPersonMethodDeveloperHandler(IAggregateRepository repository)
-              : base(repository)
-            {
-            }
-
-            protected override Events.IEvent NewCreatedEvent(ValueObjects.Id id, Commands.AddMethodDeveloper command)
-            {
-                return Events.PersonMethodDeveloperAdded.From(id, command);
             }
         }
     }

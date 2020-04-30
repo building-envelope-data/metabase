@@ -1,4 +1,5 @@
 using NSwag.Generation.Processors.Security;
+using IAggregateRepository = Icon.Infrastructure.Aggregate.IAggregateRepository;
 using IdentityServer4.AccessTokenValidation;
 using Icon.Data;
 using Microsoft.AspNetCore.Authentication;
@@ -217,50 +218,90 @@ namespace Icon.Configuration
               Commands.CreateComponent,
               Result<ValueObjects.TimestampedId, Errors>
                 >,
-              Handlers.CreateComponentHandler>();
+              Handlers.CreateModelHandler<Commands.CreateComponent, Aggregates.ComponentAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.CreateComponent, Aggregates.ComponentAggregate>(
+                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    Events.ComponentCreated.From
+                    )
+                  );
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.CreateDatabase,
               Result<ValueObjects.TimestampedId, Errors>
                 >,
-              Handlers.CreateDatabaseHandler>();
+              Handlers.CreateModelHandler<Commands.CreateDatabase, Aggregates.DatabaseAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.CreateDatabase, Aggregates.DatabaseAggregate>(
+                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    Events.DatabaseCreated.From
+                    )
+                  );
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.CreateInstitution,
               Result<ValueObjects.TimestampedId, Errors>
                 >,
-              Handlers.CreateInstitutionHandler>();
+              Handlers.CreateModelHandler<Commands.CreateInstitution, Aggregates.InstitutionAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.CreateInstitution, Aggregates.InstitutionAggregate>(
+                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    Events.InstitutionCreated.From
+                    )
+                  );
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.CreateMethod,
               Result<ValueObjects.TimestampedId, Errors>
                 >,
-              Handlers.CreateMethodHandler>();
+              Handlers.CreateModelHandler<Commands.CreateMethod, Aggregates.MethodAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.CreateMethod, Aggregates.MethodAggregate>(
+                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    Events.MethodCreated.From
+                    )
+                  );
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.CreatePerson,
               Result<ValueObjects.TimestampedId, Errors>
                 >,
-              Handlers.CreatePersonHandler>();
+              Handlers.CreateModelHandler<Commands.CreatePerson, Aggregates.PersonAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.CreatePerson, Aggregates.PersonAggregate>(
+                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    Events.PersonCreated.From
+                    )
+                  );
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.CreateStandard,
               Result<ValueObjects.TimestampedId, Errors>
                 >,
-              Handlers.CreateStandardHandler>();
+              Handlers.CreateModelHandler<Commands.CreateStandard, Aggregates.StandardAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.CreateStandard, Aggregates.StandardAggregate>(
+                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    Events.StandardCreated.From
+                    )
+                  );
 
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.AddComponentManufacturer,
               Result<ValueObjects.TimestampedId, Errors>
                 >,
-              Handlers.AddComponentManufacturerHandler>();
+              Handlers.CreateModelHandler<Commands.AddComponentManufacturer, Aggregates.ComponentManufacturerAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.AddComponentManufacturer, Aggregates.ComponentManufacturerAggregate>(
+                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    Events.ComponentManufacturerAdded.From
+                    )
+                  );
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.AddInstitutionRepresentative,
               Result<ValueObjects.TimestampedId, Errors>
                 >,
-              Handlers.AddInstitutionRepresentativeHandler>();
+              Handlers.CreateModelHandler<Commands.AddInstitutionRepresentative, Aggregates.InstitutionRepresentativeAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.AddInstitutionRepresentative, Aggregates.InstitutionRepresentativeAggregate>(
+                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    Events.InstitutionRepresentativeAdded.From
+                    )
+                  );
             services.AddScoped<
               MediatR.IRequestHandler<
               Commands.AddMethodDeveloper,
@@ -272,7 +313,12 @@ namespace Icon.Configuration
               Commands.AddPersonAffiliation,
               Result<ValueObjects.TimestampedId, Errors>
                 >,
-              Handlers.AddPersonAffiliationHandler>();
+              Handlers.CreateModelHandler<Commands.AddPersonAffiliation, Aggregates.PersonAffiliationAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.AddPersonAffiliation, Aggregates.PersonAffiliationAggregate>(
+                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    Events.PersonAffiliationAdded.From
+                    )
+                  );
 
             // TODO Shall we broadcast events?
             /* services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>(); */
