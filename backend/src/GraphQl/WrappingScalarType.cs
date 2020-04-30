@@ -45,10 +45,12 @@ namespace Icon.GraphQl
             if (value is TWrappedClrType x)
             {
                 var wrappingResult = _wrap(x);
-                if (wrappingResult.IsSuccess) return wrappingResult.Value;
-                else throw new ScalarSerializationException(
-                    $"{Name} cannot parse the given literal of type `{literal?.GetType()}` because of the following error(s): {wrappingResult.Error}."
-                    );
+                if (wrappingResult.IsSuccess)
+                    return wrappingResult.Value;
+                else
+                    throw new ScalarSerializationException(
+                        $"{Name} cannot parse the given literal of type `{literal?.GetType()}` because of the following error(s): {wrappingResult.Error}."
+                        );
             }
             throw new ScalarSerializationException(
                 $"{Name} cannot parse the given literal of type `{literal?.GetType()}`."
