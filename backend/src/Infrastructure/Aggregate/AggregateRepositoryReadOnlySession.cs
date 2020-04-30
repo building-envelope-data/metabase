@@ -108,7 +108,7 @@ namespace Icon.Infrastructure.Aggregate
             var aggregate =
               await _session.Events.AggregateStreamAsync<T>(
                   id,
-                  timestamp: timestamp,
+                  timestamp: timestamp.ToUniversalTime(),
                   token: cancellationToken
                   );
             if (aggregate is null)
@@ -218,7 +218,7 @@ namespace Icon.Infrastructure.Aggregate
             var aggregate =
               await _session.Events.AggregateStreamAsync<T>(
                   id,
-                  timestamp: timestamp,
+                  timestamp: timestamp.ToUniversalTime(),
                   token: cancellationToken
                   );
             return BuildResult(id, aggregate);
@@ -270,7 +270,7 @@ namespace Icon.Infrastructure.Aggregate
             var aggregateStreamTasks =
               idsAndTimestamps
               .Select(((Guid id, DateTime timestamp) t) // There sadly is no proper tuple deconstruction in lambdas yet. For details see https://github.com/dotnet/csharplang/issues/258
-                  => batch.Events.AggregateStream<T>(t.id, timestamp: t.timestamp)
+                  => batch.Events.AggregateStream<T>(t.id, timestamp: t.timestamp.ToUniversalTime())
                   )
               // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
               .ToList();
@@ -429,7 +429,7 @@ namespace Icon.Infrastructure.Aggregate
             var tasks = timestampsAndIds.Select(((DateTime timestamp, IEnumerable<Guid> ids) t) =>
                 Task.WhenAll(
                     t.ids.Select(id =>
-                        batch.Events.AggregateStream<T>(id, timestamp: t.timestamp)
+                        batch.Events.AggregateStream<T>(id, timestamp: t.timestamp.ToUniversalTime())
                         )
                       // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
                       .ToList()
