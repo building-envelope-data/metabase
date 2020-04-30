@@ -29,6 +29,7 @@ namespace Icon.Handlers
         {
         }
 
+        // TODO This does not seem to work. It is for example used by `institutions/manufacturedComponents/nodes`
         protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
             IAggregateRepositoryReadOnlySession session,
             IEnumerable<ValueObjects.Id> modelIds,
