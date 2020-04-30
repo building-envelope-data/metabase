@@ -14,7 +14,7 @@ namespace Icon.Aggregates
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; set; }
 
-        /* [ForeignKey(typeof(InstitutionAggregate))] */
+        [ForeignKey(typeof(InstitutionAggregate))]
         public Guid InstitutionId { get; set; }
 
         public ComponentManufacturerMarketingInformationAggregateData? MarketingInformation { get; set; }
@@ -29,6 +29,7 @@ namespace Icon.Aggregates
             var data = @event.Data;
             Id = data.AggregateId.NotEmpty();
             ComponentId = data.ComponentId.NotEmpty();
+            InstitutionId = data.InstitutionId.NotEmpty();
             MarketingInformation = data.MarketingInformation is null ? null : ComponentManufacturerMarketingInformationAggregateData.From(data.MarketingInformation);
         }
 
