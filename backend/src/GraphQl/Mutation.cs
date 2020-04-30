@@ -18,7 +18,6 @@ using QueryException = HotChocolate.Execution.QueryException;
 namespace Icon.GraphQl
 {
     public sealed class Mutation
-      : QueryAndMutationBase
     {
         private readonly ICommandBus _commandBus;
         private readonly IQueryBus _queryBus;
@@ -33,8 +32,7 @@ namespace Icon.GraphQl
 
         public async Task<Component> CreateComponent(
             CreateComponentInput input,
-            [DataLoader] ComponentForTimestampedIdDataLoader componentLoader,
-            IResolverContext resolverContext
+            [DataLoader] ComponentForTimestampedIdDataLoader componentLoader
             )
         {
             // TODO Use this style for all create mutations?
@@ -53,10 +51,7 @@ namespace Icon.GraphQl
                       >(command)
                       )
                     .Map(async timestampedId =>
-                      {
-                          TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
-                          return await componentLoader.LoadAsync(timestampedId);
-                      }
+                      await componentLoader.LoadAsync(timestampedId)
                       )
                     )
                   )
@@ -65,8 +60,7 @@ namespace Icon.GraphQl
 
         public async Task<Database> CreateDatabase(
             CreateDatabaseInput input,
-            [DataLoader] DatabaseForTimestampedIdDataLoader databaseLoader,
-            IResolverContext resolverContext
+            [DataLoader] DatabaseForTimestampedIdDataLoader databaseLoader
             )
         {
             var command = ResultHelpers.HandleFailure(
@@ -85,14 +79,12 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await databaseLoader.LoadAsync(timestampedId);
         }
 
         public async Task<Institution> CreateInstitution(
             CreateInstitutionInput input,
-            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader,
-            IResolverContext resolverContext
+            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader
             )
         {
             var command = ResultHelpers.HandleFailure(
@@ -111,14 +103,12 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await institutionLoader.LoadAsync(timestampedId);
         }
 
         public async Task<Method> CreateMethod(
             CreateMethodInput input,
-            [DataLoader] MethodForTimestampedIdDataLoader methodLoader,
-            IResolverContext resolverContext
+            [DataLoader] MethodForTimestampedIdDataLoader methodLoader
             )
         {
             var command = ResultHelpers.HandleFailure(
@@ -137,14 +127,12 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await methodLoader.LoadAsync(timestampedId);
         }
 
         public async Task<Person> CreatePerson(
             CreatePersonInput input,
-            [DataLoader] PersonForTimestampedIdDataLoader personLoader,
-            IResolverContext resolverContext
+            [DataLoader] PersonForTimestampedIdDataLoader personLoader
             )
         {
             var command = ResultHelpers.HandleFailure(
@@ -163,14 +151,12 @@ namespace Icon.GraphQl
               Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await personLoader.LoadAsync(timestampedId);
         }
 
         public async Task<Standard> CreateStandard(
             CreateStandardInput input,
-            [DataLoader] StandardForTimestampedIdDataLoader standardLoader,
-            IResolverContext resolverContext
+            [DataLoader] StandardForTimestampedIdDataLoader standardLoader
             )
         {
             var command = ResultHelpers.HandleFailure(
@@ -189,15 +175,14 @@ namespace Icon.GraphQl
               Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
             return await standardLoader.LoadAsync(timestampedId);
         }
 
-        /* ComponentAssembly */
-        public async Task<ComponentManufacturer> AddComponentManufacturer(
+        /* TODO ComponentAssembly */
+
+        public async Task<AddComponentManufacturerPayload> AddComponentManufacturer(
             AddComponentManufacturerInput input,
-            [DataLoader] ComponentManufacturerForTimestampedIdDataLoader componentManufacturerLoader,
-            IResolverContext resolverContext
+            [DataLoader] ComponentManufacturerForTimestampedIdDataLoader componentManufacturerLoader
             )
         {
             var command = ResultHelpers.HandleFailure(
@@ -216,15 +201,14 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            var timestamp = timestampedId.Timestamp;
-            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
-            return await componentManufacturerLoader.LoadAsync(timestampedId);
+            return new AddComponentManufacturerPayload(
+                await componentManufacturerLoader.LoadAsync(timestampedId)
+                );
         }
 
-        public async Task<InstitutionRepresentative> AddInstitutionRepresentative(
+        public async Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentative(
             AddInstitutionRepresentativeInput input,
-            [DataLoader] InstitutionRepresentativeForTimestampedIdDataLoader institutionRepresentativeLoader,
-            IResolverContext resolverContext
+            [DataLoader] InstitutionRepresentativeForTimestampedIdDataLoader institutionRepresentativeLoader
             )
         {
             var command = ResultHelpers.HandleFailure(
@@ -243,15 +227,14 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            var timestamp = timestampedId.Timestamp;
-            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
-            return await institutionRepresentativeLoader.LoadAsync(timestampedId);
+            return new AddInstitutionRepresentativePayload(
+                await institutionRepresentativeLoader.LoadAsync(timestampedId)
+                );
         }
 
         public async Task<AddMethodDeveloperPayload> AddMethodDeveloper(
             AddMethodDeveloperInput input,
-            [DataLoader] MethodDeveloperForTimestampedIdDataLoader methodDeveloperLoader,
-            IResolverContext resolverContext
+            [DataLoader] MethodDeveloperForTimestampedIdDataLoader methodDeveloperLoader
             )
         {
             var command = ResultHelpers.HandleFailure(
@@ -270,22 +253,14 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            var timestamp = timestampedId.Timestamp;
-            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
-            var methodDeveloper = await methodDeveloperLoader.LoadAsync(timestampedId);
             return new AddMethodDeveloperPayload(
-                methodId: methodDeveloper.MethodId,
-                stakeholderId: methodDeveloper.StakeholderId,
-                timestamp: timestamp
+                await methodDeveloperLoader.LoadAsync(timestampedId)
                 );
         }
 
         public async Task<AddPersonAffiliationPayload> AddPersonAffiliation(
             AddPersonAffiliationInput input,
-            [DataLoader] PersonAffiliationForTimestampedIdDataLoader personAffiliationLoader,
-            [DataLoader] PersonForTimestampedIdDataLoader personLoader,
-            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader,
-            IResolverContext resolverContext
+            [DataLoader] PersonAffiliationForTimestampedIdDataLoader personAffiliationLoader
             )
         {
             var command = ResultHelpers.HandleFailure(
@@ -304,18 +279,8 @@ namespace Icon.GraphQl
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command)
                 );
-            var timestamp = timestampedId.Timestamp;
-            TimestampHelpers.Store(timestampedId.Timestamp, resolverContext); // May be used by resolvers.
-            var personAffiliation = await personAffiliationLoader.LoadAsync(timestampedId);
-            // We could use a resolver for person and institution of the payload `AddPersonAffiliationPayload` instead of fetching person and payload here. The payload would then only have `personId` and `institutionId` instead of `person` and `institution`.
             return new AddPersonAffiliationPayload(
-                await personLoader.LoadAsync(
-                  TimestampHelpers.TimestampId(personAffiliation.PersonId, timestamp)
-                  ),
-                await institutionLoader.LoadAsync(
-                  TimestampHelpers.TimestampId(personAffiliation.InstitutionId, timestamp)
-                  ),
-                timestamp
+                await personAffiliationLoader.LoadAsync(timestampedId)
                 );
         }
     }

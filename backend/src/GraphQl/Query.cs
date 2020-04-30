@@ -16,7 +16,6 @@ using CSharpFunctionalExtensions;
 namespace Icon.GraphQl
 {
     public sealed class Query
-      : QueryAndMutationBase
     {
         private readonly IQueryBus _queryBus;
         private readonly UserManager<Models.User> _userManager;
@@ -30,153 +29,153 @@ namespace Icon.GraphQl
         // TODO Use `EnableRelaySupport` in `Icon.Configuration.GraphQl` instead
         public Task<Node> GetNode(
             ValueObjects.Id id,
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] NodeForTimestampedIdDataLoader nodeLoader,
             IResolverContext resolverContext
             )
         {
             return nodeLoader.LoadAsync(
-                TimestampId(id, timestamp, resolverContext)
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
                 );
         }
 
         public Task<IReadOnlyList<Component>> GetComponents(
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] ComponentsAtTimestampDataLoader componentsLoader,
             IResolverContext resolverContext
             )
         {
             return componentsLoader.LoadAsync(
-                HandleTimestamp(timestamp, resolverContext)
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
                 );
         }
 
         public Task<Component> GetComponent(
             ValueObjects.Id id,
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] ComponentForTimestampedIdDataLoader componentLoader,
             IResolverContext resolverContext
             )
         {
             return componentLoader.LoadAsync(
-                TimestampId(id, timestamp, resolverContext)
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
                 );
         }
 
         public Task<IReadOnlyList<Database>> GetDatabases(
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] DatabasesAtTimestampDataLoader databasesLoader,
             IResolverContext resolverContext
             )
         {
             return databasesLoader.LoadAsync(
-                HandleTimestamp(timestamp, resolverContext)
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
                 );
         }
 
         public Task<Database> GetDatabase(
             ValueObjects.Id id,
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] DatabaseForTimestampedIdDataLoader databaseLoader,
             IResolverContext resolverContext
             )
         {
             return databaseLoader.LoadAsync(
-                TimestampId(id, timestamp, resolverContext)
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
                 );
         }
 
         public Task<IReadOnlyList<Institution>> GetInstitutions(
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] InstitutionsAtTimestampDataLoader institutionsLoader,
             IResolverContext resolverContext
             )
         {
             return institutionsLoader.LoadAsync(
-                HandleTimestamp(timestamp, resolverContext)
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
                 );
         }
 
         public Task<Institution> GetInstitution(
             ValueObjects.Id id,
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader,
             IResolverContext resolverContext
             )
         {
             return institutionLoader.LoadAsync(
-                TimestampId(id, timestamp, resolverContext)
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
                 );
         }
 
         public Task<IReadOnlyList<Method>> GetMethods(
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] MethodsAtTimestampDataLoader methodsLoader,
             IResolverContext resolverContext
             )
         {
             return methodsLoader.LoadAsync(
-                HandleTimestamp(timestamp, resolverContext)
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
                 );
         }
 
         public Task<Method> GetMethod(
             ValueObjects.Id id,
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] MethodForTimestampedIdDataLoader methodLoader,
             IResolverContext resolverContext
             )
         {
             return methodLoader.LoadAsync(
-                TimestampId(id, timestamp, resolverContext)
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
                 );
         }
 
         public Task<IReadOnlyList<Person>> GetPersons(
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] PersonsAtTimestampDataLoader personsLoader,
             IResolverContext resolverContext
             )
         {
             return personsLoader.LoadAsync(
-                HandleTimestamp(timestamp, resolverContext)
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
                 );
         }
 
         public Task<Person> GetPerson(
             ValueObjects.Id id,
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] PersonForTimestampedIdDataLoader personLoader,
             IResolverContext resolverContext
             )
         {
             return personLoader.LoadAsync(
-                TimestampId(id, timestamp, resolverContext)
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
                 );
         }
 
         // TODO GetStakeholder and GetStakeholders
 
         public Task<IReadOnlyList<Standard>> GetStandards(
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] StandardsAtTimestampDataLoader standardsLoader,
             IResolverContext resolverContext
             )
         {
             return standardsLoader.LoadAsync(
-                HandleTimestamp(timestamp, resolverContext)
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
                 );
         }
 
         public Task<Standard> GetStandard(
             ValueObjects.Id id,
-            DateTime? timestamp,
+            ValueObjects.Timestamp? timestamp,
             [DataLoader] StandardForTimestampedIdDataLoader standardLoader,
             IResolverContext resolverContext
             )
         {
             return standardLoader.LoadAsync(
-                TimestampId(id, timestamp, resolverContext)
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
                 );
         }
     }

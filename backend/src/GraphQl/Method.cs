@@ -45,12 +45,11 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Stakeholder>> GetDevelopers(
             [Parent] Method method,
-            [DataLoader] DevelopersOfMethodIdentifiedByTimestampedIdDataLoader developersLoader,
-            IResolverContext context
+            [DataLoader] DevelopersOfMethodIdentifiedByTimestampedIdDataLoader developersLoader
             )
         {
             return developersLoader.LoadAsync(
-                TimestampHelpers.TimestampId(method.Id, TimestampHelpers.Fetch(context))
+                TimestampHelpers.TimestampId(method.Id, method.RequestTimestamp)
                 );
         }
 

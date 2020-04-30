@@ -49,12 +49,11 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Institution>> GetAffiliatedInstitutions(
             [Parent] Person person,
-            [DataLoader] InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader institutionsLoader,
-            IResolverContext context
+            [DataLoader] InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader institutionsLoader
             )
         {
             return institutionsLoader.LoadAsync(
-                TimestampHelpers.TimestampId(person.Id, TimestampHelpers.Fetch(context))
+                TimestampHelpers.TimestampId(person.Id, person.RequestTimestamp)
                 );
         }
 
@@ -69,12 +68,11 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Method>> GetDevelopedMethods(
             [Parent] Person person,
-            [DataLoader] MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader methodsLoader,
-            IResolverContext context
+            [DataLoader] MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader methodsLoader
             )
         {
             return methodsLoader.LoadAsync(
-                TimestampHelpers.TimestampId(person.Id, TimestampHelpers.Fetch(context))
+                TimestampHelpers.TimestampId(person.Id, person.RequestTimestamp)
                 );
         }
 

@@ -66,7 +66,7 @@ namespace Icon.Configuration
                 /* identity.AddClaim(new Claim(ClaimTypes.Country, "us")); */
                 /* ctx.User = new ClaimsPrincipal(identity); */
                 /* builder.SetProperty(nameof(ClaimsPrincipal), ctx.User); */
-                GraphQlX.TimestampHelpers.StoreRequest(
+                GraphQlX.TimestampHelpers.Store(
                     ValueObjects.Timestamp.Now,
                     requestBuilder
                     );

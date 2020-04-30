@@ -55,12 +55,11 @@ namespace Icon.GraphQl
         [UsePaging]
         public Task<IReadOnlyList<Person>> GetAffiliatedPersons(
             [Parent] Institution institution,
-            [DataLoader] PersonsAffiliatedWithInstitutionIdentifiedByTimestampedIdDataLoader affiliatedPersonsLoader,
-            IResolverContext context
+            [DataLoader] PersonsAffiliatedWithInstitutionIdentifiedByTimestampedIdDataLoader affiliatedPersonsLoader
             )
         {
             return affiliatedPersonsLoader.LoadAsync(
-                TimestampHelpers.TimestampId(institution.Id, TimestampHelpers.Fetch(context))
+                TimestampHelpers.TimestampId(institution.Id, institution.RequestTimestamp)
                 );
         }
 
@@ -75,12 +74,11 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Method>> GetDevelopedMethods(
             [Parent] Institution institution,
-            [DataLoader] MethodsDevelopedByInstitutionIdentifiedByTimestampedIdDataLoader methodsLoader,
-            IResolverContext context
+            [DataLoader] MethodsDevelopedByInstitutionIdentifiedByTimestampedIdDataLoader methodsLoader
             )
         {
             return methodsLoader.LoadAsync(
-                TimestampHelpers.TimestampId(institution.Id, TimestampHelpers.Fetch(context))
+                TimestampHelpers.TimestampId(institution.Id, institution.RequestTimestamp)
                 );
         }
 
@@ -93,25 +91,23 @@ namespace Icon.GraphQl
             }
         }
 
-        public Task<IReadOnlyList<Component>> GetManufacturedComponents(
+        public ManufacturedComponentsConnection GetManufacturedComponents(
+            [Parent] Institution institution,
             IResolverContext context
             )
         {
-            /* ManufacturedComponentsConnection */
-            /* return new ManufacturedComponentsConnection */
-            return null!;
+            return new ManufacturedComponentsConnection();
         }
 
         // TODO Return role information associated with representatives!
         public Task<IReadOnlyList<User>> GetRepresentatives(
             IEnumerable<ValueObjects.InstitutionRepresentativeRole>? roles,
             [Parent] Institution institution,
-            [DataLoader] RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader representativesLoader,
-            IResolverContext context
+            [DataLoader] RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader representativesLoader
             )
         {
             return representativesLoader.LoadAsync(
-                TimestampHelpers.TimestampId(institution.Id, TimestampHelpers.Fetch(context))
+                TimestampHelpers.TimestampId(institution.Id, institution.RequestTimestamp)
                 );
         }
 

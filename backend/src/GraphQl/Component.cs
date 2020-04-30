@@ -45,12 +45,11 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Institution>> GetManufacturers(
             [Parent] Component component,
-            [DataLoader] ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader manufacturersLoader,
-            IResolverContext context
+            [DataLoader] ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader manufacturersLoader
             )
         {
             return manufacturersLoader.LoadAsync(
-                TimestampHelpers.TimestampId(component.Id, TimestampHelpers.Fetch(context))
+                TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp)
                 );
         }
 

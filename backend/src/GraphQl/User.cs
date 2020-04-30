@@ -43,12 +43,11 @@ namespace Icon.GraphQl
         public Task<IReadOnlyList<Institution>> GetRepresentedInstitutions(
             IEnumerable<ValueObjects.InstitutionRepresentativeRole>? roles,
             [Parent] User user,
-            [DataLoader] InstitutionsRepresentedByUserIdentifiedByTimestampedIdDataLoader representedInstitutionsLoader,
-            IResolverContext context
+            [DataLoader] InstitutionsRepresentedByUserIdentifiedByTimestampedIdDataLoader representedInstitutionsLoader
             )
         {
             return representedInstitutionsLoader.LoadAsync(
-                TimestampHelpers.TimestampId(user.Id, TimestampHelpers.Fetch(context))
+                TimestampHelpers.TimestampId(user.Id, user.RequestTimestamp)
                 );
         }
 
