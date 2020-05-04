@@ -21,6 +21,7 @@ namespace Icon.GraphQl
             )
           : base(
               nodeId: componentManufacturer.InstitutionId,
+              timestamp: componentManufacturer.Timestamp,
               requestTimestamp: componentManufacturer.RequestTimestamp
               )
         {
