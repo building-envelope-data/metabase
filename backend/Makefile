@@ -13,16 +13,20 @@ help : ## Print this help
 # Tasks to run, for example, in a Docker container #
 # ------------------------------------------------ #
 
-# TODO Strip the byte-order mark, aka, BOM
 # TODO Apply not only to `src` folder but ignore files and directories within .gitignore.
 #      With git installed there are various options, which all have some
 #      disadvantages, see
 #      https://unix.stackexchange.com/questions/358270/find-files-that-are-not-in-gitignore
-dos2unix : ## Remove carriage returns
-	find src/ -type f -exec sed -i -e "s/\r//" {} +
-	# find src/ -type f -exec sed -i -e "1s/^\xFEFF//" -e "s/\r//" {} +
+# Inspired by
+# * https://stackoverflow.com/questions/45240387/how-can-i-remove-the-bom-from-a-utf-8-file/45240995#45240995
+# * https://unix.stackexchange.com/questions/381230/how-can-i-remove-the-bom-from-a-utf-8-file/381263#381263
+dos2unix : ## Strip the byte-order mark, also known as, BOM, and remove carriage returns
+	find \
+		./src/ ./test/ \
+		\( -name "*.cs" -o -name "*.cshtml" \) \
+		-type f \
+		-exec sed -i -e "$(shell printf '1s/^\357\273\277//')" -e "s/\r//" {} +
 	# find . -type f -exec dos2unix {} \;
-	# find . \( -name "*.cs" -o -name "*.cshtml" \) ...
 .PHONY : dos2unix
 
 format : ## Format code
