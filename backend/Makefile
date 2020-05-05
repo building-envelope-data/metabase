@@ -29,8 +29,11 @@ dos2unix : ## Strip the byte-order mark, also known as, BOM, and remove carriage
 	# find . -type f -exec dos2unix {} \;
 .PHONY : dos2unix
 
-format : ## Format code
+dosformat : ## Format code and add byte-order marks
 	dotnet tool run dotnet-format
+.PHONY : dosformat
+
+format : dosformat dos2unix ## Format code
 .PHONY : format
 
 assets : ## Build assets
