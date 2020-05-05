@@ -26,7 +26,7 @@ dos2unix : ## Remove carriage returns
 .PHONY : dos2unix
 
 format : ## Format code
-	dotnet-format
+	dotnet tool run dotnet-format
 .PHONY : format
 
 assets : ## Build assets
