@@ -36,6 +36,7 @@ assets : ## Build assets
 update : ## Update packages
 	cd ./src/ && dotnet list package | awk '/>/ {print $$2}' | xargs -n 1 dotnet add package
 	cd ./test/ && dotnet list package | awk '/>/ {print $$2}' | xargs -n 1 dotnet add package
+.PHONY : update
 
 # TODO Shortcuts for `dotnet aspnet-codegenerator`?
 
@@ -66,6 +67,7 @@ cnfmigrations : ## Add migration with name ${NAME} of identity server's configur
 		--context ConfigurationDbContext \
 		--output-dir Data/Migrations/IdentityServer/ConfigurationDb \
 		${NAME}
+.PHONY : cnfmigrations
 
 migrate : ## Run migrations
 	dotnet ef database update \
