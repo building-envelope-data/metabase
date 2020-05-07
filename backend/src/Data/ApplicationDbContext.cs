@@ -15,7 +15,7 @@ namespace Icon.Data
     // Inspired by
     // [Authentication and authorization for SPAs](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-3.0)
     // [Customize Identity Model](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-3.0)
-    public class ApplicationDbContext : IdentityDbContext<Models.User, IdentityRole<Guid>, Guid>
+    public class ApplicationDbContext : IdentityDbContext<Models.UserX, IdentityRole<Guid>, Guid>
     {
         private readonly string _schemaName;
 
@@ -37,7 +37,7 @@ namespace Icon.Data
             /*   .HasDefaultValueSql("gen_random_uuid()"); */
 
             // https://stackoverflow.com/questions/19902756/asp-net-identity-dbcontext-confusion/35722688#35722688
-            builder.Entity<Models.User>().ToTable("Users");
+            builder.Entity<Models.UserX>().ToTable("Users");
             builder.Entity<IdentityRole<Guid>>().ToTable("Roles");
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");

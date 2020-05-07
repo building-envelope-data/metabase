@@ -20,7 +20,7 @@ namespace Icon.Events
     {
         public static StandardCreated From(
             Guid standardId,
-            Commands.CreateStandard command
+            Commands.Create<ValueObjects.CreateStandardInput> command
             )
         {
             return new StandardCreated(

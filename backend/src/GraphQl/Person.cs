@@ -58,7 +58,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.Person, Models.Institution>
+            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.Person, Models.PersonAffiliation, Models.Institution>
         {
             public InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
               : base(Institution.FromModel, queryBus)
@@ -77,7 +77,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Method, Models.Person, Models.Method>
+            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Method, Models.Person, Models.MethodDeveloper, Models.Method>
         {
             public MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
               : base(Method.FromModel, queryBus)

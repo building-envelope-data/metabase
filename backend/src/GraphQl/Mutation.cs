@@ -21,267 +21,223 @@ namespace Icon.GraphQl
     {
         private readonly ICommandBus _commandBus;
         private readonly IQueryBus _queryBus;
-        private readonly UserManager<Models.User> _userManager;
+        private readonly UserManager<Models.UserX> _userManager;
 
-        public Mutation(ICommandBus commandBus, IQueryBus queryBus, UserManager<Models.User> userManager)
+        public Mutation(ICommandBus commandBus, IQueryBus queryBus, UserManager<Models.UserX> userManager)
         {
             _commandBus = commandBus;
             _queryBus = queryBus;
             _userManager = userManager;
         }
 
-        public async Task<Component> CreateComponent(
+        private async Task<TPayload> Create<TInput, TValidatedInput, TPayload>(
+            TInput input,
+            Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
+            Func<ValueObjects.TimestampedId, TPayload> newPayload
+            )
+        {
+            var command = ResultHelpers.HandleFailure(
+                  validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
+                  .Bind(validatedInput =>
+                    Commands.Create<TValidatedInput>.From(
+                      input: validatedInput,
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
+                      )
+                    )
+                  );
+            var timestampedId = ResultHelpers.HandleFailure(
+              await _commandBus
+              .Send<
+              Commands.Create<TValidatedInput>,
+              Result<ValueObjects.TimestampedId, Errors>
+                >(command)
+                );
+            return newPayload(timestampedId);
+        }
+
+        private async Task<TPayload> Add<TInput, TValidatedInput, TAssociation, TPayload>(
+            TInput input,
+            Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
+            Func<TAssociation, TPayload> newPayload,
+            IDataLoader<ValueObjects.TimestampedId, TAssociation> associationLoader
+        )
+        {
+            var command = ResultHelpers.HandleFailure(
+                  validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
+                  .Bind(validatedInput =>
+                    Commands.Add<TValidatedInput>.From(
+                      input: validatedInput,
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
+                      )
+                    )
+                  );
+            var timestampedId = ResultHelpers.HandleFailure(
+                await _commandBus
+                .Send<
+                Commands.Add<TValidatedInput>,
+                Result<ValueObjects.TimestampedId, Errors>
+                >(command)
+                );
+            return newPayload(
+                  await associationLoader.LoadAsync(timestampedId)
+                );
+        }
+
+        public Task<CreateComponentPayload> CreateComponent(
             CreateComponentInput input,
             [DataLoader] ComponentForTimestampedIdDataLoader componentLoader
             )
         {
-            // TODO Use this style for all create mutations?
-            return ResultHelpers.HandleFailure(
-                await CreateComponentInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                .Bind(async validatedInput =>
-                  await Commands.CreateComponent.From(
-                    input: validatedInput,
-                    creatorId: ValueObjects.Id.New() // TODO Use current user!
-                    )
-                  .Bind(async command =>
-                    await (await _commandBus
-                      .Send<
-                        Commands.CreateComponent,
-                        Result<ValueObjects.TimestampedId, Errors>
-                      >(command)
-                      )
-                    .Map(async timestampedId =>
-                      await componentLoader.LoadAsync(timestampedId)
-                      )
-                    )
-                  )
-                );
+            return Create<CreateComponentInput, ValueObjects.CreateComponentInput, CreateComponentPayload>(
+                input,
+                CreateComponentInput.Validate,
+                timestampedId => new CreateComponentPayload(timestampedId)
+            );
         }
 
-        public async Task<Database> CreateDatabase(
-            CreateDatabaseInput input,
-            [DataLoader] DatabaseForTimestampedIdDataLoader databaseLoader
+        public Task<CreateDatabasePayload> CreateDatabase(
+            CreateDatabaseInput input
             )
         {
-            var command = ResultHelpers.HandleFailure(
-                CreateDatabaseInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                .Bind(validatedInput =>
-                  Commands.CreateDatabase.From(
-                    input: validatedInput,
-                    creatorId: ValueObjects.Id.New() // TODO Use current user!
-                    )
-                  )
-                );
-            var timestampedId = ResultHelpers.HandleFailure(
-                await _commandBus
-                .Send<
-                Commands.CreateDatabase,
-                Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            return await databaseLoader.LoadAsync(timestampedId);
+            return Create<CreateDatabaseInput, ValueObjects.CreateDatabaseInput, CreateDatabasePayload>(
+                input,
+                CreateDatabaseInput.Validate,
+                timestampedId => new CreateDatabasePayload(timestampedId)
+            );
         }
 
-        public async Task<Institution> CreateInstitution(
-            CreateInstitutionInput input,
-            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader
+        public Task<CreateInstitutionPayload> CreateInstitution(
+            CreateInstitutionInput input
             )
         {
-            var command = ResultHelpers.HandleFailure(
-                CreateInstitutionInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                .Bind(validatedInput =>
-                  Commands.CreateInstitution.From(
-                    input: validatedInput,
-                    creatorId: ValueObjects.Id.New() // TODO Use current user!
-                    )
-                  )
-                );
-            var timestampedId = ResultHelpers.HandleFailure(
-                await _commandBus
-                .Send<
-                Commands.CreateInstitution,
-                Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            return await institutionLoader.LoadAsync(timestampedId);
+            return Create<CreateInstitutionInput, ValueObjects.CreateInstitutionInput, CreateInstitutionPayload>(
+                input,
+                CreateInstitutionInput.Validate,
+                timestampedId => new CreateInstitutionPayload(timestampedId)
+            );
         }
 
-        public async Task<Method> CreateMethod(
-            CreateMethodInput input,
-            [DataLoader] MethodForTimestampedIdDataLoader methodLoader
+        public Task<CreateMethodPayload> CreateMethod(
+            CreateMethodInput input
             )
         {
-            var command = ResultHelpers.HandleFailure(
-                CreateMethodInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                .Bind(validatedInput =>
-                  Commands.CreateMethod.From(
-                    input: validatedInput,
-                    creatorId: ValueObjects.Id.New() // TODO Use current user!
-                    )
-                  )
-                );
-            var timestampedId = ResultHelpers.HandleFailure(
-                await _commandBus
-                .Send<
-                Commands.CreateMethod,
-                Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            return await methodLoader.LoadAsync(timestampedId);
+            return Create<CreateMethodInput, ValueObjects.CreateMethodInput, CreateMethodPayload>(
+                input,
+                CreateMethodInput.Validate,
+                timestampedId => new CreateMethodPayload(timestampedId)
+            );
         }
 
-        public async Task<Person> CreatePerson(
-            CreatePersonInput input,
-            [DataLoader] PersonForTimestampedIdDataLoader personLoader
+        public Task<CreatePersonPayload> CreatePerson(
+            CreatePersonInput input
             )
         {
-            var command = ResultHelpers.HandleFailure(
-                  CreatePersonInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                  .Bind(validatedInput =>
-                    Commands.CreatePerson.From(
-                      input: validatedInput,
-                      creatorId: ValueObjects.Id.New() // TODO Use current user!
-                      )
-                    )
-                  );
-            var timestampedId = ResultHelpers.HandleFailure(
-              await _commandBus
-              .Send<
-              Commands.CreatePerson,
-              Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            return await personLoader.LoadAsync(timestampedId);
+            return Create<CreatePersonInput, ValueObjects.CreatePersonInput, CreatePersonPayload>(
+                input,
+                CreatePersonInput.Validate,
+                timestampedId => new CreatePersonPayload(timestampedId)
+            );
         }
 
-        public async Task<Standard> CreateStandard(
-            CreateStandardInput input,
-            [DataLoader] StandardForTimestampedIdDataLoader standardLoader
+        public Task<CreateStandardPayload> CreateStandard(
+            CreateStandardInput input
             )
         {
-            var command = ResultHelpers.HandleFailure(
-                  CreateStandardInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                  .Bind(validatedInput =>
-                    Commands.CreateStandard.From(
-                      input: validatedInput,
-                      creatorId: ValueObjects.Id.New() // TODO Use current user!
-                      )
-                    )
-                  );
-            var timestampedId = ResultHelpers.HandleFailure(
-              await _commandBus
-              .Send<
-              Commands.CreateStandard,
-              Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            return await standardLoader.LoadAsync(timestampedId);
+            return Create<CreateStandardInput, ValueObjects.CreateStandardInput, CreateStandardPayload>(
+                input,
+                CreateStandardInput.Validate,
+                timestampedId => new CreateStandardPayload(timestampedId)
+            );
         }
 
-        /* TODO ComponentAssembly */
+        public Task<AddComponentConcretizationPayload> AddComponentConcretization(
+            AddComponentConcretizationInput input,
+            [DataLoader] ComponentConcretizationForTimestampedIdDataLoader componentConcretizationLoader
+            )
+        {
+            return Add<
+              AddComponentConcretizationInput,
+              ValueObjects.AddComponentConcretizationInput,
+              ComponentConcretization,
+              AddComponentConcretizationPayload
+              >(
+                input,
+                AddComponentConcretizationInput.Validate,
+                association => new AddComponentConcretizationPayload(association),
+                componentConcretizationLoader
+              );
+        }
 
-        public async Task<AddComponentManufacturerPayload> AddComponentManufacturer(
+        public Task<AddComponentManufacturerPayload> AddComponentManufacturer(
             AddComponentManufacturerInput input,
             [DataLoader] ComponentManufacturerForTimestampedIdDataLoader componentManufacturerLoader
             )
         {
-            var command = ResultHelpers.HandleFailure(
-                  AddComponentManufacturerInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                  .Bind(validatedInput =>
-                    Commands.AddComponentManufacturer.From(
-                      input: validatedInput,
-                      creatorId: ValueObjects.Id.New() // TODO Use current user!
-                      )
-                    )
-                  );
-            var timestampedId = ResultHelpers.HandleFailure(
-                await _commandBus
-                .Send<
-                Commands.AddComponentManufacturer,
-                Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            return new AddComponentManufacturerPayload(
-                await componentManufacturerLoader.LoadAsync(timestampedId)
-                );
+            return Add<
+              AddComponentManufacturerInput,
+              ValueObjects.AddComponentManufacturerInput,
+              ComponentManufacturer,
+              AddComponentManufacturerPayload
+              >(
+                input,
+                AddComponentManufacturerInput.Validate,
+                association => new AddComponentManufacturerPayload(association),
+                componentManufacturerLoader
+              );
         }
 
-        public async Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentative(
+        public Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentative(
             AddInstitutionRepresentativeInput input,
             [DataLoader] InstitutionRepresentativeForTimestampedIdDataLoader institutionRepresentativeLoader
             )
         {
-            var command = ResultHelpers.HandleFailure(
-                  AddInstitutionRepresentativeInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                  .Bind(validatedInput =>
-                    Commands.AddInstitutionRepresentative.From(
-                      input: validatedInput,
-                      creatorId: ValueObjects.Id.New() // TODO Use current user!
-                      )
-                    )
-                  );
-            var timestampedId = ResultHelpers.HandleFailure(
-                await _commandBus
-                .Send<
-                Commands.AddInstitutionRepresentative,
-                Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            return new AddInstitutionRepresentativePayload(
-                await institutionRepresentativeLoader.LoadAsync(timestampedId)
-                );
+            return Add<
+              AddInstitutionRepresentativeInput,
+              ValueObjects.AddInstitutionRepresentativeInput,
+              InstitutionRepresentative,
+              AddInstitutionRepresentativePayload
+              >(
+                input,
+                AddInstitutionRepresentativeInput.Validate,
+                association => new AddInstitutionRepresentativePayload(association),
+                institutionRepresentativeLoader
+              );
         }
 
-        public async Task<AddMethodDeveloperPayload> AddMethodDeveloper(
+        public Task<AddMethodDeveloperPayload> AddMethodDeveloper(
             AddMethodDeveloperInput input,
             [DataLoader] MethodDeveloperForTimestampedIdDataLoader methodDeveloperLoader
             )
         {
-            var command = ResultHelpers.HandleFailure(
-                  AddMethodDeveloperInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                  .Bind(validatedInput =>
-                    Commands.AddMethodDeveloper.From(
-                      input: validatedInput,
-                      creatorId: ValueObjects.Id.New() // TODO Use current user!
-                      )
-                    )
-                  );
-            var timestampedId = ResultHelpers.HandleFailure(
-                await _commandBus
-                .Send<
-                Commands.AddMethodDeveloper,
-                Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            return new AddMethodDeveloperPayload(
-                await methodDeveloperLoader.LoadAsync(timestampedId)
-                );
+            return Add<
+              AddMethodDeveloperInput,
+              ValueObjects.AddMethodDeveloperInput,
+              MethodDeveloper,
+              AddMethodDeveloperPayload
+              >(
+                input,
+                AddMethodDeveloperInput.Validate,
+                association => new AddMethodDeveloperPayload(association),
+                methodDeveloperLoader
+              );
         }
 
-        public async Task<AddPersonAffiliationPayload> AddPersonAffiliation(
+        public Task<AddPersonAffiliationPayload> AddPersonAffiliation(
             AddPersonAffiliationInput input,
             [DataLoader] PersonAffiliationForTimestampedIdDataLoader personAffiliationLoader
             )
         {
-            var command = ResultHelpers.HandleFailure(
-                  AddPersonAffiliationInput.Validate(input, path: Array.Empty<object>()) // TODO What is the proper path for variables?
-                  .Bind(validatedInput =>
-                    Commands.AddPersonAffiliation.From(
-                      input: validatedInput,
-                      creatorId: ValueObjects.Id.New() // TODO Use current user!
-                      )
-                    )
-                  );
-            var timestampedId = ResultHelpers.HandleFailure(
-                await _commandBus
-                .Send<
-                Commands.AddPersonAffiliation,
-                Result<ValueObjects.TimestampedId, Errors>
-                >(command)
-                );
-            return new AddPersonAffiliationPayload(
-                await personAffiliationLoader.LoadAsync(timestampedId)
-                );
+            return Add<
+              AddPersonAffiliationInput,
+              ValueObjects.AddPersonAffiliationInput,
+              PersonAffiliation,
+              AddPersonAffiliationPayload
+              >(
+                input,
+                AddPersonAffiliationInput.Validate,
+                association => new AddPersonAffiliationPayload(association),
+                personAffiliationLoader
+              );
         }
     }
 }

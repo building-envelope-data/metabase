@@ -39,7 +39,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class ManufacturersOfComponentIdentifiedByTimestampedIdAssociationDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<ComponentManufacturer, Models.Component, Models.ComponentManufacturer>
+            : ForwardAssociationsOfModelIdentifiedByTimestampedIdDataLoader<ComponentManufacturer, Models.Component, Models.ComponentManufacturer>
         {
             public ManufacturersOfComponentIdentifiedByTimestampedIdAssociationDataLoader(IQueryBus queryBus)
               : base(ComponentManufacturer.FromModel, queryBus)
@@ -57,7 +57,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.Component, Models.Institution>
+            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.Component, Models.ComponentManufacturer, Models.Institution>
         {
             public ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
               : base(Institution.FromModel, queryBus)

@@ -22,14 +22,14 @@ namespace Icon.Pages.Account
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<UserX> _signInManager;
+        private readonly UserManager<UserX> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
         public RegisterModel(
-            UserManager<User> userManager,
-            SignInManager<User> signInManager,
+            UserManager<UserX> userManager,
+            SignInManager<UserX> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
@@ -77,7 +77,7 @@ namespace Icon.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = Input.Email, Email = Input.Email };
+                var user = new UserX { UserName = Input.Email, Email = Input.Email };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

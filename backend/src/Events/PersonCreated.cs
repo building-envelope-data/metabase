@@ -19,7 +19,7 @@ namespace Icon.Events
     {
         public static PersonCreated From(
             Guid personId,
-            Commands.CreatePerson command
+            Commands.Create<ValueObjects.CreatePersonInput> command
             )
         {
             return new PersonCreated(

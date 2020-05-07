@@ -18,9 +18,9 @@ namespace Icon.GraphQl
     public sealed class Query
     {
         private readonly IQueryBus _queryBus;
-        private readonly UserManager<Models.User> _userManager;
+        private readonly UserManager<Models.UserX> _userManager;
 
-        public Query(IQueryBus queryBus, UserManager<Models.User> userManager)
+        public Query(IQueryBus queryBus, UserManager<Models.UserX> userManager)
         {
             _queryBus = queryBus;
             _userManager = userManager;

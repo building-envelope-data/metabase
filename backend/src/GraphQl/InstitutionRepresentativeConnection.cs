@@ -39,7 +39,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class RepresentativesOfInstitutionIdentifiedByTimestampedIdAssociationDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<InstitutionRepresentative, Models.Institution, Models.InstitutionRepresentative>
+            : ForwardAssociationsOfModelIdentifiedByTimestampedIdDataLoader<InstitutionRepresentative, Models.Institution, Models.InstitutionRepresentative>
         {
             public RepresentativesOfInstitutionIdentifiedByTimestampedIdAssociationDataLoader(IQueryBus queryBus)
               : base(InstitutionRepresentative.FromModel, queryBus)
@@ -57,7 +57,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<User, Models.Institution, Models.User>
+            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<User, Models.Institution, Models.InstitutionRepresentative, Models.User>
         {
             public RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
               : base(User.FromModel, queryBus)

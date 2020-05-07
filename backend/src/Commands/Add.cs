@@ -13,13 +13,13 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Commands
 {
-    public sealed class CreateComponent
+    public sealed class Add<TInput>
       : CommandBase<Result<ValueObjects.TimestampedId, Errors>>
     {
-        public ValueObjects.CreateComponentInput Input { get; }
+        public TInput Input { get; }
 
-        private CreateComponent(
-            ValueObjects.CreateComponentInput input,
+        private Add(
+            TInput input,
             ValueObjects.Id creatorId
             )
           : base(creatorId)
@@ -27,13 +27,13 @@ namespace Icon.Commands
             Input = input;
         }
 
-        public static Result<CreateComponent, Errors> From(
-            ValueObjects.CreateComponentInput input,
+        public static Result<Add<TInput>, Errors> From(
+            TInput input,
             ValueObjects.Id creatorId
             )
         {
-            return Result.Ok<CreateComponent, Errors>(
-                    new CreateComponent(
+            return Result.Ok<Add<TInput>, Errors>(
+                    new Add<TInput>(
                         input: input,
                         creatorId: creatorId
                         )

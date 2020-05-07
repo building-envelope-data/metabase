@@ -18,7 +18,7 @@ namespace Icon.Events
     {
         public static ComponentCreated From(
             Guid componentId,
-            Commands.CreateComponent command
+            Commands.Create<ValueObjects.CreateComponentInput> command
             )
         {
             return new ComponentCreated(

@@ -35,9 +35,7 @@ namespace Icon.GraphQl
                 );
         }
 
-        public Task<User> GetUser(
-            /* TODO [DataLoader] UserForTimestampedIdDataLoader userLoader */
-            )
+        public Task<User> GetUser(/* TODO [DataLoader] UserForTimestampedIdDataLoader userLoader */)
         {
             return null!;
             /* return userLoader.LoadAsync( */

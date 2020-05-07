@@ -20,7 +20,7 @@ using System;
 namespace Icon.Handlers
 {
     public sealed class GetForwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
-      : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociationAggregate>
+      : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociationModel, TAssociationAggregate>
             where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
             where TAddedEvent : Events.IAddedEvent
     {

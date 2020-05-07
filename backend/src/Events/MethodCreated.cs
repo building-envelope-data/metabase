@@ -20,7 +20,7 @@ namespace Icon.Events
     {
         public static MethodCreated From(
             Guid methodId,
-            Commands.CreateMethod command
+            Commands.Create<ValueObjects.CreateMethodInput> command
             )
         {
             return new MethodCreated(

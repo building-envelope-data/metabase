@@ -19,7 +19,7 @@ namespace Icon.Events
     {
         public static InstitutionCreated From(
             Guid institutionId,
-            Commands.CreateInstitution command
+            Commands.Create<ValueObjects.CreateInstitutionInput> command
             )
         {
             return new InstitutionCreated(

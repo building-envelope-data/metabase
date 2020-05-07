@@ -9,27 +9,16 @@ using System.Linq;
 
 namespace Icon.Queries
 {
-    public sealed class GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>
+    public abstract class GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel, TAssociateModel>
       : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
     {
         public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedModelIds { get; }
 
-        private GetAssociatesOfModelsIdentifiedByTimestampedIds(
+        protected GetAssociatesOfModelsIdentifiedByTimestampedIds(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
             )
         {
             TimestampedModelIds = timestampedModelIds;
-        }
-
-        public static Result<GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>, Errors> From(
-            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
-            )
-        {
-            return Result.Ok<GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>, Errors>(
-                new GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>(
-                  timestampedModelIds: timestampedModelIds
-                  )
-                );
         }
     }
 }

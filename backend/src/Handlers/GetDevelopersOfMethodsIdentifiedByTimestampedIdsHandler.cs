@@ -18,25 +18,24 @@ using Errors = Icon.Errors;
 
 namespace Icon.Handlers
 {
-    // TODO Refactor this implementation. I'm not happy with it!
     public sealed class GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
-      : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
+      : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
     {
         private readonly IAggregateRepository _repository;
-        private readonly GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded> _getInstitutionDevelopersHandler;
-        private readonly GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded> _getPersonDevelopersHandler;
+        private readonly GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded> _getInstitutionDevelopersHandler;
+        private readonly GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded> _getPersonDevelopersHandler;
 
         public GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
         {
             _repository = repository;
             _getInstitutionDevelopersHandler =
-              new GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>(repository);
+              new GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>(repository);
             _getPersonDevelopersHandler =
-              new GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>(repository);
+              new GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>(repository);
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Stakeholder> query,
+            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
             CancellationToken cancellationToken
             )
         {
@@ -44,12 +43,14 @@ namespace Icon.Handlers
             {
                 // TODO Await both results in parallel by using `WhenAll`?  There are sadly no n-tuple overloads of `WhenAll` as discussed in https://github.com/dotnet/runtime/issues/20166
                 var institutionsResults = await _getInstitutionDevelopersHandler.Handle(
-                    Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Institution>.From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
+                    Queries.GetForwardAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Institution>
+                      .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
                     session,
                     cancellationToken
                     );
                 var personsResults = await _getPersonDevelopersHandler.Handle(
-                    Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.Person>.From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
+                    Queries.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Person>
+                      .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
                     session,
                     cancellationToken
                     );

@@ -13,17 +13,21 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public class AssociatesOfModelIdentifiedByTimestampedIdDataLoader<TAssociateGraphQlObject, TModel, TAssociateModel>
+    public abstract class AssociatesOfModelIdentifiedByTimestampedIdDataLoader<TAssociateGraphQlObject, TModel, TAssociationModel, TAssociateModel, TQuery>
       : OurDataLoaderBase<ValueObjects.TimestampedId, IReadOnlyList<TAssociateGraphQlObject>>
+      where TQuery : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
     {
+        private readonly Func<IReadOnlyList<ValueObjects.TimestampedId>, Result<TQuery, Errors>> _newQuery;
         private readonly Func<TAssociateModel, ValueObjects.Timestamp, TAssociateGraphQlObject> _mapAssociateModelToGraphQlObject;
 
         public AssociatesOfModelIdentifiedByTimestampedIdDataLoader(
+            Func<IReadOnlyList<ValueObjects.TimestampedId>, Result<TQuery, Errors>> newQuery,
             Func<TAssociateModel, ValueObjects.Timestamp, TAssociateGraphQlObject> mapAssociateModelToGraphQlObject,
             IQueryBus queryBus
             )
           : base(queryBus)
         {
+            _newQuery = newQuery;
             _mapAssociateModelToGraphQlObject = mapAssociateModelToGraphQlObject;
         }
 
@@ -34,11 +38,11 @@ namespace Icon.GraphQl
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>.From(timestampedIds)
+                  _newQuery(timestampedIds)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociateModel>,
+                  TQuery,
                   IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>
                >(query);
             return ResultHelpers.ToDataLoaderResultsX<TAssociateGraphQlObject>(

@@ -64,7 +64,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class PersonsAffiliatedWithInstitutionIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Person, Models.Institution, Models.Person>
+            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Person, Models.Institution, Models.PersonAffiliation, Models.Person>
         {
             public PersonsAffiliatedWithInstitutionIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
               : base(Person.FromModel, queryBus)
@@ -83,12 +83,20 @@ namespace Icon.GraphQl
         }
 
         public sealed class MethodsDevelopedByInstitutionIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Method, Models.Institution, Models.Method>
+            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Method, Models.Institution, Models.MethodDeveloper, Models.Method>
         {
             public MethodsDevelopedByInstitutionIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
               : base(Method.FromModel, queryBus)
             {
             }
+        }
+
+        // TODO Add `DatabaseOperator` association between database and institution
+        public Task<IReadOnlyList<Database>> GetOperatedDatabases(
+            [Parent] Institution institution
+            )
+        {
+            return null!;
         }
 
         public ManufacturedComponentConnection GetManufacturedComponents(

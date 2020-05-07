@@ -49,7 +49,7 @@ namespace Icon.Configuration
 
         private static void ConfigureIdentityServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddIdentity<Models.User, IdentityRole<Guid>>(_ =>
+            services.AddIdentity<Models.UserX, IdentityRole<Guid>>(_ =>
                 {
                     _.SignIn.RequireConfirmedAccount = true;
 
@@ -131,9 +131,9 @@ namespace Icon.Configuration
                 })
               .AddSecretParser<JwtBearerClientAssertionSecretParser>()
               .AddSecretValidator<PrivateKeyJwtSecretValidator>() // https://identityserver4.readthedocs.io/en/latest/topics/secrets.html#beyond-shared-secrets
-              .AddAspNetIdentity<Models.User>()
-              .AddProfileService<ProfileService<Models.User>>();
-            /* builder.AddApiAuthorization<User, ApplicationDbContext>(); */
+              .AddAspNetIdentity<Models.UserX>()
+              .AddProfileService<ProfileService<Models.UserX>>();
+            /* builder.AddApiAuthorization<UserX, ApplicationDbContext>(); */
             if (environment.IsDevelopment() || environment.IsEnvironment("Test"))
             {
                 builder.AddDeveloperSigningCredential();

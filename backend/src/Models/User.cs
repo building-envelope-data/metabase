@@ -1,17 +1,36 @@
-using System;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using CSharpFunctionalExtensions;
+using Guid = System.Guid;
 
 namespace Icon.Models
 {
-    public class User : IdentityUser<Guid>// , IModel
+    public sealed class User
+      : Model
     {
-        /* [NotMapped] */
-        /* public ValueObjects.Id Id { get; } */
+        private User(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp
+            )
+            : base(id, timestamp)
+        {
+        }
 
-        /* [NotMapped] */
-        /* public ValueObjects.Timestamp Timestamp { get; } */
+        public static Result<User, Errors> From(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp
+            )
+        {
+            return Result.Ok<User, Errors>(
+                new User(
+                  id: id,
+                  timestamp: timestamp
+                )
+                );
+        }
+    }
+
+    // TODO Combine `User` and `UserX` by creating an event sourced `IdentityUser`.
+    public sealed class UserX : IdentityUser<Guid>
+    {
     }
 }

@@ -19,7 +19,7 @@ namespace Icon.Events
     {
         public static DatabaseCreated From(
             Guid databaseId,
-            Commands.CreateDatabase command
+            Commands.Create<ValueObjects.CreateDatabaseInput> command
             )
         {
             return new DatabaseCreated(

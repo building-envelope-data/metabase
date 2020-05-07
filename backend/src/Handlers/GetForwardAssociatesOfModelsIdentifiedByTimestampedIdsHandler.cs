@@ -19,14 +19,22 @@ using System;
 
 namespace Icon.Handlers
 {
-    public sealed class GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociateModel, TAssociateAggregate, TAddedEvent>
-      : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociateModel, TAssociateAggregate>
+    public sealed class GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociateModel, TAssociateAggregate, TAddedEvent>
+      : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociateModel, TAssociateAggregate>
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
       where TAddedEvent : Events.IAddedEvent
     {
         public GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
           : base(repository)
         {
+        }
+
+        public Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
+            Queries.GetForwardAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel, TAssociateModel> query,
+            CancellationToken cancellationToken
+            )
+        {
+            return base.Handle(query, cancellationToken);
         }
 
         protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(

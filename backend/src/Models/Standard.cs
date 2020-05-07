@@ -7,7 +7,7 @@ using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
-    public class Standard
+    public sealed class Standard
       : Model
     {
         public ValueObjects.Title Title { get; }

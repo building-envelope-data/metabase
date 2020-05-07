@@ -54,7 +54,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class DevelopersOfMethodIdentifiedByTimestampedIdDataLoader
-            : AssociatesOfModelIdentifiedByTimestampedIdDataLoader<Stakeholder, Models.Method, Models.Stakeholder>
+            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Stakeholder, Models.Method, Models.MethodDeveloper, Models.Stakeholder>
         {
             public DevelopersOfMethodIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
               : base(StakeholderBase.FromModel, queryBus)

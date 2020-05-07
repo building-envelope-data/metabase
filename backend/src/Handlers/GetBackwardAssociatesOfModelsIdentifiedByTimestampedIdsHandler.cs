@@ -19,8 +19,9 @@ using System;
 
 namespace Icon.Handlers
 {
-    public sealed class GetBackwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TAssociateModel, TModel, TModelAggregate, TAddedEvent>
-      : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TAssociateModel, TModel, TModelAggregate>
+    public sealed class GetBackwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TAssociateModel, TAssociationModel, TModel, TModelAggregate, TAddedEvent>
+      : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TAssociateModel, TAssociationModel, TModel, TModelAggregate>,
+        IQueryHandler<Queries.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIds<TAssociateModel, TAssociationModel, TModel>, IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
       where TModelAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAddedEvent : Events.IAddedEvent
     {
@@ -29,7 +30,14 @@ namespace Icon.Handlers
         {
         }
 
-        // TODO This does not seem to work. It is for example used by `institutions/manufacturedComponents/nodes`
+        public Task<IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>> Handle(
+            Queries.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIds<TAssociateModel, TAssociationModel, TModel> query,
+            CancellationToken cancellationToken
+            )
+        {
+            return base.Handle(query, cancellationToken);
+        }
+
         protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
             IAggregateRepositoryReadOnlySession session,
             IEnumerable<ValueObjects.Id> modelIds,
@@ -38,7 +46,7 @@ namespace Icon.Handlers
         {
             var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
             return (await session.Query<TAddedEvent>()
-                .Where(e => e.ParentId.IsOneOf(modelGuids))
+                .Where(e => e.AssociateId.IsOneOf(modelGuids))
                 .Select(e => new { ModelId = e.AssociateId, AssociateId = e.ParentId })
                 .ToListAsync(cancellationToken))
               .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociateId));
