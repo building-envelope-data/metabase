@@ -29,7 +29,13 @@ dos2unix : ## Strip the byte-order mark, also known as, BOM, and remove carriage
 	# find . -type f -exec dos2unix {} \;
 .PHONY : dos2unix
 
+# TODO We run `dotnet-format` three times because subsequent runs sometimes
+# still make changes. It would be best if we'd check the output to figure out
+# whether changes have been made or not and run it again and again until no
+# more changes are made.
 dosformat : ## Format code and add byte-order marks
+	dotnet tool run dotnet-format
+	dotnet tool run dotnet-format
 	dotnet tool run dotnet-format
 .PHONY : dosformat
 
