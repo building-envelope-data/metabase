@@ -36,21 +36,30 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                var possibleIds = await QueryModelIds(session, cancellationToken);
-                return
-                  (await session
-                   .LoadAllThatExistedBatched<TAggregate>(
-                     query.Timestamps.Select(timestamp => (timestamp, possibleIds)),
-                     cancellationToken
-                     )
-                    ).Select(results =>
-                      Result.Ok<IEnumerable<Result<TModel, Errors>>, Errors>(
-                        results.Select(result =>
-                          result.Bind(a => a.ToModel())
-                          )
-                        )
-                      );
+                return await Handle(query.Timestamps, session, cancellationToken);
             }
+        }
+
+        public async Task<IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>> Handle(
+            IEnumerable<ValueObjects.Timestamp> timestamps,
+            IAggregateRepositoryReadOnlySession session,
+            CancellationToken cancellationToken
+            )
+        {
+            var possibleIds = await QueryModelIds(session, cancellationToken);
+            return
+              (await session
+               .LoadAllThatExistedBatched<TAggregate>(
+                 timestamps.Select(timestamp => (timestamp, possibleIds)),
+                 cancellationToken
+                 )
+                ).Select(results =>
+                  Result.Ok<IEnumerable<Result<TModel, Errors>>, Errors>(
+                    results.Select(result =>
+                      result.Bind(a => a.ToModel())
+                      )
+                    )
+                  );
         }
 
         private async Task<IEnumerable<ValueObjects.Id>> QueryModelIds(
