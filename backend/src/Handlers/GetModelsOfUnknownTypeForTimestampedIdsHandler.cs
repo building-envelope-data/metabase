@@ -30,14 +30,29 @@ namespace Icon.Handlers
         {
             _repository = repository;
             _aggregateTypeToGetHandler = new Dictionary<Type, IGetModelsForTimestampedIdsHandler>();
-            /* TODO _aggregateTypeToGetHandler.Add(typeof(Aggregates.ComponentAssemblyAggregate), new GetModelsForTimestampedIdsHandler<Models.ComponentAssembly, Aggregates.ComponentAssemblyAggregate>(repository)); */
             _aggregateTypeToGetHandler.Add(
                 typeof(Aggregates.ComponentAggregate),
                 new GetModelsForTimestampedIdsHandler<Models.Component, Aggregates.ComponentAggregate>(repository)
                 );
             _aggregateTypeToGetHandler.Add(
+                typeof(Aggregates.ComponentConcretizationAggregate),
+                new GetModelsForTimestampedIdsHandler<Models.ComponentConcretization, Aggregates.ComponentConcretizationAggregate>(repository)
+                );
+            _aggregateTypeToGetHandler.Add(
                 typeof(Aggregates.ComponentManufacturerAggregate),
                 new GetModelsForTimestampedIdsHandler<Models.ComponentManufacturer, Aggregates.ComponentManufacturerAggregate>(repository)
+                );
+            _aggregateTypeToGetHandler.Add(
+                typeof(Aggregates.ComponentPartAggregate),
+                new GetModelsForTimestampedIdsHandler<Models.ComponentPart, Aggregates.ComponentPartAggregate>(repository)
+                );
+            _aggregateTypeToGetHandler.Add(
+                typeof(Aggregates.ComponentVariantAggregate),
+                new GetModelsForTimestampedIdsHandler<Models.ComponentVariant, Aggregates.ComponentVariantAggregate>(repository)
+                );
+            _aggregateTypeToGetHandler.Add(
+                typeof(Aggregates.ComponentVersionAggregate),
+                new GetModelsForTimestampedIdsHandler<Models.ComponentVersion, Aggregates.ComponentVersionAggregate>(repository)
                 );
             _aggregateTypeToGetHandler.Add(
                 typeof(Aggregates.DatabaseAggregate),
@@ -75,7 +90,10 @@ namespace Icon.Handlers
                 typeof(Aggregates.StandardAggregate),
                 new GetModelsForTimestampedIdsHandler<Models.Standard, Aggregates.StandardAggregate>(repository)
                 );
-            /* TODO _aggregateTypeToGetHandler.Add(typeof(Aggregates.UserAggregate), new GetModelsForTimestampedIdsHandler<Models.User, Aggregates.UserAggregate>(repository)); */
+            _aggregateTypeToGetHandler.Add(
+                typeof(Aggregates.UserAggregate),
+                new GetModelsForTimestampedIdsHandler<Models.User, Aggregates.UserAggregate>(repository)
+                );
         }
 
         public async Task<IEnumerable<Result<Models.IModel, Errors>>> Handle(

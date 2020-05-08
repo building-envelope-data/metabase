@@ -24,12 +24,18 @@ namespace Icon.GraphQl
             ValueObjects.Timestamp requestTimestamp
             )
         {
-            /* if (model is ComponentAssembly componentAssembly) */
-            /*     return ComponentAssembly.FromModel(componentAssembly, requestTimestamp); */
             if (model is Models.Component component)
                 return Component.FromModel(component, requestTimestamp);
+            if (model is Models.ComponentConcretization componentConcretization)
+                return ComponentConcretization.FromModel(componentConcretization, requestTimestamp);
             if (model is Models.ComponentManufacturer componentManufacturer)
                 return ComponentManufacturer.FromModel(componentManufacturer, requestTimestamp);
+            if (model is Models.ComponentPart componentPart)
+                return ComponentPart.FromModel(componentPart, requestTimestamp);
+            if (model is Models.ComponentVariant componentVariant)
+                return ComponentVariant.FromModel(componentVariant, requestTimestamp);
+            if (model is Models.ComponentVersion componentVersion)
+                return ComponentVersion.FromModel(componentVersion, requestTimestamp);
             if (model is Models.Database database)
                 return Database.FromModel(database, requestTimestamp);
             if (model is Models.Institution institution)
