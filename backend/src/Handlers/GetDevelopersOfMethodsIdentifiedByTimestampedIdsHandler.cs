@@ -41,20 +41,34 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                // TODO Await both results in parallel by using `WhenAll`?  There are sadly no n-tuple overloads of `WhenAll` as discussed in https://github.com/dotnet/runtime/issues/20166
-                var institutionsResults = await _getInstitutionDevelopersHandler.Handle(
+                // There are sadly no n-tuple overloads of `WhenAll` as discussed in
+                // https://github.com/dotnet/runtime/issues/20166
+                // However, there is a NuGet package that does that
+                // https://www.nuget.org/packages/TaskTupleAwaiter/
+                // https://github.com/buvinghausen/TaskTupleAwaiter
+                // Because that package seems to be out-dated, I use good old
+                // `WhenAll` to await the tasks and extract the result
+                // afterwards using `Task#Result` as was mentioned in
+                // https://github.com/dotnet/runtime/issues/20166#issuecomment-428028466
+                var institutionsResultsTask = _getInstitutionDevelopersHandler.Handle(
                     Queries.GetForwardAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Institution>
                       .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
                     session,
                     cancellationToken
                     );
-                var personsResults = await _getPersonDevelopersHandler.Handle(
+                var personsResultsTask = _getPersonDevelopersHandler.Handle(
                     Queries.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Person>
                       .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
                     session,
                     cancellationToken
                     );
-                return institutionsResults.Zip(personsResults, (institutionsResult, personsResult) =>
+                await Task.WhenAll(
+                    (Task)institutionsResultsTask,
+                    (Task)personsResultsTask
+                    ).ConfigureAwait(false);
+                return institutionsResultsTask.Result.Zip( // Using `Result` here and below is potentially unsafe but should be safe here!
+                    personsResultsTask.Result,
+                    (institutionsResult, personsResult) =>
                     Errors.Combine(institutionsResult, personsResult).Map(_ =>
                         institutionsResult.Value.Select(r => r.Map(i => (Models.Stakeholder)i))
                         .Concat(personsResult.Value.Select(r => r.Map(p => (Models.Stakeholder)p)))
