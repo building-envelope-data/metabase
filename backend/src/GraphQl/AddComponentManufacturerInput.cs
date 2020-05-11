@@ -24,9 +24,6 @@ namespace Icon.GraphQl
             MarketingInformation = marketingInformation;
         }
 
-        // TODO Figure out how methods can be made to be ignored by
-        // HotChocolate and remove the keyword `static` that makes this method
-        // a class method as opposed to an instance method.
         public static Result<ValueObjects.AddComponentManufacturerInput, Errors> Validate(
             AddComponentManufacturerInput self,
             IReadOnlyList<object> path

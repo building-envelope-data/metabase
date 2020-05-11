@@ -25,9 +25,6 @@ namespace Icon.GraphQl
             WebsiteLocator = websiteLocator;
         }
 
-        // TODO Figure out how methods can be made to be ignored by
-        // HotChocolate and remove the keyword `static` that makes this method
-        // a class method as opposed to an instance method.
         public static Result<ValueObjects.InstitutionInformation, Errors> Validate(
             InstitutionInformationInput self,
             IReadOnlyList<object> path

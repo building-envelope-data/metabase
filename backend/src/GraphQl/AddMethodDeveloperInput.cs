@@ -20,9 +20,6 @@ namespace Icon.GraphQl
             StakeholderId = stakeholderId;
         }
 
-        // TODO Figure out how methods can be made to be ignored by
-        // HotChocolate and remove the keyword `static` that makes this method
-        // a class method as opposed to an instance method.
         public static Result<ValueObjects.AddMethodDeveloperInput, Errors> Validate(
             AddMethodDeveloperInput self,
             IReadOnlyList<object> path
