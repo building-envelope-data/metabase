@@ -6,7 +6,7 @@ namespace Icon.GraphQl
     {
         public ValueObjects.Id FromId { get; }
         public IPageInfo PageInfo { get; }
-        public ValueObjects.Timestamp RequestTimestamp { get; } // TODO? Better name it `timestamp` or `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
+        public ValueObjects.Timestamp RequestTimestamp { get; }
 
         public Connection(
             ValueObjects.Id fromId,

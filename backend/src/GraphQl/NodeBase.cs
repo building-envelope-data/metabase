@@ -59,7 +59,7 @@ namespace Icon.GraphQl
 
         public ValueObjects.Id Id { get; }
         public ValueObjects.Timestamp Timestamp { get; }
-        public ValueObjects.Timestamp RequestTimestamp { get; } // TODO? Better name it `requestTimestamp` or `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
+        public ValueObjects.Timestamp RequestTimestamp { get; }
 
         public NodeBase(
             ValueObjects.Id id,

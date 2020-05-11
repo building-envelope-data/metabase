@@ -5,7 +5,7 @@ namespace Icon.GraphQl
 {
     public abstract class Payload
     {
-        public ValueObjects.Timestamp RequestTimestamp { get; } // TODO? Better name it `timestamp` or `fetchTimestamp` or `loadTimestamp` or `queryTimestamp` or ...
+        public ValueObjects.Timestamp RequestTimestamp { get; } // Alternative verbs: fetch, load, query
 
         public Payload(ValueObjects.Timestamp requestTimestamp)
         {
