@@ -14,12 +14,12 @@ namespace Icon.Pages.Account.Manage
 {
     public class ExternalLoginsModel : PageModel
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<UserX> _userManager;
+        private readonly SignInManager<UserX> _signInManager;
 
         public ExternalLoginsModel(
-            UserManager<User> userManager,
-            SignInManager<User> signInManager)
+            UserManager<UserX> userManager,
+            SignInManager<UserX> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;

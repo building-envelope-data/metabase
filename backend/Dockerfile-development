@@ -1,6 +1,6 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 # See https://hub.docker.com/_/microsoft-dotnet-core-sdk
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1.101-alpine3.10
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1.201-alpine3.11
 
 ARG GROUP_ID=1000
 ARG USER_ID=1000
@@ -32,31 +32,32 @@ RUN \
 USER me
 WORKDIR /app
 
+# Install the tools specified in the manifest file `dotnet-tools.json`.
 # For a comprehensive list of tools see https://github.com/natemcmaster/dotnet-tools
 # Diagnostics is provided by `counters`, `dump`, and `trace`, see https://devblogs.microsoft.com/dotnet/introducing-diagnostics-improvements-in-net-core-3-0/
 # Code formatting is provided by `format`
 # Code generation is provided by `aspnet-codegenerator`
 # Database migrations are provided by `ef`
 # Read-Evaluate-Print-Loop (REPL) is provided by `script`, see https://github.com/filipw/dotnet-script#repl
-ENV PATH=$PATH:/home/me/.dotnet/tools
+# Information on the `dotnet tool` command-line interface can be found under
+# * https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install
+# * https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools#install-a-local-tool
+COPY \
+  --chown=me:us \
+  ./dotnet-tools.json ./
 RUN \
-  dotnet tool install --global dotnet-aspnet-codegenerator --version 3.1.0 && \
-  dotnet tool install --global dotnet-counters --version 3.1.57502 && \
-  dotnet tool install --global dotnet-dump --version 3.1.57502 && \
-  dotnet tool install --global dotnet-ef --version 3.1.1 && \
-  dotnet tool install --global dotnet-format --version 3.1.37601 && \
-  dotnet tool install --global dotnet-script --version 0.50.1 && \
-  dotnet tool install --global dotnet-trace --version 3.1.57502
+  dotnet tool restore \
+    --tool-manifest ./dotnet-tools.json
 
 RUN \
   mkdir -p ./src && \
   mkdir -p ./test
 COPY \
   --chown=me:us \
-  src/Icon.csproj ./src/
+  ./src/Icon.csproj ./src/
 COPY \
   --chown=me:us \
-  test/Test.csproj ./test/
+  ./test/Test.csproj ./test/
 
 # TODO Is this really what we want? It is inspired by
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/aspnetapp/aspnetcore-docker-https-development.md#linux
@@ -69,14 +70,14 @@ RUN \
 
 COPY \
   --chown=me:us \
-  app.sln ./
+  ./app.sln ./
 RUN \
   dotnet clean && \
   dotnet restore
 
 COPY \
   --chown=me:us \
-  package.json package-lock.json ./
+  ./package.json ./package-lock.json ./
 RUN npm install
 
 # Create empty directories `/app/*/bin` and `/app/*/obj` for user `me` and group

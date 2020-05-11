@@ -48,6 +48,36 @@ namespace Icon.ValueObjects
                 );
         }
 
+        public static Result<ContactInformation, Errors> From(
+            string phoneNumber,
+            string postalAddress,
+            string emailAddress,
+            Uri websiteLocator,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            var phoneNumberResult = PhoneNumber.From(phoneNumber);
+            var postalAddressResult = PostalAddress.From(postalAddress);
+            var emailAddressResult = EmailAddress.From(emailAddress);
+            var websiteLocatorResult = AbsoluteUri.From(websiteLocator);
+
+            return Errors.Combine(
+                phoneNumberResult,
+                postalAddressResult,
+                emailAddressResult,
+                websiteLocatorResult
+                )
+              .Bind(_ =>
+                  From(
+                    phoneNumber: phoneNumberResult.Value,
+                    postalAddress: postalAddressResult.Value,
+                    emailAddress: emailAddressResult.Value,
+                    websiteLocator: websiteLocatorResult.Value,
+                    path: path
+                    )
+                  );
+        }
+
         protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return PhoneNumber;

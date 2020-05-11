@@ -16,7 +16,7 @@ namespace Icon
             if (!(@object is null))
                 return Result.Failure<bool, Errors>(
                     Errors.One(
-                      message: $"{variableName} is non-null",
+                      message: $"{variableName} is non-null but has the value {@object}",
                       code: ErrorCodes.InvalidValue
                       )
                     );
@@ -48,7 +48,7 @@ namespace Icon
             if (id != Guid.Empty)
                 return Result.Failure<bool, Errors>(
                     Errors.One(
-                      message: $"{variableName} is non-empty",
+                      message: $"{variableName} is non-empty but but has the value {id}",
                       code: ErrorCodes.InvalidValue
                       )
                     );
@@ -72,6 +72,36 @@ namespace Icon
             return Result.Ok<bool, Errors>(true);
         }
 
+        public static Result<bool, Errors> ValidateNullOrNonEmpty(
+            Guid? id,
+            string variableName
+            )
+        {
+            if (id is null)
+                return Result.Ok<bool, Errors>(true);
+
+            // Why can't we use the null-forgiving operator `!` as follows?
+            // return ValidateNonEmpty(id!, variableName);
+            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/null-forgiving
+            return ValidateNonEmpty(id ?? throw new ArgumentNullException(nameof(id)), variableName);
+        }
+
+        public static Result<bool, Errors> ValidateMinValue(
+            DateTime dateTime,
+            string variableName
+            )
+        {
+            if (!(dateTime == DateTime.MinValue))
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"{variableName} does not have the default value but the value {dateTime}",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
+
+            return Result.Ok<bool, Errors>(true);
+        }
+
         public static Result<bool, Errors> ValidateNotMinValue(
             DateTime dateTime,
             string variableName
@@ -80,7 +110,23 @@ namespace Icon
             if (dateTime == DateTime.MinValue)
                 return Result.Failure<bool, Errors>(
                     Errors.One(
-                      message: $"{variableName} has the default value",
+                      message: $"{variableName} has the default value {DateTime.MinValue}",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
+
+            return Result.Ok<bool, Errors>(true);
+        }
+
+        public static Result<bool, Errors> ValidateZero(
+            int number,
+            string variableName
+            )
+        {
+            if (!(number == 0))
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"{variableName} is not 0 but the number {number}",
                       code: ErrorCodes.InvalidValue
                       )
                     );
@@ -97,6 +143,27 @@ namespace Icon
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} is 0",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
+
+            return Result.Ok<bool, Errors>(true);
+        }
+
+        public static Result<bool, Errors> ValidateEquality<T>(
+            T @object,
+            T expected,
+            string variableName
+            )
+        {
+            // What `==` does is explained under
+            // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/equality-comparisons
+            // and
+            // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/how-to-define-value-equality-for-a-type
+            if (!object.Equals(@object, expected))
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"{variableName} does not have the expected value {expected} but the value {@object}",
                       code: ErrorCodes.InvalidValue
                       )
                     );

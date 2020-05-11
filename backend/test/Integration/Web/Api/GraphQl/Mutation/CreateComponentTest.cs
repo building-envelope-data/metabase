@@ -28,14 +28,16 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
         {
             // Act
             var errors = await Client.CreateComponentErroneously(
-                new GraphQlClient.ComponentInputData(
-                  name: "Component A",
-                  abbreviation: "C!A",
-                  description: "Best component ever!",
-                  availableFrom: null,
-                  availableUntil: null,
-                  categories: new ValueObjects.ComponentCategory[0] { }
-                  )
+                new GraphQlClient.CreateComponentInput(
+                  new GraphQlClient.ComponentInformationInput(
+                    name: "Component A",
+                    abbreviation: "C!A",
+                    description: "Best component ever!",
+                    availableFrom: null,
+                    availableUntil: null,
+                    categories: new ValueObjects.ComponentCategory[0] { }
+                    )
+                )
                 );
             // Assert
             errors.Count.Should().Be(1);
@@ -52,8 +54,9 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
             await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
             var beforeTimestamp = DateTime.UtcNow;
             // Act
-            var component = await Client.CreateComponentSuccessfully(
-              new GraphQlClient.ComponentInputData(
+            var componentPayload = await Client.CreateComponentSuccessfully(
+              new GraphQlClient.CreateComponentInput(
+                  new GraphQlClient.ComponentInformationInput(
                 name: "Component A",
                 abbreviation: "C!A",
                 description: "Best component ever!",
@@ -61,12 +64,20 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
                 availableUntil: null,
                 categories: new ValueObjects.ComponentCategory[0] { }
                 )
-                );
+                )
+              );
             // Assert
+            componentPayload.requestTimestamp
+              .Should().BeAfter(beforeTimestamp)
+              .And.BeBefore(DateTime.UtcNow);
+            componentPayload.component.Should().NotBeNull();
+            var component = componentPayload.component!;
             component.id.Should().NotBeEmpty();
             component.timestamp
               .Should().BeAfter(beforeTimestamp)
               .And.BeBefore(DateTime.UtcNow);
+            component.requestTimestamp
+              .Should().Be(component.timestamp);
         }
     }
 }

@@ -46,6 +46,17 @@ namespace Icon.ValueObjects
             return Result.Ok<Suffix, Errors>(new Suffix(suffix));
         }
 
+        public static Result<Suffix, Errors>? MaybeFrom(
+            string? suffix,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (suffix is null)
+                return null;
+
+            return From(suffix: suffix!, path: path);
+        }
+
         protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Value;

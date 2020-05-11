@@ -7,7 +7,7 @@ using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
-    public class Method
+    public sealed class Method
       : Model
     {
         public ValueObjects.MethodInformation Information { get; }
@@ -31,10 +31,10 @@ namespace Icon.Models
             return
               Result.Ok<Method, Errors>(
                   new Method(
-            id: id,
-            information: information,
-            timestamp: timestamp
-            )
+                    id: id,
+                    information: information,
+                    timestamp: timestamp
+                    )
                   );
         }
     }

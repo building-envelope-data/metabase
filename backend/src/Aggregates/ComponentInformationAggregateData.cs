@@ -17,13 +17,12 @@ namespace Icon.Aggregates
             )
         {
             return new ComponentInformationAggregateData(
-                name: information.Name.NotNull(),
+                name: information.Name,
                 abbreviation: information.Abbreviation,
-                description: information.Description.NotNull(),
+                description: information.Description,
                 availableFrom: information.AvailableFrom,
                 availableUntil: information.AvailableUntil,
-                categories:
-                information.Categories.NotNull()
+                categories: information.Categories
                 .Select(Events.ComponentCategoryEventDataExtensions.ToModel)
                 .ToList()
                 );
@@ -69,27 +68,14 @@ namespace Icon.Aggregates
 
         public Result<ValueObjects.ComponentInformation, Errors> ToValueObject()
         {
-            var nameResult = ValueObjects.Name.From(Name);
-            var abbreviationResult = ValueObjects.Abbreviation.MaybeFrom(Abbreviation);
-            var descriptionResult = ValueObjects.Description.From(Description);
-            var availabilityResult = ValueObjects.DateInterval.MaybeFrom(AvailableFrom, AvailableUntil);
-
-            return
-              Errors.CombineExistent(
-                  nameResult,
-                  abbreviationResult,
-                  descriptionResult,
-                  availabilityResult
-                  )
-              .Bind(_ =>
-                  ValueObjects.ComponentInformation.From(
-                    name: nameResult.Value,
-                    abbreviation: abbreviationResult?.Value,
-                    description: descriptionResult.Value,
-                    availability: availabilityResult?.Value,
-                    categories: Categories
-                    )
-                  );
+            return ValueObjects.ComponentInformation.From(
+                name: Name,
+                abbreviation: Abbreviation,
+                description: Description,
+                availableFrom: AvailableFrom,
+                availableUntil: AvailableUntil,
+                categories: Categories.ToList().AsReadOnly()
+                );
         }
     }
 }

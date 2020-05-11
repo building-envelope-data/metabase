@@ -14,7 +14,21 @@ namespace Icon.Infrastructure.Aggregate
 {
     public interface IAggregateRepositorySession : IAggregateRepositoryReadOnlySession
     {
-        public Task<Result<ValueObjects.TimestampedId, Errors>> Store<T>(
+        public Task<Result<ValueObjects.TimestampedId, Errors>> New<T>(
+            Guid id,
+            IEvent @event,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<ValueObjects.TimestampedId, Errors>> New<T>(
+            Guid id,
+            IEnumerable<IEvent> events,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
             Guid id,
             int expectedVersion,
             IEvent @event,
@@ -22,7 +36,7 @@ namespace Icon.Infrastructure.Aggregate
             )
           where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<ValueObjects.TimestampedId, Errors>> Store<T>(
+        public Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
             Guid id,
             int expectedVersion,
             IEnumerable<IEvent> events,

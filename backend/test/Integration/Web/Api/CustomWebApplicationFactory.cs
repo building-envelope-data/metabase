@@ -127,7 +127,7 @@ namespace Test.Integration.Web.Api
             await DoAsync(
                     async services =>
                     {
-                        await SeedData.SeedUsers(services.GetRequiredService<UserManager<Models.User>>());
+                        await SeedData.SeedUsers(services.GetRequiredService<UserManager<Models.UserX>>());
                     }
             );
         }

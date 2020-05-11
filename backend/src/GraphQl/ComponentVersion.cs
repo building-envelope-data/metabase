@@ -1,35 +1,34 @@
-using Guid = System.Guid;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
 
 namespace Icon.GraphQl
 {
     public sealed class ComponentVersion
-      : Node
+      : NodeBase
     {
         public static ComponentVersion FromModel(
             Models.ComponentVersion model,
-            DateTime requestTimestamp
+            ValueObjects.Timestamp requestTimestamp
             )
         {
             return new ComponentVersion(
-                model.Id,
-                componentId: model.ComponentId,
-                information: ComponentInformation.FromModel(model.Information),
+                id: model.Id,
+                baseComponentId: model.BaseComponentId,
+                versionComponentId: model.VersionComponentId,
                 timestamp: model.Timestamp,
                 requestTimestamp: requestTimestamp
                 );
         }
 
-        public Guid ComponentId { get; }
-        public ComponentInformation Information { get; }
+        public ValueObjects.Id BaseComponentId { get; }
+        public ValueObjects.Id VersionComponentId { get; }
 
         public ComponentVersion(
-            Guid id,
-            Guid componentId,
-            ComponentInformation information,
-            DateTime timestamp,
-            DateTime requestTimestamp
+            ValueObjects.Id id,
+            ValueObjects.Id baseComponentId,
+            ValueObjects.Id versionComponentId,
+            ValueObjects.Timestamp timestamp,
+            ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,
@@ -37,8 +36,8 @@ namespace Icon.GraphQl
               requestTimestamp: requestTimestamp
               )
         {
-            ComponentId = componentId;
-            Information = information;
+            BaseComponentId = baseComponentId;
+            VersionComponentId = versionComponentId;
         }
     }
 }

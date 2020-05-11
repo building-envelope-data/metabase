@@ -46,6 +46,17 @@ namespace Icon.ValueObjects
             return Result.Ok<Prefix, Errors>(new Prefix(prefix));
         }
 
+        public static Result<Prefix, Errors>? MaybeFrom(
+            string? prefix,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (prefix is null)
+                return null;
+
+            return From(prefix: prefix!, path: path);
+        }
+
         protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Value;

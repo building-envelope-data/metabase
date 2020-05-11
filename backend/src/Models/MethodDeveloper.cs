@@ -33,11 +33,11 @@ namespace Icon.Models
             return
               Result.Ok<MethodDeveloper, Errors>(
                   new MethodDeveloper(
-            id: id,
-            methodId: methodId,
-            stakeholderId: stakeholderId,
-            timestamp: timestamp
-            )
+                    id: id,
+                    methodId: methodId,
+                    stakeholderId: stakeholderId,
+                    timestamp: timestamp
+                    )
                   );
         }
     }

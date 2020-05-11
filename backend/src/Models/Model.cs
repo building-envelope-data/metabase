@@ -1,9 +1,9 @@
 using ValueObjects = Icon.ValueObjects;
-using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
     public abstract class Model
+      : IModel
     {
         public ValueObjects.Id Id { get; }
         public ValueObjects.Timestamp Timestamp { get; }

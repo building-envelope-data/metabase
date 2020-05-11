@@ -15,14 +15,14 @@ namespace Icon.ValueObjects
         public Abbreviation? Abbreviation { get; }
         public Description Description { get; }
         public DateInterval? Availability { get; }
-        public IEnumerable<ComponentCategory> Categories { get; }
+        public IReadOnlyCollection<ComponentCategory> Categories { get; }
 
         private ComponentInformation(
             Name name,
             Abbreviation? abbreviation,
             Description description,
             DateInterval? availability,
-            IEnumerable<ComponentCategory> categories
+            IReadOnlyCollection<ComponentCategory> categories
             )
         {
             Name = name;
@@ -37,7 +37,7 @@ namespace Icon.ValueObjects
             Abbreviation? abbreviation,
             Description description,
             DateInterval? availability,
-            IEnumerable<ComponentCategory> categories,
+            IReadOnlyCollection<ComponentCategory> categories,
             IReadOnlyList<object>? path = null
             )
         {
@@ -50,6 +50,40 @@ namespace Icon.ValueObjects
                   categories: categories
                   )
                 );
+        }
+
+        public static Result<ComponentInformation, Errors> From(
+            string name,
+            string? abbreviation,
+            string description,
+            DateTime? availableFrom,
+            DateTime? availableUntil,
+            IReadOnlyCollection<ComponentCategory> categories,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            var nameResult = ValueObjects.Name.From(name);
+            var abbreviationResult = ValueObjects.Abbreviation.MaybeFrom(abbreviation);
+            var descriptionResult = ValueObjects.Description.From(description);
+            var availabilityResult = ValueObjects.DateInterval.MaybeFrom(availableFrom, availableUntil);
+
+            return
+              Errors.CombineExistent(
+                  nameResult,
+                  abbreviationResult,
+                  descriptionResult,
+                  availabilityResult
+                  )
+              .Bind(_ =>
+                  From(
+                    name: nameResult.Value,
+                    abbreviation: abbreviationResult?.Value,
+                    description: descriptionResult.Value,
+                    availability: availabilityResult?.Value,
+                    categories: categories,
+                    path: path
+                    )
+                  );
         }
 
         protected override IEnumerable<object?> GetEqualityComponents()

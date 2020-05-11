@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using Icon.Infrastructure.Query;
-using HotChocolate.Types;
-using HotChocolate.Types.Relay;
+using DateTime = System.DateTime;
 
 namespace Icon.GraphQl
 {
@@ -12,6 +10,18 @@ namespace Icon.GraphQl
         public ResolversBase(IQueryBus queryBus)
         {
             QueryBus = queryBus;
+        }
+
+        protected ValueObjects.TimestampedId TimestampId(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp
+            )
+        {
+            return ResultHelpers.HandleFailure(
+                ValueObjects.TimestampedId.From(
+                  id, timestamp
+                  )
+                );
         }
     }
 }

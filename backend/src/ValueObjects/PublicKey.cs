@@ -46,6 +46,17 @@ namespace Icon.ValueObjects
             return Result.Ok<PublicKey, Errors>(new PublicKey(publicKey));
         }
 
+        public static Result<PublicKey, Errors>? MaybeFrom(
+            string? publicKey,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            if (publicKey is null)
+                return null;
+
+            return From(publicKey: publicKey!, path: path);
+        }
+
         protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Value;

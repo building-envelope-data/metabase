@@ -42,7 +42,7 @@ namespace Test.Integration.EventStore
                 // TODO Add those inline projections to the tests where they are needed.
                 _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentAggregate>();
                 _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionAggregate>();
-                _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionManufacturerAggregate>();
+                _.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentManufacturerAggregate>();
 
                 if (!(setStoreOptions is null))
                 {

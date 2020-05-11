@@ -37,12 +37,12 @@ namespace Icon.Models
             return
               Result.Ok<InstitutionRepresentative, Errors>(
                   new InstitutionRepresentative(
-            id: id,
-            institutionId: institutionId,
-            userId: userId,
-            role: role,
-            timestamp: timestamp
-            )
+                    id: id,
+                    institutionId: institutionId,
+                    userId: userId,
+                    role: role,
+                    timestamp: timestamp
+                    )
                   );
         }
     }

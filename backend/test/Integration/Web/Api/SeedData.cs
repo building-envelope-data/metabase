@@ -23,10 +23,10 @@ namespace Test.Integration.Web.Api
 {
     public static class SeedData
     {
-        public static async Task SeedUsers(UserManager<Models.User> userManager)
+        public static async Task SeedUsers(UserManager<Models.UserX> userManager)
         {
             var identityResult = await userManager.CreateAsync(
-                    new Models.User()
+                    new Models.UserX()
                     {
                         /* Id = 1, */
                         UserName = "simon@icon.com",

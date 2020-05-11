@@ -13,21 +13,21 @@ using Commands = Icon.Commands;
 
 namespace Icon.Events
 {
-    public sealed class ComponentCreated : Event
+    public sealed class ComponentCreated
+      : CreatedEvent
     {
         public static ComponentCreated From(
             Guid componentId,
-            Commands.CreateComponent command
+            Commands.Create<ValueObjects.CreateComponentInput> command
             )
         {
             return new ComponentCreated(
                 componentId: componentId,
-                information: ComponentInformationEventData.From(command.Input),
+                information: ComponentInformationEventData.From(command.Input.Information),
                 creatorId: command.CreatorId
                 );
         }
 
-        public Guid ComponentId { get; set; }
         public ComponentInformationEventData Information { get; set; }
 
 #nullable disable
@@ -39,9 +39,11 @@ namespace Icon.Events
             ComponentInformationEventData information,
             Guid creatorId
             )
-          : base(creatorId)
+          : base(
+              aggregateId: componentId,
+              creatorId: creatorId
+              )
         {
-            ComponentId = componentId;
             Information = information;
             EnsureValid();
         }
@@ -51,7 +53,6 @@ namespace Icon.Events
             return
               Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(ComponentId, nameof(ComponentId)),
                   Information.Validate()
                   );
         }

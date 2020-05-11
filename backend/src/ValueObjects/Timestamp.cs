@@ -30,10 +30,11 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            if (timestamp > (now ?? DateTime.UtcNow))
+            var nonNullNow = now ?? DateTime.UtcNow;
+            if (timestamp > nonNullNow)
                 return Result.Failure<Timestamp, Errors>(
                     Errors.One(
-                    message: "Timestamp is in the future",
+                    message: $"Timestamp {timestamp} is in the future where {nonNullNow} is now",
                     code: ErrorCodes.InvalidValue,
                     path: path
                     )

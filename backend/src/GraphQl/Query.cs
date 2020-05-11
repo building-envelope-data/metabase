@@ -16,77 +16,167 @@ using CSharpFunctionalExtensions;
 namespace Icon.GraphQl
 {
     public sealed class Query
-      : QueryAndMutationBase
     {
         private readonly IQueryBus _queryBus;
-        private readonly UserManager<Models.User> _userManager;
+        private readonly UserManager<Models.UserX> _userManager;
 
-        public Query(IQueryBus queryBus, UserManager<Models.User> userManager)
+        public Query(IQueryBus queryBus, UserManager<Models.UserX> userManager)
         {
             _queryBus = queryBus;
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<Component>> GetComponents(
-            DateTime? timestamp,
+        // TODO Use `EnableRelaySupport` in `Icon.Configuration.GraphQl` instead
+        public Task<Node> GetNode(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] NodeForTimestampedIdDataLoader nodeLoader,
             IResolverContext resolverContext
             )
         {
-            var requestTimestamp = HandleTimestamp(timestamp, resolverContext);
-            var query =
-              ResultHelpers.HandleFailure(
-                  Queries.ListComponents.From(requestTimestamp)
-                  );
-            return ResultHelpers.HandleFailures<Models.Component>(
-              await _queryBus
-               .Send<
-                  Queries.ListComponents,
-                  IEnumerable<Result<Models.Component, Errors>>
-                  >(query)
-              )
-              .Select(c => Component.FromModel(c, requestTimestamp));
+            return nodeLoader.LoadAsync(
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
+                );
+        }
+
+        public Task<IReadOnlyList<Component>> GetComponents(
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] ComponentsAtTimestampDataLoader componentsLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return componentsLoader.LoadAsync(
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                );
         }
 
         public Task<Component> GetComponent(
-            Guid id,
-            DateTime? timestamp,
-            [DataLoader] ComponentDataLoader componentLoader,
+            ValueObjects.Id id,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] ComponentForTimestampedIdDataLoader componentLoader,
             IResolverContext resolverContext
             )
         {
-            var requestTimestamp = HandleTimestamp(timestamp, resolverContext);
-            var timestampedId =
-              ResultHelpers.HandleFailure(
-                  ValueObjects.TimestampedId.From(
-                    id, requestTimestamp
-                    )
-                  );
-            return
-              componentLoader.LoadAsync(timestampedId);
-            /* return */
-            /*   Component.FromModel( */
-            /*       (await _queryBus */
-            /*         .Send< */
-            /*            Queries.GetComponent, */
-            /*            Models.Component */
-            /*            >(new Queries.GetComponent(id, nonNullTimestamp)) */
-            /*       )); */
+            return componentLoader.LoadAsync(
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
+                );
         }
 
-        /* public async Task<ActionResult<ComponentAggregate>> Get(Guid id, DateTime? timestamp) // TODO Use `ZonedDateTime` here. Problem: Its (de)serialization is rather complex. */
-        /* { */
-        /*     var component = await _queryBus.Send<Component.Get.Query, ComponentView>( */
-        /*         new Component.Get.Query() */
-        /*         { */
-        /*             ComponentId = id, */
-        /*             Timestamp = timestamp, */
-        /*         } */
-        /*         ); */
-        /*     if (component is null) */
-        /*     { */
-        /*         return NotFound(); */
-        /*     } */
-        /*     return component; */
-        /* } */
+        public Task<IReadOnlyList<Database>> GetDatabases(
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] DatabasesAtTimestampDataLoader databasesLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return databasesLoader.LoadAsync(
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                );
+        }
+
+        public Task<Database> GetDatabase(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] DatabaseForTimestampedIdDataLoader databaseLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return databaseLoader.LoadAsync(
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
+                );
+        }
+
+        public Task<IReadOnlyList<Institution>> GetInstitutions(
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] InstitutionsAtTimestampDataLoader institutionsLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return institutionsLoader.LoadAsync(
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                );
+        }
+
+        public Task<Institution> GetInstitution(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return institutionLoader.LoadAsync(
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
+                );
+        }
+
+        public Task<IReadOnlyList<Method>> GetMethods(
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] MethodsAtTimestampDataLoader methodsLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return methodsLoader.LoadAsync(
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                );
+        }
+
+        public Task<Method> GetMethod(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] MethodForTimestampedIdDataLoader methodLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return methodLoader.LoadAsync(
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
+                );
+        }
+
+        public Task<IReadOnlyList<Person>> GetPersons(
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] PersonsAtTimestampDataLoader personsLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return personsLoader.LoadAsync(
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                );
+        }
+
+        public Task<Person> GetPerson(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] PersonForTimestampedIdDataLoader personLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return personLoader.LoadAsync(
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
+                );
+        }
+
+        // TODO GetStakeholder and GetStakeholders
+
+        public Task<IReadOnlyList<Standard>> GetStandards(
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] StandardsAtTimestampDataLoader standardsLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return standardsLoader.LoadAsync(
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                );
+        }
+
+        public Task<Standard> GetStandard(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] StandardForTimestampedIdDataLoader standardLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return standardLoader.LoadAsync(
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
+                );
+        }
     }
 }

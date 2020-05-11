@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Marten;
+using IEventStore = Marten.Events.IEventStore;
 using Marten.Linq;
 using System.Threading.Tasks;
 using Icon.Events;
@@ -28,15 +29,43 @@ namespace Icon.Infrastructure.Aggregate
             _eventBus = eventBus;
         }
 
-        public Task<Result<ValueObjects.TimestampedId, Errors>> Store<T>(
+        public Task<Result<ValueObjects.TimestampedId, Errors>> New<T>(
+            Guid id,
+            IEvent @event,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return New<T>(
+                id,
+                new IEvent[] { @event },
+                cancellationToken
+                );
+        }
+
+        public Task<Result<ValueObjects.TimestampedId, Errors>> New<T>(
+            Guid id,
+            IEnumerable<IEvent> events,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return Store<T>(
+                id,
+                events,
+                (eventStore, eventArray) => eventStore.StartStream<T>(id, eventArray),
+                cancellationToken
+                );
+        }
+
+        public Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
             Guid id,
             int expectedVersion,
             IEvent @event,
             CancellationToken cancellationToken
             ) where T : class, IEventSourcedAggregate, new()
         {
-            AssertNotDisposed();
-            return Store<T>(
+            return Append<T>(
                 id,
                 expectedVersion,
                 new IEvent[] { @event },
@@ -44,10 +73,26 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public async Task<Result<ValueObjects.TimestampedId, Errors>> Store<T>(
+        public Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
             Guid id,
             int expectedVersion,
             IEnumerable<IEvent> events,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return Store<T>(
+                id,
+                events,
+                (eventStore, eventArray) => eventStore.Append(id, expectedVersion, eventArray),
+                cancellationToken
+                );
+        }
+
+        private async Task<Result<ValueObjects.TimestampedId, Errors>> Store<T>(
+            Guid id,
+            IEnumerable<IEvent> events,
+            Action<IEventStore, IEvent[]> action,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
@@ -59,14 +104,13 @@ namespace Icon.Infrastructure.Aggregate
                 cancellationToken
                 );
             var eventArray = events.ToArray();
-            _session.Events.Append(id, expectedVersion, eventArray);
-            await _session.SaveChangesAsync(cancellationToken);
-            await _eventBus.Publish(eventArray);
-            var timestampResult = await FetchTimestamp<T>(id, cancellationToken);
+            action(_session.Events, eventArray);
+            await _session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await _eventBus.Publish(eventArray).ConfigureAwait(false);
+            var timestampResult = await FetchTimestamp<T>(id, cancellationToken).ConfigureAwait(false);
             return ValueObjects.Id.From(id)
               .Bind(nonEmptyId =>
-                  timestampResult.Bind(
-                    timestamp =>
+                  timestampResult.Bind(timestamp =>
                       ValueObjects.TimestampedId.From(
                         id, timestamp
                         )

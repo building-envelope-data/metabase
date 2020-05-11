@@ -7,16 +7,14 @@ using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
-    public class Standard
+    public sealed class Standard
       : Model
     {
         public ValueObjects.Title Title { get; }
         public ValueObjects.Abstract Abstract { get; }
         public ValueObjects.Section Section { get; }
         public ValueObjects.Year Year { get; }
-        public ValueObjects.Prefix? Prefix { get; }
-        public ValueObjects.MainNumber MainNumber { get; }
-        public ValueObjects.Suffix? Suffix { get; }
+        public ValueObjects.Numeration Numeration { get; }
         public IReadOnlyCollection<ValueObjects.Standardizer> Standardizers { get; }
         public ValueObjects.AbsoluteUri? Locator { get; }
 
@@ -26,9 +24,7 @@ namespace Icon.Models
             ValueObjects.Abstract @abstract,
             ValueObjects.Section section,
             ValueObjects.Year year,
-            ValueObjects.Prefix? prefix,
-            ValueObjects.MainNumber mainNumber,
-            ValueObjects.Suffix? suffix,
+            ValueObjects.Numeration numeration,
             IReadOnlyCollection<ValueObjects.Standardizer> standardizers,
             ValueObjects.AbsoluteUri? locator,
             ValueObjects.Timestamp timestamp
@@ -39,9 +35,7 @@ namespace Icon.Models
             Abstract = @abstract;
             Section = section;
             Year = year;
-            Prefix = prefix;
-            MainNumber = mainNumber;
-            Suffix = suffix;
+            Numeration = numeration;
             Standardizers = standardizers;
             Locator = locator;
         }
@@ -52,9 +46,7 @@ namespace Icon.Models
             ValueObjects.Abstract @abstract,
             ValueObjects.Section section,
             ValueObjects.Year year,
-            ValueObjects.Prefix? prefix,
-            ValueObjects.MainNumber mainNumber,
-            ValueObjects.Suffix? suffix,
+            ValueObjects.Numeration numeration,
             IReadOnlyCollection<ValueObjects.Standardizer> standardizers,
             ValueObjects.AbsoluteUri? locator,
             ValueObjects.Timestamp timestamp
@@ -68,9 +60,7 @@ namespace Icon.Models
             @abstract: @abstract,
             section: section,
             year: year,
-            prefix: prefix,
-            mainNumber: mainNumber,
-            suffix: suffix,
+            numeration: numeration,
             standardizers: standardizers,
             locator: locator,
             timestamp: timestamp
