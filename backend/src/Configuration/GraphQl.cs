@@ -15,7 +15,7 @@ using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceColl
 using IApplicationBuilder = Microsoft.AspNetCore.Builder.IApplicationBuilder;
 using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 using Microsoft.Extensions.Hosting; // Provides `IsDevelopment` for `IWebHostEnvironment`, see https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostenvironment?view=dotnet-plat-ext-3.1 and https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.iwebhostenvironment?view=aspnetcore-3.1
-using Microsoft.AspNetCore.Builder; // UseWebSockets
+// using Microsoft.AspNetCore.Builder; // UseWebSockets
 using GraphQlX = Icon.GraphQl;
 
 namespace Icon.Configuration
@@ -24,8 +24,10 @@ namespace Icon.Configuration
     {
         public static void ConfigureServices(IServiceCollection services)
         {
-            // Add in-memory event provider
-            services.AddInMemorySubscriptionProvider();
+            // How subscriptions can be used is explained on
+            // https://hotchocolate.io/docs/code-first-subscription
+            // services.AddInMemorySubscriptionProvider();
+            // services.AddRedisSubscriptionProvider(...);
 
             // https://hotchocolate.io/docs/dataloaders
             services.AddDataLoaderRegistry();
@@ -43,7 +45,7 @@ namespace Icon.Configuration
 
                   .AddQueryType<GraphQlX.Query>()
                   .AddMutationType<GraphQlX.Mutation>()
-                  /* .AddSubscriptionType<SubscriptionType>() */
+                  // .AddSubscriptionType<SubscriptionType>()
 
                   .AddType<GraphQlX.Node>()
                   .AddType<GraphQlX.StakeholderBase>()
@@ -78,9 +80,8 @@ namespace Icon.Configuration
 
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment environment)
         {
-            // TODO Do we want `UseWebSockets` here?
             var graphQl = app
-                  .UseWebSockets()
+                  // .UseWebSockets()
                   .UseGraphQL(
                       new QueryMiddlewareOptions
                       {
