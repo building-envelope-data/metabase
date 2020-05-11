@@ -56,7 +56,6 @@ namespace Icon.Configuration
         public static Marten.IDocumentStore BuildDocumentStore(IWebHostEnvironment environment, AppSettings.DatabaseSettings databaseSettings, ILogger<EventStore> logger)
         {
             var martenLogger = new MartenLogger(logger);
-            // TODO Declare `creatorId` of events as foreign key to `User`, see https://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/
             return Marten.DocumentStore.For(_ =>
                 {
                     _.Connection(databaseSettings.ConnectionString);
