@@ -86,9 +86,13 @@ namespace Icon.Configuration
         private static void ProjectAggregatesInline(Marten.StoreOptions options)
         {
             // Originally generated from the command line with the command
-            // `ls -1 src/Aggregates/ | grep -E ".*Aggregate.cs$" | sed -e "s/^\(.*\).cs\$/options.Events.InlineProjections.AggregateStreamsWith<Aggregates.\1>();/"`
+            // `ls -1 src/Aggregates/ | grep -E ".*Aggregate.cs$" | grep -v -E "^MethodDeveloperAggregate.cs$" | sed -e "s/^\(.*\).cs\$/options.Events.InlineProjections.AggregateStreamsWith<Aggregates.\1>();/"`
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentConcretizationAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentManufacturerAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentPartAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVariantAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.ComponentVersionAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.DatabaseAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.InstitutionAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.InstitutionMethodDeveloperAggregate>();
@@ -98,14 +102,19 @@ namespace Icon.Configuration
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.PersonAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.PersonMethodDeveloperAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.StandardAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.UserAggregate>();
         }
 
         private static void AddEventTypes(Marten.StoreOptions options)
         {
             // Originally generated from the command line with the command
-            // `ls -1 src/Events/ | grep "Created\|Added" | sed -e "s/^\(.*\).cs\$/options.Events.AddEventType(typeof(Events.\1));/"`
+            // `ls -1 src/Events/ | grep "Created\|Added" | grep -v -E "^I?(Created|Added)Event.cs$" | grep -v -E "^MethodDeveloperAdded.cs$" | sed -e "s/^\(.*\).cs\$/options.Events.AddEventType(typeof(Events.\1));/"`
+            options.Events.AddEventType(typeof(Events.ComponentConcretizationAdded));
             options.Events.AddEventType(typeof(Events.ComponentCreated));
             options.Events.AddEventType(typeof(Events.ComponentManufacturerAdded));
+            options.Events.AddEventType(typeof(Events.ComponentPartAdded));
+            options.Events.AddEventType(typeof(Events.ComponentVariantAdded));
+            options.Events.AddEventType(typeof(Events.ComponentVersionAdded));
             options.Events.AddEventType(typeof(Events.DatabaseCreated));
             options.Events.AddEventType(typeof(Events.InstitutionCreated));
             options.Events.AddEventType(typeof(Events.InstitutionMethodDeveloperAdded));
@@ -115,6 +124,7 @@ namespace Icon.Configuration
             options.Events.AddEventType(typeof(Events.PersonCreated));
             options.Events.AddEventType(typeof(Events.PersonMethodDeveloperAdded));
             options.Events.AddEventType(typeof(Events.StandardCreated));
+            options.Events.AddEventType(typeof(Events.UserCreated));
         }
     }
 }
