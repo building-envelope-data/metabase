@@ -407,18 +407,6 @@ namespace Icon.Infrastructure.Aggregate
                     );
         }
 
-        private bool HasAggregateNeverExisted<T>(T? aggregate)
-          where T : class, IEventSourcedAggregate, new()
-        {
-            return aggregate is null;
-        }
-
-        private bool DoesAggregateExist<T>(T? aggregate)
-          where T : class, IEventSourcedAggregate, new()
-        {
-            return !(aggregate is null) && aggregate.Version >= 1;
-        }
-
         public Task<IEnumerable<Result<T, Errors>>> LoadAllThatExisted<T>(
             IEnumerable<ValueObjects.Id> possibleIds,
             DateTime timestamp,
@@ -531,6 +519,18 @@ namespace Icon.Infrastructure.Aggregate
                   ),
                 cancellationToken
                 );
+        }
+
+        private bool HasAggregateNeverExisted<T>(T? aggregate)
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return aggregate is null;
+        }
+
+        private bool DoesAggregateExist<T>(T? aggregate)
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return !(aggregate is null) && aggregate.Version >= 1;
         }
 
         private Result<T, Errors> BuildResult<T>(Guid id, T? aggregate)
