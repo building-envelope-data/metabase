@@ -80,7 +80,7 @@ namespace Icon
             if (id is null)
                 return Result.Ok<bool, Errors>(true);
 
-            // TODO Why can't we use the null-forgiving operator `!` as follows?
+            // Why can't we use the null-forgiving operator `!` as follows?
             // return ValidateNonEmpty(id!, variableName);
             // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/null-forgiving
             return ValidateNonEmpty(id ?? throw new ArgumentNullException(nameof(id)), variableName);

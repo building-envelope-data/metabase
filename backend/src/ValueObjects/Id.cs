@@ -53,7 +53,7 @@ namespace Icon.ValueObjects
             if (id is null)
                 return null;
 
-            // TODO Why can't we use the null-forgiving operator `!` as follows?
+            // Why can't we use the null-forgiving operator `!` as follows?
             // return From(id: id!, path: path);
             // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/null-forgiving
             return From(id: id ?? throw new ArgumentNullException(nameof(id)), path: path);
