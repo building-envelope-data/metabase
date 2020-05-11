@@ -12,6 +12,7 @@ using CancellationToken = System.Threading.CancellationToken;
 using ErrorCodes = Icon.ErrorCodes;
 using HotChocolate;
 using CSharpFunctionalExtensions;
+using System.Diagnostics.CodeAnalysis; // NotNullWhen
 
 namespace Icon.Infrastructure.Aggregate
 {
@@ -521,13 +522,13 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        private bool HasAggregateNeverExisted<T>(T? aggregate)
+        private bool HasAggregateNeverExisted<T>([NotNullWhen(false)] T? aggregate)
           where T : class, IEventSourcedAggregate, new()
         {
             return aggregate is null;
         }
 
-        private bool DoesAggregateExist<T>(T? aggregate)
+        private bool DoesAggregateExist<T>([NotNullWhen(true)] T? aggregate)
           where T : class, IEventSourcedAggregate, new()
         {
             return !(aggregate is null) && aggregate.Version >= 1;
