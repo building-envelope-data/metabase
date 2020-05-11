@@ -20,7 +20,7 @@ namespace Icon.Infrastructure.Aggregate
         private readonly IDocumentSession _session;
         private bool _disposed;
 
-        // TODO We sould like to use `IQuerySession` here, which however does
+        // TODO We would like to use `IQuerySession` here, which however does
         // not provide access to an `IEventStore` via a getter `Events`.
         public AggregateRepositoryReadOnlySession(IDocumentSession session)
         {
@@ -259,7 +259,7 @@ namespace Icon.Infrastructure.Aggregate
         /*         return await LoadAll<T>(aggregateIds, timestamp, cancellationToken); */
         /* } */
 
-        public async Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
+        private async Task<IEnumerable<((Guid, DateTime), T?)>> LoadAllRaw<T>(
             IEnumerable<(Guid, DateTime)> idsAndTimestamps,
             CancellationToken cancellationToken = default(CancellationToken)
             )
@@ -276,9 +276,26 @@ namespace Icon.Infrastructure.Aggregate
               .ToList();
             await batch.Execute(cancellationToken);
             var aggregates = await Task.WhenAll(aggregateStreamTasks);
-            return
-              idsAndTimestamps
-              .Zip(aggregates, BuildResult);
+            return idsAndTimestamps.Zip(aggregates,
+                (idAndTimestamp, aggregate) => (idAndTimestamp, (T?)aggregate)
+                );
+        }
+
+        public async Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
+            IEnumerable<(Guid, DateTime)> idsAndTimestamps,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            return (await LoadAllRaw<T>(
+                  idsAndTimestamps,
+                  cancellationToken
+                  )
+                )
+              .Select((((Guid id, DateTime timestamp) idAndTimestamp, T? aggregate) t) =>
+                  BuildResult(t.idAndTimestamp.id, t.aggregate)
+                  );
         }
 
         public async Task<IEnumerable<Result<T, Errors>>> LoadAllX<T>(
@@ -289,7 +306,7 @@ namespace Icon.Infrastructure.Aggregate
         {
             AssertNotDisposed();
             var aggregateTypeResults = await FetchAggregateTypes(
-                idsAndTimestamps.Select(t => t.Item1),
+                idsAndTimestamps.Select(((Guid id, DateTime timestamp) t) => t.id),
                 cancellationToken
                 );
             var aggregateTypeToIdsAndTimestamps =
@@ -372,36 +389,34 @@ namespace Icon.Infrastructure.Aggregate
             IEnumerable<Guid> possibleIds,
             DateTime timestamp,
             CancellationToken cancellationToken = default(CancellationToken)
-            ) where T : class, IEventSourcedAggregate, new()
+            )
+          where T : class, IEventSourcedAggregate, new()
         {
             AssertNotDisposed();
-            return
-              (await LoadAll<T>(
-                                possibleIds.Select(id => (Id: id, Timestamp: timestamp)),
-                                cancellationToken
-                               )
-              ).Where(r =>
-                // TODO This way of excluding errors is error-prone and is also
-                // somewhat not what we want. We, for example, exclude an error
-                // right now if the model has never existed neither in the past
-                // nor in the future. This should however still be reported as
-                // an error. We only want to exclude the models that have been
-                // created after the respective timestamp. This information
-                // however cannot be extracted from the error right now. There
-                // are two solutions: Either differentiate between those two
-                // errors, or extract the common logic from `LoadAll` that is
-                // also needed by this method into a helper method and use that
-                // helper here. I would prefere the latter method because it's
-                // less error-prone.
-                r.IsSuccess ||
-                (
-                 r.IsFailure &&
-                 (
-                  r.Error.Count != 1 ||
-                  r.Error[0].Code != ErrorCodes.NonExistentModel
-                 )
+            return (await LoadAllRaw<T>(
+                  possibleIds.Select(id => (id, timestamp)),
+                  cancellationToken
+                  )
                 )
-                );
+                .Where((((Guid, DateTime) idAndTimestamp, T? aggregate) t) =>
+                    HasAggregateNeverExisted(t.aggregate) ||
+                    DoesAggregateExist(t.aggregate)
+                    ) // Exclude the aggregates that existed once but not at the given timestamp, that is, the ones whose version is `0`. But include aggregates that never existed at all, that is, the ones that are `null`, with the effect that they are reported as errors by `BuildResult`.
+                .Select((((Guid id, DateTime timestamp) idAndTimestamp, T? aggregate) t) =>
+                    BuildResult(t.idAndTimestamp.id, t.aggregate)
+                    );
+        }
+
+        private bool HasAggregateNeverExisted<T>(T? aggregate)
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return aggregate is null;
+        }
+
+        private bool DoesAggregateExist<T>(T? aggregate)
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return !(aggregate is null) && aggregate.Version >= 1;
         }
 
         public Task<IEnumerable<Result<T, Errors>>> LoadAllThatExisted<T>(
@@ -418,7 +433,7 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public async Task<IEnumerable<IEnumerable<Result<T, Errors>>>> LoadAllBatched<T>(
+        private async Task<IEnumerable<(DateTime, IEnumerable<(Guid, T?)>)>> LoadAllBatchedRaw<T>(
             IEnumerable<(DateTime, IEnumerable<Guid>)> timestampsAndIds,
             CancellationToken cancellationToken = default(CancellationToken)
             )
@@ -440,7 +455,29 @@ namespace Icon.Infrastructure.Aggregate
             return
               timestampsAndIds
               .Zip(aggregates, ((DateTime timestamp, IEnumerable<Guid> ids) t, IEnumerable<T> aggregates) =>
-                  t.ids.Zip(aggregates, BuildResult));
+                  (t.timestamp,
+                   t.ids.Zip(aggregates, (id, aggregate) => (id, (T?)aggregate))
+                   )
+                  );
+        }
+
+        public async Task<IEnumerable<IEnumerable<Result<T, Errors>>>> LoadAllBatched<T>(
+            IEnumerable<(DateTime, IEnumerable<Guid>)> timestampsAndIds,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            return (await LoadAllBatchedRaw<T>(
+                  timestampsAndIds,
+                  cancellationToken
+                  )
+                )
+              .Select(((DateTime timestamp, IEnumerable<(Guid, T?)> idsAndAggregates) t) =>
+                  t.idsAndAggregates.Select(((Guid id, T? aggregate) u) =>
+                    BuildResult(u.id, u.aggregate)
+                    )
+                  );
         }
 
         public Task<IEnumerable<IEnumerable<Result<T, Errors>>>> LoadAllBatched<T>(
@@ -452,7 +489,7 @@ namespace Icon.Infrastructure.Aggregate
             return LoadAllBatched<T>(
                 timestampsAndIds.Select(((ValueObjects.Timestamp timestamp, IEnumerable<ValueObjects.Id> ids) t) =>
                   ((DateTime)t.timestamp,
-                   t.ids.Select(id => id.Value))
+                   t.ids.Select(id => (Guid)id))
                   )
                 );
         }
@@ -465,34 +502,19 @@ namespace Icon.Infrastructure.Aggregate
         {
             AssertNotDisposed();
             return
-              (await LoadAllBatched<T>(
-                                timestampsAndPossibleIds,
-                                cancellationToken
-                               )
-              ).Select(aggregateResults =>
-                aggregateResults.Where(
-                  r =>
-                  // TODO This way of excluding errors is error-prone and is also
-                  // somewhat not what we want. We, for example, exclude an error
-                  // right now if the model has never existed neither in the past
-                  // nor in the future. This should however still be reported as
-                  // an error. We only want to exclude the models that have been
-                  // created after the respective timestamp. This information
-                  // however cannot be extracted from the error right now. There
-                  // are two solutions: Either differentiate between those two
-                  // errors, or extract the common logic from `LoadAll` that is
-                  // also needed by this method into a helper method and use that
-                  // helper here. I would prefere the latter method because it's
-                  // less error-prone.
-                  r.IsSuccess ||
-                  (
-                   r.IsFailure &&
-                   (
-                    r.Error.Count != 1 ||
-                    r.Error[0].Code != ErrorCodes.NonExistentModel
-                   )
+              (await LoadAllBatchedRaw<T>(
+                  timestampsAndPossibleIds,
+                  cancellationToken
                   )
-                  )
+                )
+              .Select(((DateTime timestamp, IEnumerable<(Guid, T?)> idsAndAggregates) t) =>
+                  t.idsAndAggregates
+                  .Where(((Guid id, T? aggregate) u) =>
+                    HasAggregateNeverExisted(u.aggregate) ||
+                    DoesAggregateExist(u.aggregate)
+                  ) // Exclude the aggregates that existed once but not at the given timestamp, that is, the ones whose version is `0`. But include aggregates that never existed at all, that is, the ones that are `null`, with the effect that they are reported as errors by `BuildResult`.
+                  .Select(((Guid id, T? aggregate) u) =>
+                    BuildResult(u.id, u.aggregate))
                   );
         }
 
@@ -511,21 +533,15 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        private Result<T, Errors> BuildResult<T>((Guid Id, DateTime Timestamp) idAndTimestamp, T aggregate)
-          where T : class, IEventSourcedAggregate, new()
-        {
-            return BuildResult(idAndTimestamp.Id, aggregate);
-        }
-
-        private Result<T, Errors> BuildResult<T>(Guid id, T aggregate)
-          where T : class, IEventSourcedAggregate, new()
+        private Result<T, Errors> BuildResult<T>(Guid id, T? aggregate)
+          where T : class, IEventSourcedAggregate
         {
             aggregate?.EnsureValid();
             if (aggregate is null || aggregate.Version == 0)
             {
                 return Result.Failure<T, Errors>(BuildNonExistentModelError(id));
             }
-            return Result.Ok<T, Errors>(aggregate);
+            return Result.Ok<T, Errors>(aggregate!);
         }
     }
 }
