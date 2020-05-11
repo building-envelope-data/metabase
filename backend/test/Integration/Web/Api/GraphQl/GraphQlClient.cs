@@ -46,7 +46,12 @@ namespace Test.Integration.Web.Api.GraphQl
             _httpClient = httpClient;
         }
 
-        public sealed class ComponentInputData
+        public abstract class Payload : ResponseBase
+        {
+            public DateTime? requestTimestamp { get; set; }
+        }
+
+        public sealed class ComponentInformationInput
         {
             public string name { get; }
             public string? abbreviation { get; }
@@ -55,7 +60,7 @@ namespace Test.Integration.Web.Api.GraphQl
             public DateTime? availableUntil { get; }
             public ValueObjects.ComponentCategory[] categories { get; }
 
-            public ComponentInputData(
+            public ComponentInformationInput(
                 string name,
                 string? abbreviation,
                 string description,
@@ -73,23 +78,33 @@ namespace Test.Integration.Web.Api.GraphQl
             }
         }
 
+        public sealed class CreateComponentInput
+        {
+            public ComponentInformationInput information { get; }
+
+            public CreateComponentInput(ComponentInformationInput information)
+            {
+                this.information = information;
+            }
+        }
+
         public sealed class ComponentData : ResponseBase
         {
             public Guid? id { get; set; }
             public DateTime? timestamp { get; set; }
-            public IEnumerable<ComponentVersionData>? versions { get; set; }
+            public DateTime? requestTimestamp { get; set; }
+            public IEnumerable<ComponentData>? versions { get; set; }
         }
 
-        public sealed class ComponentVersionData : ResponseBase
+        public sealed class CreateComponentPayload : Payload
         {
-            public Guid? id { get; set; }
             public Guid? componentId { get; set; }
-            public DateTime? timestamp { get; set; }
+            public ComponentData? component { get; set; }
         }
 
         public sealed class CreateComponentData : ResponseBase
         {
-            public ComponentData? createComponent { get; set; }
+            public CreateComponentPayload? createComponent { get; set; }
         }
 
         public async Task<Response<T, Error>> Request<T>(
@@ -108,26 +123,27 @@ namespace Test.Integration.Web.Api.GraphQl
                       variables: variables
                     )
                   )
-                );
+                )
+              .ConfigureAwait(false);
             var response =
               await new ResponseParser()
-              .Parse<T, Error>(httpResponse);
+              .Parse<T, Error>(httpResponse)
+              .ConfigureAwait(false);
             return response;
         }
 
         public Task<Response<CreateComponentData, Error>> CreateComponent(
-            ComponentInputData input
+            CreateComponentInput input
             )
         {
             return Request<CreateComponentData>(
-                 query: @"mutation($input: ComponentInput!) {
+                 query: @"mutation($input: CreateComponentInput!) {
               createComponent(input: $input) {
+              requestTimestamp
+              component {
               id
               timestamp
-              versions {
-              id
-              componentId
-              timestamp
+              requestTimestamp
               }
               }
               }",
@@ -138,12 +154,12 @@ namespace Test.Integration.Web.Api.GraphQl
                 );
         }
 
-        public async Task<ComponentData> CreateComponentSuccessfully(
-            ComponentInputData input
+        public async Task<CreateComponentPayload> CreateComponentSuccessfully(
+            CreateComponentInput input
             )
         {
             var data =
-              (await CreateComponent(input))
+              (await CreateComponent(input).ConfigureAwait(false))
               .EnsureSuccess();
             return
               data.createComponent
@@ -151,11 +167,11 @@ namespace Test.Integration.Web.Api.GraphQl
         }
 
         public async Task<IReadOnlyList<Error>> CreateComponentErroneously(
-            ComponentInputData input
+            CreateComponentInput input
             )
         {
             return
-              (await CreateComponent(input))
+              (await CreateComponent(input).ConfigureAwait(false))
               .EnsureFailure();
         }
 
@@ -168,15 +184,33 @@ namespace Test.Integration.Web.Api.GraphQl
             DateTime? timestamp = null
             )
         {
+            if (timestamp is null)
+            {
+                return Request<GetComponentsData>(
+                      query: @"query {
+              components {
+              id
+              timestamp
+              requestTimestamp
+              versions {
+              id
+              timestamp
+              requestTimestamp
+              }
+              }
+              }"
+                    );
+            }
             return Request<GetComponentsData>(
                   query: @"query($timestamp: DateTime) {
               components(timestamp: $timestamp) {
               id
               timestamp
+              requestTimestamp
               versions {
               id
-              componentId
               timestamp
+              requestTimestamp
               }
               }
               }",
@@ -192,7 +226,7 @@ namespace Test.Integration.Web.Api.GraphQl
             )
         {
             return
-              (await GetComponents(timestamp))
+              (await GetComponents(timestamp).ConfigureAwait(false))
               .EnsureSuccess()
               .components
               .NotNull();
