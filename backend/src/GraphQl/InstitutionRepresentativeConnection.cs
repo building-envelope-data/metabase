@@ -33,6 +33,7 @@ namespace Icon.GraphQl
             return (await representativesLoader.LoadAsync(
                   TimestampHelpers.TimestampId(FromId, RequestTimestamp)
                   )
+                .ConfigureAwait(false)
                 )
               .Select(a => new InstitutionRepresentativeEdge(a))
               .ToList().AsReadOnly();

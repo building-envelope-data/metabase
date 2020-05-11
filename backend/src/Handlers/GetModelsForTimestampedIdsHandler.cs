@@ -37,7 +37,7 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Handle(query.TimestampedIds, session, cancellationToken);
+                return await Handle(query.TimestampedIds, session, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -53,7 +53,9 @@ namespace Icon.Handlers
                  timestampedIds,
                  cancellationToken: cancellationToken
                  )
-              ).Select(result =>
+               .ConfigureAwait(false)
+              )
+              .Select(result =>
                 result.Bind(a => a.ToModel())
                 );
         }
@@ -64,7 +66,10 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            return (await Handle(timestampedIds, session, cancellationToken))
+            return
+              (await Handle(timestampedIds, session, cancellationToken)
+               .ConfigureAwait(false)
+               )
               .Select(r => r.Map(m => (Models.IModel)m));
         }
     }

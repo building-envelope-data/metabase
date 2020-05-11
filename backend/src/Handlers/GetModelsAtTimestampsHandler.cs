@@ -36,7 +36,7 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Handle(query.Timestamps, session, cancellationToken);
+                return await Handle(query.Timestamps, session, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -46,14 +46,16 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            var possibleIds = await QueryModelIds(session, cancellationToken);
+            var possibleIds = await QueryModelIds(session, cancellationToken).ConfigureAwait(false);
             return
               (await session
                .LoadAllThatExistedBatched<TAggregate>(
                  timestamps.Select(timestamp => (timestamp, possibleIds)),
                  cancellationToken
                  )
-                ).Select(results =>
+               .ConfigureAwait(false)
+                )
+              .Select(results =>
                   Result.Ok<IEnumerable<Result<TModel, Errors>>, Errors>(
                     results.Select(result =>
                       result.Bind(a => a.ToModel())
@@ -67,9 +69,12 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            return (await session.Query<TCreatedEvent>()
+            return
+              (await session.Query<TCreatedEvent>()
               .Select(e => e.AggregateId)
-              .ToListAsync(cancellationToken))
+              .ToListAsync(cancellationToken)
+              .ConfigureAwait(false)
+              )
               .Select(id => (ValueObjects.Id)id);
         }
     }

@@ -74,7 +74,7 @@ namespace Icon.Infrastructure.Aggregate
         {
             AssertNotDisposed();
             var id = ValueObjects.Id.New();
-            while (await Exists(id, cancellationToken))
+            while (await Exists(id, cancellationToken).ConfigureAwait(false))
             {
                 id = ValueObjects.Id.New();
             }
@@ -91,7 +91,8 @@ namespace Icon.Infrastructure.Aggregate
               await _session.Events.FetchStreamStateAsync(
                   id,
                   token: cancellationToken
-                  );
+                  )
+              .ConfigureAwait(false);
             return streamState != null;
         }
 
@@ -111,7 +112,8 @@ namespace Icon.Infrastructure.Aggregate
                   id,
                   timestamp: timestamp.ToUniversalTime(),
                   token: cancellationToken
-                  );
+                  )
+              .ConfigureAwait(false);
             if (aggregate is null)
             {
                 return Result.Failure<int, Errors>(BuildNonExistentModelError(id));
@@ -124,7 +126,7 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             ) where T : class, IEventSourcedAggregate, new()
         {
-            return (await FetchStreamState(id, cancellationToken))
+            return (await FetchStreamState(id, cancellationToken).ConfigureAwait(false))
               .Bind(streamState =>
                   {
                       if (streamState.AggregateType != typeof(T))
@@ -146,7 +148,7 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             )
         {
-            return (await FetchStreamState(id, cancellationToken))
+            return (await FetchStreamState(id, cancellationToken).ConfigureAwait(false))
               .Map(streamState => streamState.AggregateType);
         }
 
@@ -155,7 +157,7 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             )
         {
-            return (await FetchStreamStates(ids, cancellationToken))
+            return (await FetchStreamStates(ids, cancellationToken).ConfigureAwait(false))
               .Select(streamStateResult =>
                   streamStateResult.Map(streamState =>
                     streamState.AggregateType
@@ -184,7 +186,8 @@ namespace Icon.Infrastructure.Aggregate
               await _session.Events.FetchStreamStateAsync(
                   id,
                   token: cancellationToken
-                  );
+                  )
+              .ConfigureAwait(false);
             if (streamState is null)
             {
                 return Result.Failure<StreamState, Errors>(BuildNonExistentModelError(id));
@@ -200,8 +203,8 @@ namespace Icon.Infrastructure.Aggregate
             AssertNotDisposed();
             var batch = _session.CreateBatchQuery();
             var streamStateTasks = ids.Select(id => batch.Events.FetchStreamState(id)).ToList(); // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
-            await batch.Execute(cancellationToken);
-            var streamStates = await Task.WhenAll(streamStateTasks);
+            await batch.Execute(cancellationToken).ConfigureAwait(false);
+            var streamStates = await Task.WhenAll(streamStateTasks).ConfigureAwait(false);
             return ids.Zip(streamStates, (id, streamState) =>
                   streamState is null
                     ? Result.Failure<StreamState, Errors>(BuildNonExistentModelError(id))
@@ -221,7 +224,8 @@ namespace Icon.Infrastructure.Aggregate
                   id,
                   timestamp: timestamp.ToUniversalTime(),
                   token: cancellationToken
-                  );
+                  )
+              .ConfigureAwait(false);
             return BuildResult(id, aggregate);
         }
 
@@ -233,10 +237,11 @@ namespace Icon.Infrastructure.Aggregate
             )
         {
             AssertNotDisposed();
-            var aggregateTypeResult = await FetchAggregateType(id, cancellationToken);
+            var aggregateTypeResult = await FetchAggregateType(id, cancellationToken).ConfigureAwait(false);
             return await aggregateTypeResult.Bind(async aggregateType =>
-                await load(this, aggregateType, id, timestamp, cancellationToken)
-                );
+                await load(this, aggregateType, id, timestamp, cancellationToken).ConfigureAwait(false)
+                )
+              .ConfigureAwait(false);
         }
 
         public Task<Result<T, Errors>> Load<T>(
@@ -275,8 +280,8 @@ namespace Icon.Infrastructure.Aggregate
                   )
               // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
               .ToList();
-            await batch.Execute(cancellationToken);
-            var aggregates = await Task.WhenAll(aggregateStreamTasks);
+            await batch.Execute(cancellationToken).ConfigureAwait(false);
+            var aggregates = await Task.WhenAll(aggregateStreamTasks).ConfigureAwait(false);
             return idsAndTimestamps.Zip(aggregates,
                 (idAndTimestamp, aggregate) => (idAndTimestamp, (T?)aggregate)
                 );
@@ -293,6 +298,7 @@ namespace Icon.Infrastructure.Aggregate
                   idsAndTimestamps,
                   cancellationToken
                   )
+                .ConfigureAwait(false)
                 )
               .Select((((Guid id, DateTime timestamp) idAndTimestamp, T? aggregate) t) =>
                   BuildResult(t.idAndTimestamp.id, t.aggregate)
@@ -309,7 +315,8 @@ namespace Icon.Infrastructure.Aggregate
             var aggregateTypeResults = await FetchAggregateTypes(
                 idsAndTimestamps.Select(((Guid id, DateTime timestamp) t) => t.id),
                 cancellationToken
-                );
+                )
+              .ConfigureAwait(false);
             var aggregateTypeToIdsAndTimestamps =
               idsAndTimestamps.Zip(aggregateTypeResults)
               .Where(t => t.Item2.IsSuccess)
@@ -318,11 +325,13 @@ namespace Icon.Infrastructure.Aggregate
                   t => t.Item1
                   );
             var aggregateTypes = aggregateTypeToIdsAndTimestamps.Select(g => g.Key);
-            var results = await Task.WhenAll(
-                                  aggregateTypes.Select(aggregateType =>
-                                    loadAll(this, aggregateType, aggregateTypeToIdsAndTimestamps[aggregateType], cancellationToken)
-                                    )
-                                 );
+            var results =
+              await Task.WhenAll(
+                  aggregateTypes.Select(aggregateType =>
+                    loadAll(this, aggregateType, aggregateTypeToIdsAndTimestamps[aggregateType], cancellationToken)
+                    )
+                  )
+              .ConfigureAwait(false);
             var aggregateTypeToResultsEnumerator =
               aggregateTypes.Zip(results).ToDictionary(
                   t => t.Item1,
@@ -398,6 +407,7 @@ namespace Icon.Infrastructure.Aggregate
                   possibleIds.Select(id => (id, timestamp)),
                   cancellationToken
                   )
+                .ConfigureAwait(false)
                 )
                 .Where((((Guid, DateTime) idAndTimestamp, T? aggregate) t) =>
                     HasAggregateNeverExisted(t.aggregate) ||
@@ -439,8 +449,8 @@ namespace Icon.Infrastructure.Aggregate
                       .ToList()
                       )
                 ).ToList(); // Force evaluation of the lazily evaluated `Select` before executing the batch.
-            await batch.Execute(cancellationToken);
-            var aggregates = await Task.WhenAll(tasks);
+            await batch.Execute(cancellationToken).ConfigureAwait(false);
+            var aggregates = await Task.WhenAll(tasks).ConfigureAwait(false);
             return
               timestampsAndIds
               .Zip(aggregates, ((DateTime timestamp, IEnumerable<Guid> ids) t, IEnumerable<T> aggregates) =>
@@ -461,6 +471,7 @@ namespace Icon.Infrastructure.Aggregate
                   timestampsAndIds,
                   cancellationToken
                   )
+                .ConfigureAwait(false)
                 )
               .Select(((DateTime timestamp, IEnumerable<(Guid, T?)> idsAndAggregates) t) =>
                   t.idsAndAggregates.Select(((Guid id, T? aggregate) u) =>
@@ -495,6 +506,7 @@ namespace Icon.Infrastructure.Aggregate
                   timestampsAndPossibleIds,
                   cancellationToken
                   )
+               .ConfigureAwait(false)
                 )
               .Select(((DateTime timestamp, IEnumerable<(Guid, T?)> idsAndAggregates) t) =>
                   t.idsAndAggregates

@@ -50,7 +50,7 @@ namespace Icon.GraphQl
               .Send<
               Commands.Create<TValidatedInput>,
               Result<ValueObjects.TimestampedId, Errors>
-                >(command)
+                >(command).ConfigureAwait(false)
                 );
             return newPayload(timestampedId);
         }
@@ -76,10 +76,10 @@ namespace Icon.GraphQl
                 .Send<
                 Commands.Add<TValidatedInput>,
                 Result<ValueObjects.TimestampedId, Errors>
-                >(command)
+                >(command).ConfigureAwait(false)
                 );
             return newPayload(
-                  await associationLoader.LoadAsync(timestampedId)
+                  await associationLoader.LoadAsync(timestampedId).ConfigureAwait(false)
                 );
         }
 

@@ -65,7 +65,8 @@ namespace Icon.Handlers
                 await Task.WhenAll(
                     (Task)institutionsResultsTask,
                     (Task)personsResultsTask
-                    ).ConfigureAwait(false);
+                    )
+                  .ConfigureAwait(false);
                 return institutionsResultsTask.Result.Zip( // Using `Result` here and below is potentially unsafe but should be safe here!
                     personsResultsTask.Result,
                     (institutionsResult, personsResult) =>

@@ -39,7 +39,8 @@ namespace Icon.Handlers
             return (await session.Query<TAddedEvent>()
                 .Where(e => e.AssociateId.IsOneOf(modelGuids))
                 .Select(e => new { ModelId = e.AssociateId, AssociationId = e.AggregateId })
-                .ToListAsync(cancellationToken))
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false))
               .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociationId));
         }
     }

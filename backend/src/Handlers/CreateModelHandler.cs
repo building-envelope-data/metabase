@@ -35,7 +35,7 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenSession())
             {
-                return await Handle(command, session, cancellationToken);
+                return await Handle(command, session, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -45,12 +45,13 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            var id = await session.GenerateNewId(cancellationToken);
+            var id = await session.GenerateNewId(cancellationToken).ConfigureAwait(false);
             var @event = _newCreatedEvent(id, command);
             return
               await session.New<TAggregate>(
                   id, @event, cancellationToken
-                  );
+                  )
+              .ConfigureAwait(false);
         }
     }
 }

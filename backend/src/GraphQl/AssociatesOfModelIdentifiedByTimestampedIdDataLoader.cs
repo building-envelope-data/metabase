@@ -44,7 +44,7 @@ namespace Icon.GraphQl
               await QueryBus.Send<
                   TQuery,
                   IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>
-               >(query);
+               >(query).ConfigureAwait(false);
             return ResultHelpers.ToDataLoaderResultsX<TAssociateGraphQlObject>(
                 timestampedIds.Zip(results, (timestampedId, result) =>
                   result.Map(associateResults =>

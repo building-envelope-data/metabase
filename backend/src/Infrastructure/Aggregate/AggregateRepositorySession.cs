@@ -105,13 +105,12 @@ namespace Icon.Infrastructure.Aggregate
                 );
             var eventArray = events.ToArray();
             action(_session.Events, eventArray);
-            await _session.SaveChangesAsync(cancellationToken);
-            await _eventBus.Publish(eventArray);
-            var timestampResult = await FetchTimestamp<T>(id, cancellationToken);
+            await _session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await _eventBus.Publish(eventArray).ConfigureAwait(false);
+            var timestampResult = await FetchTimestamp<T>(id, cancellationToken).ConfigureAwait(false);
             return ValueObjects.Id.From(id)
               .Bind(nonEmptyId =>
-                  timestampResult.Bind(
-                    timestamp =>
+                  timestampResult.Bind(timestamp =>
                       ValueObjects.TimestampedId.From(
                         id, timestamp
                         )

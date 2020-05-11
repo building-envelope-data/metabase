@@ -69,7 +69,8 @@ namespace Icon.Handlers
                         /*     ); */
                     },
                     cancellationToken
-                    );
+                    )
+                    .ConfigureAwait(false);
             }
         }
     }

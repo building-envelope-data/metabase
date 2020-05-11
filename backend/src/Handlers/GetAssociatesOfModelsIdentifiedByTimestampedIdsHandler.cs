@@ -37,7 +37,7 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Handle(query, session, cancellationToken);
+                return await Handle(query, session, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -50,7 +50,15 @@ namespace Icon.Handlers
             // TODO Check existence of model ids (and use `Result.Failure` for non-existing ones)
             var modelIds = query.TimestampedModelIds.Select(timestampedId => timestampedId.Id);
             // TODO Use LINQs `GroupBy` once it has been implemented for Marten, see https://github.com/JasperFx/marten/issues/569
-            var modelIdToAssociateIds = (await QueryAssociateIds(session, modelIds, cancellationToken)).ToLookup(
+            var modelIdToAssociateIds =
+              (await QueryAssociateIds(
+                  session,
+                  modelIds,
+                  cancellationToken
+                  )
+                .ConfigureAwait(false)
+                )
+              .ToLookup(
                 modelIdAndAssociateId => modelIdAndAssociateId.Item1,
                 modelIdAndAssociateId => modelIdAndAssociateId.Item2
                 );
@@ -61,12 +69,14 @@ namespace Icon.Handlers
                     modelIdToAssociateIds.Contains(timestampedId.Id) ? modelIdToAssociateIds[timestampedId.Id] : Enumerable.Empty<ValueObjects.Id>()
                     )
                   );
-            return (await
-                session.LoadAllThatExistedBatched<TAssociateAggregate>(
+            return
+              (await session.LoadAllThatExistedBatched<TAssociateAggregate>(
                   timestampsAndAssociatesIds,
                   cancellationToken
                   )
-                ).Select(results =>
+                .ConfigureAwait(false)
+                )
+              .Select(results =>
                   Result.Ok<IEnumerable<Result<TAssociateModel, Errors>>, Errors>(
                     results.Select(result =>
                       result.Bind(a => a.ToModel())

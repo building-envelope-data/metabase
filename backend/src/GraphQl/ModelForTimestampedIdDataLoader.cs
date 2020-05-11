@@ -39,7 +39,7 @@ namespace Icon.GraphQl
               await QueryBus.Send<
                   Queries.GetModelsForTimestampedIds<TModel>,
                   IEnumerable<Result<TModel, Errors>>
-               >(query);
+               >(query).ConfigureAwait(false);
             return ResultHelpers.ToDataLoaderResults<TGraphQlObject>(
                 timestampedIds.Zip(results, (timestampedId, result) =>
                   result.Map(m => _mapModelToGraphQlObject(m, timestampedId.Timestamp))

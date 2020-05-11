@@ -38,17 +38,21 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenSession())
             {
-                return await (
-                    await session.FetchAggregateType(
+                return await
+                  (await session.FetchAggregateType(
                       command.Input.StakeholderId,
                       cancellationToken
                       )
-                    ).Bind(async aggregateType =>
+                    .ConfigureAwait(false)
+                    )
+                  .Bind(async aggregateType =>
                     {
                         if (aggregateType == typeof(Aggregates.InstitutionAggregate))
-                            return await _addInstitutionMethodDeveloperHandler.Handle(command, session, cancellationToken);
+                            return await _addInstitutionMethodDeveloperHandler.Handle(command, session, cancellationToken)
+                            .ConfigureAwait(false);
                         if (aggregateType == typeof(Aggregates.PersonAggregate))
-                            return await _addPersonMethodDeveloperHandler.Handle(command, session, cancellationToken);
+                            return await _addPersonMethodDeveloperHandler.Handle(command, session, cancellationToken)
+                            .ConfigureAwait(false);
                         return Result.Failure<ValueObjects.TimestampedId, Errors>(
                         Errors.One(
                           message: $"The stakeholder with id {command.Input.StakeholderId} has the aggregate type {aggregateType} which is none of the expected types {typeof(Aggregates.InstitutionAggregate)} and {typeof(Aggregates.PersonAggregate)}",
@@ -56,7 +60,8 @@ namespace Icon.Handlers
                           )
                         );
                     }
-                    );
+                    )
+                  .ConfigureAwait(false);
             }
         }
     }

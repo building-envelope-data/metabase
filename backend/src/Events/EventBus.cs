@@ -16,7 +16,7 @@ namespace Icon.Events
         {
             foreach (var @event in events)
             {
-                await _mediator.Publish(@event);
+                await _mediator.Publish(@event).ConfigureAwait(false);
             }
         }
     }

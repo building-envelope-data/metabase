@@ -33,6 +33,7 @@ namespace Icon.GraphQl
             return (await manufacturedComponentsLoader.LoadAsync(
                   TimestampHelpers.TimestampId(FromId, RequestTimestamp)
                   )
+                .ConfigureAwait(false)
                 )
               .Select(a => new ManufacturedComponentEdge(a))
               .ToList().AsReadOnly();

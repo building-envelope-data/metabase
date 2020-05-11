@@ -40,7 +40,7 @@ namespace Icon.GraphQl
               await QueryBus.Send<
                   Queries.GetModelsAtTimestamps<TModel>,
                   IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>
-               >(query);
+               >(query).ConfigureAwait(false);
             return ResultHelpers.ToDataLoaderResultsX<TGraphQlObject>(
                 timestamps.Zip(results, (timestamp, result) =>
                   result.Map(associateResults =>

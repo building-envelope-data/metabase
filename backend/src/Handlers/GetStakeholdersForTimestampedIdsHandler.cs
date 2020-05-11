@@ -45,21 +45,28 @@ namespace Icon.Handlers
                     {
                         if (aggregateType == typeof(Aggregates.InstitutionAggregate))
                         {
-                            return (await _getInstitutionsHandler.Handle(
+                            return
+                            (await _getInstitutionsHandler.Handle(
                               timestampedIds,
                               session,
                               cancellationToken
-                              )).Select(r =>
-                                                                        r.Map(i => (Models.Stakeholder)i)
-                                                                        );
+                              )
+                                .ConfigureAwait(false)
+                                )
+                            .Select(r =>
+                                r.Map(i => (Models.Stakeholder)i)
+                                );
                         }
                         if (aggregateType == typeof(Aggregates.PersonAggregate))
                         {
-                            return (await _getPersonsHandler.Handle(
+                            return
+                              (await _getPersonsHandler.Handle(
                               timestampedIds,
                               session,
                               cancellationToken
-                              )).Select(r =>
+                              )
+                                .ConfigureAwait(false)
+                                ).Select(r =>
                                                                         r.Map(i => (Models.Stakeholder)i)
                                                                         );
                         }
@@ -73,7 +80,8 @@ namespace Icon.Handlers
                         /*     ); */
                     },
                     cancellationToken
-                    );
+                    )
+                    .ConfigureAwait(false);
             }
         }
     }
