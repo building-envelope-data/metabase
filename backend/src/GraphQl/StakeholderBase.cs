@@ -13,7 +13,8 @@ namespace Icon.GraphQl
             ValueObjects.Timestamp requestTimestamp
             )
         {
-            // TODO I'd like this to be with `GraphQl.Stakeholder` but interfaces cannot have class methods in C#.
+            // I'd like this to be with `GraphQl.Stakeholder` but interfaces
+            // cannot have class methods in C#.
             if (model is Models.Institution institution)
                 return Institution.FromModel(institution, requestTimestamp);
             if (model is Models.Person person)
