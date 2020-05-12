@@ -20,22 +20,13 @@ using System;
 namespace Icon.Handlers
 {
     public sealed class GetBackwardAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TModelAggregate, TAddedEvent>
-      : GetAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TModelAggregate>,
-        IQueryHandler<Queries.GetBackwardAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>, IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
+      : GetAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TModelAggregate>
       where TModelAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAddedEvent : Events.IAddedEvent
     {
         public GetBackwardAssociatesOfModelsHandler(IAggregateRepository repository)
           : base(repository)
         {
-        }
-
-        public Task<IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>> Handle(
-            Queries.GetBackwardAssociatesOfModels<TAssociateModel, TAssociationModel, TModel> query,
-            CancellationToken cancellationToken
-            )
-        {
-            return base.Handle(query, cancellationToken);
         }
 
         protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
