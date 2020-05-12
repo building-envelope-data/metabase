@@ -13,14 +13,14 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public abstract class AssociatesOfModelIdentifiedByTimestampedIdDataLoader<TAssociateGraphQlObject, TModel, TAssociationModel, TAssociateModel, TQuery>
+    public abstract class AssociatesOfModelDataLoader<TAssociateGraphQlObject, TModel, TAssociationModel, TAssociateModel, TQuery>
       : OurDataLoaderBase<ValueObjects.TimestampedId, IReadOnlyList<TAssociateGraphQlObject>>
       where TQuery : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
     {
         private readonly Func<IReadOnlyList<ValueObjects.TimestampedId>, Result<TQuery, Errors>> _newQuery;
         private readonly Func<TAssociateModel, ValueObjects.Timestamp, TAssociateGraphQlObject> _mapAssociateModelToGraphQlObject;
 
-        public AssociatesOfModelIdentifiedByTimestampedIdDataLoader(
+        public AssociatesOfModelDataLoader(
             Func<IReadOnlyList<ValueObjects.TimestampedId>, Result<TQuery, Errors>> newQuery,
             Func<TAssociateModel, ValueObjects.Timestamp, TAssociateGraphQlObject> mapAssociateModelToGraphQlObject,
             IQueryBus queryBus

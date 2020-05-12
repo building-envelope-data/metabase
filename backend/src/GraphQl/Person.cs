@@ -49,7 +49,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Institution>> GetAffiliatedInstitutions(
             [Parent] Person person,
-            [DataLoader] InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader institutionsLoader
+            [DataLoader] InstitutionsAffiliatedWithPersonDataLoader institutionsLoader
             )
         {
             return institutionsLoader.LoadAsync(
@@ -57,10 +57,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader
-            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.Person, Models.PersonAffiliation, Models.Institution>
+        public sealed class InstitutionsAffiliatedWithPersonDataLoader
+            : ForwardAssociatesOfModelDataLoader<Institution, Models.Person, Models.PersonAffiliation, Models.Institution>
         {
-            public InstitutionsAffiliatedWithPersonIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public InstitutionsAffiliatedWithPersonDataLoader(IQueryBus queryBus)
               : base(Institution.FromModel, queryBus)
             {
             }
@@ -68,7 +68,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Method>> GetDevelopedMethods(
             [Parent] Person person,
-            [DataLoader] MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader methodsLoader
+            [DataLoader] MethodsDevelopedByPersonDataLoader methodsLoader
             )
         {
             return methodsLoader.LoadAsync(
@@ -76,10 +76,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Method, Models.Person, Models.MethodDeveloper, Models.Method>
+        public sealed class MethodsDevelopedByPersonDataLoader
+            : BackwardAssociatesOfModelDataLoader<Method, Models.Person, Models.MethodDeveloper, Models.Method>
         {
-            public MethodsDevelopedByPersonIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public MethodsDevelopedByPersonDataLoader(IQueryBus queryBus)
               : base(Method.FromModel, queryBus)
             {
             }

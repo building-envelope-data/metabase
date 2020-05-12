@@ -43,7 +43,7 @@ namespace Icon.GraphQl
         public Task<IReadOnlyList<Institution>> GetRepresentedInstitutions(
             IEnumerable<ValueObjects.InstitutionRepresentativeRole>? roles,
             [Parent] User user,
-            [DataLoader] InstitutionsRepresentedByUserIdentifiedByTimestampedIdDataLoader representedInstitutionsLoader
+            [DataLoader] InstitutionsRepresentedByUserDataLoader representedInstitutionsLoader
             )
         {
             return representedInstitutionsLoader.LoadAsync(
@@ -51,10 +51,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class InstitutionsRepresentedByUserIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.User, Models.InstitutionRepresentative, Models.Institution>
+        public sealed class InstitutionsRepresentedByUserDataLoader
+            : BackwardAssociatesOfModelDataLoader<Institution, Models.User, Models.InstitutionRepresentative, Models.Institution>
         {
-            public InstitutionsRepresentedByUserIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public InstitutionsRepresentedByUserDataLoader(IQueryBus queryBus)
               : base(Institution.FromModel, queryBus)
             {
             }

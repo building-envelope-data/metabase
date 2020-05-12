@@ -55,7 +55,7 @@ namespace Icon.GraphQl
         [UsePaging]
         public Task<IReadOnlyList<Person>> GetAffiliatedPersons(
             [Parent] Institution institution,
-            [DataLoader] PersonsAffiliatedWithInstitutionIdentifiedByTimestampedIdDataLoader affiliatedPersonsLoader
+            [DataLoader] PersonsAffiliatedWithInstitutionDataLoader affiliatedPersonsLoader
             )
         {
             return affiliatedPersonsLoader.LoadAsync(
@@ -63,10 +63,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class PersonsAffiliatedWithInstitutionIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Person, Models.Institution, Models.PersonAffiliation, Models.Person>
+        public sealed class PersonsAffiliatedWithInstitutionDataLoader
+            : BackwardAssociatesOfModelDataLoader<Person, Models.Institution, Models.PersonAffiliation, Models.Person>
         {
-            public PersonsAffiliatedWithInstitutionIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public PersonsAffiliatedWithInstitutionDataLoader(IQueryBus queryBus)
               : base(Person.FromModel, queryBus)
             {
             }
@@ -74,7 +74,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Method>> GetDevelopedMethods(
             [Parent] Institution institution,
-            [DataLoader] MethodsDevelopedByInstitutionIdentifiedByTimestampedIdDataLoader methodsLoader
+            [DataLoader] MethodsDevelopedByInstitutionDataLoader methodsLoader
             )
         {
             return methodsLoader.LoadAsync(
@@ -82,10 +82,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class MethodsDevelopedByInstitutionIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Method, Models.Institution, Models.MethodDeveloper, Models.Method>
+        public sealed class MethodsDevelopedByInstitutionDataLoader
+            : BackwardAssociatesOfModelDataLoader<Method, Models.Institution, Models.MethodDeveloper, Models.Method>
         {
-            public MethodsDevelopedByInstitutionIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public MethodsDevelopedByInstitutionDataLoader(IQueryBus queryBus)
               : base(Method.FromModel, queryBus)
             {
             }

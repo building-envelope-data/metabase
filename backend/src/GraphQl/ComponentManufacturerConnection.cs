@@ -27,7 +27,7 @@ namespace Icon.GraphQl
         }
 
         public async Task<IReadOnlyList<ComponentManufacturerEdge>> GetEdges(
-            [DataLoader] ManufacturersOfComponentIdentifiedByTimestampedIdAssociationDataLoader manufacturersLoader
+            [DataLoader] ManufacturersOfComponentAssociationDataLoader manufacturersLoader
             )
         {
             return (await manufacturersLoader.LoadAsync(
@@ -39,17 +39,17 @@ namespace Icon.GraphQl
               .ToList().AsReadOnly();
         }
 
-        public sealed class ManufacturersOfComponentIdentifiedByTimestampedIdAssociationDataLoader
-            : ForwardAssociationsOfModelIdentifiedByTimestampedIdDataLoader<ComponentManufacturer, Models.Component, Models.ComponentManufacturer>
+        public sealed class ManufacturersOfComponentAssociationDataLoader
+            : ForwardAssociationsOfModelDataLoader<ComponentManufacturer, Models.Component, Models.ComponentManufacturer>
         {
-            public ManufacturersOfComponentIdentifiedByTimestampedIdAssociationDataLoader(IQueryBus queryBus)
+            public ManufacturersOfComponentAssociationDataLoader(IQueryBus queryBus)
               : base(ComponentManufacturer.FromModel, queryBus)
             {
             }
         }
 
         public Task<IReadOnlyList<Institution>> GetNodes(
-            [DataLoader] ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader manufacturersLoader
+            [DataLoader] ManufacturersOfComponentDataLoader manufacturersLoader
             )
         {
             return manufacturersLoader.LoadAsync(
@@ -57,10 +57,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader
-            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.Component, Models.ComponentManufacturer, Models.Institution>
+        public sealed class ManufacturersOfComponentDataLoader
+            : ForwardAssociatesOfModelDataLoader<Institution, Models.Component, Models.ComponentManufacturer, Models.Institution>
         {
-            public ManufacturersOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public ManufacturersOfComponentDataLoader(IQueryBus queryBus)
               : base(Institution.FromModel, queryBus)
             {
             }

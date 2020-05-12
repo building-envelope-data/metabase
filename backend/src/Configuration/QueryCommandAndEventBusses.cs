@@ -338,10 +338,10 @@ namespace Icon.Configuration
             // Get associates
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetForwardAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Stakeholder>,
+              Queries.GetForwardAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>,
               IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>
                 >,
-              Handlers.GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
+              Handlers.GetDevelopersOfMethodsHandler
                 >();
             AddGetBackwardAssociatesHandler<Models.Person, Models.MethodDeveloper, Models.Method, Aggregates.MethodAggregate, Events.PersonMethodDeveloperAdded>(services);
             AddGetBackwardAssociatesHandler<Models.Institution, Models.MethodDeveloper, Models.Method, Aggregates.MethodAggregate, Events.InstitutionMethodDeveloperAdded>(services);
@@ -465,10 +465,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetForwardAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel, TAssociatedModel>,
+              Queries.GetForwardAssociatesOfModels<TModel, TAssociationModel, TAssociatedModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociatedModel, Errors>>, Errors>>
                 >,
-              Handlers.GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociatedModel, TAssociatedAggregate, TAddedEvent>
+              Handlers.GetForwardAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociatedModel, TAssociatedAggregate, TAddedEvent>
                 >();
         }
 
@@ -479,10 +479,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIds<TAssociatedModel, TAssociationModel, TModel>,
+              Queries.GetBackwardAssociatesOfModels<TAssociatedModel, TAssociationModel, TModel>,
               IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>
                 >,
-              Handlers.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TAssociatedModel, TAssociationModel, TModel, TAggregate, TAddedEvent>
+              Handlers.GetBackwardAssociatesOfModelsHandler<TAssociatedModel, TAssociationModel, TModel, TAggregate, TAddedEvent>
                 >();
         }
 
@@ -505,10 +505,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetForwardAssociationsOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel>,
+              Queries.GetForwardAssociationsOfModels<TModel, TAssociationModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>
                 >,
-              Handlers.GetForwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
+              Handlers.GetForwardAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
                 >();
         }
 
@@ -520,10 +520,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetBackwardAssociationsOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel>,
+              Queries.GetBackwardAssociationsOfModels<TModel, TAssociationModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>
                 >,
-              Handlers.GetBackwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
+              Handlers.GetBackwardAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
                 >();
         }
     }

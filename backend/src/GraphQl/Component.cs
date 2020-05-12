@@ -52,7 +52,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Component>> GetConcretizations(
             [Parent] Component component,
-            [DataLoader] ConcretizationsOfComponentIdentifiedByTimestampedIdDataLoader concretizationsLoader
+            [DataLoader] ConcretizationsOfComponentDataLoader concretizationsLoader
             )
         {
             return concretizationsLoader.LoadAsync(
@@ -60,10 +60,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class ConcretizationsOfComponentIdentifiedByTimestampedIdDataLoader
-            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Component, Models.Component, Models.ComponentConcretization, Models.Component>
+        public sealed class ConcretizationsOfComponentDataLoader
+            : ForwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentConcretization, Models.Component>
         {
-            public ConcretizationsOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public ConcretizationsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }
@@ -71,7 +71,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Component>> GetGeneralizations(
             [Parent] Component component,
-            [DataLoader] GeneralizationsOfComponentIdentifiedByTimestampedIdDataLoader generalizationsLoader
+            [DataLoader] GeneralizationsOfComponentDataLoader generalizationsLoader
             )
         {
             return generalizationsLoader.LoadAsync(
@@ -79,10 +79,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class GeneralizationsOfComponentIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Component, Models.Component, Models.ComponentConcretization, Models.Component>
+        public sealed class GeneralizationsOfComponentDataLoader
+            : BackwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentConcretization, Models.Component>
         {
-            public GeneralizationsOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public GeneralizationsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }
@@ -90,7 +90,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Component>> GetParts(
             [Parent] Component component,
-            [DataLoader] PartsOfComponentIdentifiedByTimestampedIdDataLoader partsLoader
+            [DataLoader] PartsOfComponentDataLoader partsLoader
             )
         {
             return partsLoader.LoadAsync(
@@ -98,10 +98,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class PartsOfComponentIdentifiedByTimestampedIdDataLoader
-            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Component, Models.Component, Models.ComponentPart, Models.Component>
+        public sealed class PartsOfComponentDataLoader
+            : ForwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentPart, Models.Component>
         {
-            public PartsOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public PartsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }
@@ -109,7 +109,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Component>> GetPartOf(
             [Parent] Component component,
-            [DataLoader] PartOfOfComponentIdentifiedByTimestampedIdDataLoader partOfLoader
+            [DataLoader] PartOfOfComponentDataLoader partOfLoader
             )
         {
             return partOfLoader.LoadAsync(
@@ -117,10 +117,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class PartOfOfComponentIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Component, Models.Component, Models.ComponentPart, Models.Component>
+        public sealed class PartOfOfComponentDataLoader
+            : BackwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentPart, Models.Component>
         {
-            public PartOfOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public PartOfOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }
@@ -128,7 +128,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Component>> GetVariants(
             [Parent] Component component,
-            [DataLoader] VariantsOfComponentIdentifiedByTimestampedIdDataLoader variantsLoader
+            [DataLoader] VariantsOfComponentDataLoader variantsLoader
             )
         {
             return variantsLoader.LoadAsync(
@@ -136,10 +136,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class VariantsOfComponentIdentifiedByTimestampedIdDataLoader
-            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Component, Models.Component, Models.ComponentVariant, Models.Component>
+        public sealed class VariantsOfComponentDataLoader
+            : ForwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVariant, Models.Component>
         {
-            public VariantsOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public VariantsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }
@@ -148,7 +148,7 @@ namespace Icon.GraphQl
         // TODO If we enforce `ComponentVariant` to be symmetric, then `variantOf` is obsolete
         public Task<IReadOnlyList<Component>> GetVariantOf(
             [Parent] Component component,
-            [DataLoader] VariantOfOfComponentIdentifiedByTimestampedIdDataLoader variantOfLoader
+            [DataLoader] VariantOfOfComponentDataLoader variantOfLoader
             )
         {
             return variantOfLoader.LoadAsync(
@@ -156,10 +156,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class VariantOfOfComponentIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Component, Models.Component, Models.ComponentVariant, Models.Component>
+        public sealed class VariantOfOfComponentDataLoader
+            : BackwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVariant, Models.Component>
         {
-            public VariantOfOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public VariantOfOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }
@@ -167,7 +167,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Component>> GetVersions(
             [Parent] Component component,
-            [DataLoader] VersionsOfComponentIdentifiedByTimestampedIdDataLoader versionsLoader
+            [DataLoader] VersionsOfComponentDataLoader versionsLoader
             )
         {
             return versionsLoader.LoadAsync(
@@ -175,10 +175,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class VersionsOfComponentIdentifiedByTimestampedIdDataLoader
-            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Component, Models.Component, Models.ComponentVersion, Models.Component>
+        public sealed class VersionsOfComponentDataLoader
+            : ForwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVersion, Models.Component>
         {
-            public VersionsOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public VersionsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }
@@ -186,7 +186,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Component>> GetVersionOf(
             [Parent] Component component,
-            [DataLoader] VersionOfOfComponentIdentifiedByTimestampedIdDataLoader versionOfLoader
+            [DataLoader] VersionOfOfComponentDataLoader versionOfLoader
             )
         {
             return versionOfLoader.LoadAsync(
@@ -194,10 +194,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class VersionOfOfComponentIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Component, Models.Component, Models.ComponentVersion, Models.Component>
+        public sealed class VersionOfOfComponentDataLoader
+            : BackwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVersion, Models.Component>
         {
-            public VersionOfOfComponentIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public VersionOfOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }

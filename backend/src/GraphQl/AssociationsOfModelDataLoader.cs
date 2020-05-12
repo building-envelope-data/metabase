@@ -13,15 +13,17 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public class BackwardAssociationsOfModelIdentifiedByTimestampedIdDataLoader<TAssociationGraphQlObject, TModel, TAssociationModel>
-      : AssociationsOfModelIdentifiedByTimestampedIdDataLoader<TAssociationGraphQlObject, TModel, TAssociationModel, Queries.GetBackwardAssociationsOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel>>
+    public abstract class AssociationsOfModelDataLoader<TAssociationGraphQlObject, TModel, TAssociationModel, TQuery>
+      : AssociatesOfModelDataLoader<TAssociationGraphQlObject, TModel, TAssociationModel, TAssociationModel, TQuery>
+      where TQuery : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
     {
-        public BackwardAssociationsOfModelIdentifiedByTimestampedIdDataLoader(
+        public AssociationsOfModelDataLoader(
+            Func<IReadOnlyList<ValueObjects.TimestampedId>, Result<TQuery, Errors>> newQuery,
             Func<TAssociationModel, ValueObjects.Timestamp, TAssociationGraphQlObject> mapAssociationModelToGraphQlObject,
             IQueryBus queryBus
             )
           : base(
-            Queries.GetBackwardAssociationsOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel>.From,
+            newQuery,
             mapAssociationModelToGraphQlObject,
             queryBus
             )

@@ -18,24 +18,24 @@ using Errors = Icon.Errors;
 
 namespace Icon.Handlers
 {
-    public sealed class GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
-      : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
+    public sealed class GetDevelopersOfMethodsHandler
+      : IQueryHandler<Queries.GetAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
     {
         private readonly IAggregateRepository _repository;
-        private readonly GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded> _getInstitutionDevelopersHandler;
-        private readonly GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded> _getPersonDevelopersHandler;
+        private readonly GetForwardAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded> _getInstitutionDevelopersHandler;
+        private readonly GetForwardAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded> _getPersonDevelopersHandler;
 
-        public GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
+        public GetDevelopersOfMethodsHandler(IAggregateRepository repository)
         {
             _repository = repository;
             _getInstitutionDevelopersHandler =
-              new GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>(repository);
+              new GetForwardAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>(repository);
             _getPersonDevelopersHandler =
-              new GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>(repository);
+              new GetForwardAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>(repository);
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
+            Queries.GetAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
             CancellationToken cancellationToken
             )
         {
@@ -51,13 +51,13 @@ namespace Icon.Handlers
                 // afterwards using `Task#Result` as was mentioned in
                 // https://github.com/dotnet/runtime/issues/20166#issuecomment-428028466
                 var institutionsResultsTask = _getInstitutionDevelopersHandler.Handle(
-                    Queries.GetForwardAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Institution>
+                    Queries.GetForwardAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Institution>
                       .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
                     session,
                     cancellationToken
                     );
                 var personsResultsTask = _getPersonDevelopersHandler.Handle(
-                    Queries.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Person>
+                    Queries.GetBackwardAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Person>
                       .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
                     session,
                     cancellationToken

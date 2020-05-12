@@ -19,12 +19,12 @@ using System;
 
 namespace Icon.Handlers
 {
-    public sealed class GetForwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
-      : GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociationModel, TAssociationAggregate>
-            where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
-            where TAddedEvent : Events.IAddedEvent
+    public sealed class GetBackwardAssociationsOfModelsHandler<TAssociationModel, TModel, TModelAggregate, TAddedEvent>
+      : GetAssociatesOfModelsHandler<TAssociationModel, TModel, TModel, TModelAggregate>
+      where TModelAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAddedEvent : Events.IAddedEvent
     {
-        public GetForwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
+        public GetBackwardAssociationsOfModelsHandler(IAggregateRepository repository)
           : base(repository)
         {
         }
@@ -37,8 +37,8 @@ namespace Icon.Handlers
         {
             var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
             return (await session.Query<TAddedEvent>()
-                .Where(e => e.ParentId.IsOneOf(modelGuids))
-                .Select(e => new { ModelId = e.ParentId, AssociationId = e.AggregateId })
+                .Where(e => e.AssociateId.IsOneOf(modelGuids))
+                .Select(e => new { ModelId = e.AssociateId, AssociationId = e.AggregateId })
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false))
               .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociationId));

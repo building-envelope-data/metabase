@@ -19,19 +19,19 @@ using System;
 
 namespace Icon.Handlers
 {
-    public abstract class GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociateModel, TAssociateAggregate>
-      : IQueryHandler<Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+    public abstract class GetAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAssociateAggregate>
+      : IQueryHandler<Queries.GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     {
         private readonly IAggregateRepository _repository;
 
-        public GetAssociatesOfModelsIdentifiedByTimestampedIdsHandler(IAggregateRepository repository)
+        public GetAssociatesOfModelsHandler(IAggregateRepository repository)
         {
             _repository = repository;
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel, TAssociateModel> query,
+            Queries.GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel> query,
             CancellationToken cancellationToken
             )
         {
@@ -42,7 +42,7 @@ namespace Icon.Handlers
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel, TAssociateModel> query,
+            Queries.GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel> query,
             IAggregateRepositoryReadOnlySession session,
             CancellationToken cancellationToken
             )
