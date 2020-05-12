@@ -54,7 +54,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class DevelopersOfMethodDataLoader
-            : ForwardAssociatesOfModelDataLoader<Stakeholder, Models.Method, Models.MethodDeveloper, Models.Stakeholder>
+            : ForwardManyToManyAssociatesOfModelDataLoader<Stakeholder, Models.Method, Models.MethodDeveloper, Models.Stakeholder>
         {
             public DevelopersOfMethodDataLoader(IQueryBus queryBus)
               : base(StakeholderBase.FromModel, queryBus)

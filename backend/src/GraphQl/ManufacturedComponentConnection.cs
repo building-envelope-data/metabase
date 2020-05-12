@@ -58,7 +58,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class ComponentsManufacturedByInstitutionDataLoader
-            : BackwardAssociatesOfModelDataLoader<Component, Models.Institution, Models.ComponentManufacturer, Models.Component>
+            : BackwardManyToManyAssociatesOfModelDataLoader<Component, Models.Institution, Models.ComponentManufacturer, Models.Component>
         {
             public ComponentsManufacturedByInstitutionDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)

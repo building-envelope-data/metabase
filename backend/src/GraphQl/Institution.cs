@@ -64,7 +64,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class PersonsAffiliatedWithInstitutionDataLoader
-            : BackwardAssociatesOfModelDataLoader<Person, Models.Institution, Models.PersonAffiliation, Models.Person>
+            : BackwardManyToManyAssociatesOfModelDataLoader<Person, Models.Institution, Models.PersonAffiliation, Models.Person>
         {
             public PersonsAffiliatedWithInstitutionDataLoader(IQueryBus queryBus)
               : base(Person.FromModel, queryBus)
@@ -83,7 +83,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class MethodsDevelopedByInstitutionDataLoader
-            : BackwardAssociatesOfModelDataLoader<Method, Models.Institution, Models.MethodDeveloper, Models.Method>
+            : BackwardManyToManyAssociatesOfModelDataLoader<Method, Models.Institution, Models.MethodDeveloper, Models.Method>
         {
             public MethodsDevelopedByInstitutionDataLoader(IQueryBus queryBus)
               : base(Method.FromModel, queryBus)

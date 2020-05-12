@@ -58,7 +58,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class ManufacturersOfComponentDataLoader
-            : ForwardAssociatesOfModelDataLoader<Institution, Models.Component, Models.ComponentManufacturer, Models.Institution>
+            : ForwardManyToManyAssociatesOfModelDataLoader<Institution, Models.Component, Models.ComponentManufacturer, Models.Institution>
         {
             public ManufacturersOfComponentDataLoader(IQueryBus queryBus)
               : base(Institution.FromModel, queryBus)

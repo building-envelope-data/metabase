@@ -52,7 +52,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class InstitutionsRepresentedByUserDataLoader
-            : BackwardAssociatesOfModelDataLoader<Institution, Models.User, Models.InstitutionRepresentative, Models.Institution>
+            : BackwardManyToManyAssociatesOfModelDataLoader<Institution, Models.User, Models.InstitutionRepresentative, Models.Institution>
         {
             public InstitutionsRepresentedByUserDataLoader(IQueryBus queryBus)
               : base(Institution.FromModel, queryBus)

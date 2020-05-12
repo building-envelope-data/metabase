@@ -4,22 +4,22 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Queries
 {
-    public sealed class GetForwardAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
+    public sealed class GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
       : GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
     {
-        private GetForwardAssociatesOfModels(
+        private GetBackwardManyToManyAssociatesOfModels(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
             )
             : base(timestampedModelIds)
         {
         }
 
-        public static Result<GetForwardAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, Errors> From(
+        public static Result<GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, Errors> From(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
             )
         {
-            return Result.Ok<GetForwardAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, Errors>(
-                new GetForwardAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>(
+            return Result.Ok<GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, Errors>(
+                new GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>(
                   timestampedModelIds: timestampedModelIds
                   )
                 );

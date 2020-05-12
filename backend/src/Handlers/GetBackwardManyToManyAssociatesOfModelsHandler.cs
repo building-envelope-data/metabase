@@ -19,22 +19,14 @@ using System;
 
 namespace Icon.Handlers
 {
-    public sealed class GetForwardAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAssociateAggregate, TAddedEvent>
-      : GetAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAssociateAggregate>
-      where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+    public sealed class GetBackwardManyToManyAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TModelAggregate, TAddedEvent>
+      : GetAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TModelAggregate>
+      where TModelAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAddedEvent : Events.IAddedEvent
     {
-        public GetForwardAssociatesOfModelsHandler(IAggregateRepository repository)
+        public GetBackwardManyToManyAssociatesOfModelsHandler(IAggregateRepository repository)
           : base(repository)
         {
-        }
-
-        public Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
-            Queries.GetForwardAssociatesOfModels<TModel, TAssociationModel, TAssociateModel> query,
-            CancellationToken cancellationToken
-            )
-        {
-            return base.Handle(query, cancellationToken);
         }
 
         protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
@@ -45,8 +37,8 @@ namespace Icon.Handlers
         {
             var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
             return (await session.Query<TAddedEvent>()
-                .Where(e => e.ParentId.IsOneOf(modelGuids))
-                .Select(e => new { ModelId = e.ParentId, AssociateId = e.AssociateId })
+                .Where(e => e.AssociateId.IsOneOf(modelGuids))
+                .Select(e => new { ModelId = e.AssociateId, AssociateId = e.ParentId })
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false))
               .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociateId));

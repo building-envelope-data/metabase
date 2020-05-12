@@ -61,7 +61,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class ConcretizationsOfComponentDataLoader
-            : ForwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentConcretization, Models.Component>
+            : ForwardManyToManyAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentConcretization, Models.Component>
         {
             public ConcretizationsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
@@ -80,7 +80,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class GeneralizationsOfComponentDataLoader
-            : BackwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentConcretization, Models.Component>
+            : BackwardManyToManyAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentConcretization, Models.Component>
         {
             public GeneralizationsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
@@ -99,7 +99,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class PartsOfComponentDataLoader
-            : ForwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentPart, Models.Component>
+            : ForwardManyToManyAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentPart, Models.Component>
         {
             public PartsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
@@ -118,7 +118,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class PartOfOfComponentDataLoader
-            : BackwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentPart, Models.Component>
+            : BackwardManyToManyAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentPart, Models.Component>
         {
             public PartOfOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
@@ -137,7 +137,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class VariantsOfComponentDataLoader
-            : ForwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVariant, Models.Component>
+            : ForwardManyToManyAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVariant, Models.Component>
         {
             public VariantsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
@@ -157,7 +157,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class VariantOfOfComponentDataLoader
-            : BackwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVariant, Models.Component>
+            : BackwardManyToManyAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVariant, Models.Component>
         {
             public VariantOfOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
@@ -176,7 +176,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class VersionsOfComponentDataLoader
-            : ForwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVersion, Models.Component>
+            : ForwardManyToManyAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVersion, Models.Component>
         {
             public VersionsOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
@@ -195,7 +195,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class VersionOfOfComponentDataLoader
-            : BackwardAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVersion, Models.Component>
+            : BackwardManyToManyAssociatesOfModelDataLoader<Component, Models.Component, Models.ComponentVersion, Models.Component>
         {
             public VersionOfOfComponentDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
