@@ -42,6 +42,8 @@ namespace Icon.Configuration
 
                   .BindClrType<ValueObjects.Id, GraphQlX.NonEmptyUuidType>()
                   .BindClrType<ValueObjects.Timestamp, GraphQlX.TimestampType>()
+                  .BindClrType<DateTime, GraphQlX.PreciseDateTimeType>()
+                  .BindClrType<DateTimeOffset, GraphQlX.PreciseDateTimeType>()
 
                   .AddQueryType<GraphQlX.Query>()
                   .AddMutationType<GraphQlX.Mutation>()
