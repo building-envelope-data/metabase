@@ -20,7 +20,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Standard> GetStandard(
-            [DataLoader] StandardForTimestampedIdDataLoader standardLoader
+            [DataLoader] StandardDataLoader standardLoader
             )
         {
             return standardLoader.LoadAsync(

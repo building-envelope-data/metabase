@@ -17,21 +17,21 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
-    public sealed class GetModelsForTimestampedIdsHandler<M, A>
-      : IQueryHandler<Queries.GetModelsForTimestampedIds<M>, IEnumerable<Result<M, Errors>>>,
-        IGetModelsForTimestampedIdsHandler
+    public sealed class GetModelsHandler<M, A>
+      : IQueryHandler<Queries.GetModels<M>, IEnumerable<Result<M, Errors>>>,
+        IGetModelsHandler
       where M : Models.IModel
       where A : class, IEventSourcedAggregate, IConvertible<M>, new()
     {
         private readonly IAggregateRepository _repository;
 
-        public GetModelsForTimestampedIdsHandler(IAggregateRepository repository)
+        public GetModelsHandler(IAggregateRepository repository)
         {
             _repository = repository;
         }
 
         public async Task<IEnumerable<Result<M, Errors>>> Handle(
-            Queries.GetModelsForTimestampedIds<M> query,
+            Queries.GetModels<M> query,
             CancellationToken cancellationToken
             )
         {

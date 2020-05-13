@@ -22,7 +22,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Component> GetGeneralComponent(
-            [DataLoader] ComponentForTimestampedIdDataLoader componentLoader
+            [DataLoader] ComponentDataLoader componentLoader
             )
         {
             return componentLoader.LoadAsync(
@@ -31,7 +31,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Component> GetConcreteComponent(
-            [DataLoader] ComponentForTimestampedIdDataLoader componentLoader
+            [DataLoader] ComponentDataLoader componentLoader
             )
         {
             return componentLoader.LoadAsync(

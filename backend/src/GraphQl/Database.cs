@@ -53,7 +53,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Institution> GetOperatingInstitution(
-            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader
+            [DataLoader] InstitutionDataLoader institutionLoader
             )
         {
             return institutionLoader.LoadAsync(

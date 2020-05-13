@@ -85,7 +85,7 @@ namespace Icon.GraphQl
 
         public Task<CreateComponentPayload> CreateComponent(
             CreateComponentInput input,
-            [DataLoader] ComponentForTimestampedIdDataLoader componentLoader
+            [DataLoader] ComponentDataLoader componentLoader
             )
         {
             return Create<CreateComponentInput, ValueObjects.CreateComponentInput, CreateComponentPayload>(
@@ -152,7 +152,7 @@ namespace Icon.GraphQl
 
         public Task<AddComponentConcretizationPayload> AddComponentConcretization(
             AddComponentConcretizationInput input,
-            [DataLoader] ComponentConcretizationForTimestampedIdDataLoader componentConcretizationLoader
+            [DataLoader] ComponentConcretizationDataLoader componentConcretizationLoader
             )
         {
             return Add<
@@ -170,7 +170,7 @@ namespace Icon.GraphQl
 
         public Task<AddComponentManufacturerPayload> AddComponentManufacturer(
             AddComponentManufacturerInput input,
-            [DataLoader] ComponentManufacturerForTimestampedIdDataLoader componentManufacturerLoader
+            [DataLoader] ComponentManufacturerDataLoader componentManufacturerLoader
             )
         {
             return Add<
@@ -188,7 +188,7 @@ namespace Icon.GraphQl
 
         public Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentative(
             AddInstitutionRepresentativeInput input,
-            [DataLoader] InstitutionRepresentativeForTimestampedIdDataLoader institutionRepresentativeLoader
+            [DataLoader] InstitutionRepresentativeDataLoader institutionRepresentativeLoader
             )
         {
             return Add<
@@ -206,7 +206,7 @@ namespace Icon.GraphQl
 
         public Task<AddMethodDeveloperPayload> AddMethodDeveloper(
             AddMethodDeveloperInput input,
-            [DataLoader] MethodDeveloperForTimestampedIdDataLoader methodDeveloperLoader
+            [DataLoader] MethodDeveloperDataLoader methodDeveloperLoader
             )
         {
             return Add<
@@ -224,7 +224,7 @@ namespace Icon.GraphQl
 
         public Task<AddPersonAffiliationPayload> AddPersonAffiliation(
             AddPersonAffiliationInput input,
-            [DataLoader] PersonAffiliationForTimestampedIdDataLoader personAffiliationLoader
+            [DataLoader] PersonAffiliationDataLoader personAffiliationLoader
             )
         {
             return Add<

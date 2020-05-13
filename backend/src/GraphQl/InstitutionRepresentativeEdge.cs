@@ -28,7 +28,7 @@ namespace Icon.GraphQl
             Role = institutionRepresentative.Role;
         }
 
-        public Task<User> GetNode(/* TODO [DataLoader] UserForTimestampedIdDataLoader userLoader */)
+        public Task<User> GetNode(/* TODO [DataLoader] UserDataLoader userLoader */)
         {
             return null!;
             /* return userLoader.LoadAsync( */

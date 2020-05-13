@@ -20,7 +20,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Component> GetComponent(
-            [DataLoader] ComponentForTimestampedIdDataLoader componentLoader
+            [DataLoader] ComponentDataLoader componentLoader
             )
         {
             return componentLoader.LoadAsync(

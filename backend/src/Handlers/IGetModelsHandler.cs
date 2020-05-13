@@ -17,7 +17,7 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
-    public interface IGetModelsForTimestampedIdsHandler
+    public interface IGetModelsHandler
     {
         public Task<IEnumerable<Result<Models.IModel, Errors>>> HandleX(
             IEnumerable<ValueObjects.TimestampedId> timestampedIds,

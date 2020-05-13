@@ -3,10 +3,10 @@ using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
 
 namespace Icon.GraphQl
 {
-    public sealed class ComponentManufacturerForTimestampedIdDataLoader
-      : ModelForTimestampedIdDataLoader<ComponentManufacturer, Models.ComponentManufacturer>
+    public sealed class ComponentManufacturerDataLoader
+      : ModelDataLoader<ComponentManufacturer, Models.ComponentManufacturer>
     {
-        public ComponentManufacturerForTimestampedIdDataLoader(IQueryBus queryBus)
+        public ComponentManufacturerDataLoader(IQueryBus queryBus)
           : base(ComponentManufacturer.FromModel, queryBus)
         {
         }

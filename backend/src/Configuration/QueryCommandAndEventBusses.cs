@@ -86,10 +86,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModelsForTimestampedIds<Models.IModel>,
+              Queries.GetModels<Models.IModel>,
               IEnumerable<Result<Models.IModel, Errors>>
                 >,
-              Handlers.GetModelsOfUnknownTypeForTimestampedIdsHandler
+              Handlers.GetModelsOfUnknownTypeHandler
                 >();
         }
 
@@ -150,10 +150,10 @@ namespace Icon.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModelsForTimestampedIds<Models.Stakeholder>,
+              Queries.GetModels<Models.Stakeholder>,
               IEnumerable<Result<Models.Stakeholder, Errors>>
                 >,
-              Handlers.GetStakeholdersForTimestampedIdsHandler
+              Handlers.GetStakeholdersHandler
                 >();
         }
 
@@ -223,10 +223,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
                 MediatR.IRequestHandler<
-                Queries.GetModelsForTimestampedIds<TModel>,
+                Queries.GetModels<TModel>,
                 IEnumerable<Result<TModel, Errors>>
                     >,
-                Handlers.GetModelsForTimestampedIdsHandler<TModel, TAggregate>
+                Handlers.GetModelsHandler<TModel, TAggregate>
                     >();
         }
 
@@ -343,10 +343,10 @@ namespace Icon.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModelsForTimestampedIds<Models.MethodDeveloper>,
+              Queries.GetModels<Models.MethodDeveloper>,
               IEnumerable<Result<Models.MethodDeveloper, Errors>>
                 >,
-              Handlers.GetMethodDevelopersForTimestampedIdsHandler
+              Handlers.GetMethodDevelopersHandler
                 >();
 
             // Get associates
@@ -454,10 +454,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModelsForTimestampedIds<TModel>,
+              Queries.GetModels<TModel>,
               IEnumerable<Result<TModel, Errors>>
                 >,
-              Handlers.GetModelsForTimestampedIdsHandler<TModel, TAggregate>
+              Handlers.GetModelsHandler<TModel, TAggregate>
                 >();
         }
 

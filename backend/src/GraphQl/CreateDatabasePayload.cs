@@ -20,7 +20,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Database> GetDatabase(
-            [DataLoader] DatabaseForTimestampedIdDataLoader databaseLoader
+            [DataLoader] DatabaseDataLoader databaseLoader
             )
         {
             return databaseLoader.LoadAsync(

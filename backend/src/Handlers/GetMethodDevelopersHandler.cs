@@ -18,22 +18,22 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
-    public sealed class GetMethodDevelopersForTimestampedIdsHandler
-      : IQueryHandler<Queries.GetModelsForTimestampedIds<Models.MethodDeveloper>, IEnumerable<Result<Models.MethodDeveloper, Errors>>>
+    public sealed class GetMethodDevelopersHandler
+      : IQueryHandler<Queries.GetModels<Models.MethodDeveloper>, IEnumerable<Result<Models.MethodDeveloper, Errors>>>
     {
         private readonly IAggregateRepository _repository;
-        private readonly GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate> _getInstitutionMethodDevelopersHandler;
-        private readonly GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.PersonMethodDeveloperAggregate> _getPersonMethodDevelopersHandler;
+        private readonly GetModelsHandler<Models.MethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate> _getInstitutionMethodDevelopersHandler;
+        private readonly GetModelsHandler<Models.MethodDeveloper, Aggregates.PersonMethodDeveloperAggregate> _getPersonMethodDevelopersHandler;
 
-        public GetMethodDevelopersForTimestampedIdsHandler(IAggregateRepository repository)
+        public GetMethodDevelopersHandler(IAggregateRepository repository)
         {
             _repository = repository;
-            _getInstitutionMethodDevelopersHandler = new GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate>(repository);
-            _getPersonMethodDevelopersHandler = new GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.PersonMethodDeveloperAggregate>(repository);
+            _getInstitutionMethodDevelopersHandler = new GetModelsHandler<Models.MethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate>(repository);
+            _getPersonMethodDevelopersHandler = new GetModelsHandler<Models.MethodDeveloper, Aggregates.PersonMethodDeveloperAggregate>(repository);
         }
 
         public async Task<IEnumerable<Result<Models.MethodDeveloper, Errors>>> Handle(
-            Queries.GetModelsForTimestampedIds<Models.MethodDeveloper> query,
+            Queries.GetModels<Models.MethodDeveloper> query,
             CancellationToken cancellationToken
             )
         {

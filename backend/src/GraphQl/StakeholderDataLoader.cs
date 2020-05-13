@@ -3,10 +3,10 @@ using Icon.Infrastructure.Query;
 
 namespace Icon.GraphQl
 {
-    public sealed class StakeholderForTimestampedIdDataLoader
-      : ModelForTimestampedIdDataLoader<Stakeholder, Models.Stakeholder>
+    public sealed class StakeholderDataLoader
+      : ModelDataLoader<Stakeholder, Models.Stakeholder>
     {
-        public StakeholderForTimestampedIdDataLoader(IQueryBus queryBus)
+        public StakeholderDataLoader(IQueryBus queryBus)
           : base(StakeholderBase.FromModel, queryBus)
         {
         }

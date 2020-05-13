@@ -13,12 +13,12 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public class ModelForTimestampedIdDataLoader<TGraphQlObject, TModel>
+    public class ModelDataLoader<TGraphQlObject, TModel>
       : OurDataLoaderBase<ValueObjects.TimestampedId, TGraphQlObject>
     {
         private readonly Func<TModel, ValueObjects.Timestamp, TGraphQlObject> _mapModelToGraphQlObject;
 
-        public ModelForTimestampedIdDataLoader(
+        public ModelDataLoader(
             Func<TModel, ValueObjects.Timestamp, TGraphQlObject> mapModelToGraphQlObject,
             IQueryBus queryBus
             )
@@ -33,11 +33,11 @@ namespace Icon.GraphQl
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.GetModelsForTimestampedIds<TModel>.From(timestampedIds)
+                  Queries.GetModels<TModel>.From(timestampedIds)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.GetModelsForTimestampedIds<TModel>,
+                  Queries.GetModels<TModel>,
                   IEnumerable<Result<TModel, Errors>>
                >(query).ConfigureAwait(false);
             return ResultHelpers.ToDataLoaderResults<TGraphQlObject>(

@@ -3,10 +3,10 @@ using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {
-    public sealed class StandardForTimestampedIdDataLoader
-      : ModelForTimestampedIdDataLoader<Standard, Models.Standard>
+    public sealed class StandardDataLoader
+      : ModelDataLoader<Standard, Models.Standard>
     {
-        public StandardForTimestampedIdDataLoader(IQueryBus queryBus)
+        public StandardDataLoader(IQueryBus queryBus)
           : base(Standard.FromModel, queryBus)
         {
         }

@@ -29,7 +29,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Component> GetNode(
-            [DataLoader] ComponentForTimestampedIdDataLoader componentLoader
+            [DataLoader] ComponentDataLoader componentLoader
             )
         {
             return componentLoader.LoadAsync(

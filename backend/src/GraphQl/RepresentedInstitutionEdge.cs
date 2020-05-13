@@ -29,7 +29,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Institution> GetNode(
-            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader
+            [DataLoader] InstitutionDataLoader institutionLoader
             )
         {
             return institutionLoader.LoadAsync(

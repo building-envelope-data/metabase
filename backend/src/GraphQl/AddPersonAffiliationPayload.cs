@@ -22,7 +22,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Person> GetPerson(
-            [DataLoader] PersonForTimestampedIdDataLoader personLoader
+            [DataLoader] PersonDataLoader personLoader
             )
         {
             return personLoader.LoadAsync(
@@ -31,7 +31,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Institution> GetInstitution(
-            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader
+            [DataLoader] InstitutionDataLoader institutionLoader
             )
         {
             return institutionLoader.LoadAsync(
