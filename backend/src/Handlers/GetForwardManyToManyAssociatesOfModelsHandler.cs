@@ -29,14 +29,6 @@ namespace Icon.Handlers
         {
         }
 
-        public Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
-            Queries.GetForwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel> query,
-            CancellationToken cancellationToken
-            )
-        {
-            return base.Handle(query, cancellationToken);
-        }
-
         protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
             IAggregateRepositoryReadOnlySession session,
             IEnumerable<ValueObjects.Id> modelIds,
