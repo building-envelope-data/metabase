@@ -58,6 +58,10 @@ updatetools : ## Update tools
 update : updatepackages updatetools ## Update packages and tools
 .PHONY : update
 
+play : ## Run facts in `Test.Play` (semi-alternative to the buggy `dotnet script` REPL)
+	dotnet test --filter "FullyQualifiedName~Test.Play"
+.PHONY : play
+
 # TODO Shortcuts for `dotnet aspnet-codegenerator`?
 
 # List of commands
