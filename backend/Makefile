@@ -46,9 +46,16 @@ assets : ## Build assets
 	npm run all
 .PHONY : assets
 
-update : ## Update packages
+updatepackages : ## Update packages
 	cd ./src/ && dotnet list package | awk '/>/ {print $$2}' | xargs -n 1 dotnet add package
 	cd ./test/ && dotnet list package | awk '/>/ {print $$2}' | xargs -n 1 dotnet add package
+.PHONY : updatepackages
+
+updatetools : # Update tools
+	dotnet tool list | tail -n +3 | awk '{print $$1}' | xargs -n 1 dotnet tool update
+.PHONY : updatetools
+
+update : updatepackages updatetools ## Update packages and tools
 .PHONY : update
 
 # TODO Shortcuts for `dotnet aspnet-codegenerator`?
