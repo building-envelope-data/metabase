@@ -38,6 +38,8 @@ using Handlers = Icon.Handlers;
 using IError = HotChocolate.IError;
 using CSharpFunctionalExtensions;
 using MediatR;
+using System.Linq.Expressions;
+using Marten; // IsOneOf
 
 namespace Icon.Configuration
 {
@@ -113,6 +115,18 @@ namespace Icon.Configuration
                     services,
                     Events.InstitutionCreated.From
                     );
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetOneToManyAssociatesOfModels<Models.Institution, Models.Database>,
+              IEnumerable<Result<IEnumerable<Result<Models.Database, Errors>>, Errors>>
+                                >,
+              Handlers.GetDatabasesOperatedByInstitutionsHandler
+                                >();
+            /* AddGetOneToManyAssociatesHandler<Models.Institution, Models.Database, Aggregates.DatabaseAggregate, Events.DatabaseCreated>( */
+            /*         services, */
+            /*         modelGuids => (createdEvent => createdEvent.InstitutionId.IsOneOf(modelGuids)), */
+            /*         createdEvent => new Handlers.GetOneToManyAssociatesOfModelsHandler<Models.Institution, Models.Database, Aggregates.DatabaseAggregate, Events.DatabaseCreated>.Select { ModelId = createdEvent.InstitutionId, AssociateId = createdEvent.AggregateId } */
+            /*         ); */
         }
 
         private static void AddMethodHandlers(IServiceCollection services)
@@ -394,7 +408,7 @@ namespace Icon.Configuration
         {
             AddAddHandler<TAddInput, TAssociationAggregate>(services, newEvent);
             AddGetHandler<TAssociationModel, TAssociationAggregate>(services);
-            AddGetAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(services);
+            AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(services);
             AddGetAssociationsHandler<TModel, TAssociationModel, TAssociatedModel, TAssociationAggregate, TAddedEvent>(services);
         }
 
@@ -412,7 +426,7 @@ namespace Icon.Configuration
         {
             AddAddHandler<TAddInput, TAssociationAggregate>(services, newEvent);
             AddGetHandler<TAssociationModel, TAssociationAggregate>(services);
-            AddGetAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(services);
+            AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(services);
         }
 
         private static void AddAddHandler<TInput, TAggregate>(
@@ -447,7 +461,31 @@ namespace Icon.Configuration
                 >();
         }
 
-        private static void AddGetAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(IServiceCollection services)
+        /* private static void AddGetOneToManyAssociatesHandler<TModel, TAssociatedModel, TAssociatedAggregate, TCreatedEvent>( */
+        /*     IServiceCollection services, */
+        /*                 Func<Guid[], Expression<Func<TCreatedEvent, bool>>> where, */
+        /*                 Expression<Func<TCreatedEvent, Handlers.GetOneToManyAssociatesOfModelsHandler<TModel, TAssociatedModel, TAssociatedAggregate, TCreatedEvent>.Select>> select */
+        /*     ) */
+        /*     where TModel : Models.IModel */
+        /*     where TAssociatedAggregate : class, IEventSourcedAggregate, IConvertible<TAssociatedModel>, new() */
+        /*     where TCreatedEvent : Events.ICreatedEvent */
+        /* { */
+        /*     services.AddScoped< */
+        /*       MediatR.IRequestHandler< */
+        /*       Queries.GetOneToManyAssociatesOfModels<TModel, TAssociatedModel>, */
+        /*       IEnumerable<Result<IEnumerable<Result<TAssociatedModel, Errors>>, Errors>> */
+        /*         >, */
+        /*       Handlers.GetOneToManyAssociatesOfModelsHandler<TModel, TAssociatedModel, TAssociatedAggregate, TCreatedEvent> */
+        /*         >(serviceProvider => */
+        /*           new Handlers.GetOneToManyAssociatesOfModelsHandler<TModel, TAssociatedModel, TAssociatedAggregate, TCreatedEvent>( */
+        /*             where, */
+        /*                                 select, */
+        /*             serviceProvider.GetRequiredService<IAggregateRepository>() */
+        /*             ) */
+        /*          ); */
+        /* } */
+
+        private static void AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(IServiceCollection services)
             where TModel : Models.IModel
             where TAssociatedModel : Models.IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()

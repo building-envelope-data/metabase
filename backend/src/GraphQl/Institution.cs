@@ -91,12 +91,23 @@ namespace Icon.GraphQl
             }
         }
 
-        // TODO Add `DatabaseOperator` association between database and institution
         public Task<IReadOnlyList<Database>> GetOperatedDatabases(
-            [Parent] Institution institution
+            [Parent] Institution institution,
+            [DataLoader] DatabasesOperatedByInstitutionDataLoader databasesLoader
             )
         {
-            return null!;
+            return databasesLoader.LoadAsync(
+                TimestampHelpers.TimestampId(institution.Id, institution.RequestTimestamp)
+                );
+        }
+
+        public sealed class DatabasesOperatedByInstitutionDataLoader
+            : OneToManyAssociatesOfModelDataLoader<Database, Models.Institution, Models.Database>
+        {
+            public DatabasesOperatedByInstitutionDataLoader(IQueryBus queryBus)
+              : base(Database.FromModel, queryBus)
+            {
+            }
         }
 
         public ManufacturedComponentConnection GetManufacturedComponents(
