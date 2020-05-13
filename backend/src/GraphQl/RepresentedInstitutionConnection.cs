@@ -27,7 +27,7 @@ namespace Icon.GraphQl
         }
 
         public async Task<IReadOnlyList<RepresentedInstitutionEdge>> GetEdges(
-            [DataLoader] InstitutionsRepresentedByUserIdentifiedByTimestampedIdAssociationDataLoader representedInstitutionsLoader
+            [DataLoader] InstitutionsRepresentedByUserAssociationDataLoader representedInstitutionsLoader
             )
         {
             return (await representedInstitutionsLoader.LoadAsync(
@@ -39,17 +39,17 @@ namespace Icon.GraphQl
               .ToList().AsReadOnly();
         }
 
-        public sealed class InstitutionsRepresentedByUserIdentifiedByTimestampedIdAssociationDataLoader
-            : BackwardAssociationsOfModelIdentifiedByTimestampedIdDataLoader<InstitutionRepresentative, Models.User, Models.InstitutionRepresentative>
+        public sealed class InstitutionsRepresentedByUserAssociationDataLoader
+            : BackwardAssociationsOfModelDataLoader<InstitutionRepresentative, Models.User, Models.InstitutionRepresentative>
         {
-            public InstitutionsRepresentedByUserIdentifiedByTimestampedIdAssociationDataLoader(IQueryBus queryBus)
+            public InstitutionsRepresentedByUserAssociationDataLoader(IQueryBus queryBus)
               : base(InstitutionRepresentative.FromModel, queryBus)
             {
             }
         }
 
         public Task<IReadOnlyList<Institution>> GetNodes(
-            [DataLoader] InstitutionsRepresentedByUserIdentifiedByTimestampedIdDataLoader representedInstitutionsLoader
+            [DataLoader] InstitutionsRepresentedByUserDataLoader representedInstitutionsLoader
             )
         {
             return representedInstitutionsLoader.LoadAsync(
@@ -57,10 +57,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class InstitutionsRepresentedByUserIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Institution, Models.User, Models.InstitutionRepresentative, Models.Institution>
+        public sealed class InstitutionsRepresentedByUserDataLoader
+            : BackwardManyToManyAssociatesOfModelDataLoader<Institution, Models.User, Models.InstitutionRepresentative, Models.Institution>
         {
-            public InstitutionsRepresentedByUserIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public InstitutionsRepresentedByUserDataLoader(IQueryBus queryBus)
               : base(Institution.FromModel, queryBus)
             {
             }

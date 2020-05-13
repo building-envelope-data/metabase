@@ -46,10 +46,21 @@ assets : ## Build assets
 	npm run all
 .PHONY : assets
 
-update : ## Update packages
+updatepackages : ## Update packages
 	cd ./src/ && dotnet list package | awk '/>/ {print $$2}' | xargs -n 1 dotnet add package
 	cd ./test/ && dotnet list package | awk '/>/ {print $$2}' | xargs -n 1 dotnet add package
+.PHONY : updatepackages
+
+updatetools : ## Update tools
+	dotnet tool list | tail -n +3 | awk '{print $$1}' | xargs -n 1 dotnet tool update
+.PHONY : updatetools
+
+update : updatepackages updatetools ## Update packages and tools
 .PHONY : update
+
+play : ## Run facts in `Test.Play` (semi-alternative to the buggy `dotnet script` REPL)
+	dotnet test --filter "FullyQualifiedName~Test.Play"
+.PHONY : play
 
 # TODO Shortcuts for `dotnet aspnet-codegenerator`?
 

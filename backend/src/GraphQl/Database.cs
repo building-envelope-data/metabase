@@ -1,6 +1,9 @@
 using Uri = System.Uri;
 using Models = Icon.Models;
 using DateTime = System.DateTime;
+using System.Threading.Tasks;
+using HotChocolate;
+using GreenDonut;
 
 namespace Icon.GraphQl
 {
@@ -47,6 +50,15 @@ namespace Icon.GraphQl
             Description = description;
             Locator = locator;
             InstitutionId = institutionId;
+        }
+
+        public Task<Institution> GetOperatingInstitution(
+            [DataLoader] InstitutionDataLoader institutionLoader
+            )
+        {
+            return institutionLoader.LoadAsync(
+                TimestampHelpers.TimestampId(InstitutionId, RequestTimestamp)
+                );
         }
     }
 }

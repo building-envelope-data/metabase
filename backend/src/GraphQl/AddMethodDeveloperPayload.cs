@@ -22,7 +22,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Method> GetMethod(
-            [DataLoader] MethodForTimestampedIdDataLoader methodLoader
+            [DataLoader] MethodDataLoader methodLoader
             )
         {
             return methodLoader.LoadAsync(
@@ -31,7 +31,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Stakeholder> GetStakeholder(
-            [DataLoader] StakeholderForTimestampedIdDataLoader stakeholderLoader
+            [DataLoader] StakeholderDataLoader stakeholderLoader
             )
         {
             return stakeholderLoader.LoadAsync(

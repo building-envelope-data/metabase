@@ -38,6 +38,8 @@ using Handlers = Icon.Handlers;
 using IError = HotChocolate.IError;
 using CSharpFunctionalExtensions;
 using MediatR;
+using System.Linq.Expressions;
+using Marten; // IsOneOf
 
 namespace Icon.Configuration
 {
@@ -84,10 +86,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModelsForTimestampedIds<Models.IModel>,
+              Queries.GetModels<Models.IModel>,
               IEnumerable<Result<Models.IModel, Errors>>
                 >,
-              Handlers.GetModelsOfUnknownTypeForTimestampedIdsHandler
+              Handlers.GetModelsOfUnknownTypeHandler
                 >();
         }
 
@@ -113,6 +115,18 @@ namespace Icon.Configuration
                     services,
                     Events.InstitutionCreated.From
                     );
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.GetOneToManyAssociatesOfModels<Models.Institution, Models.Database>,
+              IEnumerable<Result<IEnumerable<Result<Models.Database, Errors>>, Errors>>
+                                >,
+              Handlers.GetDatabasesOperatedByInstitutionsHandler
+                                >();
+            /* AddGetOneToManyAssociatesHandler<Models.Institution, Models.Database, Aggregates.DatabaseAggregate, Events.DatabaseCreated>( */
+            /*         services, */
+            /*         modelGuids => (createdEvent => createdEvent.InstitutionId.IsOneOf(modelGuids)), */
+            /*         createdEvent => new Handlers.GetOneToManyAssociatesOfModelsHandler<Models.Institution, Models.Database, Aggregates.DatabaseAggregate, Events.DatabaseCreated>.Select { ModelId = createdEvent.InstitutionId, AssociateId = createdEvent.AggregateId } */
+            /*         ); */
         }
 
         private static void AddMethodHandlers(IServiceCollection services)
@@ -136,10 +150,10 @@ namespace Icon.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModelsForTimestampedIds<Models.Stakeholder>,
+              Queries.GetModels<Models.Stakeholder>,
               IEnumerable<Result<Models.Stakeholder, Errors>>
                 >,
-              Handlers.GetStakeholdersForTimestampedIdsHandler
+              Handlers.GetStakeholdersHandler
                 >();
         }
 
@@ -209,10 +223,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
                 MediatR.IRequestHandler<
-                Queries.GetModelsForTimestampedIds<TModel>,
+                Queries.GetModels<TModel>,
                 IEnumerable<Result<TModel, Errors>>
                     >,
-                Handlers.GetModelsForTimestampedIdsHandler<TModel, TAggregate>
+                Handlers.GetModelsHandler<TModel, TAggregate>
                     >();
         }
 
@@ -329,22 +343,22 @@ namespace Icon.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModelsForTimestampedIds<Models.MethodDeveloper>,
+              Queries.GetModels<Models.MethodDeveloper>,
               IEnumerable<Result<Models.MethodDeveloper, Errors>>
                 >,
-              Handlers.GetMethodDevelopersForTimestampedIdsHandler
+              Handlers.GetMethodDevelopersHandler
                 >();
 
             // Get associates
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetForwardAssociatesOfModelsIdentifiedByTimestampedIds<Models.Method, Models.MethodDeveloper, Models.Stakeholder>,
+              Queries.GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>,
               IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>
                 >,
-              Handlers.GetDevelopersOfMethodsIdentifiedByTimestampedIdsHandler
+              Handlers.GetDevelopersOfMethodsHandler
                 >();
-            AddGetBackwardAssociatesHandler<Models.Person, Models.MethodDeveloper, Models.Method, Aggregates.MethodAggregate, Events.PersonMethodDeveloperAdded>(services);
-            AddGetBackwardAssociatesHandler<Models.Institution, Models.MethodDeveloper, Models.Method, Aggregates.MethodAggregate, Events.InstitutionMethodDeveloperAdded>(services);
+            AddGetBackwardManyToManyAssociatesHandler<Models.Person, Models.MethodDeveloper, Models.Method, Aggregates.MethodAggregate, Events.PersonMethodDeveloperAdded>(services);
+            AddGetBackwardManyToManyAssociatesHandler<Models.Institution, Models.MethodDeveloper, Models.Method, Aggregates.MethodAggregate, Events.InstitutionMethodDeveloperAdded>(services);
         }
 
         private static void AddPersonAffiliationHandlers(IServiceCollection services)
@@ -394,7 +408,7 @@ namespace Icon.Configuration
         {
             AddAddHandler<TAddInput, TAssociationAggregate>(services, newEvent);
             AddGetHandler<TAssociationModel, TAssociationAggregate>(services);
-            AddGetAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(services);
+            AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(services);
             AddGetAssociationsHandler<TModel, TAssociationModel, TAssociatedModel, TAssociationAggregate, TAddedEvent>(services);
         }
 
@@ -412,7 +426,7 @@ namespace Icon.Configuration
         {
             AddAddHandler<TAddInput, TAssociationAggregate>(services, newEvent);
             AddGetHandler<TAssociationModel, TAssociationAggregate>(services);
-            AddGetAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(services);
+            AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(services);
         }
 
         private static void AddAddHandler<TInput, TAggregate>(
@@ -440,49 +454,73 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModelsForTimestampedIds<TModel>,
+              Queries.GetModels<TModel>,
               IEnumerable<Result<TModel, Errors>>
                 >,
-              Handlers.GetModelsForTimestampedIdsHandler<TModel, TAggregate>
+              Handlers.GetModelsHandler<TModel, TAggregate>
                 >();
         }
 
-        private static void AddGetAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(IServiceCollection services)
+        /* private static void AddGetOneToManyAssociatesHandler<TModel, TAssociatedModel, TAssociatedAggregate, TCreatedEvent>( */
+        /*     IServiceCollection services, */
+        /*                 Func<Guid[], Expression<Func<TCreatedEvent, bool>>> where, */
+        /*                 Expression<Func<TCreatedEvent, Handlers.GetOneToManyAssociatesOfModelsHandler<TModel, TAssociatedModel, TAssociatedAggregate, TCreatedEvent>.Select>> select */
+        /*     ) */
+        /*     where TModel : Models.IModel */
+        /*     where TAssociatedAggregate : class, IEventSourcedAggregate, IConvertible<TAssociatedModel>, new() */
+        /*     where TCreatedEvent : Events.ICreatedEvent */
+        /* { */
+        /*     services.AddScoped< */
+        /*       MediatR.IRequestHandler< */
+        /*       Queries.GetOneToManyAssociatesOfModels<TModel, TAssociatedModel>, */
+        /*       IEnumerable<Result<IEnumerable<Result<TAssociatedModel, Errors>>, Errors>> */
+        /*         >, */
+        /*       Handlers.GetOneToManyAssociatesOfModelsHandler<TModel, TAssociatedModel, TAssociatedAggregate, TCreatedEvent> */
+        /*         >(serviceProvider => */
+        /*           new Handlers.GetOneToManyAssociatesOfModelsHandler<TModel, TAssociatedModel, TAssociatedAggregate, TCreatedEvent>( */
+        /*             where, */
+        /*                                 select, */
+        /*             serviceProvider.GetRequiredService<IAggregateRepository>() */
+        /*             ) */
+        /*          ); */
+        /* } */
+
+        private static void AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAggregate, TAssociatedAggregate, TAddedEvent>(IServiceCollection services)
             where TModel : Models.IModel
             where TAssociatedModel : Models.IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociatedAggregate : class, IEventSourcedAggregate, IConvertible<TAssociatedModel>, new()
             where TAddedEvent : Events.IAddedEvent
         {
-            AddGetForwardAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAssociatedAggregate, TAddedEvent>(services);
-            AddGetBackwardAssociatesHandler<TAssociatedModel, TAssociationModel, TModel, TAggregate, TAddedEvent>(services);
+            AddGetForwardManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAssociatedAggregate, TAddedEvent>(services);
+            AddGetBackwardManyToManyAssociatesHandler<TAssociatedModel, TAssociationModel, TModel, TAggregate, TAddedEvent>(services);
         }
 
-        private static void AddGetForwardAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAssociatedAggregate, TAddedEvent>(IServiceCollection services)
+        private static void AddGetForwardManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociatedModel, TAssociatedAggregate, TAddedEvent>(IServiceCollection services)
             where TModel : Models.IModel
             where TAssociatedAggregate : class, IEventSourcedAggregate, IConvertible<TAssociatedModel>, new()
             where TAddedEvent : Events.IAddedEvent
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetForwardAssociatesOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel, TAssociatedModel>,
+              Queries.GetForwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociatedModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociatedModel, Errors>>, Errors>>
                 >,
-              Handlers.GetForwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociatedModel, TAssociatedAggregate, TAddedEvent>
+              Handlers.GetForwardManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociatedModel, TAssociatedAggregate, TAddedEvent>
                 >();
         }
 
-        private static void AddGetBackwardAssociatesHandler<TAssociatedModel, TAssociationModel, TModel, TAggregate, TAddedEvent>(IServiceCollection services)
+        private static void AddGetBackwardManyToManyAssociatesHandler<TAssociatedModel, TAssociationModel, TModel, TAggregate, TAddedEvent>(IServiceCollection services)
             where TModel : Models.IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAddedEvent : Events.IAddedEvent
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIds<TAssociatedModel, TAssociationModel, TModel>,
+              Queries.GetBackwardManyToManyAssociatesOfModels<TAssociatedModel, TAssociationModel, TModel>,
               IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>
                 >,
-              Handlers.GetBackwardAssociatesOfModelsIdentifiedByTimestampedIdsHandler<TAssociatedModel, TAssociationModel, TModel, TAggregate, TAddedEvent>
+              Handlers.GetBackwardManyToManyAssociatesOfModelsHandler<TAssociatedModel, TAssociationModel, TModel, TAggregate, TAddedEvent>
                 >();
         }
 
@@ -505,10 +543,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetForwardAssociationsOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel>,
+              Queries.GetForwardAssociationsOfModels<TModel, TAssociationModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>
                 >,
-              Handlers.GetForwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
+              Handlers.GetForwardAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
                 >();
         }
 
@@ -520,10 +558,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetBackwardAssociationsOfModelsIdentifiedByTimestampedIds<TModel, TAssociationModel>,
+              Queries.GetBackwardAssociationsOfModels<TModel, TAssociationModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>
                 >,
-              Handlers.GetBackwardAssociationsOfModelsIdentifiedByTimestampedIdsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
+              Handlers.GetBackwardAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
                 >();
         }
     }

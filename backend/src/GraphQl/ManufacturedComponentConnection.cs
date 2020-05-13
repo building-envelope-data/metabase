@@ -27,7 +27,7 @@ namespace Icon.GraphQl
         }
 
         public async Task<IReadOnlyList<ManufacturedComponentEdge>> GetEdges(
-            [DataLoader] ComponentsManufacturedByInstitutionIdentifiedByTimestampedIdAssociationDataLoader manufacturedComponentsLoader
+            [DataLoader] ComponentsManufacturedByInstitutionAssociationDataLoader manufacturedComponentsLoader
             )
         {
             return (await manufacturedComponentsLoader.LoadAsync(
@@ -39,17 +39,17 @@ namespace Icon.GraphQl
               .ToList().AsReadOnly();
         }
 
-        public sealed class ComponentsManufacturedByInstitutionIdentifiedByTimestampedIdAssociationDataLoader
-            : BackwardAssociationsOfModelIdentifiedByTimestampedIdDataLoader<ComponentManufacturer, Models.Institution, Models.ComponentManufacturer>
+        public sealed class ComponentsManufacturedByInstitutionAssociationDataLoader
+            : BackwardAssociationsOfModelDataLoader<ComponentManufacturer, Models.Institution, Models.ComponentManufacturer>
         {
-            public ComponentsManufacturedByInstitutionIdentifiedByTimestampedIdAssociationDataLoader(IQueryBus queryBus)
+            public ComponentsManufacturedByInstitutionAssociationDataLoader(IQueryBus queryBus)
               : base(ComponentManufacturer.FromModel, queryBus)
             {
             }
         }
 
         public Task<IReadOnlyList<Component>> GetNodes(
-            [DataLoader] ComponentsManufacturedByInstitutionIdentifiedByTimestampedIdDataLoader manufacturedComponentsLoader
+            [DataLoader] ComponentsManufacturedByInstitutionDataLoader manufacturedComponentsLoader
             )
         {
             return manufacturedComponentsLoader.LoadAsync(
@@ -57,10 +57,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class ComponentsManufacturedByInstitutionIdentifiedByTimestampedIdDataLoader
-            : BackwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Component, Models.Institution, Models.ComponentManufacturer, Models.Component>
+        public sealed class ComponentsManufacturedByInstitutionDataLoader
+            : BackwardManyToManyAssociatesOfModelDataLoader<Component, Models.Institution, Models.ComponentManufacturer, Models.Component>
         {
-            public ComponentsManufacturedByInstitutionIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public ComponentsManufacturedByInstitutionDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }

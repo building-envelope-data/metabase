@@ -30,7 +30,7 @@ namespace Icon.GraphQl
         public Task<Node> GetNode(
             ValueObjects.Id id,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] NodeForTimestampedIdDataLoader nodeLoader,
+            [DataLoader] NodeDataLoader nodeLoader,
             IResolverContext resolverContext
             )
         {
@@ -53,7 +53,7 @@ namespace Icon.GraphQl
         public Task<Component> GetComponent(
             ValueObjects.Id id,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] ComponentForTimestampedIdDataLoader componentLoader,
+            [DataLoader] ComponentDataLoader componentLoader,
             IResolverContext resolverContext
             )
         {
@@ -76,7 +76,7 @@ namespace Icon.GraphQl
         public Task<Database> GetDatabase(
             ValueObjects.Id id,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] DatabaseForTimestampedIdDataLoader databaseLoader,
+            [DataLoader] DatabaseDataLoader databaseLoader,
             IResolverContext resolverContext
             )
         {
@@ -99,7 +99,7 @@ namespace Icon.GraphQl
         public Task<Institution> GetInstitution(
             ValueObjects.Id id,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader,
+            [DataLoader] InstitutionDataLoader institutionLoader,
             IResolverContext resolverContext
             )
         {
@@ -122,7 +122,7 @@ namespace Icon.GraphQl
         public Task<Method> GetMethod(
             ValueObjects.Id id,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] MethodForTimestampedIdDataLoader methodLoader,
+            [DataLoader] MethodDataLoader methodLoader,
             IResolverContext resolverContext
             )
         {
@@ -145,7 +145,7 @@ namespace Icon.GraphQl
         public Task<Person> GetPerson(
             ValueObjects.Id id,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] PersonForTimestampedIdDataLoader personLoader,
+            [DataLoader] PersonDataLoader personLoader,
             IResolverContext resolverContext
             )
         {
@@ -170,7 +170,7 @@ namespace Icon.GraphQl
         public Task<Standard> GetStandard(
             ValueObjects.Id id,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] StandardForTimestampedIdDataLoader standardLoader,
+            [DataLoader] StandardDataLoader standardLoader,
             IResolverContext resolverContext
             )
         {

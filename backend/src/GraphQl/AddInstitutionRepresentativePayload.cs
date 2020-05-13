@@ -27,7 +27,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Institution> GetInstitution(
-            [DataLoader] InstitutionForTimestampedIdDataLoader institutionLoader
+            [DataLoader] InstitutionDataLoader institutionLoader
             )
         {
             return institutionLoader.LoadAsync(
@@ -35,7 +35,7 @@ namespace Icon.GraphQl
                 );
         }
 
-        public Task<User> GetUser(/* TODO [DataLoader] UserForTimestampedIdDataLoader userLoader */)
+        public Task<User> GetUser(/* TODO [DataLoader] UserDataLoader userLoader */)
         {
             return null!;
             /* return userLoader.LoadAsync( */

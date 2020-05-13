@@ -27,7 +27,7 @@ namespace Icon.GraphQl
         }
 
         public async Task<IReadOnlyList<InstitutionRepresentativeEdge>> GetEdges(
-            [DataLoader] RepresentativesOfInstitutionIdentifiedByTimestampedIdAssociationDataLoader representativesLoader
+            [DataLoader] RepresentativesOfInstitutionAssociationDataLoader representativesLoader
             )
         {
             return (await representativesLoader.LoadAsync(
@@ -39,17 +39,17 @@ namespace Icon.GraphQl
               .ToList().AsReadOnly();
         }
 
-        public sealed class RepresentativesOfInstitutionIdentifiedByTimestampedIdAssociationDataLoader
-            : ForwardAssociationsOfModelIdentifiedByTimestampedIdDataLoader<InstitutionRepresentative, Models.Institution, Models.InstitutionRepresentative>
+        public sealed class RepresentativesOfInstitutionAssociationDataLoader
+            : ForwardAssociationsOfModelDataLoader<InstitutionRepresentative, Models.Institution, Models.InstitutionRepresentative>
         {
-            public RepresentativesOfInstitutionIdentifiedByTimestampedIdAssociationDataLoader(IQueryBus queryBus)
+            public RepresentativesOfInstitutionAssociationDataLoader(IQueryBus queryBus)
               : base(InstitutionRepresentative.FromModel, queryBus)
             {
             }
         }
 
         public Task<IReadOnlyList<User>> GetNodes(
-            [DataLoader] RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader representativesLoader
+            [DataLoader] RepresentativesOfInstitutionDataLoader representativesLoader
             )
         {
             return representativesLoader.LoadAsync(
@@ -57,10 +57,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader
-            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<User, Models.Institution, Models.InstitutionRepresentative, Models.User>
+        public sealed class RepresentativesOfInstitutionDataLoader
+            : ForwardManyToManyAssociatesOfModelDataLoader<User, Models.Institution, Models.InstitutionRepresentative, Models.User>
         {
-            public RepresentativesOfInstitutionIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public RepresentativesOfInstitutionDataLoader(IQueryBus queryBus)
               : base(User.FromModel, queryBus)
             {
             }

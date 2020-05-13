@@ -45,7 +45,7 @@ namespace Icon.GraphQl
 
         public Task<IReadOnlyList<Stakeholder>> GetDevelopers(
             [Parent] Method method,
-            [DataLoader] DevelopersOfMethodIdentifiedByTimestampedIdDataLoader developersLoader
+            [DataLoader] DevelopersOfMethodDataLoader developersLoader
             )
         {
             return developersLoader.LoadAsync(
@@ -53,10 +53,10 @@ namespace Icon.GraphQl
                 );
         }
 
-        public sealed class DevelopersOfMethodIdentifiedByTimestampedIdDataLoader
-            : ForwardAssociatesOfModelIdentifiedByTimestampedIdDataLoader<Stakeholder, Models.Method, Models.MethodDeveloper, Models.Stakeholder>
+        public sealed class DevelopersOfMethodDataLoader
+            : ForwardManyToManyAssociatesOfModelDataLoader<Stakeholder, Models.Method, Models.MethodDeveloper, Models.Stakeholder>
         {
-            public DevelopersOfMethodIdentifiedByTimestampedIdDataLoader(IQueryBus queryBus)
+            public DevelopersOfMethodDataLoader(IQueryBus queryBus)
               : base(StakeholderBase.FromModel, queryBus)
             {
             }
