@@ -531,11 +531,11 @@ namespace Icon.Configuration
     where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
     where TAddedEvent : Events.IAddedEvent
         {
-            AddGetForwardAssociationsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(services);
-            AddGetBackwardAssociationsHandler<TAssociatedModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(services);
+            AddGetForwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(services);
+            AddGetBackwardManyToManyAssociationsHandler<TAssociatedModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(services);
         }
 
-        private static void AddGetForwardAssociationsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(IServiceCollection services)
+        private static void AddGetForwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(IServiceCollection services)
     where TModel : Models.IModel
     where TAssociationModel : Models.IModel
     where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
@@ -543,14 +543,14 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetForwardAssociationsOfModels<TModel, TAssociationModel>,
+              Queries.GetForwardManyToManyAssociationsOfModels<TModel, TAssociationModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>
                 >,
-              Handlers.GetForwardAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
+              Handlers.GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
                 >();
         }
 
-        private static void AddGetBackwardAssociationsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(IServiceCollection services)
+        private static void AddGetBackwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(IServiceCollection services)
     where TModel : Models.IModel
     where TAssociationModel : Models.IModel
     where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
@@ -558,10 +558,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetBackwardAssociationsOfModels<TModel, TAssociationModel>,
+              Queries.GetBackwardManyToManyAssociationsOfModels<TModel, TAssociationModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>
                 >,
-              Handlers.GetBackwardAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
+              Handlers.GetBackwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
                 >();
         }
     }

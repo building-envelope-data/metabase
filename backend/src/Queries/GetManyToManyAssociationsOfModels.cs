@@ -4,10 +4,10 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Queries
 {
-    public abstract class GetAssociationsOfModels<TModel, TAssociationModel>
+    public abstract class GetManyToManyAssociationsOfModels<TModel, TAssociationModel>
       : GetAssociatesOfModels<TModel, TAssociationModel, TAssociationModel>
     {
-        protected GetAssociationsOfModels(
+        protected GetManyToManyAssociationsOfModels(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
             )
             : base(timestampedModelIds)
