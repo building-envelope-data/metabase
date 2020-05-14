@@ -86,10 +86,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModels<Models.IModel>,
+              Queries.GetModelsForTimestampedIds<Models.IModel>,
               IEnumerable<Result<Models.IModel, Errors>>
                 >,
-              Handlers.GetModelsOfUnknownTypeHandler
+              Handlers.GetModelsOfUnknownTypeForTimestampedIdsHandler
                 >();
         }
 
@@ -150,7 +150,7 @@ namespace Icon.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModels<Models.Stakeholder>,
+              Queries.GetModelsForTimestampedIds<Models.Stakeholder>,
               IEnumerable<Result<Models.Stakeholder, Errors>>
                 >,
               Handlers.GetStakeholdersHandler
@@ -177,7 +177,7 @@ namespace Icon.Configuration
                     services,
                     newCreatedEvent
                     );
-            AddGetModelsHandler<TModel, TAggregate, TCreatedEvent>(services);
+            AddGetModelsForTimestampedIdsHandler<TModel, TAggregate, TCreatedEvent>(services);
             AddGetModelHandler<TModel, TAggregate>(services);
         }
 
@@ -200,7 +200,7 @@ namespace Icon.Configuration
                   );
         }
 
-        private static void AddGetModelsHandler<TModel, TAggregate, TCreatedEvent>(
+        private static void AddGetModelsForTimestampedIdsHandler<TModel, TAggregate, TCreatedEvent>(
                 IServiceCollection services
                 )
                 where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
@@ -223,10 +223,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
                 MediatR.IRequestHandler<
-                Queries.GetModels<TModel>,
+                Queries.GetModelsForTimestampedIds<TModel>,
                 IEnumerable<Result<TModel, Errors>>
                     >,
-                Handlers.GetModelsHandler<TModel, TAggregate>
+                Handlers.GetModelsForTimestampedIdsHandler<TModel, TAggregate>
                     >();
         }
 
@@ -343,7 +343,7 @@ namespace Icon.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModels<Models.MethodDeveloper>,
+              Queries.GetModelsForTimestampedIds<Models.MethodDeveloper>,
               IEnumerable<Result<Models.MethodDeveloper, Errors>>
                 >,
               Handlers.GetMethodDevelopersHandler
@@ -454,10 +454,10 @@ namespace Icon.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetModels<TModel>,
+              Queries.GetModelsForTimestampedIds<TModel>,
               IEnumerable<Result<TModel, Errors>>
                 >,
-              Handlers.GetModelsHandler<TModel, TAggregate>
+              Handlers.GetModelsForTimestampedIdsHandler<TModel, TAggregate>
                 >();
         }
 

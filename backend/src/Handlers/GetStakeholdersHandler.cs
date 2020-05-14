@@ -19,21 +19,21 @@ using CSharpFunctionalExtensions;
 namespace Icon.Handlers
 {
     public sealed class GetStakeholdersHandler
-      : IQueryHandler<Queries.GetModels<Models.Stakeholder>, IEnumerable<Result<Models.Stakeholder, Errors>>>
+      : IQueryHandler<Queries.GetModelsForTimestampedIds<Models.Stakeholder>, IEnumerable<Result<Models.Stakeholder, Errors>>>
     {
         private readonly IAggregateRepository _repository;
-        private readonly GetModelsHandler<Models.Institution, Aggregates.InstitutionAggregate> _getInstitutionsHandler;
-        private readonly GetModelsHandler<Models.Person, Aggregates.PersonAggregate> _getPersonsHandler;
+        private readonly GetModelsForTimestampedIdsHandler<Models.Institution, Aggregates.InstitutionAggregate> _getInstitutionsHandler;
+        private readonly GetModelsForTimestampedIdsHandler<Models.Person, Aggregates.PersonAggregate> _getPersonsHandler;
 
         public GetStakeholdersHandler(IAggregateRepository repository)
         {
             _repository = repository;
-            _getInstitutionsHandler = new GetModelsHandler<Models.Institution, Aggregates.InstitutionAggregate>(repository);
-            _getPersonsHandler = new GetModelsHandler<Models.Person, Aggregates.PersonAggregate>(repository);
+            _getInstitutionsHandler = new GetModelsForTimestampedIdsHandler<Models.Institution, Aggregates.InstitutionAggregate>(repository);
+            _getPersonsHandler = new GetModelsForTimestampedIdsHandler<Models.Person, Aggregates.PersonAggregate>(repository);
         }
 
         public async Task<IEnumerable<Result<Models.Stakeholder, Errors>>> Handle(
-            Queries.GetModels<Models.Stakeholder> query,
+            Queries.GetModelsForTimestampedIds<Models.Stakeholder> query,
             CancellationToken cancellationToken
             )
         {
