@@ -12,7 +12,9 @@ namespace Icon.Infrastructure.Aggregate
 {
     public interface IAggregateRepositoryReadOnlySession : IDisposable
     {
-        public IMartenQueryable<E> Query<E>() where E : IEvent;
+        public IMartenQueryable<E> QueryEvents<E>() where E : IEvent;
+
+        public IMartenQueryable<T> Query<T>() where T : class, IEventSourcedAggregate, new();
 
         public Task<ValueObjects.Id> GenerateNewId(
             CancellationToken cancellationToken

@@ -11,7 +11,7 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
-    public sealed class CreateModelHandler<TCommand, TAggregate>
+    public class CreateModelHandler<TCommand, TAggregate>
       : ICommandHandler<TCommand, Result<ValueObjects.TimestampedId, Errors>>
       where TCommand : ICommand<Result<ValueObjects.TimestampedId, Errors>>
       where TAggregate : class, IEventSourcedAggregate, new()
@@ -39,7 +39,7 @@ namespace Icon.Handlers
             }
         }
 
-        public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
+        public virtual async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
             TCommand command,
             IAggregateRepositorySession session,
             CancellationToken cancellationToken

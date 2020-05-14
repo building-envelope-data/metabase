@@ -5,23 +5,8 @@ using CSharpFunctionalExtensions;
 namespace Icon.ValueObjects
 {
     public sealed class AddComponentManufacturerInput
-      : ValueObject
+      : AddManyToManyAssociationInput
     {
-        public Id ComponentId { get; }
-        public Id InstitutionId { get; }
-        public ComponentManufacturerMarketingInformation? MarketingInformation { get; }
-
-        private AddComponentManufacturerInput(
-            Id componentId,
-            Id institutionId,
-            ComponentManufacturerMarketingInformation? marketingInformation
-            )
-        {
-            ComponentId = componentId;
-            InstitutionId = institutionId;
-            MarketingInformation = marketingInformation;
-        }
-
         public static Result<AddComponentManufacturerInput, Errors> From(
             Id componentId,
             Id institutionId,
@@ -38,10 +23,29 @@ namespace Icon.ValueObjects
                   );
         }
 
+        public Id ComponentId { get => ParentId; }
+        public Id InstitutionId { get => AssociateId; }
+        public ComponentManufacturerMarketingInformation? MarketingInformation { get; }
+
+        private AddComponentManufacturerInput(
+            Id componentId,
+            Id institutionId,
+            ComponentManufacturerMarketingInformation? marketingInformation
+            )
+          : base(
+              parentId: componentId,
+              associateId: institutionId
+              )
+        {
+            MarketingInformation = marketingInformation;
+        }
+
         protected override IEnumerable<object?> GetEqualityComponents()
         {
-            yield return ComponentId;
-            yield return InstitutionId;
+            foreach (var component in base.GetEqualityComponents())
+            {
+                yield return component;
+            }
             yield return MarketingInformation;
         }
     }

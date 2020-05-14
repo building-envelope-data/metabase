@@ -62,10 +62,16 @@ namespace Icon.Infrastructure.Aggregate
                   );
         }
 
-        public IMartenQueryable<E> Query<E>() where E : IEvent
+        public IMartenQueryable<E> QueryEvents<E>() where E : IEvent
         {
             AssertNotDisposed();
             return _session.Events.QueryRawEventDataOnly<E>();
+        }
+
+        public IMartenQueryable<T> Query<T>() where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            return _session.Query<T>();
         }
 
         public async Task<ValueObjects.Id> GenerateNewId(

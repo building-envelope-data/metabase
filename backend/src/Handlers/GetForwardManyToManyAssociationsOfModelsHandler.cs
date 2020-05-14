@@ -36,7 +36,7 @@ namespace Icon.Handlers
             )
         {
             var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
-            return (await session.Query<TAddedEvent>()
+            return (await session.QueryEvents<TAddedEvent>()
                 .Where(e => e.ParentId.IsOneOf(modelGuids))
                 .Select(e => new { ModelId = e.ParentId, AssociationId = e.AggregateId })
                 .ToListAsync(cancellationToken)

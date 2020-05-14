@@ -38,7 +38,7 @@ namespace Icon.Infrastructure.Aggregate
         public bool IsVirgin()
         {
             return
-               Id == Guid.Empty &&
+               // Id == Guid.Empty && // TODO For some reason the `Id` is set by `AggregateRepositoryReadOnlySession#Load<T>`. Why? How? Who?
                Timestamp == DateTime.MinValue &&
                Version is 0;
         }

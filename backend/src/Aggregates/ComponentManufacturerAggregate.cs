@@ -9,13 +9,16 @@ using Marten.Schema;
 namespace Icon.Aggregates
 {
     public sealed class ComponentManufacturerAggregate
-      : EventSourcedAggregate, IConvertible<Models.ComponentManufacturer>
+      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentManufacturer>
     {
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; set; }
 
         [ForeignKey(typeof(InstitutionAggregate))]
         public Guid InstitutionId { get; set; }
+
+        public Guid ParentId { get => ComponentId; }
+        public Guid AssociateId { get => InstitutionId; }
 
         public ComponentManufacturerMarketingInformationAggregateData? MarketingInformation { get; set; }
 

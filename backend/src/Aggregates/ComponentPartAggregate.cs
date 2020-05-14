@@ -9,13 +9,16 @@ using Events = Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class ComponentPartAggregate
-      : EventSourcedAggregate, IConvertible<Models.ComponentPart>
+      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentPart>
     {
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid AssembledComponentId { get; set; }
 
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid PartComponentId { get; set; }
+
+        public Guid ParentId { get => AssembledComponentId; }
+        public Guid AssociateId { get => PartComponentId; }
 
 #nullable disable
         public ComponentPartAggregate() { }

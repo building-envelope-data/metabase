@@ -12,7 +12,7 @@ using Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class InstitutionRepresentativeAggregate
-      : EventSourcedAggregate, IConvertible<Models.InstitutionRepresentative>
+      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.InstitutionRepresentative>
     {
         [ForeignKey(typeof(InstitutionAggregate))]
         public Guid InstitutionId { get; set; }
@@ -21,6 +21,9 @@ namespace Icon.Aggregates
         public Guid UserId { get; set; }
 
         public ValueObjects.InstitutionRepresentativeRole Role { get; set; }
+
+        public Guid ParentId { get => InstitutionId; }
+        public Guid AssociateId { get => UserId; }
 
 #nullable disable
         public InstitutionRepresentativeAggregate() { }

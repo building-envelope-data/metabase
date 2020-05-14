@@ -36,7 +36,7 @@ namespace Icon.Handlers
         {
             var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
             return
-              (await session.Query<Events.DatabaseCreated>()
+              (await session.QueryEvents<Events.DatabaseCreated>()
                 .Where(createdEvent => createdEvent.InstitutionId.IsOneOf(modelGuids))
                 .Select(createdEvent => new { ModelId = createdEvent.InstitutionId, AssociateId = createdEvent.AggregateId })
                 .ToListAsync(cancellationToken)

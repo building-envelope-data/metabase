@@ -64,7 +64,7 @@ namespace Icon.Handlers
     /*     { */
     /*         var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray(); */
     /*         return */
-    /*           (await session.Query<TCreatedEvent>() */
+    /*           (await session.QueryEvents<TCreatedEvent>() */
     /*             .Where(_where(modelGuids)) */
     /*             .Select(_select) */
     /*             .ToListAsync(cancellationToken) */

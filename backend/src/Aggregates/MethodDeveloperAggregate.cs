@@ -11,12 +11,15 @@ using Marten.Schema;
 namespace Icon.Aggregates
 {
     public abstract class MethodDeveloperAggregate
-      : EventSourcedAggregate, IConvertible<Models.MethodDeveloper>
+      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.MethodDeveloper>
     {
         [ForeignKey(typeof(MethodAggregate))]
         public Guid MethodId { get; set; }
 
         public abstract Guid StakeholderId { get; set; }
+
+        public Guid ParentId { get => MethodId; }
+        public Guid AssociateId { get => StakeholderId; }
 
 #nullable disable
         public MethodDeveloperAggregate() { }
