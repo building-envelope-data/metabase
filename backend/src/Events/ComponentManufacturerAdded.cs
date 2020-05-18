@@ -24,10 +24,10 @@ namespace Icon.Events
         }
 
         [JsonIgnore]
-        public Guid ComponentId { get => ParentId; set => ParentId = value; }
+        public Guid ComponentId { get => ParentId; }
 
         [JsonIgnore]
-        public Guid InstitutionId { get => AssociateId; set => AssociateId = value; }
+        public Guid InstitutionId { get => AssociateId; }
 
         public ComponentManufacturerMarketingInformationEventData? MarketingInformation { get; set; }
 

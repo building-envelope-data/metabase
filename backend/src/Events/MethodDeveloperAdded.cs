@@ -10,10 +10,10 @@ namespace Icon.Events
       : AddedEvent
     {
         [JsonIgnore]
-        public Guid MethodId { get => ParentId; set => ParentId = value; }
+        public Guid MethodId { get => ParentId; }
 
         [JsonIgnore]
-        public Guid StakeholderId { get => AssociateId; set => AssociateId = value; }
+        public Guid StakeholderId { get => AssociateId; }
 
 #nullable disable
         public MethodDeveloperAdded() { }

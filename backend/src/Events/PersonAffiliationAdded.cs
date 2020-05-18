@@ -23,10 +23,10 @@ namespace Icon.Events
         }
 
         [JsonIgnore]
-        public Guid PersonId { get => ParentId; set => ParentId = value; }
+        public Guid PersonId { get => ParentId; }
 
         [JsonIgnore]
-        public Guid InstitutionId { get => AssociateId; set => AssociateId = value; }
+        public Guid InstitutionId { get => AssociateId; }
 
 #nullable disable
         public PersonAffiliationAdded() { }

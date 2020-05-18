@@ -23,10 +23,10 @@ namespace Icon.Events
         }
 
         [JsonIgnore]
-        public Guid BaseComponentId { get => ParentId; set => ParentId = value; }
+        public Guid BaseComponentId { get => ParentId; }
 
         [JsonIgnore]
-        public Guid VersionComponentId { get => AssociateId; set => AssociateId = value; }
+        public Guid VersionComponentId { get => AssociateId; }
 
 #nullable disable
         public ComponentVersionAdded() { }
