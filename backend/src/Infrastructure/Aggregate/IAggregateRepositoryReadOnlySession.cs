@@ -55,6 +55,12 @@ namespace Icon.Infrastructure.Aggregate
 
         public Task<Result<T, Errors>> Load<T>(
             Guid id,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+                    where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<T, Errors>> Load<T>(
+            Guid id,
             DateTime timestamp,
             CancellationToken cancellationToken = default(CancellationToken)
             )

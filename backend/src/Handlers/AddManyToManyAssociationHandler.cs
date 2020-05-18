@@ -41,12 +41,10 @@ namespace Icon.Handlers
             // TODO Do the queries below in a Marten batch!
             var parentResult = await session.Load<TAggregate>(
                                     command.Input.ParentId,
-                                    DateTime.UtcNow,
                                     cancellationToken
                                     );
             var associateResult = await session.Load<TAssociateAggregate>(
                                     command.Input.AssociateId,
-                                    DateTime.UtcNow,
                                     cancellationToken
                                     );
             return

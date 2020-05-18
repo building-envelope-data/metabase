@@ -220,6 +220,16 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<Result<T, Errors>> Load<T>(
             Guid id,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            var aggregate = await _session.LoadAsync<T>(id, cancellationToken);
+            return BuildResult(id, aggregate);
+        }
+
+        public async Task<Result<T, Errors>> Load<T>(
+            Guid id,
             DateTime timestamp,
             CancellationToken cancellationToken = default(CancellationToken)
             ) where T : class, IEventSourcedAggregate, new()
