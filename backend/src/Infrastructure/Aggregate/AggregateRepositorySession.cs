@@ -120,7 +120,6 @@ namespace Icon.Infrastructure.Aggregate
 
         private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)
         {
-            // TODO
             /* foreach (var creatorId in creatorIds) */
             /* { */
             /*   if (!_session.Query<UserAggregate>().AnyAsync(user => user.Id == creatorId, cancellationToken)) */
