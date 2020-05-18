@@ -284,7 +284,7 @@ namespace Icon.Configuration
 
         private static void AddReflexiveComponentAssociationHandlers<TAssociationModel, TAssociationAggregate, TAddedEvent, TAddInput>(
                         IServiceCollection services,
-                        Func<Guid, Commands.Add<TAddInput>, Events.IEvent> newEvent
+                        Func<Guid, Commands.Add<TAddInput>, Events.IAddedEvent> newEvent
                         )
             where TAssociationModel : Models.IModel
             where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
@@ -381,7 +381,7 @@ namespace Icon.Configuration
 
         private static void AddReflexiveAssociationHandlers<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent, TAddInput>(
                         IServiceCollection services,
-                        Func<Guid, Commands.Add<TAddInput>, Events.IEvent> newEvent
+                        Func<Guid, Commands.Add<TAddInput>, Events.IAddedEvent> newEvent
                         )
             where TModel : Models.IModel
             where TAssociationModel : Models.IModel
@@ -398,7 +398,7 @@ namespace Icon.Configuration
 
         private static void AddAssociationHandlersWithAssociationGetters<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent, TAddInput>(
                         IServiceCollection services,
-                        Func<Guid, Commands.Add<TAddInput>, Events.IEvent> newEvent
+                        Func<Guid, Commands.Add<TAddInput>, Events.IAddedEvent> newEvent
                         )
                     where TModel : Models.IModel
                     where TAssociationModel : Models.IModel
@@ -417,7 +417,7 @@ namespace Icon.Configuration
 
         private static void AddAssociationHandlers<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent, TAddInput>(
                         IServiceCollection services,
-                        Func<Guid, Commands.Add<TAddInput>, Events.IEvent> newEvent
+                        Func<Guid, Commands.Add<TAddInput>, Events.IAddedEvent> newEvent
                         )
                     where TModel : Models.IModel
                     where TAssociationModel : Models.IModel
@@ -435,7 +435,7 @@ namespace Icon.Configuration
 
         private static void AddAddManyToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>(
                 IServiceCollection services,
-                Func<Guid, Commands.Add<TInput>, Events.IEvent> newEvent
+                Func<Guid, Commands.Add<TInput>, Events.IAddedEvent> newEvent
                 )
             where TInput : ValueObjects.AddManyToManyAssociationInput
             where TAggregate : class, IEventSourcedAggregate, new()
