@@ -33,6 +33,11 @@ namespace Icon.Aggregates
             ConcreteComponentId = data.ConcreteComponentId;
         }
 
+        private void Apply(Marten.Events.Event<Events.ComponentConcretizationRemoved> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

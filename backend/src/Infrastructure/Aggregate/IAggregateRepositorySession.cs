@@ -29,17 +29,30 @@ namespace Icon.Infrastructure.Aggregate
           where T : class, IEventSourcedAggregate, new();
 
         public Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
-            Guid id,
-            int expectedVersion,
+            ValueObjects.TimestampedId timestampedId,
             IEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
 
         public Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
-            Guid id,
-            int expectedVersion,
+            ValueObjects.TimestampedId timestampedId,
             IEnumerable<IEvent> events,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<ValueObjects.TimestampedId, Errors>> Delete<T>(
+            ValueObjects.TimestampedId timestampedId,
+            IEvent @event,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<ValueObjects.TimestampedId, Errors>> Delete<T>(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp,
+            IEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();

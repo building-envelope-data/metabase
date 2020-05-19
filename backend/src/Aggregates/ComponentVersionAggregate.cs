@@ -33,6 +33,11 @@ namespace Icon.Aggregates
             VersionComponentId = data.VersionComponentId;
         }
 
+        private void Apply(Marten.Events.Event<Events.ComponentVersionRemoved> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

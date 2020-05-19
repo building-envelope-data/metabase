@@ -39,6 +39,11 @@ namespace Icon.Aggregates
             Role = data.Role.ToModel();
         }
 
+        private void Apply(Marten.Events.Event<Events.InstitutionRepresentativeRemoved> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

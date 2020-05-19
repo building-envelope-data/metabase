@@ -45,6 +45,11 @@ namespace Icon.Aggregates
             Locator = data.Locator;
         }
 
+        private void Apply(Marten.Events.Event<Events.StandardDeleted> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

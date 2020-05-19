@@ -36,6 +36,11 @@ namespace Icon.Aggregates
             MarketingInformation = data.MarketingInformation is null ? null : ComponentManufacturerMarketingInformationAggregateData.From(data.MarketingInformation);
         }
 
+        private void Apply(Marten.Events.Event<Events.ComponentManufacturerRemoved> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

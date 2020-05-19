@@ -25,5 +25,10 @@ namespace Icon.Aggregates
             ApplyMeta(@event);
             ApplyData(@event.Data);
         }
+
+        private void Apply(Marten.Events.Event<Events.InstitutionMethodDeveloperRemoved> @event)
+        {
+            ApplyDeleted(@event);
+        }
     }
 }

@@ -35,6 +35,11 @@ namespace Icon.Aggregates
             InstitutionId = data.InstitutionId;
         }
 
+        private void Apply(Marten.Events.Event<Events.PersonAffiliationRemoved> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

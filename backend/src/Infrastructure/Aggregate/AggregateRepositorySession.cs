@@ -59,33 +59,65 @@ namespace Icon.Infrastructure.Aggregate
         }
 
         public Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
-            Guid id,
-            int expectedVersion,
+            ValueObjects.TimestampedId timestampedId,
             IEvent @event,
             CancellationToken cancellationToken
             ) where T : class, IEventSourcedAggregate, new()
         {
             return Append<T>(
-                id,
-                expectedVersion,
+                timestampedId,
                 new IEvent[] { @event },
                 cancellationToken
                 );
         }
 
-        public Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
-            Guid id,
-            int expectedVersion,
+        public async Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
+            ValueObjects.TimestampedId timestampedId,
             IEnumerable<IEvent> events,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
         {
-            return Store<T>(
-                id,
+            var expectedVersion = await FetchVersion<T>(timestampedId, cancellationToken);
+            return await Store<T>(
+                timestampedId.Id,
                 events,
-                (eventStore, eventArray) => eventStore.Append(id, expectedVersion, eventArray),
+                (eventStore, eventArray) => eventStore.Append(timestampedId.Id, expectedVersion, eventArray),
                 cancellationToken
+                );
+        }
+
+        public Task<Result<ValueObjects.TimestampedId, Errors>> Delete<T>(
+            ValueObjects.TimestampedId timestampedId,
+            IEvent @event,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            _session.Delete<T>(timestampedId.Id);
+            return Append<T>(
+                timestampedId,
+                @event,
+                cancellationToken
+                );
+        }
+
+        public Task<Result<ValueObjects.TimestampedId, Errors>> Delete<T>(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp,
+            IEvent @event,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return
+              ValueObjects.TimestampedId.From(id, timestamp)
+              .Bind(timestampedId =>
+                Delete<T>(
+                  timestampedId,
+                  @event,
+                  cancellationToken
+                  )
                 );
         }
 

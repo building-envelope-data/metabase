@@ -7,17 +7,17 @@ using CSharpFunctionalExtensions;
 namespace Icon.GraphQl
 {
     public sealed class AddMethodDeveloperInput
+      : AddOrRemoveMethodDeveloperInput
     {
-        public ValueObjects.Id MethodId { get; }
-        public ValueObjects.Id StakeholderId { get; }
-
-        private AddMethodDeveloperInput(
+        public AddMethodDeveloperInput(
             ValueObjects.Id methodId,
             ValueObjects.Id stakeholderId
             )
+          : base(
+              methodId: methodId,
+              stakeholderId: stakeholderId
+              )
         {
-            MethodId = methodId;
-            StakeholderId = stakeholderId;
         }
 
         public static Result<ValueObjects.AddMethodDeveloperInput, Errors> Validate(

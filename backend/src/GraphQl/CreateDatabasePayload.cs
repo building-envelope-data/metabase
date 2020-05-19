@@ -7,16 +7,13 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.GraphQl
 {
     public sealed class CreateDatabasePayload
-      : Payload
+      : CreateOrDeleteDatabasePayload
     {
-        public ValueObjects.Id DatabaseId { get; }
-
         public CreateDatabasePayload(
             ValueObjects.TimestampedId timestampedId
             )
-          : base(timestampedId.Timestamp)
+          : base(timestampedId)
         {
-            DatabaseId = timestampedId.Id;
         }
 
         public Task<Database> GetDatabase(

@@ -3,6 +3,7 @@ using Errors = Icon.Errors;
 using ErrorCodes = Icon.ErrorCodes;
 using CSharpFunctionalExtensions;
 using IError = HotChocolate.IError;
+using Newtonsoft.Json;
 
 namespace Icon
 {

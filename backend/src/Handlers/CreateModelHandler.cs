@@ -17,11 +17,11 @@ namespace Icon.Handlers
       where TAggregate : class, IEventSourcedAggregate, new()
     {
         private readonly IAggregateRepository _repository;
-        private readonly Func<Guid, TCommand, Events.IEvent> _newCreatedEvent;
+        private readonly Func<Guid, TCommand, Events.ICreatedEvent> _newCreatedEvent;
 
         public CreateModelHandler(
             IAggregateRepository repository,
-            Func<Guid, TCommand, Events.IEvent> newCreatedEvent
+            Func<Guid, TCommand, Events.ICreatedEvent> newCreatedEvent
             )
         {
             _repository = repository;

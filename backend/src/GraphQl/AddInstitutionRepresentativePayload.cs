@@ -7,10 +7,8 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.GraphQl
 {
     public sealed class AddInstitutionRepresentativePayload
-      : Payload
+      : AddOrRemoveInstitutionRepresentativePayload
     {
-        public ValueObjects.Id InstitutionId { get; }
-        public ValueObjects.Id UserId { get; }
         /* public ValueObjects.InstitutionRepresentativeRole Role { get; } */
         public InstitutionRepresentativeEdge InstitutionRepresentativeEdge { get; }
         public RepresentedInstitutionEdge RepresentedInstitutionEdge { get; }
@@ -18,29 +16,14 @@ namespace Icon.GraphQl
         public AddInstitutionRepresentativePayload(
             InstitutionRepresentative institutionRepresentative
             )
-          : base(institutionRepresentative.RequestTimestamp)
+          : base(
+              institutionId: institutionRepresentative.InstitutionId,
+              userId: institutionRepresentative.UserId,
+              requestTimestamp: institutionRepresentative.RequestTimestamp
+              )
         {
-            InstitutionId = institutionRepresentative.InstitutionId;
-            UserId = institutionRepresentative.UserId;
             InstitutionRepresentativeEdge = new InstitutionRepresentativeEdge(institutionRepresentative);
             RepresentedInstitutionEdge = new RepresentedInstitutionEdge(institutionRepresentative);
-        }
-
-        public Task<Institution> GetInstitution(
-            [DataLoader] InstitutionDataLoader institutionLoader
-            )
-        {
-            return institutionLoader.LoadAsync(
-                TimestampHelpers.TimestampId(InstitutionId, RequestTimestamp)
-                );
-        }
-
-        public Task<User> GetUser(/* TODO [DataLoader] UserDataLoader userLoader */)
-        {
-            return null!;
-            /* return userLoader.LoadAsync( */
-            /*     TimestampHelpers.TimestampId(UserId, RequestTimestamp) */
-            /*     ); */
         }
     }
 }

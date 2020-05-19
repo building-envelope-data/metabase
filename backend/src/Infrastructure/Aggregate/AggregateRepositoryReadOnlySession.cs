@@ -103,8 +103,7 @@ namespace Icon.Infrastructure.Aggregate
         }
 
         public async Task<Result<int, Errors>> FetchVersion<T>(
-            Guid id,
-            DateTime timestamp,
+            ValueObjects.TimestampedId timestampedId,
             CancellationToken cancellationToken
             ) where T : class, IEventSourcedAggregate, new()
         {
@@ -115,14 +114,16 @@ namespace Icon.Infrastructure.Aggregate
             // Ask on https://github.com/JasperFx/marten/issues for the parameter `timestamp` to be implemented
             var aggregate =
               await _session.Events.AggregateStreamAsync<T>(
-                  id,
-                  timestamp: timestamp.ToUniversalTime(),
+                  timestampedId.Id,
+                  timestamp: ((DateTime)timestampedId.Timestamp).ToUniversalTime(),
                   token: cancellationToken
                   )
               .ConfigureAwait(false);
             if (aggregate is null)
             {
-                return Result.Failure<int, Errors>(BuildNonExistentModelError(id));
+                return Result.Failure<int, Errors>(
+                    BuildNonExistentModelError(timestampedId.Id)
+                    );
             }
             return Result.Ok<int, Errors>(aggregate.Version);
         }
@@ -224,7 +225,19 @@ namespace Icon.Infrastructure.Aggregate
             ) where T : class, IEventSourcedAggregate, new()
         {
             AssertNotDisposed();
-            var aggregate = await _session.LoadAsync<T>(id, cancellationToken);
+            // Loading the materialized aggregate as follows
+            // var aggregate = await _session.LoadAsync<T>(id, cancellationToken);
+            // is not possible because event meta data is not available during
+            // inline projection as said on
+            // https://martendb.io/documentation/events/projections/
+            // in the section on inline projections.
+            // Therefore, version and timestamp of snapshots are not set.
+            var aggregate =
+              await _session.Events.AggregateStreamAsync<T>(
+                  id,
+                  token: cancellationToken
+                  )
+              .ConfigureAwait(false);
             return BuildResult(id, aggregate);
         }
 
@@ -559,14 +572,17 @@ namespace Icon.Infrastructure.Aggregate
         private bool DoesAggregateExist<T>([NotNullWhen(true)] T? aggregate)
           where T : class, IEventSourcedAggregate, new()
         {
-            return !(aggregate is null) && aggregate.Version >= 1;
+            return
+              !(aggregate is null) &&
+              aggregate.Version >= 1 &&
+              !aggregate.Deleted;
         }
 
         private Result<T, Errors> BuildResult<T>(Guid id, T? aggregate)
           where T : class, IEventSourcedAggregate
         {
             aggregate?.EnsureValid();
-            if (aggregate is null || aggregate.Version == 0)
+            if (aggregate is null || aggregate.Version == 0 || aggregate.Deleted)
             {
                 return Result.Failure<T, Errors>(BuildNonExistentModelError(id));
             }

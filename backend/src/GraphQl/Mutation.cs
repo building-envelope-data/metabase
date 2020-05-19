@@ -55,6 +55,31 @@ namespace Icon.GraphQl
             return newPayload(timestampedId);
         }
 
+        private async Task<TPayload> Delete<TModel, TPayload>(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp timestamp,
+            Func<ValueObjects.TimestampedId, TPayload> newPayload
+            )
+        {
+            var command = ResultHelpers.HandleFailure(
+                  ValueObjects.TimestampedId.From(id, timestamp, Array.Empty<object>()) // TODO What is the proper path for variables?
+                  .Bind(timestampedId =>
+                    Commands.Delete<TModel>.From(
+                      timestampedId: timestampedId,
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
+                      )
+                    )
+                  );
+            var timestampedId = ResultHelpers.HandleFailure(
+              await _commandBus
+              .Send<
+              Commands.Delete<TModel>,
+              Result<ValueObjects.TimestampedId, Errors>
+                >(command).ConfigureAwait(false)
+                );
+            return newPayload(timestampedId);
+        }
+
         private async Task<TPayload> Add<TInput, TValidatedInput, TAssociation, TPayload>(
             TInput input,
             Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
@@ -83,15 +108,55 @@ namespace Icon.GraphQl
                 );
         }
 
+        private async Task<TPayload> Remove<TAssociationModel, TInput, TValidatedInput, TPayload>(
+            TInput input,
+            Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
+            Func<ValueObjects.Id, ValueObjects.Id, ValueObjects.Timestamp, TPayload> newPayload
+        )
+          where TValidatedInput : ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>
+        {
+            var command = ResultHelpers.HandleFailure(
+                  validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
+                  .Bind(validatedInput =>
+                    Commands.Remove<TValidatedInput>.From(
+                      input: validatedInput,
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
+                      )
+                    )
+                  );
+            var timestampedId = ResultHelpers.HandleFailure(
+                await _commandBus
+                .Send<
+                Commands.Remove<TValidatedInput>,
+                Result<ValueObjects.TimestampedId, Errors>
+                >(command).ConfigureAwait(false)
+                );
+            return newPayload(
+                command.Input.ParentId,
+                command.Input.AssociateId,
+                timestampedId.Timestamp
+                );
+        }
+
         public Task<CreateComponentPayload> CreateComponent(
-            CreateComponentInput input,
-            [DataLoader] ComponentDataLoader componentLoader
+            CreateComponentInput input
             )
         {
             return Create<CreateComponentInput, ValueObjects.CreateComponentInput, CreateComponentPayload>(
                 input,
                 CreateComponentInput.Validate,
                 timestampedId => new CreateComponentPayload(timestampedId)
+            );
+        }
+
+        public Task<DeleteComponentPayload> DeleteComponent(
+            DeleteComponentInput input
+            )
+        {
+            return Delete<Models.Component, DeleteComponentPayload>(
+                input.Id,
+                input.Timestamp,
+                timestampedId => new DeleteComponentPayload(timestampedId)
             );
         }
 
@@ -106,6 +171,17 @@ namespace Icon.GraphQl
             );
         }
 
+        public Task<DeleteDatabasePayload> DeleteDatabase(
+            DeleteDatabaseInput input
+            )
+        {
+            return Delete<Models.Database, DeleteDatabasePayload>(
+                input.Id,
+                input.Timestamp,
+                timestampedId => new DeleteDatabasePayload(timestampedId)
+            );
+        }
+
         public Task<CreateInstitutionPayload> CreateInstitution(
             CreateInstitutionInput input
             )
@@ -114,6 +190,17 @@ namespace Icon.GraphQl
                 input,
                 CreateInstitutionInput.Validate,
                 timestampedId => new CreateInstitutionPayload(timestampedId)
+            );
+        }
+
+        public Task<DeleteInstitutionPayload> DeleteInstitution(
+            DeleteInstitutionInput input
+            )
+        {
+            return Delete<Models.Institution, DeleteInstitutionPayload>(
+                input.Id,
+                input.Timestamp,
+                timestampedId => new DeleteInstitutionPayload(timestampedId)
             );
         }
 
@@ -128,6 +215,17 @@ namespace Icon.GraphQl
             );
         }
 
+        public Task<DeleteMethodPayload> DeleteMethod(
+            DeleteMethodInput input
+            )
+        {
+            return Delete<Models.Method, DeleteMethodPayload>(
+                input.Id,
+                input.Timestamp,
+                timestampedId => new DeleteMethodPayload(timestampedId)
+            );
+        }
+
         public Task<CreatePersonPayload> CreatePerson(
             CreatePersonInput input
             )
@@ -139,6 +237,17 @@ namespace Icon.GraphQl
             );
         }
 
+        public Task<DeletePersonPayload> DeletePerson(
+            DeletePersonInput input
+            )
+        {
+            return Delete<Models.Person, DeletePersonPayload>(
+                input.Id,
+                input.Timestamp,
+                timestampedId => new DeletePersonPayload(timestampedId)
+            );
+        }
+
         public Task<CreateStandardPayload> CreateStandard(
             CreateStandardInput input
             )
@@ -147,6 +256,39 @@ namespace Icon.GraphQl
                 input,
                 CreateStandardInput.Validate,
                 timestampedId => new CreateStandardPayload(timestampedId)
+            );
+        }
+
+        public Task<DeleteStandardPayload> DeleteStandard(
+            DeleteStandardInput input
+            )
+        {
+            return Delete<Models.Standard, DeleteStandardPayload>(
+                input.Id,
+                input.Timestamp,
+                timestampedId => new DeleteStandardPayload(timestampedId)
+            );
+        }
+
+        public Task<CreateUserPayload> CreateUser(
+            CreateUserInput input
+            )
+        {
+            return Create<CreateUserInput, ValueObjects.CreateUserInput, CreateUserPayload>(
+                input,
+                CreateUserInput.Validate,
+                timestampedId => new CreateUserPayload(timestampedId)
+            );
+        }
+
+        public Task<DeleteUserPayload> DeleteUser(
+            DeleteUserInput input
+            )
+        {
+            return Delete<Models.User, DeleteUserPayload>(
+                input.Id,
+                input.Timestamp,
+                timestampedId => new DeleteUserPayload(timestampedId)
             );
         }
 
@@ -168,6 +310,23 @@ namespace Icon.GraphQl
               );
         }
 
+        public Task<RemoveComponentConcretizationPayload> RemoveComponentConcretization(
+            RemoveComponentConcretizationInput input,
+            [DataLoader] ComponentConcretizationDataLoader componentConcretizationLoader
+            )
+        {
+            return Remove<
+              Models.ComponentConcretization,
+              RemoveComponentConcretizationInput,
+              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentConcretization>,
+              RemoveComponentConcretizationPayload
+              >(
+                input,
+                RemoveComponentConcretizationInput.Validate,
+                (generalComponentId, concreteComponentId, requestTimestamp) => new RemoveComponentConcretizationPayload(generalComponentId, concreteComponentId, requestTimestamp)
+              );
+        }
+
         public Task<AddComponentManufacturerPayload> AddComponentManufacturer(
             AddComponentManufacturerInput input,
             [DataLoader] ComponentManufacturerDataLoader componentManufacturerLoader
@@ -183,6 +342,128 @@ namespace Icon.GraphQl
                 AddComponentManufacturerInput.Validate,
                 association => new AddComponentManufacturerPayload(association),
                 componentManufacturerLoader
+              );
+        }
+
+        public Task<RemoveComponentManufacturerPayload> RemoveComponentManufacturer(
+            RemoveComponentManufacturerInput input,
+            [DataLoader] ComponentManufacturerDataLoader componentManufacturerLoader
+            )
+        {
+            return Remove<
+              Models.ComponentManufacturer,
+              RemoveComponentManufacturerInput,
+              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>,
+              RemoveComponentManufacturerPayload
+              >(
+                input,
+                RemoveComponentManufacturerInput.Validate,
+                (componentId, institutionId, requestTimestamp) => new RemoveComponentManufacturerPayload(componentId, institutionId, requestTimestamp)
+              );
+        }
+
+        public Task<AddComponentPartPayload> AddComponentPart(
+            AddComponentPartInput input,
+            [DataLoader] ComponentPartDataLoader componentPartLoader
+            )
+        {
+            return Add<
+              AddComponentPartInput,
+              ValueObjects.AddComponentPartInput,
+              ComponentPart,
+              AddComponentPartPayload
+              >(
+                input,
+                AddComponentPartInput.Validate,
+                association => new AddComponentPartPayload(association),
+                componentPartLoader
+              );
+        }
+
+        public Task<RemoveComponentPartPayload> RemoveComponentPart(
+            RemoveComponentPartInput input,
+            [DataLoader] ComponentPartDataLoader componentPartLoader
+            )
+        {
+            return Remove<
+              Models.ComponentPart,
+              RemoveComponentPartInput,
+              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentPart>,
+              RemoveComponentPartPayload
+              >(
+                input,
+                RemoveComponentPartInput.Validate,
+                (assembledComponentId, partComponentId, requestTimestamp) => new RemoveComponentPartPayload(assembledComponentId, partComponentId, requestTimestamp)
+              );
+        }
+
+        public Task<AddComponentVariantPayload> AddComponentVariant(
+            AddComponentVariantInput input,
+            [DataLoader] ComponentVariantDataLoader componentVariantLoader
+            )
+        {
+            return Add<
+              AddComponentVariantInput,
+              ValueObjects.AddComponentVariantInput,
+              ComponentVariant,
+              AddComponentVariantPayload
+              >(
+                input,
+                AddComponentVariantInput.Validate,
+                association => new AddComponentVariantPayload(association),
+                componentVariantLoader
+              );
+        }
+
+        public Task<RemoveComponentVariantPayload> RemoveComponentVariant(
+            RemoveComponentVariantInput input,
+            [DataLoader] ComponentVariantDataLoader componentVariantLoader
+            )
+        {
+            return Remove<
+              Models.ComponentVariant,
+              RemoveComponentVariantInput,
+              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVariant>,
+              RemoveComponentVariantPayload
+              >(
+                input,
+                RemoveComponentVariantInput.Validate,
+                (baseComponentId, variantComponentId, requestTimestamp) => new RemoveComponentVariantPayload(baseComponentId, variantComponentId, requestTimestamp)
+              );
+        }
+
+        public Task<AddComponentVersionPayload> AddComponentVersion(
+            AddComponentVersionInput input,
+            [DataLoader] ComponentVersionDataLoader componentVersionLoader
+            )
+        {
+            return Add<
+              AddComponentVersionInput,
+              ValueObjects.AddComponentVersionInput,
+              ComponentVersion,
+              AddComponentVersionPayload
+              >(
+                input,
+                AddComponentVersionInput.Validate,
+                association => new AddComponentVersionPayload(association),
+                componentVersionLoader
+              );
+        }
+
+        public Task<RemoveComponentVersionPayload> RemoveComponentVersion(
+            RemoveComponentVersionInput input,
+            [DataLoader] ComponentVersionDataLoader componentVersionLoader
+            )
+        {
+            return Remove<
+              Models.ComponentVersion,
+              RemoveComponentVersionInput,
+              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVersion>,
+              RemoveComponentVersionPayload
+              >(
+                input,
+                RemoveComponentVersionInput.Validate,
+                (baseComponentId, versionComponentId, requestTimestamp) => new RemoveComponentVersionPayload(baseComponentId, versionComponentId, requestTimestamp)
               );
         }
 
@@ -204,6 +485,23 @@ namespace Icon.GraphQl
               );
         }
 
+        public Task<RemoveInstitutionRepresentativePayload> RemoveInstitutionRepresentative(
+            RemoveInstitutionRepresentativeInput input,
+            [DataLoader] InstitutionRepresentativeDataLoader institutionRepresentativeLoader
+            )
+        {
+            return Remove<
+              Models.InstitutionRepresentative,
+              RemoveInstitutionRepresentativeInput,
+              ValueObjects.RemoveManyToManyAssociationInput<Models.InstitutionRepresentative>,
+              RemoveInstitutionRepresentativePayload
+              >(
+                input,
+                RemoveInstitutionRepresentativeInput.Validate,
+                (institutionId, userId, requestTimestamp) => new RemoveInstitutionRepresentativePayload(institutionId, userId, requestTimestamp)
+              );
+        }
+
         public Task<AddMethodDeveloperPayload> AddMethodDeveloper(
             AddMethodDeveloperInput input,
             [DataLoader] MethodDeveloperDataLoader methodDeveloperLoader
@@ -222,6 +520,23 @@ namespace Icon.GraphQl
               );
         }
 
+        public Task<RemoveMethodDeveloperPayload> RemoveMethodDeveloper(
+            RemoveMethodDeveloperInput input,
+            [DataLoader] MethodDeveloperDataLoader methodDeveloperLoader
+            )
+        {
+            return Remove<
+              Models.MethodDeveloper,
+              RemoveMethodDeveloperInput,
+              ValueObjects.RemoveManyToManyAssociationInput<Models.MethodDeveloper>,
+              RemoveMethodDeveloperPayload
+              >(
+                input,
+                RemoveMethodDeveloperInput.Validate,
+                (methodId, stakeholderId, requestTimestamp) => new RemoveMethodDeveloperPayload(methodId, stakeholderId, requestTimestamp)
+              );
+        }
+
         public Task<AddPersonAffiliationPayload> AddPersonAffiliation(
             AddPersonAffiliationInput input,
             [DataLoader] PersonAffiliationDataLoader personAffiliationLoader
@@ -237,6 +552,23 @@ namespace Icon.GraphQl
                 AddPersonAffiliationInput.Validate,
                 association => new AddPersonAffiliationPayload(association),
                 personAffiliationLoader
+              );
+        }
+
+        public Task<RemovePersonAffiliationPayload> RemovePersonAffiliation(
+            RemovePersonAffiliationInput input,
+            [DataLoader] PersonAffiliationDataLoader personAffiliationLoader
+            )
+        {
+            return Remove<
+              Models.PersonAffiliation,
+              RemovePersonAffiliationInput,
+              ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>,
+              RemovePersonAffiliationPayload
+              >(
+                input,
+                RemovePersonAffiliationInput.Validate,
+                (personId, institutionId, requestTimestamp) => new RemovePersonAffiliationPayload(personId, institutionId, requestTimestamp)
               );
         }
     }

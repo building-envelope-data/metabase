@@ -26,8 +26,7 @@ namespace Icon.Infrastructure.Aggregate
             );
 
         public Task<Result<int, Errors>> FetchVersion<T>(
-            Guid id,
-            DateTime timestamp,
+            ValueObjects.TimestampedId timestampedId,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();

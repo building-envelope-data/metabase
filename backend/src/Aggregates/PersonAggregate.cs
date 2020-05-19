@@ -34,6 +34,11 @@ namespace Icon.Aggregates
             WebsiteLocator = data.WebsiteLocator;
         }
 
+        private void Apply(Marten.Events.Event<Events.PersonDeleted> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

@@ -107,21 +107,37 @@ namespace Icon.Configuration
             // Originally generated from the command line with the command
             // `ls -1 src/Events/ | grep "Created\|Added" | grep -v -E "^I?(Created|Added)Event.cs$" | grep -v -E "^MethodDeveloperAdded.cs$" | sed -e "s/^\(.*\).cs\$/options.Events.AddEventType(typeof(Events.\1));/"`
             options.Events.AddEventType(typeof(Events.ComponentConcretizationAdded));
+            options.Events.AddEventType(typeof(Events.ComponentConcretizationRemoved));
             options.Events.AddEventType(typeof(Events.ComponentCreated));
+            options.Events.AddEventType(typeof(Events.ComponentDeleted));
             options.Events.AddEventType(typeof(Events.ComponentManufacturerAdded));
+            options.Events.AddEventType(typeof(Events.ComponentManufacturerRemoved));
             options.Events.AddEventType(typeof(Events.ComponentPartAdded));
+            options.Events.AddEventType(typeof(Events.ComponentPartRemoved));
             options.Events.AddEventType(typeof(Events.ComponentVariantAdded));
+            options.Events.AddEventType(typeof(Events.ComponentVariantRemoved));
             options.Events.AddEventType(typeof(Events.ComponentVersionAdded));
+            options.Events.AddEventType(typeof(Events.ComponentVersionRemoved));
             options.Events.AddEventType(typeof(Events.DatabaseCreated));
+            options.Events.AddEventType(typeof(Events.DatabaseDeleted));
             options.Events.AddEventType(typeof(Events.InstitutionCreated));
+            options.Events.AddEventType(typeof(Events.InstitutionDeleted));
             options.Events.AddEventType(typeof(Events.InstitutionMethodDeveloperAdded));
+            options.Events.AddEventType(typeof(Events.InstitutionMethodDeveloperRemoved));
             options.Events.AddEventType(typeof(Events.InstitutionRepresentativeAdded));
+            options.Events.AddEventType(typeof(Events.InstitutionRepresentativeRemoved));
             options.Events.AddEventType(typeof(Events.MethodCreated));
+            options.Events.AddEventType(typeof(Events.MethodDeleted));
             options.Events.AddEventType(typeof(Events.PersonAffiliationAdded));
+            options.Events.AddEventType(typeof(Events.PersonAffiliationRemoved));
             options.Events.AddEventType(typeof(Events.PersonCreated));
+            options.Events.AddEventType(typeof(Events.PersonDeleted));
             options.Events.AddEventType(typeof(Events.PersonMethodDeveloperAdded));
+            options.Events.AddEventType(typeof(Events.PersonMethodDeveloperRemoved));
             options.Events.AddEventType(typeof(Events.StandardCreated));
+            options.Events.AddEventType(typeof(Events.StandardDeleted));
             options.Events.AddEventType(typeof(Events.UserCreated));
+            options.Events.AddEventType(typeof(Events.UserDeleted));
         }
     }
 }

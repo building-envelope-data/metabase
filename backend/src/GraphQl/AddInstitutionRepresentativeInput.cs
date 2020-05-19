@@ -7,19 +7,20 @@ using CSharpFunctionalExtensions;
 namespace Icon.GraphQl
 {
     public sealed class AddInstitutionRepresentativeInput
+      : AddOrRemoveInstitutionRepresentativeInput
     {
-        public ValueObjects.Id InstitutionId { get; }
-        public ValueObjects.Id UserId { get; }
         public ValueObjects.InstitutionRepresentativeRole Role { get; }
 
-        private AddInstitutionRepresentativeInput(
+        public AddInstitutionRepresentativeInput(
             ValueObjects.Id institutionId,
             ValueObjects.Id userId,
             ValueObjects.InstitutionRepresentativeRole role
             )
+          : base(
+              institutionId: institutionId,
+              userId: userId
+              )
         {
-            InstitutionId = institutionId;
-            UserId = userId;
             Role = role;
         }
 

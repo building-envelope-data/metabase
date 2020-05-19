@@ -7,17 +7,17 @@ using CSharpFunctionalExtensions;
 namespace Icon.GraphQl
 {
     public sealed class AddPersonAffiliationInput
+      : AddOrRemovePersonAffiliationInput
     {
-        public ValueObjects.Id PersonId { get; }
-        public ValueObjects.Id InstitutionId { get; }
-
-        private AddPersonAffiliationInput(
+        public AddPersonAffiliationInput(
             ValueObjects.Id personId,
             ValueObjects.Id institutionId
             )
+          : base(
+              personId: personId,
+              institutionId: institutionId
+              )
         {
-            PersonId = personId;
-            InstitutionId = institutionId;
         }
 
         public static Result<ValueObjects.AddPersonAffiliationInput, Errors> Validate(

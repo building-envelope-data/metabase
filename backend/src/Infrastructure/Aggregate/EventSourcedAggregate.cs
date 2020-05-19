@@ -20,11 +20,14 @@ namespace Icon.Infrastructure.Aggregate
         // For protecting the state, i.e. conflict prevention
         public int Version { get; set; }
 
+        public bool Deleted { get; set; }
+
         protected EventSourcedAggregate()
         {
             Id = Guid.Empty;
             Timestamp = DateTime.MinValue;
             Version = 0;
+            Deleted = false;
         }
 
         protected void ApplyMeta<E>(Marten.Events.Event<E> @event)
@@ -35,12 +38,25 @@ namespace Icon.Infrastructure.Aggregate
             Version = @event.Version;
         }
 
+        protected void ApplyDeleted<E>(Marten.Events.Event<E> @event)
+          where E : IDeletedEvent
+        {
+            ApplyMeta(@event);
+            Delete();
+        }
+
+        protected void Delete()
+        {
+            Deleted = true;
+        }
+
         public bool IsVirgin()
         {
             return
                // Id == Guid.Empty && // TODO For some reason the `Id` is set by `AggregateRepositoryReadOnlySession#Load<T>`. Why? How? Who?
                Timestamp == DateTime.MinValue &&
-               Version is 0;
+               Version is 0 &&
+               !Deleted;
         }
 
         public override Result<bool, Errors> Validate()
