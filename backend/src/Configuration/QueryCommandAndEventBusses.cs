@@ -323,7 +323,7 @@ namespace Icon.Configuration
                         Func<Guid, Commands.Add<TAddInput>, Events.IAddedEvent> newAddedEvent,
                         Func<Guid, Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IRemovedEvent> newRemovedEvent
                         )
-            where TAssociationModel : Models.IModel
+            where TAssociationModel : Models.IManyToManyAssociation
             where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAddedEvent : Events.IAddedEvent
             where TAddInput : ValueObjects.AddManyToManyAssociationInput
@@ -403,8 +403,8 @@ namespace Icon.Configuration
                 >,
               Handlers.GetDevelopersOfMethodsHandler
                 >();
-            AddGetBackwardManyToManyAssociatesHandler<Models.Person, Models.MethodDeveloper, Models.Method, Aggregates.MethodAggregate, Events.PersonMethodDeveloperAdded>(services);
-            AddGetBackwardManyToManyAssociatesHandler<Models.Institution, Models.MethodDeveloper, Models.Method, Aggregates.MethodAggregate, Events.InstitutionMethodDeveloperAdded>(services);
+            AddGetBackwardManyToManyAssociatesHandler<Models.Person, Models.MethodDeveloper, Models.Method, Aggregates.PersonAggregate, Aggregates.PersonMethodDeveloperAggregate, Aggregates.MethodAggregate, Events.PersonMethodDeveloperAdded>(services);
+            AddGetBackwardManyToManyAssociatesHandler<Models.Institution, Models.MethodDeveloper, Models.Method, Aggregates.InstitutionAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Aggregates.MethodAggregate, Events.InstitutionMethodDeveloperAdded>(services);
         }
 
         private static void AddPersonAffiliationHandlers(IServiceCollection services)
@@ -432,7 +432,7 @@ namespace Icon.Configuration
                         Func<Guid, Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IRemovedEvent> newRemovedEvent
                         )
             where TModel : Models.IModel
-            where TAssociationModel : Models.IModel
+            where TAssociationModel : Models.IManyToManyAssociation
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAddedEvent : Events.IAddedEvent
@@ -452,7 +452,7 @@ namespace Icon.Configuration
                         Func<Guid, Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IRemovedEvent> newRemovedEvent
                         )
                     where TModel : Models.IModel
-                    where TAssociationModel : Models.IModel
+                    where TAssociationModel : Models.IManyToManyAssociation
                     where TAssociateModel : Models.IModel
                     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
                     where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
@@ -466,7 +466,7 @@ namespace Icon.Configuration
                     newAddedEvent,
                     newRemovedEvent
                     );
-            AddGetAssociationsHandler<TModel, TAssociationModel, TAssociateModel, TAssociationAggregate, TAddedEvent>(services);
+            AddGetAssociationsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent>(services);
         }
 
         private static void AddAssociationHandlers<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent, TAddInput, TRemovedEvent>(
@@ -475,7 +475,7 @@ namespace Icon.Configuration
                         Func<Guid, Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IRemovedEvent> newRemovedEvent
                         )
                     where TModel : Models.IModel
-                    where TAssociationModel : Models.IModel
+                    where TAssociationModel : Models.IManyToManyAssociation
                     where TAssociateModel : Models.IModel
                     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
                     where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
@@ -487,7 +487,7 @@ namespace Icon.Configuration
             AddAddManyToManyAssociationHandler<TAddInput, TAggregate, TAssociationAggregate, TAssociateAggregate>(services, newAddedEvent);
             AddRemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>(services, newRemovedEvent);
             AddGetHandler<TAssociationModel, TAssociationAggregate>(services);
-            AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociateAggregate, TAddedEvent>(services);
+            AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent>(services);
         }
 
         private static void AddAddManyToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>(
@@ -568,19 +568,25 @@ namespace Icon.Configuration
         /*          ); */
         /* } */
 
-        private static void AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociateAggregate, TAddedEvent>(IServiceCollection services)
+        private static void AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent>(IServiceCollection services)
             where TModel : Models.IModel
+            where TAssociationModel : Models.IManyToManyAssociation
             where TAssociateModel : Models.IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
             where TAddedEvent : Events.IAddedEvent
         {
-            AddGetForwardManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAssociateAggregate, TAddedEvent>(services);
-            AddGetBackwardManyToManyAssociatesHandler<TAssociateModel, TAssociationModel, TModel, TAggregate, TAddedEvent>(services);
+            AddGetForwardManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent>(services);
+            AddGetBackwardManyToManyAssociatesHandler<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate, TAddedEvent>(services);
         }
 
-        private static void AddGetForwardManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAssociateAggregate, TAddedEvent>(IServiceCollection services)
+        private static void AddGetForwardManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent>(IServiceCollection services)
             where TModel : Models.IModel
+            where TAssociationModel : Models.IManyToManyAssociation
+            where TAssociateModel : Models.IModel
+            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
             where TAddedEvent : Events.IAddedEvent
         {
@@ -589,12 +595,16 @@ namespace Icon.Configuration
               Queries.GetForwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>
                 >,
-              Handlers.GetForwardManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAssociateAggregate, TAddedEvent>
+              Handlers.GetForwardManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent>
                 >();
         }
 
-        private static void AddGetBackwardManyToManyAssociatesHandler<TAssociateModel, TAssociationModel, TModel, TAggregate, TAddedEvent>(IServiceCollection services)
+        private static void AddGetBackwardManyToManyAssociatesHandler<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate, TAddedEvent>(IServiceCollection services)
+            where TAssociateModel : Models.IModel
+            where TAssociationModel : Models.IManyToManyAssociation
             where TModel : Models.IModel
+            where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+            where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAddedEvent : Events.IAddedEvent
         {
@@ -603,24 +613,27 @@ namespace Icon.Configuration
               Queries.GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>,
               IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>
                 >,
-              Handlers.GetBackwardManyToManyAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TAggregate, TAddedEvent>
+              Handlers.GetBackwardManyToManyAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate, TAddedEvent>
                 >();
         }
 
-        private static void AddGetAssociationsHandler<TModel, TAssociationModel, TAssociateModel, TAssociationAggregate, TAddedEvent>(IServiceCollection services)
+        private static void AddGetAssociationsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAddedEvent>(IServiceCollection services)
     where TModel : Models.IModel
     where TAssociateModel : Models.IModel
-    where TAssociationModel : Models.IModel
+    where TAssociationModel : Models.IManyToManyAssociation
+    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
     where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
+    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     where TAddedEvent : Events.IAddedEvent
         {
-            AddGetForwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(services);
-            AddGetBackwardManyToManyAssociationsHandler<TAssociateModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(services);
+            AddGetForwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>(services);
+            AddGetBackwardManyToManyAssociationsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>(services);
         }
 
-        private static void AddGetForwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(IServiceCollection services)
+        private static void AddGetForwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>(IServiceCollection services)
     where TModel : Models.IModel
-    where TAssociationModel : Models.IModel
+    where TAssociationModel : Models.IManyToManyAssociation
+    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
     where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
     where TAddedEvent : Events.IAddedEvent
         {
@@ -629,22 +642,23 @@ namespace Icon.Configuration
               Queries.GetForwardManyToManyAssociationsOfModels<TModel, TAssociationModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>
                 >,
-              Handlers.GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
+              Handlers.GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>
                 >();
         }
 
-        private static void AddGetBackwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>(IServiceCollection services)
-    where TModel : Models.IModel
-    where TAssociationModel : Models.IModel
+        private static void AddGetBackwardManyToManyAssociationsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>(IServiceCollection services)
+    where TAssociateModel : Models.IModel
+    where TAssociationModel : Models.IManyToManyAssociation
+    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
     where TAddedEvent : Events.IAddedEvent
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetBackwardManyToManyAssociationsOfModels<TModel, TAssociationModel>,
+              Queries.GetBackwardManyToManyAssociationsOfModels<TAssociateModel, TAssociationModel>,
               IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>
                 >,
-              Handlers.GetBackwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
+              Handlers.GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>
                 >();
         }
     }

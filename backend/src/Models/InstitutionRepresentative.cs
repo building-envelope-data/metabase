@@ -6,11 +6,14 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class InstitutionRepresentative
-      : Model
+      : Model, IManyToManyAssociation
     {
         public ValueObjects.Id InstitutionId { get; }
         public ValueObjects.Id UserId { get; }
         public ValueObjects.InstitutionRepresentativeRole Role { get; }
+
+        public ValueObjects.Id ParentId { get => InstitutionId; }
+        public ValueObjects.Id AssociateId { get => UserId; }
 
         private InstitutionRepresentative(
             ValueObjects.Id id,

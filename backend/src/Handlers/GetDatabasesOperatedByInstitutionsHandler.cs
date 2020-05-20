@@ -21,7 +21,7 @@ using System.Linq.Expressions;
 namespace Icon.Handlers
 {
     public sealed class GetDatabasesOperatedByInstitutionsHandler
-      : GetOneToManyAssociatesOfModelsHandler<Models.Institution, Models.Database, Aggregates.DatabaseAggregate, Events.DatabaseCreated>
+      : GetOneToManyAssociatesOfModelsHandler<Models.Institution, Models.Database, Aggregates.InstitutionAggregate, Aggregates.DatabaseAggregate, Events.DatabaseCreated>
     {
         public GetDatabasesOperatedByInstitutionsHandler(IAggregateRepository repository)
           : base(repository)

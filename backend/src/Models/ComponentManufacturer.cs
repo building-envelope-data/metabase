@@ -6,11 +6,14 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class ComponentManufacturer
-      : Model
+      : Model, IManyToManyAssociation
     {
         public ValueObjects.Id ComponentId { get; }
         public ValueObjects.Id InstitutionId { get; }
         public ValueObjects.ComponentManufacturerMarketingInformation? MarketingInformation { get; }
+
+        public ValueObjects.Id ParentId { get => ComponentId; }
+        public ValueObjects.Id AssociateId { get => InstitutionId; }
 
         private ComponentManufacturer(
             ValueObjects.Id id,

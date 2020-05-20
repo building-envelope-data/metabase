@@ -19,9 +19,10 @@ using System;
 
 namespace Icon.Handlers
 {
-    public sealed class GetBackwardManyToManyAssociationsOfModelsHandler<TAssociationModel, TModel, TModelAggregate, TAddedEvent>
-      : GetAssociatesOfModelsHandler<TAssociationModel, TModel, TModel, TModelAggregate>
-      where TModelAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+    public sealed class GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>
+      : GetManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate>
+      where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+      where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
       where TAddedEvent : Events.IAddedEvent
     {
         public GetBackwardManyToManyAssociationsOfModelsHandler(IAggregateRepository repository)
@@ -29,7 +30,7 @@ namespace Icon.Handlers
         {
         }
 
-        protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
+        protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associationId)>> QueryAssociationIds(
             IAggregateRepositoryReadOnlySession session,
             IEnumerable<ValueObjects.Id> modelIds,
             CancellationToken cancellationToken

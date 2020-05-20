@@ -22,16 +22,16 @@ namespace Icon.Handlers
       : IQueryHandler<Queries.GetAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
     {
         private readonly IAggregateRepository _repository;
-        private readonly GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded> _getInstitutionDevelopersHandler;
-        private readonly GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded> _getPersonDevelopersHandler;
+        private readonly GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.MethodAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded> _getInstitutionDevelopersHandler;
+        private readonly GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.MethodAggregate, Aggregates.PersonMethodDeveloperAggregate, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded> _getPersonDevelopersHandler;
 
         public GetDevelopersOfMethodsHandler(IAggregateRepository repository)
         {
             _repository = repository;
             _getInstitutionDevelopersHandler =
-              new GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>(repository);
+              new GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.MethodAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>(repository);
             _getPersonDevelopersHandler =
-              new GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>(repository);
+              new GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.MethodAggregate, Aggregates.PersonMethodDeveloperAggregate, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>(repository);
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Handle(
@@ -51,14 +51,12 @@ namespace Icon.Handlers
                 // afterwards using `Task#Result` as was mentioned in
                 // https://github.com/dotnet/runtime/issues/20166#issuecomment-428028466
                 var institutionsResultsTask = _getInstitutionDevelopersHandler.Handle(
-                    Queries.GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Institution>
-                      .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
+                    query.TimestampedModelIds,
                     session,
                     cancellationToken
                     );
                 var personsResultsTask = _getPersonDevelopersHandler.Handle(
-                    Queries.GetBackwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Person>
-                      .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
+                    query.TimestampedModelIds,
                     session,
                     cancellationToken
                     );

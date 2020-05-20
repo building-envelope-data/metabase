@@ -102,6 +102,42 @@ namespace Icon.Infrastructure.Aggregate
             return streamState != null;
         }
 
+        public async Task<bool> Exists<T>(
+            ValueObjects.TimestampedId timestampedId,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            var streamState =
+              await _session.Events.FetchStreamStateAsync(
+                  timestampedId.Id,
+                  token: cancellationToken
+                  )
+              .ConfigureAwait(false);
+            return DoesStreamStateExist<T>(streamState, timestampedId.Timestamp);
+        }
+
+        public async Task<IEnumerable<bool>> Exist<T>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            var batch = _session.CreateBatchQuery();
+            var streamStateTasks =
+              timestampedIds.Select(timestampedId =>
+                batch.Events.FetchStreamState(timestampedId.Id)
+                )
+              .ToList(); // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
+            await batch.Execute(cancellationToken).ConfigureAwait(false);
+            var streamStates = await Task.WhenAll(streamStateTasks).ConfigureAwait(false);
+            return timestampedIds.Zip(streamStates, (timestampedId, streamState) =>
+                DoesStreamStateExist<T>(streamState, timestampedId.Timestamp)
+                );
+        }
+
         public async Task<Result<int, Errors>> FetchVersion<T>(
             ValueObjects.TimestampedId timestampedId,
             CancellationToken cancellationToken
@@ -209,7 +245,11 @@ namespace Icon.Infrastructure.Aggregate
         {
             AssertNotDisposed();
             var batch = _session.CreateBatchQuery();
-            var streamStateTasks = ids.Select(id => batch.Events.FetchStreamState(id)).ToList(); // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
+            var streamStateTasks =
+              ids.Select(id =>
+                  batch.Events.FetchStreamState(id)
+                  )
+              .ToList(); // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
             await batch.Execute(cancellationToken).ConfigureAwait(false);
             var streamStates = await Task.WhenAll(streamStateTasks).ConfigureAwait(false);
             return ids.Zip(streamStates, (id, streamState) =>
@@ -561,6 +601,18 @@ namespace Icon.Infrastructure.Aggregate
                   ),
                 cancellationToken
                 );
+        }
+
+        private bool DoesStreamStateExist<T>(
+            [NotNullWhen(true)] StreamState? streamState,
+            DateTime timestamp
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return
+              streamState != null &&
+              streamState.AggregateType == typeof(T) &&
+              streamState.Created <= timestamp.ToUniversalTime();
         }
 
         private bool HasAggregateNeverExisted<T>([NotNullWhen(false)] T? aggregate)

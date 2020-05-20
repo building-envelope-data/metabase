@@ -20,14 +20,29 @@ using System.Linq.Expressions;
 
 namespace Icon.Handlers
 {
-    public abstract class GetOneToManyAssociatesOfModelsHandler<TModel, TAssociateModel, TAssociateAggregate, TCreatedEvent>
-      : GetAssociatesOfModelsHandler<TModel, TAssociateModel, TAssociateModel, TAssociateAggregate>
+    public abstract class GetOneToManyAssociatesOfModelsHandler<TModel, TAssociateModel, TAggregate, TAssociateAggregate, TCreatedEvent>
+      : GetAssociatesOfModelsHandler<TModel, TAssociateModel, TAggregate, TAssociateAggregate>,
+        IQueryHandler<Queries.GetAssociatesOfModels<TModel, TAssociateModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
       where TCreatedEvent : Events.ICreatedEvent
     {
+        private readonly IAggregateRepository _repository;
+
         public GetOneToManyAssociatesOfModelsHandler(IAggregateRepository repository)
-          : base(repository)
         {
+            _repository = repository;
+        }
+
+        public async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
+            Queries.GetAssociatesOfModels<TModel, TAssociateModel, TAssociateModel> query,
+            CancellationToken cancellationToken
+            )
+        {
+            using (var session = _repository.OpenReadOnlySession())
+            {
+                return await Handle(query.TimestampedModelIds, session, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 

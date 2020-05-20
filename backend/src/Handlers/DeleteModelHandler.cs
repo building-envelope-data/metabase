@@ -44,6 +44,7 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
+            // TODO Remove associations!
             var @event = _newDeletedEvent(command);
             return
               await session.Delete<TAggregate>(

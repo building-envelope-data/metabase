@@ -5,10 +5,13 @@ using CSharpFunctionalExtensions;
 namespace Icon.Models
 {
     public sealed class ComponentVersion
-      : Model
+      : Model, IManyToManyAssociation
     {
         public ValueObjects.Id BaseComponentId { get; }
         public ValueObjects.Id VersionComponentId { get; }
+
+        public ValueObjects.Id ParentId { get => BaseComponentId; }
+        public ValueObjects.Id AssociateId { get => VersionComponentId; }
 
         private ComponentVersion(
             ValueObjects.Id id,

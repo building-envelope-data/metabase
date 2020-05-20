@@ -5,10 +5,13 @@ using CSharpFunctionalExtensions;
 namespace Icon.Models
 {
     public sealed class ComponentConcretization
-      : Model
+      : Model, IManyToManyAssociation
     {
         public ValueObjects.Id GeneralComponentId { get; }
         public ValueObjects.Id ConcreteComponentId { get; }
+
+        public ValueObjects.Id ParentId { get => GeneralComponentId; }
+        public ValueObjects.Id AssociateId { get => ConcreteComponentId; }
 
         private ComponentConcretization(
             ValueObjects.Id id,

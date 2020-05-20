@@ -25,6 +25,18 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             );
 
+        public Task<bool> Exists<T>(
+            ValueObjects.TimestampedId timestampedId,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<bool>> Exist<T>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
         public Task<Result<int, Errors>> FetchVersion<T>(
             ValueObjects.TimestampedId timestampedId,
             CancellationToken cancellationToken

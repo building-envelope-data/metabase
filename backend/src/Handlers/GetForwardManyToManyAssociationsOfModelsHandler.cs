@@ -19,8 +19,9 @@ using System;
 
 namespace Icon.Handlers
 {
-    public sealed class GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAssociationAggregate, TAddedEvent>
-      : GetAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociationModel, TAssociationAggregate>
+    public sealed class GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>
+      : GetManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate>
+            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
             where TAddedEvent : Events.IAddedEvent
     {
@@ -29,7 +30,7 @@ namespace Icon.Handlers
         {
         }
 
-        protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
+        protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associationId)>> QueryAssociationIds(
             IAggregateRepositoryReadOnlySession session,
             IEnumerable<ValueObjects.Id> modelIds,
             CancellationToken cancellationToken
