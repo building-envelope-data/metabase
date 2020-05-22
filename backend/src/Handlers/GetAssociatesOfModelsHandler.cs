@@ -19,9 +19,6 @@ using System;
 
 namespace Icon.Handlers
 {
-  // TODO This is only needed by many-to-many associations and
-  // one-to-many associates but not by many-to-many associates. Find
-  // a better name!
     public abstract class GetAssociatesOfModelsHandler<TModel, TAssociateModel, TAggregate, TAssociateAggregate>
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
