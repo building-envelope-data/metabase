@@ -39,7 +39,7 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Handle(query.TimestampedModelIds, session, cancellationToken).ConfigureAwait(false);
+                return await Handle(query.TimestampedIds, session, cancellationToken).ConfigureAwait(false);
             }
         }
 

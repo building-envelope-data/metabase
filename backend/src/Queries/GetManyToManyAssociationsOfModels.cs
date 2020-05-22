@@ -12,13 +12,13 @@ namespace Icon.Queries
     public abstract class GetManyToManyAssociationsOfModels<TModel, TAssociationModel>
       : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
     {
-        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedModelIds { get; }
+        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedIds { get; }
 
         protected GetManyToManyAssociationsOfModels(
-            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
         {
-            TimestampedModelIds = timestampedModelIds;
+            TimestampedIds = timestampedIds;
         }
     }
 }

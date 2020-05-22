@@ -20,7 +20,7 @@ using System;
 namespace Icon.Handlers
 {
     public abstract class GetManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>
-      : IQueryHandler<Queries.GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+      : IQueryHandler<Queries.GetManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
       where TAssociationModel : Models.IManyToManyAssociation
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
@@ -39,31 +39,31 @@ namespace Icon.Handlers
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel> query,
+            Queries.GetManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel> query,
             CancellationToken cancellationToken
             )
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Handle(query.TimestampedModelIds, session, cancellationToken).ConfigureAwait(false);
+                return await Handle(query.TimestampedIds, session, cancellationToken).ConfigureAwait(false);
             }
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
-            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds,
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds,
             IAggregateRepositoryReadOnlySession session,
             CancellationToken cancellationToken
             )
         {
             var results =
               await _getAssociationsHandler.Handle(
-                timestampedModelIds,
+                timestampedIds,
                 session,
                 cancellationToken
                 )
               .ConfigureAwait(false);
             var timestampsAndAssociatesIds =
-              timestampedModelIds
+              timestampedIds
               .Zip(results, (timestampedId, result) => (
                     timestampedId.Timestamp,
                     result.IsSuccess

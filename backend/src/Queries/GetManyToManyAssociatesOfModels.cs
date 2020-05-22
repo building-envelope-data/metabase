@@ -9,16 +9,16 @@ using System.Linq;
 
 namespace Icon.Queries
 {
-    public abstract class GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
+    public abstract class GetManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
       : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
     {
-        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedModelIds { get; }
+        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedIds { get; }
 
-        protected GetAssociatesOfModels(
-            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
+        protected GetManyToManyAssociatesOfModels(
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
         {
-            TimestampedModelIds = timestampedModelIds;
+            TimestampedIds = timestampedIds;
         }
     }
 }

@@ -19,7 +19,7 @@ using Errors = Icon.Errors;
 namespace Icon.Handlers
 {
     public sealed class GetDevelopersOfMethodsHandler
-      : IQueryHandler<Queries.GetAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
+      : IQueryHandler<Queries.GetManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
     {
         private readonly IAggregateRepository _repository;
         private readonly GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.MethodAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded> _getInstitutionDevelopersHandler;
@@ -35,7 +35,7 @@ namespace Icon.Handlers
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
+            Queries.GetManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
             CancellationToken cancellationToken
             )
         {
@@ -51,12 +51,12 @@ namespace Icon.Handlers
                 // afterwards using `Task#Result` as was mentioned in
                 // https://github.com/dotnet/runtime/issues/20166#issuecomment-428028466
                 var institutionsResultsTask = _getInstitutionDevelopersHandler.Handle(
-                    query.TimestampedModelIds,
+                    query.TimestampedIds,
                     session,
                     cancellationToken
                     );
                 var personsResultsTask = _getPersonDevelopersHandler.Handle(
-                    query.TimestampedModelIds,
+                    query.TimestampedIds,
                     session,
                     cancellationToken
                     );

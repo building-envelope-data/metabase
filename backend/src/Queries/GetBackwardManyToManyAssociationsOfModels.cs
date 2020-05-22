@@ -8,19 +8,19 @@ namespace Icon.Queries
       : GetManyToManyAssociationsOfModels<TModel, TAssociationModel>
     {
         private GetBackwardManyToManyAssociationsOfModels(
-            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
-            : base(timestampedModelIds)
+            : base(timestampedIds)
         {
         }
 
         public static Result<GetBackwardManyToManyAssociationsOfModels<TModel, TAssociationModel>, Errors> From(
-            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
         {
             return Result.Ok<GetBackwardManyToManyAssociationsOfModels<TModel, TAssociationModel>, Errors>(
                 new GetBackwardManyToManyAssociationsOfModels<TModel, TAssociationModel>(
-                  timestampedModelIds: timestampedModelIds
+                  timestampedIds: timestampedIds
                   )
                 );
         }
