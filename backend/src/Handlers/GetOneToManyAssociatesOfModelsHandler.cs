@@ -22,7 +22,7 @@ namespace Icon.Handlers
 {
     public abstract class GetOneToManyAssociatesOfModelsHandler<TModel, TAssociateModel, TAggregate, TAssociateAggregate, TCreatedEvent>
       : GetAssociatesOfModelsHandler<TModel, TAssociateModel, TAggregate, TAssociateAggregate>,
-        IQueryHandler<Queries.GetAssociatesOfModels<TModel, TAssociateModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+        IQueryHandler<Queries.GetOneToManyAssociatesOfModels<TModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
       where TCreatedEvent : Events.ICreatedEvent
@@ -35,13 +35,13 @@ namespace Icon.Handlers
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModels<TModel, TAssociateModel, TAssociateModel> query,
+            Queries.GetOneToManyAssociatesOfModels<TModel, TAssociateModel> query,
             CancellationToken cancellationToken
             )
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Handle(query.TimestampedModelIds, session, cancellationToken).ConfigureAwait(false);
+                return await Handle(query.TimestampedIds, session, cancellationToken).ConfigureAwait(false);
             }
         }
     }

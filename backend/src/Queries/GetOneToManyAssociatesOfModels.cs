@@ -5,26 +5,29 @@ using Models = Icon.Models;
 using Icon.Infrastructure.Query;
 using IError = HotChocolate.IError;
 using CSharpFunctionalExtensions;
+using System.Linq;
 
 namespace Icon.Queries
 {
     public sealed class GetOneToManyAssociatesOfModels<TModel, TAssociateModel>
-      : GetAssociatesOfModels<TModel, TAssociateModel, TAssociateModel>
+      : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
     {
+        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedIds { get; }
+
         private GetOneToManyAssociatesOfModels(
-            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
-          : base(timestampedModelIds)
         {
+            TimestampedIds = timestampedIds;
         }
 
         public static Result<GetOneToManyAssociatesOfModels<TModel, TAssociateModel>, Errors> From(
-            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedModelIds
+            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
         {
             return Result.Ok<GetOneToManyAssociatesOfModels<TModel, TAssociateModel>, Errors>(
                 new GetOneToManyAssociatesOfModels<TModel, TAssociateModel>(
-                  timestampedModelIds: timestampedModelIds
+                  timestampedIds: timestampedIds
                   )
                 );
         }
