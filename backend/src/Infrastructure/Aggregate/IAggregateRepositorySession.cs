@@ -14,42 +14,42 @@ namespace Icon.Infrastructure.Aggregate
 {
     public interface IAggregateRepositorySession : IAggregateRepositoryReadOnlySession
     {
-        public Task<Result<IAggregateRepositorySession, Errors>> Create<T>(
+        public Task<Result<bool, Errors>> Create<T>(
             Guid id,
             IEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Create<T>(
+        public Task<Result<bool, Errors>> Create<T>(
             Guid id,
             IEnumerable<IEvent> events,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Append<T>(
+        public Task<Result<bool, Errors>> Append<T>(
             ValueObjects.TimestampedId timestampedId,
             IEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Append<T>(
+        public Task<Result<bool, Errors>> Append<T>(
             ValueObjects.TimestampedId timestampedId,
             IEnumerable<IEvent> events,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Delete<T>(
+        public Task<Result<bool, Errors>> Delete<T>(
             ValueObjects.TimestampedId timestampedId,
             IEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Delete<T>(
+        public Task<Result<bool, Errors>> Delete<T>(
             ValueObjects.Id id,
             ValueObjects.Timestamp timestamp,
             IEvent @event,
@@ -57,7 +57,7 @@ namespace Icon.Infrastructure.Aggregate
             )
           where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Save(
+        public Task<Result<bool, Errors>> Save(
             CancellationToken cancellationToken
             );
     }

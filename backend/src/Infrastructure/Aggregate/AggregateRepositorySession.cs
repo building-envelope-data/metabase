@@ -31,7 +31,7 @@ namespace Icon.Infrastructure.Aggregate
             _unsavedEvents = new List<IEvent[]>();
         }
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Create<T>(
+        public Task<Result<bool, Errors>> Create<T>(
             Guid id,
             IEvent @event,
             CancellationToken cancellationToken
@@ -45,7 +45,7 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Create<T>(
+        public Task<Result<bool, Errors>> Create<T>(
             Guid id,
             IEnumerable<IEvent> events,
             CancellationToken cancellationToken
@@ -60,7 +60,7 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Append<T>(
+        public Task<Result<bool, Errors>> Append<T>(
             ValueObjects.TimestampedId timestampedId,
             IEvent @event,
             CancellationToken cancellationToken
@@ -73,7 +73,7 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public async Task<Result<IAggregateRepositorySession, Errors>> Append<T>(
+        public async Task<Result<bool, Errors>> Append<T>(
             ValueObjects.TimestampedId timestampedId,
             IEnumerable<IEvent> events,
             CancellationToken cancellationToken
@@ -98,7 +98,7 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Delete<T>(
+        public Task<Result<bool, Errors>> Delete<T>(
             ValueObjects.TimestampedId timestampedId,
             IEvent @event,
             CancellationToken cancellationToken
@@ -114,7 +114,7 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public Task<Result<IAggregateRepositorySession, Errors>> Delete<T>(
+        public Task<Result<bool, Errors>> Delete<T>(
             ValueObjects.Id id,
             ValueObjects.Timestamp timestamp,
             IEvent @event,
@@ -133,7 +133,7 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public async Task<Result<IAggregateRepositorySession, Errors>> Save(
+        public async Task<Result<bool, Errors>> Save(
             CancellationToken cancellationToken
             )
         {
@@ -143,12 +143,12 @@ namespace Icon.Infrastructure.Aggregate
                 await _eventBus.Publish(events).ConfigureAwait(false);
             }
             _unsavedEvents = new List<IEvent[]>();
-            return await Task.FromResult<Result<IAggregateRepositorySession, Errors>>(
-                Result.Ok<IAggregateRepositorySession, Errors>(this)
+            return await Task.FromResult<Result<bool, Errors>>(
+                Result.Ok<bool, Errors>(true)
                 );
         }
 
-        private async Task<Result<IAggregateRepositorySession, Errors>> RegisterEvents(
+        private async Task<Result<bool, Errors>> RegisterEvents(
             IEnumerable<IEvent> events,
             Action<IEvent[]> action,
             CancellationToken cancellationToken
@@ -162,8 +162,8 @@ namespace Icon.Infrastructure.Aggregate
                 );
             action(eventArray);
             _unsavedEvents.Add(eventArray);
-            return await Task.FromResult<Result<IAggregateRepositorySession, Errors>>(
-                Result.Ok<IAggregateRepositorySession, Errors>(this)
+            return await Task.FromResult<Result<bool, Errors>>(
+                Result.Ok<bool, Errors>(true)
                 );
         }
 
