@@ -21,14 +21,14 @@ namespace Icon.Infrastructure.Aggregate
     {
         private readonly IDocumentSession _session;
         private readonly IEventBus _eventBus;
-        private List<IEvent[]> _unsavedEvents;
+        private IEnumerable<IEvent> _unsavedEvents;
 
         public AggregateRepositorySession(IDocumentSession session, IEventBus eventBus)
           : base(session)
         {
             _session = session;
             _eventBus = eventBus;
-            _unsavedEvents = new List<IEvent[]>();
+            _unsavedEvents = Enumerable.Empty<IEvent>();
         }
 
         public Task<Result<bool, Errors>> Create<T>(
@@ -142,7 +142,7 @@ namespace Icon.Infrastructure.Aggregate
             {
                 await _eventBus.Publish(events).ConfigureAwait(false);
             }
-            _unsavedEvents = new List<IEvent[]>();
+            _unsavedEvents = Enumerable.Empty<IEvent>();
             return await Task.FromResult<Result<bool, Errors>>(
                 Result.Ok<bool, Errors>(true)
                 );
@@ -161,7 +161,7 @@ namespace Icon.Infrastructure.Aggregate
                 cancellationToken
                 );
             action(eventArray);
-            _unsavedEvents.Add(eventArray);
+            _unsavedEvents = _unsavedEvents.Concat(eventArray);
             return await Task.FromResult<Result<bool, Errors>>(
                 Result.Ok<bool, Errors>(true)
                 );
