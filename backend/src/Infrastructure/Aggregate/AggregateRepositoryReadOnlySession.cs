@@ -219,6 +219,23 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
+        public async Task<Result<ValueObjects.TimestampedId, Errors>> TimestampId<T>(
+            Guid id,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            var timestampResult = await FetchTimestamp<T>(id, cancellationToken).ConfigureAwait(false);
+            return ValueObjects.Id.From(id)
+              .Bind(nonEmptyId =>
+                  timestampResult.Bind(timestamp =>
+                    ValueObjects.TimestampedId.From(
+                      id, timestamp
+                      )
+                    )
+                  );
+        }
+
         private async Task<Result<StreamState, Errors>> FetchStreamState(
             Guid id,
             CancellationToken cancellationToken

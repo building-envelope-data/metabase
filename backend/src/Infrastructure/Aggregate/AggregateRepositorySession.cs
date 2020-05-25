@@ -139,15 +139,7 @@ namespace Icon.Infrastructure.Aggregate
             action(_session.Events, eventArray);
             await _session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             await _eventBus.Publish(eventArray).ConfigureAwait(false);
-            var timestampResult = await FetchTimestamp<T>(id, cancellationToken).ConfigureAwait(false);
-            return ValueObjects.Id.From(id)
-              .Bind(nonEmptyId =>
-                  timestampResult.Bind(timestamp =>
-                      ValueObjects.TimestampedId.From(
-                        id, timestamp
-                        )
-                    )
-                  );
+            return await TimestampId<T>(id, cancellationToken);
         }
 
         private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)

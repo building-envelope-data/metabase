@@ -64,6 +64,12 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             );
 
+        public Task<Result<ValueObjects.TimestampedId, Errors>> TimestampId<T>(
+            Guid id,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
         public Task<Result<T, Errors>> Load<T>(
             Guid id,
             CancellationToken cancellationToken = default(CancellationToken)
