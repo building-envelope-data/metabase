@@ -47,9 +47,18 @@ namespace Icon.Handlers
         {
             var id = await session.GenerateNewId(cancellationToken).ConfigureAwait(false);
             var @event = _newCreatedEvent(id, command);
-            return
-              await session.New<TAggregate>(
+            return await (
+                await session.Create<TAggregate>(
                   id, @event, cancellationToken
+                  )
+                .ConfigureAwait(false)
+              )
+              .Bind(async _ => await
+                  (await session.Save(cancellationToken).ConfigureAwait(false))
+                  .Bind(async _ => await
+                    session.TimestampId<TAggregate>(id, cancellationToken).ConfigureAwait(false)
+                    )
+                  .ConfigureAwait(false)
                   )
               .ConfigureAwait(false);
         }

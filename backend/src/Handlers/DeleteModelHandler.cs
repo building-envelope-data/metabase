@@ -46,9 +46,18 @@ namespace Icon.Handlers
         {
             // TODO Remove associations!
             var @event = _newDeletedEvent(command);
-            return
+            return await (
               await session.Delete<TAggregate>(
                   command.TimestampedId, @event, cancellationToken
+                  )
+              .ConfigureAwait(false)
+               )
+              .Bind(async _ => await
+                  (await session.Save(cancellationToken).ConfigureAwait(false))
+                  .Bind(async _ => await
+                    session.TimestampId<TAggregate>(command.TimestampedId.Id, cancellationToken).ConfigureAwait(false)
+                    )
+                  .ConfigureAwait(false)
                   )
               .ConfigureAwait(false);
         }

@@ -21,44 +21,46 @@ namespace Icon.Infrastructure.Aggregate
     {
         private readonly IDocumentSession _session;
         private readonly IEventBus _eventBus;
+        private List<IEvent[]> _unsavedEvents;
 
         public AggregateRepositorySession(IDocumentSession session, IEventBus eventBus)
           : base(session)
         {
             _session = session;
             _eventBus = eventBus;
+            _unsavedEvents = new List<IEvent[]>();
         }
 
-        public Task<Result<ValueObjects.TimestampedId, Errors>> New<T>(
+        public Task<Result<IAggregateRepositorySession, Errors>> Create<T>(
             Guid id,
             IEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
         {
-            return New<T>(
+            return Create<T>(
                 id,
                 new IEvent[] { @event },
                 cancellationToken
                 );
         }
 
-        public Task<Result<ValueObjects.TimestampedId, Errors>> New<T>(
+        public Task<Result<IAggregateRepositorySession, Errors>> Create<T>(
             Guid id,
             IEnumerable<IEvent> events,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
         {
-            return Store<T>(
-                id,
+            AssertNotDisposed();
+            return RegisterEvents(
                 events,
-                (eventStore, eventArray) => eventStore.StartStream<T>(id, eventArray),
+                eventArray => _session.Events.StartStream<T>(id, eventArray),
                 cancellationToken
                 );
         }
 
-        public Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
+        public Task<Result<IAggregateRepositorySession, Errors>> Append<T>(
             ValueObjects.TimestampedId timestampedId,
             IEvent @event,
             CancellationToken cancellationToken
@@ -71,29 +73,39 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public async Task<Result<ValueObjects.TimestampedId, Errors>> Append<T>(
+        public async Task<Result<IAggregateRepositorySession, Errors>> Append<T>(
             ValueObjects.TimestampedId timestampedId,
             IEnumerable<IEvent> events,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
         {
-            var expectedVersion = await FetchVersion<T>(timestampedId, cancellationToken);
-            return await Store<T>(
-                timestampedId.Id,
-                events,
-                (eventStore, eventArray) => eventStore.Append(timestampedId.Id, expectedVersion, eventArray),
-                cancellationToken
+            AssertNotDisposed();
+            return await (
+                await FetchVersion<T>(
+                  timestampedId,
+                  cancellationToken
+                  )
+               .ConfigureAwait(false)
+               )
+              .Bind(async version => await
+                  RegisterEvents(
+                    events,
+                    eventArray => _session.Events.Append(timestampedId.Id, version + 1, eventArray),
+                    cancellationToken
+                    )
+                  .ConfigureAwait(false)
                 );
         }
 
-        public Task<Result<ValueObjects.TimestampedId, Errors>> Delete<T>(
+        public Task<Result<IAggregateRepositorySession, Errors>> Delete<T>(
             ValueObjects.TimestampedId timestampedId,
             IEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
         {
+            AssertNotDisposed();
             _session.Delete<T>(timestampedId.Id);
             return Append<T>(
                 timestampedId,
@@ -102,7 +114,7 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        public Task<Result<ValueObjects.TimestampedId, Errors>> Delete<T>(
+        public Task<Result<IAggregateRepositorySession, Errors>> Delete<T>(
             ValueObjects.Id id,
             ValueObjects.Timestamp timestamp,
             IEvent @event,
@@ -121,29 +133,46 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
-        private async Task<Result<ValueObjects.TimestampedId, Errors>> Store<T>(
-            Guid id,
-            IEnumerable<IEvent> events,
-            Action<IEventStore, IEvent[]> action,
+        public async Task<Result<IAggregateRepositorySession, Errors>> Save(
             CancellationToken cancellationToken
             )
-          where T : class, IEventSourcedAggregate, new()
         {
-            AssertNotDisposed();
-            Event.EnsureValid(events);
-            AssertExistenceOfCreators(
-                events.Select(@event => @event.CreatorId),
-                cancellationToken
-                );
-            var eventArray = events.ToArray();
-            action(_session.Events, eventArray);
             await _session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            await _eventBus.Publish(eventArray).ConfigureAwait(false);
-            return await TimestampId<T>(id, cancellationToken);
+            foreach (var events in _unsavedEvents)
+            {
+                await _eventBus.Publish(events).ConfigureAwait(false);
+            }
+            _unsavedEvents = new List<IEvent[]>();
+            return await Task.FromResult<Result<IAggregateRepositorySession, Errors>>(
+                Result.Ok<IAggregateRepositorySession, Errors>(this)
+                );
         }
 
-        private void AssertExistenceOfCreators(IEnumerable<Guid> creatorIds, CancellationToken cancellationToken)
+        private async Task<Result<IAggregateRepositorySession, Errors>> RegisterEvents(
+            IEnumerable<IEvent> events,
+            Action<IEvent[]> action,
+            CancellationToken cancellationToken
+            )
         {
+            var eventArray = events.ToArray();
+            Event.EnsureValid(eventArray);
+            await AssertExistenceOfCreators(
+                eventArray.Select(@event => @event.CreatorId),
+                cancellationToken
+                );
+            action(eventArray);
+            _unsavedEvents.Add(eventArray);
+            return await Task.FromResult<Result<IAggregateRepositorySession, Errors>>(
+                Result.Ok<IAggregateRepositorySession, Errors>(this)
+                );
+        }
+
+        private Task AssertExistenceOfCreators(
+            IEnumerable<Guid> creatorIds,
+            CancellationToken cancellationToken
+            )
+        {
+            return Task.CompletedTask;
             /* foreach (var creatorId in creatorIds) */
             /* { */
             /*   if (!_session.Query<UserAggregate>().AnyAsync(user => user.Id == creatorId, cancellationToken)) */

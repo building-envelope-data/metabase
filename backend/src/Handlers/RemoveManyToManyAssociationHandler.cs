@@ -60,12 +60,23 @@ namespace Icon.Handlers
               .Bind(async associationId =>
                   {
                       var @event = _newRemovedEvent(associationId, command);
-                      return await session.Delete<TAssociationAggregate>(
-                          associationId, command.Input.Timestamp, @event, cancellationToken
+                      return await (
+                          await session.Delete<TAssociationAggregate>(
+                            associationId, command.Input.Timestamp, @event, cancellationToken
+                            )
+                          .ConfigureAwait(false)
+                          )
+                      .Bind(async _ => await
+                          (await session.Save(cancellationToken).ConfigureAwait(false))
+                          .Bind(async _ => await
+                            session.TimestampId<TAssociationAggregate>(associationId, cancellationToken).ConfigureAwait(false)
+                            )
+                          .ConfigureAwait(false)
                           )
                       .ConfigureAwait(false);
                   }
-                  ).ConfigureAwait(false);
+                  )
+              .ConfigureAwait(false);
         }
     }
 }
