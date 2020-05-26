@@ -16,17 +16,9 @@ namespace Icon.Events
         {
             return new InstitutionRepresentativeRemoved(
                 institutionRepresentativeId: institutionRepresentativeId,
-                institutionId: command.Input.ParentId,
-                userId: command.Input.AssociateId,
                 creatorId: command.CreatorId
                 );
         }
-
-        [JsonIgnore]
-        public Guid InstitutionId { get => ParentId; }
-
-        [JsonIgnore]
-        public Guid UserId { get => AssociateId; }
 
 #nullable disable
         public InstitutionRepresentativeRemoved() { }
@@ -34,14 +26,10 @@ namespace Icon.Events
 
         public InstitutionRepresentativeRemoved(
             Guid institutionRepresentativeId,
-            Guid institutionId,
-            Guid userId,
             Guid creatorId
             )
           : base(
               aggregateId: institutionRepresentativeId,
-              parentId: institutionId,
-              associateId: userId,
               creatorId: creatorId
               )
         {

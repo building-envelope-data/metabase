@@ -16,17 +16,9 @@ namespace Icon.Events
         {
             return new PersonAffiliationRemoved(
                 personAffiliationId: personAffiliationId,
-                personId: command.Input.ParentId,
-                institutionId: command.Input.AssociateId,
                 creatorId: command.CreatorId
                 );
         }
-
-        [JsonIgnore]
-        public Guid PersonId { get => ParentId; }
-
-        [JsonIgnore]
-        public Guid InstitutionId { get => AssociateId; }
 
 #nullable disable
         public PersonAffiliationRemoved() { }
@@ -34,14 +26,10 @@ namespace Icon.Events
 
         public PersonAffiliationRemoved(
             Guid personAffiliationId,
-            Guid personId,
-            Guid institutionId,
             Guid creatorId
             )
           : base(
               aggregateId: personAffiliationId,
-              parentId: personId,
-              associateId: institutionId,
               creatorId: creatorId
               )
         {

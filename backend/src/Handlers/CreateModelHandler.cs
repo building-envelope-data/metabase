@@ -53,11 +53,11 @@ namespace Icon.Handlers
                   )
                 .ConfigureAwait(false)
               )
-              .Bind(async _ => await
-                  (await session.Save(cancellationToken).ConfigureAwait(false))
-                  .Bind(async _ => await
-                    session.TimestampId<TAggregate>(id, cancellationToken).ConfigureAwait(false)
-                    )
+              .Bind(async _ =>
+                  await (await session.Save(cancellationToken).ConfigureAwait(false))
+                  .Bind(async _ =>
+                      await session.TimestampId<TAggregate>(id, cancellationToken).ConfigureAwait(false)
+                      )
                   .ConfigureAwait(false)
                   )
               .ConfigureAwait(false);

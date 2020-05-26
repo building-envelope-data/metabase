@@ -16,17 +16,9 @@ namespace Icon.Events
         {
             return new ComponentVariantRemoved(
                 componentVariantId: componentVariantId,
-                baseComponentId: command.Input.ParentId,
-                variantComponentId: command.Input.AssociateId,
                 creatorId: command.CreatorId
                 );
         }
-
-        [JsonIgnore]
-        public Guid BaseComponentId { get => ParentId; }
-
-        [JsonIgnore]
-        public Guid VariantComponentId { get => AssociateId; }
 
 #nullable disable
         public ComponentVariantRemoved() { }
@@ -34,14 +26,10 @@ namespace Icon.Events
 
         public ComponentVariantRemoved(
             Guid componentVariantId,
-            Guid baseComponentId,
-            Guid variantComponentId,
             Guid creatorId
             )
           : base(
               aggregateId: componentVariantId,
-              parentId: baseComponentId,
-              associateId: variantComponentId,
               creatorId: creatorId
               )
         {

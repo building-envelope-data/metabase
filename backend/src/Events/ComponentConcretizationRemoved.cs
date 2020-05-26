@@ -16,17 +16,9 @@ namespace Icon.Events
         {
             return new ComponentConcretizationRemoved(
                 componentConcretizationId: componentConcretizationId,
-                generalComponentId: command.Input.ParentId,
-                concreteComponentId: command.Input.AssociateId,
                 creatorId: command.CreatorId
                 );
         }
-
-        [JsonIgnore]
-        public Guid GeneralComponentId { get => ParentId; }
-
-        [JsonIgnore]
-        public Guid ConcreteComponentId { get => AssociateId; }
 
 #nullable disable
         public ComponentConcretizationRemoved() { }
@@ -34,14 +26,10 @@ namespace Icon.Events
 
         public ComponentConcretizationRemoved(
             Guid componentConcretizationId,
-            Guid generalComponentId,
-            Guid concreteComponentId,
             Guid creatorId
             )
           : base(
               aggregateId: componentConcretizationId,
-              parentId: generalComponentId,
-              associateId: concreteComponentId,
               creatorId: creatorId
               )
         {

@@ -95,7 +95,8 @@ namespace Icon.Infrastructure.Aggregate
                     cancellationToken
                     )
                   .ConfigureAwait(false)
-                );
+                )
+              .ConfigureAwait(false);
         }
 
         public Task<Result<bool, Errors>> Delete<T>(
@@ -133,19 +134,37 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
+        public async Task<Result<bool, Errors>> Delete<T>(
+            IEnumerable<(ValueObjects.TimestampedId, IEvent)> timestampedIdsAndEvents,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+          var deletionResults = new List<Result<bool, Errors>>();
+          foreach (var (timestampedId, @event) in timestampedIdsAndEvents)
+          {
+            deletionResults.Add(
+                await Delete<T>(
+                  timestampedId, @event, cancellationToken
+                  )
+                .ConfigureAwait(false)
+                );
+          }
+          return Result.Combine<bool, Errors>(deletionResults);
+        }
+
         public async Task<Result<bool, Errors>> Save(
             CancellationToken cancellationToken
             )
         {
             await _session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            foreach (var events in _unsavedEvents)
-            {
-                await _eventBus.Publish(events).ConfigureAwait(false);
-            }
+            await _eventBus.Publish(_unsavedEvents).ConfigureAwait(false);
             _unsavedEvents = Enumerable.Empty<IEvent>();
-            return await Task.FromResult<Result<bool, Errors>>(
-                Result.Ok<bool, Errors>(true)
-                );
+            return
+              await Task.FromResult<Result<bool, Errors>>(
+                  Result.Ok<bool, Errors>(true)
+                  )
+              .ConfigureAwait(false);
         }
 
         private async Task<Result<bool, Errors>> RegisterEvents(
@@ -159,12 +178,15 @@ namespace Icon.Infrastructure.Aggregate
             await AssertExistenceOfCreators(
                 eventArray.Select(@event => @event.CreatorId),
                 cancellationToken
-                );
+                )
+              .ConfigureAwait(false);
             action(eventArray);
             _unsavedEvents = _unsavedEvents.Concat(eventArray);
-            return await Task.FromResult<Result<bool, Errors>>(
-                Result.Ok<bool, Errors>(true)
-                );
+            return
+              await Task.FromResult<Result<bool, Errors>>(
+                  Result.Ok<bool, Errors>(true)
+                  )
+              .ConfigureAwait(false);
         }
 
         private Task AssertExistenceOfCreators(

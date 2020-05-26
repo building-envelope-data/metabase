@@ -25,12 +25,21 @@ namespace Icon.Handlers
       where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
       where TAddedEvent : Events.IAddedEvent
     {
-        public GetBackwardManyToManyAssociationsOfModelsHandler(IAggregateRepository repository)
-          : base(repository)
+        public static Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>> Do(
+            IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedModelIds,
+            CancellationToken cancellationToken
+            )
         {
+          return GetManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate>.Do(
+              session,
+              timestampedModelIds,
+              QueryAssociationIds,
+              cancellationToken
+              );
         }
 
-        protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associationId)>> QueryAssociationIds(
+        private static async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associationId)>> QueryAssociationIds(
             IAggregateRepositoryReadOnlySession session,
             IEnumerable<ValueObjects.Id> modelIds,
             CancellationToken cancellationToken
@@ -43,6 +52,11 @@ namespace Icon.Handlers
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false))
               .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociationId));
+        }
+
+        public GetBackwardManyToManyAssociationsOfModelsHandler(IAggregateRepository repository)
+          : base(repository, QueryAssociationIds)
+        {
         }
     }
 }

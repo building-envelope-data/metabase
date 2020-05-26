@@ -15,8 +15,6 @@ namespace Icon.Events
         {
             return new InstitutionMethodDeveloperRemoved(
                 methodDeveloperId: methodDeveloperId,
-                methodId: command.Input.ParentId,
-                stakeholderId: command.Input.AssociateId,
                 creatorId: command.CreatorId
                 );
         }
@@ -27,14 +25,10 @@ namespace Icon.Events
 
         public InstitutionMethodDeveloperRemoved(
             Guid methodDeveloperId,
-            Guid methodId,
-            Guid stakeholderId,
             Guid creatorId
             )
           : base(
               methodDeveloperId: methodDeveloperId,
-              methodId: methodId,
-              stakeholderId: stakeholderId,
               creatorId: creatorId
               )
         {

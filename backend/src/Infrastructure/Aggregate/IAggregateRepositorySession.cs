@@ -57,6 +57,12 @@ namespace Icon.Infrastructure.Aggregate
             )
           where T : class, IEventSourcedAggregate, new();
 
+        public Task<Result<bool, Errors>> Delete<T>(
+            IEnumerable<(ValueObjects.TimestampedId, IEvent)> timestampedIdsAndEvents,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
         public Task<Result<bool, Errors>> Save(
             CancellationToken cancellationToken
             );

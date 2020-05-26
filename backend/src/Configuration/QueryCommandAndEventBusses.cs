@@ -1,5 +1,8 @@
 using NSwag.Generation.Processors.Security;
+using CancellationToken = System.Threading.CancellationToken;
 using IAggregateRepository = Icon.Infrastructure.Aggregate.IAggregateRepository;
+using IAggregateRepositorySession = Icon.Infrastructure.Aggregate.IAggregateRepositorySession;
+using IAggregateRepositoryReadOnlySession = Icon.Infrastructure.Aggregate.IAggregateRepositoryReadOnlySession;
 using IEventSourcedAggregate = Icon.Infrastructure.Aggregate.IEventSourcedAggregate;
 using IdentityServer4.AccessTokenValidation;
 using Icon.Data;
@@ -98,7 +101,73 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Component, Aggregates.ComponentAggregate, ValueObjects.CreateComponentInput, Events.ComponentCreated>(
                     services,
                     Events.ComponentCreated.From,
-                    Events.ComponentDeleted.From
+                    Events.ComponentDeleted.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    {
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Forward<Models.Component, Models.ComponentManufacturer, Aggregates.ComponentAggregate, Aggregates.ComponentManufacturerAggregate, Events.ComponentManufacturerAdded>(
+                        session,
+                        timestampedId,
+                        componentManufacturerId => new Events.ComponentManufacturerRemoved(componentManufacturerId, creatorId),
+                        cancellationToken
+                        ),
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Forward<Models.Component, Models.ComponentConcretization, Aggregates.ComponentAggregate, Aggregates.ComponentConcretizationAggregate, Events.ComponentConcretizationAdded>(
+                        session,
+                        timestampedId,
+                        componentConcretizationId => new Events.ComponentConcretizationRemoved(componentConcretizationId, creatorId),
+                        cancellationToken
+                        ),
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Backward<Models.Component, Models.ComponentConcretization, Aggregates.ComponentAggregate, Aggregates.ComponentConcretizationAggregate, Events.ComponentConcretizationAdded>(
+                        session,
+                        timestampedId,
+                        componentConcretizationId => new Events.ComponentConcretizationRemoved(componentConcretizationId, creatorId),
+                        cancellationToken
+                        ),
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Forward<Models.Component, Models.ComponentPart, Aggregates.ComponentAggregate, Aggregates.ComponentPartAggregate, Events.ComponentPartAdded>(
+                        session,
+                        timestampedId,
+                        componentPartId => new Events.ComponentPartRemoved(componentPartId, creatorId),
+                        cancellationToken
+                        ),
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Backward<Models.Component, Models.ComponentPart, Aggregates.ComponentAggregate, Aggregates.ComponentPartAggregate, Events.ComponentPartAdded>(
+                        session,
+                        timestampedId,
+                        componentPartId => new Events.ComponentPartRemoved(componentPartId, creatorId),
+                        cancellationToken
+                        ),
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Forward<Models.Component, Models.ComponentVariant, Aggregates.ComponentAggregate, Aggregates.ComponentVariantAggregate, Events.ComponentVariantAdded>(
+                        session,
+                        timestampedId,
+                        componentVariantId => new Events.ComponentVariantRemoved(componentVariantId, creatorId),
+                        cancellationToken
+                        ),
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Backward<Models.Component, Models.ComponentVariant, Aggregates.ComponentAggregate, Aggregates.ComponentVariantAggregate, Events.ComponentVariantAdded>(
+                        session,
+                        timestampedId,
+                        componentVariantId => new Events.ComponentVariantRemoved(componentVariantId, creatorId),
+                        cancellationToken
+                        ),
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Forward<Models.Component, Models.ComponentVersion, Aggregates.ComponentAggregate, Aggregates.ComponentVersionAggregate, Events.ComponentVersionAdded>(
+                        session,
+                        timestampedId,
+                        componentVersionId => new Events.ComponentVersionRemoved(componentVersionId, creatorId),
+                        cancellationToken
+                        ),
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Backward<Models.Component, Models.ComponentVersion, Aggregates.ComponentAggregate, Aggregates.ComponentVersionAggregate, Events.ComponentVersionAdded>(
+                        session,
+                        timestampedId,
+                        componentVersionId => new Events.ComponentVersionRemoved(componentVersionId, creatorId),
+                        cancellationToken
+                        )
+                    }
                     );
         }
 
@@ -107,7 +176,10 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Database, Aggregates.DatabaseAggregate, ValueObjects.CreateDatabaseInput, Events.DatabaseCreated>(
                     services,
                     Events.DatabaseCreated.From,
-                    Events.DatabaseDeleted.From
+                    Events.DatabaseDeleted.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[] {
+                    // TODO Remove operating institution
+                    }
                     );
         }
 
@@ -116,8 +188,33 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Institution, Aggregates.InstitutionAggregate, ValueObjects.CreateInstitutionInput, Events.InstitutionCreated>(
                     services,
                     Events.InstitutionCreated.From,
-                    Events.InstitutionDeleted.From
-                    );
+                    Events.InstitutionDeleted.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    {
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      Handlers.RemoveManyToManyAssociationsOfModel.Backward<Models.Institution, Models.PersonAffiliation, Aggregates.InstitutionAggregate, Aggregates.PersonAffiliationAggregate, Events.PersonAffiliationAdded>(
+                          session,
+                          timestampedId,
+                          personAffiliationId => new Events.PersonAffiliationRemoved(personAffiliationId, creatorId),
+                          cancellationToken
+                          ),
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      Handlers.RemoveManyToManyAssociationsOfModel.Backward<Models.Institution, Models.MethodDeveloper, Aggregates.InstitutionAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Events.InstitutionMethodDeveloperAdded>(
+                          session,
+                          timestampedId,
+                          institutionMethodDeveloperId => new Events.InstitutionMethodDeveloperRemoved(institutionMethodDeveloperId, creatorId),
+                          cancellationToken
+                          ),
+                      // TODO Remove operated databases
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      Handlers.RemoveManyToManyAssociationsOfModel.Backward<Models.Institution, Models.ComponentManufacturer, Aggregates.InstitutionAggregate, Aggregates.ComponentManufacturerAggregate, Events.ComponentManufacturerAdded>(
+                          session,
+                          timestampedId,
+                          componentManufacturerId => new Events.ComponentManufacturerRemoved(componentManufacturerId, creatorId),
+                          cancellationToken
+                          )
+                    }
+            );
             services.AddScoped<
               MediatR.IRequestHandler<
               Queries.GetOneToManyAssociatesOfModels<Models.Institution, Models.Database>,
@@ -137,7 +234,24 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Method, Aggregates.MethodAggregate, ValueObjects.CreateMethodInput, Events.MethodCreated>(
                     services,
                     Events.MethodCreated.From,
-                    Events.MethodDeleted.From
+                    Events.MethodDeleted.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    {
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      Handlers.RemoveManyToManyAssociationsOfModel.Forward<Models.Method, Models.MethodDeveloper, Aggregates.MethodAggregate, Aggregates.PersonMethodDeveloperAggregate, Events.PersonMethodDeveloperAdded>(
+                          session,
+                          timestampedId,
+                          personMethodDeveloperId => new Events.PersonMethodDeveloperRemoved(personMethodDeveloperId, creatorId),
+                          cancellationToken
+                          ),
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      Handlers.RemoveManyToManyAssociationsOfModel.Forward<Models.Method, Models.MethodDeveloper, Aggregates.MethodAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Events.InstitutionMethodDeveloperAdded>(
+                          session,
+                          timestampedId,
+                          institutionMethodDeveloperId => new Events.InstitutionMethodDeveloperRemoved(institutionMethodDeveloperId, creatorId),
+                          cancellationToken
+                          )
+                    }
                     );
         }
 
@@ -146,8 +260,25 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Person, Aggregates.PersonAggregate, ValueObjects.CreatePersonInput, Events.PersonCreated>(
                     services,
                     Events.PersonCreated.From,
-                    Events.PersonDeleted.From
-                    );
+                    Events.PersonDeleted.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    {
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      Handlers.RemoveManyToManyAssociationsOfModel.Forward<Models.Person, Models.PersonAffiliation, Aggregates.PersonAggregate, Aggregates.PersonAffiliationAggregate, Events.PersonAffiliationAdded>(
+                          session,
+                          timestampedId,
+                          personAffiliationId => new Events.PersonAffiliationRemoved(personAffiliationId, creatorId),
+                          cancellationToken
+                          ),
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      Handlers.RemoveManyToManyAssociationsOfModel.Backward<Models.Person, Models.MethodDeveloper, Aggregates.PersonAggregate, Aggregates.PersonMethodDeveloperAggregate, Events.PersonMethodDeveloperAdded>(
+                          session,
+                          timestampedId,
+                          personMethodDeveloperId => new Events.PersonMethodDeveloperRemoved(personMethodDeveloperId, creatorId),
+                          cancellationToken
+                          )
+                    }
+                );
         }
 
         private static void AddStakeholderHandlers(IServiceCollection services)
@@ -167,14 +298,16 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Standard, Aggregates.StandardAggregate, ValueObjects.CreateStandardInput, Events.StandardCreated>(
                     services,
                     Events.StandardCreated.From,
-                    Events.StandardDeleted.From
+                    Events.StandardDeleted.From,
+                    Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
         }
 
         private static void AddModelHandlers<TModel, TAggregate, TCreateInput, TCreatedEvent>(
                 IServiceCollection services,
                 Func<Guid, Commands.Create<TCreateInput>, Events.ICreatedEvent> newCreatedEvent,
-                Func<Commands.Delete<TModel>, Events.IDeletedEvent> newDeletedEvent
+                Func<Commands.Delete<TModel>, Events.IDeletedEvent> newDeletedEvent,
+                IEnumerable<Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
                     )
                 where TModel : Models.IModel
                 where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
@@ -184,7 +317,7 @@ namespace Icon.Configuration
                     services, newCreatedEvent
                     );
             AddDeleteHandler<TModel, TAggregate>(
-                services, newDeletedEvent
+                services, newDeletedEvent, removeAssociations
                 );
             AddGetModelsForTimestampedIdsHandler<TModel, TAggregate, TCreatedEvent>(services);
             AddGetModelHandler<TModel, TAggregate>(services);
@@ -211,7 +344,8 @@ namespace Icon.Configuration
 
         private static void AddDeleteHandler<TModel, TAggregate>(
                 IServiceCollection services,
-                Func<Commands.Delete<TModel>, Events.IDeletedEvent> newEvent
+                Func<Commands.Delete<TModel>, Events.IDeletedEvent> newEvent,
+                IEnumerable<Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
         )
           where TAggregate : class, IEventSourcedAggregate, new()
         {
@@ -223,7 +357,8 @@ namespace Icon.Configuration
               Handlers.DeleteModelHandler<TModel, TAggregate>>(serviceProvider =>
                   new Handlers.DeleteModelHandler<TModel, TAggregate>(
                     serviceProvider.GetRequiredService<IAggregateRepository>(),
-                    newEvent
+                    newEvent,
+                    removeAssociations
                     )
                   );
         }

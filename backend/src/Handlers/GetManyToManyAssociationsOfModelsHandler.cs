@@ -20,16 +20,35 @@ using System;
 namespace Icon.Handlers
 {
     public abstract class GetManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate>
-      : GetAssociatesOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate>,
-        IQueryHandler<Queries.GetManyToManyAssociationsOfModels<TModel, TAssociationModel>, IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
+      : IQueryHandler<Queries.GetManyToManyAssociationsOfModels<TModel, TAssociationModel>, IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
     {
-        private readonly IAggregateRepository _repository;
+        public static Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>> Do(
+            IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedModelIds,
+            Func<IAggregateRepositoryReadOnlySession, IEnumerable<ValueObjects.Id>, CancellationToken, Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associationId)>>> queryAssociationIds,
+            CancellationToken cancellationToken
+            )
+        {
+          return GetAssociationsOrAssociatesOfModels<TModel, TAssociationModel, TAggregate, TAssociationAggregate>.Do(
+              session,
+              timestampedModelIds,
+              queryAssociationIds,
+              cancellationToken
+              );
+        }
 
-        public GetManyToManyAssociationsOfModelsHandler(IAggregateRepository repository)
+        private readonly IAggregateRepository _repository;
+        private readonly Func<IAggregateRepositoryReadOnlySession, IEnumerable<ValueObjects.Id>, CancellationToken, Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associationId)>>> _queryAssociationIds;
+
+        public GetManyToManyAssociationsOfModelsHandler(
+            IAggregateRepository repository,
+            Func<IAggregateRepositoryReadOnlySession, IEnumerable<ValueObjects.Id>, CancellationToken, Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associationId)>>> queryAssociationIds
+            )
         {
             _repository = repository;
+            _queryAssociationIds = queryAssociationIds;
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>> Handle(
@@ -39,23 +58,14 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Handle(query.TimestampedIds, session, cancellationToken).ConfigureAwait(false);
+                return await Do(
+                    session,
+                    query.TimestampedIds,
+                    _queryAssociationIds,
+                    cancellationToken
+                    )
+                  .ConfigureAwait(false);
             }
         }
-
-        protected override Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
-            IAggregateRepositoryReadOnlySession session,
-            IEnumerable<ValueObjects.Id> modelIds,
-            CancellationToken cancellationToken
-            )
-        {
-            return QueryAssociationIds(session, modelIds, cancellationToken);
-        }
-
-        protected abstract Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associationId)>> QueryAssociationIds(
-            IAggregateRepositoryReadOnlySession session,
-            IEnumerable<ValueObjects.Id> modelIds,
-            CancellationToken cancellationToken
-            );
     }
 }

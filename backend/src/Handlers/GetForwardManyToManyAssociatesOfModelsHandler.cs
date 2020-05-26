@@ -27,17 +27,28 @@ namespace Icon.Handlers
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
       where TAddedEvent : Events.IAddedEvent
     {
+        public static Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Do(
+            IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+        {
+          return GetManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>.Do(
+              session,
+              timestampedIds,
+              association => association.AssociateId,
+              GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>.Do,
+              cancellationToken
+              );
+        }
+
         public GetForwardManyToManyAssociatesOfModelsHandler(IAggregateRepository repository)
           : base(
               repository,
-              new GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>(repository)
+              association => association.AssociateId,
+              GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>.Do
               )
         {
-        }
-
-        protected override ValueObjects.Id GetAssociateId(TAssociationModel association)
-        {
-            return association.AssociateId;
         }
     }
 }
