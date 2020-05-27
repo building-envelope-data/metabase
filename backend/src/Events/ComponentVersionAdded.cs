@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static ComponentVersionAdded From(
             Guid componentVersionId,
-            Commands.Add<ValueObjects.AddComponentVersionInput> command
+            Commands.AddAssociation<ValueObjects.AddComponentVersionInput> command
             )
         {
             return new ComponentVersionAdded(

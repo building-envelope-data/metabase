@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static ComponentManufacturerAdded From(
               Guid componentManufacturerId,
-              Commands.Add<ValueObjects.AddComponentManufacturerInput> command
+              Commands.AddAssociation<ValueObjects.AddComponentManufacturerInput> command
             )
         {
             return new ComponentManufacturerAdded(

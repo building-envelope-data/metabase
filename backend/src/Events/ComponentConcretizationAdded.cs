@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static ComponentConcretizationAdded From(
             Guid componentConcretizationId,
-            Commands.Add<ValueObjects.AddComponentConcretizationInput> command
+            Commands.AddAssociation<ValueObjects.AddComponentConcretizationInput> command
             )
         {
             return new ComponentConcretizationAdded(

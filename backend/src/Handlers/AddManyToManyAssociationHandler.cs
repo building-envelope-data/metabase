@@ -15,7 +15,7 @@ using System.Linq;
 namespace Icon.Handlers
 {
     public sealed class AddManyToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>
-      : CreateModelHandler<Commands.Add<TInput>, TAssociationAggregate>
+      : CreateModelHandler<Commands.AddAssociation<TInput>, TAssociationAggregate>
       where TInput : ValueObjects.AddManyToManyAssociationInput
       where TAggregate : class, IEventSourcedAggregate, new()
       where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, new()
@@ -23,7 +23,7 @@ namespace Icon.Handlers
     {
         public AddManyToManyAssociationHandler(
             IAggregateRepository repository,
-            Func<Guid, Commands.Add<TInput>, Events.IAssociationAddedEvent> newAssociationAddedEvent
+            Func<Guid, Commands.AddAssociation<TInput>, Events.IAssociationAddedEvent> newAssociationAddedEvent
             )
           : base(
               repository,
@@ -33,7 +33,7 @@ namespace Icon.Handlers
         }
 
         public override async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            Commands.Add<TInput> command,
+            Commands.AddAssociation<TInput> command,
             IAggregateRepositorySession session,
             CancellationToken cancellationToken
             )

@@ -13,12 +13,14 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Commands
 {
-    public sealed class Add<TInput>
+    // The difference between the words `remove` and `delete` is explained on
+    // https://english.stackexchange.com/questions/52508/difference-between-delete-and-remove
+    public sealed class RemoveAssociation<TInput>
       : CommandBase<Result<ValueObjects.TimestampedId, Errors>>
     {
         public TInput Input { get; }
 
-        private Add(
+        private RemoveAssociation(
             TInput input,
             ValueObjects.Id creatorId
             )
@@ -27,13 +29,13 @@ namespace Icon.Commands
             Input = input;
         }
 
-        public static Result<Add<TInput>, Errors> From(
+        public static Result<RemoveAssociation<TInput>, Errors> From(
             TInput input,
             ValueObjects.Id creatorId
             )
         {
-            return Result.Ok<Add<TInput>, Errors>(
-                    new Add<TInput>(
+            return Result.Ok<RemoveAssociation<TInput>, Errors>(
+                    new RemoveAssociation<TInput>(
                         input: input,
                         creatorId: creatorId
                         )

@@ -7,11 +7,11 @@ using Newtonsoft.Json;
 namespace Icon.Events
 {
     public sealed class PersonAffiliationRemoved
-      : RemovedEvent
+      : AssociationRemovedEvent
     {
         public static PersonAffiliationRemoved From(
             Guid personAffiliationId,
-            Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>> command
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>> command
             )
         {
             return new PersonAffiliationRemoved(

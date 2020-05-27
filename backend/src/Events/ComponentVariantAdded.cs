@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static ComponentVariantAdded From(
             Guid componentVariantId,
-            Commands.Add<ValueObjects.AddComponentVariantInput> command
+            Commands.AddAssociation<ValueObjects.AddComponentVariantInput> command
             )
         {
             return new ComponentVariantAdded(

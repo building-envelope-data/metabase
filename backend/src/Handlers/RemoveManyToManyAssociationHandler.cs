@@ -15,23 +15,23 @@ using System.Linq;
 namespace Icon.Handlers
 {
     public sealed class RemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>
-      : ICommandHandler<Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Result<ValueObjects.TimestampedId, Errors>>
+      : ICommandHandler<Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Result<ValueObjects.TimestampedId, Errors>>
       where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, new()
     {
         private readonly IAggregateRepository _repository;
-        private readonly Func<Guid, Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IRemovedEvent> _newRemovedEvent;
+        private readonly Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IAssociationRemovedEvent> _newAssociationRemovedEvent;
 
         public RemoveManyToManyAssociationHandler(
             IAggregateRepository repository,
-            Func<Guid, Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IRemovedEvent> newRemovedEvent
+            Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IAssociationRemovedEvent> newAssociationRemovedEvent
             )
         {
             _repository = repository;
-            _newRemovedEvent = newRemovedEvent;
+            _newAssociationRemovedEvent = newAssociationRemovedEvent;
         }
 
         public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
             CancellationToken cancellationToken
             )
         {
@@ -42,7 +42,7 @@ namespace Icon.Handlers
         }
 
         public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
             IAggregateRepositorySession session,
             CancellationToken cancellationToken
             )
@@ -59,7 +59,7 @@ namespace Icon.Handlers
               await ValueObjects.Id.From(maybeAssociationId)
               .Bind(async associationId =>
                   {
-                      var @event = _newRemovedEvent(associationId, command);
+                      var @event = _newAssociationRemovedEvent(associationId, command);
                       return await (
                           await session.Delete<TAssociationAggregate>(
                             associationId, command.Input.Timestamp, @event, cancellationToken

@@ -80,7 +80,7 @@ namespace Icon.GraphQl
             return newPayload(timestampedId);
         }
 
-        private async Task<TPayload> Add<TInput, TValidatedInput, TAssociation, TPayload>(
+        private async Task<TPayload> AddAssociation<TInput, TValidatedInput, TAssociation, TPayload>(
             TInput input,
             Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
             Func<TAssociation, TPayload> newPayload,
@@ -90,7 +90,7 @@ namespace Icon.GraphQl
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Commands.Add<TValidatedInput>.From(
+                    Commands.AddAssociation<TValidatedInput>.From(
                       input: validatedInput,
                       creatorId: ValueObjects.Id.New() // TODO Use current user!
                       )
@@ -99,7 +99,7 @@ namespace Icon.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Commands.Add<TValidatedInput>,
+                Commands.AddAssociation<TValidatedInput>,
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -108,7 +108,7 @@ namespace Icon.GraphQl
                 );
         }
 
-        private async Task<TPayload> Remove<TAssociationModel, TInput, TValidatedInput, TPayload>(
+        private async Task<TPayload> RemoveAssociation<TAssociationModel, TInput, TValidatedInput, TPayload>(
             TInput input,
             Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
             Func<ValueObjects.Id, ValueObjects.Id, ValueObjects.Timestamp, TPayload> newPayload
@@ -118,7 +118,7 @@ namespace Icon.GraphQl
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Commands.Remove<TValidatedInput>.From(
+                    Commands.RemoveAssociation<TValidatedInput>.From(
                       input: validatedInput,
                       creatorId: ValueObjects.Id.New() // TODO Use current user!
                       )
@@ -127,7 +127,7 @@ namespace Icon.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Commands.Remove<TValidatedInput>,
+                Commands.RemoveAssociation<TValidatedInput>,
                 Result<ValueObjects.TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -297,7 +297,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentConcretizationDataLoader componentConcretizationLoader
             )
         {
-            return Add<
+            return AddAssociation<
               AddComponentConcretizationInput,
               ValueObjects.AddComponentConcretizationInput,
               ComponentConcretization,
@@ -315,7 +315,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentConcretizationDataLoader componentConcretizationLoader
             )
         {
-            return Remove<
+            return RemoveAssociation<
               Models.ComponentConcretization,
               RemoveComponentConcretizationInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentConcretization>,
@@ -332,7 +332,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentManufacturerDataLoader componentManufacturerLoader
             )
         {
-            return Add<
+            return AddAssociation<
               AddComponentManufacturerInput,
               ValueObjects.AddComponentManufacturerInput,
               ComponentManufacturer,
@@ -350,7 +350,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentManufacturerDataLoader componentManufacturerLoader
             )
         {
-            return Remove<
+            return RemoveAssociation<
               Models.ComponentManufacturer,
               RemoveComponentManufacturerInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>,
@@ -367,7 +367,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentPartDataLoader componentPartLoader
             )
         {
-            return Add<
+            return AddAssociation<
               AddComponentPartInput,
               ValueObjects.AddComponentPartInput,
               ComponentPart,
@@ -385,7 +385,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentPartDataLoader componentPartLoader
             )
         {
-            return Remove<
+            return RemoveAssociation<
               Models.ComponentPart,
               RemoveComponentPartInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentPart>,
@@ -402,7 +402,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentVariantDataLoader componentVariantLoader
             )
         {
-            return Add<
+            return AddAssociation<
               AddComponentVariantInput,
               ValueObjects.AddComponentVariantInput,
               ComponentVariant,
@@ -420,7 +420,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentVariantDataLoader componentVariantLoader
             )
         {
-            return Remove<
+            return RemoveAssociation<
               Models.ComponentVariant,
               RemoveComponentVariantInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVariant>,
@@ -437,7 +437,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentVersionDataLoader componentVersionLoader
             )
         {
-            return Add<
+            return AddAssociation<
               AddComponentVersionInput,
               ValueObjects.AddComponentVersionInput,
               ComponentVersion,
@@ -455,7 +455,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentVersionDataLoader componentVersionLoader
             )
         {
-            return Remove<
+            return RemoveAssociation<
               Models.ComponentVersion,
               RemoveComponentVersionInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVersion>,
@@ -472,7 +472,7 @@ namespace Icon.GraphQl
             [DataLoader] InstitutionRepresentativeDataLoader institutionRepresentativeLoader
             )
         {
-            return Add<
+            return AddAssociation<
               AddInstitutionRepresentativeInput,
               ValueObjects.AddInstitutionRepresentativeInput,
               InstitutionRepresentative,
@@ -490,7 +490,7 @@ namespace Icon.GraphQl
             [DataLoader] InstitutionRepresentativeDataLoader institutionRepresentativeLoader
             )
         {
-            return Remove<
+            return RemoveAssociation<
               Models.InstitutionRepresentative,
               RemoveInstitutionRepresentativeInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.InstitutionRepresentative>,
@@ -507,7 +507,7 @@ namespace Icon.GraphQl
             [DataLoader] MethodDeveloperDataLoader methodDeveloperLoader
             )
         {
-            return Add<
+            return AddAssociation<
               AddMethodDeveloperInput,
               ValueObjects.AddMethodDeveloperInput,
               MethodDeveloper,
@@ -525,7 +525,7 @@ namespace Icon.GraphQl
             [DataLoader] MethodDeveloperDataLoader methodDeveloperLoader
             )
         {
-            return Remove<
+            return RemoveAssociation<
               Models.MethodDeveloper,
               RemoveMethodDeveloperInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.MethodDeveloper>,
@@ -542,7 +542,7 @@ namespace Icon.GraphQl
             [DataLoader] PersonAffiliationDataLoader personAffiliationLoader
             )
         {
-            return Add<
+            return AddAssociation<
               AddPersonAffiliationInput,
               ValueObjects.AddPersonAffiliationInput,
               PersonAffiliation,
@@ -560,7 +560,7 @@ namespace Icon.GraphQl
             [DataLoader] PersonAffiliationDataLoader personAffiliationLoader
             )
         {
-            return Remove<
+            return RemoveAssociation<
               Models.PersonAffiliation,
               RemovePersonAffiliationInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>,

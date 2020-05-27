@@ -4,14 +4,14 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Events
 {
-    public abstract class RemovedEvent
-      : DeletedEvent, IRemovedEvent
+    public abstract class AssociationRemovedEvent
+      : DeletedEvent, IAssociationRemovedEvent
     {
 #nullable disable
-        public RemovedEvent() { }
+        public AssociationRemovedEvent() { }
 #nullable enable
 
-        public RemovedEvent(
+        public AssociationRemovedEvent(
             Guid aggregateId,
             Guid creatorId
             )
