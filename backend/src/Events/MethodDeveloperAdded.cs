@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Icon.Events
 {
     public abstract class MethodDeveloperAdded
-      : AddedEvent
+      : AssociationAddedEvent
     {
         [JsonIgnore]
         public Guid MethodId { get => ParentId; }

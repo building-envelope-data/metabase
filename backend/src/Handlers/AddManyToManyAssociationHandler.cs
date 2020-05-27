@@ -23,11 +23,11 @@ namespace Icon.Handlers
     {
         public AddManyToManyAssociationHandler(
             IAggregateRepository repository,
-            Func<Guid, Commands.Add<TInput>, Events.IAddedEvent> newAddedEvent
+            Func<Guid, Commands.Add<TInput>, Events.IAssociationAddedEvent> newAssociationAddedEvent
             )
           : base(
               repository,
-              newAddedEvent
+              newAssociationAddedEvent
               )
         {
         }

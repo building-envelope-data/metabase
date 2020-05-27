@@ -21,7 +21,7 @@ namespace Icon.Handlers
 {
     public static class RemoveManyToManyAssociationsOfModel
     {
-        public static Task<Result<bool, Errors>> Forward<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>(
+        public static Task<Result<bool, Errors>> Forward<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
             IAggregateRepositorySession session,
             ValueObjects.TimestampedId timestampedId,
             Func<ValueObjects.Id, Events.IRemovedEvent> newRemovedEvent,
@@ -31,18 +31,18 @@ namespace Icon.Handlers
             where TAssociationModel : Models.IManyToManyAssociation
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAddedEvent : Events.IAddedEvent
+            where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
-            return Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>(
+            return Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
                 session,
                 timestampedId,
                 newRemovedEvent,
-                Handlers.GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>.Do,
+                Handlers.GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>.Do,
                 cancellationToken
                 );
         }
 
-        public static Task<Result<bool, Errors>> Backward<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>(
+        public static Task<Result<bool, Errors>> Backward<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
             IAggregateRepositorySession session,
             ValueObjects.TimestampedId timestampedId,
             Func<ValueObjects.Id, Events.IRemovedEvent> newRemovedEvent,
@@ -52,18 +52,18 @@ namespace Icon.Handlers
             where TAssociationModel : Models.IManyToManyAssociation
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAddedEvent : Events.IAddedEvent
+            where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
-            return Do<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>(
+            return Do<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
                 session,
                 timestampedId,
                 newRemovedEvent,
-                Handlers.GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>.Do,
+                Handlers.GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>.Do,
                 cancellationToken
                 );
         }
 
-        private static async Task<Result<bool, Errors>> Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>(
+        private static async Task<Result<bool, Errors>> Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
             IAggregateRepositorySession session,
             ValueObjects.TimestampedId timestampedId,
             Func<ValueObjects.Id, Events.IRemovedEvent> newRemovedEvent,
@@ -74,7 +74,7 @@ namespace Icon.Handlers
             where TAssociationModel : Models.IManyToManyAssociation
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAddedEvent : Events.IAddedEvent
+            where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return await (
                 await getManyToManyAssociationsOfModels(

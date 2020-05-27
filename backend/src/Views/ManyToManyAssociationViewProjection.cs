@@ -11,44 +11,44 @@
 
 /* namespace Icon.Views */
 /* { */
-/*     public sealed class ManyToManyAssociationViewProjection<TAddedEvent, TRemovedEvent> */
+/*     public sealed class ManyToManyAssociationViewProjection<TAssociationAddedEvent, TRemovedEvent> */
 /*       : IProjection */
-/*       where TAddedEvent : Events.IAddedEvent */
+/*       where TAssociationAddedEvent : Events.IAssociationAddedEvent */
 /*       where TRemovedEvent : Events.IRemovedEvent */
 /*     { */
-/*         public static ManyToManyAssociationViewProjection<TAddedEvent, TRemovedEvent> ForwardAssociates() */
+/*         public static ManyToManyAssociationViewProjection<TAssociationAddedEvent, TRemovedEvent> ForwardAssociates() */
 /*         { */
-/*             return new ManyToManyAssociationViewProjection<TAddedEvent, TRemovedEvent>( */
+/*             return new ManyToManyAssociationViewProjection<TAssociationAddedEvent, TRemovedEvent>( */
 /*                 addedEvent => (addedEvent.ParentId, addedEvent.AssociateId), */
 /*                 removedEvent => (removedEvent.ParentId, removedEvent.AssociateId) */
 /*                 ); */
 /*         } */
 
-/*         public static ManyToManyAssociationViewProjection<TAddedEvent, TRemovedEvent> ForwardAssociations() */
+/*         public static ManyToManyAssociationViewProjection<TAssociationAddedEvent, TRemovedEvent> ForwardAssociations() */
 /*         { */
-/*             return new ManyToManyAssociationViewProjection<TAddedEvent, TRemovedEvent>( */
+/*             return new ManyToManyAssociationViewProjection<TAssociationAddedEvent, TRemovedEvent>( */
 /*                 addedEvent => (addedEvent.ParentId, addedEvent.AggregateId), */
 /*                 removedEvent => (removedEvent.ParentId, removedEvent.AggregateId) */
 /*                 ); */
 /*         } */
 
-/*         public static ManyToManyAssociationViewProjection<TAddedEvent, TRemovedEvent> BackwardAssociates() */
+/*         public static ManyToManyAssociationViewProjection<TAssociationAddedEvent, TRemovedEvent> BackwardAssociates() */
 /*         { */
-/*             return new ManyToManyAssociationViewProjection<TAddedEvent, TRemovedEvent>( */
+/*             return new ManyToManyAssociationViewProjection<TAssociationAddedEvent, TRemovedEvent>( */
 /*                 addedEvent => (addedEvent.AssociateId, addedEvent.ParentId), */
 /*                 removedEvent => (removedEvent.AssociateId, removedEvent.ParentId) */
 /*                 ); */
 /*         } */
 
-/*         public static ManyToManyAssociationViewProjection<TAddedEvent, TRemovedEvent> BackwardAssociations() */
+/*         public static ManyToManyAssociationViewProjection<TAssociationAddedEvent, TRemovedEvent> BackwardAssociations() */
 /*         { */
-/*             return new ManyToManyAssociationViewProjection<TAddedEvent, TRemovedEvent>( */
+/*             return new ManyToManyAssociationViewProjection<TAssociationAddedEvent, TRemovedEvent>( */
 /*                 addedEvent => (addedEvent.AssociateId, addedEvent.AggregateId), */
 /*                 removedEvent => (removedEvent.AssociateId, removedEvent.AggregateId) */
 /*                 ); */
 /*         } */
 
-/*         private readonly Func<TAddedEvent, (Guid, Guid)> _addedIdsSelector; */
+/*         private readonly Func<TAssociationAddedEvent, (Guid, Guid)> _addedIdsSelector; */
 /*         private readonly Func<TRemovedEvent, (Guid, Guid)> _removedIdsSelector; */
 /*         private readonly IDictionary<Guid, ISet<Guid>> _idToAssociationIds; */
 
@@ -56,7 +56,7 @@
 /*         public AsyncOptions AsyncOptions { get; } */
 
 /*         public ManyToManyAssociationViewProjection( */
-/*             Func<TAddedEvent, (Guid, Guid)> addedIdsSelector, */
+/*             Func<TAssociationAddedEvent, (Guid, Guid)> addedIdsSelector, */
 /*             Func<TRemovedEvent, (Guid, Guid)> removedIdsSelector */
 /*             ) */
 /*         { */
@@ -64,7 +64,7 @@
 /*             _removedIdsSelector = removedIdsSelector; */
 /*             _idToAssociationIds = new Dictionary<Guid, ISet<Guid>>(); */
 /*             Consumes = new Type[] { */
-/*               typeof(TAddedEvent), */
+/*               typeof(TAssociationAddedEvent), */
 /*               typeof(TRemovedEvent) */
 /*             }; */
 /*             AsyncOptions = new AsyncOptions(); */
@@ -80,7 +80,7 @@
 /*             /1* } *1/ */
 /*             foreach (var @event in page.Events) */
 /*             { */
-/*                 if (@event.Data is TAddedEvent addedData) */
+/*                 if (@event.Data is TAssociationAddedEvent addedData) */
 /*                 { */
 /*                     var (viewId, otherId) = _addedIdsSelector(addedData); */
 /*                     if (!_idToAssociationIds.ContainsKey(viewId)) */
@@ -96,7 +96,7 @@
 /*                 } */
 /*                 else */
 /*                 { */
-/*                     throw new Exception($"The event {@event} is neither of type {typeof(TAddedEvent)} nor of type {typeof(TRemovedEvent)}"); */
+/*                     throw new Exception($"The event {@event} is neither of type {typeof(TAssociationAddedEvent)} nor of type {typeof(TRemovedEvent)}"); */
 /*                 } */
 /*             } */
 /*         } */

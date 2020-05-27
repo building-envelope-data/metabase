@@ -19,11 +19,11 @@ using System;
 
 namespace Icon.Handlers
 {
-    public sealed class GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>
+    public sealed class GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>
       : GetManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate>
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, new()
-            where TAddedEvent : Events.IAddedEvent
+            where TAssociationAddedEvent : Events.IAssociationAddedEvent
     {
         public static Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>> Do(
             IAggregateRepositoryReadOnlySession session,
@@ -46,7 +46,7 @@ namespace Icon.Handlers
             )
         {
             var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
-            return (await session.QueryEvents<TAddedEvent>()
+            return (await session.QueryEvents<TAssociationAddedEvent>()
                 .Where(e => e.ParentId.IsOneOf(modelGuids))
                 .Select(e => new { ModelId = e.ParentId, AssociationId = e.AggregateId })
                 .ToListAsync(cancellationToken)

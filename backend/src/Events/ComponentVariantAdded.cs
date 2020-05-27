@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Icon.Events
 {
     public sealed class ComponentVariantAdded
-      : AddedEvent
+      : AssociationAddedEvent
     {
         public static ComponentVariantAdded From(
             Guid componentVariantId,

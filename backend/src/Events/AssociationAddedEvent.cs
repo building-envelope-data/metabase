@@ -4,17 +4,17 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Events
 {
-    public abstract class AddedEvent
-      : CreatedEvent, IAddedEvent
+    public abstract class AssociationAddedEvent
+      : CreatedEvent, IAssociationAddedEvent
     {
         public Guid ParentId { get; set; }
         public Guid AssociateId { get; set; }
 
 #nullable disable
-        public AddedEvent() { }
+        public AssociationAddedEvent() { }
 #nullable enable
 
-        public AddedEvent(
+        public AssociationAddedEvent(
             Guid aggregateId,
             Guid parentId,
             Guid associateId,

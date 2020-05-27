@@ -2,7 +2,7 @@ using Guid = System.Guid;
 
 namespace Icon.Events
 {
-    public interface IAddedEvent
+    public interface IAssociationAddedEvent
       : ICreatedEvent
     {
         public Guid ParentId { get; }

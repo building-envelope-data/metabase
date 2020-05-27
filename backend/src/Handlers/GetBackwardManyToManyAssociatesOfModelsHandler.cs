@@ -19,13 +19,13 @@ using System;
 
 namespace Icon.Handlers
 {
-    public sealed class GetBackwardManyToManyAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate, TAddedEvent>
+    public sealed class GetBackwardManyToManyAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate, TAssociationAddedEvent>
       : GetManyToManyAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate>
       where TAssociationModel : Models.IManyToManyAssociation
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
       where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-      where TAddedEvent : Events.IAddedEvent
+      where TAssociationAddedEvent : Events.IAssociationAddedEvent
     {
         public static Task<IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>> Do(
             IAggregateRepositoryReadOnlySession session,
@@ -37,7 +37,7 @@ namespace Icon.Handlers
                 session,
                 timestampedIds,
                 association => association.ParentId,
-                GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>.Do,
+                GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>.Do,
                 cancellationToken
                 );
         }
@@ -46,7 +46,7 @@ namespace Icon.Handlers
           : base(
               repository,
               association => association.ParentId,
-              GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>.Do
+              GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>.Do
               )
         {
         }
