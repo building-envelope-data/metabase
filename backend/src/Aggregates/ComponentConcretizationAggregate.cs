@@ -11,14 +11,19 @@ namespace Icon.Aggregates
     public sealed class ComponentConcretizationAggregate
       : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentConcretization>
     {
+        // The instance variables `GeneralCompId` and `ConcreteCompId` are
+        // abbreviated to make the corresponding database index have less than
+        // 64 characters (which is Postgres maximum). I would prefer not
+        // abbreviating the variable names but specifying custom database
+        // index names instead.
         [ForeignKey(typeof(ComponentAggregate))]
-        public Guid GeneralComponentId { get; set; }
+        public Guid GeneralCompId { get; set; }
 
         [ForeignKey(typeof(ComponentAggregate))]
-        public Guid ConcreteComponentId { get; set; }
+        public Guid ConcreteCompId { get; set; }
 
-        public Guid ParentId { get => GeneralComponentId; }
-        public Guid AssociateId { get => ConcreteComponentId; }
+        public Guid ParentId { get => GeneralCompId; }
+        public Guid AssociateId { get => ConcreteCompId; }
 
 #nullable disable
         public ComponentConcretizationAggregate() { }
@@ -29,8 +34,8 @@ namespace Icon.Aggregates
             ApplyMeta(@event);
             var data = @event.Data;
             Id = data.AggregateId;
-            GeneralComponentId = data.GeneralComponentId;
-            ConcreteComponentId = data.ConcreteComponentId;
+            GeneralCompId = data.GeneralComponentId;
+            ConcreteCompId = data.ConcreteComponentId;
         }
 
         private void Apply(Marten.Events.Event<Events.ComponentConcretizationRemoved> @event)
@@ -43,14 +48,14 @@ namespace Icon.Aggregates
             if (IsVirgin())
                 return Result.Combine(
                     base.Validate(),
-                    ValidateEmpty(GeneralComponentId, nameof(GeneralComponentId)),
-                    ValidateEmpty(ConcreteComponentId, nameof(ConcreteComponentId))
+                    ValidateEmpty(GeneralCompId, nameof(GeneralCompId)),
+                    ValidateEmpty(ConcreteCompId, nameof(ConcreteCompId))
                     );
 
             return Result.Combine(
                   base.Validate(),
-                  ValidateNonEmpty(GeneralComponentId, nameof(GeneralComponentId)),
-                  ValidateNonEmpty(ConcreteComponentId, nameof(ConcreteComponentId))
+                  ValidateNonEmpty(GeneralCompId, nameof(GeneralCompId)),
+                  ValidateNonEmpty(ConcreteCompId, nameof(ConcreteCompId))
                   );
         }
 
@@ -61,8 +66,8 @@ namespace Icon.Aggregates
                 return Result.Failure<Models.ComponentConcretization, Errors>(virginResult.Error);
 
             var idResult = ValueObjects.Id.From(Id);
-            var generalComponentIdResult = ValueObjects.Id.From(GeneralComponentId);
-            var concreteComponentIdResult = ValueObjects.Id.From(ConcreteComponentId);
+            var generalComponentIdResult = ValueObjects.Id.From(GeneralCompId);
+            var concreteComponentIdResult = ValueObjects.Id.From(ConcreteCompId);
             var timestampResult = ValueObjects.Timestamp.From(Timestamp);
 
             return
