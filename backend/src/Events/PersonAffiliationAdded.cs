@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static PersonAffiliationAdded From(
             Guid personAffiliationId,
-            Commands.Add<ValueObjects.AddPersonAffiliationInput> command
+            Commands.AddAssociation<ValueObjects.AddPersonAffiliationInput> command
             )
         {
             return new PersonAffiliationAdded(

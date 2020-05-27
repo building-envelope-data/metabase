@@ -10,7 +10,7 @@ namespace Icon.Events
     {
         public static InstitutionMethodDeveloperAdded From(
             Guid methodDeveloperId,
-            Commands.Add<ValueObjects.AddMethodDeveloperInput> command
+            Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput> command
             )
         {
             return new InstitutionMethodDeveloperAdded(

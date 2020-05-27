@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static PersonAffiliationRemoved From(
             Guid personAffiliationId,
-            Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>> command
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>> command
             )
         {
             return new PersonAffiliationRemoved(

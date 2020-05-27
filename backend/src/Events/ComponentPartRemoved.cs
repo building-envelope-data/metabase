@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static ComponentPartRemoved From(
             Guid componentPartId,
-            Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentPart>> command
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentPart>> command
             )
         {
             return new ComponentPartRemoved(

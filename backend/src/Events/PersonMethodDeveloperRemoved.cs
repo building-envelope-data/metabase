@@ -10,7 +10,7 @@ namespace Icon.Events
     {
         public static PersonMethodDeveloperRemoved From(
             Guid methodDeveloperId,
-            Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<Models.MethodDeveloper>> command
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.MethodDeveloper>> command
             )
         {
             return new PersonMethodDeveloperRemoved(

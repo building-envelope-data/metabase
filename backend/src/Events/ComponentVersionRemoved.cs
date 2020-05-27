@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static ComponentVersionRemoved From(
             Guid componentVersionId,
-            Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVersion>> command
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVersion>> command
             )
         {
             return new ComponentVersionRemoved(

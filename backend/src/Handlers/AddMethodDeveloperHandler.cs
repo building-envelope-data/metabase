@@ -10,29 +10,29 @@ using CSharpFunctionalExtensions;
 namespace Icon.Handlers
 {
     public sealed class AddMethodDeveloperHandler
-      : ICommandHandler<Commands.Add<ValueObjects.AddMethodDeveloperInput>, Result<ValueObjects.TimestampedId, Errors>>
+      : ICommandHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Result<ValueObjects.TimestampedId, Errors>>
     {
         private readonly IAggregateRepository _repository;
-        private readonly CreateModelHandler<Commands.Add<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate> _addInstitutionMethodDeveloperHandler;
-        private readonly CreateModelHandler<Commands.Add<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate> _addPersonMethodDeveloperHandler;
+        private readonly CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate> _addInstitutionMethodDeveloperHandler;
+        private readonly CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate> _addPersonMethodDeveloperHandler;
 
         public AddMethodDeveloperHandler(IAggregateRepository repository)
         {
             _repository = repository;
             _addInstitutionMethodDeveloperHandler =
-              new CreateModelHandler<Commands.Add<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate>(
+              new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate>(
                   repository,
                   Events.InstitutionMethodDeveloperAdded.From
                   );
             _addPersonMethodDeveloperHandler =
-              new CreateModelHandler<Commands.Add<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate>(
+              new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate>(
                   repository,
                   Events.PersonMethodDeveloperAdded.From
                   );
         }
 
         public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            Commands.Add<ValueObjects.AddMethodDeveloperInput> command,
+            Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput> command,
             CancellationToken cancellationToken
             )
         {

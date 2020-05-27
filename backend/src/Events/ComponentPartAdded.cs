@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static ComponentPartAdded From(
             Guid componentPartId,
-            Commands.Add<ValueObjects.AddComponentPartInput> command
+            Commands.AddAssociation<ValueObjects.AddComponentPartInput> command
             )
         {
             return new ComponentPartAdded(

@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static ComponentConcretizationRemoved From(
             Guid componentConcretizationId,
-            Commands.Remove<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentConcretization>> command
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentConcretization>> command
             )
         {
             return new ComponentConcretizationRemoved(

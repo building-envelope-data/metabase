@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static InstitutionRepresentativeAdded From(
             Guid institutionRepresentativeId,
-            Commands.Add<ValueObjects.AddInstitutionRepresentativeInput> command
+            Commands.AddAssociation<ValueObjects.AddInstitutionRepresentativeInput> command
             )
         {
             return new InstitutionRepresentativeAdded(

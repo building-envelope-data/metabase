@@ -13,12 +13,12 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Commands
 {
-    public sealed class Remove<TInput>
+    public sealed class RemoveAssociation<TInput>
       : CommandBase<Result<ValueObjects.TimestampedId, Errors>>
     {
         public TInput Input { get; }
 
-        private Remove(
+        private RemoveAssociation(
             TInput input,
             ValueObjects.Id creatorId
             )
@@ -27,13 +27,13 @@ namespace Icon.Commands
             Input = input;
         }
 
-        public static Result<Remove<TInput>, Errors> From(
+        public static Result<RemoveAssociation<TInput>, Errors> From(
             TInput input,
             ValueObjects.Id creatorId
             )
         {
-            return Result.Ok<Remove<TInput>, Errors>(
-                    new Remove<TInput>(
+            return Result.Ok<RemoveAssociation<TInput>, Errors>(
+                    new RemoveAssociation<TInput>(
                         input: input,
                         creatorId: creatorId
                         )
