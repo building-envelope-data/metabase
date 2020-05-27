@@ -7,36 +7,17 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.GraphQl
 {
     public sealed class AddComponentConcretizationPayload
-      : Payload
+      : AddOrRemoveComponentConcretizationPayload
     {
-        public ValueObjects.Id GeneralComponentId { get; }
-        public ValueObjects.Id ConcreteComponentId { get; }
-
         public AddComponentConcretizationPayload(
             ComponentConcretization componentConcretization
             )
-          : base(componentConcretization.RequestTimestamp)
+          : base(
+              generalComponentId: componentConcretization.GeneralComponentId,
+              concreteComponentId: componentConcretization.ConcreteComponentId,
+              requestTimestamp: componentConcretization.RequestTimestamp
+              )
         {
-            GeneralComponentId = componentConcretization.GeneralComponentId;
-            ConcreteComponentId = componentConcretization.ConcreteComponentId;
-        }
-
-        public Task<Component> GetGeneralComponent(
-            [DataLoader] ComponentDataLoader componentLoader
-            )
-        {
-            return componentLoader.LoadAsync(
-                TimestampHelpers.TimestampId(GeneralComponentId, RequestTimestamp)
-                );
-        }
-
-        public Task<Component> GetConcreteComponent(
-            [DataLoader] ComponentDataLoader componentLoader
-            )
-        {
-            return componentLoader.LoadAsync(
-                TimestampHelpers.TimestampId(ConcreteComponentId, RequestTimestamp)
-                );
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class RepresentativesOfInstitutionAssociationDataLoader
-            : ForwardAssociationsOfModelDataLoader<InstitutionRepresentative, Models.Institution, Models.InstitutionRepresentative>
+            : ForwardManyToManyAssociationsOfModelDataLoader<InstitutionRepresentative, Models.Institution, Models.InstitutionRepresentative>
         {
             public RepresentativesOfInstitutionAssociationDataLoader(IQueryBus queryBus)
               : base(InstitutionRepresentative.FromModel, queryBus)

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Icon.Events
 {
     public sealed class ComponentPartAdded
-      : AddedEvent
+      : AssociationAddedEvent
     {
         public static ComponentPartAdded From(
             Guid componentPartId,
@@ -23,10 +23,10 @@ namespace Icon.Events
         }
 
         [JsonIgnore]
-        public Guid AssembledComponentId { get => ParentId; set => ParentId = value; }
+        public Guid AssembledComponentId { get => ParentId; }
 
         [JsonIgnore]
-        public Guid PartComponentId { get => AssociateId; set => AssociateId = value; }
+        public Guid PartComponentId { get => AssociateId; }
 
 #nullable disable
         public ComponentPartAdded() { }

@@ -11,13 +11,16 @@ using Events = Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class PersonAffiliationAggregate
-      : EventSourcedAggregate, IConvertible<Models.PersonAffiliation>
+      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.PersonAffiliation>
     {
         [ForeignKey(typeof(PersonAggregate))]
         public Guid PersonId { get; set; }
 
         [ForeignKey(typeof(InstitutionAggregate))]
         public Guid InstitutionId { get; set; }
+
+        public Guid ParentId { get => PersonId; }
+        public Guid AssociateId { get => InstitutionId; }
 
 #nullable disable
         public PersonAffiliationAggregate() { }
@@ -30,6 +33,11 @@ namespace Icon.Aggregates
             Id = data.AggregateId;
             PersonId = data.PersonId;
             InstitutionId = data.InstitutionId;
+        }
+
+        private void Apply(Marten.Events.Event<Events.PersonAffiliationRemoved> @event)
+        {
+            ApplyDeleted(@event);
         }
 
         public override Result<bool, Errors> Validate()

@@ -70,7 +70,7 @@ namespace Icon.Handlers
             )
         {
             return
-              (await session.Query<TCreatedEvent>()
+              (await session.QueryEvents<TCreatedEvent>()
               .Select(e => e.AggregateId)
               .ToListAsync(cancellationToken)
               .ConfigureAwait(false)

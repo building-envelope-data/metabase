@@ -44,6 +44,11 @@ namespace Icon.Aggregates
               .ToList();
         }
 
+        private void Apply(Marten.Events.Event<Events.MethodDeleted> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

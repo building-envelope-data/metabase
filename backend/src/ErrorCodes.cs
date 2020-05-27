@@ -8,6 +8,7 @@ namespace Icon
         public const string InvalidState = "INVALID_STATE";
         public const string InvalidValue = "INVALID_VALUE";
         public const string InvalidType = "INVALID_TYPE";
+        public const string AlreadyExistingAssociation = "ALREADY_EXISTING_ASSOCIATION";
         public const string NonExistentModel = "NON_EXISTENT_MODEL";
     }
 }

@@ -7,16 +7,13 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.GraphQl
 {
     public sealed class CreateMethodPayload
-      : Payload
+      : CreateOrDeleteMethodPayload
     {
-        public ValueObjects.Id MethodId { get; }
-
         public CreateMethodPayload(
             ValueObjects.TimestampedId timestampedId
             )
-          : base(timestampedId.Timestamp)
+          : base(timestampedId)
         {
-            MethodId = timestampedId.Id;
         }
 
         public Task<Method> GetMethod(

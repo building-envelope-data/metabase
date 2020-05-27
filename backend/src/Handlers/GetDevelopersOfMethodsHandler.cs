@@ -19,62 +19,51 @@ using Errors = Icon.Errors;
 namespace Icon.Handlers
 {
     public sealed class GetDevelopersOfMethodsHandler
-      : IQueryHandler<Queries.GetAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
+      : IQueryHandler<Queries.GetManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
     {
+        public static async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Do(
+            IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+        {
+            // Note that the two handlers must not be executed simultaneously
+            // because they both use the same session.
+            var institutionsResults = await GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.MethodAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>.Do(
+                session,
+                timestampedIds,
+                cancellationToken
+                )
+              .ConfigureAwait(false);
+            var personsResults = await GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.MethodAggregate, Aggregates.PersonMethodDeveloperAggregate, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>.Do(
+                session,
+                timestampedIds,
+                cancellationToken
+                )
+              .ConfigureAwait(false);
+            return institutionsResults.Zip(personsResults, (institutionsResult, personsResult) =>
+                Errors.Combine(institutionsResult, personsResult).Map(_ =>
+                  institutionsResult.Value.Select(r => r.Map(i => (Models.Stakeholder)i))
+                  .Concat(personsResult.Value.Select(r => r.Map(p => (Models.Stakeholder)p)))
+                  )
+                );
+        }
+
         private readonly IAggregateRepository _repository;
-        private readonly GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded> _getInstitutionDevelopersHandler;
-        private readonly GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded> _getPersonDevelopersHandler;
 
         public GetDevelopersOfMethodsHandler(IAggregateRepository repository)
         {
             _repository = repository;
-            _getInstitutionDevelopersHandler =
-              new GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>(repository);
-            _getPersonDevelopersHandler =
-              new GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>(repository);
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Handle(
-            Queries.GetAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
+            Queries.GetManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
             CancellationToken cancellationToken
             )
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                // There are sadly no n-tuple overloads of `WhenAll` as discussed in
-                // https://github.com/dotnet/runtime/issues/20166
-                // However, there is a NuGet package that does that
-                // https://www.nuget.org/packages/TaskTupleAwaiter/
-                // https://github.com/buvinghausen/TaskTupleAwaiter
-                // Because that package seems to be out-dated, I use good old
-                // `WhenAll` to await the tasks and extract the result
-                // afterwards using `Task#Result` as was mentioned in
-                // https://github.com/dotnet/runtime/issues/20166#issuecomment-428028466
-                var institutionsResultsTask = _getInstitutionDevelopersHandler.Handle(
-                    Queries.GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Institution>
-                      .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
-                    session,
-                    cancellationToken
-                    );
-                var personsResultsTask = _getPersonDevelopersHandler.Handle(
-                    Queries.GetBackwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Person>
-                      .From(query.TimestampedModelIds).Value, // Using `Value` is potentially unsafe but should be safe here!
-                    session,
-                    cancellationToken
-                    );
-                await Task.WhenAll(
-                    (Task)institutionsResultsTask,
-                    (Task)personsResultsTask
-                    )
-                  .ConfigureAwait(false);
-                return institutionsResultsTask.Result.Zip( // Using `Result` here and below is potentially unsafe but should be safe here!
-                    personsResultsTask.Result,
-                    (institutionsResult, personsResult) =>
-                    Errors.Combine(institutionsResult, personsResult).Map(_ =>
-                        institutionsResult.Value.Select(r => r.Map(i => (Models.Stakeholder)i))
-                        .Concat(personsResult.Value.Select(r => r.Map(p => (Models.Stakeholder)p)))
-                        )
-                    );
+                return await Do(session, query.TimestampedIds, cancellationToken);
             }
         }
     }

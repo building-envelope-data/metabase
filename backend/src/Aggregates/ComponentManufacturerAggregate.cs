@@ -9,13 +9,16 @@ using Marten.Schema;
 namespace Icon.Aggregates
 {
     public sealed class ComponentManufacturerAggregate
-      : EventSourcedAggregate, IConvertible<Models.ComponentManufacturer>
+      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentManufacturer>
     {
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; set; }
 
         [ForeignKey(typeof(InstitutionAggregate))]
         public Guid InstitutionId { get; set; }
+
+        public Guid ParentId { get => ComponentId; }
+        public Guid AssociateId { get => InstitutionId; }
 
         public ComponentManufacturerMarketingInformationAggregateData? MarketingInformation { get; set; }
 
@@ -31,6 +34,11 @@ namespace Icon.Aggregates
             ComponentId = data.ComponentId.NotEmpty();
             InstitutionId = data.InstitutionId.NotEmpty();
             MarketingInformation = data.MarketingInformation is null ? null : ComponentManufacturerMarketingInformationAggregateData.From(data.MarketingInformation);
+        }
+
+        private void Apply(Marten.Events.Event<Events.ComponentManufacturerRemoved> @event)
+        {
+            ApplyDeleted(@event);
         }
 
         public override Result<bool, Errors> Validate()

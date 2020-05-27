@@ -21,6 +21,11 @@ namespace Icon.Aggregates
             Id = data.AggregateId;
         }
 
+        private void Apply(Marten.Events.Event<Events.UserDeleted> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

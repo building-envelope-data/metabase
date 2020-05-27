@@ -9,13 +9,16 @@ using Events = Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class ComponentPartAggregate
-      : EventSourcedAggregate, IConvertible<Models.ComponentPart>
+      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentPart>
     {
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid AssembledComponentId { get; set; }
 
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid PartComponentId { get; set; }
+
+        public Guid ParentId { get => AssembledComponentId; }
+        public Guid AssociateId { get => PartComponentId; }
 
 #nullable disable
         public ComponentPartAggregate() { }
@@ -28,6 +31,11 @@ namespace Icon.Aggregates
             Id = data.AggregateId;
             AssembledComponentId = data.AssembledComponentId;
             PartComponentId = data.PartComponentId;
+        }
+
+        private void Apply(Marten.Events.Event<Events.ComponentPartRemoved> @event)
+        {
+            ApplyDeleted(@event);
         }
 
         public override Result<bool, Errors> Validate()

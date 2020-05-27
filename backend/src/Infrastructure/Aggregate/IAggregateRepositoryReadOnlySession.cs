@@ -12,7 +12,9 @@ namespace Icon.Infrastructure.Aggregate
 {
     public interface IAggregateRepositoryReadOnlySession : IDisposable
     {
-        public IMartenQueryable<E> Query<E>() where E : IEvent;
+        public IMartenQueryable<E> QueryEvents<E>() where E : IEvent;
+
+        public IMartenQueryable<T> Query<T>() where T : class, IEventSourcedAggregate, new();
 
         public Task<ValueObjects.Id> GenerateNewId(
             CancellationToken cancellationToken
@@ -23,9 +25,20 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             );
 
+        public Task<bool> Exists<T>(
+            ValueObjects.TimestampedId timestampedId,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<bool>> Exist<T>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
         public Task<Result<int, Errors>> FetchVersion<T>(
-            Guid id,
-            DateTime timestamp,
+            ValueObjects.TimestampedId timestampedId,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
@@ -50,6 +63,18 @@ namespace Icon.Infrastructure.Aggregate
             IEnumerable<ValueObjects.Id> ids,
             CancellationToken cancellationToken
             );
+
+        public Task<Result<ValueObjects.TimestampedId, Errors>> TimestampId<T>(
+            Guid id,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<T, Errors>> Load<T>(
+            Guid id,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+                    where T : class, IEventSourcedAggregate, new();
 
         public Task<Result<T, Errors>> Load<T>(
             Guid id,

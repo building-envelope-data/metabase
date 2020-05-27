@@ -11,17 +11,17 @@ using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
-    public sealed class CreateModelHandler<TCommand, TAggregate>
+    public class CreateModelHandler<TCommand, TAggregate>
       : ICommandHandler<TCommand, Result<ValueObjects.TimestampedId, Errors>>
       where TCommand : ICommand<Result<ValueObjects.TimestampedId, Errors>>
       where TAggregate : class, IEventSourcedAggregate, new()
     {
         private readonly IAggregateRepository _repository;
-        private readonly Func<Guid, TCommand, Events.IEvent> _newCreatedEvent;
+        private readonly Func<Guid, TCommand, Events.ICreatedEvent> _newCreatedEvent;
 
         public CreateModelHandler(
             IAggregateRepository repository,
-            Func<Guid, TCommand, Events.IEvent> newCreatedEvent
+            Func<Guid, TCommand, Events.ICreatedEvent> newCreatedEvent
             )
         {
             _repository = repository;
@@ -39,7 +39,7 @@ namespace Icon.Handlers
             }
         }
 
-        public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
+        public virtual async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
             TCommand command,
             IAggregateRepositorySession session,
             CancellationToken cancellationToken
@@ -47,9 +47,18 @@ namespace Icon.Handlers
         {
             var id = await session.GenerateNewId(cancellationToken).ConfigureAwait(false);
             var @event = _newCreatedEvent(id, command);
-            return
-              await session.New<TAggregate>(
+            return await (
+                await session.Create<TAggregate>(
                   id, @event, cancellationToken
+                  )
+                .ConfigureAwait(false)
+              )
+              .Bind(async _ =>
+                  await (await session.Save(cancellationToken).ConfigureAwait(false))
+                  .Bind(async _ =>
+                      await session.TimestampId<TAggregate>(id, cancellationToken).ConfigureAwait(false)
+                      )
+                  .ConfigureAwait(false)
                   )
               .ConfigureAwait(false);
         }

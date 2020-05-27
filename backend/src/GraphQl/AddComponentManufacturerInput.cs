@@ -8,9 +8,8 @@ using CSharpFunctionalExtensions;
 namespace Icon.GraphQl
 {
     public sealed class AddComponentManufacturerInput
+      : AddOrRemoveComponentManufacturerInput
     {
-        public ValueObjects.Id ComponentId { get; }
-        public ValueObjects.Id InstitutionId { get; }
         public ComponentManufacturerMarketingInformationInput? MarketingInformation { get; }
 
         public AddComponentManufacturerInput(
@@ -18,9 +17,11 @@ namespace Icon.GraphQl
             ValueObjects.Id institutionId,
             ComponentManufacturerMarketingInformationInput? marketingInformation
             )
+          : base(
+              componentId: componentId,
+              institutionId: institutionId
+              )
         {
-            ComponentId = componentId;
-            InstitutionId = institutionId;
             MarketingInformation = marketingInformation;
         }
 

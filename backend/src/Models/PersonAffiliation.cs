@@ -6,10 +6,13 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class PersonAffiliation
-      : Model
+      : Model, IManyToManyAssociation
     {
         public ValueObjects.Id PersonId { get; }
         public ValueObjects.Id InstitutionId { get; }
+
+        public ValueObjects.Id ParentId { get => PersonId; }
+        public ValueObjects.Id AssociateId { get => InstitutionId; }
 
         private PersonAffiliation(
             ValueObjects.Id id,

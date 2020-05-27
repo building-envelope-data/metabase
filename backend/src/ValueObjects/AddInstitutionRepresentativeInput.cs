@@ -1,12 +1,14 @@
 using Errors = Icon.Errors;
+using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 
 namespace Icon.ValueObjects
 {
     public sealed class AddInstitutionRepresentativeInput
+      : AddManyToManyAssociationInput
     {
-        public Id InstitutionId { get; }
-        public Id UserId { get; }
+        public Id InstitutionId { get => ParentId; }
+        public Id UserId { get => AssociateId; }
         public InstitutionRepresentativeRole Role { get; }
 
         private AddInstitutionRepresentativeInput(
@@ -14,9 +16,11 @@ namespace Icon.ValueObjects
             Id userId,
             InstitutionRepresentativeRole role
             )
+          : base(
+              parentId: institutionId,
+              associateId: userId
+              )
         {
-            InstitutionId = institutionId;
-            UserId = userId;
             Role = role;
         }
 
@@ -34,6 +38,15 @@ namespace Icon.ValueObjects
                     role: role
                     )
                   );
+        }
+
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            foreach (var component in base.GetEqualityComponents())
+            {
+                yield return component;
+            }
+            yield return Role;
         }
     }
 }

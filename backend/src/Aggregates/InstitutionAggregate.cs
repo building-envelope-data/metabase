@@ -31,6 +31,11 @@ namespace Icon.Aggregates
             State = data.State.ToModel();
         }
 
+        private void Apply(Marten.Events.Event<Events.InstitutionDeleted> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

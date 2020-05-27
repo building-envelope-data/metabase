@@ -21,14 +21,23 @@ using System.Linq.Expressions;
 namespace Icon.Handlers
 {
     public sealed class GetDatabasesOperatedByInstitutionsHandler
-      : GetOneToManyAssociatesOfModelsHandler<Models.Institution, Models.Database, Aggregates.DatabaseAggregate, Events.DatabaseCreated>
+      : GetOneToManyAssociatesOfModelsHandler<Models.Institution, Models.Database, Aggregates.InstitutionAggregate, Aggregates.DatabaseAggregate, Events.DatabaseCreated>
     {
-        public GetDatabasesOperatedByInstitutionsHandler(IAggregateRepository repository)
-          : base(repository)
+        public static Task<IEnumerable<Result<IEnumerable<Result<Models.Database, Errors>>, Errors>>> Do(
+            IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedModelIds,
+            CancellationToken cancellationToken
+            )
         {
+            return GetOneToManyAssociatesOfModelsHandler<Models.Institution, Models.Database, Aggregates.InstitutionAggregate, Aggregates.DatabaseAggregate, Events.DatabaseCreated>.Do(
+                session,
+                timestampedModelIds,
+                QueryAssociateIds,
+                cancellationToken
+                );
         }
 
-        protected override async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
+        private static async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(
             IAggregateRepositoryReadOnlySession session,
             IEnumerable<ValueObjects.Id> modelIds,
             CancellationToken cancellationToken
@@ -36,13 +45,18 @@ namespace Icon.Handlers
         {
             var modelGuids = modelIds.Select(modelId => (Guid)modelId).ToArray();
             return
-              (await session.Query<Events.DatabaseCreated>()
+              (await session.QueryEvents<Events.DatabaseCreated>()
                 .Where(createdEvent => createdEvent.InstitutionId.IsOneOf(modelGuids))
                 .Select(createdEvent => new { ModelId = createdEvent.InstitutionId, AssociateId = createdEvent.AggregateId })
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false)
                 )
               .Select(a => ((ValueObjects.Id)a.ModelId, (ValueObjects.Id)a.AssociateId));
+        }
+
+        public GetDatabasesOperatedByInstitutionsHandler(IAggregateRepository repository)
+          : base(repository, QueryAssociateIds)
+        {
         }
     }
 }

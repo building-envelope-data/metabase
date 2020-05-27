@@ -6,10 +6,13 @@ using DateTime = System.DateTime;
 namespace Icon.Models
 {
     public sealed class MethodDeveloper
-      : Model
+      : Model, IManyToManyAssociation
     {
         public ValueObjects.Id MethodId { get; }
         public ValueObjects.Id StakeholderId { get; }
+
+        public ValueObjects.Id ParentId { get => MethodId; }
+        public ValueObjects.Id AssociateId { get => StakeholderId; }
 
         private MethodDeveloper(
             ValueObjects.Id id,

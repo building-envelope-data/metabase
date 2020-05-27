@@ -7,17 +7,17 @@ using CSharpFunctionalExtensions;
 namespace Icon.GraphQl
 {
     public sealed class AddComponentVersionInput
+      : AddOrRemoveComponentVersionInput
     {
-        public ValueObjects.Id BaseComponentId { get; }
-        public ValueObjects.Id VersionComponentId { get; }
-
-        private AddComponentVersionInput(
+        public AddComponentVersionInput(
             ValueObjects.Id baseComponentId,
             ValueObjects.Id versionComponentId
             )
+          : base(
+              baseComponentId: baseComponentId,
+              versionComponentId: versionComponentId
+              )
         {
-            BaseComponentId = baseComponentId;
-            VersionComponentId = versionComponentId;
         }
 
         public static Result<ValueObjects.AddComponentVersionInput, Errors> Validate(

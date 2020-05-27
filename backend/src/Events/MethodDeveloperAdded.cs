@@ -7,13 +7,13 @@ using Newtonsoft.Json;
 namespace Icon.Events
 {
     public abstract class MethodDeveloperAdded
-      : AddedEvent
+      : AssociationAddedEvent
     {
         [JsonIgnore]
-        public Guid MethodId { get => ParentId; set => ParentId = value; }
+        public Guid MethodId { get => ParentId; }
 
         [JsonIgnore]
-        public Guid StakeholderId { get => AssociateId; set => AssociateId = value; }
+        public Guid StakeholderId { get => AssociateId; }
 
 #nullable disable
         public MethodDeveloperAdded() { }

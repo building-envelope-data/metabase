@@ -5,18 +5,20 @@ using CSharpFunctionalExtensions;
 namespace Icon.ValueObjects
 {
     public sealed class AddMethodDeveloperInput
-      : ValueObject
+      : AddManyToManyAssociationInput
     {
-        public Id MethodId { get; }
-        public Id StakeholderId { get; }
+        public Id MethodId { get => ParentId; }
+        public Id StakeholderId { get => AssociateId; }
 
         private AddMethodDeveloperInput(
             Id methodId,
             Id stakeholderId
             )
+          : base(
+              parentId: methodId,
+              associateId: stakeholderId
+              )
         {
-            MethodId = methodId;
-            StakeholderId = stakeholderId;
         }
 
         public static Result<AddMethodDeveloperInput, Errors> From(
@@ -31,12 +33,6 @@ namespace Icon.ValueObjects
                     stakeholderId: stakeholderId
                     )
                   );
-        }
-
-        protected override IEnumerable<object?> GetEqualityComponents()
-        {
-            yield return MethodId;
-            yield return StakeholderId;
         }
     }
 }

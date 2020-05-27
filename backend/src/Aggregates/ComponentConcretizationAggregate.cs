@@ -9,13 +9,16 @@ using Events = Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class ComponentConcretizationAggregate
-      : EventSourcedAggregate, IConvertible<Models.ComponentConcretization>
+      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentConcretization>
     {
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid GeneralComponentId { get; set; }
 
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ConcreteComponentId { get; set; }
+
+        public Guid ParentId { get => GeneralComponentId; }
+        public Guid AssociateId { get => ConcreteComponentId; }
 
 #nullable disable
         public ComponentConcretizationAggregate() { }
@@ -28,6 +31,11 @@ namespace Icon.Aggregates
             Id = data.AggregateId;
             GeneralComponentId = data.GeneralComponentId;
             ConcreteComponentId = data.ConcreteComponentId;
+        }
+
+        private void Apply(Marten.Events.Event<Events.ComponentConcretizationRemoved> @event)
+        {
+            ApplyDeleted(@event);
         }
 
         public override Result<bool, Errors> Validate()

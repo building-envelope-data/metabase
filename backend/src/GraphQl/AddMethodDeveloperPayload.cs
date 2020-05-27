@@ -7,36 +7,17 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.GraphQl
 {
     public sealed class AddMethodDeveloperPayload
-      : Payload
+      : AddOrRemoveMethodDeveloperPayload
     {
-        public ValueObjects.Id MethodId { get; }
-        public ValueObjects.Id StakeholderId { get; }
-
         public AddMethodDeveloperPayload(
             MethodDeveloper methodDeveloper
             )
-          : base(methodDeveloper.RequestTimestamp)
+          : base(
+              methodId: methodDeveloper.MethodId,
+              stakeholderId: methodDeveloper.StakeholderId,
+              requestTimestamp: methodDeveloper.RequestTimestamp
+              )
         {
-            MethodId = methodDeveloper.MethodId;
-            StakeholderId = methodDeveloper.StakeholderId;
-        }
-
-        public Task<Method> GetMethod(
-            [DataLoader] MethodDataLoader methodLoader
-            )
-        {
-            return methodLoader.LoadAsync(
-                TimestampHelpers.TimestampId(MethodId, RequestTimestamp)
-                );
-        }
-
-        public Task<Stakeholder> GetStakeholder(
-            [DataLoader] StakeholderDataLoader stakeholderLoader
-            )
-        {
-            return stakeholderLoader.LoadAsync(
-                TimestampHelpers.TimestampId(StakeholderId, RequestTimestamp)
-                );
         }
     }
 }

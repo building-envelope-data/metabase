@@ -6,18 +6,20 @@ using DateTime = System.DateTime;
 namespace Icon.ValueObjects
 {
     public sealed class AddComponentConcretizationInput
-      : ValueObject
+      : AddManyToManyAssociationInput
     {
-        public Id GeneralComponentId { get; }
-        public Id ConcreteComponentId { get; }
+        public Id GeneralComponentId { get => ParentId; }
+        public Id ConcreteComponentId { get => AssociateId; }
 
         private AddComponentConcretizationInput(
             Id generalComponentId,
             Id concreteComponentId
             )
+          : base(
+              parentId: generalComponentId,
+              associateId: concreteComponentId
+              )
         {
-            GeneralComponentId = generalComponentId;
-            ConcreteComponentId = concreteComponentId;
         }
 
         public static Result<AddComponentConcretizationInput, Errors> From(
@@ -32,12 +34,6 @@ namespace Icon.ValueObjects
                     concreteComponentId: concreteComponentId
                     )
                   );
-        }
-
-        protected override IEnumerable<object?> GetEqualityComponents()
-        {
-            yield return GeneralComponentId;
-            yield return ConcreteComponentId;
         }
     }
 }

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Icon.Events
 {
     public sealed class InstitutionRepresentativeAdded
-      : AddedEvent
+      : AssociationAddedEvent
     {
         public static InstitutionRepresentativeAdded From(
             Guid institutionRepresentativeId,
@@ -24,10 +24,10 @@ namespace Icon.Events
         }
 
         [JsonIgnore]
-        public Guid InstitutionId { get => ParentId; set => ParentId = value; }
+        public Guid InstitutionId { get => ParentId; }
 
         [JsonIgnore]
-        public Guid UserId { get => AssociateId; set => AssociateId = value; }
+        public Guid UserId { get => AssociateId; }
 
         public InstitutionRepresentativeRoleEventData Role { get; set; }
 

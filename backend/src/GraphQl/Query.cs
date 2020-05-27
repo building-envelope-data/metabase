@@ -178,5 +178,28 @@ namespace Icon.GraphQl
                 TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
                 );
         }
+
+        public Task<IReadOnlyList<User>> GetUsers(
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] UsersAtTimestampDataLoader usersLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return usersLoader.LoadAsync(
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                );
+        }
+
+        public Task<User> GetUser(
+            ValueObjects.Id id,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] UserDataLoader userLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return userLoader.LoadAsync(
+                TimestampHelpers.TimestampId(id, timestamp ?? TimestampHelpers.Fetch(resolverContext))
+                );
+        }
     }
 }

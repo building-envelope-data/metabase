@@ -26,6 +26,11 @@ namespace Icon.Aggregates
             Information = ComponentInformationAggregateData.From(data.Information);
         }
 
+        private void Apply(Marten.Events.Event<Events.ComponentDeleted> @event)
+        {
+            ApplyDeleted(@event);
+        }
+
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())

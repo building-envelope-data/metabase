@@ -6,18 +6,20 @@ using DateTime = System.DateTime;
 namespace Icon.ValueObjects
 {
     public sealed class AddPersonAffiliationInput
-      : ValueObject
+      : AddManyToManyAssociationInput
     {
-        public Id PersonId { get; }
-        public Id InstitutionId { get; }
+        public Id PersonId { get => ParentId; }
+        public Id InstitutionId { get => AssociateId; }
 
         private AddPersonAffiliationInput(
             Id personId,
             Id institutionId
             )
+          : base(
+              parentId: personId,
+              associateId: institutionId
+              )
         {
-            PersonId = personId;
-            InstitutionId = institutionId;
         }
 
         public static Result<AddPersonAffiliationInput, Errors> From(
@@ -32,12 +34,6 @@ namespace Icon.ValueObjects
                     institutionId: institutionId
                     )
                   );
-        }
-
-        protected override IEnumerable<object?> GetEqualityComponents()
-        {
-            yield return PersonId;
-            yield return InstitutionId;
         }
     }
 }

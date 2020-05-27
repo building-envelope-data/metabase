@@ -62,10 +62,16 @@ namespace Icon.Infrastructure.Aggregate
                   );
         }
 
-        public IMartenQueryable<E> Query<E>() where E : IEvent
+        public IMartenQueryable<E> QueryEvents<E>() where E : IEvent
         {
             AssertNotDisposed();
             return _session.Events.QueryRawEventDataOnly<E>();
+        }
+
+        public IMartenQueryable<T> Query<T>() where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            return _session.Query<T>();
         }
 
         public async Task<ValueObjects.Id> GenerateNewId(
@@ -96,9 +102,44 @@ namespace Icon.Infrastructure.Aggregate
             return streamState != null;
         }
 
+        public async Task<bool> Exists<T>(
+            ValueObjects.TimestampedId timestampedId,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            var streamState =
+              await _session.Events.FetchStreamStateAsync(
+                  timestampedId.Id,
+                  token: cancellationToken
+                  )
+              .ConfigureAwait(false);
+            return DoesStreamStateExist<T>(streamState, timestampedId.Timestamp);
+        }
+
+        public async Task<IEnumerable<bool>> Exist<T>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            var batch = _session.CreateBatchQuery();
+            var streamStateTasks =
+              timestampedIds.Select(timestampedId =>
+                batch.Events.FetchStreamState(timestampedId.Id)
+                )
+              .ToList(); // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
+            await batch.Execute(cancellationToken).ConfigureAwait(false);
+            var streamStates = await Task.WhenAll(streamStateTasks).ConfigureAwait(false);
+            return timestampedIds.Zip(streamStates, (timestampedId, streamState) =>
+                DoesStreamStateExist<T>(streamState, timestampedId.Timestamp)
+                );
+        }
+
         public async Task<Result<int, Errors>> FetchVersion<T>(
-            Guid id,
-            DateTime timestamp,
+            ValueObjects.TimestampedId timestampedId,
             CancellationToken cancellationToken
             ) where T : class, IEventSourcedAggregate, new()
         {
@@ -109,14 +150,16 @@ namespace Icon.Infrastructure.Aggregate
             // Ask on https://github.com/JasperFx/marten/issues for the parameter `timestamp` to be implemented
             var aggregate =
               await _session.Events.AggregateStreamAsync<T>(
-                  id,
-                  timestamp: timestamp.ToUniversalTime(),
+                  timestampedId.Id,
+                  timestamp: ((DateTime)timestampedId.Timestamp).ToUniversalTime(),
                   token: cancellationToken
                   )
               .ConfigureAwait(false);
             if (aggregate is null)
             {
-                return Result.Failure<int, Errors>(BuildNonExistentModelError(id));
+                return Result.Failure<int, Errors>(
+                    BuildNonExistentModelError(timestampedId.Id)
+                    );
             }
             return Result.Ok<int, Errors>(aggregate.Version);
         }
@@ -176,6 +219,23 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
+        public async Task<Result<ValueObjects.TimestampedId, Errors>> TimestampId<T>(
+            Guid id,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            var timestampResult = await FetchTimestamp<T>(id, cancellationToken).ConfigureAwait(false);
+            return ValueObjects.Id.From(id)
+              .Bind(nonEmptyId =>
+                  timestampResult.Bind(timestamp =>
+                    ValueObjects.TimestampedId.From(
+                      id, timestamp
+                      )
+                    )
+                  );
+        }
+
         private async Task<Result<StreamState, Errors>> FetchStreamState(
             Guid id,
             CancellationToken cancellationToken
@@ -202,7 +262,11 @@ namespace Icon.Infrastructure.Aggregate
         {
             AssertNotDisposed();
             var batch = _session.CreateBatchQuery();
-            var streamStateTasks = ids.Select(id => batch.Events.FetchStreamState(id)).ToList(); // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
+            var streamStateTasks =
+              ids.Select(id =>
+                  batch.Events.FetchStreamState(id)
+                  )
+              .ToList(); // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
             await batch.Execute(cancellationToken).ConfigureAwait(false);
             var streamStates = await Task.WhenAll(streamStateTasks).ConfigureAwait(false);
             return ids.Zip(streamStates, (id, streamState) =>
@@ -210,6 +274,28 @@ namespace Icon.Infrastructure.Aggregate
                     ? Result.Failure<StreamState, Errors>(BuildNonExistentModelError(id))
                     : Result.Ok<StreamState, Errors>(streamState)
                   );
+        }
+
+        public async Task<Result<T, Errors>> Load<T>(
+            Guid id,
+            CancellationToken cancellationToken = default(CancellationToken)
+            ) where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            // Loading the materialized aggregate as follows
+            // var aggregate = await _session.LoadAsync<T>(id, cancellationToken);
+            // is not possible because event meta data is not available during
+            // inline projection as said on
+            // https://martendb.io/documentation/events/projections/
+            // in the section on inline projections.
+            // Therefore, version and timestamp of snapshots are not set.
+            var aggregate =
+              await _session.Events.AggregateStreamAsync<T>(
+                  id,
+                  token: cancellationToken
+                  )
+              .ConfigureAwait(false);
+            return BuildResult(id, aggregate);
         }
 
         public async Task<Result<T, Errors>> Load<T>(
@@ -534,6 +620,18 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
+        private bool DoesStreamStateExist<T>(
+            [NotNullWhen(true)] StreamState? streamState,
+            DateTime timestamp
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            return
+              streamState != null &&
+              streamState.AggregateType == typeof(T) &&
+              streamState.Created <= timestamp.ToUniversalTime();
+        }
+
         private bool HasAggregateNeverExisted<T>([NotNullWhen(false)] T? aggregate)
           where T : class, IEventSourcedAggregate, new()
         {
@@ -543,14 +641,17 @@ namespace Icon.Infrastructure.Aggregate
         private bool DoesAggregateExist<T>([NotNullWhen(true)] T? aggregate)
           where T : class, IEventSourcedAggregate, new()
         {
-            return !(aggregate is null) && aggregate.Version >= 1;
+            return
+              !(aggregate is null) &&
+              aggregate.Version >= 1 &&
+              !aggregate.Deleted;
         }
 
         private Result<T, Errors> BuildResult<T>(Guid id, T? aggregate)
           where T : class, IEventSourcedAggregate
         {
             aggregate?.EnsureValid();
-            if (aggregate is null || aggregate.Version == 0)
+            if (aggregate is null || aggregate.Version == 0 || aggregate.Deleted)
             {
                 return Result.Failure<T, Errors>(BuildNonExistentModelError(id));
             }
