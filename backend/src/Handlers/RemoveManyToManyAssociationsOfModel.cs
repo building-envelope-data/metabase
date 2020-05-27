@@ -33,13 +33,13 @@ namespace Icon.Handlers
             where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAddedEvent : Events.IAddedEvent
         {
-          return Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>(
-              session,
-              timestampedId,
-              newRemovedEvent,
-              Handlers.GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>.Do,
-              cancellationToken
-              );
+            return Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>(
+                session,
+                timestampedId,
+                newRemovedEvent,
+                Handlers.GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>.Do,
+                cancellationToken
+                );
         }
 
         public static Task<Result<bool, Errors>> Backward<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>(
@@ -54,13 +54,13 @@ namespace Icon.Handlers
             where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAddedEvent : Events.IAddedEvent
         {
-          return Do<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>(
-              session,
-              timestampedId,
-              newRemovedEvent,
-              Handlers.GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>.Do,
-              cancellationToken
-              );
+            return Do<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>(
+                session,
+                timestampedId,
+                newRemovedEvent,
+                Handlers.GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>.Do,
+                cancellationToken
+                );
         }
 
         private static async Task<Result<bool, Errors>> Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAddedEvent>(
@@ -76,31 +76,31 @@ namespace Icon.Handlers
             where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAddedEvent : Events.IAddedEvent
         {
-          return await (
-              await getManyToManyAssociationsOfModels(
-                session,
-                new ValueObjects.TimestampedId[] { timestampedId },
-                cancellationToken
-                )
-                .ConfigureAwait(false)
-              )
-            .First()
-            .Bind(async associationResults =>
-                await associationResults.Combine<TAssociationModel, Errors>()
-                .Bind(async associations =>
-                  await session.Delete<TAssociationAggregate>(
-                    associations.Select(association => (
-                       (ValueObjects.TimestampedId)(association.Id, association.Timestamp), // TODO Casting to `TimestampedId` could result in a run-time error and must not be done!
-                       (Events.IEvent)newRemovedEvent(association.Id)
-                       )
-                      ),
-                    cancellationToken
-                    )
-                .ConfigureAwait(false)
+            return await (
+                await getManyToManyAssociationsOfModels(
+                  session,
+                  new ValueObjects.TimestampedId[] { timestampedId },
+                  cancellationToken
                   )
-                .ConfigureAwait(false)
+                  .ConfigureAwait(false)
                 )
-                .ConfigureAwait(false);
+              .First()
+              .Bind(async associationResults =>
+                  await associationResults.Combine<TAssociationModel, Errors>()
+                  .Bind(async associations =>
+                    await session.Delete<TAssociationAggregate>(
+                      associations.Select(association => (
+                         (ValueObjects.TimestampedId)(association.Id, association.Timestamp), // TODO Casting to `TimestampedId` could result in a run-time error and must not be done!
+                         (Events.IEvent)newRemovedEvent(association.Id)
+                         )
+                        ),
+                      cancellationToken
+                      )
+                  .ConfigureAwait(false)
+                    )
+                  .ConfigureAwait(false)
+                  )
+                  .ConfigureAwait(false);
         }
     }
 }

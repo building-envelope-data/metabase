@@ -140,17 +140,17 @@ namespace Icon.Infrastructure.Aggregate
             )
           where T : class, IEventSourcedAggregate, new()
         {
-          var deletionResults = new List<Result<bool, Errors>>();
-          foreach (var (timestampedId, @event) in timestampedIdsAndEvents)
-          {
-            deletionResults.Add(
-                await Delete<T>(
-                  timestampedId, @event, cancellationToken
-                  )
-                .ConfigureAwait(false)
-                );
-          }
-          return Result.Combine<bool, Errors>(deletionResults);
+            var deletionResults = new List<Result<bool, Errors>>();
+            foreach (var (timestampedId, @event) in timestampedIdsAndEvents)
+            {
+                deletionResults.Add(
+                    await Delete<T>(
+                      timestampedId, @event, cancellationToken
+                      )
+                    .ConfigureAwait(false)
+                    );
+            }
+            return Result.Combine<bool, Errors>(deletionResults);
         }
 
         public async Task<Result<bool, Errors>> Save(

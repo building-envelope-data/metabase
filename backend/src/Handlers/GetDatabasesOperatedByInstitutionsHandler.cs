@@ -29,12 +29,12 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-          return GetOneToManyAssociatesOfModelsHandler<Models.Institution, Models.Database, Aggregates.InstitutionAggregate, Aggregates.DatabaseAggregate, Events.DatabaseCreated>.Do(
-              session,
-              timestampedModelIds,
-              QueryAssociateIds,
-              cancellationToken
-              );
+            return GetOneToManyAssociatesOfModelsHandler<Models.Institution, Models.Database, Aggregates.InstitutionAggregate, Aggregates.DatabaseAggregate, Events.DatabaseCreated>.Do(
+                session,
+                timestampedModelIds,
+                QueryAssociateIds,
+                cancellationToken
+                );
         }
 
         private static async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associateId)>> QueryAssociateIds(

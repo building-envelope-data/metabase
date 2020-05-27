@@ -31,12 +31,12 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-          return GetManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate>.Do(
-              session,
-              timestampedModelIds,
-              QueryAssociationIds,
-              cancellationToken
-              );
+            return GetManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate>.Do(
+                session,
+                timestampedModelIds,
+                QueryAssociationIds,
+                cancellationToken
+                );
         }
 
         private static async Task<IEnumerable<(ValueObjects.Id modelId, ValueObjects.Id associationId)>> QueryAssociationIds(

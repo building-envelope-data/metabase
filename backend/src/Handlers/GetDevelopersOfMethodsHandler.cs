@@ -27,26 +27,26 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-          // Note that the two handlers must not be executed simultaneously
-          // because they both use the same session.
-          var institutionsResults = await GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.MethodAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>.Do(
-              session,
-              timestampedIds,
-              cancellationToken
-              )
-            .ConfigureAwait(false);
-          var personsResults = await GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.MethodAggregate, Aggregates.PersonMethodDeveloperAggregate, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>.Do(
-              session,
-              timestampedIds,
-              cancellationToken
-              )
-            .ConfigureAwait(false);
-          return institutionsResults.Zip(personsResults, (institutionsResult, personsResult) =>
-              Errors.Combine(institutionsResult, personsResult).Map(_ =>
-                institutionsResult.Value.Select(r => r.Map(i => (Models.Stakeholder)i))
-                .Concat(personsResult.Value.Select(r => r.Map(p => (Models.Stakeholder)p)))
+            // Note that the two handlers must not be executed simultaneously
+            // because they both use the same session.
+            var institutionsResults = await GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.MethodAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>.Do(
+                session,
+                timestampedIds,
+                cancellationToken
                 )
-              );
+              .ConfigureAwait(false);
+            var personsResults = await GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.MethodAggregate, Aggregates.PersonMethodDeveloperAggregate, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>.Do(
+                session,
+                timestampedIds,
+                cancellationToken
+                )
+              .ConfigureAwait(false);
+            return institutionsResults.Zip(personsResults, (institutionsResult, personsResult) =>
+                Errors.Combine(institutionsResult, personsResult).Map(_ =>
+                  institutionsResult.Value.Select(r => r.Map(i => (Models.Stakeholder)i))
+                  .Concat(personsResult.Value.Select(r => r.Map(p => (Models.Stakeholder)p)))
+                  )
+                );
         }
 
         private readonly IAggregateRepository _repository;

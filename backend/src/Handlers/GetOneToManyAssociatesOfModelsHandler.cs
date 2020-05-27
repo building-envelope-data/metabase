@@ -33,12 +33,12 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-          return GetAssociationsOrAssociatesOfModels<TModel, TAssociateModel, TAggregate, TAssociateAggregate>.Do(
-              session,
-              timestampedModelIds,
-              queryAssociateIds,
-              cancellationToken
-              );
+            return GetAssociationsOrAssociatesOfModels<TModel, TAssociateModel, TAggregate, TAssociateAggregate>.Do(
+                session,
+                timestampedModelIds,
+                queryAssociateIds,
+                cancellationToken
+                );
         }
 
         private readonly IAggregateRepository _repository;

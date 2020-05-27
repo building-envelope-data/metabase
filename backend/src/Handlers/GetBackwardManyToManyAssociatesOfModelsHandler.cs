@@ -33,13 +33,13 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-          return GetManyToManyAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate>.Do(
-              session,
-              timestampedIds,
-              association => association.ParentId,
-              GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>.Do,
-              cancellationToken
-              );
+            return GetManyToManyAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate>.Do(
+                session,
+                timestampedIds,
+                association => association.ParentId,
+                GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAddedEvent>.Do,
+                cancellationToken
+                );
         }
 
         public GetBackwardManyToManyAssociatesOfModelsHandler(IAggregateRepository repository)

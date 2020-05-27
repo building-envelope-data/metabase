@@ -53,44 +53,44 @@ namespace Icon.Handlers
               (await session.Load<TAggregate>(command.TimestampedId, cancellationToken))
               .Bind(async _ =>
                   {
-                  // We cannot aggregate the removal tasks and execute them in
-                  // parallel with `Task.WhenAll` because all removal tasks use the
-                  // same session.
-                  var associationRemovalResults = new List<Result<bool, Errors>>();
-                  foreach (var removeAssociation in _removeAssociations)
-                  {
-                  associationRemovalResults.Add(
-                      await removeAssociation(
-                        session,
-                        command.TimestampedId,
-                        command.CreatorId,
-                        cancellationToken
-                        )
-                      .ConfigureAwait(false)
-                      );
-                  }
-                  return
-                  await Result.Combine(associationRemovalResults)
-                  .Bind(async _ =>
+                      // We cannot aggregate the removal tasks and execute them in
+                      // parallel with `Task.WhenAll` because all removal tasks use the
+                      // same session.
+                      var associationRemovalResults = new List<Result<bool, Errors>>();
+                      foreach (var removeAssociation in _removeAssociations)
                       {
-                      var @event = _newDeletedEvent(command);
-                      return await (
-                          await session.Delete<TAggregate>(
-                            command.TimestampedId, @event, cancellationToken
-                            )
-                          .ConfigureAwait(false)
-                          )
-                      .Bind(async _ => await
-                          (await session.Save(cancellationToken).ConfigureAwait(false))
+                          associationRemovalResults.Add(
+                              await removeAssociation(
+                                session,
+                                command.TimestampedId,
+                                command.CreatorId,
+                                cancellationToken
+                                )
+                              .ConfigureAwait(false)
+                              );
+                      }
+                      return
+                      await Result.Combine(associationRemovalResults)
+                      .Bind(async _ =>
+                          {
+                              var @event = _newDeletedEvent(command);
+                              return await (
+                              await session.Delete<TAggregate>(
+                                command.TimestampedId, @event, cancellationToken
+                                )
+                              .ConfigureAwait(false)
+                              )
                           .Bind(async _ => await
-                            session.TimestampId<TAggregate>(command.TimestampedId.Id, cancellationToken).ConfigureAwait(false)
-                            )
-                          .ConfigureAwait(false)
+                              (await session.Save(cancellationToken).ConfigureAwait(false))
+                              .Bind(async _ => await
+                                session.TimestampId<TAggregate>(command.TimestampedId.Id, cancellationToken).ConfigureAwait(false)
+                                )
+                              .ConfigureAwait(false)
+                              )
+                          .ConfigureAwait(false);
+                          }
                           )
                       .ConfigureAwait(false);
-                      }
-                      )
-                  .ConfigureAwait(false);
                   }
             )
               .ConfigureAwait(false);

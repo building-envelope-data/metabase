@@ -31,12 +31,12 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-          return GetAssociationsOrAssociatesOfModels<TModel, TAssociationModel, TAggregate, TAssociationAggregate>.Do(
-              session,
-              timestampedModelIds,
-              queryAssociationIds,
-              cancellationToken
-              );
+            return GetAssociationsOrAssociatesOfModels<TModel, TAssociationModel, TAggregate, TAssociationAggregate>.Do(
+                session,
+                timestampedModelIds,
+                queryAssociationIds,
+                cancellationToken
+                );
         }
 
         private readonly IAggregateRepository _repository;
