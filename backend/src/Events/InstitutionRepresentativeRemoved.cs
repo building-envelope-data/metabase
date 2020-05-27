@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Icon.Events
 {
     public sealed class InstitutionRepresentativeRemoved
-      : RemovedEvent
+      : AssociationRemovedEvent
     {
         public static InstitutionRepresentativeRemoved From(
             Guid institutionRepresentativeId,

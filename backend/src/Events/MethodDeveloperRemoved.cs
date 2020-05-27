@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Icon.Events
 {
     public abstract class MethodDeveloperRemoved
-      : RemovedEvent
+      : AssociationRemovedEvent
     {
 #nullable disable
         public MethodDeveloperRemoved() { }

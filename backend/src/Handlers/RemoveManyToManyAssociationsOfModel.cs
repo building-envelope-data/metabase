@@ -24,7 +24,7 @@ namespace Icon.Handlers
         public static Task<Result<bool, Errors>> Forward<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
             IAggregateRepositorySession session,
             ValueObjects.TimestampedId timestampedId,
-            Func<ValueObjects.Id, Events.IRemovedEvent> newRemovedEvent,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
             where TModel : Models.IModel
@@ -36,7 +36,7 @@ namespace Icon.Handlers
             return Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
                 session,
                 timestampedId,
-                newRemovedEvent,
+                newAssociationRemovedEvent,
                 Handlers.GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>.Do,
                 cancellationToken
                 );
@@ -45,7 +45,7 @@ namespace Icon.Handlers
         public static Task<Result<bool, Errors>> Backward<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
             IAggregateRepositorySession session,
             ValueObjects.TimestampedId timestampedId,
-            Func<ValueObjects.Id, Events.IRemovedEvent> newRemovedEvent,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
             where TAssociateModel : Models.IModel
@@ -57,7 +57,7 @@ namespace Icon.Handlers
             return Do<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
                 session,
                 timestampedId,
-                newRemovedEvent,
+                newAssociationRemovedEvent,
                 Handlers.GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>.Do,
                 cancellationToken
                 );
@@ -66,7 +66,7 @@ namespace Icon.Handlers
         private static async Task<Result<bool, Errors>> Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
             IAggregateRepositorySession session,
             ValueObjects.TimestampedId timestampedId,
-            Func<ValueObjects.Id, Events.IRemovedEvent> newRemovedEvent,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             Func<IAggregateRepositoryReadOnlySession, IEnumerable<ValueObjects.TimestampedId>, CancellationToken, Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>> getManyToManyAssociationsOfModels,
             CancellationToken cancellationToken
             )
@@ -91,7 +91,7 @@ namespace Icon.Handlers
                     await session.Delete<TAssociationAggregate>(
                       associations.Select(association => (
                          (ValueObjects.TimestampedId)(association.Id, association.Timestamp), // TODO Casting to `TimestampedId` could result in a run-time error and must not be done!
-                         (Events.IEvent)newRemovedEvent(association.Id)
+                         (Events.IEvent)newAssociationRemovedEvent(association.Id)
                          )
                         ),
                       cancellationToken

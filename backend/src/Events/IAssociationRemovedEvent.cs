@@ -2,7 +2,7 @@ using Guid = System.Guid;
 
 namespace Icon.Events
 {
-    public interface IRemovedEvent
+    public interface IAssociationRemovedEvent
       : IDeletedEvent
     {
     }
