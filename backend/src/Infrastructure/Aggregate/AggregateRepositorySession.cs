@@ -159,7 +159,28 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             )
         {
-            await _session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            try
+            {
+              await _session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (Marten.Services.EventStreamUnexpectedMaxEventIdException exception)
+            {
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"The aggregate with identifier {exception.Id} of type {exception.AggregateType} was changed after the given timestamp causing the exception {exception}",
+                      code: ErrorCodes.OutOfDate
+                      )
+                );
+            }
+            catch (Marten.Events.ExistingStreamIdCollisionException exception)
+            {
+                return Result.Failure<bool, Errors>(
+                    Errors.One(
+                      message: $"The identifier {exception.Id} is already in use and can not be used for the new aggregate of type {exception.AggregateType} causing the exception {exception}",
+                      code: ErrorCodes.IdCollision
+                      )
+                );
+            }
             await _eventBus.Publish(_unsavedEvents).ConfigureAwait(false);
             _unsavedEvents = Enumerable.Empty<IEvent>();
             return
