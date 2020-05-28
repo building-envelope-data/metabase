@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System; // Func
 using DateTime = System.DateTime;
 using CancellationToken = System.Threading.CancellationToken;
@@ -27,7 +28,8 @@ namespace Icon.Handlers
             )
           : base(
               repository,
-              newAssociationAddedEvent
+              newAssociationAddedEvent,
+              Enumerable.Empty<Func<IAggregateRepositorySession, Commands.AddAssociation<TInput>, CancellationToken, Task<Result<bool, Errors>>>>()
               )
         {
         }

@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using System.Linq; // Enumerable.Empty
+using System; // Func
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure.Command;
 using Icon.Infrastructure.Aggregate;
@@ -22,12 +24,14 @@ namespace Icon.Handlers
             _addInstitutionMethodDeveloperHandler =
               new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate>(
                   repository,
-                  Events.InstitutionMethodDeveloperAdded.From
+                  Events.InstitutionMethodDeveloperAdded.From,
+                  Enumerable.Empty<Func<IAggregateRepositorySession, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<bool, Errors>>>>()
                   );
             _addPersonMethodDeveloperHandler =
               new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate>(
                   repository,
-                  Events.PersonMethodDeveloperAdded.From
+                  Events.PersonMethodDeveloperAdded.From,
+                  Enumerable.Empty<Func<IAggregateRepositorySession, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<bool, Errors>>>>()
                   );
         }
 

@@ -101,6 +101,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Component, Aggregates.ComponentAggregate, ValueObjects.CreateComponentInput, Events.ComponentCreated>(
                     services,
                     Events.ComponentCreated.From,
+                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateComponentInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
                     Events.ComponentDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -176,6 +177,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Database, Aggregates.DatabaseAggregate, ValueObjects.CreateDatabaseInput, Events.DatabaseCreated>(
                     services,
                     Events.DatabaseCreated.From,
+                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateDatabaseInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
                     Events.DatabaseDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[] {
                     // TODO Remove operating institution
@@ -188,6 +190,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Institution, Aggregates.InstitutionAggregate, ValueObjects.CreateInstitutionInput, Events.InstitutionCreated>(
                     services,
                     Events.InstitutionCreated.From,
+                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateInstitutionInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
                     Events.InstitutionDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -234,6 +237,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Method, Aggregates.MethodAggregate, ValueObjects.CreateMethodInput, Events.MethodCreated>(
                     services,
                     Events.MethodCreated.From,
+                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateMethodInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
                     Events.MethodDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -260,6 +264,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Person, Aggregates.PersonAggregate, ValueObjects.CreatePersonInput, Events.PersonCreated>(
                     services,
                     Events.PersonCreated.From,
+                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreatePersonInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
                     Events.PersonDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -298,6 +303,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Standard, Aggregates.StandardAggregate, ValueObjects.CreateStandardInput, Events.StandardCreated>(
                     services,
                     Events.StandardCreated.From,
+                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateStandardInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
                     Events.StandardDeleted.From,
                     Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
@@ -306,6 +312,7 @@ namespace Icon.Configuration
         private static void AddModelHandlers<TModel, TAggregate, TCreateInput, TCreatedEvent>(
                 IServiceCollection services,
                 Func<Guid, Commands.Create<TCreateInput>, Events.ICreatedEvent> newCreatedEvent,
+                IEnumerable<Func<IAggregateRepositorySession, Commands.Create<TCreateInput>, CancellationToken, Task<Result<bool, Errors>>>> addAssociations,
                 Func<Commands.Delete<TModel>, Events.IDeletedEvent> newDeletedEvent,
                 IEnumerable<Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
                     )
@@ -314,7 +321,7 @@ namespace Icon.Configuration
                 where TCreatedEvent : Events.ICreatedEvent
         {
             AddCreateHandler<TCreateInput, TAggregate>(
-                    services, newCreatedEvent
+                    services, newCreatedEvent, addAssociations
                     );
             AddDeleteHandler<TModel, TAggregate>(
                 services, newDeletedEvent, removeAssociations
@@ -325,7 +332,8 @@ namespace Icon.Configuration
 
         private static void AddCreateHandler<TInput, TAggregate>(
                 IServiceCollection services,
-                Func<Guid, Commands.Create<TInput>, Events.ICreatedEvent> newEvent
+                Func<Guid, Commands.Create<TInput>, Events.ICreatedEvent> newEvent,
+                IEnumerable<Func<IAggregateRepositorySession, Commands.Create<TInput>, CancellationToken, Task<Result<bool, Errors>>>> addAssociations
         )
           where TAggregate : class, IEventSourcedAggregate, new()
         {
@@ -337,7 +345,8 @@ namespace Icon.Configuration
               Handlers.CreateModelHandler<Commands.Create<TInput>, TAggregate>>(serviceProvider =>
                   new Handlers.CreateModelHandler<Commands.Create<TInput>, TAggregate>(
                     serviceProvider.GetRequiredService<IAggregateRepository>(),
-                    newEvent
+                    newEvent,
+                    addAssociations
                     )
                   );
         }
