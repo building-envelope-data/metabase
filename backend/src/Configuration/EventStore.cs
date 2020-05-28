@@ -71,6 +71,10 @@ namespace Icon.Configuration
                         _.AutoCreateSchemaObjects = Marten.AutoCreate.CreateOrUpdate;
                     }
                     _.Events.UseAggregatorLookup(Marten.Services.Events.AggregationLookupStrategy.UsePrivateApply);
+                    _.UseDefaultSerialization( // https://martendb.io/documentation/documents/json/newtonsoft/
+                        enumStorage: Marten.EnumStorage.AsString,
+                        collectionStorage: Marten.CollectionStorage.AsArray
+                        );
 
                     _.Logger(martenLogger);
                     _.Listeners.Add(martenLogger);
