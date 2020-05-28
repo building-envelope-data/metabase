@@ -59,5 +59,10 @@ namespace Icon.ValueObjects
         {
             return timestamp.Value;
         }
+
+        public override string ToString()
+        {
+            return $"{GetType()}({Value})";
+        }
     }
 }
