@@ -91,7 +91,9 @@ namespace Icon.Infrastructure.Aggregate
               .Bind(async version => await
                   RegisterEvents(
                     events,
-                    eventArray => _session.Events.Append(timestampedId.Id, version + 1, eventArray),
+                    eventArray => _session.Events.Append(
+                    timestampedId.Id, version + eventArray.Length, eventArray
+                    ),
                     cancellationToken
                     )
                   .ConfigureAwait(false)
