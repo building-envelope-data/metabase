@@ -17,34 +17,34 @@ namespace Icon.Events
     {
         public static ComponentCategoryEventData FromModel(this ValueObjects.ComponentCategory category)
         {
-            switch (category)
+            return category switch
             {
-                case ValueObjects.ComponentCategory.MATERIAL:
-                    return ComponentCategoryEventData.MATERIAL;
-                case ValueObjects.ComponentCategory.LAYER:
-                    return ComponentCategoryEventData.LAYER;
-                case ValueObjects.ComponentCategory.UNIT:
-                    return ComponentCategoryEventData.UNIT;
-            }
-            // God-damned C# does not have switch expression exhaustiveness for
-            // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
-            throw new Exception($"The category {category} fell through");
+                ValueObjects.ComponentCategory.MATERIAL
+                    => ComponentCategoryEventData.MATERIAL,
+                ValueObjects.ComponentCategory.LAYER
+                    => ComponentCategoryEventData.LAYER,
+                ValueObjects.ComponentCategory.UNIT
+                    => ComponentCategoryEventData.UNIT,
+                // God-damned C# does not have switch expression exhaustiveness for
+                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                _ => throw new Exception($"The category {category} fell through")
+            };
         }
 
         public static ValueObjects.ComponentCategory ToModel(this ComponentCategoryEventData category)
         {
-            switch (category)
+            return category switch
             {
-                case ComponentCategoryEventData.MATERIAL:
-                    return ValueObjects.ComponentCategory.MATERIAL;
-                case ComponentCategoryEventData.LAYER:
-                    return ValueObjects.ComponentCategory.LAYER;
-                case ComponentCategoryEventData.UNIT:
-                    return ValueObjects.ComponentCategory.UNIT;
-            }
-            // God-damned C# does not have switch expression exhaustiveness for
-            // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
-            throw new Exception($"The category {category} fell through");
+                ComponentCategoryEventData.MATERIAL
+                    => ValueObjects.ComponentCategory.MATERIAL,
+                ComponentCategoryEventData.LAYER
+                    => ValueObjects.ComponentCategory.LAYER,
+                ComponentCategoryEventData.UNIT
+                    => ValueObjects.ComponentCategory.UNIT,
+                // God-damned C# does not have switch expression exhaustiveness for
+                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                _ => throw new Exception($"The category {category} fell through")
+            };
         }
     }
 }
