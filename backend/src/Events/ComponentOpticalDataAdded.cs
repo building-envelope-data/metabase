@@ -1,0 +1,51 @@
+using Errors = Icon.Errors;
+using CSharpFunctionalExtensions;
+using Guid = System.Guid;
+using Commands = Icon.Commands;
+using Newtonsoft.Json;
+
+namespace Icon.Events
+{
+    public sealed class ComponentOpticalDataAdded
+      : AssociationAddedEvent
+    {
+        public static ComponentOpticalDataAdded From(
+            Guid componentOpticalDataId,
+            Commands.AddAssociation<ValueObjects.AddComponentOpticalDataInput> command
+            )
+        {
+            return new ComponentOpticalDataAdded(
+                componentOpticalDataId: componentOpticalDataId,
+                componentId: command.Input.ComponentId,
+                opticalDataId: command.Input.OpticalDataId,
+                creatorId: command.CreatorId
+                );
+        }
+
+        [JsonIgnore]
+        public Guid ComponentId { get => ParentId; }
+
+        [JsonIgnore]
+        public Guid OpticalDataId { get => AssociateId; }
+
+#nullable disable
+        public ComponentOpticalDataAdded() { }
+#nullable enable
+
+        public ComponentOpticalDataAdded(
+            Guid componentOpticalDataId,
+            Guid componentId,
+            Guid opticalDataId,
+            Guid creatorId
+            )
+          : base(
+              aggregateId: componentOpticalDataId,
+              parentId: componentId,
+              associateId: opticalDataId,
+              creatorId: creatorId
+              )
+        {
+            EnsureValid();
+        }
+    }
+}

@@ -65,6 +65,7 @@ namespace Icon.Configuration
             AddDatabaseHandlers(services);
             AddInstitutionHandlers(services);
             AddMethodHandlers(services);
+            AddOpticalDataHandlers(services);
             AddPersonHandlers(services);
             AddStakeholderHandlers(services);
             AddStandardHandlers(services);
@@ -110,6 +111,13 @@ namespace Icon.Configuration
                         session,
                         timestampedId,
                         componentManufacturerId => new Events.ComponentManufacturerRemoved(componentManufacturerId, creatorId),
+                        cancellationToken
+                        ),
+                    (session, timestampedId, creatorId, cancellationToken) =>
+                    Handlers.RemoveManyToManyAssociationsOfModel.Forward<Models.Component, Models.ComponentOpticalData, Aggregates.ComponentAggregate, Aggregates.ComponentOpticalDataAggregate, Events.ComponentOpticalDataAdded>(
+                        session,
+                        timestampedId,
+                        componentOpticalDataId => new Events.ComponentOpticalDataRemoved(componentOpticalDataId, creatorId),
                         cancellationToken
                         ),
                     (session, timestampedId, creatorId, cancellationToken) =>
@@ -255,6 +263,26 @@ namespace Icon.Configuration
                           institutionMethodDeveloperId => new Events.InstitutionMethodDeveloperRemoved(institutionMethodDeveloperId, creatorId),
                           cancellationToken
                           )
+                    }
+                    );
+        }
+
+        private static void AddOpticalDataHandlers(IServiceCollection services)
+        {
+            AddModelHandlers<Models.OpticalData, Aggregates.OpticalDataAggregate, ValueObjects.CreateOpticalDataInput, Events.OpticalDataCreated>(
+                    services,
+                    Events.OpticalDataCreated.From,
+                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateOpticalDataInput>, CancellationToken, Task<Result<bool, Errors>>>>(), // TODO Add association!
+                    Events.OpticalDataDeleted.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    {
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      Handlers.RemoveManyToManyAssociationsOfModel.Backward<Models.OpticalData, Models.ComponentOpticalData, Aggregates.OpticalDataAggregate, Aggregates.ComponentOpticalDataAggregate, Events.ComponentOpticalDataAdded>(
+                          session,
+                          timestampedId,
+                          componentOpticalDataId => new Events.ComponentOpticalDataRemoved(componentOpticalDataId, creatorId),
+                          cancellationToken
+                          ),
                     }
                     );
         }

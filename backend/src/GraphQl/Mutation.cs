@@ -226,6 +226,28 @@ namespace Icon.GraphQl
             );
         }
 
+        public Task<CreateOpticalDataPayload> CreateOpticalData(
+            CreateOpticalDataInput input
+            )
+        {
+            return Create<CreateOpticalDataInput, ValueObjects.CreateOpticalDataInput, CreateOpticalDataPayload>(
+                input,
+                CreateOpticalDataInput.Validate,
+                timestampedId => new CreateOpticalDataPayload(timestampedId)
+            );
+        }
+
+        public Task<DeleteOpticalDataPayload> DeleteOpticalData(
+            DeleteOpticalDataInput input
+            )
+        {
+            return Delete<Models.OpticalData, DeleteOpticalDataPayload>(
+                input.Id,
+                input.Timestamp,
+                timestampedId => new DeleteOpticalDataPayload(timestampedId)
+            );
+        }
+
         public Task<CreatePersonPayload> CreatePerson(
             CreatePersonInput input
             )

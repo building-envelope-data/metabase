@@ -7,6 +7,7 @@ using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
 using IResolverContext = HotChocolate.Resolvers.IResolverContext;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using HotChocolate.Language;
 
 namespace Icon.GraphQl
 {
@@ -41,6 +42,20 @@ namespace Icon.GraphQl
               )
         {
             Information = information;
+        }
+
+        public IReadOnlyList<object> GetOpticalData(
+            [Parent] Component component
+            )
+        {
+            return new string[] { "123", "455" };
+        }
+
+        public IReadOnlyList<Database> GetWhoHasOpticalData(
+            [Parent] Component component
+            )
+        {
+            return new Database[] { };
         }
 
         public ComponentManufacturerConnection GetManufacturers(

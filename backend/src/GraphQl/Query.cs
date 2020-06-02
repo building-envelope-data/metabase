@@ -39,6 +39,27 @@ namespace Icon.GraphQl
                 );
         }
 
+        public IReadOnlyList<object> GetOpticalData(
+            ValueObjects.Id componentId
+            )
+        {
+            return new string[] { "123", "455" };
+        }
+
+        public IReadOnlyList<Database> GetWhoHasOpticalData(
+            ValueObjects.Id componentId
+            )
+        {
+            return new Database[] { };
+        }
+
+        public IReadOnlyList<ValueObjects.Id> GetSearchComponents(
+            SearchComponentsInput input
+            )
+        {
+            return new ValueObjects.Id[] { };
+        }
+
         public Task<IReadOnlyList<Component>> GetComponents(
             ValueObjects.Timestamp? timestamp,
             [DataLoader] ComponentsAtTimestampDataLoader componentsLoader,

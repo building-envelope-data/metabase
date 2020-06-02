@@ -53,12 +53,26 @@ namespace Icon
             )
         {
             return One(
-                ErrorBuilder.New()
-                .SetMessage(message)
-                .SetCode(code)
-                .SetPath(path)
-                .Build()
+                OneX(
+                  message: message,
+                  code: code,
+                  path: path
+                  )
                 );
+        }
+
+        public static IError OneX(
+            string message,
+            string code,
+            IReadOnlyList<object>? path = null
+            )
+        {
+          return
+            ErrorBuilder.New()
+            .SetMessage(message)
+            .SetCode(code)
+            .SetPath(path)
+            .Build();
         }
 
         public static Errors ConcatX(IEnumerable<Errors> collections)

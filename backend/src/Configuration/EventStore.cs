@@ -99,6 +99,7 @@ namespace Icon.Configuration
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.InstitutionMethodDeveloperAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.InstitutionRepresentativeAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.MethodAggregate>();
+            options.Events.InlineProjections.AggregateStreamsWith<Aggregates.OpticalDataAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.PersonAffiliationAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.PersonAggregate>();
             options.Events.InlineProjections.AggregateStreamsWith<Aggregates.PersonMethodDeveloperAggregate>();
@@ -132,6 +133,8 @@ namespace Icon.Configuration
             options.Events.AddEventType(typeof(Events.InstitutionRepresentativeRemoved));
             options.Events.AddEventType(typeof(Events.MethodCreated));
             options.Events.AddEventType(typeof(Events.MethodDeleted));
+            options.Events.AddEventType(typeof(Events.OpticalDataCreated));
+            options.Events.AddEventType(typeof(Events.OpticalDataDeleted));
             options.Events.AddEventType(typeof(Events.PersonAffiliationAdded));
             options.Events.AddEventType(typeof(Events.PersonAffiliationRemoved));
             options.Events.AddEventType(typeof(Events.PersonCreated));

@@ -45,12 +45,15 @@ namespace Icon.Configuration
                   .BindClrType<DateTime, GraphQlX.PreciseDateTimeType>()
                   .BindClrType<DateTimeOffset, GraphQlX.PreciseDateTimeType>()
 
-                  .AddQueryType<GraphQlX.Query>()
+                  .AddQueryType<GraphQlX.QueryType>()
                   .AddMutationType<GraphQlX.Mutation>()
                   // .AddSubscriptionType<SubscriptionType>()
 
                   .AddType<GraphQlX.Node>()
                   .AddType<GraphQlX.StakeholderBase>()
+                  .AddType<HotChocolate.Types.Relay.PageInfoType>()
+                  .AddType<GraphQlX.ComponentType>()
+                  .AddType<GraphQlX.CreateOpticalDataInputType>()
 
                   .Create(),
                   new QueryExecutionOptions

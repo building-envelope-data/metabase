@@ -12,5 +12,7 @@ namespace Icon
         public const string NonExistentModel = "NON_EXISTENT_MODEL";
         public const string OutOfDate = "OUT_OF_DATE";
         public const string IdCollision = "ID_COLLISION";
+        public const string FileNotFound = "FILE_NOT_FOUND";
+        public const string InvalidSyntax = "INVALID_SYNTAX";
     }
 }
