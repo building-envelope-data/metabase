@@ -1,9 +1,9 @@
-using Uri = System.Uri;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
-using Guid = System.Guid;
 using DateTime = System.DateTime;
+using Errors = Icon.Errors;
+using Guid = System.Guid;
 using Models = Icon.Models;
+using Uri = System.Uri;
 
 namespace Icon.Events
 {

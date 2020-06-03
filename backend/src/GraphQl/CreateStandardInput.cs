@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Uri = System.Uri;
-using DateTime = System.DateTime;
 using CSharpFunctionalExtensions;
+using DateTime = System.DateTime;
+using Uri = System.Uri;
 
 namespace Icon.GraphQl
 {

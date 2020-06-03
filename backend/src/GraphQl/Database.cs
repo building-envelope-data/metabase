@@ -1,9 +1,9 @@
-using Uri = System.Uri;
-using Models = Icon.Models;
-using DateTime = System.DateTime;
 using System.Threading.Tasks;
-using HotChocolate;
 using GreenDonut;
+using HotChocolate;
+using DateTime = System.DateTime;
+using Models = Icon.Models;
+using Uri = System.Uri;
 
 namespace Icon.GraphQl
 {

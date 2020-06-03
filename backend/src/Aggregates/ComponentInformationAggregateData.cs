@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Guid = System.Guid;
-using DateTime = System.DateTime;
-using Models = Icon.Models;
 using System.Linq;
+using CSharpFunctionalExtensions;
+using DateTime = System.DateTime;
 using Events = Icon.Events;
+using Guid = System.Guid;
+using Models = Icon.Models;
 using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Aggregates

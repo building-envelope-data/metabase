@@ -1,20 +1,20 @@
 // Inspired by https://chillicream.com/blog/2019/04/11/integration-tests
 // TODO When mature, use the client https://github.com/ChilliCream/hotchocolate/issues/1011
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ValueObjects = Icon.ValueObjects;
-using System.Net.Http;
-using HttpResponse = Microsoft.AspNetCore.Http.HttpResponse;
 using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System;
-using Xunit;
-using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
-using IdentityModel.Client;
 using FluentAssertions;
+using IdentityModel.Client;
+using Xunit;
+using HttpResponse = Microsoft.AspNetCore.Http.HttpResponse;
 using Models = Icon.Models;
+using ValueObjects = Icon.ValueObjects;
+using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 
 namespace Test.Integration.Web.Api.GraphQl.Query
 {

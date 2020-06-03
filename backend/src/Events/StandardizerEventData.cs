@@ -1,8 +1,8 @@
-using Exception = System.Exception;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
-using Guid = System.Guid;
 using DateTime = System.DateTime;
+using Errors = Icon.Errors;
+using Exception = System.Exception;
+using Guid = System.Guid;
 
 namespace Icon.Events
 {

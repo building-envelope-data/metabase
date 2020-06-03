@@ -1,19 +1,19 @@
 using System;
-using System.IO;
-using Array = System.Array;
 using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using ErrorBuilder = HotChocolate.ErrorBuilder;
-using IError = HotChocolate.IError;
-using ErrorCodes = Icon.ErrorCodes;
-using System.Linq;
-using System.Collections.ObjectModel; // ReadOnlyDictionary
-using JsonValue = Manatee.Json.JsonValue;
-using JsonObject = Manatee.Json.JsonObject;
-using JsonArray = Manatee.Json.JsonArray;
-using JsonValueType = Manatee.Json.JsonValueType;
-using JsonSyntaxException = Manatee.Json.JsonSyntaxException;
 using System.Collections.Immutable;
+using System.Collections.ObjectModel; // ReadOnlyDictionary
+using System.IO;
+using System.Linq;
+using CSharpFunctionalExtensions;
+using Array = System.Array;
+using ErrorBuilder = HotChocolate.ErrorBuilder;
+using ErrorCodes = Icon.ErrorCodes;
+using IError = HotChocolate.IError;
+using JsonArray = Manatee.Json.JsonArray;
+using JsonObject = Manatee.Json.JsonObject;
+using JsonSyntaxException = Manatee.Json.JsonSyntaxException;
+using JsonValue = Manatee.Json.JsonValue;
+using JsonValueType = Manatee.Json.JsonValueType;
 
 namespace Icon.ValueObjects
 {

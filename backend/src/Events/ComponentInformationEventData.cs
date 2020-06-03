@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using Guid = System.Guid;
-using DateTime = System.DateTime;
-using Models = Icon.Models;
 using System.Linq;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
+using DateTime = System.DateTime;
+using Errors = Icon.Errors;
+using Guid = System.Guid;
+using Models = Icon.Models;
 
 namespace Icon.Events
 {

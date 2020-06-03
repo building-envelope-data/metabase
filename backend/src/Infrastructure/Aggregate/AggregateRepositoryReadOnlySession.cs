@@ -1,18 +1,18 @@
 // Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis; // NotNullWhen
+using System.Linq;
+using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
+using HotChocolate;
+using Icon.Events;
 using Marten;
 using Marten.Linq;
-using StreamState = Marten.Events.StreamState;
-using System.Threading.Tasks;
-using Icon.Events;
 using CancellationToken = System.Threading.CancellationToken;
 using ErrorCodes = Icon.ErrorCodes;
-using HotChocolate;
-using CSharpFunctionalExtensions;
-using System.Diagnostics.CodeAnalysis; // NotNullWhen
+using StreamState = Marten.Events.StreamState;
 
 namespace Icon.Infrastructure.Aggregate
 {

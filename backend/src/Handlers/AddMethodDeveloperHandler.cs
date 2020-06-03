@@ -1,13 +1,13 @@
-using System.Threading.Tasks;
-using System.Linq; // Enumerable.Empty
 using System; // Func
-using CancellationToken = System.Threading.CancellationToken;
-using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Aggregate;
-using Events = Icon.Events;
-using Commands = Icon.Commands;
-using Aggregates = Icon.Aggregates;
+using System.Linq; // Enumerable.Empty
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Command;
+using Aggregates = Icon.Aggregates;
+using CancellationToken = System.Threading.CancellationToken;
+using Commands = Icon.Commands;
+using Events = Icon.Events;
 
 namespace Icon.Handlers
 {

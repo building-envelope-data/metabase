@@ -3,30 +3,30 @@
 // https://github.com/oskardudycz/EventSourcing.NetCore/blob/master/Marten.Integration.Tests/TestsInfrasructure/MartenTest.cs
 // https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-3.0#customize-webapplicationfactory
 
-using System.Threading.Tasks;
-using IRelationalDatabaseCreator = Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator;
-using PersistedGrantDbContext = IdentityServer4.EntityFramework.DbContexts.PersistedGrantDbContext;
-using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Guid = System.Guid;
 using System;
-using Exception = System.Exception;
-using Npgsql;
-using IsolationLevel = System.Data.IsolationLevel;
-using IDisposable = System.IDisposable;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using ApplicationDbContext = Icon.Data.ApplicationDbContext;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Configuration = Icon.Configuration;
-using Startup = Icon.Startup;
+using Microsoft.Extensions.Logging;
+using Npgsql;
+using ApplicationDbContext = Icon.Data.ApplicationDbContext;
 using AppSettings = Icon.AppSettings;
+using Configuration = Icon.Configuration;
+using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
+using Exception = System.Exception;
+using Guid = System.Guid;
+using IDisposable = System.IDisposable;
+using IRelationalDatabaseCreator = Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator;
+using IsolationLevel = System.Data.IsolationLevel;
 using Models = Icon.Models;
+using PersistedGrantDbContext = IdentityServer4.EntityFramework.DbContexts.PersistedGrantDbContext;
+using Startup = Icon.Startup;
 
 namespace Test.Integration.Web.Api
 {

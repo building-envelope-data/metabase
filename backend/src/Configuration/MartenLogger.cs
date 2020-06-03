@@ -1,16 +1,16 @@
 // Inspired by http://jasperfx.github.io/marten/documentation/documents/diagnostics/
 // and https://github.com/JasperFx/marten/blob/master/src/Marten.Testing/Examples/SimpleSessionListener.cs
 
-using System.Threading.Tasks;
-using CancellationToken = System.Threading.CancellationToken;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Marten.Services;
-using Marten;
-using Npgsql;
-using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 using Baseline;
+using Marten;
+using Marten.Services;
+using Microsoft.Extensions.Logging;
+using Npgsql;
+using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Configuration
 {

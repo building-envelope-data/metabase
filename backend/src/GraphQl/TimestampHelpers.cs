@@ -1,17 +1,17 @@
 using System;
-using Icon.Infrastructure.Query;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
+using System.Linq;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
+using HotChocolate;
+using HotChocolate.Execution;
+using HotChocolate.Resolvers;
+using Icon.Infrastructure.Query;
+using Microsoft.AspNetCore.Identity;
+using ErrorCodes = Icon.ErrorCodes;
 using Models = Icon.Models;
 using Queries = Icon.Queries;
-using System.Linq;
-using HotChocolate.Resolvers;
-using HotChocolate;
-using CSharpFunctionalExtensions;
-using ErrorCodes = Icon.ErrorCodes;
 using ValueObjects = Icon.ValueObjects;
-using HotChocolate.Execution;
 
 namespace Icon.GraphQl
 {

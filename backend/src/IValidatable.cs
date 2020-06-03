@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
-using IError = HotChocolate.IError;
 using Errors = Icon.Errors;
+using IError = HotChocolate.IError;
 
 namespace Icon
 {

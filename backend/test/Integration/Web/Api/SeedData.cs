@@ -1,23 +1,23 @@
 using System;
-using ApplicationDbContext = Icon.Data.ApplicationDbContext;
-using PersistedGrantDbContext = IdentityServer4.EntityFramework.DbContexts.PersistedGrantDbContext;
-using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
-using Microsoft.AspNetCore.Identity;
-using Seeds = Icon.Data.Seeds;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using IdentityServer4;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Interfaces;
 using IdentityServer4.EntityFramework.Mappers;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using IdentityServer4.EntityFramework.Storage;
 using IdentityServer4.Models;
-using IdentityServer4;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using ApplicationDbContext = Icon.Data.ApplicationDbContext;
 using Configuration = Icon.Configuration;
+using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
 using Models = Icon.Models;
+using PersistedGrantDbContext = IdentityServer4.EntityFramework.DbContexts.PersistedGrantDbContext;
+using Seeds = Icon.Data.Seeds;
 
 namespace Test.Integration.Web.Api
 {

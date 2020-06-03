@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CancellationToken = System.Threading.CancellationToken;
-using ValueObjects = Icon.ValueObjects;
-using Icon.Infrastructure;
-using Icon.Infrastructure.Command;
-using Icon.Events;
-using Icon.Infrastructure.Aggregate;
-using Models = Icon.Models;
-using IError = HotChocolate.IError;
 using CSharpFunctionalExtensions;
+using Icon.Events;
+using Icon.Infrastructure;
+using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Command;
+using CancellationToken = System.Threading.CancellationToken;
+using IError = HotChocolate.IError;
+using Models = Icon.Models;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Commands
 {

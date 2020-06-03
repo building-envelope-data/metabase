@@ -1,12 +1,12 @@
 using System;
-using Array = System.Array;
 using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using ErrorBuilder = HotChocolate.ErrorBuilder;
-using IError = HotChocolate.IError;
-using ErrorCodes = Icon.ErrorCodes;
-using System.Linq;
 using System.Collections.ObjectModel; // ReadOnlyDictionary
+using System.Linq;
+using CSharpFunctionalExtensions;
+using Array = System.Array;
+using ErrorBuilder = HotChocolate.ErrorBuilder;
+using ErrorCodes = Icon.ErrorCodes;
+using IError = HotChocolate.IError;
 
 namespace Icon.ValueObjects
 {
@@ -23,7 +23,7 @@ namespace Icon.ValueObjects
         {
             if (JsonSchemaRegistry.ContainsKey(schemaUri))
             {
-              return JsonSchemaRegistry[schemaUri];
+                return JsonSchemaRegistry[schemaUri];
             }
             return Result.Failure<JsonSchema, Errors>(
                 Errors.One(
@@ -61,13 +61,13 @@ namespace Icon.ValueObjects
         {
             var jsonSchemasDirectoryEnumerationOptions = new System.IO.EnumerationOptions
             {
-              AttributesToSkip = System.IO.FileAttributes.Hidden | System.IO.FileAttributes.System,
-              BufferSize = 0,
-              IgnoreInaccessible = true,
-              MatchCasing = System.IO.MatchCasing.PlatformDefault,
-              MatchType = System.IO.MatchType.Simple,
-              RecurseSubdirectories = true,
-              ReturnSpecialDirectories = false
+                AttributesToSkip = System.IO.FileAttributes.Hidden | System.IO.FileAttributes.System,
+                BufferSize = 0,
+                IgnoreInaccessible = true,
+                MatchCasing = System.IO.MatchCasing.PlatformDefault,
+                MatchType = System.IO.MatchType.Simple,
+                RecurseSubdirectories = true,
+                ReturnSpecialDirectories = false
             };
             return
               System.IO.Directory.GetFiles(
@@ -92,14 +92,14 @@ namespace Icon.ValueObjects
                   .Combine()
                   .Map(ids =>
                     {
-                    var jsonSchemaRegistry = new Dictionary<string, JsonSchema>();
-                    foreach (var (id, jsonSchema) in ids.Zip(jsonSchemas))
-                    {
-                    jsonSchemaRegistry[id] = jsonSchema;
-                    // https://gregsdennis.github.io/Manatee.Json/usage/schema/references.html
-                    Manatee.Json.Schema.JsonSchemaRegistry.Register(jsonSchema.Value);
-                    }
-                    return new ReadOnlyDictionary<string, JsonSchema>(jsonSchemaRegistry);
+                        var jsonSchemaRegistry = new Dictionary<string, JsonSchema>();
+                        foreach (var (id, jsonSchema) in ids.Zip(jsonSchemas))
+                        {
+                            jsonSchemaRegistry[id] = jsonSchema;
+                            // https://gregsdennis.github.io/Manatee.Json/usage/schema/references.html
+                            Manatee.Json.Schema.JsonSchemaRegistry.Register(jsonSchema.Value);
+                        }
+                        return new ReadOnlyDictionary<string, JsonSchema>(jsonSchemaRegistry);
                     }
                     )
                 );
@@ -113,9 +113,9 @@ namespace Icon.ValueObjects
         private static readonly Manatee.Json.Schema.JsonSchemaOptions _validationOptions =
           new Manatee.Json.Schema.JsonSchemaOptions(Manatee.Json.Schema.JsonSchemaOptions.Default)
           {
-            AllowUnknownFormats = false,
-            OutputFormat = Manatee.Json.Schema.SchemaValidationOutputFormat.Basic,
-            ValidateFormatKeyword = true
+              AllowUnknownFormats = false,
+              OutputFormat = Manatee.Json.Schema.SchemaValidationOutputFormat.Basic,
+              ValidateFormatKeyword = true
           };
 
         private static Result<JsonSchema, Errors> From(
@@ -123,20 +123,20 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-          var validationResults = jsonSchema.ValidateSchema(); // https://gregsdennis.github.io/Manatee.Json/api/Manatee.Json.Schema.MetaSchemaValidationResults.html
-          if (validationResults.IsValid)
-          {
-            return Result.Ok<JsonSchema, Errors>(
-                new JsonSchema(jsonSchema)
+            var validationResults = jsonSchema.ValidateSchema(); // https://gregsdennis.github.io/Manatee.Json/api/Manatee.Json.Schema.MetaSchemaValidationResults.html
+            if (validationResults.IsValid)
+            {
+                return Result.Ok<JsonSchema, Errors>(
+                    new JsonSchema(jsonSchema)
+                    );
+            }
+            return Result.Failure<JsonSchema, Errors>(
+                Errors.One(
+                  message: $"The given JSON schema is in-valid: {validationResults}`",
+                  code: ErrorCodes.InvalidValue,
+                  path: path
+                  )
                 );
-          }
-          return Result.Failure<JsonSchema, Errors>(
-              Errors.One(
-                message: $"The given JSON schema is in-valid: {validationResults}`",
-                code: ErrorCodes.InvalidValue,
-                path: path
-                )
-              );
         }
 
         private static Result<JsonSchema, Errors> From(
@@ -146,20 +146,20 @@ namespace Icon.ValueObjects
         {
             try
             {
-              var jsonSchema =
-                new Manatee.Json.Serialization.JsonSerializer()
-                .Deserialize<Manatee.Json.Schema.JsonSchema>(json);
-              return From(jsonSchema);
+                var jsonSchema =
+                  new Manatee.Json.Serialization.JsonSerializer()
+                  .Deserialize<Manatee.Json.Schema.JsonSchema>(json);
+                return From(jsonSchema);
             }
             catch (Manatee.Json.Serialization.TypeDoesNotContainPropertyException exception)
             {
-              return Result.Failure<JsonSchema, Errors>(
-                  Errors.One(
-                    message: $"The given JSON contains a property, namely, `{exception.Json}`, which is not defined by the type `{exception.Type}`",
-                    code: ErrorCodes.InvalidValue,
-                    path: path
-                    )
-                  );
+                return Result.Failure<JsonSchema, Errors>(
+                    Errors.One(
+                      message: $"The given JSON contains a property, namely, `{exception.Json}`, which is not defined by the type `{exception.Type}`",
+                      code: ErrorCodes.InvalidValue,
+                      path: path
+                      )
+                    );
             }
         }
 
@@ -186,12 +186,12 @@ namespace Icon.ValueObjects
         {
             if (Value.Id is null)
             {
-              return Result.Failure<string, Errors>(
-                  Errors.One(
-                    message: $"The JSON schema {this} does not have an `$id`",
-                    code: ErrorCodes.InvalidValue
-                    )
-                  );
+                return Result.Failure<string, Errors>(
+                    Errors.One(
+                      message: $"The JSON schema {this} does not have an `$id`",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    );
             }
             return Result.Ok<string, Errors>(Value.Id);
         }

@@ -1,11 +1,11 @@
-using ValueObjects = Icon.ValueObjects;
 using System;
 using System.Collections.Generic;
-using Models = Icon.Models;
+using System.Linq;
+using CSharpFunctionalExtensions;
 using Icon.Infrastructure.Query;
 using IError = HotChocolate.IError;
-using CSharpFunctionalExtensions;
-using System.Linq;
+using Models = Icon.Models;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Queries
 {

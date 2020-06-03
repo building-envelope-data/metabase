@@ -1,11 +1,11 @@
-using Validatable = Icon.Validatable;
 using System.Collections.Generic;
-using Uri = System.Uri;
-using ValueObjects = Icon.ValueObjects;
 using CSharpFunctionalExtensions;
-using IError = HotChocolate.IError;
-using Errors = Icon.Errors;
 using DateTime = System.DateTime;
+using Errors = Icon.Errors;
+using IError = HotChocolate.IError;
+using Uri = System.Uri;
+using Validatable = Icon.Validatable;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.ValueObjects
 {

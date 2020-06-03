@@ -1,7 +1,7 @@
-using ValueObjects = Icon.ValueObjects;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
+using Errors = Icon.Errors;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Models
 {

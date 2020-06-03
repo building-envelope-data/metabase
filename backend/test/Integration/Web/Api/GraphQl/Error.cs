@@ -1,5 +1,5 @@
-using Icon;
 using System.Collections.Generic;
+using Icon;
 
 namespace Test.Integration.Web.Api.GraphQl
 {

@@ -1,16 +1,16 @@
-using System.Threading.Tasks;
 using System; // Func
-using DateTime = System.DateTime;
-using CancellationToken = System.Threading.CancellationToken;
-using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Aggregate;
-using Events = Icon.Events;
-using Commands = Icon.Commands;
-using Aggregates = Icon.Aggregates;
+using System.Linq;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Command;
 using Marten;
 using Marten.Linq;
-using System.Linq;
+using Aggregates = Icon.Aggregates;
+using CancellationToken = System.Threading.CancellationToken;
+using Commands = Icon.Commands;
+using DateTime = System.DateTime;
+using Events = Icon.Events;
 
 namespace Icon.Handlers
 {

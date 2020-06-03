@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using JsonExtensionDataAttribute = System.Text.Json.Serialization.JsonExtensionDataAttribute;
 using System.Text.Json;
+using JsonExtensionDataAttribute = System.Text.Json.Serialization.JsonExtensionDataAttribute;
 
 namespace Test.Integration.Web.Api.GraphQl
 {

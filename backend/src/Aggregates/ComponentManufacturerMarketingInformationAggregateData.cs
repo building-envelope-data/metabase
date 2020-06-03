@@ -1,7 +1,7 @@
-using Icon;
 using CSharpFunctionalExtensions;
-using Guid = System.Guid;
+using Icon;
 using DateTime = System.DateTime;
+using Guid = System.Guid;
 using Models = Icon.Models;
 
 namespace Icon.Aggregates

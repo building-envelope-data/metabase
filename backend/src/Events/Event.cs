@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using Errors = Icon.Errors;
 using Guid = System.Guid;
-using CSharpFunctionalExtensions;
 
 namespace Icon.Events
 {

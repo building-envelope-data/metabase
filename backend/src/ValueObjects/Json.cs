@@ -1,22 +1,22 @@
 using System;
-using System.IO;
-using Array = System.Array;
 using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using ErrorBuilder = HotChocolate.ErrorBuilder;
-using IError = HotChocolate.IError;
-using ErrorCodes = Icon.ErrorCodes;
-using JToken = Newtonsoft.Json.Linq.JToken;
-using JObject = Newtonsoft.Json.Linq.JObject;
-using JArray = Newtonsoft.Json.Linq.JArray;
-using JValue = Newtonsoft.Json.Linq.JValue;
-using System.Linq;
 using System.Collections.ObjectModel; // ReadOnlyDictionary
-using JsonValue = Manatee.Json.JsonValue;
-using JsonObject = Manatee.Json.JsonObject;
+using System.IO;
+using System.Linq;
+using CSharpFunctionalExtensions;
+using Array = System.Array;
+using ErrorBuilder = HotChocolate.ErrorBuilder;
+using ErrorCodes = Icon.ErrorCodes;
+using IError = HotChocolate.IError;
+using JArray = Newtonsoft.Json.Linq.JArray;
+using JObject = Newtonsoft.Json.Linq.JObject;
 using JsonArray = Manatee.Json.JsonArray;
-using JsonValueType = Manatee.Json.JsonValueType;
+using JsonObject = Manatee.Json.JsonObject;
 using JsonSyntaxException = Manatee.Json.JsonSyntaxException;
+using JsonValue = Manatee.Json.JsonValue;
+using JsonValueType = Manatee.Json.JsonValueType;
+using JToken = Newtonsoft.Json.Linq.JToken;
+using JValue = Newtonsoft.Json.Linq.JValue;
 
 namespace Icon.ValueObjects
 {
@@ -53,86 +53,86 @@ namespace Icon.ValueObjects
 
         private static object? ConvertJsonValueToNestedCollections(JsonValue jsonValue)
         {
-          return jsonValue.Type switch
-          {
-              JsonValueType.Array =>
-                jsonValue.Array
-                .Select(ConvertJsonValueToNestedCollections)
-                .ToList().AsReadOnly(),
-              JsonValueType.Boolean => jsonValue.Boolean,
-              JsonValueType.Null => null,
-              JsonValueType.Number => jsonValue.Number,
-              JsonValueType.Object =>
-                new ReadOnlyDictionary<string, object?>(
-                    jsonValue.Object.ToDictionary(
-                      pair => pair.Key,
-                      pair => ConvertJsonValueToNestedCollections(pair.Value)
-                      )
-                    ),
-              JsonValueType.String => jsonValue.String,
-              // God-damned C# does not have switch expression exhaustiveness for
-              // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
-              _ => throw new Exception($"The JSON value `{jsonValue}` of type `{jsonValue.Type}` fell through")
-          };
+            return jsonValue.Type switch
+            {
+                JsonValueType.Array =>
+                  jsonValue.Array
+                  .Select(ConvertJsonValueToNestedCollections)
+                  .ToList().AsReadOnly(),
+                JsonValueType.Boolean => jsonValue.Boolean,
+                JsonValueType.Null => null,
+                JsonValueType.Number => jsonValue.Number,
+                JsonValueType.Object =>
+                  new ReadOnlyDictionary<string, object?>(
+                      jsonValue.Object.ToDictionary(
+                        pair => pair.Key,
+                        pair => ConvertJsonValueToNestedCollections(pair.Value)
+                        )
+                      ),
+                JsonValueType.String => jsonValue.String,
+                // God-damned C# does not have switch expression exhaustiveness for
+                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                _ => throw new Exception($"The JSON value `{jsonValue}` of type `{jsonValue.Type}` fell through")
+            };
         }
 
         private static Result<JsonValue, Errors> ConvertNestedCollectionsToJsonValue(object? jsonValue)
         {
-          return jsonValue switch
-          {
-              IList<object?> list =>
-                list.Select(ConvertNestedCollectionsToJsonValue)
-                .Combine()
-                .Map(jsonValues =>
-                    new JsonValue(
-                      new JsonArray(jsonValues)
-                      )
-                    ),
-              bool boolean => Result.Ok<JsonValue, Errors>(new JsonValue(boolean)),
-              null => Result.Ok<JsonValue, Errors>(JsonValue.Null),
-              // For the list of implicit conversions to `double` see
-              // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/numeric-conversions#implicit-numeric-conversions
-              // and for the explicit ones see
-              // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/numeric-conversions#explicit-numeric-conversions
-              sbyte number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              byte number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              short number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              ushort number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              int number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              uint number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              long number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              ulong number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              float number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              double number => Result.Ok<JsonValue, Errors>(new JsonValue(number)),
-              decimal number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-              IDictionary<string, object?> dictionary =>
-                dictionary.Select(pair =>
-                    ConvertNestedCollectionsToJsonValue(pair.Value)
-                    .Map(jsonValue =>
-                      new KeyValuePair<string, JsonValue>(pair.Key, jsonValue)
-                      )
-                    )
-                .Combine()
-                .Map(stringJsonValuePairs =>
-                    new JsonValue(
-                      new JsonObject(
-                        stringJsonValuePairs.ToDictionary(
-                          pair => pair.Key,
-                          pair => (JsonValue?)pair.Value
-                          )
+            return jsonValue switch
+            {
+                IList<object?> list =>
+                  list.Select(ConvertNestedCollectionsToJsonValue)
+                  .Combine()
+                  .Map(jsonValues =>
+                      new JsonValue(
+                        new JsonArray(jsonValues)
+                        )
+                      ),
+                bool boolean => Result.Ok<JsonValue, Errors>(new JsonValue(boolean)),
+                null => Result.Ok<JsonValue, Errors>(JsonValue.Null),
+                // For the list of implicit conversions to `double` see
+                // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/numeric-conversions#implicit-numeric-conversions
+                // and for the explicit ones see
+                // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/numeric-conversions#explicit-numeric-conversions
+                sbyte number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                byte number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                short number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                ushort number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                int number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                uint number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                long number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                ulong number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                float number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                double number => Result.Ok<JsonValue, Errors>(new JsonValue(number)),
+                decimal number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                IDictionary<string, object?> dictionary =>
+                  dictionary.Select(pair =>
+                      ConvertNestedCollectionsToJsonValue(pair.Value)
+                      .Map(jsonValue =>
+                        new KeyValuePair<string, JsonValue>(pair.Key, jsonValue)
                         )
                       )
-                    ),
-              string @string => Result.Ok<JsonValue, Errors>(new JsonValue(@string)),
-              // God-damned C# does not have switch expression exhaustiveness for
-              // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
-              _ => Result.Failure<JsonValue, Errors>(
-                  Errors.One(
-                    message: $"The JSON value `{jsonValue}` of type `{jsonValue.GetType()}` fell through",
-                    code: ErrorCodes.InvalidValue
+                  .Combine()
+                  .Map(stringJsonValuePairs =>
+                      new JsonValue(
+                        new JsonObject(
+                          stringJsonValuePairs.ToDictionary(
+                            pair => pair.Key,
+                            pair => (JsonValue?)pair.Value
+                            )
+                          )
+                        )
+                      ),
+                string @string => Result.Ok<JsonValue, Errors>(new JsonValue(@string)),
+                // God-damned C# does not have switch expression exhaustiveness for
+                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                _ => Result.Failure<JsonValue, Errors>(
+                    Errors.One(
+                      message: $"The JSON value `{jsonValue}` of type `{jsonValue.GetType()}` fell through",
+                      code: ErrorCodes.InvalidValue
+                      )
                     )
-                  )
-          };
+            };
         }
 
         // We should __not__ expose the underlying `JsonValue` instance because
@@ -159,42 +159,42 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-          // TODO Catch other exceptions mentioned on
-          // https://docs.microsoft.com/en-us/dotnet/api/system.io.file.open?view=netcore-3.1#System_IO_File_Open_System_String_System_IO_FileMode_System_IO_FileAccess_System_IO_FileShare_
-          // https://gregsdennis.github.io/Manatee.Json/api/Manatee.Json.JsonValue.html#Manatee_Json_JsonValue_Parse_System_IO_TextReader_
-          try
-          {
-            using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            // TODO Catch other exceptions mentioned on
+            // https://docs.microsoft.com/en-us/dotnet/api/system.io.file.open?view=netcore-3.1#System_IO_File_Open_System_String_System_IO_FileMode_System_IO_FileAccess_System_IO_FileShare_
+            // https://gregsdennis.github.io/Manatee.Json/api/Manatee.Json.JsonValue.html#Manatee_Json_JsonValue_Parse_System_IO_TextReader_
+            try
             {
-              using (var streamReader = new StreamReader(fileStream))
-              {
-                return new Json(
-                    JsonValue.Parse(streamReader)
-                    );
-              }
+                using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    using (var streamReader = new StreamReader(fileStream))
+                    {
+                        return new Json(
+                            JsonValue.Parse(streamReader)
+                            );
+                    }
+                }
             }
-          }
-          catch (FileNotFoundException exception)
-          {
-            return Result.Failure<Json, Errors>(
-                Errors.One(
-                  message: $"There is no file with path {filePath} causing the exception {exception}",
-                  code: ErrorCodes.FileNotFound,
-                  path: path
-                  )
-                );
-          }
-          catch (JsonSyntaxException exception)
-          {
-            // https://gregsdennis.github.io/Manatee.Json/usage/getting-started.html#handling-errors
-            return Result.Failure<Json, Errors>(
-                Errors.One(
-                  message: $"The contents of the file with path {filePath} is not valid JSON: {exception.Message}",
-                  code: ErrorCodes.InvalidSyntax,
-                  path: path?.Concat(exception.Location).ToList().AsReadOnly()
-                  )
-                );
-          }
+            catch (FileNotFoundException exception)
+            {
+                return Result.Failure<Json, Errors>(
+                    Errors.One(
+                      message: $"There is no file with path {filePath} causing the exception {exception}",
+                      code: ErrorCodes.FileNotFound,
+                      path: path
+                      )
+                    );
+            }
+            catch (JsonSyntaxException exception)
+            {
+                // https://gregsdennis.github.io/Manatee.Json/usage/getting-started.html#handling-errors
+                return Result.Failure<Json, Errors>(
+                    Errors.One(
+                      message: $"The contents of the file with path {filePath} is not valid JSON: {exception.Message}",
+                      code: ErrorCodes.InvalidSyntax,
+                      path: path?.Concat(exception.Location).ToList().AsReadOnly()
+                      )
+                    );
+            }
         }
 
         // https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8.1.1

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
+using Errors = Icon.Errors;
 using Uri = System.Uri;
 using ValueObjects = Icon.ValueObjects;
 

@@ -1,20 +1,20 @@
-using Guid = System.Guid;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using CancellationToken = System.Threading.CancellationToken;
-using Icon.Infrastructure.Command;
+using CSharpFunctionalExtensions;
 using Icon.Events;
 using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Command;
 using Icon.Infrastructure.Query;
-using Models = Icon.Models;
-using Queries = Icon.Queries;
-using Events = Icon.Events;
-using Aggregates = Icon.Aggregates;
-using System.Linq;
 using Marten;
 using Marten.Linq.MatchesSql;
-using CSharpFunctionalExtensions;
+using Aggregates = Icon.Aggregates;
+using CancellationToken = System.Threading.CancellationToken;
 using Errors = Icon.Errors;
+using Events = Icon.Events;
+using Guid = System.Guid;
+using Models = Icon.Models;
+using Queries = Icon.Queries;
 
 namespace Icon.Handlers
 {

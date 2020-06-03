@@ -1,14 +1,14 @@
 using System;
-using ValueObjects = Icon.ValueObjects;
-using Errors = Icon.Errors;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
+using HotChocolate;
+using Icon.Events;
 using Marten;
 using Marten.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using CancellationToken = System.Threading.CancellationToken;
-using Icon.Events;
-using HotChocolate;
-using CSharpFunctionalExtensions;
+using Errors = Icon.Errors;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Infrastructure.Aggregate
 {

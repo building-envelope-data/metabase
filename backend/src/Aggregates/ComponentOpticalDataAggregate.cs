@@ -1,9 +1,9 @@
-using CSharpFunctionalExtensions;
-using Marten.Schema;
-using Icon;
 using System;
 using System.Collections.Generic;
+using CSharpFunctionalExtensions;
+using Icon;
 using Icon.Infrastructure.Aggregate;
+using Marten.Schema;
 using Events = Icon.Events;
 
 namespace Icon.Aggregates

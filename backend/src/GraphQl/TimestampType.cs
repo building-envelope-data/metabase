@@ -1,6 +1,6 @@
-using ValueObjects = Icon.ValueObjects;
-using DateTimeOffset = System.DateTimeOffset;
 using CSharpFunctionalExtensions;
+using DateTimeOffset = System.DateTimeOffset;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.GraphQl
 {

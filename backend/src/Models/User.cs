@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Identity;
 using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Identity;
 using Guid = System.Guid;
 
 namespace Icon.Models

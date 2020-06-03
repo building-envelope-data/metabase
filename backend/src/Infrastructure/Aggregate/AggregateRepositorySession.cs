@@ -1,19 +1,19 @@
 // Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
 
-using Errors = Icon.Errors;
-using ValueObjects = Icon.ValueObjects;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using Marten;
-using IEventStore = Marten.Events.IEventStore;
-using Marten.Linq;
+using System.Linq;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
+using HotChocolate;
 using Icon.Events;
+using Marten;
+using Marten.Linq;
 using CancellationToken = System.Threading.CancellationToken;
 using ErrorCodes = Icon.ErrorCodes;
-using HotChocolate;
-using CSharpFunctionalExtensions;
+using Errors = Icon.Errors;
+using IEventStore = Marten.Events.IEventStore;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Infrastructure.Aggregate
 {
@@ -161,7 +161,7 @@ namespace Icon.Infrastructure.Aggregate
         {
             try
             {
-              await _session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                await _session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Marten.Services.EventStreamUnexpectedMaxEventIdException exception)
             {

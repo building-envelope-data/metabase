@@ -1,17 +1,17 @@
-using Icon;
-using Errors = Icon.Errors;
-using CSharpFunctionalExtensions;
-using Guid = System.Guid;
-using Uri = System.Uri;
 using System.Collections.Generic;
-using DateTime = System.DateTime;
 using System.Threading.Tasks;
-using Icon.Infrastructure;
-using Icon.Infrastructure.Command;
+using CSharpFunctionalExtensions;
+using Icon;
 using Icon.Events;
+using Icon.Infrastructure;
 using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Command;
 using Commands = Icon.Commands;
+using DateTime = System.DateTime;
+using Errors = Icon.Errors;
+using Guid = System.Guid;
 using JToken = Newtonsoft.Json.Linq.JToken;
+using Uri = System.Uri;
 
 namespace Icon.Events
 {

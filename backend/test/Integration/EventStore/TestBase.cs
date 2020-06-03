@@ -1,12 +1,12 @@
 using System;
 using System.Data;
-using Marten.Events;
 using Marten;
+using Marten.Events;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Xunit;
-using Microsoft.Extensions.Configuration;
-using AppSettings = Icon.AppSettings;
 using Aggregates = Icon.Aggregates;
+using AppSettings = Icon.AppSettings;
 
 namespace Test.Integration.EventStore
 {

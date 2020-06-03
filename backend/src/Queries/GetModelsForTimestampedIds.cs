@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Icon.Infrastructure.Query;
 using Models = Icon.Models;
-using System.Collections.Generic;
 using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Queries

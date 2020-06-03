@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
+using Errors = Icon.Errors;
 
 namespace Icon.ValueObjects
 {

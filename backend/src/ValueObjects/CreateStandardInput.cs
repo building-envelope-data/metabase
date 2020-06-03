@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
+using DateTime = System.DateTime;
+using Errors = Icon.Errors;
 using Uri = System.Uri;
 using ValueObjects = Icon.ValueObjects;
-using DateTime = System.DateTime;
 
 namespace Icon.ValueObjects
 {

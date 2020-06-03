@@ -1,12 +1,12 @@
 // Inspired by https://github.com/ChilliCream/hotchocolate/blob/10.4.2/src/Core/Types/Types/Scalars/ScalarType.cs
 // TODO Once it's available use the generic `ScalarType<.., ..>` as in https://github.com/ChilliCream/hotchocolate/blob/master/src/HotChocolate/Core/src/Types/Types/Scalars/ScalarType.cs, see https://github.com/ChilliCream/hotchocolate/blob/master/src/HotChocolate/Core/src/Types/Types/Scalars/ScalarType~2.cs
 
+using System; // Func
+using CSharpFunctionalExtensions;
 using HotChocolate.Types;
+using IValueNode = HotChocolate.Language.IValueNode;
 using NameString = HotChocolate.NameString;
 using Type = System.Type;
-using IValueNode = HotChocolate.Language.IValueNode;
-using CSharpFunctionalExtensions;
-using System; // Func
 // using TypeResourceHelper = HotChocolate.Properties.TypeResourceHelper;
 
 namespace Icon.GraphQl

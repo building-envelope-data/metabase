@@ -1,10 +1,10 @@
+using System;
+using Icon.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
 using Directory = System.IO.Directory;
-using Icon.Data;
 
 namespace Icon
 {
