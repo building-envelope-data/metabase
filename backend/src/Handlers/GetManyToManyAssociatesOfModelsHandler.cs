@@ -23,7 +23,7 @@ namespace Icon.Handlers
       : IQueryHandler<Queries.GetManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
       where TAssociationModel : Models.IManyToManyAssociation
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-      where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
+      where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     {
         public static async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Do(

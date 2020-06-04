@@ -23,7 +23,7 @@ namespace Icon.Handlers
       : GetManyToManyAssociatesOfModelsHandler<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate>
       where TAssociationModel : Models.IManyToManyAssociation
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-      where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
+      where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociationAddedEvent : Events.IAssociationAddedEvent
     {

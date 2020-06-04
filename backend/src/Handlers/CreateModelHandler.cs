@@ -12,19 +12,19 @@ using Events = Icon.Events;
 
 namespace Icon.Handlers
 {
-    public class CreateModelHandler<TCommand, TAggregate>
+    public sealed class CreateModelHandler<TCommand, TAggregate>
       : ICommandHandler<TCommand, Result<ValueObjects.TimestampedId, Errors>>
       where TCommand : ICommand<Result<ValueObjects.TimestampedId, Errors>>
       where TAggregate : class, IEventSourcedAggregate, new()
     {
         private readonly IAggregateRepository _repository;
         private readonly Func<Guid, TCommand, Events.ICreatedEvent> _newCreatedEvent;
-        private readonly IEnumerable<Func<IAggregateRepositorySession, TCommand, CancellationToken, Task<Result<bool, Errors>>>> _addAssociations;
+        private readonly IEnumerable<Func<IAggregateRepositorySession, ValueObjects.Id, TCommand, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>> _addAssociations;
 
         public CreateModelHandler(
             IAggregateRepository repository,
             Func<Guid, TCommand, Events.ICreatedEvent> newCreatedEvent,
-            IEnumerable<Func<IAggregateRepositorySession, TCommand, CancellationToken, Task<Result<bool, Errors>>>> addAssociations
+            IEnumerable<Func<IAggregateRepositorySession, ValueObjects.Id, TCommand, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>> addAssociations
             )
         {
             _repository = repository;
@@ -43,7 +43,7 @@ namespace Icon.Handlers
             }
         }
 
-        public virtual async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
+        public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
             IAggregateRepositorySession session,
             TCommand command,
             CancellationToken cancellationToken
@@ -61,12 +61,12 @@ namespace Icon.Handlers
                       // We cannot aggregate the addition tasks and execute them in
                       // parallel with `Task.WhenAll` because all addition tasks use the
                       // same session.
-                      var associationAdditionResults = new List<Result<bool, Errors>>();
+                      var associationAdditionResults = new List<Result<ValueObjects.Id, Errors>>();
                       foreach (var addAssociation in _addAssociations)
                       {
                           associationAdditionResults.Add(
                               await addAssociation(
-                                session, command, cancellationToken
+                                session, id, command, cancellationToken
                                 )
                               .ConfigureAwait(false)
                               );

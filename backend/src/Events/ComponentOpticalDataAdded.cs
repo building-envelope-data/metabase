@@ -22,6 +22,20 @@ namespace Icon.Events
                 );
         }
 
+        public static ComponentOpticalDataAdded From(
+            Guid componentOpticalDataId,
+            Guid opticalDataId,
+            Commands.Create<ValueObjects.CreateOpticalDataInput> command
+            )
+        {
+            return new ComponentOpticalDataAdded(
+                componentOpticalDataId: componentOpticalDataId,
+                componentId: command.Input.ComponentId,
+                opticalDataId: opticalDataId,
+                creatorId: command.CreatorId
+                );
+        }
+
         [JsonIgnore]
         public Guid ComponentId { get => ParentId; }
 

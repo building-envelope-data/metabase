@@ -37,10 +37,16 @@ namespace Icon.Infrastructure.Aggregate
             )
           where T : class, IEventSourcedAggregate, new()
         {
+          AssertNotDisposed();
           var id = await GenerateNewId(cancellationToken).ConfigureAwait(false);
+          var @event = newCreatedEvent(id);
+          if (@event.AggregateId != (Guid)id)
+          {
+              throw new Exception($"The aggregate identifier of the created event {@event.AggregateId} differs from the generated identifier {(Guid)id}");
+          }
           return (
             await Create<T>(
-                newCreatedEvent(id),
+                @event,
                 cancellationToken
               )
             .ConfigureAwait(false)
@@ -48,19 +54,84 @@ namespace Icon.Infrastructure.Aggregate
             .Map(_ => id);
         }
 
-        public async Task<Result<bool, Errors>> Create<T>(
+        public Task<Result<ValueObjects.Id, Errors>> Create<T>(
             ICreatedEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
-        {
+          {
             AssertNotDisposed();
             return
-              await RegisterEvents(
-                new IEvent[] { @event },
-                eventArray => _session.Events.StartStream<T>(@event.AggregateId, eventArray),
-                cancellationToken
-                );
+              ValueObjects.Id
+              .From(@event.AggregateId)
+              .Bind(async id =>
+                  (await RegisterEvents(
+                    new IEvent[] { @event },
+                    eventArray => _session.Events.StartStream<T>(@event.AggregateId, eventArray),
+                    cancellationToken
+                    )
+                    .ConfigureAwait(false)
+                  )
+                  .Map(_ => id)
+                  );
+          }
+
+        public async Task<Result<ValueObjects.Id, Errors>> AddAssociation<TParent, TAssociation, TAssociate>(
+            Func<Guid, Events.IAssociationAddedEvent> newAssociationAddedEvent,
+            CancellationToken cancellationToken
+            )
+          where TParent : class, IEventSourcedAggregate, new()
+          where TAssociation : class, Aggregates.IManyToManyAssociationAggregate, new()
+          where TAssociate : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            var id = await GenerateNewId(cancellationToken).ConfigureAwait(false);
+            var @event = newAssociationAddedEvent(id);
+            if (@event.AggregateId != (Guid)id)
+            {
+              throw new Exception($"The aggregate identifier of the association added event {@event.AggregateId} differs from the generated identifier {(Guid)id}");
+            }
+            var (parentResult, associateResult) =
+              await Load<TParent, TAssociate>(
+                  (
+                   @event.ParentId,
+                   @event.AssociateId
+                  ),
+                  cancellationToken
+                  )
+              .ConfigureAwait(false);
+            return
+              await Errors.Combine(
+                  parentResult,
+                  associateResult
+                  )
+              .Bind(async _ =>
+                {
+                    var doesAssociationExist =
+                                    await Query<TAssociation>()
+                    .Where(a =>
+                        a.ParentId == @event.ParentId &&
+                        a.AssociateId == @event.AssociateId
+                        )
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false);
+                    if (doesAssociationExist)
+                    {
+                        return Result.Failure<ValueObjects.Id, Errors>(
+                            Errors.One(
+                              message: $"There already is an association from {@event.ParentId} to {@event.AssociateId} of type {typeof(TAssociation)}",
+                              code: ErrorCodes.AlreadyExistingAssociation
+                              )
+                            );
+                    }
+                    return await Create<TAssociation>(
+                        @event,
+                        cancellationToken
+                        )
+                      .ConfigureAwait(false);
+                }
+                )
+                                    .ConfigureAwait(false);
         }
 
         public Task<Result<bool, Errors>> Append<T>(

@@ -25,13 +25,13 @@ namespace Icon.Handlers
               new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate>(
                   repository,
                   Events.InstitutionMethodDeveloperAdded.From,
-                  Enumerable.Empty<Func<IAggregateRepositorySession, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<bool, Errors>>>>()
+                  Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>()
                   );
             _addPersonMethodDeveloperHandler =
               new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate>(
                   repository,
                   Events.PersonMethodDeveloperAdded.From,
-                  Enumerable.Empty<Func<IAggregateRepositorySession, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<bool, Errors>>>>()
+                  Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>()
                   );
         }
 

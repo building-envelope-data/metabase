@@ -20,11 +20,19 @@ namespace Icon.Infrastructure.Aggregate
             )
           where T : class, IEventSourcedAggregate, new();
 
-        public Task<Result<bool, Errors>> Create<T>(
+        public Task<Result<ValueObjects.Id, Errors>> Create<T>(
             ICreatedEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
+
+        public Task<Result<ValueObjects.Id, Errors>> AddAssociation<TParent, TAssociation, TAssociate>(
+            Func<Guid, Events.IAssociationAddedEvent> newAssociationAddedEvent,
+            CancellationToken cancellationToken
+            )
+          where TParent : class, IEventSourcedAggregate, new()
+          where TAssociation : class, Aggregates.IManyToManyAssociationAggregate, new()
+          where TAssociate : class, IEventSourcedAggregate, new();
 
         public Task<Result<bool, Errors>> Append<T>(
             ValueObjects.TimestampedId timestampedId,

@@ -30,7 +30,7 @@ namespace Icon.Handlers
             where TModel : Models.IModel
             where TAssociationModel : Models.IManyToManyAssociation
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return Do<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
@@ -51,7 +51,7 @@ namespace Icon.Handlers
             where TAssociateModel : Models.IModel
             where TAssociationModel : Models.IManyToManyAssociation
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-            where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return Do<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
@@ -73,7 +73,7 @@ namespace Icon.Handlers
             where TModel : Models.IModel
             where TAssociationModel : Models.IManyToManyAssociation
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return await (

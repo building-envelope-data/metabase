@@ -16,7 +16,7 @@ namespace Icon.Handlers
 {
     public sealed class RemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>
       : ICommandHandler<Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Result<ValueObjects.TimestampedId, Errors>>
-      where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, new()
+      where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, new()
     {
         private readonly IAggregateRepository _repository;
         private readonly Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IAssociationRemovedEvent> _newAssociationRemovedEvent;

@@ -102,7 +102,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Component, Aggregates.ComponentAggregate, ValueObjects.CreateComponentInput, Events.ComponentCreated>(
                     services,
                     Events.ComponentCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateComponentInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
+                    Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreateComponentInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>(),
                     Events.ComponentDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -185,7 +185,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Database, Aggregates.DatabaseAggregate, ValueObjects.CreateDatabaseInput, Events.DatabaseCreated>(
                     services,
                     Events.DatabaseCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateDatabaseInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
+                    Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreateDatabaseInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>(),
                     Events.DatabaseDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[] {
                     // TODO Remove operating institution
@@ -198,7 +198,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Institution, Aggregates.InstitutionAggregate, ValueObjects.CreateInstitutionInput, Events.InstitutionCreated>(
                     services,
                     Events.InstitutionCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateInstitutionInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
+                    Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreateInstitutionInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>(),
                     Events.InstitutionDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -245,7 +245,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Method, Aggregates.MethodAggregate, ValueObjects.CreateMethodInput, Events.MethodCreated>(
                     services,
                     Events.MethodCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateMethodInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
+                    Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreateMethodInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>(),
                     Events.MethodDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -272,7 +272,14 @@ namespace Icon.Configuration
             AddModelHandlers<Models.OpticalData, Aggregates.OpticalDataAggregate, ValueObjects.CreateOpticalDataInput, Events.OpticalDataCreated>(
                     services,
                     Events.OpticalDataCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateOpticalDataInput>, CancellationToken, Task<Result<bool, Errors>>>>(), // TODO Add association!
+                    new Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreateOpticalDataInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>[]
+                    {
+                    (session, opticalDataId, command, cancellationToken) =>
+                    session.AddAssociation<Aggregates.ComponentAggregate, Aggregates.ComponentOpticalDataAggregate, Aggregates.OpticalDataAggregate>(
+                        id => Events.ComponentOpticalDataAdded.From(id, opticalDataId, command),
+                        cancellationToken
+                        )
+                    },
                     Events.OpticalDataDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -292,7 +299,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Person, Aggregates.PersonAggregate, ValueObjects.CreatePersonInput, Events.PersonCreated>(
                     services,
                     Events.PersonCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreatePersonInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
+                    Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreatePersonInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>(),
                     Events.PersonDeleted.From,
                     new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -331,7 +338,7 @@ namespace Icon.Configuration
             AddModelHandlers<Models.Standard, Aggregates.StandardAggregate, ValueObjects.CreateStandardInput, Events.StandardCreated>(
                     services,
                     Events.StandardCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Commands.Create<ValueObjects.CreateStandardInput>, CancellationToken, Task<Result<bool, Errors>>>>(),
+                    Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreateStandardInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>(),
                     Events.StandardDeleted.From,
                     Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
@@ -340,7 +347,7 @@ namespace Icon.Configuration
         private static void AddModelHandlers<TModel, TAggregate, TCreateInput, TCreatedEvent>(
                 IServiceCollection services,
                 Func<Guid, Commands.Create<TCreateInput>, Events.ICreatedEvent> newCreatedEvent,
-                IEnumerable<Func<IAggregateRepositorySession, Commands.Create<TCreateInput>, CancellationToken, Task<Result<bool, Errors>>>> addAssociations,
+                IEnumerable<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<TCreateInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>> addAssociations,
                 Func<Commands.Delete<TModel>, Events.IDeletedEvent> newDeletedEvent,
                 IEnumerable<Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
                     )
@@ -361,7 +368,7 @@ namespace Icon.Configuration
         private static void AddCreateHandler<TInput, TAggregate>(
                 IServiceCollection services,
                 Func<Guid, Commands.Create<TInput>, Events.ICreatedEvent> newEvent,
-                IEnumerable<Func<IAggregateRepositorySession, Commands.Create<TInput>, CancellationToken, Task<Result<bool, Errors>>>> addAssociations
+                IEnumerable<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<TInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>> addAssociations
         )
           where TAggregate : class, IEventSourcedAggregate, new()
         {
@@ -496,7 +503,7 @@ namespace Icon.Configuration
                         Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IAssociationRemovedEvent> newAssociationRemovedEvent
                         )
             where TAssociationModel : Models.IManyToManyAssociation
-            where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
             where TAddInput : ValueObjects.AddManyToManyAssociationInput
             where TAssociationRemovedEvent : Events.IAssociationRemovedEvent
@@ -606,7 +613,7 @@ namespace Icon.Configuration
             where TModel : Models.IModel
             where TAssociationModel : Models.IManyToManyAssociation
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
             where TAddInput : ValueObjects.AddManyToManyAssociationInput
             where TAssociationRemovedEvent : Events.IAssociationRemovedEvent
@@ -627,7 +634,7 @@ namespace Icon.Configuration
                     where TAssociationModel : Models.IManyToManyAssociation
                     where TAssociateModel : Models.IModel
                     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-                    where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+                    where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
                     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : Events.IAssociationAddedEvent
                     where TAddInput : ValueObjects.AddManyToManyAssociationInput
@@ -650,7 +657,7 @@ namespace Icon.Configuration
                     where TAssociationModel : Models.IManyToManyAssociation
                     where TAssociateModel : Models.IModel
                     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-                    where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+                    where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
                     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : Events.IAssociationAddedEvent
                     where TAddInput : ValueObjects.AddManyToManyAssociationInput
@@ -668,7 +675,7 @@ namespace Icon.Configuration
                 )
             where TInput : ValueObjects.AddManyToManyAssociationInput
             where TAggregate : class, IEventSourcedAggregate, new()
-            where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, new()
         {
             services.AddScoped<
@@ -688,7 +695,7 @@ namespace Icon.Configuration
                 IServiceCollection services,
                 Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Events.IAssociationRemovedEvent> newEvent
                 )
-            where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
@@ -745,7 +752,7 @@ namespace Icon.Configuration
             where TAssociationModel : Models.IManyToManyAssociation
             where TAssociateModel : Models.IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
@@ -758,7 +765,7 @@ namespace Icon.Configuration
             where TAssociationModel : Models.IManyToManyAssociation
             where TAssociateModel : Models.IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
@@ -776,7 +783,7 @@ namespace Icon.Configuration
             where TAssociationModel : Models.IManyToManyAssociation
             where TModel : Models.IModel
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-            where TAssociationAggregate : class, IEventSourcedAggregate, IConvertible<TAssociationModel>, Aggregates.IManyToManyAssociationAggregate, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
