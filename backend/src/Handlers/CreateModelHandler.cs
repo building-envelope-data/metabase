@@ -39,13 +39,13 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenSession())
             {
-                return await Handle(command, session, cancellationToken).ConfigureAwait(false);
+                return await Handle(session, command, cancellationToken).ConfigureAwait(false);
             }
         }
 
         public virtual async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            TCommand command,
             IAggregateRepositorySession session,
+            TCommand command,
             CancellationToken cancellationToken
             )
         {
@@ -53,7 +53,7 @@ namespace Icon.Handlers
             var @event = _newCreatedEvent(id, command);
             return await (
                 await session.Create<TAggregate>(
-                  id, @event, cancellationToken
+                  @event, cancellationToken
                   )
                 .ConfigureAwait(false)
               )

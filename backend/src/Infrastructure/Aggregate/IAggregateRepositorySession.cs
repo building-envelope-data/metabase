@@ -15,15 +15,7 @@ namespace Icon.Infrastructure.Aggregate
     public interface IAggregateRepositorySession : IAggregateRepositoryReadOnlySession
     {
         public Task<Result<bool, Errors>> Create<T>(
-            Guid id,
-            IEvent @event,
-            CancellationToken cancellationToken
-            )
-          where T : class, IEventSourcedAggregate, new();
-
-        public Task<Result<bool, Errors>> Create<T>(
-            Guid id,
-            IEnumerable<IEvent> events,
+            ICreatedEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
@@ -43,22 +35,14 @@ namespace Icon.Infrastructure.Aggregate
           where T : class, IEventSourcedAggregate, new();
 
         public Task<Result<bool, Errors>> Delete<T>(
-            ValueObjects.TimestampedId timestampedId,
-            IEvent @event,
-            CancellationToken cancellationToken
-            )
-          where T : class, IEventSourcedAggregate, new();
-
-        public Task<Result<bool, Errors>> Delete<T>(
-            ValueObjects.Id id,
             ValueObjects.Timestamp timestamp,
-            IEvent @event,
+            IDeletedEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();
 
         public Task<Result<bool, Errors>> Delete<T>(
-            IEnumerable<(ValueObjects.TimestampedId, IEvent)> timestampedIdsAndEvents,
+            IEnumerable<(ValueObjects.Timestamp, IDeletedEvent)> timestampsAndEvents,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();

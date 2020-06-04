@@ -35,8 +35,8 @@ namespace Icon.Handlers
         }
 
         public override async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            Commands.AddAssociation<TInput> command,
             IAggregateRepositorySession session,
+            Commands.AddAssociation<TInput> command,
             CancellationToken cancellationToken
             )
         {
@@ -73,7 +73,7 @@ namespace Icon.Handlers
                               )
                             );
                     }
-                    return await base.Handle(command, session, cancellationToken).ConfigureAwait(false);
+                    return await base.Handle(session, command, cancellationToken).ConfigureAwait(false);
                 }
                 )
                                     .ConfigureAwait(false);

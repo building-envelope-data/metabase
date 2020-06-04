@@ -39,13 +39,13 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenSession())
             {
-                return await Handle(command, session, cancellationToken).ConfigureAwait(false);
+                return await Handle(session, command, cancellationToken).ConfigureAwait(false);
             }
         }
 
         public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            Commands.Delete<TModel> command,
             IAggregateRepositorySession session,
+            Commands.Delete<TModel> command,
             CancellationToken cancellationToken
             )
         {
@@ -76,7 +76,7 @@ namespace Icon.Handlers
                               var @event = _newDeletedEvent(command);
                               return await (
                               await session.Delete<TAggregate>(
-                                command.TimestampedId, @event, cancellationToken
+                                command.TimestampedId.Timestamp, @event, cancellationToken
                                 )
                               .ConfigureAwait(false)
                               )

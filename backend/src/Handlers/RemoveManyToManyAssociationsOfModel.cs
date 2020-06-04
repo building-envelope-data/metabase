@@ -90,8 +90,8 @@ namespace Icon.Handlers
                   .Bind(async associations =>
                     await session.Delete<TAssociationAggregate>(
                       associations.Select(association => (
-                         (ValueObjects.TimestampedId)(association.Id, association.Timestamp), // TODO Casting to `TimestampedId` could result in a run-time error and must not be done!
-                         (Events.IEvent)newAssociationRemovedEvent(association.Id)
+                         association.Timestamp, // TODO Casting to `TimestampedId` could result in a run-time error and must not be done!
+                         (Events.IDeletedEvent)newAssociationRemovedEvent(association.Id)
                          )
                         ),
                       cancellationToken

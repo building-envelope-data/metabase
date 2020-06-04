@@ -37,13 +37,13 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenSession())
             {
-                return await Handle(command, session, cancellationToken).ConfigureAwait(false);
+                return await Handle(session, command, cancellationToken).ConfigureAwait(false);
             }
         }
 
         public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
             IAggregateRepositorySession session,
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
             CancellationToken cancellationToken
             )
         {
@@ -62,7 +62,7 @@ namespace Icon.Handlers
                       var @event = _newAssociationRemovedEvent(associationId, command);
                       return await (
                           await session.Delete<TAssociationAggregate>(
-                            associationId, command.Input.Timestamp, @event, cancellationToken
+                            command.Input.Timestamp, @event, cancellationToken
                             )
                           .ConfigureAwait(false)
                           )

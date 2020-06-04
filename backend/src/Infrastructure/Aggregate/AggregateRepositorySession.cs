@@ -31,31 +31,17 @@ namespace Icon.Infrastructure.Aggregate
             _unsavedEvents = Enumerable.Empty<IEvent>();
         }
 
-        public Task<Result<bool, Errors>> Create<T>(
-            Guid id,
-            IEvent @event,
-            CancellationToken cancellationToken
-            )
-          where T : class, IEventSourcedAggregate, new()
-        {
-            return Create<T>(
-                id,
-                new IEvent[] { @event },
-                cancellationToken
-                );
-        }
-
-        public Task<Result<bool, Errors>> Create<T>(
-            Guid id,
-            IEnumerable<IEvent> events,
+        public async Task<Result<bool, Errors>> Create<T>(
+            ICreatedEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
         {
             AssertNotDisposed();
-            return RegisterEvents(
-                events,
-                eventArray => _session.Events.StartStream<T>(id, eventArray),
+            return
+              await RegisterEvents(
+                new IEvent[] { @event },
+                eventArray => _session.Events.StartStream<T>(@event.AggregateId, eventArray),
                 cancellationToken
                 );
         }
@@ -102,52 +88,40 @@ namespace Icon.Infrastructure.Aggregate
         }
 
         public Task<Result<bool, Errors>> Delete<T>(
-            ValueObjects.TimestampedId timestampedId,
-            IEvent @event,
+            ValueObjects.Timestamp timestamp,
+            IDeletedEvent @event,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
         {
             AssertNotDisposed();
-            _session.Delete<T>(timestampedId.Id);
-            return Append<T>(
-                timestampedId,
-                @event,
-                cancellationToken
-                );
-        }
-
-        public Task<Result<bool, Errors>> Delete<T>(
-            ValueObjects.Id id,
-            ValueObjects.Timestamp timestamp,
-            IEvent @event,
-            CancellationToken cancellationToken
-            )
-          where T : class, IEventSourcedAggregate, new()
-        {
             return
-              ValueObjects.TimestampedId.From(id, timestamp)
+              ValueObjects.TimestampedId
+              .From(@event.AggregateId, timestamp)
               .Bind(timestampedId =>
-                Delete<T>(
-                  timestampedId,
-                  @event,
-                  cancellationToken
-                  )
-                );
+                  {
+                  _session.Delete<T>(timestampedId.Id);
+                  return Append<T>(
+                      timestampedId,
+                      @event,
+                      cancellationToken
+                      );
+                  }
+                  );
         }
 
         public async Task<Result<bool, Errors>> Delete<T>(
-            IEnumerable<(ValueObjects.TimestampedId, IEvent)> timestampedIdsAndEvents,
+            IEnumerable<(ValueObjects.Timestamp, IDeletedEvent)> timestampsAndEvents,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
         {
             var deletionResults = new List<Result<bool, Errors>>();
-            foreach (var (timestampedId, @event) in timestampedIdsAndEvents)
+            foreach (var (timestamp, @event) in timestampsAndEvents)
             {
                 deletionResults.Add(
                     await Delete<T>(
-                      timestampedId, @event, cancellationToken
+                      timestamp, @event, cancellationToken
                       )
                     .ConfigureAwait(false)
                     );
