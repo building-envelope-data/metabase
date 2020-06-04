@@ -51,21 +51,21 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-          return await (
-            await session.AddAssociation<TAggregate, TAssociationAggregate, TAssociateAggregate>(
-              id => _newAssociationAddedEvent(id, command),
-              cancellationToken
+            return await (
+              await session.AddAssociation<TAggregate, TAssociationAggregate, TAssociateAggregate>(
+                id => _newAssociationAddedEvent(id, command),
+                cancellationToken
+                )
+                .ConfigureAwait(false)
               )
-              .ConfigureAwait(false)
-            )
-              .Bind(async id => await
-                  (await session.Save(cancellationToken).ConfigureAwait(false))
-                  .Bind(async _ =>
-                    await session.TimestampId<TAggregate>(id, cancellationToken).ConfigureAwait(false)
+                .Bind(async id => await
+                    (await session.Save(cancellationToken).ConfigureAwait(false))
+                    .Bind(async _ =>
+                      await session.TimestampId<TAggregate>(id, cancellationToken).ConfigureAwait(false)
+                      )
+                    .ConfigureAwait(false)
                     )
-                  .ConfigureAwait(false)
-                  )
-              .ConfigureAwait(false);
+                .ConfigureAwait(false);
         }
     }
 }

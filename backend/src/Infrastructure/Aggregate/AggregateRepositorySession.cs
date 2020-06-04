@@ -37,21 +37,21 @@ namespace Icon.Infrastructure.Aggregate
             )
           where T : class, IEventSourcedAggregate, new()
         {
-          AssertNotDisposed();
-          var id = await GenerateNewId(cancellationToken).ConfigureAwait(false);
-          var @event = newCreatedEvent(id);
-          if (@event.AggregateId != (Guid)id)
-          {
-              throw new Exception($"The aggregate identifier of the created event {@event.AggregateId} differs from the generated identifier {(Guid)id}");
-          }
-          return (
-            await Create<T>(
-                @event,
-                cancellationToken
+            AssertNotDisposed();
+            var id = await GenerateNewId(cancellationToken).ConfigureAwait(false);
+            var @event = newCreatedEvent(id);
+            if (@event.AggregateId != (Guid)id)
+            {
+                throw new Exception($"The aggregate identifier of the created event {@event.AggregateId} differs from the generated identifier {(Guid)id}");
+            }
+            return (
+              await Create<T>(
+                  @event,
+                  cancellationToken
+                )
+              .ConfigureAwait(false)
               )
-            .ConfigureAwait(false)
-            )
-            .Map(_ => id);
+              .Map(_ => id);
         }
 
         public Task<Result<ValueObjects.Id, Errors>> Create<T>(
@@ -59,7 +59,7 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
-          {
+        {
             AssertNotDisposed();
             return
               ValueObjects.Id
@@ -74,7 +74,7 @@ namespace Icon.Infrastructure.Aggregate
                   )
                   .Map(_ => id)
                   );
-          }
+        }
 
         public async Task<Result<ValueObjects.Id, Errors>> AddAssociation<TParent, TAssociation, TAssociate>(
             Func<Guid, Events.IAssociationAddedEvent> newAssociationAddedEvent,
@@ -89,7 +89,7 @@ namespace Icon.Infrastructure.Aggregate
             var @event = newAssociationAddedEvent(id);
             if (@event.AggregateId != (Guid)id)
             {
-              throw new Exception($"The aggregate identifier of the association added event {@event.AggregateId} differs from the generated identifier {(Guid)id}");
+                throw new Exception($"The aggregate identifier of the association added event {@event.AggregateId} differs from the generated identifier {(Guid)id}");
             }
             var (parentResult, associateResult) =
               await Load<TParent, TAssociate>(
@@ -188,12 +188,12 @@ namespace Icon.Infrastructure.Aggregate
               .From(@event.AggregateId, timestamp)
               .Bind(timestampedId =>
                   {
-                  _session.Delete<T>(timestampedId.Id);
-                  return Append<T>(
-                      timestampedId,
-                      @event,
-                      cancellationToken
-                      );
+                      _session.Delete<T>(timestampedId.Id);
+                      return Append<T>(
+                          timestampedId,
+                          @event,
+                          cancellationToken
+                          );
                   }
                   );
         }
