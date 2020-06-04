@@ -298,6 +298,38 @@ namespace Icon.Infrastructure.Aggregate
             return BuildResult(id, aggregate);
         }
 
+        public async Task<(Result<T1, Errors>, Result<T2, Errors>)> Load<T1, T2>(
+            (Guid, Guid) ids,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+          where T1 : class, IEventSourcedAggregate, new()
+          where T2 : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            var batch = _session.CreateBatchQuery();
+            // Loading the materialized aggregates as follows
+            // batch.Load<T>(id);
+            // is not possible because event meta data is not available during
+            // inline projection as said on
+            // https://martendb.io/documentation/events/projections/
+            // in the section on inline projections.
+            // Therefore, version and timestamp of snapshots are not set.
+            var aggregateStreamTasks = (
+              batch.Events.AggregateStream<T1>(ids.Item1),
+              batch.Events.AggregateStream<T2>(ids.Item2)
+              );
+            await batch.Execute(cancellationToken).ConfigureAwait(false);
+            await Task.WhenAll(
+                aggregateStreamTasks.Item1,
+                aggregateStreamTasks.Item2
+                )
+              .ConfigureAwait(false);
+            return (
+                BuildResult(ids.Item1, aggregateStreamTasks.Item1.Result),
+                BuildResult(ids.Item2, aggregateStreamTasks.Item2.Result)
+                );
+        }
+
         public async Task<Result<T, Errors>> Load<T>(
             Guid id,
             DateTime timestamp,

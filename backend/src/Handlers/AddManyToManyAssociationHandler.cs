@@ -40,21 +40,21 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            // TODO Do the queries below in a Marten batch!
-            var parentResult = await session.Load<TAggregate>(
-                                    command.Input.ParentId,
-                                    cancellationToken
-                                    );
-            var associateResult = await session.Load<TAssociateAggregate>(
-                                    command.Input.AssociateId,
-                                    cancellationToken
-                                    );
+            var (parentResult, associateResult) =
+              await session.Load<TAggregate, TAssociateAggregate>(
+                  (
+                   command.Input.ParentId,
+                   command.Input.AssociateId
+                  ),
+                  cancellationToken
+                  )
+              .ConfigureAwait(false);
             return
-                            await Errors.Combine(
-                                parentResult,
-                                associateResult
-                                )
-                            .Bind(async _ =>
+              await Errors.Combine(
+                  parentResult,
+                  associateResult
+                  )
+              .Bind(async _ =>
                 {
                     var doesAssociationExist =
                                     await session.Query<TAssociationAggregate>()
