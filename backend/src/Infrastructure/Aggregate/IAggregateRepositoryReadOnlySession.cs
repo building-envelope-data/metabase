@@ -97,6 +97,12 @@ namespace Icon.Infrastructure.Aggregate
           where T : class, IEventSourcedAggregate, new();
 
         public Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
+            IEnumerable<Guid> ids,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+          where T : class, IEventSourcedAggregate, new();
+
+        public Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
             IEnumerable<(Guid, DateTime)> idsAndTimestamps,
             CancellationToken cancellationToken = default(CancellationToken)
             )

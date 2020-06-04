@@ -343,6 +343,30 @@ namespace Icon.Infrastructure.Aggregate
                 );
         }
 
+        public async Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
+            IEnumerable<Guid> ids,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+            AssertNotDisposed();
+            var batch = _session.CreateBatchQuery();
+            // Loading the materialized aggregates as follows
+            // batch.Load<T>(id);
+            // is not possible because event meta data is not available during
+            // inline projection as said on
+            // https://martendb.io/documentation/events/projections/
+            // in the section on inline projections.
+            // Therefore, version and timestamp of snapshots are not set.
+            var aggregateStreamTasks =
+              ids.Select(id => batch.Events.AggregateStream<T>(id))
+              // Turning the `System.Linq.Enumerable+SelectListIterator` into a list forces the lazily evaluated `Select` to be evaluated whereby the queries are added to the batch query.
+              .ToList();
+            await batch.Execute(cancellationToken).ConfigureAwait(false);
+            var aggregates = await Task.WhenAll(aggregateStreamTasks).ConfigureAwait(false);
+            return ids.Zip(aggregates, BuildResult);
+        }
+
         /* public async Task<IEnumerable<T>> LoadAll<T>(DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new() */
         /* { */
         /*         var aggregateIds = await _session.Query<T>() */
