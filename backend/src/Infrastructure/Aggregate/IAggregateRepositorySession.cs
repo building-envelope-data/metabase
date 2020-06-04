@@ -14,6 +14,12 @@ namespace Icon.Infrastructure.Aggregate
 {
     public interface IAggregateRepositorySession : IAggregateRepositoryReadOnlySession
     {
+        public Task<Result<ValueObjects.Id, Errors>> Create<T>(
+            Func<Guid, Events.ICreatedEvent> newCreatedEvent,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new();
+
         public Task<Result<bool, Errors>> Create<T>(
             ICreatedEvent @event,
             CancellationToken cancellationToken

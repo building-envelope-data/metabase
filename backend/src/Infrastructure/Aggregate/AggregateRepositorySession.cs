@@ -31,6 +31,23 @@ namespace Icon.Infrastructure.Aggregate
             _unsavedEvents = Enumerable.Empty<IEvent>();
         }
 
+        public async Task<Result<ValueObjects.Id, Errors>> Create<T>(
+            Func<Guid, Events.ICreatedEvent> newCreatedEvent,
+            CancellationToken cancellationToken
+            )
+          where T : class, IEventSourcedAggregate, new()
+        {
+          var id = await GenerateNewId(cancellationToken).ConfigureAwait(false);
+          return (
+            await Create<T>(
+                newCreatedEvent(id),
+                cancellationToken
+              )
+            .ConfigureAwait(false)
+            )
+            .Map(_ => id);
+        }
+
         public async Task<Result<bool, Errors>> Create<T>(
             ICreatedEvent @event,
             CancellationToken cancellationToken

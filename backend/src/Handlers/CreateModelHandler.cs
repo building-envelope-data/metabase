@@ -49,15 +49,14 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            var id = await session.GenerateNewId(cancellationToken).ConfigureAwait(false);
-            var @event = _newCreatedEvent(id, command);
             return await (
                 await session.Create<TAggregate>(
-                  @event, cancellationToken
+                  id => _newCreatedEvent(id, command),
+                  cancellationToken
                   )
                 .ConfigureAwait(false)
               )
-              .Bind(async _ =>
+              .Bind(async id =>
                   {
                       // We cannot aggregate the addition tasks and execute them in
                       // parallel with `Task.WhenAll` because all addition tasks use the
