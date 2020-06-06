@@ -14,5 +14,6 @@ namespace Icon
         public const string IdCollision = "ID_COLLISION";
         public const string FileNotFound = "FILE_NOT_FOUND";
         public const string InvalidSyntax = "INVALID_SYNTAX";
+        public const string GraphQlRequestFailed = "GRAPH_QL_REQUEST_FAILED";
     }
 }

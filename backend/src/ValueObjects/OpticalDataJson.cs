@@ -30,14 +30,36 @@ namespace Icon.ValueObjects
             Json = json;
         }
 
-        public static Result<OpticalDataJson, Errors> From(
+        public static Result<OpticalDataJson, Errors> FromNestedCollections(
             object? nestedCollectionsJson,
             IReadOnlyList<object>? path = null
             )
         {
             return
-              Json.From(nestedCollectionsJson, path)
+              Json.FromNestedCollections(nestedCollectionsJson, path)
               .Bind(json =>
+                  FromJson(json, path)
+                  );
+        }
+
+        public static Result<OpticalDataJson, Errors> FromJsonElement(
+            System.Text.Json.JsonElement jsonElement,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            return
+              Json.FromJsonElement(jsonElement, path)
+              .Bind(json =>
+                  FromJson(json, path)
+                  );
+        }
+
+        private static Result<OpticalDataJson, Errors> FromJson(
+            Json json,
+            IReadOnlyList<object>? path = null
+            )
+        {
+                return
                   json.ExtractSchemaUri().Bind(schemaUri =>
                     JsonSchemaUris.Contains(schemaUri)
                     ? JsonSchema.Get(schemaUri)
@@ -53,13 +75,15 @@ namespace Icon.ValueObjects
                           code: ErrorCodes.InvalidValue
                           )
                         )
-                    )
-                  );
+                    );
         }
 
-        public object? ToNestedCollections()
+        public object ToNestedCollections()
         {
-            return Json.ToNestedCollections();
+            // In `From` we make sure that the JSON ist a JSON Object with at
+            // least the key `schema`. So, using the null-forgiving operator
+            // `!` is safe here.
+            return Json.ToNestedCollections()!;
         }
 
         protected override IEnumerable<object?> GetEqualityComponents()

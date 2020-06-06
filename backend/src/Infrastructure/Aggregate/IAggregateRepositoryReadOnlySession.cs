@@ -140,6 +140,12 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken = default(CancellationToken)
             );
 
+        public Task<IEnumerable<Result<T, Errors>>> LoadAllThatExist<T>(
+            IEnumerable<ValueObjects.Id> possibleIds,
+            CancellationToken cancellationToken = default(CancellationToken)
+            )
+          where T : class, IEventSourcedAggregate, new();
+
         public Task<IEnumerable<Result<T, Errors>>> LoadAllThatExisted<T>(
             IEnumerable<Guid> possibleIds,
             DateTime timestamp,
@@ -177,5 +183,121 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken = default(CancellationToken)
             )
           where T : class, IEventSourcedAggregate, new();
+
+        ////////////
+        // Models //
+        ////////////
+
+        public
+          Task<IEnumerable<Result<TModel, Errors>>>
+          GetModels<TModel, TAggregate, TCreatedEvent>(
+            CancellationToken cancellationToken
+            )
+          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TCreatedEvent : ICreatedEvent;
+
+        public
+          Task<IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
+          GetModelsAtTimestamps<TModel, TAggregate, TCreatedEvent>(
+            IEnumerable<ValueObjects.Timestamp> timestamps,
+            CancellationToken cancellationToken
+            )
+          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TCreatedEvent : ICreatedEvent;
+
+        //////////////////
+        // Associations //
+        //////////////////
+
+        public
+          Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
+          GetForwardManyToManyAssociationsOfModels<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedModelIds,
+            CancellationToken cancellationToken
+            )
+          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+          where TAssociationAddedEvent : Events.IAssociationAddedEvent;
+
+        public Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
+          GetBackwardManyToManyAssociationsOfModels<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
+              IEnumerable<ValueObjects.TimestampedId> timestampedModelIds,
+              CancellationToken cancellationToken
+              )
+          where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+          where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+          where TAssociationAddedEvent : Events.IAssociationAddedEvent;
+
+        public
+          Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
+          GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedModelIds,
+            CancellationToken cancellationToken
+            )
+          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+          where TAssociationAddedEvent : Events.IAssociationAddedEvent;
+
+        public
+          Task<IEnumerable<Result<TAssociationModel, Errors>>>
+          GetBackwardOneToManyAssociationOfModels<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedModelIds,
+            CancellationToken cancellationToken
+            )
+          where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+          where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+          where TAssociationAddedEvent : Events.IAssociationAddedEvent;
+
+        ////////////////
+        // Associates //
+        ////////////////
+
+        public
+          Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+          GetForwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+          where TAssociationModel : Models.IManyToManyAssociation
+          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+          where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+          where TAssociationAddedEvent : Events.IAssociationAddedEvent;
+
+        public
+          Task<IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
+          GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate, TAssociationAddedEvent>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+          where TAssociationModel : Models.IManyToManyAssociation
+          where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+          where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TAssociationAddedEvent : Events.IAssociationAddedEvent;
+
+        public
+          Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+          GetForwardOneToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+          where TAssociationModel : Models.IOneToManyAssociation
+          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+          where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+          where TAssociationAddedEvent : Events.IAssociationAddedEvent;
+
+        public
+          Task<IEnumerable<Result<TModel, Errors>>>
+          GetBackwardOneToManyAssociateOfModels<TAssociateModel, TAssociationModel, TModel, TAssociateAggregate, TAssociationAggregate, TAggregate, TAssociationAddedEvent>(
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+            CancellationToken cancellationToken
+            )
+          where TAssociationModel : Models.IOneToManyAssociation
+          where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+          where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TAssociationAddedEvent : Events.IAssociationAddedEvent;
     }
 }

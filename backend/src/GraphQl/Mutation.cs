@@ -108,7 +108,7 @@ namespace Icon.GraphQl
                 );
         }
 
-        private async Task<TPayload> RemoveAssociation<TAssociationModel, TInput, TValidatedInput, TPayload>(
+        private async Task<TPayload> RemoveManyToManyAssociation<TAssociationModel, TInput, TValidatedInput, TPayload>(
             TInput input,
             Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
             Func<ValueObjects.Id, ValueObjects.Id, ValueObjects.Timestamp, TPayload> newPayload
@@ -133,6 +133,35 @@ namespace Icon.GraphQl
                 );
             return newPayload(
                 command.Input.ParentId,
+                command.Input.AssociateId,
+                timestampedId.Timestamp
+                );
+        }
+
+        private async Task<TPayload> RemoveOneToManyAssociation<TAssociationModel, TInput, TValidatedInput, TPayload>(
+            TInput input,
+            Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
+            Func<ValueObjects.Id, ValueObjects.Timestamp, TPayload> newPayload
+        )
+          where TValidatedInput : ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>
+        {
+            var command = ResultHelpers.HandleFailure(
+                  validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
+                  .Bind(validatedInput =>
+                    Commands.RemoveAssociation<TValidatedInput>.From(
+                      input: validatedInput,
+                      creatorId: ValueObjects.Id.New() // TODO Use current user!
+                      )
+                    )
+                  );
+            var timestampedId = ResultHelpers.HandleFailure(
+                await _commandBus
+                .Send<
+                Commands.RemoveAssociation<TValidatedInput>,
+                Result<ValueObjects.TimestampedId, Errors>
+                >(command).ConfigureAwait(false)
+                );
+            return newPayload(
                 command.Input.AssociateId,
                 timestampedId.Timestamp
                 );
@@ -337,7 +366,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentConcretizationDataLoader componentConcretizationLoader
             )
         {
-            return RemoveAssociation<
+            return RemoveManyToManyAssociation<
               Models.ComponentConcretization,
               RemoveComponentConcretizationInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentConcretization>,
@@ -372,7 +401,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentManufacturerDataLoader componentManufacturerLoader
             )
         {
-            return RemoveAssociation<
+            return RemoveManyToManyAssociation<
               Models.ComponentManufacturer,
               RemoveComponentManufacturerInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>,
@@ -407,7 +436,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentPartDataLoader componentPartLoader
             )
         {
-            return RemoveAssociation<
+            return RemoveManyToManyAssociation<
               Models.ComponentPart,
               RemoveComponentPartInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentPart>,
@@ -442,7 +471,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentVariantDataLoader componentVariantLoader
             )
         {
-            return RemoveAssociation<
+            return RemoveManyToManyAssociation<
               Models.ComponentVariant,
               RemoveComponentVariantInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVariant>,
@@ -477,7 +506,7 @@ namespace Icon.GraphQl
             [DataLoader] ComponentVersionDataLoader componentVersionLoader
             )
         {
-            return RemoveAssociation<
+            return RemoveManyToManyAssociation<
               Models.ComponentVersion,
               RemoveComponentVersionInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVersion>,
@@ -512,7 +541,7 @@ namespace Icon.GraphQl
             [DataLoader] InstitutionRepresentativeDataLoader institutionRepresentativeLoader
             )
         {
-            return RemoveAssociation<
+            return RemoveManyToManyAssociation<
               Models.InstitutionRepresentative,
               RemoveInstitutionRepresentativeInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.InstitutionRepresentative>,
@@ -547,7 +576,7 @@ namespace Icon.GraphQl
             [DataLoader] MethodDeveloperDataLoader methodDeveloperLoader
             )
         {
-            return RemoveAssociation<
+            return RemoveManyToManyAssociation<
               Models.MethodDeveloper,
               RemoveMethodDeveloperInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.MethodDeveloper>,
@@ -582,7 +611,7 @@ namespace Icon.GraphQl
             [DataLoader] PersonAffiliationDataLoader personAffiliationLoader
             )
         {
-            return RemoveAssociation<
+            return RemoveManyToManyAssociation<
               Models.PersonAffiliation,
               RemovePersonAffiliationInput,
               ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>,

@@ -9,27 +9,14 @@ using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Queries
 {
-    public sealed class GetOneToManyAssociatesOfModels<TModel, TAssociateModel>
-      : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+    public abstract class GetOneToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
+      : GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
     {
-        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedIds { get; }
-
-        private GetOneToManyAssociatesOfModels(
+        protected GetOneToManyAssociatesOfModels(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
+          : base(timestampedIds)
         {
-            TimestampedIds = timestampedIds;
-        }
-
-        public static Result<GetOneToManyAssociatesOfModels<TModel, TAssociateModel>, Errors> From(
-            IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
-            )
-        {
-            return Result.Ok<GetOneToManyAssociatesOfModels<TModel, TAssociateModel>, Errors>(
-                new GetOneToManyAssociatesOfModels<TModel, TAssociateModel>(
-                  timestampedIds: timestampedIds
-                  )
-                );
         }
     }
 }

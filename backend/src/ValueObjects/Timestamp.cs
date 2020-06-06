@@ -50,6 +50,11 @@ namespace Icon.ValueObjects
             yield return Value;
         }
 
+        public string InUtcFormat()
+        {
+            return Value.ToString("yyyy-MM-ddTHH\\:mm\\:ss.ffffffZ");
+        }
+
         public static explicit operator Timestamp(DateTime timestamp)
         {
             return From(timestamp).Value;

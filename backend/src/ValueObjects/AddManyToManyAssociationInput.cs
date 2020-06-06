@@ -5,24 +5,17 @@ using Errors = Icon.Errors;
 namespace Icon.ValueObjects
 {
     public abstract class AddManyToManyAssociationInput
-      : ValueObject
+      : AddAssociationInput
     {
-        public Id ParentId { get; }
-        public Id AssociateId { get; }
-
         protected AddManyToManyAssociationInput(
             Id parentId,
             Id associateId
             )
+          : base(
+              parentId: parentId,
+              associateId: associateId
+              )
         {
-            ParentId = parentId;
-            AssociateId = associateId;
-        }
-
-        protected override IEnumerable<object?> GetEqualityComponents()
-        {
-            yield return ParentId;
-            yield return AssociateId;
         }
     }
 }

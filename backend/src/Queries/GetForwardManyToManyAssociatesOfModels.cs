@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using ValueObjects = Icon.ValueObjects;
+using Icon.Infrastructure.Query;
 
 namespace Icon.Queries
 {
     public sealed class GetForwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
-      : GetManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
+      : GetManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>,
+        IQuery<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
     {
         private GetForwardManyToManyAssociatesOfModels(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds

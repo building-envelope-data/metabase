@@ -20,7 +20,7 @@ namespace Icon.GraphQl
         {
             return new OpticalData(
                 id: model.Id,
-                data: model.Data,
+                data: model.Data.ToNestedCollections(),
                 timestamp: model.Timestamp,
                 requestTimestamp: requestTimestamp
                 );
@@ -43,20 +43,24 @@ namespace Icon.GraphQl
             Data = data;
         }
 
-        public Task<IReadOnlyList<Component>> GetComponents(
+        public async Task<ValueObjects.Id> GetComponentId(
             [Parent] OpticalData opticalData,
-            [DataLoader] ComponentsOfOpticalDataDataLoader componentsLoader
+            [DataLoader] ComponentOfOpticalDataDataLoader componentLoader
             )
         {
-            return componentsLoader.LoadAsync(
-                TimestampHelpers.TimestampId(opticalData.Id, opticalData.RequestTimestamp)
-                );
+            return
+              (
+               await componentLoader.LoadAsync(
+                 TimestampHelpers.TimestampId(opticalData.Id, opticalData.RequestTimestamp)
+                 )
+              )
+              .Id;
         }
 
-        public sealed class ComponentsOfOpticalDataDataLoader
-            : BackwardManyToManyAssociatesOfModelDataLoader<Component, Models.OpticalData, Models.ComponentOpticalData, Models.Component>
+        public sealed class ComponentOfOpticalDataDataLoader
+            : BackwardOneToManyAssociateOfModelDataLoader<Component, Models.OpticalData, Models.ComponentOpticalData, Models.Component>
         {
-            public ComponentsOfOpticalDataDataLoader(IQueryBus queryBus)
+            public ComponentOfOpticalDataDataLoader(IQueryBus queryBus)
               : base(Component.FromModel, queryBus)
             {
             }

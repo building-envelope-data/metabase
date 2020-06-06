@@ -15,8 +15,8 @@ using JsonObject = Manatee.Json.JsonObject;
 using JsonSyntaxException = Manatee.Json.JsonSyntaxException;
 using JsonValue = Manatee.Json.JsonValue;
 using JsonValueType = Manatee.Json.JsonValueType;
-using JToken = Newtonsoft.Json.Linq.JToken;
-using JValue = Newtonsoft.Json.Linq.JValue;
+using JsonElement = System.Text.Json.JsonElement;
+using JsonValueKind = System.Text.Json.JsonValueKind;
 
 namespace Icon.ValueObjects
 {
@@ -76,12 +76,20 @@ namespace Icon.ValueObjects
             };
         }
 
-        private static Result<JsonValue, Errors> ConvertNestedCollectionsToJsonValue(object? jsonValue)
+        private static Result<JsonValue, Errors> ConvertNestedCollectionsToJsonValue(
+            object? jsonValue,
+            IReadOnlyList<object>? path = null
+            )
         {
             return jsonValue switch
             {
                 IList<object?> list =>
-                  list.Select(ConvertNestedCollectionsToJsonValue)
+                  list.Select((v, index) =>
+                      ConvertNestedCollectionsToJsonValue(
+                        v,
+                        path?.Append(index).ToList().AsReadOnly()
+                        )
+                      )
                   .Combine()
                   .Map(jsonValues =>
                       new JsonValue(
@@ -107,7 +115,10 @@ namespace Icon.ValueObjects
                 decimal number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
                 IDictionary<string, object?> dictionary =>
                   dictionary.Select(pair =>
-                      ConvertNestedCollectionsToJsonValue(pair.Value)
+                      ConvertNestedCollectionsToJsonValue(
+                        pair.Value,
+                        path?.Append(pair.Key).ToList().AsReadOnly()
+                        )
                       .Map(jsonValue =>
                         new KeyValuePair<string, JsonValue>(pair.Key, jsonValue)
                         )
@@ -129,7 +140,75 @@ namespace Icon.ValueObjects
                 _ => Result.Failure<JsonValue, Errors>(
                     Errors.One(
                       message: $"The JSON value `{jsonValue}` of type `{jsonValue.GetType()}` fell through",
-                      code: ErrorCodes.InvalidValue
+                      code: ErrorCodes.InvalidValue,
+                      path: path
+                      )
+                    )
+            };
+        }
+
+        private static Result<JsonValue, Errors> ConvertJsonElementToJsonValue(
+            JsonElement jsonElement,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            return jsonElement.ValueKind switch
+            {
+                JsonValueKind.Array =>
+                  jsonElement.EnumerateArray()
+                  .Select((v, index) =>
+                      ConvertJsonElementToJsonValue(
+                        v,
+                        path?.Append(index).ToList().AsReadOnly()
+                        )
+                      )
+                  .Combine()
+                  .Map(jsonValues =>
+                      new JsonValue(
+                        new JsonArray(jsonValues)
+                        )
+                      ),
+                JsonValueKind.False => Result.Ok<JsonValue, Errors>(new JsonValue(false)),
+                JsonValueKind.Null => Result.Ok<JsonValue, Errors>(JsonValue.Null),
+                JsonValueKind.Number => Result.Ok<JsonValue, Errors>(new JsonValue(jsonElement.GetDouble())),
+                JsonValueKind.Object =>
+                  jsonElement.EnumerateObject()
+                  .Select(jsonProperty =>
+                      ConvertJsonElementToJsonValue(
+                        jsonProperty.Value,
+                        path?.Append(jsonProperty.Name).ToList().AsReadOnly()
+                        )
+                      .Map(jsonValue =>
+                        new KeyValuePair<string, JsonValue>(jsonProperty.Name, jsonValue)
+                        )
+                      )
+                  .Combine()
+                  .Map(stringJsonValuePairs =>
+                      new JsonValue(
+                        new JsonObject(
+                          stringJsonValuePairs.ToDictionary(
+                            pair => pair.Key,
+                            pair => (JsonValue?)pair.Value
+                            )
+                          )
+                        )
+                      ),
+                JsonValueKind.String => Result.Ok<JsonValue, Errors>(new JsonValue(jsonElement.GetString())),
+                JsonValueKind.True => Result.Ok<JsonValue, Errors>(new JsonValue(true)),
+                JsonValueKind.Undefined => Result.Failure<JsonValue, Errors>(
+                    Errors.One(
+                      message: $"The JSON element `{jsonElement}` is of kind `{JsonValueKind.Undefined}`",
+                      code: ErrorCodes.InvalidValue,
+                      path: path
+                      )
+                    ),
+                // God-damned C# does not have switch expression exhaustiveness for
+                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                _ => Result.Failure<JsonValue, Errors>(
+                    Errors.One(
+                      message: $"The JSON element `{jsonElement}` of kind `{jsonElement.ValueKind}` fell through",
+                      code: ErrorCodes.InvalidValue,
+                      path: path
                       )
                     )
             };
@@ -144,13 +223,23 @@ namespace Icon.ValueObjects
             Value = value;
         }
 
-        public static Result<Json, Errors> From(
+        public static Result<Json, Errors> FromNestedCollections(
             object? nestedCollectionsJson,
             IReadOnlyList<object>? path = null
             )
         {
             return
-              ConvertNestedCollectionsToJsonValue(nestedCollectionsJson)
+              ConvertNestedCollectionsToJsonValue(nestedCollectionsJson, path)
+              .Map(jsonValue => new Json(jsonValue));
+        }
+
+        public static Result<Json, Errors> FromJsonElement(
+            JsonElement jsonElement,
+            IReadOnlyList<object>? path = null
+            )
+        {
+            return
+              ConvertJsonElementToJsonValue(jsonElement, path)
               .Map(jsonValue => new Json(jsonValue));
         }
 

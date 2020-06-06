@@ -17,9 +17,6 @@ namespace Icon.Aggregates
         public string Description { get; set; }
         public Uri Locator { get; set; }
 
-        [ForeignKey(typeof(InstitutionAggregate))]
-        public Guid InstitutionId { get; set; }
-
 #nullable disable
         public DatabaseAggregate() { }
 #nullable enable
@@ -32,7 +29,6 @@ namespace Icon.Aggregates
             Name = data.Name;
             Description = data.Description;
             Locator = data.Locator;
-            InstitutionId = data.InstitutionId;
         }
 
         private void Apply(Marten.Events.Event<Events.DatabaseDeleted> @event)
@@ -47,16 +43,14 @@ namespace Icon.Aggregates
                     base.Validate(),
                     ValidateNull(Name, nameof(Name)),
                     ValidateNull(Description, nameof(Description)),
-                    ValidateNull(Locator, nameof(Locator)),
-                    ValidateEmpty(InstitutionId, nameof(InstitutionId))
+                    ValidateNull(Locator, nameof(Locator))
                   );
 
             return Result.Combine(
                   base.Validate(),
                   ValidateNonNull(Name, nameof(Name)),
                   ValidateNonNull(Description, nameof(Description)),
-                  ValidateNonNull(Locator, nameof(Locator)),
-                  ValidateNonEmpty(InstitutionId, nameof(InstitutionId))
+                  ValidateNonNull(Locator, nameof(Locator))
                   );
         }
 
@@ -70,7 +64,6 @@ namespace Icon.Aggregates
             var nameResult = ValueObjects.Name.From(Name);
             var descriptionResult = ValueObjects.Description.From(Description);
             var locatorResult = ValueObjects.AbsoluteUri.From(Locator);
-            var institutionIdResult = ValueObjects.Id.From(InstitutionId);
             var timestampResult = ValueObjects.Timestamp.From(Timestamp);
 
             return
@@ -84,7 +77,6 @@ namespace Icon.Aggregates
                     name: nameResult.Value,
                     description: descriptionResult.Value,
                     locator: locatorResult.Value,
-                    institutionId: institutionIdResult.Value,
                     timestamp: timestampResult.Value
                     )
                   );

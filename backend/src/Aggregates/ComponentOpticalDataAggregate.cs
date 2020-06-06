@@ -9,7 +9,7 @@ using Events = Icon.Events;
 namespace Icon.Aggregates
 {
     public sealed class ComponentOpticalDataAggregate
-      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentOpticalData>
+      : EventSourcedAggregate, IOneToManyAssociationAggregate, IConvertible<Models.ComponentOpticalData>
     {
         // The instance variables `ComponentId` and `OpticalDataId` are
         // abbreviated to make the corresponding database index have less than

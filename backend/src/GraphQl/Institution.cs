@@ -102,7 +102,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class DatabasesOperatedByInstitutionDataLoader
-            : OneToManyAssociatesOfModelDataLoader<Database, Models.Institution, Models.Database>
+            : ForwardOneToManyAssociatesOfModelDataLoader<Database, Models.Institution, Models.InstitutionOperatedDatabase, Models.Database>
         {
             public DatabasesOperatedByInstitutionDataLoader(IQueryBus queryBus)
               : base(Database.FromModel, queryBus)

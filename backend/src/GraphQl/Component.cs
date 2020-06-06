@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GreenDonut;
 using HotChocolate;
@@ -44,12 +45,30 @@ namespace Icon.GraphQl
             Information = information;
         }
 
-        public IReadOnlyList<object> GetOpticalData(
-            [Parent] Component component
+        public Task<IReadOnlyList<OpticalData>> GetOpticalData(
+            [Parent] Component component,
+            [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader
             )
         {
-            return new string[] { "123", "455" };
+          return opticalDataLoader.LoadAsync(
+              TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp)
+              );
         }
+
+        /* public async Task<IReadOnlyList<object>> GetOpticalData( */
+        /*     [Parent] Component component, */
+        /*     [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader */
+        /*     ) */
+        /* { */
+        /*   return (await */
+        /*       opticalDataLoader.LoadAsync( */
+        /*         TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp) */
+        /*         ) */
+        /*       .ConfigureAwait(false) */
+        /*       ) */
+        /*     .Select(opticalData => opticalData.Data) */
+        /*     .ToList().AsReadOnly(); */
+        /* } */
 
         public IReadOnlyList<Database> GetWhoHasOpticalData(
             [Parent] Component component

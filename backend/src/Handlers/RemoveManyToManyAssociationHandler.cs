@@ -47,34 +47,22 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            var maybeAssociationId =
-              await session.Query<TAssociationAggregate>()
-              .Where(a =>
-                  a.ParentId == command.Input.ParentId &&
-                  a.AssociateId == command.Input.AssociateId
-                  )
-              .Select(a => a.Id)
-              .FirstOrDefaultAsync(cancellationToken);
-            return
-              await ValueObjects.Id.From(maybeAssociationId)
-              .Bind(async associationId =>
-                  {
-                      var @event = _newAssociationRemovedEvent(associationId, command);
-                      return await (
-                          await session.Delete<TAssociationAggregate>(
-                            command.Input.Timestamp, @event, cancellationToken
-                            )
-                          .ConfigureAwait(false)
-                          )
-                      .Bind(async _ => await
-                          (await session.Save(cancellationToken).ConfigureAwait(false))
-                          .Bind(async _ => await
-                            session.TimestampId<TAssociationAggregate>(associationId, cancellationToken).ConfigureAwait(false)
-                            )
-                          .ConfigureAwait(false)
-                          )
-                      .ConfigureAwait(false);
-                  }
+            return await
+              (
+               await session.RemoveManyToManyAssociation<TAssociationAggregate>(
+                 (command.Input.ParentId, command.Input.AssociateId),
+                 command.Input.Timestamp,
+                 id => _newAssociationRemovedEvent(id, command),
+                 cancellationToken
+                 )
+               .ConfigureAwait(false)
+              )
+              .Bind(async associationId => await
+                  (await session.Save(cancellationToken).ConfigureAwait(false))
+                  .Bind(async _ => await
+                      session.TimestampId<TAssociationAggregate>(associationId, cancellationToken).ConfigureAwait(false)
+                      )
+                  .ConfigureAwait(false)
                   )
               .ConfigureAwait(false);
         }

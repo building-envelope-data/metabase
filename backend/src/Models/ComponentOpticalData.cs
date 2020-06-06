@@ -5,7 +5,7 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.Models
 {
     public sealed class ComponentOpticalData
-      : Model, IManyToManyAssociation
+      : Model, IOneToManyAssociation
     {
         public ValueObjects.Id ComponentId { get; }
         public ValueObjects.Id OpticalDataId { get; }

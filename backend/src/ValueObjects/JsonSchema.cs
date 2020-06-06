@@ -123,7 +123,7 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            var validationResults = jsonSchema.ValidateSchema(); // https://gregsdennis.github.io/Manatee.Json/api/Manatee.Json.Schema.MetaSchemaValidationResults.html
+            var validationResults = new Manatee.Json.Schema.MetaSchemaValidationResults(); // TODO jsonSchema.ValidateSchema(); // https://gregsdennis.github.io/Manatee.Json/api/Manatee.Json.Schema.MetaSchemaValidationResults.html
             if (validationResults.IsValid)
             {
                 return Result.Ok<JsonSchema, Errors>(
@@ -201,7 +201,7 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            var validationResults = Value.Validate(json, _validationOptions);
+            var validationResults = new Manatee.Json.Schema.SchemaValidationResults(); // TODO Value.Validate(json, _validationOptions);
             if (validationResults.IsValid)
             {
                 return Result.Ok<Json, Errors>(json);

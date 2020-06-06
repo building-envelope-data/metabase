@@ -54,6 +54,8 @@ namespace Icon.Configuration
                   .AddType<HotChocolate.Types.Relay.PageInfoType>()
                   .AddType<GraphQlX.ComponentType>()
                   .AddType<GraphQlX.CreateOpticalDataInputType>()
+                  .AddType<GraphQlX.OpticalDataType>()
+                  .AddType<GraphQlX.OpticalDataIkdbType>()
 
                   .Create(),
                   new QueryExecutionOptions

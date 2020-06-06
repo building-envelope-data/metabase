@@ -19,7 +19,7 @@ using Queries = Icon.Queries;
 namespace Icon.Handlers
 {
     public sealed class GetDevelopersOfMethodsHandler
-      : IQueryHandler<Queries.GetManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
+      : IQueryHandler<Queries.GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
     {
         public static async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Do(
             IAggregateRepositoryReadOnlySession session,
@@ -29,14 +29,12 @@ namespace Icon.Handlers
         {
             // Note that the two handlers must not be executed simultaneously
             // because they both use the same session.
-            var institutionsResults = await GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.MethodAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>.Do(
-                session,
+            var institutionsResults = await session.GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Institution, Aggregates.MethodAggregate, Aggregates.InstitutionMethodDeveloperAggregate, Aggregates.InstitutionAggregate, Events.InstitutionMethodDeveloperAdded>(
                 timestampedIds,
                 cancellationToken
                 )
               .ConfigureAwait(false);
-            var personsResults = await GetForwardManyToManyAssociatesOfModelsHandler<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.MethodAggregate, Aggregates.PersonMethodDeveloperAggregate, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>.Do(
-                session,
+            var personsResults = await session.GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Person, Aggregates.MethodAggregate, Aggregates.PersonMethodDeveloperAggregate, Aggregates.PersonAggregate, Events.PersonMethodDeveloperAdded>(
                 timestampedIds,
                 cancellationToken
                 )
@@ -57,7 +55,7 @@ namespace Icon.Handlers
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Handle(
-            Queries.GetManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
+            Queries.GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
             CancellationToken cancellationToken
             )
         {

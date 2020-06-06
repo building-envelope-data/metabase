@@ -11,7 +11,7 @@ namespace Icon.Events
     {
         public static ComponentOpticalDataRemoved From(
             Guid componentOpticalDataId,
-            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentOpticalData>> command
+            Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<Models.ComponentOpticalData>> command
             )
         {
             return new ComponentOpticalDataRemoved(

@@ -20,35 +20,35 @@ using Queries = Icon.Queries;
 namespace Icon.Handlers
 {
     public sealed class GetForwardManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>
-      : GetManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>
+      : GetManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>,
+        IQueryHandler<Queries.GetForwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
       where TAssociationModel : Models.IManyToManyAssociation
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
       where TAssociationAddedEvent : Events.IAssociationAddedEvent
     {
-        public static Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Do(
-            IAggregateRepositoryReadOnlySession session,
-            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
+        public GetForwardManyToManyAssociatesOfModelsHandler(
+            IAggregateRepository repository
+            )
+          : base(repository)
+        {
+        }
+
+        public async Task<IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>> Handle(
+            Queries.GetForwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel> query,
             CancellationToken cancellationToken
             )
         {
-            return GetManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>.Do(
-                session,
-                timestampedIds,
-                association => association.AssociateId,
-                GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>.Do,
-                cancellationToken
-                );
-        }
-
-        public GetForwardManyToManyAssociatesOfModelsHandler(IAggregateRepository repository)
-          : base(
-              repository,
-              association => association.AssociateId,
-              GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>.Do
-              )
-        {
+            using (var session = _repository.OpenReadOnlySession())
+            {
+                return await
+                  session.GetForwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>(
+                    query.TimestampedIds,
+                    cancellationToken
+                    )
+                  .ConfigureAwait(false);
+            }
         }
     }
 }

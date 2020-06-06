@@ -28,7 +28,7 @@ namespace Icon.GraphQl
             IReadOnlyList<object> path
             )
         {
-            var dataResult = ValueObjects.OpticalDataJson.From(
+            var dataResult = ValueObjects.OpticalDataJson.FromNestedCollections(
                 self.Data,
                 path.Append("data").ToList().AsReadOnly()
                 );

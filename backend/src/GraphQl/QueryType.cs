@@ -17,9 +17,9 @@ namespace Icon.GraphQl
     {
         protected override void Configure(IObjectTypeDescriptor<Query> descriptor)
         {
-            descriptor
-              .Field(f => f.GetOpticalData(null!))
-              .Type<NonNullType<ListType<NonNullType<AnyType>>>>();
+            /* descriptor */
+            /*   .Field(f => f.GetOpticalData(null!, null!, null!, null!)) */
+            /*   .Type<NonNullType<ListType<NonNullType<AnyType>>>>(); */
         }
     }
 }

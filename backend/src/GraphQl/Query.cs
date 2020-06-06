@@ -39,11 +39,68 @@ namespace Icon.GraphQl
                 );
         }
 
-        public IReadOnlyList<object> GetOpticalData(
-            ValueObjects.Id componentId
+        public Task<IReadOnlyList<OpticalData>> GetOpticalData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader,
+            IResolverContext resolverContext
             )
         {
-            return new string[] { "123", "455" };
+          return opticalDataLoader.LoadAsync(
+              TimestampHelpers.TimestampId(
+                componentId,
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                )
+              );
+        }
+
+        public Task<IReadOnlyList<OpticalDataIkdb>> GetOpticalDataIkdb(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] OpticalDataIkdbOfComponentDataLoader opticalDataIkdbLoader,
+            IResolverContext resolverContext
+            )
+        {
+          return opticalDataIkdbLoader.LoadAsync(
+              TimestampHelpers.TimestampId(
+                componentId,
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                )
+              );
+        }
+
+        /* public async Task<IReadOnlyList<object>> GetOpticalData( */
+        /*     ValueObjects.Id componentId, */
+        /*     ValueObjects.Timestamp? timestamp, */
+        /*     [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader */
+        /*     ) */
+        /* { */
+        /*   return (await */
+        /*       opticalDataLoader.LoadAsync( */
+        /*         TimestampHelpers.TimestampId( */
+        /*           componentId, */
+        /*           timestamp ?? TimestampHelpers.Fetch(resolverContext) */
+        /*           ) */
+        /*         ) */
+        /*       .ConfigureAwait(false) */
+        /*       ) */
+        /*     .Select(opticalData => opticalData.Data) */
+        /*     .ToList().AsReadOnly(); */
+        /* } */
+
+        public Task<bool> HasOpticalData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] HasOpticalDataForComponentDataLoader hasOpticalDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+          return hasOpticalDataLoader.LoadAsync(
+              TimestampHelpers.TimestampId(
+                componentId,
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                )
+              );
         }
 
         public IReadOnlyList<Database> GetWhoHasOpticalData(

@@ -6,22 +6,8 @@ using Errors = Icon.Errors;
 namespace Icon.ValueObjects
 {
     public sealed class AddComponentOpticalDataInput
-      : AddManyToManyAssociationInput
+      : AddOneToManyAssociationInput
     {
-        public Id ComponentId { get => ParentId; }
-        public Id OpticalDataId { get => AssociateId; }
-
-        private AddComponentOpticalDataInput(
-            Id componentId,
-            Id opticalDataId
-            )
-          : base(
-              parentId: componentId,
-              associateId: opticalDataId
-              )
-        {
-        }
-
         public static Result<AddComponentOpticalDataInput, Errors> From(
             Id componentId,
             Id opticalDataId
@@ -34,6 +20,20 @@ namespace Icon.ValueObjects
                     opticalDataId: opticalDataId
                     )
                   );
+        }
+
+        public Id ComponentId { get => ParentId; }
+        public Id OpticalDataId { get => AssociateId; }
+
+        private AddComponentOpticalDataInput(
+            Id componentId,
+            Id opticalDataId
+            )
+          : base(
+              parentId: componentId,
+              associateId: opticalDataId
+              )
+        {
         }
     }
 }

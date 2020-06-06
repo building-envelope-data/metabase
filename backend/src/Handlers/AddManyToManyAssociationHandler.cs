@@ -52,8 +52,9 @@ namespace Icon.Handlers
             )
         {
             return await (
-              await session.AddAssociation<TAggregate, TAssociationAggregate, TAssociateAggregate>(
+              await session.AddManyToManyAssociation<TAggregate, TAssociationAggregate, TAssociateAggregate>(
                 id => _newAssociationAddedEvent(id, command),
+                AddAssociationCheck.PARENT_AND_ASSOCIATE,
                 cancellationToken
                 )
                 .ConfigureAwait(false)

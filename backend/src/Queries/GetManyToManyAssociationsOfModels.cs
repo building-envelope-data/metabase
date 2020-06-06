@@ -10,15 +10,14 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.Queries
 {
     public abstract class GetManyToManyAssociationsOfModels<TModel, TAssociationModel>
-      : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
+      : GetAssociationsOfModels<TModel, TAssociationModel>,
+        IQuery<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
     {
-        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedIds { get; }
-
         protected GetManyToManyAssociationsOfModels(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
+          : base(timestampedIds)
         {
-            TimestampedIds = timestampedIds;
         }
     }
 }

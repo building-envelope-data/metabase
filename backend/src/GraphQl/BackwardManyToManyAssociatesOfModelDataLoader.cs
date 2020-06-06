@@ -13,16 +13,16 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public class BackwardManyToManyAssociatesOfModelDataLoader<TAssociateGraphQlObject, TModel, TAssociationModel, TAssociateModel>
-      : AssociatesOfModelDataLoader<TAssociateGraphQlObject, TModel, TAssociationModel, TAssociateModel, Queries.GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>>
+    public class BackwardManyToManyAssociatesOfModelDataLoader<TGraphQlObject, TAssociateModel, TAssociationModel, TModel>
+      : AssociatesOfModelDataLoader<TGraphQlObject, TAssociateModel, TAssociationModel, TModel, Queries.GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>>
     {
         public BackwardManyToManyAssociatesOfModelDataLoader(
-            Func<TAssociateModel, ValueObjects.Timestamp, TAssociateGraphQlObject> mapAssociateModelToGraphQlObject,
+            Func<TModel, ValueObjects.Timestamp, TGraphQlObject> mapModelToGraphQlObject,
             IQueryBus queryBus
             )
           : base(
-            Queries.GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>.From,
-            mapAssociateModelToGraphQlObject,
+            Queries.GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>.From,
+            mapModelToGraphQlObject,
             queryBus
             )
         {

@@ -51,7 +51,7 @@ namespace Icon.Aggregates
                 return Result.Failure<Models.OpticalData, Errors>(virginResult.Error);
 
             var idResult = ValueObjects.Id.From(Id);
-            var dataResult = ValueObjects.OpticalDataJson.From(Data);
+            var dataResult = ValueObjects.OpticalDataJson.FromNestedCollections(Data);
             var timestampResult = ValueObjects.Timestamp.From(Timestamp);
 
             return
