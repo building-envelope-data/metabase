@@ -40,7 +40,10 @@ services:
       - ASPNETCORE_URLS=https://+;http://+
       - ASPNETCORE_HTTPS_PORT=5001
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_Kestrel__Certificates__Development__Password=crypticpassword
+      # - ASPNETCORE_Kestrel__Certificates__Development__Password=crypticpassword
+      # https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/https/localhost.pfx
     depends_on:
       - database
 
