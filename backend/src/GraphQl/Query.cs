@@ -103,11 +103,19 @@ namespace Icon.GraphQl
               );
         }
 
-        public IReadOnlyList<Database> GetWhoHasOpticalData(
-            ValueObjects.Id componentId
+        public Task<IReadOnlyList<Database>> GetWhoHasOpticalData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] WhoHasOpticalDataForComponentDataLoader whoHasOpticalDataLoader,
+            IResolverContext resolverContext
             )
         {
-            return new Database[] { };
+          return whoHasOpticalDataLoader.LoadAsync(
+              TimestampHelpers.TimestampId(
+                componentId,
+                timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                )
+              );
         }
 
         public IReadOnlyList<ValueObjects.Id> GetSearchComponents(

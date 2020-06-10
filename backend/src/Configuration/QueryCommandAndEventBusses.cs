@@ -288,6 +288,15 @@ namespace Icon.Configuration
                           ),
                     }
                     );
+
+            // Has
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.HasOpticalDataForComponents,
+              IEnumerable<Result<bool, Errors>>
+                >,
+              Handlers.HasOpticalDataForComponentsHandler
+                >();
         }
 
         private static void AddOpticalDataIkdbHandlers(IServiceCollection services)
@@ -299,6 +308,15 @@ namespace Icon.Configuration
               IEnumerable<Result<IEnumerable<Result<Models.OpticalDataIkdb, Errors>>, Errors>>
                 >,
               Handlers.GetOpticalDataIkdbOfComponentsHandler
+                >();
+
+            // Who Has
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.WhoHasOpticalDataForComponents,
+              IEnumerable<Result<IEnumerable<Result<Models.Database, Errors>>, Errors>>
+                >,
+              Handlers.WhoHasOpticalDataForComponentsHandler
                 >();
         }
 
