@@ -59,23 +59,23 @@ namespace Icon.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-                return
-                  json.ExtractSchemaUri().Bind(schemaUri =>
-                    JsonSchemaUris.Contains(schemaUri)
-                    ? JsonSchema.Get(schemaUri)
-                      .Bind(jsonSchema =>
-                        jsonSchema.Validate(json, path)
-                        .Map(validatedJson =>
-                          new OpticalDataJson(validatedJson)
-                          )
-                        )
-                    : Result.Failure<OpticalDataJson, Errors>(
-                        Errors.One(
-                          message: $"The JSON schema URI `{schemaUri}` for optical data is none of the supported ones: `{string.Join("`, `", JsonSchemaUris)}`",
-                          code: ErrorCodes.InvalidValue
-                          )
-                        )
-                    );
+            return
+              json.ExtractSchemaUri().Bind(schemaUri =>
+                JsonSchemaUris.Contains(schemaUri)
+                ? JsonSchema.Get(schemaUri)
+                  .Bind(jsonSchema =>
+                    jsonSchema.Validate(json, path)
+                    .Map(validatedJson =>
+                      new OpticalDataJson(validatedJson)
+                      )
+                    )
+                : Result.Failure<OpticalDataJson, Errors>(
+                    Errors.One(
+                      message: $"The JSON schema URI `{schemaUri}` for optical data is none of the supported ones: `{string.Join("`, `", JsonSchemaUris)}`",
+                      code: ErrorCodes.InvalidValue
+                      )
+                    )
+                );
         }
 
         public object ToNestedCollections()

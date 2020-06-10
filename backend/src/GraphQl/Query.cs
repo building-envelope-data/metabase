@@ -46,12 +46,12 @@ namespace Icon.GraphQl
             IResolverContext resolverContext
             )
         {
-          return opticalDataLoader.LoadAsync(
-              TimestampHelpers.TimestampId(
-                componentId,
-                timestamp ?? TimestampHelpers.Fetch(resolverContext)
-                )
-              );
+            return opticalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
         }
 
         public Task<IReadOnlyList<OpticalDataIkdb>> GetOpticalDataIkdb(
@@ -61,12 +61,12 @@ namespace Icon.GraphQl
             IResolverContext resolverContext
             )
         {
-          return opticalDataIkdbLoader.LoadAsync(
-              TimestampHelpers.TimestampId(
-                componentId,
-                timestamp ?? TimestampHelpers.Fetch(resolverContext)
-                )
-              );
+            return opticalDataIkdbLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
         }
 
         /* public async Task<IReadOnlyList<object>> GetOpticalData( */
@@ -95,12 +95,12 @@ namespace Icon.GraphQl
             IResolverContext resolverContext
             )
         {
-          return hasOpticalDataLoader.LoadAsync(
-              TimestampHelpers.TimestampId(
-                componentId,
-                timestamp ?? TimestampHelpers.Fetch(resolverContext)
-                )
-              );
+            return hasOpticalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
         }
 
         public Task<IReadOnlyList<Database>> GetWhoHasOpticalData(
@@ -110,12 +110,12 @@ namespace Icon.GraphQl
             IResolverContext resolverContext
             )
         {
-          return whoHasOpticalDataLoader.LoadAsync(
-              TimestampHelpers.TimestampId(
-                componentId,
-                timestamp ?? TimestampHelpers.Fetch(resolverContext)
-                )
-              );
+            return whoHasOpticalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
         }
 
         public IReadOnlyList<ValueObjects.Id> GetSearchComponents(

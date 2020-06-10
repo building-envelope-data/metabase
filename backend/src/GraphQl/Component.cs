@@ -50,9 +50,9 @@ namespace Icon.GraphQl
             [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader
             )
         {
-          return opticalDataLoader.LoadAsync(
-              TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp)
-              );
+            return opticalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp)
+                );
         }
 
         /* public async Task<IReadOnlyList<object>> GetOpticalData( */

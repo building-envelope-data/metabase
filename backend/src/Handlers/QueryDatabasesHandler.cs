@@ -1,8 +1,9 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using GraphQL.Client.Http; // AsGraphQLHttpResponse
 using Icon.Events;
 using Icon.Infrastructure.Aggregate;
 using Icon.Infrastructure.Command;
@@ -12,12 +13,11 @@ using Aggregates = Icon.Aggregates;
 using CancellationToken = System.Threading.CancellationToken;
 using DateTime = System.DateTime;
 using Exception = System.Exception;
+using GraphQLRequest = GraphQL.GraphQLRequest;
 using Guid = System.Guid;
 using IError = HotChocolate.IError;
 using Models = Icon.Models;
 using Queries = Icon.Queries;
-using GraphQLRequest = GraphQL.GraphQLRequest;
-using GraphQL.Client.Http; // AsGraphQLHttpResponse
 
 namespace Icon.Handlers
 {
@@ -61,14 +61,14 @@ namespace Icon.Handlers
               CancellationToken cancellationToken
               )
         {
-          return
-            (
-             await session.GetModels<Models.Database, Aggregates.DatabaseAggregate, Events.DatabaseCreated>(cancellationToken)
-             .ConfigureAwait(false)
-             )
-            .Where(databaseResult => databaseResult.IsSuccess)
-            .Select(databaseResult => databaseResult.Value)
-            .ToList().AsReadOnly();
+            return
+              (
+               await session.GetModels<Models.Database, Aggregates.DatabaseAggregate, Events.DatabaseCreated>(cancellationToken)
+               .ConfigureAwait(false)
+               )
+              .Where(databaseResult => databaseResult.IsSuccess)
+              .Select(databaseResult => databaseResult.Value)
+              .ToList().AsReadOnly();
         }
 
         private async
@@ -94,14 +94,14 @@ namespace Icon.Handlers
                 (response.Errors != null && response.Errors.Length >= 1)
                 )
             {
-              // TODO Convert all `response.Errors` error to our `Errors` with proper path information!
-              return Result.Failure<TResponse, Errors>(
-                  Errors.One(
-                    message: $"Accessing the database {database} failed with status code {response.StatusCode} and errors {string.Join(", ", response.Errors.Select(GraphQlErrorToString))}",
-                    code: ErrorCodes.GraphQlRequestFailed
-                    // TODO path: ...
-                    )
-                  );
+                // TODO Convert all `response.Errors` error to our `Errors` with proper path information!
+                return Result.Failure<TResponse, Errors>(
+                    Errors.One(
+                      message: $"Accessing the database {database} failed with status code {response.StatusCode} and errors {string.Join(", ", response.Errors.Select(GraphQlErrorToString))}",
+                      code: ErrorCodes.GraphQlRequestFailed
+                      // TODO path: ...
+                      )
+                    );
             }
             return Result.Ok<TResponse, Errors>(
                   ParseGraphQlResponse(database, response.Data)
@@ -122,10 +122,10 @@ namespace Icon.Handlers
             Models.Database database
             )
         {
-          return new GraphQL.Client.Http.GraphQLHttpClient(
-              endPoint: database.Locator,
-              serializer: new GraphQL.Client.Serializer.SystemTextJson.SystemTextJsonSerializer()
-              );
+            return new GraphQL.Client.Http.GraphQLHttpClient(
+                endPoint: database.Locator,
+                serializer: new GraphQL.Client.Serializer.SystemTextJson.SystemTextJsonSerializer()
+                );
         }
 
         protected abstract GraphQLRequest CreateGraphQlRequest(

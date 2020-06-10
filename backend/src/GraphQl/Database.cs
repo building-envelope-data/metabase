@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
-using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
 using GreenDonut;
 using HotChocolate;
 using DateTime = System.DateTime;
+using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
 using Models = Icon.Models;
 using Uri = System.Uri;
 

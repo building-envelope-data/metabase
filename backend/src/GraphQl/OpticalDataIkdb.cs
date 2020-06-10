@@ -56,9 +56,9 @@ namespace Icon.GraphQl
             [DataLoader] DatabaseDataLoader databaseLoader
             )
         {
-          return databaseLoader.LoadAsync(
-              TimestampHelpers.TimestampId(opticalData.DatabaseId, opticalData.RequestTimestamp)
-              );
+            return databaseLoader.LoadAsync(
+                TimestampHelpers.TimestampId(opticalData.DatabaseId, opticalData.RequestTimestamp)
+                );
         }
 
         public Task<Component> GetComponent(

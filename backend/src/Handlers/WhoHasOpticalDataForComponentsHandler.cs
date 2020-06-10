@@ -1,8 +1,9 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using GraphQL.Client.Http; // AsGraphQLHttpResponse
 using Icon.Events;
 using Icon.Infrastructure.Aggregate;
 using Icon.Infrastructure.Command;
@@ -12,12 +13,11 @@ using Aggregates = Icon.Aggregates;
 using CancellationToken = System.Threading.CancellationToken;
 using DateTime = System.DateTime;
 using Exception = System.Exception;
+using GraphQLRequest = GraphQL.GraphQLRequest;
 using Guid = System.Guid;
 using IError = HotChocolate.IError;
 using Models = Icon.Models;
 using Queries = Icon.Queries;
-using GraphQLRequest = GraphQL.GraphQLRequest;
-using GraphQL.Client.Http; // AsGraphQLHttpResponse
 
 namespace Icon.Handlers
 {
@@ -39,7 +39,7 @@ namespace Icon.Handlers
         {
             return new GraphQLRequest
             {
-              Query =
+                Query =
                 // For interpolated strings `$"..."`, see
                 // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated
                 // For verbatim strings `@"..."`, see

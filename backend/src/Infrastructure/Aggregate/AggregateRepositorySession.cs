@@ -242,30 +242,30 @@ namespace Icon.Infrastructure.Aggregate
           where TAssociation : class, Aggregates.IManyToManyAssociationAggregate, new()
           where TAssociate : class, IEventSourcedAggregate, new()
         {
-          return AddAssociation<TParent, TAssociation, TAssociate>(
-              newAssociationAddedEvent,
-              async @event =>
-              {
+            return AddAssociation<TParent, TAssociation, TAssociate>(
+                newAssociationAddedEvent,
+                async @event =>
+                {
                     var doesAssociationExist =
-                    await Query<TAssociation>()
-                    .Where(a =>
-                        a.ParentId == @event.ParentId &&
-                        a.AssociateId == @event.AssociateId
-                        )
-                    .AnyAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                  await Query<TAssociation>()
+                  .Where(a =>
+                      a.ParentId == @event.ParentId &&
+                      a.AssociateId == @event.AssociateId
+                      )
+                  .AnyAsync(cancellationToken)
+                  .ConfigureAwait(false);
                     return doesAssociationExist
-                        ? Result.Failure<bool, Errors>(
-                            Errors.One(
-                              message: $"There already is an association between {@event.ParentId} and {@event.AssociateId} of type {typeof(TAssociation)}",
-                              code: ErrorCodes.AlreadyExistingAssociation
-                              )
+                      ? Result.Failure<bool, Errors>(
+                          Errors.One(
+                            message: $"There already is an association between {@event.ParentId} and {@event.AssociateId} of type {typeof(TAssociation)}",
+                            code: ErrorCodes.AlreadyExistingAssociation
                             )
-                        : Result.Ok<bool, Errors>(true);
-              },
-              addAssociationCheck,
-              cancellationToken
-              );
+                          )
+                      : Result.Ok<bool, Errors>(true);
+                },
+                addAssociationCheck,
+                cancellationToken
+                );
         }
 
         public Task<Result<ValueObjects.Id, Errors>> AddOneToManyAssociation<TParent, TAssociation, TAssociate>(
@@ -277,27 +277,27 @@ namespace Icon.Infrastructure.Aggregate
           where TAssociation : class, Aggregates.IOneToManyAssociationAggregate, new()
           where TAssociate : class, IEventSourcedAggregate, new()
         {
-          return AddAssociation<TParent, TAssociation, TAssociate>(
-              newAssociationAddedEvent,
-              async @event =>
-              {
+            return AddAssociation<TParent, TAssociation, TAssociate>(
+                newAssociationAddedEvent,
+                async @event =>
+                {
                     var doesAssociationExist =
-                    await Query<TAssociation>()
-                    .Where(a => a.AssociateId == @event.AssociateId)
-                    .AnyAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                  await Query<TAssociation>()
+                  .Where(a => a.AssociateId == @event.AssociateId)
+                  .AnyAsync(cancellationToken)
+                  .ConfigureAwait(false);
                     return doesAssociationExist
-                        ? Result.Failure<bool, Errors>(
-                            Errors.One(
-                              message: $"There already is an association for {@event.AssociateId} of type {typeof(TAssociation)}",
-                              code: ErrorCodes.AlreadyExistingAssociation
-                              )
+                      ? Result.Failure<bool, Errors>(
+                          Errors.One(
+                            message: $"There already is an association for {@event.AssociateId} of type {typeof(TAssociation)}",
+                            code: ErrorCodes.AlreadyExistingAssociation
                             )
-                        : Result.Ok<bool, Errors>(true);
-              },
-              addAssociationCheck,
-              cancellationToken
-              );
+                          )
+                      : Result.Ok<bool, Errors>(true);
+                },
+                addAssociationCheck,
+                cancellationToken
+                );
         }
 
         private async Task<Result<ValueObjects.Id, Errors>> AddAssociation<TParent, TAssociation, TAssociate>(
@@ -321,38 +321,38 @@ namespace Icon.Infrastructure.Aggregate
             (Result<TParent, Errors>? parentResult, Result<TAssociate, Errors>? associateResult) =
               addAssociationCheck switch
               {
-                AddAssociationCheck.NONE =>
-                  (null!, null!),
-                AddAssociationCheck.PARENT =>
-                  (
-                   await Load<TParent>(
-                     @event.ParentId,
-                     cancellationToken
-                     )
-                   .ConfigureAwait(false),
-                   null!
-                   ),
-                AddAssociationCheck.ASSOCIATE =>
-                  (
-                   null!,
-                   await Load<TAssociate>(
-                     @event.AssociateId,
-                     cancellationToken
-                     )
-                   .ConfigureAwait(false)
-                   ),
-                AddAssociationCheck.PARENT_AND_ASSOCIATE =>
-                  await Load<TParent, TAssociate>(
-                      (
+                  AddAssociationCheck.NONE =>
+                    (null!, null!),
+                  AddAssociationCheck.PARENT =>
+                    (
+                     await Load<TParent>(
                        @event.ParentId,
-                       @event.AssociateId
-                      ),
-                      cancellationToken
-                      )
-                  .ConfigureAwait(false),
-                // God-damned C# does not have switch expression exhaustiveness for
-                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
-                _ => throw new Exception($"The check {addAssociationCheck} fell through")
+                       cancellationToken
+                       )
+                     .ConfigureAwait(false),
+                     null!
+                     ),
+                  AddAssociationCheck.ASSOCIATE =>
+                    (
+                     null!,
+                     await Load<TAssociate>(
+                       @event.AssociateId,
+                       cancellationToken
+                       )
+                     .ConfigureAwait(false)
+                     ),
+                  AddAssociationCheck.PARENT_AND_ASSOCIATE =>
+                    await Load<TParent, TAssociate>(
+                        (
+                         @event.ParentId,
+                         @event.AssociateId
+                        ),
+                        cancellationToken
+                        )
+                    .ConfigureAwait(false),
+                  // God-damned C# does not have switch expression exhaustiveness for
+                  // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                  _ => throw new Exception($"The check {addAssociationCheck} fell through")
               };
             return
               await Errors.CombineExistent(

@@ -11,12 +11,12 @@ using IError = HotChocolate.IError;
 using JArray = Newtonsoft.Json.Linq.JArray;
 using JObject = Newtonsoft.Json.Linq.JObject;
 using JsonArray = Manatee.Json.JsonArray;
+using JsonElement = System.Text.Json.JsonElement;
 using JsonObject = Manatee.Json.JsonObject;
 using JsonSyntaxException = Manatee.Json.JsonSyntaxException;
 using JsonValue = Manatee.Json.JsonValue;
-using JsonValueType = Manatee.Json.JsonValueType;
-using JsonElement = System.Text.Json.JsonElement;
 using JsonValueKind = System.Text.Json.JsonValueKind;
+using JsonValueType = Manatee.Json.JsonValueType;
 
 namespace Icon.ValueObjects
 {

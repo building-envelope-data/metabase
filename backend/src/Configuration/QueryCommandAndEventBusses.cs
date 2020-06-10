@@ -30,6 +30,7 @@ using NSwag;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using WebPWrecover.Services;
+using AddAssociationCheck = Icon.Infrastructure.Aggregate.AddAssociationCheck;
 using CancellationToken = System.Threading.CancellationToken;
 using Command = Icon.Infrastructure.Command;
 using Commands = Icon.Commands;
@@ -43,7 +44,6 @@ using IEventSourcedAggregate = Icon.Infrastructure.Aggregate.IEventSourcedAggreg
 using Models = Icon.Models;
 using Queries = Icon.Queries;
 using Query = Icon.Infrastructure.Query;
-using AddAssociationCheck = Icon.Infrastructure.Aggregate.AddAssociationCheck;
 
 namespace Icon.Configuration
 {

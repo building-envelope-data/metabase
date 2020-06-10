@@ -1085,12 +1085,12 @@ namespace Icon.Infrastructure.Aggregate
           where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
-          return GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
-              timestampedIds,
-              association => association.AssociateId,
-              GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>,
-              cancellationToken
-              );
+            return GetAssociatesOfModels<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
+                timestampedIds,
+                association => association.AssociateId,
+                GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>,
+                cancellationToken
+                );
         }
 
         public async
