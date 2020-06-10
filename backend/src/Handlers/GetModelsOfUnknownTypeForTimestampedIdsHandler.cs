@@ -109,8 +109,8 @@ namespace Icon.Handlers
                     {
                         if (_aggregateTypeToGetHandler.ContainsKey(aggregateType))
                             return _aggregateTypeToGetHandler[aggregateType].HandleX(
-                                timestampedIds,
                                 session,
+                                timestampedIds,
                                 cancellationToken
                               );
                         // TODO Return failure result instead.

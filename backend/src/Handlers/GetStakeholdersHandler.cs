@@ -47,8 +47,8 @@ namespace Icon.Handlers
                         {
                             return
                             (await _getInstitutionsHandler.Handle(
-                              timestampedIds,
                               session,
+                              timestampedIds,
                               cancellationToken
                               )
                                 .ConfigureAwait(false)
@@ -61,8 +61,8 @@ namespace Icon.Handlers
                         {
                             return
                               (await _getPersonsHandler.Handle(
-                              timestampedIds,
                               session,
+                              timestampedIds,
                               cancellationToken
                               )
                                 .ConfigureAwait(false)

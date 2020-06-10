@@ -20,8 +20,8 @@ namespace Icon.Handlers
     public interface IGetModelsForTimestampedIdsHandler
     {
         public Task<IEnumerable<Result<Models.IModel, Errors>>> HandleX(
-            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             );
     }

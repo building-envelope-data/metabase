@@ -46,16 +46,16 @@ namespace Icon.Handlers
                         if (aggregateType == typeof(Aggregates.InstitutionMethodDeveloperAggregate))
                         {
                             return _getInstitutionMethodDevelopersHandler.Handle(
-                              timestampedIds,
                               session,
+                              timestampedIds,
                               cancellationToken
                               );
                         }
                         if (aggregateType == typeof(Aggregates.PersonMethodDeveloperAggregate))
                         {
                             return _getPersonMethodDevelopersHandler.Handle(
-                              timestampedIds,
                               session,
+                              timestampedIds,
                               cancellationToken
                               );
                         }

@@ -37,13 +37,13 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Handle(query.TimestampedIds, session, cancellationToken).ConfigureAwait(false);
+                return await Handle(session, query.TimestampedIds, cancellationToken).ConfigureAwait(false);
             }
         }
 
         public async Task<IEnumerable<Result<M, Errors>>> Handle(
-            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
         {
@@ -61,13 +61,13 @@ namespace Icon.Handlers
         }
 
         public async Task<IEnumerable<Result<Models.IModel, Errors>>> HandleX(
-            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
         {
             return
-              (await Handle(timestampedIds, session, cancellationToken)
+              (await Handle(session, timestampedIds, cancellationToken)
                .ConfigureAwait(false)
                )
               .Select(r => r.Map(m => (Models.IModel)m));
