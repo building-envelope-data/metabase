@@ -9,24 +9,22 @@ using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Queries
 {
-    public sealed class WhoHasOpticalDataForComponents
-      : IQuery<IEnumerable<Result<IEnumerable<Result<Models.Database, Errors>>, Errors>>>
+    public sealed class WhichDatabasesHaveDataForComponents<TDataModel>
+      : QueryDataOfComponentsFromDatabases<IEnumerable<Result<Models.Database, Errors>>>
     {
-        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedIds { get; }
-
-        private WhoHasOpticalDataForComponents(
+        private WhichDatabasesHaveDataForComponents(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
+          : base(timestampedIds)
         {
-            TimestampedIds = timestampedIds;
         }
 
-        public static Result<WhoHasOpticalDataForComponents, Errors> From(
+        public static Result<WhichDatabasesHaveDataForComponents<TDataModel>, Errors> From(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
         {
-            return Result.Ok<WhoHasOpticalDataForComponents, Errors>(
-                new WhoHasOpticalDataForComponents(
+            return Result.Ok<WhichDatabasesHaveDataForComponents<TDataModel>, Errors>(
+                new WhichDatabasesHaveDataForComponents<TDataModel>(
                   timestampedIds: timestampedIds
                   )
                 );

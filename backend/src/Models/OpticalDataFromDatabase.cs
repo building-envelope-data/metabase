@@ -7,14 +7,14 @@ using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Models
 {
-    public sealed class OpticalDataIkdb
+    public sealed class OpticalDataFromDatabase
       : Model
     {
         public ValueObjects.Id DatabaseId { get; }
         public ValueObjects.Id ComponentId { get; }
         public ValueObjects.OpticalDataJson Data { get; }
 
-        private OpticalDataIkdb(
+        private OpticalDataFromDatabase(
             ValueObjects.Id id,
             ValueObjects.Id databaseId,
             ValueObjects.Id componentId,
@@ -28,7 +28,7 @@ namespace Icon.Models
             Data = data;
         }
 
-        public static Result<OpticalDataIkdb, Errors> From(
+        public static Result<OpticalDataFromDatabase, Errors> From(
             ValueObjects.Id id,
             ValueObjects.Id databaseId,
             ValueObjects.Id componentId,
@@ -37,8 +37,8 @@ namespace Icon.Models
             )
         {
             return
-              Result.Ok<OpticalDataIkdb, Errors>(
-                  new OpticalDataIkdb(
+              Result.Ok<OpticalDataFromDatabase, Errors>(
+                  new OpticalDataFromDatabase(
                     id: id,
                     databaseId: databaseId,
                     componentId: componentId,

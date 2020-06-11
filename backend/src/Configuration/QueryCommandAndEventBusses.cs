@@ -67,7 +67,7 @@ namespace Icon.Configuration
             AddInstitutionHandlers(services);
             AddMethodHandlers(services);
             AddOpticalDataHandlers(services);
-            AddOpticalDataIkdbHandlers(services);
+            AddOpticalDataFromDatabaseHandlers(services);
             AddPersonHandlers(services);
             AddStakeholderHandlers(services);
             AddStandardHandlers(services);
@@ -299,25 +299,39 @@ namespace Icon.Configuration
                 >();
         }
 
-        private static void AddOpticalDataIkdbHandlers(IServiceCollection services)
+        private static void AddOpticalDataFromDatabaseHandlers(IServiceCollection services)
         {
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetOpticalDataIkdbOfComponents,
-              IEnumerable<Result<IEnumerable<Result<Models.OpticalDataIkdb, Errors>>, Errors>>
+              Queries.QueryDataArrayOfComponentsFromDatabases<Models.OpticalDataFromDatabase>,
+              IEnumerable<Result<IEnumerable<Result<Models.OpticalDataFromDatabase, Errors>>, Errors>>
                 >,
-              Handlers.GetOpticalDataIkdbOfComponentsHandler
+              Handlers.GetOpticalDataOfComponentsFromDatabasesHandler
                 >();
 
             // Who Has
+            AddWhichDatabasesHaveDataForComponentsHandler<Models.OpticalDataFromDatabase>(services, "hasOpticalData"); // TODO Get rid of magical string!
+        }
+
+        private static void AddWhichDatabasesHaveDataForComponentsHandler<TDataModel>(
+            IServiceCollection services,
+            string graphQlQueryName
+            )
+        {
+            // Who Has
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.WhoHasOpticalDataForComponents,
+              Queries.WhichDatabasesHaveDataForComponents<TDataModel>,
               IEnumerable<Result<IEnumerable<Result<Models.Database, Errors>>, Errors>>
                 >,
-              Handlers.WhoHasOpticalDataForComponentsHandler
-                >();
+              Handlers.WhichDatabasesHaveDataForComponentsHandler<TDataModel>
+                >(serviceProvider =>
+                    new Handlers.WhichDatabasesHaveDataForComponentsHandler<TDataModel>(
+                      graphQlQueryName,
+                      serviceProvider.GetRequiredService<IAggregateRepository>()
+                      )
+                 );
         }
 
         private static void AddPersonHandlers(IServiceCollection services)

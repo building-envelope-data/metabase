@@ -104,7 +104,10 @@ namespace Icon.Handlers
                     );
             }
             return Result.Ok<TResponse, Errors>(
-                  ParseGraphQlResponse(database, response.Data)
+                  ParseGraphQlResponse(
+                    database,
+                    response.Data
+                    )
                   );
         }
 

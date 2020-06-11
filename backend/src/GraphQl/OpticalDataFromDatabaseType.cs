@@ -9,10 +9,10 @@ using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.GraphQl
 {
-    public sealed class OpticalDataIkdbType
-      : ObjectType<OpticalDataIkdb>
+    public sealed class OpticalDataFromDatabaseType
+      : ObjectType<OpticalDataFromDatabase>
     {
-        protected override void Configure(IObjectTypeDescriptor<OpticalDataIkdb> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<OpticalDataFromDatabase> descriptor)
         {
             // `AnyType` https://github.com/ChilliCream/hotchocolate/issues/1051#issuecomment-613576432
             descriptor

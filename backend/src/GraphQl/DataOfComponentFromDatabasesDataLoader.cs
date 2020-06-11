@@ -13,16 +13,16 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public abstract class QueryDatabasesDataLoader<TQuery, TResultModel, TResultGraphQlObject>
-      : OurDataLoaderBase<ValueObjects.TimestampedId, IReadOnlyList<TResultGraphQlObject>>
-      where TQuery : IQuery<IEnumerable<Result<IEnumerable<Result<TResultModel, Errors>>, Errors>>>
+    public abstract class DataOfComponentFromDatabasesDataLoader<TQuery, TDataModel, TDataGraphQlObject>
+      : OurDataLoaderBase<ValueObjects.TimestampedId, IReadOnlyList<TDataGraphQlObject>>
+      where TQuery : Queries.QueryDataOfComponentsFromDatabases<IEnumerable<Result<TDataModel, Errors>>>
     {
         private Func<IReadOnlyCollection<ValueObjects.TimestampedId>, Result<TQuery, Errors>> _newQuery;
-        private Func<TResultModel, ValueObjects.Timestamp, TResultGraphQlObject> _mapModelToGraphQlObject;
+        private Func<TDataModel, ValueObjects.Timestamp, TDataGraphQlObject> _mapModelToGraphQlObject;
 
-        public QueryDatabasesDataLoader(
+        public DataOfComponentFromDatabasesDataLoader(
             Func<IReadOnlyCollection<ValueObjects.TimestampedId>, Result<TQuery, Errors>> newQuery,
-            Func<TResultModel, ValueObjects.Timestamp, TResultGraphQlObject> mapModelToGraphQlObject,
+            Func<TDataModel, ValueObjects.Timestamp, TDataGraphQlObject> mapModelToGraphQlObject,
             IQueryBus queryBus
             )
           : base(queryBus)
@@ -31,7 +31,7 @@ namespace Icon.GraphQl
             _mapModelToGraphQlObject = mapModelToGraphQlObject;
         }
 
-        protected override async Task<IReadOnlyList<GreenDonut.Result<IReadOnlyList<TResultGraphQlObject>>>> FetchAsync(
+        protected override async Task<IReadOnlyList<GreenDonut.Result<IReadOnlyList<TDataGraphQlObject>>>> FetchAsync(
             IReadOnlyList<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
@@ -43,9 +43,9 @@ namespace Icon.GraphQl
             var results =
               await QueryBus.Send<
                   TQuery,
-                  IEnumerable<Result<IEnumerable<Result<TResultModel, Errors>>, Errors>>
+                  IEnumerable<Result<IEnumerable<Result<TDataModel, Errors>>, Errors>>
                >(query).ConfigureAwait(false);
-            return ResultHelpers.ToDataLoaderResultsX<TResultGraphQlObject>(
+            return ResultHelpers.ToDataLoaderResultsX<TDataGraphQlObject>(
                 timestampedIds.Zip(results, (timestampedId, result) =>
                   result.Map(modelResults =>
                     modelResults.Select(modelResult =>

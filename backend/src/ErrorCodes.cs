@@ -15,5 +15,6 @@ namespace Icon
         public const string FileNotFound = "FILE_NOT_FOUND";
         public const string InvalidSyntax = "INVALID_SYNTAX";
         public const string GraphQlRequestFailed = "GRAPH_QL_REQUEST_FAILED";
+        public const string MissingData = "MISSING_DATA";
     }
 }

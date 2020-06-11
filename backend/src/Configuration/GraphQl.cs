@@ -55,7 +55,7 @@ namespace Icon.Configuration
                   .AddType<GraphQlX.ComponentType>()
                   .AddType<GraphQlX.CreateOpticalDataInputType>()
                   .AddType<GraphQlX.OpticalDataType>()
-                  .AddType<GraphQlX.OpticalDataIkdbType>()
+                  .AddType<GraphQlX.OpticalDataFromDatabaseType>()
 
                   .Create(),
                   new QueryExecutionOptions

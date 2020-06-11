@@ -13,15 +13,14 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public sealed class WhoHasOpticalDataForComponentDataLoader
-      : QueryDatabasesDataLoader<Queries.WhoHasOpticalDataForComponents, Models.Database, Database>
+    public sealed class OpticalDataOfComponentFromDatabasesDataLoader
+      : DataArrayOfComponentFromDatabasesDataLoader<Models.OpticalDataFromDatabase, OpticalDataFromDatabase>
     {
-        public WhoHasOpticalDataForComponentDataLoader(
+        public OpticalDataOfComponentFromDatabasesDataLoader(
             IQueryBus queryBus
             )
           : base(
-              Queries.WhoHasOpticalDataForComponents.From,
-              Database.FromModel,
+              OpticalDataFromDatabase.FromModel,
               queryBus
               )
         {

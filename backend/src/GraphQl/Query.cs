@@ -54,14 +54,14 @@ namespace Icon.GraphQl
                 );
         }
 
-        public Task<IReadOnlyList<OpticalDataIkdb>> GetOpticalDataIkdb(
+        public Task<IReadOnlyList<OpticalDataFromDatabase>> GetOpticalDataFromDatabases(
             ValueObjects.Id componentId,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] OpticalDataIkdbOfComponentDataLoader opticalDataIkdbLoader,
+            [DataLoader] OpticalDataOfComponentFromDatabasesDataLoader opticalDataLoader,
             IResolverContext resolverContext
             )
         {
-            return opticalDataIkdbLoader.LoadAsync(
+            return opticalDataLoader.LoadAsync(
                 TimestampHelpers.TimestampId(
                   componentId,
                   timestamp ?? TimestampHelpers.Fetch(resolverContext)
@@ -106,7 +106,7 @@ namespace Icon.GraphQl
         public Task<IReadOnlyList<Database>> GetWhoHasOpticalData(
             ValueObjects.Id componentId,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] WhoHasOpticalDataForComponentDataLoader whoHasOpticalDataLoader,
+            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.OpticalDataFromDatabase> whoHasOpticalDataLoader,
             IResolverContext resolverContext
             )
         {

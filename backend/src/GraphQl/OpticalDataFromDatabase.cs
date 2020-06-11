@@ -10,15 +10,15 @@ using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {
-    public sealed class OpticalDataIkdb
+    public sealed class OpticalDataFromDatabase
       : NodeBase
     {
-        public static OpticalDataIkdb FromModel(
-            Models.OpticalDataIkdb model,
+        public static OpticalDataFromDatabase FromModel(
+            Models.OpticalDataFromDatabase model,
             ValueObjects.Timestamp requestTimestamp
             )
         {
-            return new OpticalDataIkdb(
+            return new OpticalDataFromDatabase(
                 id: model.Id,
                 databaseId: model.DatabaseId,
                 componentId: model.ComponentId,
@@ -32,7 +32,7 @@ namespace Icon.GraphQl
         public ValueObjects.Id ComponentId { get; }
         public object Data { get; }
 
-        public OpticalDataIkdb(
+        public OpticalDataFromDatabase(
             ValueObjects.Id id,
             ValueObjects.Id databaseId,
             ValueObjects.Id componentId,
@@ -52,7 +52,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Database> GetDatabase(
-            [Parent] OpticalDataIkdb opticalData,
+            [Parent] OpticalDataFromDatabase opticalData,
             [DataLoader] DatabaseDataLoader databaseLoader
             )
         {
@@ -62,7 +62,7 @@ namespace Icon.GraphQl
         }
 
         public Task<Component> GetComponent(
-            [Parent] OpticalDataIkdb opticalData,
+            [Parent] OpticalDataFromDatabase opticalData,
             [DataLoader] ComponentDataLoader componentLoader
             )
         {
