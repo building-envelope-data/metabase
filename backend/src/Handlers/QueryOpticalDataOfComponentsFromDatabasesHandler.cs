@@ -39,15 +39,15 @@ namespace Icon.Handlers
                         IAggregateRepository repository
                         )
           : base(
-                            graphQlQueryName: "opticalData",
-                            graphQlQueryFields: @"
-								id
-								componentId
-								data
-								timestamp
-							",
-                            repository: repository
-                            )
+              graphQlQueryName: "opticalData",
+              graphQlQueryFields: @"
+                id
+                componentId
+                data
+                timestamp
+              ",
+              repository: repository
+              )
         {
         }
 
