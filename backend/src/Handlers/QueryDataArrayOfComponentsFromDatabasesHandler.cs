@@ -47,13 +47,18 @@ namespace Icon.Handlers
             IReadOnlyList<object> path
             )
         {
+            Console.WriteLine(database);
+            foreach (var response in responses)
+            {
+                Console.WriteLine(response);
+            }
             return
               Result.Ok<IEnumerable<Result<TDataModel, Errors>>, Errors>(
                   responses.Select(response =>
                     ParseGraphQlResponse(
                       database,
                       response,
-                      new List<object>().AsReadOnly()
+                      path
                       )
                     )
                   );
