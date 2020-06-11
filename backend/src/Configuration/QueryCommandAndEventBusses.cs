@@ -307,7 +307,7 @@ namespace Icon.Configuration
               Queries.QueryDataArrayOfComponentsFromDatabases<Models.OpticalDataFromDatabase>,
               IEnumerable<Result<IEnumerable<Result<Models.OpticalDataFromDatabase, Errors>>, Errors>>
                 >,
-              Handlers.GetOpticalDataOfComponentsFromDatabasesHandler
+              Handlers.QueryOpticalDataOfComponentsFromDatabasesHandler
                 >();
 
             // Who Has

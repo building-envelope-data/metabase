@@ -21,7 +21,7 @@ using Queries = Icon.Queries;
 
 namespace Icon.Handlers
 {
-    public sealed class GetOpticalDataOfComponentsFromDatabasesGraphQlResponse
+    public sealed class QueryOpticalDataOfComponentsFromDatabasesGraphQlResponse
     {
         public Guid Id { get; set; }
         public Guid ComponentId { get; set; }
@@ -29,13 +29,13 @@ namespace Icon.Handlers
         public DateTime Timestamp { get; set; }
     }
 
-    public sealed class GetOpticalDataOfComponentsFromDatabasesHandler
+    public sealed class QueryOpticalDataOfComponentsFromDatabasesHandler
       : QueryDataArrayOfComponentsFromDatabasesHandler<
           Models.OpticalDataFromDatabase,
-          GetOpticalDataOfComponentsFromDatabasesGraphQlResponse
+          QueryOpticalDataOfComponentsFromDatabasesGraphQlResponse
         >
     {
-        public GetOpticalDataOfComponentsFromDatabasesHandler(
+        public QueryOpticalDataOfComponentsFromDatabasesHandler(
                         IAggregateRepository repository
                         )
           : base(
@@ -53,7 +53,7 @@ namespace Icon.Handlers
 
         protected override Result<Models.OpticalDataFromDatabase, Errors> ParseGraphQlResponse(
             Models.Database database,
-            GetOpticalDataOfComponentsFromDatabasesGraphQlResponse opticalDataResponse,
+            QueryOpticalDataOfComponentsFromDatabasesGraphQlResponse opticalDataResponse,
             IReadOnlyList<object> path
             )
         {
