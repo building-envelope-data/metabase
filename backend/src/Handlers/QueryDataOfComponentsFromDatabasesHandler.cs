@@ -84,7 +84,8 @@ namespace Icon.Handlers
                     pair.Value,
                     new List<object>().AsReadOnly()
                     )
-                );
+                )
+              .ToList().AsReadOnly(); // TODO If we don't consume the stream immediately here, it is lost. Why?
         }
 
         protected abstract Result<TData, Errors> ParseGraphQlResponse(
@@ -105,7 +106,8 @@ namespace Icon.Handlers
                   dataResultsResult.Map(dataResults =>
                     dataResults.GetEnumerator()
                     )
-                  );
+                  )
+              .ToList().AsReadOnly(); // TODO If we don't consume the stream immediately here, it is lost. Why?
             return
               query.TimestampedIds
               .Select(timestampedId =>
@@ -124,10 +126,10 @@ namespace Icon.Handlers
                           )
                         )
                       )
-                    .ToList().AsReadOnly()
+                    .ToList().AsReadOnly() // TODO If we don't consume the stream immediately here, it is lost. Why?
                     )
                   )
-              .ToList().AsReadOnly();
+              .ToList().AsReadOnly(); // TODO If we don't consume the stream immediately here, it is lost. Why?
             // We turn the enumerables into lists so that consuming them
             // more than once does not consume the enumerators more than
             // once, which would only be possible if we called `Reset` on
@@ -157,6 +159,7 @@ namespace Icon.Handlers
                     Result.Failure<TDataModel, Errors>(dataResultsResult.Error)
                     }
                     )
+                  .ToList().AsReadOnly() // TODO If we don't consume the stream immediately here, it is lost. Why?
                   );
         }
     }
