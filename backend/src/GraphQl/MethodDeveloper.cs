@@ -1,5 +1,5 @@
-using Models = Icon.Models;
 using DateTime = System.DateTime;
+using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {

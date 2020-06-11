@@ -79,6 +79,30 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname icon_development
 .PHONY : psql
 
+# Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
+# and https://superuser.com/questions/226192/avoid-password-prompt-for-keys-and-prompts-for-dn-information/226229#226229
+# See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
+# and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
+generate-https-certificate : ## Generate HTTPS certificate
+	docker run \
+		--user $(shell id --user):$(shell id --group) \
+		--tty \
+		--interactive \
+		--mount type=bind,source="$(shell pwd)/backend/https",target=/https \
+		nginx \
+		sh -c "openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/CN=localhost" -passout pass:password -keyout /https/localhost.key -out /https/localhost.crt -config /https/localhost.conf && openssl pkcs12 -export -out /https/localhost.pfx -inkey /https/localhost.key -in /https/localhost.crt && openssl verify -CAfile /https/localhost.crt /https/localhost.crt"
+
+# Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
+# See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
+# and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
+trust-https-certificate : ## Trust the generated HTTPS certificate
+	sudo cp ./backend/https/localhost.crt /usr/local/share/ca-certificates
+	sudo update-ca-certificates
+	cat /etc/ssl/certs/ca-certificates.crt
+	cat ./backend/https/localhost.crt
+	sudo cat /etc/ssl/certs/localhost.pem
+	openssl verify ./backend/https/localhost.crt
+
 # ------------------------------------------------ #
 # Tasks to run, for example, in a Docker container #
 # ------------------------------------------------ #

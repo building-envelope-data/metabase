@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using Errors = Icon.Errors;
-using Array = System.Array;
-using Validatable = Icon.Validatable;
-using Guid = System.Guid;
-using DateTime = System.DateTime;
 using CSharpFunctionalExtensions;
+using Array = System.Array;
+using DateTime = System.DateTime;
+using Errors = Icon.Errors;
+using Guid = System.Guid;
 using IError = HotChocolate.IError;
+using Validatable = Icon.Validatable;
 
 namespace Icon.ValueObjects
 {

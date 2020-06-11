@@ -1,5 +1,5 @@
-using Models = Icon.Models;
 using Icon.Infrastructure.Query;
+using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {

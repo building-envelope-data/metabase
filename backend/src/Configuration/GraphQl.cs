@@ -1,22 +1,22 @@
 // Inspired by https://hotchocolate.io/docs/aspnet#asp-net-core-
 
-using ValueObjects = Icon.ValueObjects;
 using System;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore;
-using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.AspNetCore.GraphiQL;
 using HotChocolate.AspNetCore.Playground;
-using HotChocolate.Subscriptions;
+using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Execution;
-using QueryExecutionOptions = HotChocolate.Execution.Configuration.QueryExecutionOptions;
-using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
-using IApplicationBuilder = Microsoft.AspNetCore.Builder.IApplicationBuilder;
-using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
+using HotChocolate.Subscriptions;
 using Microsoft.Extensions.Hosting; // Provides `IsDevelopment` for `IWebHostEnvironment`, see https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostenvironment?view=dotnet-plat-ext-3.1 and https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.iwebhostenvironment?view=aspnetcore-3.1
 // using Microsoft.AspNetCore.Builder; // UseWebSockets
 using GraphQlX = Icon.GraphQl;
+using IApplicationBuilder = Microsoft.AspNetCore.Builder.IApplicationBuilder;
+using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
+using QueryExecutionOptions = HotChocolate.Execution.Configuration.QueryExecutionOptions;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Configuration
 {
@@ -45,12 +45,17 @@ namespace Icon.Configuration
                   .BindClrType<DateTime, GraphQlX.PreciseDateTimeType>()
                   .BindClrType<DateTimeOffset, GraphQlX.PreciseDateTimeType>()
 
-                  .AddQueryType<GraphQlX.Query>()
+                  .AddQueryType<GraphQlX.QueryType>()
                   .AddMutationType<GraphQlX.Mutation>()
                   // .AddSubscriptionType<SubscriptionType>()
 
                   .AddType<GraphQlX.Node>()
                   .AddType<GraphQlX.StakeholderBase>()
+                  .AddType<HotChocolate.Types.Relay.PageInfoType>()
+                  .AddType<GraphQlX.ComponentType>()
+                  .AddType<GraphQlX.CreateOpticalDataInputType>()
+                  .AddType<GraphQlX.OpticalDataType>()
+                  .AddType<GraphQlX.OpticalDataFromDatabaseType>()
 
                   .Create(),
                   new QueryExecutionOptions

@@ -1,5 +1,5 @@
-using ValueObjects = Icon.ValueObjects;
 using DateTime = System.DateTime;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.GraphQl
 {

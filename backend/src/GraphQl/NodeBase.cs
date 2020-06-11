@@ -1,6 +1,6 @@
-using Models = Icon.Models;
 using DateTime = System.DateTime;
 using Exception = System.Exception;
+using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {

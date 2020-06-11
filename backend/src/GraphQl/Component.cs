@@ -1,12 +1,14 @@
-using Models = Icon.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using GreenDonut;
-using DateTime = System.DateTime;
-using CancellationToken = System.Threading.CancellationToken;
 using HotChocolate;
+using HotChocolate.Language;
+using CancellationToken = System.Threading.CancellationToken;
+using DateTime = System.DateTime;
 using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
 using IResolverContext = HotChocolate.Resolvers.IResolverContext;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {
@@ -41,6 +43,38 @@ namespace Icon.GraphQl
               )
         {
             Information = information;
+        }
+
+        public Task<IReadOnlyList<OpticalData>> GetOpticalData(
+            [Parent] Component component,
+            [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader
+            )
+        {
+            return opticalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp)
+                );
+        }
+
+        /* public async Task<IReadOnlyList<object>> GetOpticalData( */
+        /*     [Parent] Component component, */
+        /*     [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader */
+        /*     ) */
+        /* { */
+        /*   return (await */
+        /*       opticalDataLoader.LoadAsync( */
+        /*         TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp) */
+        /*         ) */
+        /*       .ConfigureAwait(false) */
+        /*       ) */
+        /*     .Select(opticalData => opticalData.Data) */
+        /*     .ToList().AsReadOnly(); */
+        /* } */
+
+        public IReadOnlyList<Database> GetWhoHasOpticalData(
+            [Parent] Component component
+            )
+        {
+            return new Database[] { };
         }
 
         public ComponentManufacturerConnection GetManufacturers(

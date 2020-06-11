@@ -1,11 +1,13 @@
-using ValueObjects = Icon.ValueObjects;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Query;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Queries
 {
-    public sealed class GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
-      : GetManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>
+    public sealed class GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>
+      : GetManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>,
+        IQuery<IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
     {
         private GetBackwardManyToManyAssociatesOfModels(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
@@ -14,12 +16,12 @@ namespace Icon.Queries
         {
         }
 
-        public static Result<GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, Errors> From(
+        public static Result<GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>, Errors> From(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
         {
-            return Result.Ok<GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, Errors>(
-                new GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>(
+            return Result.Ok<GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>, Errors>(
+                new GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>(
                   timestampedIds: timestampedIds
                   )
                 );

@@ -1,10 +1,10 @@
-using DateTime = System.DateTime;
-using Array = System.Array;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Array = System.Array;
+using DateTime = System.DateTime;
 using ErrorBuilder = HotChocolate.ErrorBuilder;
-using IError = HotChocolate.IError;
 using ErrorCodes = Icon.ErrorCodes;
+using IError = HotChocolate.IError;
 
 namespace Icon.ValueObjects
 {
@@ -50,6 +50,11 @@ namespace Icon.ValueObjects
             yield return Value;
         }
 
+        public string InUtcFormat()
+        {
+            return Value.ToString("yyyy-MM-ddTHH\\:mm\\:ss.ffffffZ");
+        }
+
         public static explicit operator Timestamp(DateTime timestamp)
         {
             return From(timestamp).Value;
@@ -58,6 +63,11 @@ namespace Icon.ValueObjects
         public static implicit operator DateTime(Timestamp timestamp)
         {
             return timestamp.Value;
+        }
+
+        public override string ToString()
+        {
+            return $"{GetType()}({Value})";
         }
     }
 }

@@ -1,8 +1,8 @@
-using Exception = System.Exception;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
-using Guid = System.Guid;
 using DateTime = System.DateTime;
+using Errors = Icon.Errors;
+using Exception = System.Exception;
+using Guid = System.Guid;
 
 namespace Icon.Events
 {
@@ -16,30 +16,30 @@ namespace Icon.Events
     {
         public static MethodCategoryEventData FromModel(this ValueObjects.MethodCategory category)
         {
-            switch (category)
+            return category switch
             {
-                case ValueObjects.MethodCategory.MEASUREMENT:
-                    return MethodCategoryEventData.MEASUREMENT;
-                case ValueObjects.MethodCategory.CALCULATION:
-                    return MethodCategoryEventData.CALCULATION;
-            }
-            // God-damned C# does not have switch expression exhaustiveness for
-            // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
-            throw new Exception($"The category {category} fell through");
+                ValueObjects.MethodCategory.MEASUREMENT
+                    => MethodCategoryEventData.MEASUREMENT,
+                ValueObjects.MethodCategory.CALCULATION
+                    => MethodCategoryEventData.CALCULATION,
+                // God-damned C# does not have switch expression exhaustiveness for
+                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                _ => throw new Exception($"The category {category} fell through")
+            };
         }
 
         public static ValueObjects.MethodCategory ToModel(this MethodCategoryEventData category)
         {
-            switch (category)
+            return category switch
             {
-                case MethodCategoryEventData.MEASUREMENT:
-                    return ValueObjects.MethodCategory.MEASUREMENT;
-                case MethodCategoryEventData.CALCULATION:
-                    return ValueObjects.MethodCategory.CALCULATION;
-            }
-            // God-damned C# does not have switch expression exhaustiveness for
-            // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
-            throw new Exception($"The category {category} fell through");
+                MethodCategoryEventData.MEASUREMENT
+                    => ValueObjects.MethodCategory.MEASUREMENT,
+                MethodCategoryEventData.CALCULATION
+                    => ValueObjects.MethodCategory.CALCULATION,
+                // God-damned C# does not have switch expression exhaustiveness for
+                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                _ => throw new Exception($"The category {category} fell through")
+            };
         }
     }
 }

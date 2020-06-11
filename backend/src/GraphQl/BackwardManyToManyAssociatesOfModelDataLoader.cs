@@ -1,28 +1,28 @@
 using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
+using HotChocolate;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
-using HotChocolate;
 using Icon.Infrastructure.Query;
-using System.Linq;
-using HotChocolate.Resolvers;
 using CancellationToken = System.Threading.CancellationToken;
-using CSharpFunctionalExtensions;
 using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public class BackwardManyToManyAssociatesOfModelDataLoader<TAssociateGraphQlObject, TModel, TAssociationModel, TAssociateModel>
-      : AssociatesOfModelDataLoader<TAssociateGraphQlObject, TModel, TAssociationModel, TAssociateModel, Queries.GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>>
+    public class BackwardManyToManyAssociatesOfModelDataLoader<TGraphQlObject, TAssociateModel, TAssociationModel, TModel>
+      : AssociatesOfModelDataLoader<TGraphQlObject, TAssociateModel, TAssociationModel, TModel, Queries.GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>>
     {
         public BackwardManyToManyAssociatesOfModelDataLoader(
-            Func<TAssociateModel, ValueObjects.Timestamp, TAssociateGraphQlObject> mapAssociateModelToGraphQlObject,
+            Func<TModel, ValueObjects.Timestamp, TGraphQlObject> mapModelToGraphQlObject,
             IQueryBus queryBus
             )
           : base(
-            Queries.GetBackwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>.From,
-            mapAssociateModelToGraphQlObject,
+            Queries.GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>.From,
+            mapModelToGraphQlObject,
             queryBus
             )
         {

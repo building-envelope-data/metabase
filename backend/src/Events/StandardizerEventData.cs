@@ -1,8 +1,8 @@
-using Exception = System.Exception;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
-using Guid = System.Guid;
 using DateTime = System.DateTime;
+using Errors = Icon.Errors;
+using Exception = System.Exception;
+using Guid = System.Guid;
 
 namespace Icon.Events
 {
@@ -39,30 +39,30 @@ namespace Icon.Events
         // TODO Convert all other standardizers!
         public static StandardizerEventData FromModel(this ValueObjects.Standardizer standardizer)
         {
-            switch (standardizer)
+            return standardizer switch
             {
-                case ValueObjects.Standardizer.AERC:
-                    return StandardizerEventData.AERC;
-                case ValueObjects.Standardizer.AGI:
-                    return StandardizerEventData.AGI;
-            }
-            // God-damned C# does not have switch expression exhaustiveness for
-            // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
-            throw new Exception($"The standardizer {standardizer} fell through");
+                ValueObjects.Standardizer.AERC
+                    => StandardizerEventData.AERC,
+                ValueObjects.Standardizer.AGI
+                    => StandardizerEventData.AGI,
+                // God-damned C# does not have switch expression exhaustiveness for
+                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                _ => throw new Exception($"The standardizer {standardizer} fell through")
+            };
         }
 
         public static ValueObjects.Standardizer ToModel(this StandardizerEventData standardizer)
         {
-            switch (standardizer)
+            return standardizer switch
             {
-                case StandardizerEventData.AERC:
-                    return ValueObjects.Standardizer.AERC;
-                case StandardizerEventData.AGI:
-                    return ValueObjects.Standardizer.AGI;
-            }
-            // God-damned C# does not have switch expression exhaustiveness for
-            // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
-            throw new Exception($"The standardizer {standardizer} fell through");
+                StandardizerEventData.AERC
+                    => ValueObjects.Standardizer.AERC,
+                StandardizerEventData.AGI
+                    => ValueObjects.Standardizer.AGI,
+                // God-damned C# does not have switch expression exhaustiveness for
+                // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
+                _ => throw new Exception($"The standardizer {standardizer} fell through")
+            };
         }
     }
 }

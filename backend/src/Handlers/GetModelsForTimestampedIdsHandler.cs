@@ -1,19 +1,19 @@
-using Guid = System.Guid;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using CancellationToken = System.Threading.CancellationToken;
-using Icon.Infrastructure.Command;
+using CSharpFunctionalExtensions;
 using Icon.Events;
 using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Command;
 using Icon.Infrastructure.Query;
 using Marten;
+using Aggregates = Icon.Aggregates;
+using CancellationToken = System.Threading.CancellationToken;
 using DateTime = System.DateTime;
+using Guid = System.Guid;
+using IError = HotChocolate.IError;
 using Models = Icon.Models;
 using Queries = Icon.Queries;
-using Aggregates = Icon.Aggregates;
-using System.Linq;
-using IError = HotChocolate.IError;
-using CSharpFunctionalExtensions;
 
 namespace Icon.Handlers
 {
@@ -37,13 +37,13 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Handle(query.TimestampedIds, session, cancellationToken).ConfigureAwait(false);
+                return await Handle(session, query.TimestampedIds, cancellationToken).ConfigureAwait(false);
             }
         }
 
         public async Task<IEnumerable<Result<M, Errors>>> Handle(
-            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
         {
@@ -61,13 +61,13 @@ namespace Icon.Handlers
         }
 
         public async Task<IEnumerable<Result<Models.IModel, Errors>>> HandleX(
-            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             IAggregateRepositoryReadOnlySession session,
+            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
         {
             return
-              (await Handle(timestampedIds, session, cancellationToken)
+              (await Handle(session, timestampedIds, cancellationToken)
                .ConfigureAwait(false)
                )
               .Select(r => r.Map(m => (Models.IModel)m));

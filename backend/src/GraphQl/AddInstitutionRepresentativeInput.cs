@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using Errors = Icon.Errors;
 using ValueObjects = Icon.ValueObjects;
-using CSharpFunctionalExtensions;
 
 namespace Icon.GraphQl
 {

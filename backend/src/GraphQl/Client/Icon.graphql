@@ -1,0 +1,758 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+scalar NonEmptyUuid
+
+scalar Timestamp
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime
+
+type Query {
+  component(id: NonEmptyUuid! timestamp: Timestamp): Component!
+  components(timestamp: Timestamp): [Component!]!
+  database(id: NonEmptyUuid! timestamp: Timestamp): Database!
+  databases(timestamp: Timestamp): [Database!]!
+  institution(id: NonEmptyUuid! timestamp: Timestamp): Institution!
+  institutions(timestamp: Timestamp): [Institution!]!
+  method(id: NonEmptyUuid! timestamp: Timestamp): Method!
+  methods(timestamp: Timestamp): [Method!]!
+  node(id: NonEmptyUuid! timestamp: Timestamp): Node!
+  opticalData(componentId: NonEmptyUuid!): [Any!]!
+  person(id: NonEmptyUuid! timestamp: Timestamp): Person!
+  persons(timestamp: Timestamp): [Person!]!
+  searchComponents(input: SearchComponentsInput!): [NonEmptyUuid!]!
+  standard(id: NonEmptyUuid! timestamp: Timestamp): Standard!
+  standards(timestamp: Timestamp): [Standard!]!
+  user(id: NonEmptyUuid! timestamp: Timestamp): User!
+  users(timestamp: Timestamp): [User!]!
+  whoHasOpticalData(componentId: NonEmptyUuid!): [Database!]!
+}
+
+union Stakeholder = Institution | Person
+
+"Information about pagination in a connection."
+type PageInfo {
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+}
+
+type Component implements Node {
+  concretizations: [Component!]!
+  generalizations: [Component!]!
+  id: NonEmptyUuid!
+  information: ComponentInformation!
+  manufacturers: ComponentManufacturerConnection!
+  opticalData: [Any!]!
+  partOf: [Component!]!
+  parts: [Component!]!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+  variantOf: [Component!]!
+  variants: [Component!]!
+  versionOf: [Component!]!
+  versions: [Component!]!
+  whoHasOpticalData: [Database!]!
+}
+
+"The multiplier path scalar represents a valid GraphQL multiplier path string."
+scalar MultiplierPath
+
+scalar Any
+
+type Mutation {
+  addComponentConcretization(input: AddComponentConcretizationInput!): AddComponentConcretizationPayload!
+  addComponentManufacturer(input: AddComponentManufacturerInput!): AddComponentManufacturerPayload!
+  addComponentPart(input: AddComponentPartInput!): AddComponentPartPayload!
+  addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload!
+  addComponentVersion(input: AddComponentVersionInput!): AddComponentVersionPayload!
+  addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload!
+  addMethodDeveloper(input: AddMethodDeveloperInput!): AddMethodDeveloperPayload!
+  addPersonAffiliation(input: AddPersonAffiliationInput!): AddPersonAffiliationPayload!
+  createComponent(input: CreateComponentInput!): CreateComponentPayload!
+  createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload!
+  createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload!
+  createMethod(input: CreateMethodInput!): CreateMethodPayload!
+  createPerson(input: CreatePersonInput!): CreatePersonPayload!
+  createStandard(input: CreateStandardInput!): CreateStandardPayload!
+  createUser(input: CreateUserInput!): CreateUserPayload!
+  deleteComponent(input: DeleteComponentInput!): DeleteComponentPayload!
+  deleteDatabase(input: DeleteDatabaseInput!): DeleteDatabasePayload!
+  deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload!
+  deleteMethod(input: DeleteMethodInput!): DeleteMethodPayload!
+  deletePerson(input: DeletePersonInput!): DeletePersonPayload!
+  deleteStandard(input: DeleteStandardInput!): DeleteStandardPayload!
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload!
+  removeComponentConcretization(input: RemoveComponentConcretizationInput!): RemoveComponentConcretizationPayload!
+  removeComponentManufacturer(input: RemoveComponentManufacturerInput!): RemoveComponentManufacturerPayload!
+  removeComponentPart(input: RemoveComponentPartInput!): RemoveComponentPartPayload!
+  removeComponentVariant(input: RemoveComponentVariantInput!): RemoveComponentVariantPayload!
+  removeComponentVersion(input: RemoveComponentVersionInput!): RemoveComponentVersionPayload!
+  removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload!
+  removeMethodDeveloper(input: RemoveMethodDeveloperInput!): RemoveMethodDeveloperPayload!
+  removePersonAffiliation(input: RemovePersonAffiliationInput!): RemovePersonAffiliationPayload!
+}
+
+interface Node {
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+input SearchComponentsInput {
+  abbreviation: String
+  description: String
+  name: String
+}
+
+type Database implements Node {
+  description: String!
+  id: NonEmptyUuid!
+  institutionId: NonEmptyUuid!
+  locator: Url!
+  name: String!
+  operatingInstitution: Institution!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type Institution implements Node {
+  affiliatedPersons(after: String before: String first: PaginationAmount last: PaginationAmount): PersonConnection
+  developedMethods: [Method!]!
+  id: NonEmptyUuid!
+  information: InstitutionInformation!
+  manufacturedComponents: ManufacturedComponentConnection!
+  operatedDatabases: [Database!]!
+  publicKey: String
+  representatives(roles: [InstitutionRepresentativeRole!]): InstitutionRepresentativeConnection!
+  requestTimestamp: Timestamp!
+  state: InstitutionState!
+  timestamp: Timestamp!
+}
+
+type Method implements Node {
+  developers: [Stakeholder!]!
+  id: NonEmptyUuid!
+  information: MethodInformation!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type Person implements Node {
+  affiliatedInstitutions: [Institution!]!
+  contactInformation: ContactInformation!
+  developedMethods: [Method!]!
+  id: NonEmptyUuid!
+  name: String!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type Standard implements Node {
+  abstract: String!
+  id: NonEmptyUuid!
+  locator: Url
+  mainNumber: String!
+  prefix: String
+  requestTimestamp: Timestamp!
+  section: String!
+  standardizers: [Standardizer]!
+  suffix: String
+  timestamp: Timestamp!
+  title: String!
+  year: Int!
+}
+
+type User implements Node {
+  id: NonEmptyUuid!
+  representedInstitutions(roles: [InstitutionRepresentativeRole!]): [Institution!]!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type ComponentManufacturerConnection {
+  edges: [ComponentManufacturerEdge!]!
+  fromId: NonEmptyUuid!
+  nodes: [Institution!]!
+  pageInfo: PageInfo!
+  requestTimestamp: Timestamp!
+}
+
+type ComponentInformation {
+  abbreviation: String
+  availableFrom: DateTime
+  availableUntil: DateTime
+  categories: [ComponentCategory]!
+  description: String!
+  name: String!
+}
+
+"A connection to a list of items."
+type PersonConnection {
+  "A list of edges."
+  edges: [PersonEdge!]
+  "A flattened list of the nodes."
+  nodes: [Person]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+scalar PaginationAmount
+
+"An edge in a connection."
+type PersonEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Person
+}
+
+type CreateComponentPayload {
+  component: Component!
+  componentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input CreateComponentInput {
+  information: ComponentInformationInput!
+}
+
+input DeleteComponentInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input CreateDatabaseInput {
+  description: String!
+  institutionId: NonEmptyUuid!
+  locator: Url!
+  name: String!
+}
+
+input DeleteDatabaseInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input CreateInstitutionInput {
+  abbreviation: String
+  description: String
+  name: String!
+  publicKey: String
+  state: InstitutionState!
+  websiteLocator: Url
+}
+
+input DeleteInstitutionInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input CreateMethodInput {
+  categories: [MethodCategory]!
+  codeLocator: Url
+  description: String!
+  name: String!
+  publicationLocator: Url
+  standardId: NonEmptyUuid
+}
+
+input DeleteMethodInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input CreatePersonInput {
+  emailAddress: String!
+  name: String!
+  phoneNumber: String!
+  postalAddress: String!
+  websiteLocator: Url!
+}
+
+input DeletePersonInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input CreateStandardInput {
+  abstract: String!
+  locator: Url
+  mainNumber: String!
+  prefix: String
+  section: String!
+  standardizers: [Standardizer]!
+  suffix: String
+  title: String!
+  year: Int!
+}
+
+input DeleteStandardInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input CreateUserInput {
+  name: String!
+}
+
+input DeleteUserInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input AddComponentConcretizationInput {
+  concreteComponentId: NonEmptyUuid!
+  generalComponentId: NonEmptyUuid!
+}
+
+input RemoveComponentConcretizationInput {
+  concreteComponentId: NonEmptyUuid!
+  generalComponentId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input AddComponentManufacturerInput {
+  componentId: NonEmptyUuid!
+  institutionId: NonEmptyUuid!
+  marketingInformation: ComponentManufacturerMarketingInformationInput
+}
+
+input RemoveComponentManufacturerInput {
+  componentId: NonEmptyUuid!
+  institutionId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input AddComponentPartInput {
+  assembledComponentId: NonEmptyUuid!
+  partComponentId: NonEmptyUuid!
+}
+
+input RemoveComponentPartInput {
+  assembledComponentId: NonEmptyUuid!
+  partComponentId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input AddComponentVariantInput {
+  baseComponentId: NonEmptyUuid!
+  variantComponentId: NonEmptyUuid!
+}
+
+input RemoveComponentVariantInput {
+  baseComponentId: NonEmptyUuid!
+  timestamp: Timestamp!
+  variantComponentId: NonEmptyUuid!
+}
+
+input AddComponentVersionInput {
+  baseComponentId: NonEmptyUuid!
+  versionComponentId: NonEmptyUuid!
+}
+
+input RemoveComponentVersionInput {
+  baseComponentId: NonEmptyUuid!
+  timestamp: Timestamp!
+  versionComponentId: NonEmptyUuid!
+}
+
+input AddInstitutionRepresentativeInput {
+  institutionId: NonEmptyUuid!
+  role: InstitutionRepresentativeRole!
+  userId: NonEmptyUuid!
+}
+
+input RemoveInstitutionRepresentativeInput {
+  institutionId: NonEmptyUuid!
+  timestamp: Timestamp!
+  userId: NonEmptyUuid!
+}
+
+input AddMethodDeveloperInput {
+  methodId: NonEmptyUuid!
+  stakeholderId: NonEmptyUuid!
+}
+
+input RemoveMethodDeveloperInput {
+  methodId: NonEmptyUuid!
+  stakeholderId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+input AddPersonAffiliationInput {
+  institutionId: NonEmptyUuid!
+  personId: NonEmptyUuid!
+}
+
+input RemovePersonAffiliationInput {
+  institutionId: NonEmptyUuid!
+  personId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type DeleteComponentPayload {
+  componentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type CreateDatabasePayload {
+  database: Database!
+  databaseId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type DeleteDatabasePayload {
+  databaseId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type CreateInstitutionPayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type DeleteInstitutionPayload {
+  institutionId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type CreateMethodPayload {
+  method: Method!
+  methodId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type DeleteMethodPayload {
+  methodId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type CreatePersonPayload {
+  person: Person!
+  personId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type DeletePersonPayload {
+  personId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type CreateStandardPayload {
+  requestTimestamp: Timestamp!
+  standard: Standard!
+  standardId: NonEmptyUuid!
+}
+
+type DeleteStandardPayload {
+  requestTimestamp: Timestamp!
+  standardId: NonEmptyUuid!
+}
+
+type CreateUserPayload {
+  requestTimestamp: Timestamp!
+  user: User!
+  userId: NonEmptyUuid!
+}
+
+type DeleteUserPayload {
+  requestTimestamp: Timestamp!
+  userId: NonEmptyUuid!
+}
+
+type AddComponentConcretizationPayload {
+  concreteComponent: Component!
+  concreteComponentId: NonEmptyUuid!
+  generalComponent: Component!
+  generalComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type RemoveComponentConcretizationPayload {
+  concreteComponent: Component!
+  concreteComponentId: NonEmptyUuid!
+  generalComponent: Component!
+  generalComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type AddComponentManufacturerPayload {
+  component: Component!
+  componentId: NonEmptyUuid!
+  componentManufacturerEdge: ComponentManufacturerEdge!
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  manufacturedComponentEdge: ManufacturedComponentEdge!
+  requestTimestamp: Timestamp!
+}
+
+type RemoveComponentManufacturerPayload {
+  component: Component!
+  componentId: NonEmptyUuid!
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type AddComponentPartPayload {
+  assembledComponent: Component!
+  assembledComponentId: NonEmptyUuid!
+  partComponent: Component!
+  partComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type RemoveComponentPartPayload {
+  assembledComponent: Component!
+  assembledComponentId: NonEmptyUuid!
+  partComponent: Component!
+  partComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type AddComponentVariantPayload {
+  baseComponent: Component!
+  baseComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  variantComponent: Component!
+  variantComponentId: NonEmptyUuid!
+}
+
+type RemoveComponentVariantPayload {
+  baseComponent: Component!
+  baseComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  variantComponent: Component!
+  variantComponentId: NonEmptyUuid!
+}
+
+type AddComponentVersionPayload {
+  baseComponent: Component!
+  baseComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  versionComponent: Component!
+  versionComponentId: NonEmptyUuid!
+}
+
+type RemoveComponentVersionPayload {
+  baseComponent: Component!
+  baseComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  versionComponent: Component!
+  versionComponentId: NonEmptyUuid!
+}
+
+type AddInstitutionRepresentativePayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  institutionRepresentativeEdge: InstitutionRepresentativeEdge!
+  representedInstitutionEdge: RepresentedInstitutionEdge!
+  requestTimestamp: Timestamp!
+  user: User!
+  userId: NonEmptyUuid!
+}
+
+type RemoveInstitutionRepresentativePayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  user: User!
+  userId: NonEmptyUuid!
+}
+
+type AddMethodDeveloperPayload {
+  method: Method!
+  methodId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  stakeholder: Stakeholder!
+  stakeholderId: NonEmptyUuid!
+}
+
+type RemoveMethodDeveloperPayload {
+  method: Method!
+  methodId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  stakeholder: Stakeholder!
+  stakeholderId: NonEmptyUuid!
+}
+
+type AddPersonAffiliationPayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  person: Person!
+  personId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type RemovePersonAffiliationPayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  person: Person!
+  personId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+scalar Url
+
+enum InstitutionRepresentativeRole {
+  OWNER
+  MAINTAINER
+  ASSISTANT
+}
+
+type ManufacturedComponentConnection {
+  edges: [ManufacturedComponentEdge!]!
+  fromId: NonEmptyUuid!
+  nodes: [Component!]!
+  pageInfo: PageInfo!
+  requestTimestamp: Timestamp!
+}
+
+type InstitutionRepresentativeConnection {
+  edges: [InstitutionRepresentativeEdge!]!
+  fromId: NonEmptyUuid!
+  nodes: [User!]!
+  pageInfo: PageInfo!
+  requestTimestamp: Timestamp!
+}
+
+type InstitutionInformation {
+  abbreviation: String
+  description: String
+  name: String!
+  websiteLocator: Url
+}
+
+enum InstitutionState {
+  UNKNOWN
+  OPERATIVE
+  INOPERATIVE
+}
+
+type MethodInformation {
+  categories: [MethodCategory]!
+  codeLocator: Url
+  description: String!
+  name: String!
+  publicationLocator: Url
+  standardId: NonEmptyUuid
+}
+
+type ContactInformation {
+  emailAddress: String!
+  phoneNumber: String!
+  postalAddress: String!
+  websiteLocator: Url!
+}
+
+enum Standardizer {
+  AERC
+  AGI
+  ASHRAE
+  BREEAM
+  BS
+  BSI
+  CEN
+  CIE
+  DGNB
+  DIN
+  DVWG
+  IEC
+  IES
+  IFT
+  ISO
+  JIS
+  LEED
+  NFRC
+  RIBA
+  UL
+  UNECE
+  VDI
+  VFF
+  WELL
+}
+
+type ComponentManufacturerEdge {
+  marketingInformation: ComponentManufacturerMarketingInformation
+  node: Institution!
+  nodeId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+enum ComponentCategory {
+  MATERIAL
+  LAYER
+  UNIT
+}
+
+input ComponentInformationInput {
+  abbreviation: String
+  availableFrom: DateTime
+  availableUntil: DateTime
+  categories: [ComponentCategory]!
+  description: String!
+  name: String!
+}
+
+enum MethodCategory {
+  MEASUREMENT
+  CALCULATION
+}
+
+input ComponentManufacturerMarketingInformationInput {
+  componentInformation: ComponentInformationInput
+  institutionInformation: InstitutionInformationInput
+}
+
+type ManufacturedComponentEdge {
+  marketingInformation: ComponentManufacturerMarketingInformation
+  node: Component!
+  nodeId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type InstitutionRepresentativeEdge {
+  node: User!
+  nodeId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  role: InstitutionRepresentativeRole!
+  timestamp: Timestamp!
+}
+
+type RepresentedInstitutionEdge {
+  node: Institution!
+  nodeId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  role: InstitutionRepresentativeRole!
+  timestamp: Timestamp!
+}
+
+type ComponentManufacturerMarketingInformation {
+  componentInformation: ComponentInformation
+  institutionInformation: InstitutionInformation
+}
+
+input InstitutionInformationInput {
+  abbreviation: String
+  description: String
+  name: String!
+  websiteLocator: Url
+}
+
+"The cost directives is used to express the complexity of a field."
+directive @cost("Defines the complexity of the field." complexity: Int! = 1 "Defines field arguments that act as complexity multipliers." multipliers: [MultiplierPath!]) on FIELD_DEFINITION
+
+directive @authorize("The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access to the annotated resource." roles: [String!]) repeatable on OBJECT | FIELD_DEFINITION

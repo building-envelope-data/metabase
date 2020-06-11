@@ -1,13 +1,13 @@
-using Models = Icon.Models;
-using GreenDonut;
-using DateTime = System.DateTime;
-using CancellationToken = System.Threading.CancellationToken;
-using HotChocolate;
-using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
-using IResolverContext = HotChocolate.Resolvers.IResolverContext;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GreenDonut;
+using HotChocolate;
 using HotChocolate.Types.Relay;
+using CancellationToken = System.Threading.CancellationToken;
+using DateTime = System.DateTime;
+using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
+using IResolverContext = HotChocolate.Resolvers.IResolverContext;
+using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {
@@ -102,7 +102,7 @@ namespace Icon.GraphQl
         }
 
         public sealed class DatabasesOperatedByInstitutionDataLoader
-            : OneToManyAssociatesOfModelDataLoader<Database, Models.Institution, Models.Database>
+            : ForwardOneToManyAssociatesOfModelDataLoader<Database, Models.Institution, Models.InstitutionOperatedDatabase, Models.Database>
         {
             public DatabasesOperatedByInstitutionDataLoader(IQueryBus queryBus)
               : base(Database.FromModel, queryBus)

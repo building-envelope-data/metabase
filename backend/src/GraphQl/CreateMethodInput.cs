@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using ValueObjects = Icon.ValueObjects;
-using Uri = System.Uri;
 using CSharpFunctionalExtensions;
+using Uri = System.Uri;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.GraphQl
 {

@@ -1,24 +1,23 @@
-using ValueObjects = Icon.ValueObjects;
 using System;
 using System.Collections.Generic;
-using Models = Icon.Models;
+using System.Linq;
+using CSharpFunctionalExtensions;
 using Icon.Infrastructure.Query;
 using IError = HotChocolate.IError;
-using CSharpFunctionalExtensions;
-using System.Linq;
+using Models = Icon.Models;
+using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Queries
 {
     public abstract class GetManyToManyAssociationsOfModels<TModel, TAssociationModel>
-      : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
+      : GetAssociationsOfModels<TModel, TAssociationModel>,
+        IQuery<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
     {
-        public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedIds { get; }
-
         protected GetManyToManyAssociationsOfModels(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
+          : base(timestampedIds)
         {
-            TimestampedIds = timestampedIds;
         }
     }
 }

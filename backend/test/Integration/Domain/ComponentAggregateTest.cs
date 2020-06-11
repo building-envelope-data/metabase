@@ -1,13 +1,13 @@
-using TestBase = Test.Integration.EventStore.TestBase;
-using Xunit;
-using System.Threading.Tasks;
 using System;
-using FluentAssertions;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Xunit;
 using Aggregates = Icon.Aggregates;
 using Commands = Icon.Commands;
 using Events = Icon.Events;
-using System.Collections.Generic;
+using TestBase = Test.Integration.EventStore.TestBase;
 
 namespace Icon.Domain
 {

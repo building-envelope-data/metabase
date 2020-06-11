@@ -27,7 +27,7 @@
       ]
     },
     "dotnet-format": {
-      "version": "3.3.111304",
+      "version": "4.0.130203",
       "commands": [
         "dotnet-format"
       ]
@@ -42,6 +42,12 @@
       "version": "3.1.120604",
       "commands": [
         "dotnet-trace"
+      ]
+    },
+    "strawberryshake.tools": {
+      "version": "11.0.0-preview.130",
+      "commands": [
+        "dotnet-graphql"
       ]
     }
   }

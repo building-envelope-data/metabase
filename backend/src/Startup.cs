@@ -1,13 +1,19 @@
-using NSwag.Generation.Processors.Security;
-using IdentityServer4.AccessTokenValidation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Icon.Data;
+using IdentityServer4.AccessTokenValidation;
+using IdentityServer4.AspNetIdentity;
+using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,21 +21,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NSwag.AspNetCore;
 using Microsoft.OpenApi;
 using NSwag;
-using IdentityServer4.AspNetIdentity;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
-using Command = Icon.Infrastructure.Command;
-using Query = Icon.Infrastructure.Query;
-using Event = Icon.Events;
-using System.Threading.Tasks;
-using System;
+using NSwag.AspNetCore;
+using NSwag.Generation.Processors.Security;
 using WebPWrecover.Services;
-using IdentityServer4.Validation;
+using Command = Icon.Infrastructure.Command;
 using Configuration = Icon.Configuration;
+using Event = Icon.Events;
+using Query = Icon.Infrastructure.Query;
 
 // TODO ? Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth?view=aspnetcore-3.0
 // TODO Use NodaTime (see commented code below; confer https://www.npgsql.org/efcore/mapping/nodatime.html).
@@ -72,6 +72,21 @@ namespace Icon
                 .AddEnvironmentVariables()
               .Build();
             _appSettings = _configuration.Get<AppSettings>();
+            RegisterJsonSchemaFiles();
+        }
+
+        private void RegisterJsonSchemaFiles()
+        {
+            // We force initialization of `JsonSchemaRegistry` on start-up as
+            // otherwise errors with the JSON Schemas are only encountered on
+            // the registry's first usage initiated by a GraphQL query and that
+            // query also takes rather long (because the JSON Schemas are
+            // loaded, validated, and registered).
+            var count = ValueObjects.JsonSchema.JsonSchemaRegistry.Count;
+            if (count is 0)
+            {
+                throw new Exception("There are no JSON Schemas in the registry");
+            }
         }
 
         private string GetMigrationsAssembly()

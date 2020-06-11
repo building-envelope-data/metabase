@@ -1,9 +1,10 @@
-using Uri = System.Uri;
-using Models = Icon.Models;
-using DateTime = System.DateTime;
 using System.Threading.Tasks;
-using HotChocolate;
 using GreenDonut;
+using HotChocolate;
+using DateTime = System.DateTime;
+using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
+using Models = Icon.Models;
+using Uri = System.Uri;
 
 namespace Icon.GraphQl
 {
@@ -20,7 +21,6 @@ namespace Icon.GraphQl
                 name: model.Name,
                 description: model.Description,
                 locator: model.Locator,
-                institutionId: model.InstitutionId,
                 timestamp: model.Timestamp,
                 requestTimestamp: requestTimestamp
                 );
@@ -29,14 +29,12 @@ namespace Icon.GraphQl
         public string Name { get; }
         public string Description { get; }
         public Uri Locator { get; }
-        public ValueObjects.Id InstitutionId { get; }
 
         public Database(
             ValueObjects.Id id,
             string name,
             string description,
             Uri locator,
-            ValueObjects.Id institutionId,
             ValueObjects.Timestamp timestamp,
             ValueObjects.Timestamp requestTimestamp
             )
@@ -49,16 +47,39 @@ namespace Icon.GraphQl
             Name = name;
             Description = description;
             Locator = locator;
-            InstitutionId = institutionId;
+        }
+
+        public async Task<ValueObjects.Id> GetOperatingInstitutionId(
+            [Parent] Database database,
+            [DataLoader] InstitutionOperatingDatabaseDataLoader institutionLoader
+            )
+        {
+            return
+              (
+               await institutionLoader.LoadAsync(
+                 TimestampHelpers.TimestampId(database.Id, database.RequestTimestamp)
+                 )
+              )
+              .Id;
         }
 
         public Task<Institution> GetOperatingInstitution(
-            [DataLoader] InstitutionDataLoader institutionLoader
+            [Parent] Database database,
+            [DataLoader] InstitutionOperatingDatabaseDataLoader institutionLoader
             )
         {
             return institutionLoader.LoadAsync(
-                TimestampHelpers.TimestampId(InstitutionId, RequestTimestamp)
+                TimestampHelpers.TimestampId(database.Id, database.RequestTimestamp)
                 );
+        }
+
+        public sealed class InstitutionOperatingDatabaseDataLoader
+            : BackwardOneToManyAssociateOfModelDataLoader<Institution, Models.Database, Models.InstitutionOperatedDatabase, Models.Institution>
+        {
+            public InstitutionOperatingDatabaseDataLoader(IQueryBus queryBus)
+              : base(Institution.FromModel, queryBus)
+            {
+            }
         }
     }
 }

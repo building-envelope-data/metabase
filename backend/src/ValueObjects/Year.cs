@@ -1,10 +1,10 @@
 using System;
-using Array = System.Array;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Array = System.Array;
 using ErrorBuilder = HotChocolate.ErrorBuilder;
-using IError = HotChocolate.IError;
 using ErrorCodes = Icon.ErrorCodes;
+using IError = HotChocolate.IError;
 
 namespace Icon.ValueObjects
 {

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Icon.Infrastructure.Query;
+using GreenDonut;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
-using GreenDonut;
+using Icon.Infrastructure.Query;
 
 namespace Icon.GraphQl
 {

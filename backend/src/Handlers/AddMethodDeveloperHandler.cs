@@ -1,11 +1,13 @@
+using System; // Func
+using System.Linq; // Enumerable.Empty
 using System.Threading.Tasks;
-using CancellationToken = System.Threading.CancellationToken;
-using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Aggregate;
-using Events = Icon.Events;
-using Commands = Icon.Commands;
-using Aggregates = Icon.Aggregates;
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Command;
+using Aggregates = Icon.Aggregates;
+using CancellationToken = System.Threading.CancellationToken;
+using Commands = Icon.Commands;
+using Events = Icon.Events;
 
 namespace Icon.Handlers
 {
@@ -22,12 +24,14 @@ namespace Icon.Handlers
             _addInstitutionMethodDeveloperHandler =
               new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate>(
                   repository,
-                  Events.InstitutionMethodDeveloperAdded.From
+                  Events.InstitutionMethodDeveloperAdded.From,
+                  Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>()
                   );
             _addPersonMethodDeveloperHandler =
               new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate>(
                   repository,
-                  Events.PersonMethodDeveloperAdded.From
+                  Events.PersonMethodDeveloperAdded.From,
+                  Enumerable.Empty<Func<IAggregateRepositorySession, ValueObjects.Id, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>>()
                   );
         }
 
@@ -48,10 +52,10 @@ namespace Icon.Handlers
                   .Bind(async aggregateType =>
                     {
                         if (aggregateType == typeof(Aggregates.InstitutionAggregate))
-                            return await _addInstitutionMethodDeveloperHandler.Handle(command, session, cancellationToken)
+                            return await _addInstitutionMethodDeveloperHandler.Handle(session, command, cancellationToken)
                             .ConfigureAwait(false);
                         if (aggregateType == typeof(Aggregates.PersonAggregate))
-                            return await _addPersonMethodDeveloperHandler.Handle(command, session, cancellationToken)
+                            return await _addPersonMethodDeveloperHandler.Handle(session, command, cancellationToken)
                             .ConfigureAwait(false);
                         return Result.Failure<ValueObjects.TimestampedId, Errors>(
                         Errors.One(

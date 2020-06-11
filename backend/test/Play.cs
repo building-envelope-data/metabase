@@ -1,5 +1,5 @@
-using Xunit;
 using System;
+using Xunit;
 
 namespace Test
 {

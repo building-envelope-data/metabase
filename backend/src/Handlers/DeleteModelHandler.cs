@@ -1,15 +1,15 @@
-using System.Threading.Tasks;
-using System.Linq;
-using System.Collections.Generic;
 using System; // Func
-using DateTime = System.DateTime;
-using CancellationToken = System.Threading.CancellationToken;
-using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Aggregate;
-using Events = Icon.Events;
-using Commands = Icon.Commands;
-using Aggregates = Icon.Aggregates;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Command;
+using Aggregates = Icon.Aggregates;
+using CancellationToken = System.Threading.CancellationToken;
+using Commands = Icon.Commands;
+using DateTime = System.DateTime;
+using Events = Icon.Events;
 
 namespace Icon.Handlers
 {
@@ -39,13 +39,13 @@ namespace Icon.Handlers
         {
             using (var session = _repository.OpenSession())
             {
-                return await Handle(command, session, cancellationToken).ConfigureAwait(false);
+                return await Handle(session, command, cancellationToken).ConfigureAwait(false);
             }
         }
 
         public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
-            Commands.Delete<TModel> command,
             IAggregateRepositorySession session,
+            Commands.Delete<TModel> command,
             CancellationToken cancellationToken
             )
         {
@@ -76,7 +76,7 @@ namespace Icon.Handlers
                               var @event = _newDeletedEvent(command);
                               return await (
                               await session.Delete<TAggregate>(
-                                command.TimestampedId, @event, cancellationToken
+                                command.TimestampedId.Timestamp, @event, cancellationToken
                                 )
                               .ConfigureAwait(false)
                               )

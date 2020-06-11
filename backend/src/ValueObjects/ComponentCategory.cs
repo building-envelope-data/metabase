@@ -1,5 +1,5 @@
-using Guid = System.Guid;
 using DateTime = System.DateTime;
+using Guid = System.Guid;
 
 namespace Icon.ValueObjects
 {

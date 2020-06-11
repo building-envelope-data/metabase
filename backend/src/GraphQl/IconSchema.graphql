@@ -1,0 +1,14 @@
+scalar Any
+
+scalar NonEmptyUuid
+
+type Query {
+  opticalData(componentId: NonEmptyUuid!): [Any!]!
+  searchComponents(input: SearchComponentsInput!): [NonEmptyUuid!]!
+}
+
+input SearchComponentsInput {
+  abbreviation: String
+  description: String
+  name: String
+}

@@ -1,80 +1,72 @@
-using System.Threading.Tasks;
 using System; // Func
-using DateTime = System.DateTime;
-using CancellationToken = System.Threading.CancellationToken;
-using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Aggregate;
-using Events = Icon.Events;
-using Commands = Icon.Commands;
-using Aggregates = Icon.Aggregates;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Command;
 using Marten;
 using Marten.Linq;
-using System.Linq;
+using Aggregates = Icon.Aggregates;
+using CancellationToken = System.Threading.CancellationToken;
+using Commands = Icon.Commands;
+using DateTime = System.DateTime;
+using Events = Icon.Events;
 
 namespace Icon.Handlers
 {
     public sealed class AddManyToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>
-      : CreateModelHandler<Commands.AddAssociation<TInput>, TAssociationAggregate>
+      : ICommandHandler<Commands.AddAssociation<TInput>, Result<ValueObjects.TimestampedId, Errors>>
       where TInput : ValueObjects.AddManyToManyAssociationInput
       where TAggregate : class, IEventSourcedAggregate, new()
-      where TAssociationAggregate : class, IEventSourcedAggregate, Aggregates.IManyToManyAssociationAggregate, new()
+      where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, new()
     {
+        private readonly IAggregateRepository _repository;
+        private readonly Func<Guid, Commands.AddAssociation<TInput>, Events.IAssociationAddedEvent> _newAssociationAddedEvent;
+
         public AddManyToManyAssociationHandler(
             IAggregateRepository repository,
             Func<Guid, Commands.AddAssociation<TInput>, Events.IAssociationAddedEvent> newAssociationAddedEvent
             )
-          : base(
-              repository,
-              newAssociationAddedEvent
-              )
         {
+            _repository = repository;
+            _newAssociationAddedEvent = newAssociationAddedEvent;
         }
 
-        public override async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
+        public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
             Commands.AddAssociation<TInput> command,
-            IAggregateRepositorySession session,
             CancellationToken cancellationToken
             )
         {
-            // TODO Do the queries below in a Marten batch!
-            var parentResult = await session.Load<TAggregate>(
-                                    command.Input.ParentId,
-                                    cancellationToken
-                                    );
-            var associateResult = await session.Load<TAssociateAggregate>(
-                                    command.Input.AssociateId,
-                                    cancellationToken
-                                    );
-            return
-                            await Errors.Combine(
-                                parentResult,
-                                associateResult
-                                )
-                            .Bind(async _ =>
-                {
-                    var doesAssociationExist =
-                                    await session.Query<TAssociationAggregate>()
-                    .Where(a =>
-                        a.ParentId == command.Input.ParentId &&
-                        a.AssociateId == command.Input.AssociateId
-                        )
-                    .AnyAsync(cancellationToken)
-                    .ConfigureAwait(false);
-                    if (doesAssociationExist)
-                    {
-                        return Result.Failure<ValueObjects.TimestampedId, Errors>(
-                            Errors.One(
-                              message: $"There already is an association from {command.Input.ParentId} to {command.Input.AssociateId} of type {typeof(TAssociationAggregate)}",
-                              code: ErrorCodes.AlreadyExistingAssociation
-                              )
-                            );
-                    }
-                    return await base.Handle(command, session, cancellationToken).ConfigureAwait(false);
-                }
+            using (var session = _repository.OpenSession())
+            {
+                return await Handle(session, command, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<Result<ValueObjects.TimestampedId, Errors>> Handle(
+            IAggregateRepositorySession session,
+            Commands.AddAssociation<TInput> command,
+            CancellationToken cancellationToken
+            )
+        {
+            return await (
+              await session.AddManyToManyAssociation<TAggregate, TAssociationAggregate, TAssociateAggregate>(
+                id => _newAssociationAddedEvent(id, command),
+                AddAssociationCheck.PARENT_AND_ASSOCIATE,
+                cancellationToken
                 )
-                                    .ConfigureAwait(false);
+                .ConfigureAwait(false)
+              )
+                .Bind(async id => await
+                    (await session.Save(cancellationToken).ConfigureAwait(false))
+                    .Bind(async _ =>
+                      await session.TimestampId<TAggregate>(id, cancellationToken).ConfigureAwait(false)
+                      )
+                    .ConfigureAwait(false)
+                    )
+                .ConfigureAwait(false);
         }
     }
 }

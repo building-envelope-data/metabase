@@ -1,7 +1,7 @@
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
-using Guid = System.Guid;
 using Commands = Icon.Commands;
+using Errors = Icon.Errors;
+using Guid = System.Guid;
 
 namespace Icon.Events
 {

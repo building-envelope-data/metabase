@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Models = Icon.Models;
-using DateTime = System.DateTime;
 using CSharpFunctionalExtensions;
+using DateTime = System.DateTime;
+using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {

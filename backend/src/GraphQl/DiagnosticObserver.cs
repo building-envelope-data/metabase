@@ -1,12 +1,12 @@
 // Inspired by https://hotchocolate.io/docs/instrumentation
 // and https://github.com/ChilliCream/hotchocolate-examples/tree/master/Instrumentation
 
-using System.Text.Json;
-using System.Text;
-using System.IO;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
 using HotChocolate;
 using HotChocolate.Execution;
 using HotChocolate.Execution.Instrumentation;

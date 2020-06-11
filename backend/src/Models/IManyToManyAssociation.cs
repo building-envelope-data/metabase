@@ -1,9 +1,7 @@
 namespace Icon.Models
 {
     public interface IManyToManyAssociation
-      : IModel
+      : IAssociation
     {
-        public ValueObjects.Id ParentId { get; }
-        public ValueObjects.Id AssociateId { get; }
     }
 }

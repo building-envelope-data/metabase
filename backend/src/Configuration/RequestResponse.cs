@@ -1,13 +1,19 @@
-using NSwag.Generation.Processors.Security;
-using IdentityServer4.AccessTokenValidation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Icon.Data;
+using IdentityServer4.AccessTokenValidation;
+using IdentityServer4.AspNetIdentity;
+using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,23 +21,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NSwag.AspNetCore;
 using Microsoft.OpenApi;
 using NSwag;
-using IdentityServer4.AspNetIdentity;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
+using NSwag.AspNetCore;
+using NSwag.Generation.Processors.Security;
+using WebPWrecover.Services;
 using Command = Icon.Infrastructure.Command;
-using Query = Icon.Infrastructure.Query;
 using Event = Icon.Events;
 using Models = Icon.Models;
-using System.Threading.Tasks;
-using System;
-using WebPWrecover.Services;
-using IdentityServer4.Validation;
-using RazorViewEngineOptions = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions;
+using Query = Icon.Infrastructure.Query;
 using RazorViewEngine = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine;
+using RazorViewEngineOptions = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions;
 
 namespace Icon.Configuration
 {
@@ -100,14 +100,22 @@ namespace Icon.Configuration
             {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                // ASP.NET advices to not use HSTS for APIs, see the warning on
+                // https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-3.1&tabs=visual-studio
                 app.UseHsts();
             }
 
             app.UseStatusCodePages();
 
             // ASP.NET advices to not use HTTPS redirection for APIs, see the
-            // warning on https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-3.0&tabs=visual-studio
-            app.UseHttpsRedirection();
+            // warning on https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-3.1&tabs=visual-studio
+            // TODO Use `app.UseHttpsRedirection();`. The problem right now is
+            // that requests from within the container to the container itself
+            // fails with the exceptions
+            // System.Net.Http.HttpRequestException: The SSL connection could not be established, see inner exception.
+            // ---> System.Security.Authentication.AuthenticationException: The remote certificate is invalid according to the validation procedure.
+            // Although, we added a self-signed root certificate to the
+            // container.
 
             app.UseStaticFiles();
             app.UseRouting();

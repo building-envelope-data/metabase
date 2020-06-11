@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Errors = Icon.Errors;
 using CSharpFunctionalExtensions;
+using DateTime = System.DateTime;
+using Errors = Icon.Errors;
 using Uri = System.Uri;
 using ValueObjects = Icon.ValueObjects;
-using DateTime = System.DateTime;
 
 namespace Icon.Models
 {
@@ -13,14 +13,12 @@ namespace Icon.Models
         public ValueObjects.Name Name { get; }
         public ValueObjects.Description Description { get; }
         public ValueObjects.AbsoluteUri Locator { get; }
-        public ValueObjects.Id InstitutionId { get; }
 
         private Database(
             ValueObjects.Id id,
             ValueObjects.Name name,
             ValueObjects.Description description,
             ValueObjects.AbsoluteUri locator,
-            ValueObjects.Id institutionId,
             ValueObjects.Timestamp timestamp
             )
           : base(id, timestamp)
@@ -28,7 +26,6 @@ namespace Icon.Models
             Name = name;
             Description = description;
             Locator = locator;
-            InstitutionId = institutionId;
         }
 
         public static Result<Database, Errors> From(
@@ -36,7 +33,6 @@ namespace Icon.Models
             ValueObjects.Name name,
             ValueObjects.Description description,
             ValueObjects.AbsoluteUri locator,
-            ValueObjects.Id institutionId,
             ValueObjects.Timestamp timestamp
             )
         {
@@ -47,7 +43,6 @@ namespace Icon.Models
             name: name,
             description: description,
             locator: locator,
-            institutionId: institutionId,
             timestamp: timestamp
             )
                   );
