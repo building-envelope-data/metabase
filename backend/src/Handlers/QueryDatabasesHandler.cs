@@ -84,7 +84,8 @@ namespace Icon.Handlers
               (
                await CreateGraphQlClient(database)
                .SendQueryAsync<TGraphQlResponse>(
-                 CreateGraphQlRequest(query)
+                 CreateGraphQlRequest(query),
+                 cancellationToken
                  )
                .ConfigureAwait(false)
                )
