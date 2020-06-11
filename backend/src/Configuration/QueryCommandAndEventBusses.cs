@@ -66,8 +66,6 @@ namespace Icon.Configuration
             AddDatabaseHandlers(services);
             AddInstitutionHandlers(services);
             AddMethodHandlers(services);
-            AddOpticalDataHandlers(services);
-            AddOpticalDataFromDatabaseHandlers(services);
             AddPersonHandlers(services);
             AddStakeholderHandlers(services);
             AddStandardHandlers(services);
@@ -78,11 +76,25 @@ namespace Icon.Configuration
             AddComponentVersionHandlers(services);
 
             AddComponentManufacturerHandlers(services);
-            AddComponentOpticalDataHandlers(services);
             AddInstitutionOperatedDatabaseHandlers(services);
             AddInstitutionRepresentativeHandlers(services);
             AddMethodDeveloperHandlers(services);
             AddPersonAffiliationHandlers(services);
+
+            AddOpticalDataHandlers(services);
+            AddCalorimetricDataHandlers(services);
+            AddPhotovoltaicDataHandlers(services);
+            AddHygrothermalDataHandlers(services);
+
+            AddOpticalDataFromDatabaseHandlers(services);
+            AddCalorimetricDataFromDatabaseHandlers(services);
+            AddPhotovoltaicDataFromDatabaseHandlers(services);
+            AddHygrothermalDataFromDatabaseHandlers(services);
+
+            AddComponentOpticalDataHandlers(services);
+            AddComponentCalorimetricDataHandlers(services);
+            AddComponentPhotovoltaicDataHandlers(services);
+            AddComponentHygrothermalDataHandlers(services);
 
             // TODO Shall we broadcast events?
             /* services.AddScoped<INotificationHandler<ClientCreated>, ClientsEventHandler>(); */
@@ -288,14 +300,107 @@ namespace Icon.Configuration
                           ),
                     }
                     );
+            AddHasDataForComponentsHandler<Models.ComponentOpticalData, Models.OpticalData, Aggregates.ComponentOpticalDataAggregate, Aggregates.OpticalDataAggregate, Events.ComponentOpticalDataAdded>(services);
+        }
 
-            // Has
+        private static void AddCalorimetricDataHandlers(IServiceCollection services)
+        {
+            AddModelHandlers<Models.CalorimetricData, Aggregates.CalorimetricDataAggregate, ValueObjects.CreateCalorimetricDataInput, Events.CalorimetricDataCreated>(
+                    services,
+                    Events.CalorimetricDataCreated.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreateCalorimetricDataInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>[]
+                    {
+                    (session, calorimetricDataId, command, cancellationToken) =>
+                    session.AddOneToManyAssociation<Aggregates.ComponentAggregate, Aggregates.ComponentCalorimetricDataAggregate, Aggregates.CalorimetricDataAggregate>(
+                        id => Events.ComponentCalorimetricDataAdded.From(id, calorimetricDataId, command),
+                        AddAssociationCheck.PARENT,
+                        cancellationToken
+                        )
+                    },
+                    Events.CalorimetricDataDeleted.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    {
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      session.RemoveBackwardOneToManyAssociationOfModel<Models.CalorimetricData, Models.ComponentCalorimetricData, Aggregates.CalorimetricDataAggregate, Aggregates.ComponentCalorimetricDataAggregate, Events.ComponentCalorimetricDataAdded>(
+                          timestampedId,
+                          componentCalorimetricDataId => new Events.ComponentCalorimetricDataRemoved(componentCalorimetricDataId, creatorId),
+                          cancellationToken
+                          ),
+                    }
+                    );
+            AddHasDataForComponentsHandler<Models.ComponentCalorimetricData, Models.CalorimetricData, Aggregates.ComponentCalorimetricDataAggregate, Aggregates.CalorimetricDataAggregate, Events.ComponentCalorimetricDataAdded>(services);
+        }
+
+        private static void AddPhotovoltaicDataHandlers(IServiceCollection services)
+        {
+            AddModelHandlers<Models.PhotovoltaicData, Aggregates.PhotovoltaicDataAggregate, ValueObjects.CreatePhotovoltaicDataInput, Events.PhotovoltaicDataCreated>(
+                    services,
+                    Events.PhotovoltaicDataCreated.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreatePhotovoltaicDataInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>[]
+                    {
+                    (session, photovoltaicDataId, command, cancellationToken) =>
+                    session.AddOneToManyAssociation<Aggregates.ComponentAggregate, Aggregates.ComponentPhotovoltaicDataAggregate, Aggregates.PhotovoltaicDataAggregate>(
+                        id => Events.ComponentPhotovoltaicDataAdded.From(id, photovoltaicDataId, command),
+                        AddAssociationCheck.PARENT,
+                        cancellationToken
+                        )
+                    },
+                    Events.PhotovoltaicDataDeleted.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    {
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      session.RemoveBackwardOneToManyAssociationOfModel<Models.PhotovoltaicData, Models.ComponentPhotovoltaicData, Aggregates.PhotovoltaicDataAggregate, Aggregates.ComponentPhotovoltaicDataAggregate, Events.ComponentPhotovoltaicDataAdded>(
+                          timestampedId,
+                          componentPhotovoltaicDataId => new Events.ComponentPhotovoltaicDataRemoved(componentPhotovoltaicDataId, creatorId),
+                          cancellationToken
+                          ),
+                    }
+                    );
+            AddHasDataForComponentsHandler<Models.ComponentPhotovoltaicData, Models.PhotovoltaicData, Aggregates.ComponentPhotovoltaicDataAggregate, Aggregates.PhotovoltaicDataAggregate, Events.ComponentPhotovoltaicDataAdded>(services);
+        }
+
+        private static void AddHygrothermalDataHandlers(IServiceCollection services)
+        {
+            AddModelHandlers<Models.HygrothermalData, Aggregates.HygrothermalDataAggregate, ValueObjects.CreateHygrothermalDataInput, Events.HygrothermalDataCreated>(
+                    services,
+                    Events.HygrothermalDataCreated.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.Id, Commands.Create<ValueObjects.CreateHygrothermalDataInput>, CancellationToken, Task<Result<ValueObjects.Id, Errors>>>[]
+                    {
+                    (session, hygrothermalDataId, command, cancellationToken) =>
+                    session.AddOneToManyAssociation<Aggregates.ComponentAggregate, Aggregates.ComponentHygrothermalDataAggregate, Aggregates.HygrothermalDataAggregate>(
+                        id => Events.ComponentHygrothermalDataAdded.From(id, hygrothermalDataId, command),
+                        AddAssociationCheck.PARENT,
+                        cancellationToken
+                        )
+                    },
+                    Events.HygrothermalDataDeleted.From,
+                    new Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    {
+                      (session, timestampedId, creatorId, cancellationToken) =>
+                      session.RemoveBackwardOneToManyAssociationOfModel<Models.HygrothermalData, Models.ComponentHygrothermalData, Aggregates.HygrothermalDataAggregate, Aggregates.ComponentHygrothermalDataAggregate, Events.ComponentHygrothermalDataAdded>(
+                          timestampedId,
+                          componentHygrothermalDataId => new Events.ComponentHygrothermalDataRemoved(componentHygrothermalDataId, creatorId),
+                          cancellationToken
+                          ),
+                    }
+                    );
+            AddHasDataForComponentsHandler<Models.ComponentHygrothermalData, Models.HygrothermalData, Aggregates.ComponentHygrothermalDataAggregate, Aggregates.HygrothermalDataAggregate, Events.ComponentHygrothermalDataAdded>(services);
+        }
+
+        private static void AddHasDataForComponentsHandler<TComponentDataAssociationModel, TDataModel, TComponentDataAssociationAggregate, TDataAggregate, TAssociationAddedEvent>(
+            IServiceCollection services
+            )
+          where TComponentDataAssociationModel : Models.IOneToManyAssociation
+          where TComponentDataAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TComponentDataAssociationModel>, new()
+          where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
+          where TAssociationAddedEvent : Events.IAssociationAddedEvent
+        {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.HasOpticalDataForComponents,
+              Queries.HasDataForComponents<TDataModel>,
               IEnumerable<Result<bool, Errors>>
                 >,
-              Handlers.HasOpticalDataForComponentsHandler
+              Handlers.HasDataForComponentsHandler<TComponentDataAssociationModel, TDataModel, TComponentDataAssociationAggregate, TDataAggregate, TAssociationAddedEvent>
                 >();
         }
 
@@ -312,6 +417,51 @@ namespace Icon.Configuration
 
             // Who Has
             AddWhichDatabasesHaveDataForComponentsHandler<Models.OpticalDataFromDatabase>(services, "hasOpticalData"); // TODO Get rid of magical string!
+        }
+
+        private static void AddCalorimetricDataFromDatabaseHandlers(IServiceCollection services)
+        {
+            // Get
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.QueryDataArrayOfComponentsFromDatabases<Models.CalorimetricDataFromDatabase>,
+              IEnumerable<Result<IEnumerable<Result<Models.CalorimetricDataFromDatabase, Errors>>, Errors>>
+                >,
+              Handlers.QueryCalorimetricDataOfComponentsFromDatabasesHandler
+                >();
+
+            // Who Has
+            AddWhichDatabasesHaveDataForComponentsHandler<Models.CalorimetricDataFromDatabase>(services, "hasCalorimetricData"); // TODO Get rid of magical string!
+        }
+
+        private static void AddPhotovoltaicDataFromDatabaseHandlers(IServiceCollection services)
+        {
+            // Get
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.QueryDataArrayOfComponentsFromDatabases<Models.PhotovoltaicDataFromDatabase>,
+              IEnumerable<Result<IEnumerable<Result<Models.PhotovoltaicDataFromDatabase, Errors>>, Errors>>
+                >,
+              Handlers.QueryPhotovoltaicDataOfComponentsFromDatabasesHandler
+                >();
+
+            // Who Has
+            AddWhichDatabasesHaveDataForComponentsHandler<Models.PhotovoltaicDataFromDatabase>(services, "hasPhotovoltaicData"); // TODO Get rid of magical string!
+        }
+
+        private static void AddHygrothermalDataFromDatabaseHandlers(IServiceCollection services)
+        {
+            // Get
+            services.AddScoped<
+              MediatR.IRequestHandler<
+              Queries.QueryDataArrayOfComponentsFromDatabases<Models.HygrothermalDataFromDatabase>,
+              IEnumerable<Result<IEnumerable<Result<Models.HygrothermalDataFromDatabase, Errors>>, Errors>>
+                >,
+              Handlers.QueryHygrothermalDataOfComponentsFromDatabasesHandler
+                >();
+
+            // Who Has
+            AddWhichDatabasesHaveDataForComponentsHandler<Models.HygrothermalDataFromDatabase>(services, "hasHygrothermalData"); // TODO Get rid of magical string!
         }
 
         private static void AddWhichDatabasesHaveDataForComponentsHandler<TDataModel>(
@@ -588,6 +738,63 @@ namespace Icon.Configuration
                             services,
                             Events.ComponentOpticalDataAdded.From,
                             Events.ComponentOpticalDataRemoved.From
+                     );
+        }
+
+        private static void AddComponentCalorimetricDataHandlers(IServiceCollection services)
+        {
+            AddOneToManyAssociationHandlers<
+                Models.Component,
+                Models.ComponentCalorimetricData,
+                Models.CalorimetricData,
+                Aggregates.ComponentAggregate,
+                Aggregates.ComponentCalorimetricDataAggregate,
+                Aggregates.CalorimetricDataAggregate,
+                Events.ComponentCalorimetricDataAdded,
+                ValueObjects.AddComponentCalorimetricDataInput,
+                Events.ComponentCalorimetricDataRemoved
+                    >(
+                            services,
+                            Events.ComponentCalorimetricDataAdded.From,
+                            Events.ComponentCalorimetricDataRemoved.From
+                     );
+        }
+
+        private static void AddComponentPhotovoltaicDataHandlers(IServiceCollection services)
+        {
+            AddOneToManyAssociationHandlers<
+                Models.Component,
+                Models.ComponentPhotovoltaicData,
+                Models.PhotovoltaicData,
+                Aggregates.ComponentAggregate,
+                Aggregates.ComponentPhotovoltaicDataAggregate,
+                Aggregates.PhotovoltaicDataAggregate,
+                Events.ComponentPhotovoltaicDataAdded,
+                ValueObjects.AddComponentPhotovoltaicDataInput,
+                Events.ComponentPhotovoltaicDataRemoved
+                    >(
+                            services,
+                            Events.ComponentPhotovoltaicDataAdded.From,
+                            Events.ComponentPhotovoltaicDataRemoved.From
+                     );
+        }
+
+        private static void AddComponentHygrothermalDataHandlers(IServiceCollection services)
+        {
+            AddOneToManyAssociationHandlers<
+                Models.Component,
+                Models.ComponentHygrothermalData,
+                Models.HygrothermalData,
+                Aggregates.ComponentAggregate,
+                Aggregates.ComponentHygrothermalDataAggregate,
+                Aggregates.HygrothermalDataAggregate,
+                Events.ComponentHygrothermalDataAdded,
+                ValueObjects.AddComponentHygrothermalDataInput,
+                Events.ComponentHygrothermalDataRemoved
+                    >(
+                            services,
+                            Events.ComponentHygrothermalDataAdded.From,
+                            Events.ComponentHygrothermalDataRemoved.From
                      );
         }
 

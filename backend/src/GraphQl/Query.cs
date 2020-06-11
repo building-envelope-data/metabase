@@ -39,25 +39,16 @@ namespace Icon.GraphQl
                 );
         }
 
+        //////////
+        // Data //
+        //////////
+
+        // OpticalData //
+
         public Task<IReadOnlyList<OpticalData>> GetOpticalData(
             ValueObjects.Id componentId,
             ValueObjects.Timestamp? timestamp,
             [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader,
-            IResolverContext resolverContext
-            )
-        {
-            return opticalDataLoader.LoadAsync(
-                TimestampHelpers.TimestampId(
-                  componentId,
-                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
-                  )
-                );
-        }
-
-        public Task<IReadOnlyList<OpticalDataFromDatabase>> GetOpticalDataFromDatabases(
-            ValueObjects.Id componentId,
-            ValueObjects.Timestamp? timestamp,
-            [DataLoader] OpticalDataOfComponentFromDatabasesDataLoader opticalDataLoader,
             IResolverContext resolverContext
             )
         {
@@ -88,10 +79,25 @@ namespace Icon.GraphQl
         /*     .ToList().AsReadOnly(); */
         /* } */
 
+        public Task<IReadOnlyList<OpticalDataFromDatabase>> GetOpticalDataFromDatabases(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] OpticalDataOfComponentFromDatabasesDataLoader opticalDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return opticalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
         public Task<bool> HasOpticalData(
             ValueObjects.Id componentId,
             ValueObjects.Timestamp? timestamp,
-            [DataLoader] HasOpticalDataForComponentDataLoader hasOpticalDataLoader,
+            [DataLoader] HasDataForComponentDataLoader<Models.OpticalData> hasOpticalDataLoader,
             IResolverContext resolverContext
             )
         {
@@ -118,12 +124,203 @@ namespace Icon.GraphQl
                 );
         }
 
+        // Calorimetric //
+
+        public Task<IReadOnlyList<CalorimetricData>> GetCalorimetricData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] CalorimetricDataOfComponentDataLoader calorimetricDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return calorimetricDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        public Task<IReadOnlyList<CalorimetricDataFromDatabase>> GetCalorimetricDataFromDatabases(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] CalorimetricDataOfComponentFromDatabasesDataLoader calorimetricDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return calorimetricDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        public Task<bool> HasCalorimetricData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] HasDataForComponentDataLoader<Models.CalorimetricData> hasCalorimetricDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return hasCalorimetricDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        public Task<IReadOnlyList<Database>> GetWhoHasCalorimetricData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.CalorimetricDataFromDatabase> whoHasCalorimetricDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return whoHasCalorimetricDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        // Photovoltaic //
+
+        public Task<IReadOnlyList<PhotovoltaicData>> GetPhotovoltaicData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] PhotovoltaicDataOfComponentDataLoader photovoltaicDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return photovoltaicDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        public Task<IReadOnlyList<PhotovoltaicDataFromDatabase>> GetPhotovoltaicDataFromDatabases(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] PhotovoltaicDataOfComponentFromDatabasesDataLoader photovoltaicDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return photovoltaicDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        public Task<bool> HasPhotovoltaicData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] HasDataForComponentDataLoader<Models.PhotovoltaicData> hasPhotovoltaicDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return hasPhotovoltaicDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        public Task<IReadOnlyList<Database>> GetWhoHasPhotovoltaicData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.PhotovoltaicDataFromDatabase> whoHasPhotovoltaicDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return whoHasPhotovoltaicDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        // Hygrothermal //
+
+        public Task<IReadOnlyList<HygrothermalData>> GetHygrothermalData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] HygrothermalDataOfComponentDataLoader hygrothermalDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return hygrothermalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        public Task<IReadOnlyList<HygrothermalDataFromDatabase>> GetHygrothermalDataFromDatabases(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] HygrothermalDataOfComponentFromDatabasesDataLoader hygrothermalDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return hygrothermalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        public Task<bool> HasHygrothermalData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] HasDataForComponentDataLoader<Models.HygrothermalData> hasHygrothermalDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return hasHygrothermalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
+        public Task<IReadOnlyList<Database>> GetWhoHasHygrothermalData(
+            ValueObjects.Id componentId,
+            ValueObjects.Timestamp? timestamp,
+            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.HygrothermalDataFromDatabase> whoHasHygrothermalDataLoader,
+            IResolverContext resolverContext
+            )
+        {
+            return whoHasHygrothermalDataLoader.LoadAsync(
+                TimestampHelpers.TimestampId(
+                  componentId,
+                  timestamp ?? TimestampHelpers.Fetch(resolverContext)
+                  )
+                );
+        }
+
         public IReadOnlyList<ValueObjects.Id> GetSearchComponents(
             SearchComponentsInput input
             )
         {
+            // TODO !
             return new ValueObjects.Id[] { };
         }
+
+        ////////////
+        // Models //
+        ////////////
 
         public Task<IReadOnlyList<Component>> GetComponents(
             ValueObjects.Timestamp? timestamp,

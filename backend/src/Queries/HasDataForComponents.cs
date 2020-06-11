@@ -9,24 +9,24 @@ using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Queries
 {
-    public sealed class HasOpticalDataForComponents
+    public sealed class HasDataForComponents<TDataModel>
       : IQuery<IEnumerable<Result<bool, Errors>>>
     {
         public IReadOnlyCollection<ValueObjects.TimestampedId> TimestampedIds { get; }
 
-        private HasOpticalDataForComponents(
+        private HasDataForComponents(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
         {
             TimestampedIds = timestampedIds;
         }
 
-        public static Result<HasOpticalDataForComponents, Errors> From(
+        public static Result<HasDataForComponents<TDataModel>, Errors> From(
             IReadOnlyCollection<ValueObjects.TimestampedId> timestampedIds
             )
         {
-            return Result.Ok<HasOpticalDataForComponents, Errors>(
-                new HasOpticalDataForComponents(
+            return Result.Ok<HasDataForComponents<TDataModel>, Errors>(
+                new HasDataForComponents<TDataModel>(
                   timestampedIds: timestampedIds
                   )
                 );

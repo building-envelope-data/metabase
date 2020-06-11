@@ -13,10 +13,10 @@ using IError = HotChocolate.IError;
 
 namespace Icon.GraphQl
 {
-    public sealed class HasOpticalDataForComponentDataLoader
+    public sealed class HasDataForComponentDataLoader<TDataModel>
       : OurDataLoaderBase<ValueObjects.TimestampedId, bool>
     {
-        public HasOpticalDataForComponentDataLoader(
+        public HasDataForComponentDataLoader(
             IQueryBus queryBus
             )
           : base(queryBus)
@@ -30,11 +30,11 @@ namespace Icon.GraphQl
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.HasOpticalDataForComponents.From(timestampedIds)
+                  Queries.HasDataForComponents<TDataModel>.From(timestampedIds)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.HasOpticalDataForComponents,
+                  Queries.HasDataForComponents<TDataModel>,
                   IEnumerable<Result<bool, Errors>>
                >(query).ConfigureAwait(false);
             return ResultHelpers.ToDataLoaderResults<bool>(results);

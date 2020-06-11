@@ -17,18 +17,18 @@ using JsonValueType = Manatee.Json.JsonValueType;
 
 namespace Icon.ValueObjects
 {
-    public sealed class OpticalDataJson
+    public sealed class HygrothermalDataJson
       : DataJson
     {
         private static readonly IImmutableSet<string> JsonSchemaUris
-          = JsonSchema.FilterUris(@"^.*/optical\.json$").ToImmutableHashSet();
+          = JsonSchema.FilterUris(@"^.*/hygrothermal\.json$").ToImmutableHashSet();
 
-        private OpticalDataJson(Json json)
+        private HygrothermalDataJson(Json json)
           : base(json)
         {
         }
 
-        public static Result<OpticalDataJson, Errors> FromNestedCollections(
+        public static Result<HygrothermalDataJson, Errors> FromNestedCollections(
             object? nestedCollectionsJson,
             IReadOnlyList<object>? path = null
             )
@@ -40,7 +40,7 @@ namespace Icon.ValueObjects
                   );
         }
 
-        public static Result<OpticalDataJson, Errors> FromJsonElement(
+        public static Result<HygrothermalDataJson, Errors> FromJsonElement(
             System.Text.Json.JsonElement jsonElement,
             IReadOnlyList<object>? path = null
             )
@@ -52,7 +52,7 @@ namespace Icon.ValueObjects
                   );
         }
 
-        private static Result<OpticalDataJson, Errors> FromJson(
+        private static Result<HygrothermalDataJson, Errors> FromJson(
             Json json,
             IReadOnlyList<object>? path = null
             )
@@ -61,7 +61,7 @@ namespace Icon.ValueObjects
               FromJson(
                   json,
                   JsonSchemaUris,
-                  validatedJson => new OpticalDataJson(validatedJson),
+                  validatedJson => new HygrothermalDataJson(validatedJson),
                   path
                   );
         }

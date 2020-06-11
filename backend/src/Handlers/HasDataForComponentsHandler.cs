@@ -17,18 +17,22 @@ using Queries = Icon.Queries;
 
 namespace Icon.Handlers
 {
-    public sealed class HasOpticalDataForComponentsHandler
-      : IQueryHandler<Queries.HasOpticalDataForComponents, IEnumerable<Result<bool, Errors>>>
+    public sealed class HasDataForComponentsHandler<TComponentDataAssociationModel, TDataModel, TComponentDataAssociationAggregate, TDataAggregate, TAssociationAddedEvent>
+      : IQueryHandler<Queries.HasDataForComponents<TDataModel>, IEnumerable<Result<bool, Errors>>>
+      where TComponentDataAssociationModel : Models.IOneToManyAssociation
+      where TComponentDataAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TComponentDataAssociationModel>, new()
+      where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
+      where TAssociationAddedEvent : Events.IAssociationAddedEvent
     {
         private readonly IAggregateRepository _repository;
 
-        public HasOpticalDataForComponentsHandler(IAggregateRepository repository)
+        public HasDataForComponentsHandler(IAggregateRepository repository)
         {
             _repository = repository;
         }
 
         public async Task<IEnumerable<Result<bool, Errors>>> Handle(
-            Queries.HasOpticalDataForComponents query,
+            Queries.HasDataForComponents<TDataModel> query,
             CancellationToken cancellationToken
             )
         {
@@ -46,7 +50,7 @@ namespace Icon.Handlers
         {
             return
               (await session
-               .GetForwardOneToManyAssociatesOfModels<Models.Component, Models.ComponentOpticalData, Models.OpticalData, Aggregates.ComponentAggregate, Aggregates.ComponentOpticalDataAggregate, Aggregates.OpticalDataAggregate, Events.ComponentOpticalDataAdded>(
+               .GetForwardOneToManyAssociatesOfModels<Models.Component, TComponentDataAssociationModel, TDataModel, Aggregates.ComponentAggregate, TComponentDataAssociationAggregate, TDataAggregate, TAssociationAddedEvent>(
                  timestampedIds,
                  cancellationToken: cancellationToken
                  )
