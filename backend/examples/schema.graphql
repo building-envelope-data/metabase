@@ -1,0 +1,931 @@
+directive @cost(
+  complexity: Int! = 1
+  multipliers: [MultiplierPath!]
+) on FIELD_DEFINITION
+
+directive @authorize(
+  policy: String
+  roles: [String!]
+) on OBJECT | FIELD_DEFINITION
+
+input AddComponentConcretizationInput {
+  concreteComponentId: NonEmptyUuid!
+  generalComponentId: NonEmptyUuid!
+}
+
+type AddComponentConcretizationPayload {
+  concreteComponent: Component!
+  concreteComponentId: NonEmptyUuid!
+  generalComponent: Component!
+  generalComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input AddComponentManufacturerInput {
+  componentId: NonEmptyUuid!
+  institutionId: NonEmptyUuid!
+  marketingInformation: ComponentManufacturerMarketingInformationInput
+}
+
+type AddComponentManufacturerPayload {
+  component: Component!
+  componentId: NonEmptyUuid!
+  componentManufacturerEdge: ComponentManufacturerEdge!
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  manufacturedComponentEdge: ManufacturedComponentEdge!
+  requestTimestamp: Timestamp!
+}
+
+input AddComponentPartInput {
+  assembledComponentId: NonEmptyUuid!
+  partComponentId: NonEmptyUuid!
+}
+
+type AddComponentPartPayload {
+  assembledComponent: Component!
+  assembledComponentId: NonEmptyUuid!
+  partComponent: Component!
+  partComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input AddComponentVariantInput {
+  baseComponentId: NonEmptyUuid!
+  variantComponentId: NonEmptyUuid!
+}
+
+type AddComponentVariantPayload {
+  baseComponent: Component!
+  baseComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  variantComponent: Component!
+  variantComponentId: NonEmptyUuid!
+}
+
+input AddComponentVersionInput {
+  baseComponentId: NonEmptyUuid!
+  versionComponentId: NonEmptyUuid!
+}
+
+type AddComponentVersionPayload {
+  baseComponent: Component!
+  baseComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  versionComponent: Component!
+  versionComponentId: NonEmptyUuid!
+}
+
+input AddInstitutionRepresentativeInput {
+  institutionId: NonEmptyUuid!
+  role: InstitutionRepresentativeRole!
+  userId: NonEmptyUuid!
+}
+
+type AddInstitutionRepresentativePayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  institutionRepresentativeEdge: InstitutionRepresentativeEdge!
+  representedInstitutionEdge: RepresentedInstitutionEdge!
+  requestTimestamp: Timestamp!
+  user: User!
+  userId: NonEmptyUuid!
+}
+
+input AddMethodDeveloperInput {
+  methodId: NonEmptyUuid!
+  stakeholderId: NonEmptyUuid!
+}
+
+type AddMethodDeveloperPayload {
+  method: Method!
+  methodId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  stakeholder: Stakeholder!
+  stakeholderId: NonEmptyUuid!
+}
+
+input AddPersonAffiliationInput {
+  institutionId: NonEmptyUuid!
+  personId: NonEmptyUuid!
+}
+
+type AddPersonAffiliationPayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  person: Person!
+  personId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+scalar Any
+
+type CalorimetricData implements Node {
+  componentId: NonEmptyUuid!
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type CalorimetricDataFromDatabase implements Node {
+  component: Component!
+  componentId: NonEmptyUuid!
+  database: Database!
+  databaseId: NonEmptyUuid!
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type Component implements Node {
+  concretizations: [Component!]!
+  generalizations: [Component!]!
+  id: NonEmptyUuid!
+  information: ComponentInformation!
+  manufacturers: ComponentManufacturerConnection!
+  opticalData: [OpticalData!]!
+  partOf: [Component!]!
+  parts: [Component!]!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+  variantOf: [Component!]!
+  variants: [Component!]!
+  versionOf: [Component!]!
+  versions: [Component!]!
+  whoHasOpticalData: [Database!]!
+}
+
+enum ComponentCategory {
+  MATERIAL
+  LAYER
+  UNIT
+}
+
+type ComponentInformation {
+  abbreviation: String
+  availableFrom: DateTime
+  availableUntil: DateTime
+  categories: [ComponentCategory]!
+  description: String!
+  name: String!
+}
+
+input ComponentInformationInput {
+  abbreviation: String
+  availableFrom: DateTime
+  availableUntil: DateTime
+  categories: [ComponentCategory]!
+  description: String!
+  name: String!
+}
+
+type ComponentManufacturerConnection {
+  edges: [ComponentManufacturerEdge!]!
+  fromId: NonEmptyUuid!
+  nodes: [Institution!]!
+  pageInfo: PageInfo!
+  requestTimestamp: Timestamp!
+}
+
+type ComponentManufacturerEdge {
+  marketingInformation: ComponentManufacturerMarketingInformation
+  node: Institution!
+  nodeId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type ComponentManufacturerMarketingInformation {
+  componentInformation: ComponentInformation
+  institutionInformation: InstitutionInformation
+}
+
+input ComponentManufacturerMarketingInformationInput {
+  componentInformation: ComponentInformationInput
+  institutionInformation: InstitutionInformationInput
+}
+
+type ContactInformation {
+  emailAddress: String!
+  phoneNumber: String!
+  postalAddress: String!
+  websiteLocator: Url!
+}
+
+input CreateComponentInput {
+  information: ComponentInformationInput!
+}
+
+type CreateComponentPayload {
+  component: Component!
+  componentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input CreateDatabaseInput {
+  description: String!
+  institutionId: NonEmptyUuid!
+  locator: Url!
+  name: String!
+}
+
+type CreateDatabasePayload {
+  database: Database!
+  databaseId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input CreateInstitutionInput {
+  abbreviation: String
+  description: String
+  name: String!
+  publicKey: String
+  state: InstitutionState!
+  websiteLocator: Url
+}
+
+type CreateInstitutionPayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input CreateMethodInput {
+  categories: [MethodCategory]!
+  codeLocator: Url
+  description: String!
+  name: String!
+  publicationLocator: Url
+  standardId: NonEmptyUuid
+}
+
+type CreateMethodPayload {
+  method: Method!
+  methodId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input CreateOpticalDataInput {
+  componentId: NonEmptyUuid!
+  data: Any!
+}
+
+type CreateOpticalDataPayload {
+  opticalData: OpticalData!
+  opticalDataId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input CreatePersonInput {
+  emailAddress: String!
+  name: String!
+  phoneNumber: String!
+  postalAddress: String!
+  websiteLocator: Url!
+}
+
+type CreatePersonPayload {
+  person: Person!
+  personId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input CreateStandardInput {
+  abstract: String!
+  locator: Url
+  mainNumber: String!
+  prefix: String
+  section: String!
+  standardizers: [Standardizer]!
+  suffix: String
+  title: String!
+  year: Int!
+}
+
+type CreateStandardPayload {
+  requestTimestamp: Timestamp!
+  standard: Standard!
+  standardId: NonEmptyUuid!
+}
+
+input CreateUserInput {
+  name: String!
+}
+
+type CreateUserPayload {
+  requestTimestamp: Timestamp!
+  user: User!
+  userId: NonEmptyUuid!
+}
+
+type Database implements Node {
+  description: String!
+  id: NonEmptyUuid!
+  locator: Url!
+  name: String!
+  operatingInstitution: Institution!
+  operatingInstitutionId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+scalar DateTime
+
+input DeleteComponentInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type DeleteComponentPayload {
+  componentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input DeleteDatabaseInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type DeleteDatabasePayload {
+  databaseId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input DeleteInstitutionInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type DeleteInstitutionPayload {
+  institutionId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input DeleteMethodInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type DeleteMethodPayload {
+  methodId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input DeleteOpticalDataInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type DeleteOpticalDataPayload {
+  opticalDataId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input DeletePersonInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type DeletePersonPayload {
+  personId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input DeleteStandardInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type DeleteStandardPayload {
+  requestTimestamp: Timestamp!
+  standardId: NonEmptyUuid!
+}
+
+input DeleteUserInput {
+  id: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type DeleteUserPayload {
+  requestTimestamp: Timestamp!
+  userId: NonEmptyUuid!
+}
+
+type HygrothermalData implements Node {
+  componentId: NonEmptyUuid!
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type HygrothermalDataFromDatabase implements Node {
+  component: Component!
+  componentId: NonEmptyUuid!
+  database: Database!
+  databaseId: NonEmptyUuid!
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type Institution implements Node {
+  affiliatedPersons(
+    after: String
+    before: String
+    first: PaginationAmount
+    last: PaginationAmount
+  ): PersonConnection
+  developedMethods: [Method!]!
+  id: NonEmptyUuid!
+  information: InstitutionInformation!
+  manufacturedComponents: ManufacturedComponentConnection!
+  operatedDatabases: [Database!]!
+  publicKey: String
+  representatives(
+    roles: [InstitutionRepresentativeRole!]
+  ): InstitutionRepresentativeConnection!
+  requestTimestamp: Timestamp!
+  state: InstitutionState!
+  timestamp: Timestamp!
+}
+
+type InstitutionInformation {
+  abbreviation: String
+  description: String
+  name: String!
+  websiteLocator: Url
+}
+
+input InstitutionInformationInput {
+  abbreviation: String
+  description: String
+  name: String!
+  websiteLocator: Url
+}
+
+type InstitutionRepresentativeConnection {
+  edges: [InstitutionRepresentativeEdge!]!
+  fromId: NonEmptyUuid!
+  nodes: [User!]!
+  pageInfo: PageInfo!
+  requestTimestamp: Timestamp!
+}
+
+type InstitutionRepresentativeEdge {
+  node: User!
+  nodeId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  role: InstitutionRepresentativeRole!
+  timestamp: Timestamp!
+}
+
+enum InstitutionRepresentativeRole {
+  OWNER
+  MAINTAINER
+  ASSISTANT
+}
+
+enum InstitutionState {
+  UNKNOWN
+  OPERATIVE
+  INOPERATIVE
+}
+
+type ManufacturedComponentConnection {
+  edges: [ManufacturedComponentEdge!]!
+  fromId: NonEmptyUuid!
+  nodes: [Component!]!
+  pageInfo: PageInfo!
+  requestTimestamp: Timestamp!
+}
+
+type ManufacturedComponentEdge {
+  marketingInformation: ComponentManufacturerMarketingInformation
+  node: Component!
+  nodeId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type Method implements Node {
+  developers: [Stakeholder!]!
+  id: NonEmptyUuid!
+  information: MethodInformation!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+enum MethodCategory {
+  MEASUREMENT
+  CALCULATION
+}
+
+type MethodInformation {
+  categories: [MethodCategory]!
+  codeLocator: Url
+  description: String!
+  name: String!
+  publicationLocator: Url
+  standardId: NonEmptyUuid
+}
+
+scalar MultiplierPath
+
+type Mutation {
+  addComponentConcretization(
+    input: AddComponentConcretizationInput!
+  ): AddComponentConcretizationPayload!
+  addComponentManufacturer(
+    input: AddComponentManufacturerInput!
+  ): AddComponentManufacturerPayload!
+  addComponentPart(input: AddComponentPartInput!): AddComponentPartPayload!
+  addComponentVariant(
+    input: AddComponentVariantInput!
+  ): AddComponentVariantPayload!
+  addComponentVersion(
+    input: AddComponentVersionInput!
+  ): AddComponentVersionPayload!
+  addInstitutionRepresentative(
+    input: AddInstitutionRepresentativeInput!
+  ): AddInstitutionRepresentativePayload!
+  addMethodDeveloper(
+    input: AddMethodDeveloperInput!
+  ): AddMethodDeveloperPayload!
+  addPersonAffiliation(
+    input: AddPersonAffiliationInput!
+  ): AddPersonAffiliationPayload!
+  createComponent(input: CreateComponentInput!): CreateComponentPayload!
+  createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload!
+  createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload!
+  createMethod(input: CreateMethodInput!): CreateMethodPayload!
+  createOpticalData(input: CreateOpticalDataInput!): CreateOpticalDataPayload!
+  createPerson(input: CreatePersonInput!): CreatePersonPayload!
+  createStandard(input: CreateStandardInput!): CreateStandardPayload!
+  createUser(input: CreateUserInput!): CreateUserPayload!
+  deleteComponent(input: DeleteComponentInput!): DeleteComponentPayload!
+  deleteDatabase(input: DeleteDatabaseInput!): DeleteDatabasePayload!
+  deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload!
+  deleteMethod(input: DeleteMethodInput!): DeleteMethodPayload!
+  deleteOpticalData(input: DeleteOpticalDataInput!): DeleteOpticalDataPayload!
+  deletePerson(input: DeletePersonInput!): DeletePersonPayload!
+  deleteStandard(input: DeleteStandardInput!): DeleteStandardPayload!
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload!
+  removeComponentConcretization(
+    input: RemoveComponentConcretizationInput!
+  ): RemoveComponentConcretizationPayload!
+  removeComponentManufacturer(
+    input: RemoveComponentManufacturerInput!
+  ): RemoveComponentManufacturerPayload!
+  removeComponentPart(
+    input: RemoveComponentPartInput!
+  ): RemoveComponentPartPayload!
+  removeComponentVariant(
+    input: RemoveComponentVariantInput!
+  ): RemoveComponentVariantPayload!
+  removeComponentVersion(
+    input: RemoveComponentVersionInput!
+  ): RemoveComponentVersionPayload!
+  removeInstitutionRepresentative(
+    input: RemoveInstitutionRepresentativeInput!
+  ): RemoveInstitutionRepresentativePayload!
+  removeMethodDeveloper(
+    input: RemoveMethodDeveloperInput!
+  ): RemoveMethodDeveloperPayload!
+  removePersonAffiliation(
+    input: RemovePersonAffiliationInput!
+  ): RemovePersonAffiliationPayload!
+}
+
+interface Node {
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+scalar NonEmptyUuid
+
+type OpticalData implements Node {
+  componentId: NonEmptyUuid!
+  data: Any!
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type OpticalDataFromDatabase implements Node {
+  component: Component!
+  componentId: NonEmptyUuid!
+  data: Any!
+  database: Database!
+  databaseId: NonEmptyUuid!
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+scalar PaginationAmount
+
+type Person implements Node {
+  affiliatedInstitutions: [Institution!]!
+  contactInformation: ContactInformation!
+  developedMethods: [Method!]!
+  id: NonEmptyUuid!
+  name: String!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type PersonConnection {
+  edges: [PersonEdge!]
+  nodes: [Person]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type PersonEdge {
+  cursor: String!
+  node: Person
+}
+
+type PhotovoltaicData implements Node {
+  componentId: NonEmptyUuid!
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type PhotovoltaicDataFromDatabase implements Node {
+  component: Component!
+  componentId: NonEmptyUuid!
+  database: Database!
+  databaseId: NonEmptyUuid!
+  id: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}
+
+type Query {
+  calorimetricData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [CalorimetricData!]!
+  calorimetricDataFromDatabases(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [CalorimetricDataFromDatabase!]!
+  component(id: NonEmptyUuid!, timestamp: Timestamp): Component!
+  components(timestamp: Timestamp): [Component!]!
+  database(id: NonEmptyUuid!, timestamp: Timestamp): Database!
+  databases(timestamp: Timestamp): [Database!]!
+  hasCalorimetricData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): Boolean!
+  hasHygrothermalData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): Boolean!
+  hasOpticalData(componentId: NonEmptyUuid!, timestamp: Timestamp): Boolean!
+  hasPhotovoltaicData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): Boolean!
+  hygrothermalData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [HygrothermalData!]!
+  hygrothermalDataFromDatabases(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [HygrothermalDataFromDatabase!]!
+  institution(id: NonEmptyUuid!, timestamp: Timestamp): Institution!
+  institutions(timestamp: Timestamp): [Institution!]!
+  method(id: NonEmptyUuid!, timestamp: Timestamp): Method!
+  methods(timestamp: Timestamp): [Method!]!
+  node(id: NonEmptyUuid!, timestamp: Timestamp): Node!
+  opticalData(componentId: NonEmptyUuid!, timestamp: Timestamp): [OpticalData!]!
+  opticalDataFromDatabases(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [OpticalDataFromDatabase!]!
+  person(id: NonEmptyUuid!, timestamp: Timestamp): Person!
+  persons(timestamp: Timestamp): [Person!]!
+  photovoltaicData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [PhotovoltaicData!]!
+  photovoltaicDataFromDatabases(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [PhotovoltaicDataFromDatabase!]!
+  searchComponents(input: SearchComponentsInput!): [NonEmptyUuid!]!
+  standard(id: NonEmptyUuid!, timestamp: Timestamp): Standard!
+  standards(timestamp: Timestamp): [Standard!]!
+  user(id: NonEmptyUuid!, timestamp: Timestamp): User!
+  users(timestamp: Timestamp): [User!]!
+  whoHasCalorimetricData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [Database!]!
+  whoHasHygrothermalData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [Database!]!
+  whoHasOpticalData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [Database!]!
+  whoHasPhotovoltaicData(
+    componentId: NonEmptyUuid!
+    timestamp: Timestamp
+  ): [Database!]!
+}
+
+input RemoveComponentConcretizationInput {
+  concreteComponentId: NonEmptyUuid!
+  generalComponentId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type RemoveComponentConcretizationPayload {
+  concreteComponent: Component!
+  concreteComponentId: NonEmptyUuid!
+  generalComponent: Component!
+  generalComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input RemoveComponentManufacturerInput {
+  componentId: NonEmptyUuid!
+  institutionId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type RemoveComponentManufacturerPayload {
+  component: Component!
+  componentId: NonEmptyUuid!
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input RemoveComponentPartInput {
+  assembledComponentId: NonEmptyUuid!
+  partComponentId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type RemoveComponentPartPayload {
+  assembledComponent: Component!
+  assembledComponentId: NonEmptyUuid!
+  partComponent: Component!
+  partComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+input RemoveComponentVariantInput {
+  baseComponentId: NonEmptyUuid!
+  timestamp: Timestamp!
+  variantComponentId: NonEmptyUuid!
+}
+
+type RemoveComponentVariantPayload {
+  baseComponent: Component!
+  baseComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  variantComponent: Component!
+  variantComponentId: NonEmptyUuid!
+}
+
+input RemoveComponentVersionInput {
+  baseComponentId: NonEmptyUuid!
+  timestamp: Timestamp!
+  versionComponentId: NonEmptyUuid!
+}
+
+type RemoveComponentVersionPayload {
+  baseComponent: Component!
+  baseComponentId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  versionComponent: Component!
+  versionComponentId: NonEmptyUuid!
+}
+
+input RemoveInstitutionRepresentativeInput {
+  institutionId: NonEmptyUuid!
+  timestamp: Timestamp!
+  userId: NonEmptyUuid!
+}
+
+type RemoveInstitutionRepresentativePayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  user: User!
+  userId: NonEmptyUuid!
+}
+
+input RemoveMethodDeveloperInput {
+  methodId: NonEmptyUuid!
+  stakeholderId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type RemoveMethodDeveloperPayload {
+  method: Method!
+  methodId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  stakeholder: Stakeholder!
+  stakeholderId: NonEmptyUuid!
+}
+
+input RemovePersonAffiliationInput {
+  institutionId: NonEmptyUuid!
+  personId: NonEmptyUuid!
+  timestamp: Timestamp!
+}
+
+type RemovePersonAffiliationPayload {
+  institution: Institution!
+  institutionId: NonEmptyUuid!
+  person: Person!
+  personId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+}
+
+type RepresentedInstitutionEdge {
+  node: Institution!
+  nodeId: NonEmptyUuid!
+  requestTimestamp: Timestamp!
+  role: InstitutionRepresentativeRole!
+  timestamp: Timestamp!
+}
+
+input SearchComponentsInput {
+  abbreviation: String
+  description: String
+  name: String
+}
+
+union Stakeholder = Institution | Person
+type Standard implements Node {
+  abstract: String!
+  id: NonEmptyUuid!
+  locator: Url
+  mainNumber: String!
+  prefix: String
+  requestTimestamp: Timestamp!
+  section: String!
+  standardizers: [Standardizer]!
+  suffix: String
+  timestamp: Timestamp!
+  title: String!
+  year: Int!
+}
+
+enum Standardizer {
+  AERC
+  AGI
+  ASHRAE
+  BREEAM
+  BS
+  BSI
+  CEN
+  CIE
+  DGNB
+  DIN
+  DVWG
+  IEC
+  IES
+  IFT
+  ISO
+  JIS
+  LEED
+  NFRC
+  RIBA
+  UL
+  UNECE
+  VDI
+  VFF
+  WELL
+}
+
+scalar Timestamp
+
+scalar Url
+
+type User implements Node {
+  id: NonEmptyUuid!
+  representedInstitutions(
+    roles: [InstitutionRepresentativeRole!]
+  ): [Institution!]!
+  requestTimestamp: Timestamp!
+  timestamp: Timestamp!
+}

@@ -8,22 +8,26 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.Models
 {
     public sealed class OpticalData
-      : Model
+      : DataX<ValueObjects.OpticalDataJson>
     {
-        public ValueObjects.OpticalDataJson Data { get; }
-
         private OpticalData(
             ValueObjects.Id id,
+            ValueObjects.Id componentId,
             ValueObjects.OpticalDataJson data,
             ValueObjects.Timestamp timestamp
             )
-          : base(id, timestamp)
+          : base(
+              id: id,
+              componentId: componentId,
+              data: data,
+              timestamp: timestamp
+              )
         {
-            Data = data;
         }
 
         public static Result<OpticalData, Errors> From(
             ValueObjects.Id id,
+            ValueObjects.Id componentId,
             ValueObjects.OpticalDataJson data,
             ValueObjects.Timestamp timestamp
             )
@@ -32,6 +36,7 @@ namespace Icon.Models
               Result.Ok<OpticalData, Errors>(
                   new OpticalData(
                     id: id,
+                    componentId: componentId,
                     data: data,
                     timestamp: timestamp
                     )

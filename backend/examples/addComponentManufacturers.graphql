@@ -1,0 +1,23 @@
+mutation addComponentManufacturers(
+  $glazingComponentId: NonEmptyUuid!,
+  $shadingComponentId: NonEmptyUuid!,
+  $iseInstitutionId: NonEmptyUuid!,
+  $lbnlInstitutionId: NonEmptyUuid!
+) {
+  glazingIse: addComponentManufacturer(input: {
+    componentId: $glazingComponentId,
+    institutionId: $iseInstitutionId
+  }) {
+  }
+  glazingLbnl: addComponentManufacturer(input: {
+    componentId: $glazingComponentId,
+    institutionId: $lbnlInstitutionId
+  }) {
+  }
+
+  shadingIse: addComponentManufacturer(input: {
+    componentId: $shadingComponentId,
+    institutionId: $iseInstitutionId
+  }) {
+  }
+}

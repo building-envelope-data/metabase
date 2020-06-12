@@ -16,7 +16,7 @@ using Uri = System.Uri;
 namespace Icon.Events
 {
     public sealed class HygrothermalDataCreated
-      : CreatedEvent
+      : DataCreatedEvent
     {
         public static HygrothermalDataCreated From(
             Guid hygrothermalDataId,
@@ -25,12 +25,11 @@ namespace Icon.Events
         {
             return new HygrothermalDataCreated(
                 hygrothermalDataId: hygrothermalDataId,
+                componentId: command.Input.ComponentId,
                 data: command.Input.Data.ToNestedCollections(),
                 creatorId: command.CreatorId
                 );
         }
-
-        public object? Data { get; set; }
 
 #nullable disable
         public HygrothermalDataCreated() { }
@@ -38,25 +37,18 @@ namespace Icon.Events
 
         public HygrothermalDataCreated(
             Guid hygrothermalDataId,
+            Guid componentId,
             object? data,
             Guid creatorId
             )
           : base(
-              aggregateId: hygrothermalDataId,
+              dataId: hygrothermalDataId,
+              componentId: componentId,
+              data: data,
               creatorId: creatorId
               )
         {
-            Data = data;
             EnsureValid();
-        }
-
-        public override Result<bool, Errors> Validate()
-        {
-            return
-              Result.Combine(
-                  base.Validate(),
-                  ValidateNonNull(Data, nameof(Data))
-                  );
         }
     }
 }

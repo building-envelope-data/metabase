@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  database:
+    restart: always
+    image: postgres:11.5-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5433:5432
+    volumes:
+      - data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile-development
+    volumes:
+      - ./backend:/app
+      - node_modules:/app/node_modules
+      # The following items make the engine create a volume for the specified
+      # path with the effect that the service does not write temporary files
+      # into the corresponding directory on the file system that was bound by
+      # the preceding binding
+      - /app/src/bin
+      - /app/src/obj
+      - /app/test/bin
+      - /app/test/obj
+    ports:
+      - 5010:5000
+      - 5011:5001
+    environment:
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_HTTPS_PORT=5001
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - database
+
+volumes:
+  data:
+  node_modules:
+  frontend_node_modules:

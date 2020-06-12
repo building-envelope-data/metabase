@@ -16,6 +16,7 @@ RUN \
 
 RUN \
   apk add --no-cache \
+    curl \
     dumb-init \
     make \
     npm \

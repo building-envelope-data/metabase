@@ -10,24 +10,13 @@ using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {
-    public sealed class CalorimetricData
-      : DataX
+    public abstract class DataX
+      : NodeBase
     {
-        public static CalorimetricData FromModel(
-            Models.CalorimetricData model,
-            ValueObjects.Timestamp requestTimestamp
-            )
-        {
-            return new CalorimetricData(
-                id: model.Id,
-                componentId: model.ComponentId,
-                data: model.Data.ToNestedCollections(),
-                timestamp: model.Timestamp,
-                requestTimestamp: requestTimestamp
-                );
-        }
+        public ValueObjects.Id ComponentId { get; }
+        public object Data { get; }
 
-        public CalorimetricData(
+        public DataX(
             ValueObjects.Id id,
             ValueObjects.Id componentId,
             object data,
@@ -36,12 +25,12 @@ namespace Icon.GraphQl
             )
           : base(
               id: id,
-              componentId: componentId,
-              data: data,
               timestamp: timestamp,
               requestTimestamp: requestTimestamp
               )
         {
+            ComponentId = componentId;
+            Data = data;
         }
     }
 }

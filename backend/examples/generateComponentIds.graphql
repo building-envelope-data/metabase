@@ -1,0 +1,25 @@
+mutation {
+  glazing: createComponent(input: {
+    information: {
+      name: "Solar Control Glazing",
+      description: "A Solar control shading example.",
+      categories: [UNIT]
+    }
+  }) {
+    component {
+      id
+    }
+  }
+
+  shading: createComponent(input: {
+    information: {
+      name: "Solar Control Shading",
+      description: "A solar control shading example.",
+      categories: [LAYER, UNIT]
+    }
+  }) {
+    component {
+      id
+    }
+  }
+}

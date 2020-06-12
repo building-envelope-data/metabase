@@ -17,20 +17,20 @@ using Queries = Icon.Queries;
 
 namespace Icon.Handlers
 {
-    public sealed class HasDataForComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>
-      : IQueryHandler<Queries.HasDataForComponents<TDataModel>, IEnumerable<Result<bool, Errors>>>
+    public sealed class GetDataOfComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>
+      : IQueryHandler<Queries.GetDataOfComponents<TDataModel>, IEnumerable<Result<IEnumerable<Result<TDataModel, Errors>>, Errors>>>
       where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
       where TDataCreatedEvent : DataCreatedEvent
     {
         private readonly IAggregateRepository _repository;
 
-        public HasDataForComponentsHandler(IAggregateRepository repository)
+        public GetDataOfComponentsHandler(IAggregateRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Result<bool, Errors>>> Handle(
-            Queries.HasDataForComponents<TDataModel> query,
+        public async Task<IEnumerable<Result<IEnumerable<Result<TDataModel, Errors>>, Errors>>> Handle(
+            Queries.GetDataOfComponents<TDataModel> query,
             CancellationToken cancellationToken
             )
         {
@@ -69,9 +69,12 @@ namespace Icon.Handlers
                .ConfigureAwait(false)
               )
               .Select(aggregateResults =>
-                  // TODO Determine the number of existing data aggregates without loading them!
-                  Result.Ok<bool, Errors>(
-                    aggregateResults.Count() >= 1
+                  Result.Ok<IEnumerable<Result<TDataModel, Errors>>, Errors>(
+                    aggregateResults.Select(aggregateResult =>
+                      aggregateResult.Bind(aggregate =>
+                        aggregate.ToModel()
+                        )
+                      )
                     )
                   );
           }

@@ -1,0 +1,15 @@
+query getOpticalDataOfGlazingComponent(
+  $glazingComponentId: NonEmptyUuid!
+) {
+  opticalDataFromDatabases(
+    componentId: $glazingComponentId
+  ) {
+    id
+    database {
+      locator
+    }
+    data
+    timestamp
+    requestTimestamp
+  }
+}

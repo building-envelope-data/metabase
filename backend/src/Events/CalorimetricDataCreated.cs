@@ -16,47 +16,39 @@ using Uri = System.Uri;
 namespace Icon.Events
 {
     public sealed class CalorimetricDataCreated
-      : CreatedEvent
+      : DataCreatedEvent
     {
         public static CalorimetricDataCreated From(
-            Guid calorimetricDataId,
+            Guid opticalDataId,
             Commands.Create<ValueObjects.CreateCalorimetricDataInput> command
             )
         {
             return new CalorimetricDataCreated(
-                calorimetricDataId: calorimetricDataId,
+                opticalDataId: opticalDataId,
+                componentId: command.Input.ComponentId,
                 data: command.Input.Data.ToNestedCollections(),
                 creatorId: command.CreatorId
                 );
         }
-
-        public object? Data { get; set; }
 
 #nullable disable
         public CalorimetricDataCreated() { }
 #nullable enable
 
         public CalorimetricDataCreated(
-            Guid calorimetricDataId,
+            Guid opticalDataId,
+            Guid componentId,
             object? data,
             Guid creatorId
             )
           : base(
-              aggregateId: calorimetricDataId,
+              dataId: opticalDataId,
+              componentId: componentId,
+              data: data,
               creatorId: creatorId
               )
         {
-            Data = data;
             EnsureValid();
-        }
-
-        public override Result<bool, Errors> Validate()
-        {
-            return
-              Result.Combine(
-                  base.Validate(),
-                  ValidateNonNull(Data, nameof(Data))
-                  );
         }
     }
 }

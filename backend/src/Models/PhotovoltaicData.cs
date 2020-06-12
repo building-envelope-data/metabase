@@ -8,22 +8,26 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.Models
 {
     public sealed class PhotovoltaicData
-      : Model
+      : DataX<ValueObjects.PhotovoltaicDataJson>
     {
-        public ValueObjects.PhotovoltaicDataJson Data { get; }
-
         private PhotovoltaicData(
             ValueObjects.Id id,
+            ValueObjects.Id componentId,
             ValueObjects.PhotovoltaicDataJson data,
             ValueObjects.Timestamp timestamp
             )
-          : base(id, timestamp)
+          : base(
+              id: id,
+              componentId: componentId,
+              data: data,
+              timestamp: timestamp
+              )
         {
-            Data = data;
         }
 
         public static Result<PhotovoltaicData, Errors> From(
             ValueObjects.Id id,
+            ValueObjects.Id componentId,
             ValueObjects.PhotovoltaicDataJson data,
             ValueObjects.Timestamp timestamp
             )
@@ -32,6 +36,7 @@ namespace Icon.Models
               Result.Ok<PhotovoltaicData, Errors>(
                   new PhotovoltaicData(
                     id: id,
+                    componentId: componentId,
                     data: data,
                     timestamp: timestamp
                     )

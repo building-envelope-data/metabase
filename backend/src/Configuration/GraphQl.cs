@@ -53,9 +53,22 @@ namespace Icon.Configuration
                   .AddType<GraphQlX.StakeholderBase>()
                   .AddType<HotChocolate.Types.Relay.PageInfoType>()
                   .AddType<GraphQlX.ComponentType>()
+
                   .AddType<GraphQlX.CreateOpticalDataInputType>()
                   .AddType<GraphQlX.OpticalDataType>()
                   .AddType<GraphQlX.OpticalDataFromDatabaseType>()
+
+                  .AddType<GraphQlX.CreateCalorimetricDataInputType>()
+                  .AddType<GraphQlX.CalorimetricDataType>()
+                  .AddType<GraphQlX.CalorimetricDataFromDatabaseType>()
+
+                  .AddType<GraphQlX.CreatePhotovoltaicDataInputType>()
+                  .AddType<GraphQlX.PhotovoltaicDataType>()
+                  .AddType<GraphQlX.PhotovoltaicDataFromDatabaseType>()
+
+                  .AddType<GraphQlX.CreateHygrothermalDataInputType>()
+                  .AddType<GraphQlX.HygrothermalDataType>()
+                  .AddType<GraphQlX.HygrothermalDataFromDatabaseType>()
 
                   .Create(),
                   new QueryExecutionOptions

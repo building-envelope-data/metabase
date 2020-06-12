@@ -1,0 +1,75 @@
+mutation addOpticalDataToIseDatabase(
+  $glazingComponentId: NonEmptyUuid!
+) {
+  createOpticalData(input: {
+    componentId: $glazingComponentId,
+    data: {
+      schema: "https://www.buildingenvelopedata.org/schemas/optical.json",
+      dataPoints: [
+        {
+          incidence: {
+            direction: [
+              {
+                polar: 10,
+                azimuth: 45
+              }
+            ],
+            wavelengths: {
+              integral: true
+            },
+            range: {
+              spectrum: [
+                 "visible"
+              ]
+            }
+          },
+          emergence: {
+            direction: [
+              {
+                polar: 20,
+                azimuth: 60
+              }
+            ]
+          },
+          results: {
+            transmittance: {
+              uncertainValue: 0.1
+            }
+          }
+        },
+        {
+          incidence: {
+            direction: [
+              {
+                polar: 30,
+                azimuth: 15
+              }
+            ],
+            wavelengths: {
+              integral: true
+            },
+            range: {
+              spectrum: [
+                 "visible"
+              ]
+            }
+          },
+          emergence: {
+            direction: [
+              {
+                polar: 10,
+                azimuth: 70
+              }
+            ]
+          },
+          results: {
+            transmittance: {
+              uncertainValue: 0.05
+            }
+          }
+        }
+      ]
+    }
+  }) {
+  }
+}

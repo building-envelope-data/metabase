@@ -79,6 +79,7 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
+            Console.WriteLine(database.Locator);
             // https://github.com/graphql-dotnet/graphql-client/blob/47b4abfbfda507a91b5c62a18a9789bd3a8079c7/src/GraphQL.Client/GraphQLHttpResponse.cs
             var response =
               (

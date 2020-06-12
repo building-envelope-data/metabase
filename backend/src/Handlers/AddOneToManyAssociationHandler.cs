@@ -62,7 +62,7 @@ namespace Icon.Handlers
                 .Bind(async id => await
                     (await session.Save(cancellationToken).ConfigureAwait(false))
                     .Bind(async _ =>
-                      await session.TimestampId<TAggregate>(id, cancellationToken).ConfigureAwait(false)
+                      await session.TimestampId<TAssociationAggregate>(id, cancellationToken).ConfigureAwait(false)
                       )
                     .ConfigureAwait(false)
                     )

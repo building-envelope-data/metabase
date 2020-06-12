@@ -16,7 +16,7 @@ using Uri = System.Uri;
 namespace Icon.Events
 {
     public sealed class OpticalDataCreated
-      : CreatedEvent
+      : DataCreatedEvent
     {
         public static OpticalDataCreated From(
             Guid opticalDataId,
@@ -25,12 +25,11 @@ namespace Icon.Events
         {
             return new OpticalDataCreated(
                 opticalDataId: opticalDataId,
+                componentId: command.Input.ComponentId,
                 data: command.Input.Data.ToNestedCollections(),
                 creatorId: command.CreatorId
                 );
         }
-
-        public object? Data { get; set; }
 
 #nullable disable
         public OpticalDataCreated() { }
@@ -38,25 +37,18 @@ namespace Icon.Events
 
         public OpticalDataCreated(
             Guid opticalDataId,
+            Guid componentId,
             object? data,
             Guid creatorId
             )
           : base(
-              aggregateId: opticalDataId,
+              dataId: opticalDataId,
+              componentId: componentId,
+              data: data,
               creatorId: creatorId
               )
         {
-            Data = data;
             EnsureValid();
-        }
-
-        public override Result<bool, Errors> Validate()
-        {
-            return
-              Result.Combine(
-                  base.Validate(),
-                  ValidateNonNull(Data, nameof(Data))
-                  );
         }
     }
 }
