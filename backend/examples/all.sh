@@ -5,4 +5,4 @@
 . ./generateComponentIdsAndAddManufacturers.sh
 . ./addOpticalDataToIseDatabase.sh
 . ./addOpticalDataToLbnlDatabase.sh
-. ./getOpticalDataOfComponent.sh
+. ./getOpticalDataOfGlazingComponent.sh
