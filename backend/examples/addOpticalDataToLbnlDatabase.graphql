@@ -73,6 +73,7 @@ mutation addOpticalDataToIseDatabase(
   }) {
     opticalData {
       id
+      timestamp
     }
   }
 }
