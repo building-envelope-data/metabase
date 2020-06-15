@@ -2,7 +2,7 @@ mutation {
   glazing: createComponent(input: {
     information: {
       name: "Solar Control Glazing",
-      description: "A Solar control shading example.",
+      description: "A solar control shading example.",
       categories: [UNIT]
     }
   }) {
