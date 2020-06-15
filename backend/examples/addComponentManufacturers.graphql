@@ -8,16 +8,22 @@ mutation addComponentManufacturers(
     componentId: $glazingComponentId,
     institutionId: $iseInstitutionId
   }) {
+    component { id }
+    institution { id }
   }
   glazingLbnl: addComponentManufacturer(input: {
     componentId: $glazingComponentId,
     institutionId: $lbnlInstitutionId
   }) {
+    component { id }
+    institution { id }
   }
 
   shadingIse: addComponentManufacturer(input: {
     componentId: $shadingComponentId,
     institutionId: $iseInstitutionId
   }) {
+    component { id }
+    institution { id }
   }
 }

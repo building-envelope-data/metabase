@@ -72,6 +72,9 @@ mutation addOpticalDataToIseDatabase(
       ]
     }
   }) {
+    opticalData {
+      id
+    }
   }
 
   glazingFile: createOpticalData(input: {
@@ -94,6 +97,9 @@ mutation addOpticalDataToIseDatabase(
       }
     }
   }) {
+    opticalData {
+      id
+    }
   }
 
   shadingDataPoints: createOpticalData(input: {
@@ -166,5 +172,8 @@ mutation addOpticalDataToIseDatabase(
       ]
     }
   }) {
+    opticalData {
+      id
+    }
   }
 }
