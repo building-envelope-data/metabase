@@ -5,4 +5,5 @@
   getOpticalDataOfGlazingComponent.graphql \
   "{ \
     \"glazingComponentId\": \"$GLAZING_COMPONENT_ID\" \
-  }"
+  }" \
+  | jq .
