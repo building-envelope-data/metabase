@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo -e "\e[33m===================================================\e[0m" >&2
-echo -e "\e[33mRegistering institutions ISE and LBNL   \e[0m" >&2
+echo -e "\e[33mRegister institutions ISE and LBNL   \e[0m" >&2
 json=$(
   ./query.sh \
     http://ikdb.org:5000/graphql/ \

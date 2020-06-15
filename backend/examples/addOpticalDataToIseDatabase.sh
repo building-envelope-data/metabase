@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo -e "\e[33m===================================================\e[0m" >&2
-echo -e "\e[33mAdding optical data to ISE database                \e[0m" >&2
+echo -e "\e[33mAdd optical data to ISE database                \e[0m" >&2
 ./query.sh \
   http://testlab-solar-facades.de:5010/graphql/ \
   addOpticalDataToIseDatabase.graphql \

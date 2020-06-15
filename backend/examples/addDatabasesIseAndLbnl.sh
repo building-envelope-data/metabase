@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo -e "\e[33m===================================================\e[0m" >&2
-echo -e "\e[33mAdding databases ISE and LBNL           \e[0m" >&2
+echo -e "\e[33mAdd databases ISE and LBNL           \e[0m" >&2
 ./query.sh \
   http://ikdb.org:5000/graphql/ \
   addDatabasesIseAndLbnl.graphql \
