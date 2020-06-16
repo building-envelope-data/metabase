@@ -1,8 +1,10 @@
 #!/bin/bash
 
-echo -e "\e[33m===================================================\e[0m" >&2
-echo -e "\e[33mWho has optical data at timestamp                  \e[0m" >&2
-./query.sh \
+. ./functions.sh
+
+begin_chapter "Who has optical data at timestamp"
+
+query \
   http://ikdb.org:5000/graphql/ \
   whoHasOpticalDataAtTimestamp.graphql \
   "{ \
@@ -11,4 +13,5 @@ echo -e "\e[33mWho has optical data at timestamp                  \e[0m" >&2
     \"lbnlGlazingOpticalDataTimestamp\": \"$LBNL_GLAZING_OPTICAL_DATA_TIMESTAMP\" \
   }" \
   > /dev/null
-echo -e "\e[33m===================================================\e[0m" >&2
+
+end_chapter

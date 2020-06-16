@@ -1,23 +1,13 @@
 #!/bin/bash
-
-. ./verifyThatIkdbIsEmpty.sh
-read -p "Press any key to continue ..."
-. ./registerInstitutionsIseAndLbnl.sh
-read -p "Press any key to continue ..."
-. ./addDatabasesIseAndLbnl.sh
-read -p "Press any key to continue ..."
-. ./generateComponentIdsAndAddManufacturers.sh
-read -p "Press any key to continue ..."
-. ./verifyExistenceOfInstitutionsDatabasesAndComponents.sh
-read -p "Press any key to continue ..."
-. ./whoHasOpticalData.sh
-read -p "Press any key to continue ..."
-. ./addOpticalDataToLbnlDatabase.sh
-read -p "Press any key to continue ..."
-. ./addOpticalDataToIseDatabase.sh
-read -p "Press any key to continue ..."
-. ./whoHasOpticalData.sh
-read -p "Press any key to continue ..."
-. ./whoHasOpticalDataAtTimestamp.sh
-read -p "Press any key to continue ..."
+. ./verifyThatIkdbIsEmpty.sh;                                                         press_any_key_to "continue" > /dev/null
+. ./registerInstitutionsIseAndLbnl.sh;                                                press_any_key_to "continue" > /dev/null
+. ./addDatabasesIseAndLbnl.sh;                                                        press_any_key_to "continue" > /dev/null
+. ./generateComponentIds.sh;                                                          press_any_key_to "continue" > /dev/null
+. ./addComponentManufacturers.sh;                                                     press_any_key_to "continue" > /dev/null
+. ./verifyExistenceOfInstitutionsDatabasesAndComponents.sh;                           press_any_key_to "continue" > /dev/null
+. ./whoHasOpticalData.sh;                                                             press_any_key_to "continue" > /dev/null
+. ./addOpticalDataToLbnlDatabase.sh;                                                  press_any_key_to "continue" > /dev/null
+. ./addOpticalDataToIseDatabase.sh;                                                   press_any_key_to "continue" > /dev/null
+. ./whoHasOpticalData.sh;                                                             press_any_key_to "continue" > /dev/null
+. ./whoHasOpticalDataAtTimestamp.sh;                                                  press_any_key_to "continue" > /dev/null
 . ./getOpticalDataOfGlazingComponent.sh

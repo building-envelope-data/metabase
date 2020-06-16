@@ -1,8 +1,10 @@
 #!/bin/bash
 
-echo -e "\e[33m===================================================\e[0m" >&2
-echo -e "\e[33mAdd databases ISE and LBNL           \e[0m" >&2
-./query.sh \
+. ./functions.sh
+
+begin_chapter "Add databases ISE and LBNL"
+
+query \
   http://ikdb.org:5000/graphql/ \
   addDatabasesIseAndLbnl.graphql \
   "{ \
@@ -10,4 +12,5 @@ echo -e "\e[33mAdd databases ISE and LBNL           \e[0m" >&2
     \"lbnlInstitutionId\": \"$LBNL_INSTITUTION_ID\" \
   }" \
   > /dev/null
-echo -e "\e[33m===================================================\e[0m" >&2
+
+end_chapter

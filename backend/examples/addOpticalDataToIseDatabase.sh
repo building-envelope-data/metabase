@@ -1,8 +1,10 @@
 #!/bin/bash
 
-echo -e "\e[33m===================================================\e[0m" >&2
-echo -e "\e[33mAdd optical data to ISE database                \e[0m" >&2
-./query.sh \
+. ./functions.sh
+
+begin_chapter "Add optical data to ISE database"
+
+query \
   http://testlab-solar-facades.de:5010/graphql/ \
   addOpticalDataToIseDatabase.graphql \
   "{ \
@@ -10,4 +12,5 @@ echo -e "\e[33mAdd optical data to ISE database                \e[0m" >&2
     \"shadingComponentId\": \"$SHADING_COMPONENT_ID\" \
   }" \
   > /dev/null
-echo -e "\e[33m===================================================\e[0m" >&2
+
+end_chapter
