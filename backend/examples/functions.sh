@@ -54,7 +54,7 @@ function query() {
   local json_file_path=$(echo $graphql_file_path | sed -e "s/\.graphql$/\.json/")
 
   begin_section "About to send an HTTP POST request to GraphQL endpoint"
-  echo_error "\e[32mhttp://ikdb.org:5000/graphql/\e[0m \e[34mwith data ...\e[0m"
+  echo_error "\e[32m${graphql_endpoint_url}\e[0m \e[34mwith data ...\e[0m"
   if [ "$(press_any_key_to "view data")" = n ]; then
     nvim $graphql_file_path >&2
   fi
