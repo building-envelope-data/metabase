@@ -35,6 +35,10 @@ services:
       - ASPNETCORE_URLS=https://+;http://+
       - ASPNETCORE_HTTPS_PORT=5001
       - ASPNETCORE_ENVIRONMENT=Development
+    extra_hosts:
+      - "ikdb.org:${DOCKER_IP}"
+      - "testlab-solar-facades.de:${DOCKER_IP}"
+      - "lbnl.gov:${DOCKER_IP}"
     depends_on:
       - database
 

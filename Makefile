@@ -2,9 +2,21 @@
 # https://swcarpentry.github.io/make-novice/reference.html
 
 name = icon
+ise_name = ise_icon
+lbnl_name = lbnl_icon
 
 # Inspired by https://docs.docker.com/engine/reference/commandline/run/#add-entries-to-container-hosts-file---add-host
 docker_ip = $(shell ip -4 addr show scope global dev docker0 | grep inet | awk '{print $$2}' | cut -d / -f 1)
+
+DOCKER_COMPOSE = docker-compose
+ise_docker_compose = \
+	docker-compose \
+		--file docker-compose-ise.yml \
+		--project-name ${ise_name}
+lbnl_docker_compose = \
+	docker-compose \
+		--file docker-compose-lbnl.yml \
+		--project-name ${lbnl_name}
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
@@ -22,107 +34,101 @@ name : ## Print value of variable `name`
 	@echo ${name}
 .PHONY : name
 
+name-ise : ## Print value of variable `ise_name`
+	@echo ${ise_name}
+.PHONY : name-ise
+
+name-lbnl : ## Print value of variable `lbnl_name`
+	@echo ${lbnl_name}
+.PHONY : name-ise
+
 build : ## Build images
 	DOCKER_IP=${docker_ip} \
-		docker-compose build \
+		${DOCKER_COMPOSE} build \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
+build-ise : DOCKER_COMPOSE = ${ise_docker_compose}
+build-ise : build ## Build ISE images
+.PHONY : build-ise
+
+build-lbnl : DOCKER_COMPOSE = ${lbnl_docker_compose}
+build-lbnl : build ## Build LBNL images
+.PHONY : build-lbnl
+
 remove : ## Remove stopped containers
 	DOCKER_IP=${docker_ip} \
-		docker-compose rm
+		${DOCKER_COMPOSE} rm
 .PHONY : remove
+
+remove-ise : DOCKER_COMPOSE = ${ise_docker_compose}
+remove-ise : remove ## Remove stopped ISE containers
+.PHONY : remove-ise
+
+remove-lbnl : DOCKER_COMPOSE = ${lbnl_docker_compose}
+remove-lbnl : remove ## Remove stopped LBNL containers
+.PHONY : remove-lbnl
 
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
 up : ## (Re)create and start containers
 	DOCKER_IP=${docker_ip} \
-		docker-compose up \
+		${DOCKER_COMPOSE} up \
 		--remove-orphans \
 		--detach
 .PHONY : up
 
-up-ise : ## (Re)create and start containers
-	docker-compose \
-	  --file docker-compose-ise.yml \
-		--project-name icon-ise \
-		up \
-		--remove-orphans \
-		--detach
+up-ise : DOCKER_COMPOSE = ${ise_docker_compose}
+up-ise : up ## (Re)create and start ISE containers
 .PHONY : up-ise
 
-up-lbnl : ## (Re)create and start containers
-	docker-compose \
-	  --file docker-compose-lbnl.yml \
-		--project-name icon-lbnl \
-		up \
-		--remove-orphans \
-		--detach
+up-lbnl : DOCKER_COMPOSE = ${lbnl_docker_compose}
+up-lbnl : up ## (Re)create and start LBNL containers
 .PHONY : up-lbnl
 
 down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
 	DOCKER_IP=${docker_ip} \
-		docker-compose down
+		${DOCKER_COMPOSE} down
 .PHONY : down
 
-down-ise : ## Stop containers and remove containers, networks, volumes, and images created by `up`
-	docker-compose \
-		--file docker-compose-ise.yml \
-		--project-name icon-ise \
-		down
+down-ise : DOCKER_COMPOSE = ${ise_docker_compose}
+down-ise : down ## Stop ISE containers and remove containers, networks, volumes, and images created by `up-ise`
 .PHONY : down-ise
 
-down-lbnl : ## Stop containers and remove containers, networks, volumes, and images created by `up`
-	docker-compose \
-		--file docker-compose-lbnl.yml \
-		--project-name icon-lbnl \
-		down
+down-lbnl : DOCKER_COMPOSE = ${lbnl_docker_compose}
+down-lbnl : down ## Stop LBNL containers and remove containers, networks, volumes, and images created by `up-lbnl`
 .PHONY : down-lbnl
 
 restart : ## Restart all stopped and running containers
 	DOCKER_IP=${docker_ip} \
-		docker-compose restart
+		${DOCKER_COMPOSE} restart
 .PHONY : restart
 
-restart-ise : ## Stop containers and remove containers, networks, volumes, and images created by `up`
-	docker-compose \
-		--file docker-compose-ise.yml \
-		--project-name icon-ise \
-		restart
+restart-ise : DOCKER_COMPOSE = ${ise_docker_compose}
+restart-ise : restart ## Restart all stopped and running ISE containers
 .PHONY : restart-ise
 
-restart-lbnl : ## Stop containers and remove containers, networks, volumes, and images created by `up`
-	docker-compose \
-		--file docker-compose-lbnl.yml \
-		--project-name icon-lbnl \
-		restart
+restart-lbnl : DOCKER_COMPOSE = ${lbnl_docker_compose}
+restart-lbnl : restart ## Restart all stopped and running LBNL containers
 .PHONY : restart-lbnl
 
 logs : ## Follow logs
 	DOCKER_IP=${docker_ip} \
-		docker-compose logs \
+		${DOCKER_COMPOSE} logs \
 		--follow
 .PHONY : logs
 
-logs-ise : ## Stop containers and remove containers, networks, volumes, and images created by `up`
-	docker-compose \
-		--file docker-compose-ise.yml \
-		--project-name icon-ise \
-		logs \
-		--follow
+logs-ise : DOCKER_COMPOSE = ${ise_docker_compose}
+logs-ise : logs ## Follow ISE logs
 .PHONY : logs-ise
 
-logs-lbnl : ## Stop containers and remove containers, networks, volumes, and images created by `up`
-	docker-compose \
-		--file docker-compose-lbnl.yml \
-		--project-name icon-lbnl \
-		logs \
-		--follow
+logs-lbnl : DOCKER_COMPOSE = ${lbnl_docker_compose}
+logs-lbnl : logs ## Follow LBNL logs
 .PHONY : logs-lbnl
 
 runf : ## Run the one-time command `${COMMAND}` against a fresh `frontend` container
 	DOCKER_IP=${docker_ip} \
-		docker-compose run \
+		${DOCKER_COMPOSE} run \
 		--user $(shell id --user):$(shell id --group) \
 		frontend \
 		${COMMAND}
@@ -130,7 +136,7 @@ runf : ## Run the one-time command `${COMMAND}` against a fresh `frontend` conta
 
 runb : ## Run the one-time command `${COMMAND}` against a fresh `backend` container
 	DOCKER_IP=${docker_ip} \
-		docker-compose run \
+		${DOCKER_COMPOSE} run \
 		--user $(shell id --user):$(shell id --group) \
 		backend \
 		${COMMAND}
@@ -144,9 +150,13 @@ shellb : COMMAND = ash
 shellb : runb ## Enter shell in a fresh `backend` container
 .PHONY : shellb
 
+shellb-examples : COMMAND = bash -c "cd ./examples && bash"
+shellb-examples : runb ## Enter Bourne-again shell, aka, bash, in a fresh `backend` container
+.PHONY : shellb-examples
+
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	DOCKER_IP=${docker_ip} \
-		docker-compose exec \
+		${DOCKER_COMPOSE} exec \
 		database \
 		psql \
 		--username postgres \

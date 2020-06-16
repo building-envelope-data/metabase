@@ -45,6 +45,7 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=password
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/https/localhost.pfx
     extra_hosts:
+      - "ikdb.org:${DOCKER_IP}"
       - "testlab-solar-facades.de:${DOCKER_IP}"
       - "lbnl.gov:${DOCKER_IP}"
     depends_on:
