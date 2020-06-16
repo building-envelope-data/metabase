@@ -1,34 +1,61 @@
-chapter_separator="\e[33m===================================================\e[0m"
-section_separator="\e[34m---------------------------------------------------\e[0m"
-paragraph_separator="\e[32m- - - - - - - - - - - - - - - - - - - - - - - - - -\e[0m"
+chapter_color="\e[33m"
+section_color="\e[34m"
+paragraph_color="\e[32m"
+reset_color="\e[0m"
+green_color="\e[32m"
+chapter_separator="==================================================="
+section_separator="---------------------------------------------------"
+paragraph_separator="- - - - - - - - - - - - - - - - - - - - - - - - - -"
 
 function echo_error() {
   local message="$1"
   echo -e "$message" >&2
 }
 
+function begin_x() {
+  local separator="$1"
+  local color="$2"
+  local title="$3"
+  local subtitle="$4"
+  if [ "$separator" != "" ]; then
+    echo_error "${color}${separator}${reset_color}"
+  fi
+  if [ "$title" != "" ]; then
+    echo_error "${color}${title}${reset_color}"
+  fi
+  if [ "$subtitle" != "" ]; then
+    echo_error "${color}${subtitle}${reset_color}"
+  fi
+}
+
+function end_x() {
+  local separator="$1"
+  local color="$2"
+  echo_error "${color}${separator}${reset_color}"
+}
+
 function begin_chapter() {
-  local title="$1"
-  echo_error "$chapter_separator"
-  echo_error "\e[33m$title\e[0m"
+  begin_x "$chapter_separator" "$chapter_color" "$1" "$2"
 }
 
 function end_chapter() {
-  echo_error "$chapter_separator"
+  end_x "$chapter_separator" "$chapter_color"
 }
 
 function begin_section() {
-  local title="$1"
-  echo_error "$section_separator"
-  echo_error "\e[34m$title\e[0m"
+  begin_x "$section_separator" "$section_color" "$1" "$2"
+}
+
+function end_section() {
+  end_x "$section_separator" "$section_color"
 }
 
 function begin_paragraph() {
-  echo_error "$paragraph_separator"
+  begin_x "$paragraph_separator" "$paragraph_color" "" ""
 }
 
 function end_paragraph() {
-  echo_error "$paragraph_separator"
+  end_x "$paragraph_separator" "$paragraph_color"
 }
 
 function press_any_key_to() {
@@ -53,8 +80,9 @@ function query() {
   local has_big_response="${4:false}"
   local json_file_path=$(echo $graphql_file_path | sed -e "s/\.graphql$/\.json/")
 
-  begin_section "About to send an HTTP POST request to GraphQL endpoint"
-  echo_error "\e[32m${graphql_endpoint_url}\e[0m \e[34mwith data ...\e[0m"
+  begin_section \
+    "About to send an HTTP POST request to GraphQL endpoint" \
+    "${green_color}${graphql_endpoint_url}${reset_color}${section_color} with data ...${reset_color}"
   if [ "$(press_any_key_to "view data")" = n ]; then
     nvim $graphql_file_path >&2
   fi
