@@ -70,6 +70,12 @@ remove-lbnl : DOCKER_COMPOSE = ${lbnl_docker_compose}
 remove-lbnl : remove ## Remove stopped LBNL containers
 .PHONY : remove-lbnl
 
+remove_data : ## Remove all data volumes
+	docker volume rm \
+		${name}_data \
+		${ise_name}_data \
+		${lbnl_name}_data
+
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
 up : ## (Re)create and start containers
 	DOCKER_IP=${docker_ip} \
