@@ -32,6 +32,8 @@ using Models = Icon.Models;
 using Query = Icon.Infrastructure.Query;
 using RazorViewEngine = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine;
 using RazorViewEngineOptions = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
 
 namespace Icon.Configuration
 {
@@ -39,6 +41,11 @@ namespace Icon.Configuration
     {
         public static void ConfigureServices(IServiceCollection services)
         {
+          /* services.Configure<ForwardedHeadersOptions>(options => */
+          /*     { */
+          /*     options.KnownProxies.Add(IPAddress.Parse("10.0.0.100")); */
+          /*     }); */
+
             services.AddResponseCompression();
             // add CORS policy for non-IdentityServer endpoints
             // https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-3.0
@@ -104,6 +111,14 @@ namespace Icon.Configuration
                 // https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-3.1&tabs=visual-studio
                 app.UseHsts();
             }
+
+          // Forwarded Headers Middleware should run before other middleware except diagnostics and error handling middleware.
+          // See https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#use-a-reverse-proxy-server
+          app.UseForwardedHeaders(new ForwardedHeadersOptions
+              {
+              ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+              }
+              );
 
             app.UseStatusCodePages();
 

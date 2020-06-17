@@ -3,9 +3,7 @@
 /tempkey.rsa
 /src/tempkey.rsa
 /src/wwwroot/assets/
-/https/localhost.crt
-/https/localhost.key
-/https/localhost.pfx
+/ssl/*
 /examples/*.json
 
 # Created by https://www.gitignore.io/api/csharp

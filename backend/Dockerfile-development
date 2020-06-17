@@ -33,7 +33,7 @@ RUN \
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
 COPY \
-  ./https/localhost.crt \
+  ./ssl/localhost.crt \
   /usr/local/share/ca-certificates
 RUN \
   update-ca-certificates
@@ -114,10 +114,4 @@ RUN \
   mkdir -p ./test/bin && \
   mkdir -p ./test/obj
 
-EXPOSE 5000
-EXPOSE 5001
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-# Inspired by https://stackoverflow.com/questions/51188774/docker-dotnet-watch-run-error-unable-to-bind-to-https-localhost5000-on-the-i/51256147#51256147
-# CMD ["dotnet", "watch", "run", "--no-restore", "--urls", "https://0.0.0.0:5001;http://0.0.0.0:5000"]
-# CMD ["dotnet", "watch", "run", "--urls", "https://0.0.0.0:5001;http://0.0.0.0:5000"]
-CMD ["dotnet", "run", "--runtime", "linux-musl-x64", "--project", "./src/Icon.csproj" ,"--urls", "https://0.0.0.0:5001;http://0.0.0.0:5000"]

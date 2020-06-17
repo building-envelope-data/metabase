@@ -8,14 +8,20 @@ lbnl_name = lbnl_icon
 # Inspired by https://docs.docker.com/engine/reference/commandline/run/#add-entries-to-container-hosts-file---add-host
 docker_ip = $(shell ip -4 addr show scope global dev docker0 | grep inet | awk '{print $$2}' | cut -d / -f 1)
 
-DOCKER_COMPOSE = docker-compose
+DOCKER_COMPOSE = \
+	docker-compose \
+		--file docker-compose.common.yml \
+		--file docker-compose.yml \
+		--project-name ${name}
 ise_docker_compose = \
 	docker-compose \
-		--file docker-compose-ise.yml \
+		--file docker-compose.common.yml \
+		--file docker-compose.ise.yml \
 		--project-name ${ise_name}
 lbnl_docker_compose = \
 	docker-compose \
-		--file docker-compose-lbnl.yml \
+		--file docker-compose.common.yml \
+		--file docker-compose.lbnl.yml \
 		--project-name ${lbnl_name}
 
 # Taken from https://www.client9.com/self-documenting-makefiles/

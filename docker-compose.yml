@@ -1,91 +1,15 @@
-# Inspired by https://mherman.org/blog/dockerizing-a-react-app/
-# TODO Have a separate `docker-compose`-file for production (see also https://docs.docker.com/compose/production/)
-
 version: '3.7'
 
 services:
-  database:
-    restart: always
-    image: postgres:11.5-alpine
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres # We can use docker-compose `secrets` for that
-      - POSTGRES_DB=postgres
-    ports:
-      - 5432:5432
-    volumes:
-      - data:/var/lib/postgresql/data
-
   backend:
-    build:
-      context: ./backend
-      dockerfile: ./Dockerfile-development
-    # user: 1000:1000
-    volumes:
-      - ./backend:/app
-      - node_modules:/app/node_modules
-      # The following items make the engine create a volume for the specified
-      # path with the effect that the service does not write temporary files
-      # into the corresponding directory on the file system that was bound by
-      # the preceding binding
-      - /app/src/bin
-      - /app/src/obj
-      - /app/test/bin
-      - /app/test/obj
     ports:
-      - 5000:5000 # In production: 8000:80
-      - 5001:5001 # In production: 8001:443
+      - 5000:8080
     environment:
-      # TODO Do we really need these environment variables?
-      - ASPNETCORE_URLS=https://+;http://+
-      - ASPNETCORE_HTTPS_PORT=5001
-      - ASPNETCORE_ENVIRONMENT=Development
-      # - ASPNETCORE_Kestrel__Certificates__Development__Password=crypticpassword
-      # https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/https/localhost.pfx
-    extra_hosts:
-      - "ikdb.org:${DOCKER_IP}"
-      - "testlab-solar-facades.de:${DOCKER_IP}"
-      - "lbnl.gov:${DOCKER_IP}"
-    depends_on:
-      - database
+      - ICON_HOST="https://${HOST}:${HTTP_PORT}"
 
-  # openid-swagger-frontend:
-  #   image: swaggerapi/swagger-ui
-  #   ports:
-  #     - 5002:80
-  #   environment:
-  #     # https://github.com/schickling/dockerfiles/tree/master/swagger-ui
-  #     - API_URL=https://localhost:5001/.well-known/openid-configuration
-  #   depends_on:
-  #     - backend
-
-  # openid-redoc-frontend:
-  #   image: redocly/redoc
-  #   ports:
-  #     - 5003:80
-  #   environment:
-  #     - SPEC_URL=https://localhost:5001/swagger/OpenAPI%203/swagger.json
-  #   depends_on:
-  #     - backend
-
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: ./Dockerfile-development
-  #   volumes:
-  #     - ./frontend:/app
-  #     # - /app/node_modules # Keep the `node_modules` of the image
-  #     - frontend_node_modules:/app/node_modules
-  #   ports:
-  #     - 3000:3000
-  #   environment:
-  #     NODE_ENV: development
-  #   depends_on:
-  #     - backend
-
-volumes:
-  data:
-  node_modules:
-  frontend_node_modules:
+  nginx:
+    ports:
+      - ${HTTP_PORT}:80
+      - ${HTTPS_PORT}:443
+    environment:
+      - SERVER_NAME=${HOST}

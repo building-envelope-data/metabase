@@ -1,3 +1,7 @@
+/ssl/localhost.crt
+/ssl/localhost.key
+/ssl/localhost.pfx
+
 .env
 .vscode
 
