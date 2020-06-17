@@ -8,22 +8,26 @@ using ValueObjects = Icon.ValueObjects;
 namespace Icon.Models
 {
     public sealed class HygrothermalData
-      : Model
+      : DataX<ValueObjects.HygrothermalDataJson>
     {
-        public ValueObjects.HygrothermalDataJson Data { get; }
-
         private HygrothermalData(
             ValueObjects.Id id,
+            ValueObjects.Id componentId,
             ValueObjects.HygrothermalDataJson data,
             ValueObjects.Timestamp timestamp
             )
-          : base(id, timestamp)
+          : base(
+              id: id,
+              componentId: componentId,
+              data: data,
+              timestamp: timestamp
+              )
         {
-            Data = data;
         }
 
         public static Result<HygrothermalData, Errors> From(
             ValueObjects.Id id,
+            ValueObjects.Id componentId,
             ValueObjects.HygrothermalDataJson data,
             ValueObjects.Timestamp timestamp
             )
@@ -32,6 +36,7 @@ namespace Icon.Models
               Result.Ok<HygrothermalData, Errors>(
                   new HygrothermalData(
                     id: id,
+                    componentId: componentId,
                     data: data,
                     timestamp: timestamp
                     )

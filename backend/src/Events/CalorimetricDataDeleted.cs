@@ -3,7 +3,7 @@ using Guid = System.Guid;
 namespace Icon.Events
 {
     public sealed class CalorimetricDataDeleted
-      : DeletedEvent
+      : DataDeletedEvent
     {
         public static CalorimetricDataDeleted From<TModel>(
             Commands.Delete<TModel> command

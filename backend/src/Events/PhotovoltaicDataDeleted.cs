@@ -3,7 +3,7 @@ using Guid = System.Guid;
 namespace Icon.Events
 {
     public sealed class PhotovoltaicDataDeleted
-      : DeletedEvent
+      : DataDeletedEvent
     {
         public static PhotovoltaicDataDeleted From<TModel>(
             Commands.Delete<TModel> command

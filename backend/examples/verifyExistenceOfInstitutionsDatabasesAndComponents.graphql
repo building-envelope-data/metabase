@@ -1,0 +1,22 @@
+query {
+  institutions {
+    information {
+      name
+    }
+  }
+  databases {
+    locator
+  }
+  components {
+    information {
+      name
+    }
+    manufacturers {
+      nodes {
+        information {
+          name
+        }
+      }
+    }
+  }
+}

@@ -11,7 +11,7 @@ using Models = Icon.Models;
 namespace Icon.GraphQl
 {
     public sealed class CalorimetricData
-      : NodeBase
+      : DataX
     {
         public static CalorimetricData FromModel(
             Models.CalorimetricData model,
@@ -20,50 +20,28 @@ namespace Icon.GraphQl
         {
             return new CalorimetricData(
                 id: model.Id,
+                componentId: model.ComponentId,
                 data: model.Data.ToNestedCollections(),
                 timestamp: model.Timestamp,
                 requestTimestamp: requestTimestamp
                 );
         }
 
-        public object Data { get; }
-
         public CalorimetricData(
             ValueObjects.Id id,
+            ValueObjects.Id componentId,
             object data,
             ValueObjects.Timestamp timestamp,
             ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,
+              componentId: componentId,
+              data: data,
               timestamp: timestamp,
               requestTimestamp: requestTimestamp
               )
         {
-            Data = data;
-        }
-
-        public async Task<ValueObjects.Id> GetComponentId(
-            [Parent] CalorimetricData calorimetricData,
-            [DataLoader] ComponentOfCalorimetricDataDataLoader componentLoader
-            )
-        {
-            return
-              (
-               await componentLoader.LoadAsync(
-                 TimestampHelpers.TimestampId(calorimetricData.Id, calorimetricData.RequestTimestamp)
-                 )
-              )
-              .Id;
-        }
-
-        public sealed class ComponentOfCalorimetricDataDataLoader
-            : BackwardOneToManyAssociateOfModelDataLoader<Component, Models.CalorimetricData, Models.ComponentCalorimetricData, Models.Component>
-        {
-            public ComponentOfCalorimetricDataDataLoader(IQueryBus queryBus)
-              : base(Component.FromModel, queryBus)
-            {
-            }
         }
     }
 }

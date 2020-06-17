@@ -3,7 +3,7 @@ using Guid = System.Guid;
 namespace Icon.Events
 {
     public sealed class HygrothermalDataDeleted
-      : DeletedEvent
+      : DataDeletedEvent
     {
         public static HygrothermalDataDeleted From<TModel>(
             Commands.Delete<TModel> command

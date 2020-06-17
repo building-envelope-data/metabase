@@ -16,10 +16,18 @@ RUN \
 
 RUN \
   apk add --no-cache \
+    curl \
     dumb-init \
     make \
     npm \
     openssl
+
+# Add dependencies for interactive examples in ./examples
+RUN \
+  apk add --no-cache \
+    bash \
+    jq \
+    neovim
 
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757

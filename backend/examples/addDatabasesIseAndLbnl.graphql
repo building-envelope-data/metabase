@@ -1,0 +1,26 @@
+mutation addDatabasesIseAndLbnl(
+  $iseInstitutionId: NonEmptyUuid!,
+  $lbnlInstitutionId: NonEmptyUuid!
+) {
+  ise: createDatabase(input: {
+    name: "TestLab Solar Façades",
+    description: "Customised services for your building project: We offer you our know-how in the form of measurements, tests and consultancy. We advise you on the method which will provide the most reliable and economic answer to your questions.",
+    locator: "http://testlab-solar-facades.de:5010/graphql/",
+    institutionId: $iseInstitutionId
+  }) {
+    database {
+      id
+    }
+  }
+
+  lbnl: createDatabase(input: {
+    name: "Lawrence Berkeley National Laboratory",
+    description: "From the infinite scale of the universe to the infinitesimal scale of subatomic particles, researchers at Lawrence Berkeley National Laboratory – Berkeley Lab – are advancing the scope of human knowledge and seeking science solutions to some of the greatest problems facing humankind. Scientific excellence and an unparalleled record of achievement have been the hallmarks of this Laboratory since it was founded in 1931.",
+    locator: "http://lbnl.gov:5020/graphql/",
+    institutionId: $lbnlInstitutionId
+  }) {
+    database {
+      id
+    }
+  }
+}

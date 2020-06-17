@@ -9,39 +9,20 @@ using JToken = Newtonsoft.Json.Linq.JToken;
 namespace Icon.Aggregates
 {
     public sealed class PhotovoltaicDataAggregate
-      : EventSourcedAggregate, IConvertible<Models.PhotovoltaicData>
+      : DataAggregate, IConvertible<Models.PhotovoltaicData>
     {
-        public object? Data { get; set; }
-
 #nullable disable
         public PhotovoltaicDataAggregate() { }
 #nullable enable
 
         private void Apply(Marten.Events.Event<Events.PhotovoltaicDataCreated> @event)
         {
-            ApplyMeta(@event);
-            var data = @event.Data;
-            Id = data.AggregateId;
-            Data = data.Data;
+            ApplyCreated(@event);
         }
 
         private void Apply(Marten.Events.Event<Events.PhotovoltaicDataDeleted> @event)
         {
             ApplyDeleted(@event);
-        }
-
-        public override Result<bool, Errors> Validate()
-        {
-            if (IsVirgin())
-                return Result.Combine(
-                    base.Validate(),
-                    ValidateNull(Data, nameof(Data))
-                    );
-
-            return Result.Combine(
-                base.Validate(),
-                ValidateNonNull(Data, nameof(Data))
-                );
         }
 
         public Result<Models.PhotovoltaicData, Errors> ToModel()
@@ -51,18 +32,21 @@ namespace Icon.Aggregates
                 return Result.Failure<Models.PhotovoltaicData, Errors>(virginResult.Error);
 
             var idResult = ValueObjects.Id.From(Id);
+            var componentIdResult = ValueObjects.Id.From(ComponentId);
             var dataResult = ValueObjects.PhotovoltaicDataJson.FromNestedCollections(Data);
             var timestampResult = ValueObjects.Timestamp.From(Timestamp);
 
             return
               Errors.Combine(
                   idResult,
+                  componentIdResult,
                   dataResult,
                   timestampResult
                   )
               .Bind(_ =>
                   Models.PhotovoltaicData.From(
                     id: idResult.Value,
+                    componentId: componentIdResult.Value,
                     data: dataResult.Value,
                     timestamp: timestampResult.Value
                     )

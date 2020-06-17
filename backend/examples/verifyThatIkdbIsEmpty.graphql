@@ -1,0 +1,11 @@
+query {
+  institutions {
+    id
+  }
+  databases {
+    id
+  }
+  components {
+    id
+  }
+}

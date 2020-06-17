@@ -17,12 +17,10 @@ using Queries = Icon.Queries;
 
 namespace Icon.Handlers
 {
-    public sealed class HasDataForComponentsHandler<TComponentDataAssociationModel, TDataModel, TComponentDataAssociationAggregate, TDataAggregate, TAssociationAddedEvent>
+    public sealed class HasDataForComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>
       : IQueryHandler<Queries.HasDataForComponents<TDataModel>, IEnumerable<Result<bool, Errors>>>
-      where TComponentDataAssociationModel : Models.IOneToManyAssociation
-      where TComponentDataAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TComponentDataAssociationModel>, new()
       where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
-      where TAssociationAddedEvent : Events.IAssociationAddedEvent
+      where TDataCreatedEvent : DataCreatedEvent
     {
         private readonly IAggregateRepository _repository;
 
@@ -36,31 +34,47 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-            using (var session = _repository.OpenReadOnlySession())
-            {
-                return await Handle(session, query.TimestampedIds, cancellationToken).ConfigureAwait(false);
-            }
-        }
-
-        public async Task<IEnumerable<Result<bool, Errors>>> Handle(
-            IAggregateRepositoryReadOnlySession session,
-            IEnumerable<ValueObjects.TimestampedId> timestampedIds,
-            CancellationToken cancellationToken
-            )
-        {
+          using (var session = _repository.OpenReadOnlySession())
+          {
+            var componentIds =
+              query.TimestampedIds
+              .Select(timestampedId =>
+                  (Guid)timestampedId.Id
+                  )
+              .ToArray();
+            // TODO This is only correct when data aggregates are immutable!
+            var componentIdToDataModelIds =
+              (await session.QueryEvents<TDataCreatedEvent>()
+               .Where(e => e.ComponentId.IsOneOf(componentIds))
+               .Select(e => new { ComponentId = e.ComponentId, DataModelId = e.AggregateId })
+               .ToListAsync(cancellationToken)
+               .ConfigureAwait(false)
+              )
+              .ToLookup(
+                  x => (ValueObjects.Id)x.ComponentId,
+                  x => (ValueObjects.Id)x.DataModelId
+                  );
             return
-              (await session
-               .GetForwardOneToManyAssociatesOfModels<Models.Component, TComponentDataAssociationModel, TDataModel, Aggregates.ComponentAggregate, TComponentDataAssociationAggregate, TDataAggregate, TAssociationAddedEvent>(
-                 timestampedIds,
-                 cancellationToken: cancellationToken
+              (
+               // TODO Avoid loading and discarding deleted data aggregates.
+               await session.LoadAllThatExistedBatched<TDataAggregate>(
+                 query.TimestampedIds.Select(timestampedId =>
+                   (
+                    timestampedId.Timestamp,
+                    componentIdToDataModelIds[timestampedId.Id]
+                   )
+                   ),
+                 cancellationToken
                  )
                .ConfigureAwait(false)
               )
-              .Select(associateResultsResult =>
-                  associateResultsResult.Map(associateResults =>
-                    associateResults.Any()
+              .Select(aggregateResults =>
+                  // TODO Determine the number of existing data aggregates without loading them!
+                  Result.Ok<bool, Errors>(
+                    aggregateResults.Count() >= 1
                     )
-                );
+                  );
+          }
         }
     }
 }

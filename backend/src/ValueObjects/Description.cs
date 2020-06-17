@@ -34,7 +34,7 @@ namespace Icon.ValueObjects
                     )
                     );
 
-            if (description.Length > 128)
+            if (description.Length > 512)
                 return Result.Failure<Description, Errors>(
                     Errors.One(
                     message: "Description is too long",

@@ -16,7 +16,7 @@ using Uri = System.Uri;
 namespace Icon.Events
 {
     public sealed class PhotovoltaicDataCreated
-      : CreatedEvent
+      : DataCreatedEvent
     {
         public static PhotovoltaicDataCreated From(
             Guid photovoltaicDataId,
@@ -25,12 +25,11 @@ namespace Icon.Events
         {
             return new PhotovoltaicDataCreated(
                 photovoltaicDataId: photovoltaicDataId,
+                componentId: command.Input.ComponentId,
                 data: command.Input.Data.ToNestedCollections(),
                 creatorId: command.CreatorId
                 );
         }
-
-        public object? Data { get; set; }
 
 #nullable disable
         public PhotovoltaicDataCreated() { }
@@ -38,25 +37,18 @@ namespace Icon.Events
 
         public PhotovoltaicDataCreated(
             Guid photovoltaicDataId,
+            Guid componentId,
             object? data,
             Guid creatorId
             )
           : base(
-              aggregateId: photovoltaicDataId,
+              dataId: photovoltaicDataId,
+              componentId: componentId,
+              data: data,
               creatorId: creatorId
               )
         {
-            Data = data;
             EnsureValid();
-        }
-
-        public override Result<bool, Errors> Validate()
-        {
-            return
-              Result.Combine(
-                  base.Validate(),
-                  ValidateNonNull(Data, nameof(Data))
-                  );
         }
     }
 }

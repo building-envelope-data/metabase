@@ -42,8 +42,8 @@ namespace Icon.GraphQl
             _logger.LogInformation(context.Request.Query.ToString());
             /* _logger.LogInformation(context.Request.QueryName); */
             /* _logger.LogInformation(context.Request.QueryHash); */
-            _logger.LogInformation(context.Request.OperationName);
-            _logger.LogInformation(JsonSerializer.Serialize(context.Request.VariableValues));
+            /* _logger.LogInformation(context.Request.OperationName); */
+            /* _logger.LogInformation(JsonSerializer.Serialize(context.Request.VariableValues)); */
             /* _logger.LogInformation(context.Request.InitialValue?.ToString()); */
             /* _logger.LogInformation(JsonSerializer.Serialize(context.Request.Properties)); */
             /* _logger.LogInformation(JsonSerializer.Serialize(context.Request.Extensions)); */

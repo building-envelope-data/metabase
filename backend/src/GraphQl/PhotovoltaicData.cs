@@ -11,7 +11,7 @@ using Models = Icon.Models;
 namespace Icon.GraphQl
 {
     public sealed class PhotovoltaicData
-      : NodeBase
+      : DataX
     {
         public static PhotovoltaicData FromModel(
             Models.PhotovoltaicData model,
@@ -20,50 +20,28 @@ namespace Icon.GraphQl
         {
             return new PhotovoltaicData(
                 id: model.Id,
+                componentId: model.ComponentId,
                 data: model.Data.ToNestedCollections(),
                 timestamp: model.Timestamp,
                 requestTimestamp: requestTimestamp
                 );
         }
 
-        public object Data { get; }
-
         public PhotovoltaicData(
             ValueObjects.Id id,
+            ValueObjects.Id componentId,
             object data,
             ValueObjects.Timestamp timestamp,
             ValueObjects.Timestamp requestTimestamp
             )
           : base(
               id: id,
+              componentId: componentId,
+              data: data,
               timestamp: timestamp,
               requestTimestamp: requestTimestamp
               )
         {
-            Data = data;
-        }
-
-        public async Task<ValueObjects.Id> GetComponentId(
-            [Parent] PhotovoltaicData photovoltaicData,
-            [DataLoader] ComponentOfPhotovoltaicDataDataLoader componentLoader
-            )
-        {
-            return
-              (
-               await componentLoader.LoadAsync(
-                 TimestampHelpers.TimestampId(photovoltaicData.Id, photovoltaicData.RequestTimestamp)
-                 )
-              )
-              .Id;
-        }
-
-        public sealed class ComponentOfPhotovoltaicDataDataLoader
-            : BackwardOneToManyAssociateOfModelDataLoader<Component, Models.PhotovoltaicData, Models.ComponentPhotovoltaicData, Models.Component>
-        {
-            public ComponentOfPhotovoltaicDataDataLoader(IQueryBus queryBus)
-              : base(Component.FromModel, queryBus)
-            {
-            }
         }
     }
 }

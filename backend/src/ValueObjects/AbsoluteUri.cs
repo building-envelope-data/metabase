@@ -60,5 +60,10 @@ namespace Icon.ValueObjects
         {
             return absoluteUri.Value;
         }
+
+        public override string ToString()
+        {
+            return $"{GetType()}({Value})";
+        }
     }
 }

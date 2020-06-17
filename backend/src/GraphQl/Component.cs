@@ -45,15 +45,16 @@ namespace Icon.GraphQl
             Information = information;
         }
 
-        public Task<IReadOnlyList<OpticalData>> GetOpticalData(
-            [Parent] Component component,
-            [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader
-            )
-        {
-            return opticalDataLoader.LoadAsync(
-                TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp)
-                );
-        }
+        // TODO Get*Data and WhoHas*Data (as in Query)
+        /* public Task<IReadOnlyList<OpticalData>> GetOpticalData( */
+        /*     [Parent] Component component, */
+        /*     [DataLoader] OpticalDataOfComponentDataLoader opticalDataLoader */
+        /*     ) */
+        /* { */
+        /*     return opticalDataLoader.LoadAsync( */
+        /*         TimestampHelpers.TimestampId(component.Id, component.RequestTimestamp) */
+        /*         ); */
+        /* } */
 
         /* public async Task<IReadOnlyList<object>> GetOpticalData( */
         /*     [Parent] Component component, */
@@ -70,12 +71,12 @@ namespace Icon.GraphQl
         /*     .ToList().AsReadOnly(); */
         /* } */
 
-        public IReadOnlyList<Database> GetWhoHasOpticalData(
-            [Parent] Component component
-            )
-        {
-            return new Database[] { };
-        }
+        /* public IReadOnlyList<Database> GetWhoHasOpticalData( */
+        /*     [Parent] Component component */
+        /*     ) */
+        /* { */
+        /*     return new Database[] { }; */
+        /* } */
 
         public ComponentManufacturerConnection GetManufacturers(
             [Parent] Component component
