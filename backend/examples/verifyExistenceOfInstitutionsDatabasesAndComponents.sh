@@ -8,6 +8,7 @@ query \
   http://ikdb.org:5000/graphql/ \
   verifyExistenceOfInstitutionsDatabasesAndComponents.graphql \
   "{}" \
+  true \
   > /dev/null
 
 end_chapter
