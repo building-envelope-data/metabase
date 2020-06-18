@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Icon.Data;
@@ -10,6 +11,7 @@ using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -32,8 +34,6 @@ using Models = Icon.Models;
 using Query = Icon.Infrastructure.Query;
 using RazorViewEngine = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine;
 using RazorViewEngineOptions = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions;
-using Microsoft.AspNetCore.HttpOverrides;
-using System.Net;
 
 namespace Icon.Configuration
 {
@@ -41,10 +41,10 @@ namespace Icon.Configuration
     {
         public static void ConfigureServices(IServiceCollection services)
         {
-          /* services.Configure<ForwardedHeadersOptions>(options => */
-          /*     { */
-          /*     options.KnownProxies.Add(IPAddress.Parse("10.0.0.100")); */
-          /*     }); */
+            /* services.Configure<ForwardedHeadersOptions>(options => */
+            /*     { */
+            /*     options.KnownProxies.Add(IPAddress.Parse("10.0.0.100")); */
+            /*     }); */
 
             services.AddResponseCompression();
             // add CORS policy for non-IdentityServer endpoints
@@ -112,13 +112,13 @@ namespace Icon.Configuration
                 app.UseHsts();
             }
 
-          // Forwarded Headers Middleware should run before other middleware except diagnostics and error handling middleware.
-          // See https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#use-a-reverse-proxy-server
-          app.UseForwardedHeaders(new ForwardedHeadersOptions
-              {
-              ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-              }
-              );
+            // Forwarded Headers Middleware should run before other middleware except diagnostics and error handling middleware.
+            // See https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#use-a-reverse-proxy-server
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            }
+                );
 
             app.UseStatusCodePages();
 
