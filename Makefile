@@ -295,6 +295,20 @@ generate-ssl-certificate-lbnl : SSL_CERTIFICATE_PASSWORD = ${LBNL_SSL_CERTIFICAT
 generate-ssl-certificate-lbnl : generate-ssl-certificate ## Generate LBNL SSL certificate
 .PHONY : generate-ssl-certificate-lbnl
 
+fetch-ssl-certificate : ## Fetch the SSL certificate of the server
+	openssl s_client ${HOST}:${HTTPS_PORT}
+.PHONY : fetch-ssl-certificate
+
+fetch-ssl-certificate-ise : HOST = ${ISE_HOST}
+fetch-ssl-certificate-ise : HTTPS_PORT = ${ISE_HTTPS_PORT}
+fetch-ssl-certificate-ise : fetch-ssl-certificate ## Fetch the SSL certificate of the ISE server
+.PHONY : fetch-ssl-certificate-ise
+
+fetch-ssl-certificate-lbnl : HOST = ${LBNL_HOST}
+fetch-ssl-certificate-lbnl : HTTPS_PORT = ${LBNL_HTTPS_PORT}
+fetch-ssl-certificate-lbnl : fetch-ssl-certificate ## Fetch the SSL certificate of the LBNL server
+.PHONY : fetch-ssl-certificate-lbnl
+
 # ------------------------------------------------ #
 # Tasks to run, for example, in a Docker container #
 # ------------------------------------------------ #
