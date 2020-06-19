@@ -221,6 +221,18 @@ generate-certificate-authority : ## Generate certificate authority ECDSA private
 	cp ./ssl/ca.* ./backend/ssl/
 
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
+# See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
+# and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
+trust-certificate-authority : ## Trust the generated SSL certificate
+	sudo cp ./ssl/ca.crt /usr/local/share/ca-certificates
+	sudo update-ca-certificates
+	cat /etc/ssl/certs/ca-certificates.crt
+	cat ./ssl/ca.crt
+	sudo cat /etc/ssl/certs/ca.pem
+	openssl verify ./ssl/ca.crt
+.PHONY : trust-certificate-authority
+
+# Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # and https://superuser.com/questions/226192/avoid-password-prompt-for-keys-and-prompts-for-dn-information/226229#226229
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
@@ -282,18 +294,6 @@ generate-ssl-certificate-lbnl : SSL_CERTIFICATE_BASE_FILE_NAME = ${LBNL_SSL_CERT
 generate-ssl-certificate-lbnl : SSL_CERTIFICATE_PASSWORD = ${LBNL_SSL_CERTIFICATE_PASSWORD}
 generate-ssl-certificate-lbnl : generate-ssl-certificate ## Generate LBNL SSL certificate
 .PHONY : generate-ssl-certificate-lbnl
-
-# Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
-# See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
-# and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
-trust-ssl-certificate : ## Trust the generated SSL certificate
-	sudo cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt /usr/local/share/ca-certificates
-	sudo update-ca-certificates
-	cat /etc/ssl/certs/ca-certificates.crt
-	cat ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
-	sudo cat /etc/ssl/certs/${SSL_CERTIFICATE_BASE_FILE_NAME}.pem
-	openssl verify ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
-.PHONY : trust-ssl-certificate
 
 # ------------------------------------------------ #
 # Tasks to run, for example, in a Docker container #
