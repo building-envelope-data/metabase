@@ -2,8 +2,9 @@
 # See https://hub.docker.com/_/microsoft-dotnet-core-sdk
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1.201-alpine3.11
 
-ARG GROUP_ID=1000
-ARG USER_ID=1000
+ARG GROUP_ID
+ARG USER_ID
+ARG SSL_CERTIFICATE_BASE_FILE_NAME
 
 # Create non-root user to run commands in (see https://medium.com/@mccode/processes-in-containers-should-not-run-as-root-2feae3f0df3b)
 RUN \
