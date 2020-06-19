@@ -1,6 +1,8 @@
 # Concise introduction to GNU Make:
 # https://swcarpentry.github.io/make-novice/reference.html
 
+include .env
+
 name = icon
 ise_name = ise_icon
 lbnl_name = lbnl_icon
@@ -179,6 +181,8 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 # and https://superuser.com/questions/226192/avoid-password-prompt-for-keys-and-prompts-for-dn-information/226229#226229
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
+# For an explanation of the distinction between `cert` and `pfx` files, see
+# https://security.stackexchange.com/questions/29425/difference-between-pfx-and-cert-certificates/29428#29428
 generate-ssl-certificate : ## Generate SSL certificate
 	DOCKER_IP=${docker_ip} \
 		docker run \
@@ -187,18 +191,40 @@ generate-ssl-certificate : ## Generate SSL certificate
 		--interactive \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
 		nginx \
-		sh -c "openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/CN=localhost" -passout pass:password -keyout /ssl/localhost.key -out /ssl/localhost.crt -config /ssl/localhost.conf && openssl pkcs12 -export -out /ssl/localhost.pfx -inkey /ssl/localhost.key -in /ssl/localhost.crt && openssl verify -CAfile /ssl/localhost.crt /ssl/localhost.crt"
+		sh -c "\
+			openssl req \
+				-x509 \
+				-nodes \
+				-days 365 \
+				-newkey rsa:2048 \
+				-subj "/CN=${SSL_CERTIFICATE_BASE_FILE_NAME}" \
+				-keyout /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key \
+				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
+				-config /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.conf && \
+			openssl pkcs12 \
+				-export \
+				-passout pass:${SSL_CERTIFICATE_PASSWORD} \
+				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx \
+				-inkey /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key \
+				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt && \
+			openssl verify \
+				-CAfile /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
+				/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
+			"
+	mkdir --parents ./backend/ssl/
+	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt ./backend/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
+	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx ./backend/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
 
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
 trust-ssl-certificate : ## Trust the generated SSL certificate
-	sudo cp ./ssl/localhost.crt /usr/local/share/ca-certificates
+	sudo cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt /usr/local/share/ca-certificates
 	sudo update-ca-certificates
 	cat /etc/ssl/certs/ca-certificates.crt
-	cat ./ssl/localhost.crt
-	sudo cat /etc/ssl/certs/localhost.pem
-	openssl verify ./ssl/localhost.crt
+	cat ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
+	sudo cat /etc/ssl/certs/${SSL_CERTIFICATE_BASE_FILE_NAME}.pem
+	openssl verify ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
 
 # ------------------------------------------------ #
 # Tasks to run, for example, in a Docker container #
