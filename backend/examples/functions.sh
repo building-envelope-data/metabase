@@ -7,6 +7,10 @@ chapter_separator="==================================================="
 section_separator="---------------------------------------------------"
 paragraph_separator="- - - - - - - - - - - - - - - - - - - - - - - - - -"
 
+ikdb_graphql_url="https://ikdb.org:4041/graphql/"
+ise_graphql_url="https://testlab-solar-facades.de:4051/graphql/"
+lbnl_graphql_url="https://lbnl.gov:4061/graphql/"
+
 function echo_error() {
   local message="$1"
   echo -e "$message" >&2

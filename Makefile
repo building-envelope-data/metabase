@@ -78,11 +78,12 @@ remove-lbnl : docker_compose = ${lbnl_docker_compose}
 remove-lbnl : remove ## Remove stopped LBNL containers
 .PHONY : remove-lbnl
 
-remove_data : ## Remove all data volumes
+remove-data : ## Remove all data volumes
 	docker volume rm \
 		${name}_data \
 		${ise_name}_data \
 		${lbnl_name}_data
+.PHONY : remove-data
 
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
 up : ## (Re)create and start containers
@@ -177,43 +178,110 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname icon_development
 .PHONY : psql
 
+# Creating Self-Signed ECDSA SSL Certificate using OpenSSL: http://www.guyrutenberg.com/2013/12/28/creating-self-signed-ecdsa-ssl-certificate-using-openssl/
+# `-param_enc explicit` tells openssl to embed the full parameters of the curve in the key, as opposed to just its name
+generate-certificate-authority : ## Generate certificate authority ECDSA private key and self-signed certificate
+	DOCKER_IP=${docker_ip} \
+		docker run \
+		--user $(shell id --user):$(shell id --group) \
+		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
+		nginx \
+		sh -c " \
+			echo \"# Generate the eliptic curve (EC) private key '/ssl/ca.key' with parameters 'secp521r1', that is, a NIST/SECG curve over a 521 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
+			openssl ecparam \
+				-genkey \
+				-name secp521r1 \
+				-param_enc explicit \
+				-out /ssl/ca.key && \
+			echo \"# Generate the certificate request '/ssl/ca.req' with common name 'ca.org' from the private key\" && \
+			openssl req \
+				-new \
+				-subj \"/CN=ca.org\" \
+				-key /ssl/ca.key \
+				-out /ssl/ca.req && \
+			echo \"# Verify the request\" && \
+			openssl req \
+				-verify \
+				-noout \
+				-in /ssl/ca.req && \
+			echo \"# Convert the request into the self-signed certificate '/ssl/ca.crt'\" && \
+			openssl x509 \
+				-req \
+				-trustout \
+				-days 365 \
+				-in /ssl/ca.req \
+				-signkey /ssl/ca.key \
+				-out /ssl/ca.crt && \
+			echo \"# Verify the self-signed certificate\" && \
+			openssl verify \
+				-CAfile /ssl/ca.crt \
+				/ssl/ca.crt \
+			"
+	mkdir --parents ./backend/ssl/
+	cp ./ssl/ca.* ./backend/ssl/
+
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # and https://superuser.com/questions/226192/avoid-password-prompt-for-keys-and-prompts-for-dn-information/226229#226229
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
 # For an explanation of the distinction between `cert` and `pfx` files, see
 # https://security.stackexchange.com/questions/29425/difference-between-pfx-and-cert-certificates/29428#29428
+# `-param_enc explicit` tells openssl to embed the full parameters of the curve in the key, as opposed to just its name
 generate-ssl-certificate : ## Generate SSL certificate
 	DOCKER_IP=${docker_ip} \
 		docker run \
 		--user $(shell id --user):$(shell id --group) \
-		--tty \
-		--interactive \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
 		nginx \
-		sh -c "\
+		sh -cx " \
+			echo \"# Generate the eliptic curve (EC) private key '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key' with parameters 'secp521r1', that is, a NIST/SECG curve over a 521 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
+			openssl ecparam \
+				-genkey \
+				-name secp521r1 \
+				-param_enc explicit \
+				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key && \
+			echo \"# Generate the PKCS#10 certificate request '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.req' with common name '${HOST}' from the private key\" && \
 			openssl req \
-				-x509 \
-				-nodes \
+				-new \
+				-subj \"/CN=${HOST}\" \
+				-key /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key \
+				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.req && \
+			echo \"# Sign the request with certificate authority '/ssl/ca.crt' and key '/ssl/ca.key' resulting in the signed certificate '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt'\" && \
+			openssl x509 \
+				-req \
 				-days 365 \
-				-newkey rsa:2048 \
-				-subj "/CN=${SSL_CERTIFICATE_BASE_FILE_NAME}" \
-				-keyout /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key \
-				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
-				-config /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.conf && \
+				-CA /ssl/ca.crt \
+				-CAkey /ssl/ca.key \
+				-CAcreateserial \
+				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.req \
+				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt && \
+			echo \"# Verify the signed certificate\" && \
+			openssl verify \
+				-CAfile /ssl/ca.crt \
+				/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt && \
+			echo \"# Create the PKCS#12 file '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx' from the signed certificate\" && \
 			openssl pkcs12 \
 				-export \
 				-passout pass:${SSL_CERTIFICATE_PASSWORD} \
-				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx \
+				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
 				-inkey /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key \
-				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt && \
-			openssl verify \
-				-CAfile /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
-				/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
+				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx \
 			"
 	mkdir --parents ./backend/ssl/
-	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt ./backend/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
-	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx ./backend/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
+	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.* ./backend/ssl/
+.PHONY : generate-ssl-certificate
+
+generate-ssl-certificate-ise : HOST = ${ISE_HOST}
+generate-ssl-certificate-ise : SSL_CERTIFICATE_BASE_FILE_NAME = ${ISE_SSL_CERTIFICATE_BASE_FILE_NAME}
+generate-ssl-certificate-ise : SSL_CERTIFICATE_PASSWORD = ${ISE_SSL_CERTIFICATE_PASSWORD}
+generate-ssl-certificate-ise : generate-ssl-certificate ## Generate ISE SSL certificate
+.PHONY : generate-ssl-certificate-ise
+
+generate-ssl-certificate-lbnl : HOST = ${LBNL_HOST}
+generate-ssl-certificate-lbnl : SSL_CERTIFICATE_BASE_FILE_NAME = ${LBNL_SSL_CERTIFICATE_BASE_FILE_NAME}
+generate-ssl-certificate-lbnl : SSL_CERTIFICATE_PASSWORD = ${LBNL_SSL_CERTIFICATE_PASSWORD}
+generate-ssl-certificate-lbnl : generate-ssl-certificate ## Generate LBNL SSL certificate
+.PHONY : generate-ssl-certificate-lbnl
 
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
@@ -225,6 +293,7 @@ trust-ssl-certificate : ## Trust the generated SSL certificate
 	cat ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
 	sudo cat /etc/ssl/certs/${SSL_CERTIFICATE_BASE_FILE_NAME}.pem
 	openssl verify ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
+.PHONY : trust-ssl-certificate
 
 # ------------------------------------------------ #
 # Tasks to run, for example, in a Docker container #

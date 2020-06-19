@@ -4,7 +4,6 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1.201-alpine3.11
 
 ARG GROUP_ID
 ARG USER_ID
-ARG SSL_CERTIFICATE_BASE_FILE_NAME
 
 # Create non-root user to run commands in (see https://medium.com/@mccode/processes-in-containers-should-not-run-as-root-2feae3f0df3b)
 RUN \
@@ -34,7 +33,7 @@ RUN \
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
 COPY \
-  ./ssl/localhost.crt \
+  ./ssl/ca.crt \
   /usr/local/share/ca-certificates
 RUN \
   update-ca-certificates

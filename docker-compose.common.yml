@@ -18,8 +18,6 @@ services:
     build:
       context: ./backend
       dockerfile: ./Dockerfile-development
-      args:
-        - SSL_CERTIFICATE_BASE_FILE_NAME=${SSL_CERTIFICATE_BASE_FILE_NAME}
     # user: 1000:1000
     command: [
       "dotnet", "run",
@@ -45,9 +43,6 @@ services:
       # - ICON_DATABASE__CONNECTION_STRING="Host=database;Port=5432;Database=icon_development;User Id=postgres;Password=postgres;"
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
-      # https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_CERTIFICATE_PASSWORD}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
     extra_hosts:
       - ${HOST}:${DOCKER_IP}
       - ${ISE_HOST}:${DOCKER_IP}
@@ -65,8 +60,6 @@ services:
       # - /etc/nginx/conf.d # run in read-only mode ...
       # - /var/cache/nginx # ...
       # - /var/run # ...
-    environment:
-      - SSL_CERTIFICATE_BASE_FILE_NAME=${SSL_CERTIFICATE_BASE_FILE_NAME}
     depends_on:
       - backend
 

@@ -5,9 +5,11 @@
 begin_chapter "Add databases ISE and LBNL"
 
 query \
-  http://ikdb.org:5000/graphql/ \
+  $ikdb_graphql_url \
   addDatabasesIseAndLbnl.graphql \
   "{ \
+    \"iseDatabaseLocator\": \"$ise_graphql_url\", \
+    \"lbnlDatabaseLocator\": \"$lbnl_graphql_url\", \
     \"iseInstitutionId\": \"$ISE_INSTITUTION_ID\", \
     \"lbnlInstitutionId\": \"$LBNL_INSTITUTION_ID\" \
   }" \

@@ -5,7 +5,7 @@
 begin_chapter "Verify existence of institutions, databases, and components"
 
 query \
-  http://ikdb.org:5000/graphql/ \
+  $ikdb_graphql_url \
   verifyExistenceOfInstitutionsDatabasesAndComponents.graphql \
   "{}" \
   > /dev/null

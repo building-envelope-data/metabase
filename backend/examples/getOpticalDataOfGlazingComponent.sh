@@ -5,7 +5,7 @@
 begin_chapter "Get optical data of glazing component"
 
 query \
-  http://ikdb.org:5000/graphql/ \
+  $ikdb_graphql_url \
   getOpticalDataOfGlazingComponent.graphql \
   "{ \
     \"glazingComponentId\": \"$GLAZING_COMPONENT_ID\" \
