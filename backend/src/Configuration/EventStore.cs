@@ -62,7 +62,7 @@ namespace Icon.Configuration
                     /* _.UseNodaTime(); */
                     // For a full list auf auto-create options, see
                     // https://jasperfx.github.io/marten/documentation/schema/
-                    if (environment.IsDevelopment() || environment.IsEnvironment("Test"))
+                    if (environment.IsDevelopment() || environment.IsEnvironment("test"))
                     {
                         _.AutoCreateSchemaObjects = Marten.AutoCreate.All;
                     }

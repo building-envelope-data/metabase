@@ -134,7 +134,7 @@ namespace Icon.Configuration
               .AddAspNetIdentity<Models.UserX>()
               .AddProfileService<ProfileService<Models.UserX>>();
             /* builder.AddApiAuthorization<UserX, ApplicationDbContext>(); */
-            if (environment.IsDevelopment() || environment.IsEnvironment("Test"))
+            if (environment.IsDevelopment() || environment.IsEnvironment("test"))
             {
                 builder.AddDeveloperSigningCredential();
             }
@@ -150,7 +150,7 @@ namespace Icon.Configuration
                   {
                       // base-address of your identityserver
                       _.Authority = appSettings.Host;
-                      _.RequireHttpsMetadata = !(environment.IsDevelopment() || environment.IsEnvironment("Test"));
+                      _.RequireHttpsMetadata = !(environment.IsDevelopment() || environment.IsEnvironment("test"));
 
                       // name of the API resource
                       _.ApiName = ApiName;
