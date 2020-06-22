@@ -273,7 +273,16 @@ generate-ssl-certificate : ## Generate SSL certificate
 				-passout pass:${SSL_CERTIFICATE_PASSWORD} \
 				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
 				-inkey /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key \
-				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx \
+				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx && \
+			echo \"# Verify the PKCS#12 file\" && \
+			( \
+				openssl pkcs12 \
+					-passin pass:${SSL_CERTIFICATE_PASSWORD} \
+					-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx \
+					-noout && \
+				echo \"PKCS#12 file is valid\" && \
+				exit 0 \
+			) || echo \"PFX file is invalid\" \
 			"
 	mkdir --parents ./backend/ssl/
 	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.* ./backend/ssl/
