@@ -179,7 +179,6 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 .PHONY : psql
 
 # Creating Self-Signed ECDSA SSL Certificate using OpenSSL: http://www.guyrutenberg.com/2013/12/28/creating-self-signed-ecdsa-ssl-certificate-using-openssl/
-# `-param_enc explicit` tells openssl to embed the full parameters of the curve in the key, as opposed to just its name
 generate-certificate-authority : ## Generate certificate authority ECDSA private key and self-signed certificate
 	DOCKER_IP=${docker_ip} \
 		docker run \
@@ -191,7 +190,6 @@ generate-certificate-authority : ## Generate certificate authority ECDSA private
 			openssl ecparam \
 				-genkey \
 				-name secp384r1 \
-				-param_enc explicit \
 				-out /ssl/ca.key && \
 			echo \"# Generate the certificate request '/ssl/ca.req' with common name 'ca.org' from the private key\" && \
 			openssl req \
@@ -238,7 +236,6 @@ trust-certificate-authority : ## Trust the generated SSL certificate
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
 # For an explanation of the distinction between `cert` and `pfx` files, see
 # https://security.stackexchange.com/questions/29425/difference-between-pfx-and-cert-certificates/29428#29428
-# `-param_enc explicit` tells openssl to embed the full parameters of the curve in the key, as opposed to just its name
 generate-ssl-certificate : ## Generate SSL certificate
 	DOCKER_IP=${docker_ip} \
 		docker run \
@@ -250,7 +247,6 @@ generate-ssl-certificate : ## Generate SSL certificate
 			openssl ecparam \
 				-genkey \
 				-name secp384r1 \
-				-param_enc explicit \
 				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key && \
 			echo \"# Generate the PKCS#10 certificate request '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.req' with common name '${HOST}' from the private key\" && \
 			openssl req \
