@@ -187,10 +187,10 @@ generate-certificate-authority : ## Generate certificate authority ECDSA private
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
 		nginx \
 		sh -c " \
-			echo \"# Generate the eliptic curve (EC) private key '/ssl/ca.key' with parameters 'secp521r1', that is, a NIST/SECG curve over a 521 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
+			echo \"# Generate the eliptic curve (EC) private key '/ssl/ca.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 521 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
 				-genkey \
-				-name secp521r1 \
+				-name secp384r1 \
 				-param_enc explicit \
 				-out /ssl/ca.key && \
 			echo \"# Generate the certificate request '/ssl/ca.req' with common name 'ca.org' from the private key\" && \
@@ -246,10 +246,10 @@ generate-ssl-certificate : ## Generate SSL certificate
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
 		nginx \
 		sh -cx " \
-			echo \"# Generate the eliptic curve (EC) private key '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key' with parameters 'secp521r1', that is, a NIST/SECG curve over a 521 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
+			echo \"# Generate the eliptic curve (EC) private key '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
 				-genkey \
-				-name secp521r1 \
+				-name secp384r1 \
 				-param_enc explicit \
 				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key && \
 			echo \"# Generate the PKCS#10 certificate request '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.req' with common name '${HOST}' from the private key\" && \
