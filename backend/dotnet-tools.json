@@ -49,6 +49,18 @@
       "commands": [
         "dotnet-graphql"
       ]
+    },
+    "dotnet-gcdump": {
+      "version": "3.1.120604",
+      "commands": [
+        "dotnet-gcdump"
+      ]
+    },
+    "dotnet-sos": {
+      "version": "3.1.122203",
+      "commands": [
+        "dotnet-sos"
+      ]
     }
   }
 }

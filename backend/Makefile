@@ -53,10 +53,20 @@ updatepackages : ## Update packages
 
 updatetools : ## Update tools
 	dotnet tool list | tail -n +3 | awk '{print $$1}' | xargs -n 1 dotnet tool update
+	dotnet tool run dotnet-sos install
 .PHONY : updatetools
 
 update : updatepackages updatetools ## Update packages and tools
 .PHONY : update
+
+# https://github.com/dotnet/diagnostics/blob/master/documentation/dotnet-trace-instructions.md#using-dotnet-trace
+trace : ## Trace the dotnet process `Icon`
+	dotnet tool run \
+		dotnet-trace collect \
+			--process-id $$(dotnet tool run dotnet-trace ps | grep Icon | awk '{print $$1}') \
+			--format speedscope \
+			--providers Microsoft-Windows-DotNETRuntime
+.PHONY : trace
 
 play : ## Run facts in `Test.Play` (semi-alternative to the buggy `dotnet script` REPL)
 	dotnet test --filter "FullyQualifiedName~Test.Play"

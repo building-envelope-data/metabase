@@ -1,6 +1,6 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 # See https://hub.docker.com/_/microsoft-dotnet-core-sdk
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1.201-alpine3.11
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1.301-alpine3.12
 
 ARG GROUP_ID
 ARG USER_ID
@@ -14,15 +14,30 @@ RUN \
 # As `root` #
 #############
 
+# `lldb` is needed by dotnet tool `dotnet-sos`, see
+# https://github.com/dotnet/diagnostics#net-core-diagnostics-repo
+# `openssl` is needed to debug SSL certificates
+#
+# Tracing cannot only be done with `dotnet-trace`, which is connected to
+# `dotnet-sos`, but also with LTTng, see
+# https://docs.microsoft.com/en-us/dotnet/core/diagnostics/logging-tracing#logging-events
+# and
+# https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#collecting-a-trace
+# and
+# https://stackoverflow.com/questions/55477684/how-to-configure-network-tracing-dotnet-core-for-httpclient-calls/58700657#58700657
+# and
+# https://lttng.org/docs/#doc-tracing-your-own-user-application
 RUN \
   apk add --no-cache \
     curl \
     dumb-init \
+    lldb \
     make \
     npm \
     openssl
 
 # Add dependencies for interactive examples in ./examples
+# `jq` can be used to format and filter JSON data
 RUN \
   apk add --no-cache \
     bash \
@@ -98,7 +113,8 @@ COPY \
   ./app.sln ./
 RUN \
   dotnet clean && \
-  dotnet restore --runtime linux-musl-x64
+  dotnet restore --runtime linux-musl-x64 && \
+  dotnet tool run dotnet-sos install # https://github.com/dotnet/diagnostics/blob/master/documentation/installing-sos-instructions.md
 
 COPY \
   --chown=me:us \
