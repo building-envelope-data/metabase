@@ -41,7 +41,7 @@ server {
 server {
   listen                    *:443 ssl;
   server_name               ${SERVER_NAME};
-  ssl_certificate           /etc/nginx/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt;
+  ssl_certificate           /etc/nginx/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.chained.crt;
   ssl_certificate_key       /etc/nginx/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key;
   ssl_protocols             TLSv1.1 TLSv1.2;
   ssl_prefer_server_ciphers on;
