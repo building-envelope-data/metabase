@@ -169,6 +169,17 @@ shellb-examples : COMMAND = bash -c "cd ./examples && bash"
 shellb-examples : runb ## Enter Bourne-again shell, aka, bash, in a fresh `backend` container
 .PHONY : shellb-examples
 
+# Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
+traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for example, `make CONTAINER_ID=c1b82eb6e03c trace-backend`
+	DOCKER_IP=${docker_ip} \
+		${docker_compose} exec \
+			--privileged \
+			backend \
+			ash -c " \
+				make trace \
+				"
+.PHONY : traceb
+
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
@@ -179,38 +190,59 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 .PHONY : psql
 
 # Creating Self-Signed ECDSA SSL Certificate using OpenSSL: http://www.guyrutenberg.com/2013/12/28/creating-self-signed-ecdsa-ssl-certificate-using-openssl/
+# OpenSSL Quick Reference: https://www.digicert.com/kb/ssl-support/openssl-quick-reference-guide.htm
+# X509v3 Extensions: See `man x509v3_config` and https://superuser.com/questions/738612/openssl-ca-keyusage-extension/1248085#1248085 and https://access.redhat.com/solutions/28965
 generate-certificate-authority : ## Generate certificate authority ECDSA private key and self-signed certificate
 	DOCKER_IP=${docker_ip} \
 		docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
-		nginx \
-		sh -c " \
-			echo \"# Generate the eliptic curve (EC) private key '/ssl/ca.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 521 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
+		nginx:1.19.0-alpine \
+		bash -cx " \
+			echo \"# Generate the elliptic curve (EC) private key '/ssl/ca.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
 				-genkey \
 				-name secp384r1 \
 				-out /ssl/ca.key && \
-			echo \"# Generate the certificate request '/ssl/ca.req' with common name 'ca.org' from the private key\" && \
+			echo \"# Check and print the private key's elliptic curve parameters\" && \
+			openssl ecparam \
+				-check \
+				-text \
+				-in /ssl/ca.key \
+				-noout && \
+			echo \"# Generate the PKCS#10 certificate request '/ssl/ca.req' with common name 'ca.org' from the private key\" && \
 			openssl req \
 				-new \
-				-subj \"/CN=ca.org\" \
+				-subj \"/C=DE/ST=BW/L=Freiburg/O=Fraunhofer Institute for Solar Energy/CN=ca.org\" \
 				-key /ssl/ca.key \
 				-out /ssl/ca.req && \
-			echo \"# Verify the request\" && \
+			echo \"# Verify and print the request\" && \
 			openssl req \
 				-verify \
-				-noout \
-				-in /ssl/ca.req && \
+				-text \
+				-in /ssl/ca.req \
+				-noout && \
 			echo \"# Convert the request into the self-signed certificate '/ssl/ca.crt'\" && \
 			openssl x509 \
 				-req \
 				-trustout \
 				-days 365 \
+				-extfile <(printf ' \
+					basicConstraints = critical, CA:TRUE, pathlen:0\n \
+					subjectKeyIdentifier = hash\n \
+					authorityKeyIdentifier = keyid:always, issuer:always\n \
+					subjectAltName = DNS:ca.org\n \
+					keyUsage = critical, cRLSign, digitalSignature, keyCertSign\n \
+				') \
 				-in /ssl/ca.req \
 				-signkey /ssl/ca.key \
 				-out /ssl/ca.crt && \
-			echo \"# Verify the self-signed certificate\" && \
+			echo \"# Print and Verify the self-signed certificate\" && \
+			openssl x509 \
+				-text \
+				-purpose \
+				-in /ssl/ca.crt \
+				-noout && \
 			openssl verify \
 				-CAfile /ssl/ca.crt \
 				/ssl/ca.crt \
@@ -221,12 +253,17 @@ generate-certificate-authority : ## Generate certificate authority ECDSA private
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
-trust-certificate-authority : ## Trust the generated SSL certificate
+# and https://superuser.com/questions/437330/how-do-you-add-a-certificate-authority-ca-to-ubuntu/719047#719047
+# For debugging purposes, the following commands can be helpful
+# cat /etc/ssl/certs/ca-certificates.crt
+# cat ./ssl/ca.crt
+# sudo cat /etc/ssl/certs/ca.pem
+# Note that Firefox and Google Chrome use their own certificate stores:
+# * Firefox: https://www.cyberciti.biz/faq/firefox-adding-trusted-ca/
+# * Google Chrome: https://rshankar.com/blog/2010/07/08/how-to-import-a-certificate-in-google-chrome/
+trust-certificate-authority : ## Trust the authority's SSL certificate
 	sudo cp ./ssl/ca.crt /usr/local/share/ca-certificates
 	sudo update-ca-certificates
-	cat /etc/ssl/certs/ca-certificates.crt
-	cat ./ssl/ca.crt
-	sudo cat /etc/ssl/certs/ca.pem
 	openssl verify ./ssl/ca.crt
 .PHONY : trust-certificate-authority
 
@@ -236,24 +273,41 @@ trust-certificate-authority : ## Trust the generated SSL certificate
 # and https://github.com/dotnet/runtime/issues/31237#issuecomment-544929504
 # For an explanation of the distinction between `cert` and `pfx` files, see
 # https://security.stackexchange.com/questions/29425/difference-between-pfx-and-cert-certificates/29428#29428
-generate-ssl-certificate : ## Generate SSL certificate
+# OpenSSL Quick Reference: https://www.digicert.com/kb/ssl-support/openssl-quick-reference-guide.htm
+# X509v3 Extensions: See `man x509v3_config` and https://superuser.com/questions/738612/openssl-ca-keyusage-extension/1248085#1248085 and https://access.redhat.com/solutions/28965
+# What are PKCS#12 files? https://security.stackexchange.com/questions/29425/difference-between-pfx-and-cert-certificates/29428#29428
+# Process substitution `<( ... )`: https://www.gnu.org/software/bash/manual/html_node/Process-Substitution.html
+# Note that extensions are not transferred to certificate requests and vice versa as said on https://www.openssl.org/docs/man1.1.0/man1/x509.html#BUGS
+generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate signed by our certificate authority
 	DOCKER_IP=${docker_ip} \
 		docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
-		nginx \
-		sh -cx " \
-			echo \"# Generate the eliptic curve (EC) private key '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
+		nginx:1.19.0-alpine \
+		bash -cx " \
+			echo \"# Generate the elliptic curve (EC) private key '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
 				-genkey \
 				-name secp384r1 \
 				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key && \
+			echo \"# Check and print the private key's elliptic curve parameters\" && \
+			openssl ecparam \
+				-check \
+				-text \
+				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key \
+				-noout && \
 			echo \"# Generate the PKCS#10 certificate request '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.req' with common name '${HOST}' from the private key\" && \
 			openssl req \
 				-new \
-				-subj \"/CN=${HOST}\" \
+				-subj \"${SSL_CERTIFICATE_SUBJECT}/CN=${HOST}\" \
 				-key /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key \
 				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.req && \
+			echo \"# Verify and print the request\" && \
+			openssl req \
+				-verify \
+				-text \
+				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.req \
+				-noout && \
 			echo \"# Sign the request with certificate authority '/ssl/ca.crt' and key '/ssl/ca.key' resulting in the signed certificate '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt'\" && \
 			openssl x509 \
 				-req \
@@ -261,15 +315,39 @@ generate-ssl-certificate : ## Generate SSL certificate
 				-CA /ssl/ca.crt \
 				-CAkey /ssl/ca.key \
 				-CAcreateserial \
+				-extfile <(printf ' \
+					basicConstraints = critical, CA:FALSE\n \
+					subjectKeyIdentifier = hash\n \
+					authorityKeyIdentifier = keyid:always, issuer:always\n \
+					subjectAltName = DNS:${HOST}\n \
+					keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment, keyAgreement\n \
+					extendedKeyUsage = critical, clientAuth, serverAuth\n \
+				') \
 				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.req \
 				-out /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt && \
-			echo \"# Verify the signed certificate\" && \
+			echo \"# Print and Verify the signed certificate\" && \
+			openssl x509 \
+				-text \
+				-purpose \
+				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
+				-noout && \
 			openssl verify \
 				-CAfile /ssl/ca.crt \
 				/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt && \
-			echo \"# Create the PKCS#12 file '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx' from the signed certificate\" && \
+			echo \"# Chain the certificate and the certificate authority's certificate in that order, see http://nginx.org/en/docs/http/configuring_https_servers.html#chains\" && \
+			cat \
+				/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
+				/ssl/ca.crt \
+				> /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.chained.crt && \
+			echo \"# Verify the chained certificate\" && \
+			openssl verify \
+				-CAfile /ssl/ca.crt \
+				/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.chained.crt && \
+			echo \"# Create the PKCS#12 file chain '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx' from the un-chained signed certificate\" && \
 			openssl pkcs12 \
 				-export \
+				-chain \
+				-CAfile /ssl/ca.crt \
 				-passout pass:${SSL_CERTIFICATE_PASSWORD} \
 				-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt \
 				-inkey /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key \
@@ -277,6 +355,7 @@ generate-ssl-certificate : ## Generate SSL certificate
 			echo \"# Verify the PKCS#12 file\" && \
 			( \
 				openssl pkcs12 \
+					-info \
 					-passin pass:${SSL_CERTIFICATE_PASSWORD} \
 					-in /ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx \
 					-noout && \
@@ -291,12 +370,14 @@ generate-ssl-certificate : ## Generate SSL certificate
 generate-ssl-certificate-ise : HOST = ${ISE_HOST}
 generate-ssl-certificate-ise : SSL_CERTIFICATE_BASE_FILE_NAME = ${ISE_SSL_CERTIFICATE_BASE_FILE_NAME}
 generate-ssl-certificate-ise : SSL_CERTIFICATE_PASSWORD = ${ISE_SSL_CERTIFICATE_PASSWORD}
+generate-ssl-certificate-ise : SSL_CERTIFICATE_SUBJECT = ${ISE_SSL_CERTIFICATE_SUBJECT}
 generate-ssl-certificate-ise : generate-ssl-certificate ## Generate ISE SSL certificate
 .PHONY : generate-ssl-certificate-ise
 
 generate-ssl-certificate-lbnl : HOST = ${LBNL_HOST}
 generate-ssl-certificate-lbnl : SSL_CERTIFICATE_BASE_FILE_NAME = ${LBNL_SSL_CERTIFICATE_BASE_FILE_NAME}
 generate-ssl-certificate-lbnl : SSL_CERTIFICATE_PASSWORD = ${LBNL_SSL_CERTIFICATE_PASSWORD}
+generate-ssl-certificate-lbnl : SSL_CERTIFICATE_SUBJECT = ${LBNL_SSL_CERTIFICATE_SUBJECT}
 generate-ssl-certificate-lbnl : generate-ssl-certificate ## Generate LBNL SSL certificate
 .PHONY : generate-ssl-certificate-lbnl
 
