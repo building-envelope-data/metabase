@@ -18,6 +18,8 @@ services:
     build:
       context: ./backend
       dockerfile: ./Dockerfile-development
+      args:
+        - CERTIFICATE_AUTHORITY_BASE_FILE_NAME=${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}
     # user: 1000:1000
     command: [
       "dotnet", "run",
