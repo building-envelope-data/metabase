@@ -190,6 +190,7 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 .PHONY : psql
 
 # Creating Self-Signed ECDSA SSL Certificate using OpenSSL: http://www.guyrutenberg.com/2013/12/28/creating-self-signed-ecdsa-ssl-certificate-using-openssl/
+# See also https://gist.github.com/Soarez/9688998
 # OpenSSL Quick Reference: https://www.digicert.com/kb/ssl-support/openssl-quick-reference-guide.htm
 # X509v3 Extensions: See `man x509v3_config` and https://superuser.com/questions/738612/openssl-ca-keyusage-extension/1248085#1248085 and https://access.redhat.com/solutions/28965
 generate-certificate-authority : ## Generate certificate authority ECDSA private key and self-signed certificate
