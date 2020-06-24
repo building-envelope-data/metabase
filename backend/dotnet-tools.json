@@ -61,6 +61,12 @@
       "commands": [
         "dotnet-sos"
       ]
+    },
+    "dotnet-certificate-tool": {
+      "version": "1.3.0",
+      "commands": [
+        "certificate-tool"
+      ]
     }
   }
 }
