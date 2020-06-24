@@ -69,7 +69,7 @@ namespace Icon
                 .SetBasePath(environment.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
+                .AddEnvironmentVariables(prefix: "ICON_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
               .Build();
             _appSettings = _configuration.Get<AppSettings>();
             RegisterJsonSchemaFiles();

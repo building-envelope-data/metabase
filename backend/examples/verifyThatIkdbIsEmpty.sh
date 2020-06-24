@@ -5,7 +5,7 @@
 begin_chapter "Verify that IKDB is empty"
 
 query \
-  http://ikdb.org:5000/graphql/ \
+  $ikdb_graphql_url \
   verifyThatIkdbIsEmpty.graphql \
   "{}" \
   > /dev/null

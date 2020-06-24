@@ -1,0 +1,106 @@
+# Inspired by https://mherman.org/blog/dockerizing-a-react-app/
+# TODO Have a separate `docker-compose`-file for production (see also https://docs.docker.com/compose/production/)
+
+version: '3.7'
+
+services:
+  database:
+    restart: always
+    image: postgres:11.5-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres # We can use docker-compose `secrets` for that
+      - POSTGRES_DB=postgres
+    volumes:
+      - data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile-development
+      args:
+        - CERTIFICATE_AUTHORITY_BASE_FILE_NAME=${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}
+        - CERTIFICATE_AUTHORITY_PASSWORD=${CERTIFICATE_AUTHORITY_PASSWORD}
+    # user: 1000:1000
+    command: [
+      "dotnet", "run",
+      "--no-launch-profile",
+      "--runtime", "linux-musl-x64",
+      "--project", "./src/Icon.csproj"
+      ]
+      # ["dotnet", "watch", "run", "--no-restore"]
+    volumes:
+      - ./backend:/app
+      - ./ssl:/app/ssl
+      - node_modules:/app/node_modules
+      # The following items make the engine create a volume for the specified
+      # path with the effect that the service does not write temporary files
+      # into the corresponding directory on the file system that was bound by
+      # the preceding binding
+      - /app/src/bin
+      - /app/src/obj
+      - /app/test/bin
+      - /app/test/obj
+    environment:
+      # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
+      # - ICON_DATABASE__CONNECTION_STRING="Host=database;Port=5432;Database=icon_development;User Id=postgres;Password=postgres;"
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
+    extra_hosts:
+      - ${HOST}:${DOCKER_IP}
+      - ${ISE_HOST}:${DOCKER_IP}
+      - ${LBNL_HOST}:${DOCKER_IP}
+    depends_on:
+      - database
+
+  nginx: # https://hub.docker.com/_/nginx
+    image: nginx:1.19.0-alpine
+    command: [nginx-debug, '-g', 'daemon off;'] # run in debug mode
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # - /etc/nginx/conf.d # run in read-only mode ...
+      # - /var/cache/nginx # ...
+      # - /var/run # ...
+    depends_on:
+      - backend
+
+  # openid-swagger-frontend:
+  #   image: swaggerapi/swagger-ui
+  #   ports:
+  #     - 5002:80
+  #   environment:
+  #     # https://github.com/schickling/dockerfiles/tree/master/swagger-ui
+  #     - API_URL=https://localhost:5001/.well-known/openid-configuration
+  #   depends_on:
+  #     - backend
+
+  # openid-redoc-frontend:
+  #   image: redocly/redoc
+  #   ports:
+  #     - 5003:80
+  #   environment:
+  #     - SPEC_URL=https://localhost:5001/swagger/OpenAPI%203/swagger.json
+  #   depends_on:
+  #     - backend
+
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: ./Dockerfile-development
+  #   volumes:
+  #     - ./frontend:/app
+  #     # - /app/node_modules # Keep the `node_modules` of the image
+  #     - frontend_node_modules:/app/node_modules
+  #   ports:
+  #     - 3000:3000
+  #   environment:
+  #     NODE_ENV: development
+  #   depends_on:
+  #     - backend
+
+volumes:
+  data:
+  node_modules:
+  frontend_node_modules:

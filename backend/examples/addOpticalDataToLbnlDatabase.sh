@@ -1,10 +1,12 @@
 #!/bin/bash
 
+. ./functions.sh
+
 begin_chapter "Add optical data to LBNL database"
 
 json_file_path=$(
   query \
-    http://lbnl.gov:5020/graphql/ \
+    $lbnl_graphql_url \
     addOpticalDataToLbnlDatabase.graphql \
     "{ \
       \"glazingComponentId\": \"$GLAZING_COMPONENT_ID\" \
@@ -19,7 +21,7 @@ read \
   < <(echo $(
       cat $json_file_path \
       | jq .data[].opticalData.timestamp \
-      | tr --delete '"'
+      | tr -d '"'
     )
   )
 echo_error "LBNL glazing optical data timestamp: \e[32m$LBNL_GLAZING_OPTICAL_DATA_TIMESTAMP\e[0m"

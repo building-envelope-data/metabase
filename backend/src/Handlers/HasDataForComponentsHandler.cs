@@ -34,47 +34,47 @@ namespace Icon.Handlers
             CancellationToken cancellationToken
             )
         {
-          using (var session = _repository.OpenReadOnlySession())
-          {
-            var componentIds =
-              query.TimestampedIds
-              .Select(timestampedId =>
-                  (Guid)timestampedId.Id
+            using (var session = _repository.OpenReadOnlySession())
+            {
+                var componentIds =
+                  query.TimestampedIds
+                  .Select(timestampedId =>
+                      (Guid)timestampedId.Id
+                      )
+                  .ToArray();
+                // TODO This is only correct when data aggregates are immutable!
+                var componentIdToDataModelIds =
+                  (await session.QueryEvents<TDataCreatedEvent>()
+                   .Where(e => e.ComponentId.IsOneOf(componentIds))
+                   .Select(e => new { ComponentId = e.ComponentId, DataModelId = e.AggregateId })
+                   .ToListAsync(cancellationToken)
+                   .ConfigureAwait(false)
                   )
-              .ToArray();
-            // TODO This is only correct when data aggregates are immutable!
-            var componentIdToDataModelIds =
-              (await session.QueryEvents<TDataCreatedEvent>()
-               .Where(e => e.ComponentId.IsOneOf(componentIds))
-               .Select(e => new { ComponentId = e.ComponentId, DataModelId = e.AggregateId })
-               .ToListAsync(cancellationToken)
-               .ConfigureAwait(false)
-              )
-              .ToLookup(
-                  x => (ValueObjects.Id)x.ComponentId,
-                  x => (ValueObjects.Id)x.DataModelId
-                  );
-            return
-              (
-               // TODO Avoid loading and discarding deleted data aggregates.
-               await session.LoadAllThatExistedBatched<TDataAggregate>(
-                 query.TimestampedIds.Select(timestampedId =>
-                   (
-                    timestampedId.Timestamp,
-                    componentIdToDataModelIds[timestampedId.Id]
-                   )
-                   ),
-                 cancellationToken
-                 )
-               .ConfigureAwait(false)
-              )
-              .Select(aggregateResults =>
-                  // TODO Determine the number of existing data aggregates without loading them!
-                  Result.Ok<bool, Errors>(
-                    aggregateResults.Count() >= 1
-                    )
-                  );
-          }
+                  .ToLookup(
+                      x => (ValueObjects.Id)x.ComponentId,
+                      x => (ValueObjects.Id)x.DataModelId
+                      );
+                return
+                  (
+                   // TODO Avoid loading and discarding deleted data aggregates.
+                   await session.LoadAllThatExistedBatched<TDataAggregate>(
+                     query.TimestampedIds.Select(timestampedId =>
+                       (
+                        timestampedId.Timestamp,
+                        componentIdToDataModelIds[timestampedId.Id]
+                       )
+                       ),
+                     cancellationToken
+                     )
+                   .ConfigureAwait(false)
+                  )
+                  .Select(aggregateResults =>
+                      // TODO Determine the number of existing data aggregates without loading them!
+                      Result.Ok<bool, Errors>(
+                        aggregateResults.Count() >= 1
+                        )
+                      );
+            }
         }
     }
 }

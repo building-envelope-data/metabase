@@ -4,7 +4,7 @@ begin_chapter "Register institutions ISE and LBNL"
 
 json_file_path=$(
   query \
-    http://ikdb.org:5000/graphql/ \
+    $ikdb_graphql_url \
     registerInstitutionsIseAndLbnl.graphql \
     "{}" \
 )
@@ -18,7 +18,7 @@ read \
   < <(echo $(
       cat $json_file_path \
       | jq .data[].institution.id \
-      | tr --delete '"'
+      | tr -d '"'
     )
   )
 echo_error "ISE identifier: \e[32m$ISE_INSTITUTION_ID\e[0m"

@@ -86,8 +86,8 @@ namespace Test.Integration.Web.Api
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            /* builder.UseStartup<Startup>().UseEnvironment("Test"); */
-            builder.UseEnvironment("Test");
+            /* builder.UseStartup<Startup>().UseEnvironment("test"); */
+            builder.UseEnvironment("test");
             builder.ConfigureServices(services =>
             {
             });
