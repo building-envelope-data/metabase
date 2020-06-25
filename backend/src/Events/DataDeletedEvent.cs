@@ -1,5 +1,3 @@
-using CSharpFunctionalExtensions;
-using Errors = Icon.Errors;
 using Guid = System.Guid;
 
 namespace Icon.Events

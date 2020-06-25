@@ -1,11 +1,3 @@
-using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Array = System.Array;
-using DateTime = System.DateTime;
-using Errors = Icon.Errors;
-using IError = HotChocolate.IError;
-using Validatable = Icon.Validatable;
-
 namespace Icon.GraphQl
 {
     public sealed class ComponentManufacturerMarketingInformation

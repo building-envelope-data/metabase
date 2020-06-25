@@ -1,9 +1,7 @@
 using System.Threading.Tasks;
 using GreenDonut;
 using HotChocolate;
-using DateTime = System.DateTime;
 using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
-using Models = Icon.Models;
 using Uri = System.Uri;
 
 namespace Icon.GraphQl

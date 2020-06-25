@@ -1,6 +1,5 @@
 using Guid = System.Guid;
 using UuidType = HotChocolate.Types.UuidType;
-using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.GraphQl
 {

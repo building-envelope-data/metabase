@@ -1,15 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using HotChocolate.Resolvers;
-using Icon.Infrastructure.Query;
-using Microsoft.AspNetCore.Identity;
-using Errors = Icon.Errors;
-using IError = HotChocolate.IError;
-using Models = Icon.Models;
-using Queries = Icon.Queries;
 using QueryException = HotChocolate.Execution.QueryException;
 
 namespace Icon.GraphQl

@@ -1,9 +1,5 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using DateTime = System.DateTime;
-using Errors = Icon.Errors;
-using Uri = System.Uri;
-using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Models
 {

@@ -1,5 +1,3 @@
-using DateTime = System.DateTime;
-
 namespace Icon.GraphQl
 {
 #pragma warning disable SA1302

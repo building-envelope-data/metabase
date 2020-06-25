@@ -1,9 +1,4 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel; // ReadOnlyDictionary
 using CSharpFunctionalExtensions;
-using DateTime = System.DateTime;
-using Errors = Icon.Errors;
-using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Models
 {

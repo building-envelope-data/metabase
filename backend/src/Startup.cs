@@ -1,35 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Icon.Data;
-using IdentityServer4.AccessTokenValidation;
-using IdentityServer4.AspNetIdentity;
-using IdentityServer4.Validation;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi;
-using NSwag;
-using NSwag.AspNetCore;
-using NSwag.Generation.Processors.Security;
-using WebPWrecover.Services;
-using Command = Icon.Infrastructure.Command;
-using Configuration = Icon.Configuration;
-using Event = Icon.Events;
-using Query = Icon.Infrastructure.Query;
 
 // TODO ? Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth?view=aspnetcore-3.0
 // TODO Use NodaTime (see commented code below; confer https://www.npgsql.org/efcore/mapping/nodatime.html).

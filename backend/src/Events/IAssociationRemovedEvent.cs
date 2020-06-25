@@ -1,5 +1,3 @@
-using Guid = System.Guid;
-
 namespace Icon.Events
 {
     // The difference between the words `remove` and `delete` is explained on

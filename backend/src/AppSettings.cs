@@ -1,7 +1,5 @@
 // Inspired by https://weblog.west-wind.com/posts/2017/dec/12/easy-configuration-binding-in-aspnet-core-revisited
 
-using Microsoft.Extensions.Configuration;
-
 namespace Icon
 {
     public class AppSettings
