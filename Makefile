@@ -189,11 +189,18 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname icon_development
 .PHONY : psql
 
+ssl : generate-certificate-authority trust-certificate-authority ## Generate and trust certificate authority, and generate SSL certificates
+	make generate-ssl-certificate
+	make generate-ssl-certificate-ise
+	make generate-ssl-certificate-lbnl
+.PHONY : ssl
+
 # Creating Self-Signed ECDSA SSL Certificate using OpenSSL: http://www.guyrutenberg.com/2013/12/28/creating-self-signed-ecdsa-ssl-certificate-using-openssl/
 # See also https://gist.github.com/Soarez/9688998
 # OpenSSL Quick Reference: https://www.digicert.com/kb/ssl-support/openssl-quick-reference-guide.htm
 # X509v3 Extensions: See `man x509v3_config` and https://superuser.com/questions/738612/openssl-ca-keyusage-extension/1248085#1248085 and https://access.redhat.com/solutions/28965
 generate-certificate-authority : ## Generate certificate authority ECDSA private key and self-signed certificate
+	mkdir --parents ./ssl/
 	DOCKER_IP=${docker_ip} \
 		docker run \
 		--user $(shell id --user):$(shell id --group) \
@@ -268,6 +275,7 @@ generate-certificate-authority : ## Generate certificate authority ECDSA private
 			"
 	mkdir --parents ./backend/ssl/
 	cp ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.* ./backend/ssl/
+.PHONY : generate-certificate-authority
 
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
@@ -298,6 +306,7 @@ trust-certificate-authority : ## Trust the authority's SSL certificate
 # Process substitution `<( ... )`: https://www.gnu.org/software/bash/manual/html_node/Process-Substitution.html
 # Note that extensions are not transferred to certificate requests and vice versa as said on https://www.openssl.org/docs/man1.1.0/man1/x509.html#BUGS
 generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate signed by our certificate authority
+	mkdir --parents ./ssl/
 	DOCKER_IP=${docker_ip} \
 		docker run \
 		--user $(shell id --user):$(shell id --group) \
