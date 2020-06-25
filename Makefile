@@ -275,6 +275,7 @@ generate-certificate-authority : ## Generate certificate authority ECDSA private
 			"
 	mkdir --parents ./backend/ssl/
 	cp ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.* ./backend/ssl/
+.PHONY : generate-certificate-authority
 
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
