@@ -1,0 +1,47 @@
+@startuml
+
+skinparam componentStyle uml2
+
+actor "User" as User
+
+package "IKDB" as Ikdb {
+  interface "GraphQL Endpoint" as GraphQlEndpoint
+
+  /' package "C#" as CSharp { '/
+    component "GraphQL" as GraphQL
+    component "Command/Query Handlers" as Handlers
+    component "Event Store" as EventStore
+  /' } '/
+
+  database "PostgreSQL" as PostgreSql
+}
+
+package "ISE" as Ise {
+  interface "ISE GraphQL Endpoint" as IseGraphQlEndpoint
+}
+
+package "LBNL" as Lbnl {
+  interface "LBNL GraphQL Endpoint" as LbnlGraphQlEndpoint
+}
+
+User --> GraphQlEndpoint : HTTPS Post Requests with GraphQL Queries/Mutations
+User <-- GraphQlEndpoint : HTTPS Responses with JSON Contents
+
+GraphQlEndpoint - GraphQL
+
+GraphQL -> Handlers : Queries/Commands
+GraphQL <- Handlers : Models
+
+Handlers -> EventStore : Queries/Events
+Handlers <- EventStore : Aggregates
+
+EventStore -> PostgreSql : SQL Queries
+EventStore <- PostgreSql : Rows of Events
+
+Handlers --> IseGraphQlEndpoint : HTTPS Requests
+Handlers <-- IseGraphQlEndpoint : HTTPS Responses
+
+Handlers --> LbnlGraphQlEndpoint : HTTPS Requests
+Handlers <-- LbnlGraphQlEndpoint : HTTPS Responses
+
+@enduml
