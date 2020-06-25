@@ -2,10 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
-using Events = Icon.Events;
-using Guid = System.Guid;
-using Models = Icon.Models;
-using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Aggregates
 {

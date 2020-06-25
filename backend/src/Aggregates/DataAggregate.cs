@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Icon;
 using Icon.Infrastructure.Aggregate;
-using Events = Icon.Events;
-using JToken = Newtonsoft.Json.Linq.JToken;
 
 namespace Icon.Aggregates
 {

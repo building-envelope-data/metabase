@@ -1,8 +1,4 @@
 using CSharpFunctionalExtensions;
-using Icon;
-using DateTime = System.DateTime;
-using Guid = System.Guid;
-using Models = Icon.Models;
 
 namespace Icon.Aggregates
 {

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Icon.Infrastructure.Query;
-using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Queries
 {

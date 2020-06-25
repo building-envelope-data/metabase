@@ -1,6 +1,4 @@
-using Icon;
 using MediatR;
-using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Infrastructure.Command
 {

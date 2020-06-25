@@ -1,6 +1,3 @@
-using Icon;
-using ValueObjects = Icon.ValueObjects;
-
 namespace Icon.Infrastructure.Command
 {
     public abstract class CommandBase<TResponse>

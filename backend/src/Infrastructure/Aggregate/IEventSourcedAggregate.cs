@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Icon.Events;
 
 namespace Icon.Infrastructure.Aggregate
 {
