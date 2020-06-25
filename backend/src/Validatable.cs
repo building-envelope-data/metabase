@@ -1,9 +1,5 @@
 using System;
 using CSharpFunctionalExtensions;
-using Newtonsoft.Json;
-using ErrorCodes = Icon.ErrorCodes;
-using Errors = Icon.Errors;
-using IError = HotChocolate.IError;
 
 namespace Icon
 {

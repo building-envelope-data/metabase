@@ -1,5 +1,4 @@
 using Icon.Infrastructure.Query;
-using DateTime = System.DateTime;
 
 namespace Icon.GraphQl
 {

@@ -1,6 +1,4 @@
 using CSharpFunctionalExtensions;
-using Errors = Icon.Errors;
-using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Models
 {

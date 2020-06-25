@@ -1,7 +1,3 @@
-using CSharpFunctionalExtensions;
-using Newtonsoft.Json;
-using Commands = Icon.Commands;
-using Errors = Icon.Errors;
 using Guid = System.Guid;
 
 namespace Icon.Events

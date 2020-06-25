@@ -2,9 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
-using Errors = Icon.Errors;
-using Guid = System.Guid;
-using Models = Icon.Models;
 
 namespace Icon.Events
 {

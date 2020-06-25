@@ -1,7 +1,4 @@
-using HotChocolate;
-using DateTime = System.DateTime;
 using Exception = System.Exception;
-using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {

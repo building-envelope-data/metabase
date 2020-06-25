@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using HotChocolate.Properties;
 using HotChocolate.Types;
 
 // The class `PreciseDateTimeType` is a literal copy of `DateTimeType`, see

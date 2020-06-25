@@ -1,7 +1,4 @@
 using CSharpFunctionalExtensions;
-using DateTime = System.DateTime;
-using Errors = Icon.Errors;
-using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Models
 {

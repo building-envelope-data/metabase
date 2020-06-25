@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using DateTime = System.DateTime;
-using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {

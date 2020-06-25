@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using DateTime = System.DateTime;
-using Models = Icon.Models;
 using Uri = System.Uri;
 
 namespace Icon.GraphQl

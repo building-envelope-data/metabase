@@ -1,5 +1,3 @@
-using ValueObjects = Icon.ValueObjects;
-
 namespace Icon.GraphQl
 {
     public abstract class DeleteNodeInput

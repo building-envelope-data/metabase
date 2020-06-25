@@ -3,12 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GreenDonut;
 using HotChocolate;
-using CancellationToken = System.Threading.CancellationToken;
-using DateTime = System.DateTime;
-using IPageInfo = HotChocolate.Types.Relay.IPageInfo;
 using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
-using IResolverContext = HotChocolate.Resolvers.IResolverContext;
-using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {

@@ -1,5 +1,3 @@
-using ValueObjects = Icon.ValueObjects;
-
 namespace Icon.Models
 {
     public abstract class Model

@@ -1,5 +1,4 @@
 using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
-using Models = Icon.Models;
 
 namespace Icon.GraphQl
 {

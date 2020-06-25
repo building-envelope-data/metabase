@@ -1,6 +1,3 @@
-using DateTime = System.DateTime;
-using Models = Icon.Models;
-
 namespace Icon.GraphQl
 {
     public sealed class ComponentVariant
