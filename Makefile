@@ -189,6 +189,12 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname icon_development
 .PHONY : psql
 
+ssl : generate-certificate-authority trust-certificate-authority ## Generate and trust certificate authority, and generate SSL certificates
+	make generate-ssl-certificate
+	make generate-ssl-certificate-ise
+	make generate-ssl-certificate-lbnl
+.PHONY : ssl
+
 # Creating Self-Signed ECDSA SSL Certificate using OpenSSL: http://www.guyrutenberg.com/2013/12/28/creating-self-signed-ecdsa-ssl-certificate-using-openssl/
 # See also https://gist.github.com/Soarez/9688998
 # OpenSSL Quick Reference: https://www.digicert.com/kb/ssl-support/openssl-quick-reference-guide.htm
