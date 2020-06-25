@@ -44,7 +44,7 @@ namespace Icon.Configuration
             // https://fullstackmark.com/post/21/user-authentication-and-identity-with-angular-aspnet-core-and-identityserver
             // https://www.scottbrady91.com/Identity-Server/ASPNET-Core-Swagger-UI-Authorization-using-IdentityServer4
             ConfigureIdentityServices(services, configuration);
-            ConfigureIdentityServerServices(services, environment, appSettings, migrationsAssembly);
+            /* ConfigureIdentityServerServices(services, environment, appSettings, migrationsAssembly); */
         }
 
         private static void ConfigureIdentityServices(IServiceCollection services, IConfiguration configuration)
@@ -180,7 +180,7 @@ namespace Icon.Configuration
         public static void Configure(IApplicationBuilder app)
         {
             /* app.UseIdentity(); */
-            app.UseIdentityServer();
+            /* app.UseIdentityServer(); */
             app.UseAuthentication();
             app.UseAuthorization();
         }
