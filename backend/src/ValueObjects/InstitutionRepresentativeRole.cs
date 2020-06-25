@@ -1,6 +1,3 @@
-using DateTime = System.DateTime;
-using ValueObjects = Icon.ValueObjects;
-
 namespace Icon.ValueObjects
 {
     // What enums are is explained in https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/enum

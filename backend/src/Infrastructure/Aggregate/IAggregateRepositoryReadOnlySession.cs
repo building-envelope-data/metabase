@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using HotChocolate;
 using Icon.Events;
-using Marten;
 using Marten.Linq;
 using CancellationToken = System.Threading.CancellationToken;
 

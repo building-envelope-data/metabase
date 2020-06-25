@@ -1,6 +1,3 @@
-using DateTime = System.DateTime;
-using ValueObjects = Icon.ValueObjects;
-
 namespace Icon.ValueObjects
 {
     public enum Standardizer

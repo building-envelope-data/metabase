@@ -1,4 +1,3 @@
-using Icon;
 using MediatR;
 
 namespace Icon.Infrastructure.Query

@@ -8,12 +8,7 @@ using CSharpFunctionalExtensions;
 using HotChocolate;
 using Icon.Events;
 using Marten;
-using Marten.Linq;
 using CancellationToken = System.Threading.CancellationToken;
-using ErrorCodes = Icon.ErrorCodes;
-using Errors = Icon.Errors;
-using IEventStore = Marten.Events.IEventStore;
-using ValueObjects = Icon.ValueObjects;
 
 namespace Icon.Infrastructure.Aggregate
 {

@@ -11,7 +11,6 @@ using Icon.Events;
 using Marten;
 using Marten.Linq;
 using CancellationToken = System.Threading.CancellationToken;
-using ErrorCodes = Icon.ErrorCodes;
 using StreamState = Marten.Events.StreamState;
 
 namespace Icon.Infrastructure.Aggregate

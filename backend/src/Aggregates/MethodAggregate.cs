@@ -1,14 +1,9 @@
-// Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Icon;
-using Icon.Events;
 using Icon.Infrastructure.Aggregate;
 using Marten.Schema;
-using Events = Icon.Events;
 
 namespace Icon.Aggregates
 {

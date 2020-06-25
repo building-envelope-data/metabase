@@ -1,11 +1,8 @@
 // Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
 
 using System;
-using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Icon.Events;
-using Newtonsoft.Json;
-using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.Infrastructure.Aggregate
 {

@@ -1,14 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using HotChocolate;
 using Icon.Events;
 using Marten;
-using Marten.Linq;
-using CancellationToken = System.Threading.CancellationToken;
-using ErrorCodes = Icon.ErrorCodes;
 
 namespace Icon.Infrastructure.Aggregate
 {

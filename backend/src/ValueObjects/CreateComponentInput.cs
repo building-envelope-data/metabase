@@ -1,9 +1,5 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Array = System.Array;
-using DateTime = System.DateTime;
-using Guid = System.Guid;
-using Models = Icon.Models;
 
 namespace Icon.ValueObjects
 {
