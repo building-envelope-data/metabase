@@ -110,7 +110,16 @@ function query() {
   begin_section "Received an HTTP response with JSON content ..."
   press_any_key_to "show content" > /dev/null
   if [ "$has_big_response" = true ]; then
-    nvim $json_file_path >&2
+    # In NeoVIM normal mode use `za` to toggle fold, `zo` to open fold, and
+    # `zc` to close fold
+    nvim -R \
+      -u <(printf " \
+        set foldenable \n \
+        set foldmethod=syntax \n \
+        set foldlevel=6 \
+      ") \
+      $json_file_path \
+      >&2
   fi
   # echo "$json" | jq --color-output . | less --RAW-CONTROL-CHARS >&2
   jq . $json_file_path >&2
