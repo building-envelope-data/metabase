@@ -44,12 +44,6 @@
         "dotnet-trace"
       ]
     },
-    "strawberryshake.tools": {
-      "version": "11.0.0-preview.130",
-      "commands": [
-        "dotnet-graphql"
-      ]
-    },
     "dotnet-gcdump": {
       "version": "3.1.120604",
       "commands": [
