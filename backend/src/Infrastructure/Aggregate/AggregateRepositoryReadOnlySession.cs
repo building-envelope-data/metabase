@@ -277,7 +277,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<Result<T, Errors>> Load<T>(
             Guid id,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             ) where T : class, IEventSourcedAggregate, new()
         {
             AssertNotDisposed();
@@ -299,7 +299,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<(Result<T1, Errors>, Result<T2, Errors>)> Load<T1, T2>(
             (Guid, Guid) ids,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T1 : class, IEventSourcedAggregate, new()
           where T2 : class, IEventSourcedAggregate, new()
@@ -332,7 +332,7 @@ namespace Icon.Infrastructure.Aggregate
         public async Task<Result<T, Errors>> Load<T>(
             Guid id,
             DateTime timestamp,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             ) where T : class, IEventSourcedAggregate, new()
         {
             AssertNotDisposed();
@@ -350,7 +350,7 @@ namespace Icon.Infrastructure.Aggregate
             Guid id,
             DateTime timestamp,
             Func<IAggregateRepositoryReadOnlySession, Type, Guid, DateTime, CancellationToken, Task<Result<T, Errors>>> load,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
         {
             AssertNotDisposed();
@@ -363,7 +363,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public Task<Result<T, Errors>> Load<T>(
             ValueObjects.TimestampedId timestampedId,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -376,7 +376,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
             IEnumerable<Guid> ids,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -398,7 +398,7 @@ namespace Icon.Infrastructure.Aggregate
             return ids.Zip(aggregates, BuildResult);
         }
 
-        /* public async Task<IEnumerable<T>> LoadAll<T>(DateTime timestamp, CancellationToken cancellationToken = default(CancellationToken)) where T : class, IEventSourcedAggregate, new() */
+        /* public async Task<IEnumerable<T>> LoadAll<T>(DateTime timestamp, CancellationToken cancellationToken = default) where T : class, IEventSourcedAggregate, new() */
         /* { */
         /*         var aggregateIds = await _session.Query<T>() */
         /*           .Select(a => a.Id) */
@@ -408,7 +408,7 @@ namespace Icon.Infrastructure.Aggregate
 
         private async Task<IEnumerable<(ValueObjects.Id, T?)>> LoadAllRaw<T>(
             IEnumerable<ValueObjects.Id> ids,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -427,7 +427,7 @@ namespace Icon.Infrastructure.Aggregate
 
         private async Task<IEnumerable<((Guid, DateTime), T?)>> LoadAllRaw<T>(
             IEnumerable<(Guid, DateTime)> idsAndTimestamps,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -449,7 +449,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
             IEnumerable<(Guid, DateTime)> idsAndTimestamps,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -468,7 +468,7 @@ namespace Icon.Infrastructure.Aggregate
         public async Task<IEnumerable<Result<T, Errors>>> LoadAllX<T>(
             IEnumerable<(Guid, DateTime)> idsAndTimestamps,
             Func<IAggregateRepositoryReadOnlySession, Type, IEnumerable<(Guid, DateTime)>, CancellationToken, Task<IEnumerable<Result<T, Errors>>>> loadAll,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
         {
             AssertNotDisposed();
@@ -518,7 +518,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
             IEnumerable<ValueObjects.TimestampedId> timestampedIds,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -531,7 +531,7 @@ namespace Icon.Infrastructure.Aggregate
         public Task<IEnumerable<Result<T, Errors>>> LoadAllX<T>(
             IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             Func<IAggregateRepositoryReadOnlySession, Type, IEnumerable<ValueObjects.TimestampedId>, CancellationToken, Task<IEnumerable<Result<T, Errors>>>> loadAll,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
         {
             // TODO Avoid the unsafe cast of `t` to `ValueObjects.TimestampedId`
@@ -546,7 +546,7 @@ namespace Icon.Infrastructure.Aggregate
         public Task<IEnumerable<Result<T, Errors>>> LoadAll<T>(
             IEnumerable<Guid> ids,
             DateTime timestamp,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             ) where T : class, IEventSourcedAggregate, new()
         {
             return LoadAll<T>(
@@ -557,7 +557,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<IEnumerable<Result<T, Errors>>> LoadAllThatExist<T>(
             IEnumerable<ValueObjects.Id> possibleIds,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -580,7 +580,7 @@ namespace Icon.Infrastructure.Aggregate
         public async Task<IEnumerable<Result<T, Errors>>> LoadAllThatExisted<T>(
             IEnumerable<Guid> possibleIds,
             DateTime timestamp,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -603,7 +603,7 @@ namespace Icon.Infrastructure.Aggregate
         public Task<IEnumerable<Result<T, Errors>>> LoadAllThatExisted<T>(
             IEnumerable<ValueObjects.Id> possibleIds,
             DateTime timestamp,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -616,7 +616,7 @@ namespace Icon.Infrastructure.Aggregate
 
         private async Task<IEnumerable<(DateTime, IEnumerable<(Guid, T?)>)>> LoadAllBatchedRaw<T>(
             IEnumerable<(DateTime, IEnumerable<Guid>)> timestampsAndIds,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -644,7 +644,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<IEnumerable<IEnumerable<Result<T, Errors>>>> LoadAllBatched<T>(
             IEnumerable<(DateTime, IEnumerable<Guid>)> timestampsAndIds,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -664,7 +664,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public Task<IEnumerable<IEnumerable<Result<T, Errors>>>> LoadAllBatched<T>(
             IEnumerable<(ValueObjects.Timestamp, IEnumerable<ValueObjects.Id>)> timestampsAndIds,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -678,7 +678,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public async Task<IEnumerable<IEnumerable<Result<T, Errors>>>> LoadAllThatExistedBatched<T>(
             IEnumerable<(DateTime, IEnumerable<Guid>)> timestampsAndPossibleIds,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
@@ -703,7 +703,7 @@ namespace Icon.Infrastructure.Aggregate
 
         public Task<IEnumerable<IEnumerable<Result<T, Errors>>>> LoadAllThatExistedBatched<T>(
             IEnumerable<(ValueObjects.Timestamp, IEnumerable<ValueObjects.Id>)> timestampsAndPossibleIds,
-            CancellationToken cancellationToken = default(CancellationToken)
+            CancellationToken cancellationToken = default
             )
           where T : class, IEventSourcedAggregate, new()
         {
