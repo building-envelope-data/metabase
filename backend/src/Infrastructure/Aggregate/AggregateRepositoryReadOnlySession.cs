@@ -479,10 +479,10 @@ namespace Icon.Infrastructure.Aggregate
               .ConfigureAwait(false);
             var aggregateTypeToIdsAndTimestamps =
               idsAndTimestamps.Zip(aggregateTypeResults)
-              .Where(t => t.Item2.IsSuccess)
+              .Where(t => t.Second.IsSuccess)
               .ToLookup(
-                  t => t.Item2.Value,
-                  t => t.Item1
+                  t => t.Second.Value,
+                  t => t.First
                   );
             var aggregateTypes = aggregateTypeToIdsAndTimestamps.Select(g => g.Key);
             var results =
@@ -494,8 +494,8 @@ namespace Icon.Infrastructure.Aggregate
               .ConfigureAwait(false);
             var aggregateTypeToResultsEnumerator =
               aggregateTypes.Zip(results).ToDictionary(
-                  t => t.Item1,
-                  t => t.Item2.GetEnumerator()
+                  t => t.First,
+                  t => t.Second.GetEnumerator()
                   );
             return aggregateTypeResults.Select(aggregateTypeResult =>
                     aggregateTypeResult.Bind(aggregateType =>
@@ -948,8 +948,8 @@ namespace Icon.Infrastructure.Aggregate
               .ConfigureAwait(false);
             var existingModelIds =
               modelIds.Zip(doModelIdsExist)
-              .Where(x => x.Item2)
-              .Select(x => x.Item1);
+              .Where(x => x.Second)
+              .Select(x => x.First);
             // TODO Use LINQs `GroupBy` once it has been implemented for Marten, see https://github.com/JasperFx/marten/issues/569
             var modelIdToAssociateIds =
               (await queryAssociateIds(
@@ -959,8 +959,8 @@ namespace Icon.Infrastructure.Aggregate
                 .ConfigureAwait(false)
                 )
               .ToLookup(
-                modelIdAndAssociateId => modelIdAndAssociateId.Item1,
-                modelIdAndAssociateId => modelIdAndAssociateId.Item2
+                t => t.modelId,
+                t => t.associateId
                 );
             var timestampsAndAssociatesIds =
               timestampedModelIds
@@ -979,7 +979,7 @@ namespace Icon.Infrastructure.Aggregate
                 .ConfigureAwait(false)
                 )
               .Zip(modelIds.Zip(doModelIdsExist), (results, modelIdAndExists) =>
-                  modelIdAndExists.Item2
+                  modelIdAndExists.Second
                   ? Result.Ok<IEnumerable<Result<TAssociateModel, Errors>>, Errors>(
                     results.Select(result =>
                       result.Bind(a => a.ToModel())
@@ -987,7 +987,7 @@ namespace Icon.Infrastructure.Aggregate
                     )
                   : Result.Failure<IEnumerable<Result<TAssociateModel, Errors>>, Errors>(
                     Errors.One(
-                      message: $"There is no model with id {modelIdAndExists.Item1}",
+                      message: $"There is no model with id {modelIdAndExists.First}",
                       code: ErrorCodes.NonExistentModel
                       )
                     )
