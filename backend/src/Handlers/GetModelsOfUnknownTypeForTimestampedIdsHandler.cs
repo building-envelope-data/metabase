@@ -18,71 +18,73 @@ namespace Icon.Handlers
         public GetModelsOfUnknownTypeForTimestampedIdsHandler(IAggregateRepository repository)
         {
             _repository = repository;
-            _aggregateTypeToGetHandler = new Dictionary<Type, IGetModelsForTimestampedIdsHandler>();
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.ComponentAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.Component, Aggregates.ComponentAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.ComponentConcretizationAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.ComponentConcretization, Aggregates.ComponentConcretizationAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.ComponentManufacturerAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.ComponentManufacturer, Aggregates.ComponentManufacturerAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.ComponentPartAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.ComponentPart, Aggregates.ComponentPartAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.ComponentVariantAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.ComponentVariant, Aggregates.ComponentVariantAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.ComponentVersionAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.ComponentVersion, Aggregates.ComponentVersionAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.DatabaseAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.Database, Aggregates.DatabaseAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.InstitutionAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.Institution, Aggregates.InstitutionAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.InstitutionMethodDeveloperAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.InstitutionRepresentativeAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.InstitutionRepresentative, Aggregates.InstitutionRepresentativeAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.MethodAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.Method, Aggregates.MethodAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.PersonAffiliationAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.PersonAffiliation, Aggregates.PersonAffiliationAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.PersonAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.Person, Aggregates.PersonAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.PersonMethodDeveloperAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.PersonMethodDeveloperAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.StandardAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.Standard, Aggregates.StandardAggregate>(repository)
-                );
-            _aggregateTypeToGetHandler.Add(
-                typeof(Aggregates.UserAggregate),
-                new GetModelsForTimestampedIdsHandler<Models.User, Aggregates.UserAggregate>(repository)
-                );
+            _aggregateTypeToGetHandler = new Dictionary<Type, IGetModelsForTimestampedIdsHandler>
+            {
+                {
+                    typeof(Aggregates.ComponentAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.Component, Aggregates.ComponentAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.ComponentConcretizationAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.ComponentConcretization, Aggregates.ComponentConcretizationAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.ComponentManufacturerAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.ComponentManufacturer, Aggregates.ComponentManufacturerAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.ComponentPartAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.ComponentPart, Aggregates.ComponentPartAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.ComponentVariantAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.ComponentVariant, Aggregates.ComponentVariantAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.ComponentVersionAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.ComponentVersion, Aggregates.ComponentVersionAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.DatabaseAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.Database, Aggregates.DatabaseAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.InstitutionAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.Institution, Aggregates.InstitutionAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.InstitutionMethodDeveloperAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.InstitutionRepresentativeAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.InstitutionRepresentative, Aggregates.InstitutionRepresentativeAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.MethodAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.Method, Aggregates.MethodAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.PersonAffiliationAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.PersonAffiliation, Aggregates.PersonAffiliationAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.PersonAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.Person, Aggregates.PersonAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.PersonMethodDeveloperAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.PersonMethodDeveloperAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.StandardAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.Standard, Aggregates.StandardAggregate>(repository)
+                },
+                {
+                    typeof(Aggregates.UserAggregate),
+                    new GetModelsForTimestampedIdsHandler<Models.User, Aggregates.UserAggregate>(repository)
+                }
+            };
         }
 
         public async Task<IEnumerable<Result<Models.IModel, Errors>>> Handle(

@@ -15,7 +15,7 @@ namespace Icon.Aggregates
         public DatabaseAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.DatabaseCreated> @event)
+        public void Apply(Marten.Events.Event<Events.DatabaseCreated> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -25,7 +25,7 @@ namespace Icon.Aggregates
             Locator = data.Locator;
         }
 
-        private void Apply(Marten.Events.Event<Events.DatabaseDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.DatabaseDeleted> @event)
         {
             ApplyDeleted(@event);
         }

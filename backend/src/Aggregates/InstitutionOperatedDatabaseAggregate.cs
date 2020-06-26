@@ -21,7 +21,7 @@ namespace Icon.Aggregates
         public InstitutionOperatedDatabaseAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.InstitutionOperatedDatabaseAdded> @event)
+        public void Apply(Marten.Events.Event<Events.InstitutionOperatedDatabaseAdded> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -30,7 +30,7 @@ namespace Icon.Aggregates
             DatabaseId = data.DatabaseId;
         }
 
-        private void Apply(Marten.Events.Event<Events.InstitutionOperatedDatabaseRemoved> @event)
+        public void Apply(Marten.Events.Event<Events.InstitutionOperatedDatabaseRemoved> @event)
         {
             ApplyDeleted(@event);
         }

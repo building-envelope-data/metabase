@@ -9,7 +9,7 @@ namespace Icon.GraphQl
         public ComponentInformationInput? ComponentInformation { get; }
         public InstitutionInformationInput? InstitutionInformation { get; }
 
-        private ComponentManufacturerMarketingInformationInput(
+        public ComponentManufacturerMarketingInformationInput(
             ComponentInformationInput? componentInformation,
             InstitutionInformationInput? institutionInformation
             )

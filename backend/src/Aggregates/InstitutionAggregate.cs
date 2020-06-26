@@ -15,7 +15,7 @@ namespace Icon.Aggregates
         public InstitutionAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.InstitutionCreated> @event)
+        public void Apply(Marten.Events.Event<Events.InstitutionCreated> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -25,7 +25,7 @@ namespace Icon.Aggregates
             State = data.State.ToModel();
         }
 
-        private void Apply(Marten.Events.Event<Events.InstitutionDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.InstitutionDeleted> @event)
         {
             ApplyDeleted(@event);
         }

@@ -21,7 +21,7 @@ namespace Icon.Aggregates
         public ComponentVersionAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.ComponentVersionAdded> @event)
+        public void Apply(Marten.Events.Event<Events.ComponentVersionAdded> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -30,7 +30,7 @@ namespace Icon.Aggregates
             VersionComponentId = data.VersionComponentId;
         }
 
-        private void Apply(Marten.Events.Event<Events.ComponentVersionRemoved> @event)
+        public void Apply(Marten.Events.Event<Events.ComponentVersionRemoved> @event)
         {
             ApplyDeleted(@event);
         }

@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WebPWrecover.Services;
 
 namespace Icon.Configuration
 {
@@ -62,9 +61,6 @@ namespace Icon.Configuration
                     _.LogoutPath = $"/Account/Logout";
                     _.AccessDeniedPath = $"/Account/AccessDenied";
                 });
-
-            services.AddTransient<IEmailSender, EmailSender>(); // TODO Put somewhere else.
-            services.Configure<AuthMessageSenderOptions>(configuration);
         }
 
         // https://github.com/IdentityServer/IdentityServer4.Demo

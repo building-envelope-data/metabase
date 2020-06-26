@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
-using Aggregates = Icon.Aggregates;
-using Commands = Icon.Commands;
-using Events = Icon.Events;
 using TestBase = Test.Integration.EventStore.TestBase;
 
 namespace Icon.Domain

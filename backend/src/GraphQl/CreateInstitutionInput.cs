@@ -14,7 +14,7 @@ namespace Icon.GraphQl
         public string? PublicKey { get; }
         public ValueObjects.InstitutionState State { get; }
 
-        private CreateInstitutionInput(
+        public CreateInstitutionInput(
             string name,
             string? abbreviation,
             string? description,

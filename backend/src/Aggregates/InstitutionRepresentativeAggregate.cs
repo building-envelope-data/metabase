@@ -24,7 +24,7 @@ namespace Icon.Aggregates
         public InstitutionRepresentativeAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.InstitutionRepresentativeAdded> @event)
+        public void Apply(Marten.Events.Event<Events.InstitutionRepresentativeAdded> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -34,7 +34,7 @@ namespace Icon.Aggregates
             Role = data.Role.ToModel();
         }
 
-        private void Apply(Marten.Events.Event<Events.InstitutionRepresentativeRemoved> @event)
+        public void Apply(Marten.Events.Event<Events.InstitutionRepresentativeRemoved> @event)
         {
             ApplyDeleted(@event);
         }

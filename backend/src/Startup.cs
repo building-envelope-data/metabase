@@ -34,9 +34,9 @@ namespace Icon
 {
     public class Startup
     {
-        private IWebHostEnvironment _environment;
-        private IConfiguration _configuration;
-        private AppSettings _appSettings;
+        private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
+        private readonly AppSettings _appSettings;
 
         public Startup(IWebHostEnvironment environment)
         {

@@ -13,13 +13,13 @@ namespace Icon.Aggregates
         public PersonMethodDeveloperAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.PersonMethodDeveloperAdded> @event)
+        public void Apply(Marten.Events.Event<Events.PersonMethodDeveloperAdded> @event)
         {
             ApplyMeta(@event);
             ApplyData(@event.Data);
         }
 
-        private void Apply(Marten.Events.Event<Events.PersonMethodDeveloperRemoved> @event)
+        public void Apply(Marten.Events.Event<Events.PersonMethodDeveloperRemoved> @event)
         {
             ApplyDeleted(@event);
         }

@@ -12,7 +12,7 @@ namespace Icon.Aggregates
         public ComponentAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.ComponentCreated> @event)
+        public void Apply(Marten.Events.Event<Events.ComponentCreated> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -20,7 +20,7 @@ namespace Icon.Aggregates
             Information = ComponentInformationAggregateData.From(data.Information);
         }
 
-        private void Apply(Marten.Events.Event<Events.ComponentDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.ComponentDeleted> @event)
         {
             ApplyDeleted(@event);
         }

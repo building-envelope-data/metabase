@@ -9,12 +9,12 @@ namespace Icon.Aggregates
         public PhotovoltaicDataAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.PhotovoltaicDataCreated> @event)
+        public void Apply(Marten.Events.Event<Events.PhotovoltaicDataCreated> @event)
         {
             ApplyCreated(@event);
         }
 
-        private void Apply(Marten.Events.Event<Events.PhotovoltaicDataDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.PhotovoltaicDataDeleted> @event)
         {
             ApplyDeleted(@event);
         }

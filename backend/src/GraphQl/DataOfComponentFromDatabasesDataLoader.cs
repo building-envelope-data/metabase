@@ -13,8 +13,8 @@ namespace Icon.GraphQl
       : OurDataLoaderBase<ValueObjects.TimestampedId, IReadOnlyList<TDataGraphQlObject>>
       where TQuery : Queries.QueryDataOfComponentsFromDatabases<IEnumerable<Result<TDataModel, Errors>>>
     {
-        private Func<IReadOnlyCollection<ValueObjects.TimestampedId>, Result<TQuery, Errors>> _newQuery;
-        private Func<TDataModel, ValueObjects.Timestamp, TDataGraphQlObject> _mapModelToGraphQlObject;
+        private readonly Func<IReadOnlyCollection<ValueObjects.TimestampedId>, Result<TQuery, Errors>> _newQuery;
+        private readonly Func<TDataModel, ValueObjects.Timestamp, TDataGraphQlObject> _mapModelToGraphQlObject;
 
         public DataOfComponentFromDatabasesDataLoader(
             Func<IReadOnlyCollection<ValueObjects.TimestampedId>, Result<TQuery, Errors>> newQuery,

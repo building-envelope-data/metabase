@@ -23,7 +23,7 @@ namespace Icon.Aggregates
         public StandardAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.StandardCreated> @event)
+        public void Apply(Marten.Events.Event<Events.StandardCreated> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -41,7 +41,7 @@ namespace Icon.Aggregates
             Locator = data.Locator;
         }
 
-        private void Apply(Marten.Events.Event<Events.StandardDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.StandardDeleted> @event)
         {
             ApplyDeleted(@event);
         }

@@ -13,13 +13,13 @@ namespace Icon.Aggregates
         public InstitutionMethodDeveloperAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.InstitutionMethodDeveloperAdded> @event)
+        public void Apply(Marten.Events.Event<Events.InstitutionMethodDeveloperAdded> @event)
         {
             ApplyMeta(@event);
             ApplyData(@event.Data);
         }
 
-        private void Apply(Marten.Events.Event<Events.InstitutionMethodDeveloperRemoved> @event)
+        public void Apply(Marten.Events.Event<Events.InstitutionMethodDeveloperRemoved> @event)
         {
             ApplyDeleted(@event);
         }
