@@ -355,8 +355,7 @@ namespace Icon.GraphQl
         }
 
         public Task<RemoveComponentConcretizationPayload> RemoveComponentConcretization(
-            RemoveComponentConcretizationInput input,
-            [DataLoader] ComponentConcretizationDataLoader componentConcretizationLoader
+            RemoveComponentConcretizationInput input
             )
         {
             return RemoveManyToManyAssociation<
@@ -390,8 +389,7 @@ namespace Icon.GraphQl
         }
 
         public Task<RemoveComponentManufacturerPayload> RemoveComponentManufacturer(
-            RemoveComponentManufacturerInput input,
-            [DataLoader] ComponentManufacturerDataLoader componentManufacturerLoader
+            RemoveComponentManufacturerInput input
             )
         {
             return RemoveManyToManyAssociation<
@@ -425,8 +423,7 @@ namespace Icon.GraphQl
         }
 
         public Task<RemoveComponentPartPayload> RemoveComponentPart(
-            RemoveComponentPartInput input,
-            [DataLoader] ComponentPartDataLoader componentPartLoader
+            RemoveComponentPartInput input
             )
         {
             return RemoveManyToManyAssociation<
@@ -460,8 +457,7 @@ namespace Icon.GraphQl
         }
 
         public Task<RemoveComponentVariantPayload> RemoveComponentVariant(
-            RemoveComponentVariantInput input,
-            [DataLoader] ComponentVariantDataLoader componentVariantLoader
+            RemoveComponentVariantInput input
             )
         {
             return RemoveManyToManyAssociation<
@@ -495,8 +491,7 @@ namespace Icon.GraphQl
         }
 
         public Task<RemoveComponentVersionPayload> RemoveComponentVersion(
-            RemoveComponentVersionInput input,
-            [DataLoader] ComponentVersionDataLoader componentVersionLoader
+            RemoveComponentVersionInput input
             )
         {
             return RemoveManyToManyAssociation<
@@ -530,8 +525,7 @@ namespace Icon.GraphQl
         }
 
         public Task<RemoveInstitutionRepresentativePayload> RemoveInstitutionRepresentative(
-            RemoveInstitutionRepresentativeInput input,
-            [DataLoader] InstitutionRepresentativeDataLoader institutionRepresentativeLoader
+            RemoveInstitutionRepresentativeInput input
             )
         {
             return RemoveManyToManyAssociation<
@@ -565,8 +559,7 @@ namespace Icon.GraphQl
         }
 
         public Task<RemoveMethodDeveloperPayload> RemoveMethodDeveloper(
-            RemoveMethodDeveloperInput input,
-            [DataLoader] MethodDeveloperDataLoader methodDeveloperLoader
+            RemoveMethodDeveloperInput input
             )
         {
             return RemoveManyToManyAssociation<
@@ -600,8 +593,7 @@ namespace Icon.GraphQl
         }
 
         public Task<RemovePersonAffiliationPayload> RemovePersonAffiliation(
-            RemovePersonAffiliationInput input,
-            [DataLoader] PersonAffiliationDataLoader personAffiliationLoader
+            RemovePersonAffiliationInput input
             )
         {
             return RemoveManyToManyAssociation<
