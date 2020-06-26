@@ -80,7 +80,7 @@ namespace Icon.ValueObjects
 
         public static implicit operator (DateTime? Start, DateTime? End)(DateInterval dateInterval)
         {
-            return (Start: dateInterval.Start, End: dateInterval.End);
+            return (dateInterval.Start, dateInterval.End);
         }
 
         // https://docs.microsoft.com/en-us/dotnet/csharp/tuples#deconstructing-user-defined-types

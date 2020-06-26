@@ -40,7 +40,7 @@ namespace Icon.Handlers
                 var componentIdToDataModelIds =
                   (await session.QueryEvents<TDataCreatedEvent>()
                    .Where(e => e.ComponentId.IsOneOf(componentIds))
-                   .Select(e => new { ComponentId = e.ComponentId, DataModelId = e.AggregateId })
+                   .Select(e => new { e.ComponentId, DataModelId = e.AggregateId })
                    .ToListAsync(cancellationToken)
                    .ConfigureAwait(false)
                   )
