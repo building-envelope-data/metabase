@@ -12,7 +12,7 @@ namespace Icon.GraphQl
     public abstract class DataOfComponentDataLoader<TDataModel, TDataGraphQlObject>
       : OurDataLoaderBase<ValueObjects.TimestampedId, IReadOnlyList<TDataGraphQlObject>>
     {
-        private Func<TDataModel, ValueObjects.Timestamp, TDataGraphQlObject> _mapModelToGraphQlObject;
+        private readonly Func<TDataModel, ValueObjects.Timestamp, TDataGraphQlObject> _mapModelToGraphQlObject;
 
         public DataOfComponentDataLoader(
             Func<TDataModel, ValueObjects.Timestamp, TDataGraphQlObject> mapModelToGraphQlObject,
