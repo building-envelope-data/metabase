@@ -12,7 +12,7 @@ namespace Icon.GraphQl
         public Uri Locator { get; }
         public ValueObjects.Id InstitutionId { get; }
 
-        private CreateDatabaseInput(
+        public CreateDatabaseInput(
             string name,
             string description,
             Uri locator,
