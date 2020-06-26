@@ -9,12 +9,12 @@ namespace Icon.Aggregates
         public OpticalDataAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.OpticalDataCreated> @event)
+        public void Apply(Marten.Events.Event<Events.OpticalDataCreated> @event)
         {
             ApplyCreated(@event);
         }
 
-        private void Apply(Marten.Events.Event<Events.OpticalDataDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.OpticalDataDeleted> @event)
         {
             ApplyDeleted(@event);
         }

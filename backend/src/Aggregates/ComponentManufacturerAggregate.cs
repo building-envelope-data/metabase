@@ -23,7 +23,7 @@ namespace Icon.Aggregates
         public ComponentManufacturerAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.ComponentManufacturerAdded> @event)
+        public void Apply(Marten.Events.Event<Events.ComponentManufacturerAdded> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -33,7 +33,7 @@ namespace Icon.Aggregates
             MarketingInformation = data.MarketingInformation is null ? null : ComponentManufacturerMarketingInformationAggregateData.From(data.MarketingInformation);
         }
 
-        private void Apply(Marten.Events.Event<Events.ComponentManufacturerRemoved> @event)
+        public void Apply(Marten.Events.Event<Events.ComponentManufacturerRemoved> @event)
         {
             ApplyDeleted(@event);
         }

@@ -24,7 +24,7 @@ namespace Icon.Aggregates
         public MethodAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.MethodCreated> @event)
+        public void Apply(Marten.Events.Event<Events.MethodCreated> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -39,7 +39,7 @@ namespace Icon.Aggregates
               .ToList();
         }
 
-        private void Apply(Marten.Events.Event<Events.MethodDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.MethodDeleted> @event)
         {
             ApplyDeleted(@event);
         }

@@ -10,14 +10,14 @@ namespace Icon.Aggregates
         public UserAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.UserCreated> @event)
+        public void Apply(Marten.Events.Event<Events.UserCreated> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
             Id = data.AggregateId;
         }
 
-        private void Apply(Marten.Events.Event<Events.UserDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.UserDeleted> @event)
         {
             ApplyDeleted(@event);
         }

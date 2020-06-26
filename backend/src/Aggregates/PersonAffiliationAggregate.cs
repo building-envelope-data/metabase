@@ -21,7 +21,7 @@ namespace Icon.Aggregates
         public PersonAffiliationAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.PersonAffiliationAdded> @event)
+        public void Apply(Marten.Events.Event<Events.PersonAffiliationAdded> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -30,7 +30,7 @@ namespace Icon.Aggregates
             InstitutionId = data.InstitutionId;
         }
 
-        private void Apply(Marten.Events.Event<Events.PersonAffiliationRemoved> @event)
+        public void Apply(Marten.Events.Event<Events.PersonAffiliationRemoved> @event)
         {
             ApplyDeleted(@event);
         }

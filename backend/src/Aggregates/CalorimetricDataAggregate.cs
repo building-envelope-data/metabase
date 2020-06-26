@@ -9,12 +9,12 @@ namespace Icon.Aggregates
         public CalorimetricDataAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.CalorimetricDataCreated> @event)
+        public void Apply(Marten.Events.Event<Events.CalorimetricDataCreated> @event)
         {
             ApplyCreated(@event);
         }
 
-        private void Apply(Marten.Events.Event<Events.CalorimetricDataDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.CalorimetricDataDeleted> @event)
         {
             ApplyDeleted(@event);
         }

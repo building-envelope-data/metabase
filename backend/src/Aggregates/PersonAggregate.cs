@@ -17,7 +17,7 @@ namespace Icon.Aggregates
         public PersonAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.PersonCreated> @event)
+        public void Apply(Marten.Events.Event<Events.PersonCreated> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -29,7 +29,7 @@ namespace Icon.Aggregates
             WebsiteLocator = data.WebsiteLocator;
         }
 
-        private void Apply(Marten.Events.Event<Events.PersonDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.PersonDeleted> @event)
         {
             ApplyDeleted(@event);
         }

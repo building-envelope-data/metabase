@@ -9,12 +9,12 @@ namespace Icon.Aggregates
         public HygrothermalDataAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.HygrothermalDataCreated> @event)
+        public void Apply(Marten.Events.Event<Events.HygrothermalDataCreated> @event)
         {
             ApplyCreated(@event);
         }
 
-        private void Apply(Marten.Events.Event<Events.HygrothermalDataDeleted> @event)
+        public void Apply(Marten.Events.Event<Events.HygrothermalDataDeleted> @event)
         {
             ApplyDeleted(@event);
         }

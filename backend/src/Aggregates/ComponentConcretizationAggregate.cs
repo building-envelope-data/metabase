@@ -26,7 +26,7 @@ namespace Icon.Aggregates
         public ComponentConcretizationAggregate() { }
 #nullable enable
 
-        private void Apply(Marten.Events.Event<Events.ComponentConcretizationAdded> @event)
+        public void Apply(Marten.Events.Event<Events.ComponentConcretizationAdded> @event)
         {
             ApplyMeta(@event);
             var data = @event.Data;
@@ -35,7 +35,7 @@ namespace Icon.Aggregates
             ConcreteCompId = data.ConcreteComponentId;
         }
 
-        private void Apply(Marten.Events.Event<Events.ComponentConcretizationRemoved> @event)
+        public void Apply(Marten.Events.Event<Events.ComponentConcretizationRemoved> @event)
         {
             ApplyDeleted(@event);
         }
