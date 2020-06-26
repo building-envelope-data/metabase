@@ -1,7 +1,6 @@
 using System;
 using System.Data;
 using Marten;
-using Marten.Events;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Xunit;

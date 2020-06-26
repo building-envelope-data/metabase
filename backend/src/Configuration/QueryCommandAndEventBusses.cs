@@ -1,48 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Data;
-using IdentityServer4.AccessTokenValidation;
-using IdentityServer4.AspNetIdentity;
-using IdentityServer4.Validation;
-using Marten; // IsOneOf
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi;
-using NSwag;
-using NSwag.AspNetCore;
-using NSwag.Generation.Processors.Security;
-using WebPWrecover.Services;
 using AddAssociationCheck = Icon.Infrastructure.Aggregate.AddAssociationCheck;
 using CancellationToken = System.Threading.CancellationToken;
 using Command = Icon.Infrastructure.Command;
-using Commands = Icon.Commands;
-using Events = Icon.Events;
-using Handlers = Icon.Handlers;
 using IAggregateRepository = Icon.Infrastructure.Aggregate.IAggregateRepository;
-using IAggregateRepositoryReadOnlySession = Icon.Infrastructure.Aggregate.IAggregateRepositoryReadOnlySession;
 using IAggregateRepositorySession = Icon.Infrastructure.Aggregate.IAggregateRepositorySession;
-using IError = HotChocolate.IError;
 using IEventSourcedAggregate = Icon.Infrastructure.Aggregate.IEventSourcedAggregate;
-using Models = Icon.Models;
-using Queries = Icon.Queries;
 using Query = Icon.Infrastructure.Query;
 
 namespace Icon.Configuration
