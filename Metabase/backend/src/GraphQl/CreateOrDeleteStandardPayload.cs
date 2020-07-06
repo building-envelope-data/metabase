@@ -1,0 +1,17 @@
+using Infrastructure.ValueObjects;
+namespace Metabase.GraphQl
+{
+    public abstract class CreateOrDeleteStandardPayload
+      : Payload
+    {
+        public Id StandardId { get; }
+
+        public CreateOrDeleteStandardPayload(
+            TimestampedId timestampedId
+            )
+          : base(timestampedId.Timestamp)
+        {
+            StandardId = timestampedId.Id;
+        }
+    }
+}

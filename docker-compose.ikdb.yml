@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  backend:
+    build:
+      args:
+        - PROJECT_NAME=Metabase
+    command: [
+      "dotnet", "run",
+      "--no-launch-profile",
+      "--no-restore",
+      "--runtime", "linux-musl-x64",
+      "--project", "./src/Metabase.csproj"
+      ]
+      # ["dotnet", "watch", "run", "--no-restore"]
+    volumes:
+      # The following items make the engine create a volume for the specified
+      # path with the effect that the service does not write temporary files
+      # into the corresponding directory on the host file system that was bound
+      # by the `/app` binding.
+      - /app/Metabase/backend/src/bin
+      - /app/Metabase/backend/src/obj
+      - /app/Metabase/backend/test/bin
+      - /app/Metabase/backend/test/obj
+    ports:
+      - 5000:8080
+    environment:
+      - ICON_HOST="https://${IKDB_HOST}:${IKDB_HTTP_PORT}"
+      # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https?view=aspnetcore-3.1#starting-a-container-with-https-support-using-docker-compose
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${IKDB_SSL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${IKDB_SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
+
+  nginx:
+    ports:
+      - ${IKDB_HTTP_PORT}:80
+      - ${IKDB_HTTPS_PORT}:443
+    environment:
+      - SERVER_NAME=${IKDB_HOST}
+      - SSL_CERTIFICATE_BASE_FILE_NAME=${IKDB_SSL_CERTIFICATE_BASE_FILE_NAME}

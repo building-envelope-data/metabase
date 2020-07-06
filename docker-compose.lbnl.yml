@@ -2,6 +2,26 @@ version: '3.7'
 
 services:
   backend:
+    build:
+      args:
+        - PROJECT_NAME=Database
+    command: [
+      "dotnet", "run",
+      "--no-launch-profile",
+      "--no-restore",
+      "--runtime", "linux-musl-x64",
+      "--project", "./src/Database.csproj"
+      ]
+      # ["dotnet", "watch", "run", "--no-restore"]
+    volumes:
+      # The following items make the engine create a volume for the specified
+      # path with the effect that the service does not write temporary files
+      # into the corresponding directory on the host file system that was bound
+      # by the `/app` binding.
+      - /app/Database/backend/src/bin
+      - /app/Database/backend/src/obj
+      - /app/Database/backend/test/bin
+      - /app/Database/backend/test/obj
     ports:
       - 5020:8080
     environment:

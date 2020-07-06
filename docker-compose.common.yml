@@ -16,30 +16,23 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: ./Dockerfile-development
+      context: .
+      dockerfile: ./Dockerfile-backend-${ENVIRONMENT}
       args:
         - CERTIFICATE_AUTHORITY_BASE_FILE_NAME=${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}
         - CERTIFICATE_AUTHORITY_PASSWORD=${CERTIFICATE_AUTHORITY_PASSWORD}
     # user: 1000:1000
-    command: [
-      "dotnet", "run",
-      "--no-launch-profile",
-      "--runtime", "linux-musl-x64",
-      "--project", "./src/Icon.csproj"
-      ]
-      # ["dotnet", "watch", "run", "--no-restore"]
     volumes:
-      - ./backend:/app
-      - node_modules:/app/node_modules
+      - .:/app
+      # - node_modules:/app/node_modules
       # The following items make the engine create a volume for the specified
       # path with the effect that the service does not write temporary files
-      # into the corresponding directory on the file system that was bound by
-      # the preceding binding
-      - /app/src/bin
-      - /app/src/obj
-      - /app/test/bin
-      - /app/test/obj
+      # into the corresponding directory on the host file system that was bound
+      # by the `/app` binding.
+      - /app/Infrastructure/backend/src/bin
+      - /app/Infrastructure/backend/src/obj
+      - /app/Infrastructure/backend/test/bin
+      - /app/Infrastructure/backend/test/obj
       # Create anonymous volumes for dotnet tools
       - /home/me/.nuget
       - /home/me/.dotnet
@@ -49,7 +42,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
     extra_hosts:
-      - ${HOST}:${DOCKER_IP}
+      - ${IKDB_HOST}:${DOCKER_IP}
       - ${ISE_HOST}:${DOCKER_IP}
       - ${LBNL_HOST}:${DOCKER_IP}
     depends_on:
@@ -90,7 +83,7 @@ services:
   # frontend:
   #   build:
   #     context: ./frontend
-  #     dockerfile: ./Dockerfile-development
+  #     dockerfile: ./Dockerfile-${ENVIRONMENT}
   #   volumes:
   #     - ./frontend:/app
   #     # - /app/node_modules # Keep the `node_modules` of the image
@@ -98,11 +91,11 @@ services:
   #   ports:
   #     - 3000:3000
   #   environment:
-  #     NODE_ENV: development
+  #     NODE_ENV: ${ENVIRONMENT}
   #   depends_on:
   #     - backend
 
 volumes:
   data:
-  node_modules:
-  frontend_node_modules:
+  # node_modules:
+  # frontend_node_modules:
