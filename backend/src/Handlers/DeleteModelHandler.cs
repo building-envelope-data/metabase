@@ -2,8 +2,8 @@ using System; // Func
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
-using Icon.Infrastructure.Command;
+using Icon.Infrastructure.Aggregates;
+using Icon.Infrastructure.Commands;
 using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
 

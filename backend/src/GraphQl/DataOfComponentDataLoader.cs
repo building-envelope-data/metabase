@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using HotChocolate;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Queries;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.GraphQl

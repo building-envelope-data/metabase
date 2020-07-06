@@ -1,4 +1,4 @@
-namespace Icon.Aggregates
+namespace Icon.Infrastructure.Aggregates
 {
     public interface IOneToManyAssociationAggregate
       : IAssociationAggregate

@@ -1,7 +1,7 @@
 using Guid = System.Guid;
-using IEventSourcedAggregate = Icon.Infrastructure.Aggregate.IEventSourcedAggregate;
+using IEventSourcedAggregate = Icon.Infrastructure.Aggregates.IEventSourcedAggregate;
 
-namespace Icon.Aggregates
+namespace Icon.Infrastructure.Aggregates
 {
     public interface IAssociationAggregate
       : IEventSourcedAggregate

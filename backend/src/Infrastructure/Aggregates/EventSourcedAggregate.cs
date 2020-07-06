@@ -4,7 +4,7 @@ using System;
 using CSharpFunctionalExtensions;
 using Icon.Infrastructure.Events;
 
-namespace Icon.Infrastructure.Aggregate
+namespace Icon.Infrastructure.Aggregates
 {
     public abstract class EventSourcedAggregate
       : Validatable, IEventSourcedAggregate

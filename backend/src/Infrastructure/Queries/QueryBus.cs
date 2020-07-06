@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Icon.Infrastructure.Query
+namespace Icon.Infrastructure.Queries
 {
     public class QueryBus : IQueryBus
     {

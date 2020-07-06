@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Icon.Infrastructure.Query
+namespace Icon.Infrastructure.Queries
 {
     public interface IQueryBus
     {

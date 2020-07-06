@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Queries;
 
 namespace Icon.GraphQl
 {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using GreenDonut;
 using HotChocolate;
 using HotChocolate.Resolvers;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Queries;
 using Microsoft.AspNetCore.Identity;
 
 namespace Icon.GraphQl

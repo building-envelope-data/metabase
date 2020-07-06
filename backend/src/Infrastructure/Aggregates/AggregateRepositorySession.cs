@@ -11,7 +11,7 @@ using Icon.Infrastructure.Models;
 using Marten;
 using CancellationToken = System.Threading.CancellationToken;
 
-namespace Icon.Infrastructure.Aggregate
+namespace Icon.Infrastructure.Aggregates
 {
     public sealed class AggregateRepositorySession : AggregateRepositoryReadOnlySession, IAggregateRepositorySession
     {
@@ -235,7 +235,7 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             )
           where TParent : class, IEventSourcedAggregate, new()
-          where TAssociation : class, Aggregates.IManyToManyAssociationAggregate, new()
+          where TAssociation : class, IManyToManyAssociationAggregate, new()
           where TAssociate : class, IEventSourcedAggregate, new()
         {
             return AddAssociation<TParent, TAssociation, TAssociate>(
@@ -270,7 +270,7 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             )
           where TParent : class, IEventSourcedAggregate, new()
-          where TAssociation : class, Aggregates.IOneToManyAssociationAggregate, new()
+          where TAssociation : class, IOneToManyAssociationAggregate, new()
           where TAssociate : class, IEventSourcedAggregate, new()
         {
             return AddAssociation<TParent, TAssociation, TAssociate>(
@@ -303,7 +303,7 @@ namespace Icon.Infrastructure.Aggregate
             CancellationToken cancellationToken
             )
           where TParent : class, IEventSourcedAggregate, new()
-          where TAssociation : class, Aggregates.IAssociationAggregate, new()
+          where TAssociation : class, IAssociationAggregate, new()
           where TAssociate : class, IEventSourcedAggregate, new()
         {
             AssertNotDisposed();
@@ -377,7 +377,7 @@ namespace Icon.Infrastructure.Aggregate
             Func<Guid, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
-          where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, new()
+          where TAssociationAggregate : class, IManyToManyAssociationAggregate, new()
         {
             var maybeAssociationId =
               await Query<TAssociationAggregate>()
@@ -412,7 +412,7 @@ namespace Icon.Infrastructure.Aggregate
             Func<Guid, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
-          where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, new()
+          where TAssociationAggregate : class, IOneToManyAssociationAggregate, new()
         {
             var maybeAssociationId =
               await Query<TAssociationAggregate>()
@@ -446,7 +446,7 @@ namespace Icon.Infrastructure.Aggregate
             where TModel : Models.IModel
             where TAssociationModel : Models.IManyToManyAssociation
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return RemoveAssociationsOfModel<TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
@@ -467,7 +467,7 @@ namespace Icon.Infrastructure.Aggregate
             where TAssociateModel : Models.IModel
             where TAssociationModel : Models.IManyToManyAssociation
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return RemoveAssociationsOfModel<TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
@@ -488,7 +488,7 @@ namespace Icon.Infrastructure.Aggregate
             where TModel : Models.IModel
             where TAssociationModel : Models.IOneToManyAssociation
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return RemoveAssociationsOfModel<TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
@@ -509,7 +509,7 @@ namespace Icon.Infrastructure.Aggregate
             where TAssociateModel : Models.IModel
             where TAssociationModel : Models.IOneToManyAssociation
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-            where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return RemoveAssociationsOfModel<TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
@@ -530,7 +530,7 @@ namespace Icon.Infrastructure.Aggregate
             )
             where TAssociationModel : IAssociation
             where TAggregate : class, IEventSourcedAggregate, new()
-            where TAssociationAggregate : class, Aggregates.IAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return await (

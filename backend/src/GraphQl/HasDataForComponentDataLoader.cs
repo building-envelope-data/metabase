@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Queries;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.GraphQl

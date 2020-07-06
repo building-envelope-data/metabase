@@ -1,7 +1,7 @@
 using Icon.Infrastructure.Events;
 using Marten;
 
-namespace Icon.Infrastructure.Aggregate
+namespace Icon.Infrastructure.Aggregates
 {
     public sealed class AggregateRepository : IAggregateRepository
     {

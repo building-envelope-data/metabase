@@ -1,4 +1,4 @@
-namespace Icon.Infrastructure.Command
+namespace Icon.Infrastructure.Commands
 {
     public abstract class CommandBase<TResponse>
       : ICommand<TResponse>

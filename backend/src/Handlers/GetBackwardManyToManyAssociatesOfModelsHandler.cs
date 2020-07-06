@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Aggregates;
+using Icon.Infrastructure.Queries;
 using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
 using Icon.Infrastructure.Models;
@@ -14,7 +14,7 @@ namespace Icon.Handlers
         IQueryHandler<Queries.GetBackwardManyToManyAssociatesOfModels<TAssociateModel, TAssociationModel, TModel>, IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
       where TAssociationModel : IManyToManyAssociation
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-      where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+      where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociationAddedEvent : IAssociationAddedEvent
     {

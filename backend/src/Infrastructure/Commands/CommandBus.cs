@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Icon.Infrastructure.Command
+namespace Icon.Infrastructure.Commands
 {
     public class CommandBus : ICommandBus
     {

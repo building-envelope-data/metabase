@@ -2,8 +2,8 @@ using System; // Func
 using System.Linq; // Enumerable.Empty
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
-using Icon.Infrastructure.Command;
+using Icon.Infrastructure.Aggregates;
+using Icon.Infrastructure.Commands;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Handlers

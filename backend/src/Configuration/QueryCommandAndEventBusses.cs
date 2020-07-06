@@ -5,15 +5,16 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using AddAssociationCheck = Icon.Infrastructure.Aggregate.AddAssociationCheck;
+using AddAssociationCheck = Icon.Infrastructure.Aggregates.AddAssociationCheck;
 using CancellationToken = System.Threading.CancellationToken;
-using Icon.Infrastructure.Command;
-using IAggregateRepository = Icon.Infrastructure.Aggregate.IAggregateRepository;
-using IAggregateRepositorySession = Icon.Infrastructure.Aggregate.IAggregateRepositorySession;
-using IEventSourcedAggregate = Icon.Infrastructure.Aggregate.IEventSourcedAggregate;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Commands;
+using IAggregateRepository = Icon.Infrastructure.Aggregates.IAggregateRepository;
+using IAggregateRepositorySession = Icon.Infrastructure.Aggregates.IAggregateRepositorySession;
+using IEventSourcedAggregate = Icon.Infrastructure.Aggregates.IEventSourcedAggregate;
+using Icon.Infrastructure.Queries;
 using Icon.Infrastructure.Events;
 using Icon.Infrastructure.Models;
+using Icon.Infrastructure.Aggregates;
 
 namespace Icon.Configuration
 {
@@ -609,7 +610,7 @@ namespace Icon.Configuration
                         Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
                         )
             where TAssociationModel : IManyToManyAssociation
-            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
             where TAddInput : ValueObjects.AddManyToManyAssociationInput
             where TAssociationRemovedEvent : IAssociationRemovedEvent
@@ -738,7 +739,7 @@ namespace Icon.Configuration
             where TModel : IModel
             where TAssociationModel : IManyToManyAssociation
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
             where TAddInput : ValueObjects.AddManyToManyAssociationInput
             where TAssociationRemovedEvent : IAssociationRemovedEvent
@@ -759,7 +760,7 @@ namespace Icon.Configuration
                     where TAssociationModel : IManyToManyAssociation
                     where TAssociateModel : IModel
                     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-                    where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+                    where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
                     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : IAssociationAddedEvent
                     where TAddInput : ValueObjects.AddManyToManyAssociationInput
@@ -782,7 +783,7 @@ namespace Icon.Configuration
                     where TAssociationModel : IManyToManyAssociation
                     where TAssociateModel : IModel
                     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-                    where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+                    where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
                     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : IAssociationAddedEvent
                     where TAddInput : ValueObjects.AddManyToManyAssociationInput
@@ -800,7 +801,7 @@ namespace Icon.Configuration
                 )
             where TInput : ValueObjects.AddManyToManyAssociationInput
             where TAggregate : class, IEventSourcedAggregate, new()
-            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, new()
         {
             services.AddScoped<
@@ -820,7 +821,7 @@ namespace Icon.Configuration
                 IServiceCollection services,
                 Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newEvent
                 )
-            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
@@ -844,7 +845,7 @@ namespace Icon.Configuration
                     where TAssociationModel : IOneToManyAssociation
                     where TAssociateModel : IModel
                     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-                    where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+                    where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
                     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : IAssociationAddedEvent
                     where TAddInput : ValueObjects.AddOneToManyAssociationInput
@@ -867,7 +868,7 @@ namespace Icon.Configuration
                     where TAssociationModel : IOneToManyAssociation
                     where TAssociateModel : IModel
                     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-                    where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+                    where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
                     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : IAssociationAddedEvent
                     where TAddInput : ValueObjects.AddOneToManyAssociationInput
@@ -885,7 +886,7 @@ namespace Icon.Configuration
                 )
             where TInput : ValueObjects.AddOneToManyAssociationInput
             where TAggregate : class, IEventSourcedAggregate, new()
-            where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, new()
+            where TAssociationAggregate : class, IOneToManyAssociationAggregate, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, new()
         {
             services.AddScoped<
@@ -905,7 +906,7 @@ namespace Icon.Configuration
                 IServiceCollection services,
                 Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newEvent
                 )
-            where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, new()
+            where TAssociationAggregate : class, IOneToManyAssociationAggregate, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
@@ -938,7 +939,7 @@ namespace Icon.Configuration
             where TAssociationModel : IManyToManyAssociation
             where TAssociateModel : IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -951,7 +952,7 @@ namespace Icon.Configuration
             where TAssociationModel : IManyToManyAssociation
             where TAssociateModel : IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -969,7 +970,7 @@ namespace Icon.Configuration
             where TAssociationModel : IManyToManyAssociation
             where TModel : IModel
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -987,7 +988,7 @@ namespace Icon.Configuration
     where TAssociateModel : IModel
     where TAssociationModel : IManyToManyAssociation
     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-    where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+    where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -999,7 +1000,7 @@ namespace Icon.Configuration
     where TModel : IModel
     where TAssociationModel : IManyToManyAssociation
     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-    where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+    where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
             services.AddScoped<
@@ -1015,7 +1016,7 @@ namespace Icon.Configuration
     where TAssociateModel : IModel
     where TAssociationModel : IManyToManyAssociation
     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-    where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+    where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
             services.AddScoped<
@@ -1032,7 +1033,7 @@ namespace Icon.Configuration
             where TAssociationModel : IOneToManyAssociation
             where TAssociateModel : IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -1045,7 +1046,7 @@ namespace Icon.Configuration
             where TAssociationModel : IOneToManyAssociation
             where TAssociateModel : IModel
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -1063,7 +1064,7 @@ namespace Icon.Configuration
             where TAssociationModel : IOneToManyAssociation
             where TModel : IModel
             where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-            where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -1081,7 +1082,7 @@ namespace Icon.Configuration
     where TAssociateModel : IModel
     where TAssociationModel : IOneToManyAssociation
     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-    where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+    where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -1093,7 +1094,7 @@ namespace Icon.Configuration
     where TModel : IModel
     where TAssociationModel : IOneToManyAssociation
     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-    where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+    where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
             services.AddScoped<
@@ -1109,7 +1110,7 @@ namespace Icon.Configuration
     where TAssociateModel : IModel
     where TAssociationModel : IOneToManyAssociation
     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-    where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+    where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
             services.AddScoped<

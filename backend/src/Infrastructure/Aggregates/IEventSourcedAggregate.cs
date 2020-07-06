@@ -1,6 +1,6 @@
 using System;
 
-namespace Icon.Infrastructure.Aggregate
+namespace Icon.Infrastructure.Aggregates
 {
     public interface IEventSourcedAggregate : IAggregate, IValidatable
     {

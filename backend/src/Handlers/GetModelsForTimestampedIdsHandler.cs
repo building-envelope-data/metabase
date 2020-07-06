@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Aggregates;
 using Icon.Infrastructure.Models;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Queries;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Handlers

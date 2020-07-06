@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using GraphQL.Client.Http; // AsGraphQLHttpResponse
-using Icon.Infrastructure.Aggregate;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Aggregates;
+using Icon.Infrastructure.Queries;
 using CancellationToken = System.Threading.CancellationToken;
 using GraphQLRequest = GraphQL.GraphQLRequest;
 

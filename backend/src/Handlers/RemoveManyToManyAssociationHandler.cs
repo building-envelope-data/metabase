@@ -1,8 +1,8 @@
 using System; // Func
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
-using Icon.Infrastructure.Command;
+using Icon.Infrastructure.Aggregates;
+using Icon.Infrastructure.Commands;
 using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
 
@@ -10,7 +10,7 @@ namespace Icon.Handlers
 {
     public sealed class RemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>
       : ICommandHandler<Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Result<ValueObjects.TimestampedId, Errors>>
-      where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, new()
+      where TAssociationAggregate : class, IManyToManyAssociationAggregate, new()
     {
         private readonly IAggregateRepository _repository;
         private readonly Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> _newAssociationRemovedEvent;

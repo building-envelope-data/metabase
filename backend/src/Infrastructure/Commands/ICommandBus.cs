@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Icon.Infrastructure.Command
+namespace Icon.Infrastructure.Commands
 {
     public interface ICommandBus
     {

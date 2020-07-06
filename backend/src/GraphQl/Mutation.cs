@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using GreenDonut;
 using HotChocolate;
-using Icon.Infrastructure.Command;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Commands;
+using Icon.Infrastructure.Queries;
 using Microsoft.AspNetCore.Identity;
 
 namespace Icon.GraphQl
