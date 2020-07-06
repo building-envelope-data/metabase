@@ -1,6 +1,6 @@
 using Guid = System.Guid;
 
-namespace Icon.Events
+namespace Icon.Infrastructure.Events
 {
     public interface IAssociationAddedEvent
       : ICreatedEvent

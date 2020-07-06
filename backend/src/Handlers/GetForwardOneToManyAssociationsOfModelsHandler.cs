@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Icon.Infrastructure.Aggregate;
 using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Handlers
@@ -12,7 +13,7 @@ namespace Icon.Handlers
         IQueryHandler<Queries.GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel>, IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
             where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAssociationAddedEvent : Events.IAssociationAddedEvent
+            where TAssociationAddedEvent : IAssociationAddedEvent
     {
         public GetForwardOneToManyAssociationsOfModelsHandler(IAggregateRepository repository)
           : base(repository)

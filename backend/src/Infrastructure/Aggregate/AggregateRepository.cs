@@ -1,4 +1,4 @@
-using Icon.Events;
+using Icon.Infrastructure.Events;
 using Marten;
 
 namespace Icon.Infrastructure.Aggregate

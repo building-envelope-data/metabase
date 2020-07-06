@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Icon.Infrastructure.Aggregate;
 using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Handlers
@@ -12,7 +13,7 @@ namespace Icon.Handlers
         IQueryHandler<Queries.GetBackwardOneToManyAssociationOfModels<TAssociateModel, TAssociationModel>, IEnumerable<Result<TAssociationModel, Errors>>>
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
       where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-      where TAssociationAddedEvent : Events.IAssociationAddedEvent
+      where TAssociationAddedEvent : IAssociationAddedEvent
     {
         public GetBackwardOneToManyAssociationOfModelsHandler(IAggregateRepository repository)
           : base(repository)

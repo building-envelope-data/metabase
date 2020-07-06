@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Icon.Infrastructure.Aggregate;
 using Icon.Infrastructure.Command;
+using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Handlers
@@ -12,11 +13,11 @@ namespace Icon.Handlers
       where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, new()
     {
         private readonly IAggregateRepository _repository;
-        private readonly Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, Events.IAssociationRemovedEvent> _newAssociationRemovedEvent;
+        private readonly Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> _newAssociationRemovedEvent;
 
         public RemoveOneToManyAssociationHandler(
             IAggregateRepository repository,
-            Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, Events.IAssociationRemovedEvent> newAssociationRemovedEvent
+            Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
             )
         {
             _repository = repository;

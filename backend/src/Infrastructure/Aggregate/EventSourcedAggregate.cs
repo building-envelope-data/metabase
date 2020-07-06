@@ -2,7 +2,7 @@
 
 using System;
 using CSharpFunctionalExtensions;
-using Icon.Events;
+using Icon.Infrastructure.Events;
 
 namespace Icon.Infrastructure.Aggregate
 {

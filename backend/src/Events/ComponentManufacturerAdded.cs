@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Events;
 using Newtonsoft.Json;
 using Guid = System.Guid;
 

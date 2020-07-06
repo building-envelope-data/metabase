@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Events;
+using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Infrastructure.Aggregate
@@ -10,7 +10,7 @@ namespace Icon.Infrastructure.Aggregate
     public interface IAggregateRepositorySession : IAggregateRepositoryReadOnlySession
     {
         public Task<Result<ValueObjects.Id, Errors>> Create<T>(
-            Func<Guid, Events.ICreatedEvent> newCreatedEvent,
+            Func<Guid, ICreatedEvent> newCreatedEvent,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new();

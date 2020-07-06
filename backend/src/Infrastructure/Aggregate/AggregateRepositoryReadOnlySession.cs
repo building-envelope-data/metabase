@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using HotChocolate;
-using Icon.Events;
+using Icon.Infrastructure.Events;
 using Marten;
 using Marten.Linq;
 using CancellationToken = System.Threading.CancellationToken;

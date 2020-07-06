@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Guid = System.Guid;
 
-namespace Icon.Events
+namespace Icon.Infrastructure.Events
 {
     public abstract class Event
       : Validatable, IEvent

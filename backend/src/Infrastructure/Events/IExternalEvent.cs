@@ -1,4 +1,4 @@
-namespace Icon.Events
+namespace Icon.Infrastructure.Events
 {
     public interface IExternalEvent : IEvent
     {

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using HotChocolate;
-using Icon.Events;
+using Icon.Infrastructure.Events;
 using Marten;
 using CancellationToken = System.Threading.CancellationToken;
 
@@ -27,7 +27,7 @@ namespace Icon.Infrastructure.Aggregate
         }
 
         public async Task<Result<ValueObjects.Id, Errors>> Create<T>(
-            Func<Guid, Events.ICreatedEvent> newCreatedEvent,
+            Func<Guid, ICreatedEvent> newCreatedEvent,
             CancellationToken cancellationToken
             )
           where T : class, IEventSourcedAggregate, new()
@@ -546,7 +546,7 @@ namespace Icon.Infrastructure.Aggregate
                     await Delete<TAssociationAggregate>(
                       associations.Select(association => (
                          association.Timestamp, // TODO Casting to `TimestampedId` could result in a run-time error and must not be done!
-                         (Events.IDeletedEvent)newAssociationRemovedEvent(association.Id)
+                         (IDeletedEvent)newAssociationRemovedEvent(association.Id)
                          )
                         ),
                       cancellationToken

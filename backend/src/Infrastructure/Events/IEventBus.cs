@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Icon.Events
+namespace Icon.Infrastructure.Events
 {
     public interface IEventBus
     {

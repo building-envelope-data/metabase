@@ -1,7 +1,7 @@
 using CSharpFunctionalExtensions;
 using Guid = System.Guid;
 
-namespace Icon.Events
+namespace Icon.Infrastructure.Events
 {
     public abstract class AssociationAddedEvent
       : CreatedEvent, IAssociationAddedEvent

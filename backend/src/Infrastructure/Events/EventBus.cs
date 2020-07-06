@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Icon.Events
+namespace Icon.Infrastructure.Events
 {
     public class EventBus : IEventBus
     {
@@ -25,7 +25,7 @@ namespace Icon.Events
         public Task Publish<TEvent>(params TEvent[] events)
           where TEvent : IEvent
         {
-            return Publish<TEvent>(events);
+            return Publish(events);
         }
     }
 }

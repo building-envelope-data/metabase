@@ -1,18 +1,18 @@
 using CSharpFunctionalExtensions;
 using Guid = System.Guid;
 
-namespace Icon.Events
+namespace Icon.Infrastructure.Events
 {
-    public abstract class DeletedEvent
-      : Event, IDeletedEvent
+    public abstract class CreatedEvent
+      : Event, ICreatedEvent
     {
         public Guid AggregateId { get; set; }
 
 #nullable disable
-        public DeletedEvent() { }
+        public CreatedEvent() { }
 #nullable enable
 
-        public DeletedEvent(
+        public CreatedEvent(
             Guid aggregateId,
             Guid creatorId
             )
