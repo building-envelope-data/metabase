@@ -1,3 +1,4 @@
+using Icon.Infrastructure.Models;
 using Exception = System.Exception;
 
 namespace Icon.GraphQl
@@ -18,7 +19,7 @@ namespace Icon.GraphQl
         }
 
         public static Node FromModel(
-            Models.IModel model,
+            IModel model,
             ValueObjects.Timestamp requestTimestamp
             )
         {

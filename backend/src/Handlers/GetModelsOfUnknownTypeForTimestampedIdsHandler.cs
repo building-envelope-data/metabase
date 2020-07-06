@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Models;
 using Icon.Infrastructure.Query;
 using CancellationToken = System.Threading.CancellationToken;
 using Exception = System.Exception;
@@ -10,7 +11,7 @@ using Type = System.Type;
 namespace Icon.Handlers
 {
     public sealed class GetModelsOfUnknownTypeForTimestampedIdsHandler
-      : IQueryHandler<Queries.GetModelsForTimestampedIds<Models.IModel>, IEnumerable<Result<Models.IModel, Errors>>>
+      : IQueryHandler<Queries.GetModelsForTimestampedIds<IModel>, IEnumerable<Result<IModel, Errors>>>
     {
         private readonly IAggregateRepository _repository;
         private readonly IDictionary<Type, IGetModelsForTimestampedIdsHandler> _aggregateTypeToGetHandler;
@@ -87,8 +88,8 @@ namespace Icon.Handlers
             };
         }
 
-        public async Task<IEnumerable<Result<Models.IModel, Errors>>> Handle(
-            Queries.GetModelsForTimestampedIds<Models.IModel> query,
+        public async Task<IEnumerable<Result<IModel, Errors>>> Handle(
+            Queries.GetModelsForTimestampedIds<IModel> query,
             CancellationToken cancellationToken
             )
         {

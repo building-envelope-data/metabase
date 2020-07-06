@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using HotChocolate;
 using Icon.Infrastructure.Events;
+using Icon.Infrastructure.Models;
 using Marten;
 using Marten.Linq;
 using CancellationToken = System.Threading.CancellationToken;
@@ -1136,7 +1137,7 @@ namespace Icon.Infrastructure.Aggregate
             Func<IEnumerable<ValueObjects.TimestampedId>, CancellationToken, Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>> getAssociations,
             CancellationToken cancellationToken
             )
-          where TAssociationModel : Models.IAssociation
+          where TAssociationModel : IAssociation
           where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
           where TAssociationAggregate : class, Aggregates.IAssociationAggregate, IConvertible<TAssociationModel>, new()
           where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()

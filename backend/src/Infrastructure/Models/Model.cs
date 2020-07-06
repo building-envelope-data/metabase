@@ -1,4 +1,4 @@
-namespace Icon.Models
+namespace Icon.Infrastructure.Models
 {
     public abstract class Model
       : IModel

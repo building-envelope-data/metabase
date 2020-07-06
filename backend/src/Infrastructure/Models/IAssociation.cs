@@ -1,4 +1,4 @@
-namespace Icon.Models
+namespace Icon.Infrastructure.Models
 {
     public interface IAssociation
       : IModel

@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Models;
 
 namespace Icon.Models
 {

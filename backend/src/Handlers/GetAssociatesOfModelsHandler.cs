@@ -1,9 +1,10 @@
 using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Models;
 
 namespace Icon.Handlers
 {
     public abstract class GetAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>
-      where TAssociationModel : Models.IAssociation
+      where TAssociationModel : IAssociation
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, Aggregates.IAssociationAggregate, IConvertible<TAssociationModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
