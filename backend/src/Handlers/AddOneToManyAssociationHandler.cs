@@ -1,8 +1,9 @@
 using System; // Func
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
-using Icon.Infrastructure.Command;
+using Icon.Infrastructure.Aggregates;
+using Icon.Infrastructure.Commands;
+using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Handlers
@@ -11,15 +12,15 @@ namespace Icon.Handlers
       : ICommandHandler<Commands.AddAssociation<TInput>, Result<ValueObjects.TimestampedId, Errors>>
       where TInput : ValueObjects.AddOneToManyAssociationInput
       where TAggregate : class, IEventSourcedAggregate, new()
-      where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, new()
+      where TAssociationAggregate : class, IOneToManyAssociationAggregate, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, new()
     {
         private readonly IAggregateRepository _repository;
-        private readonly Func<Guid, Commands.AddAssociation<TInput>, Events.IAssociationAddedEvent> _newAssociationAddedEvent;
+        private readonly Func<Guid, Commands.AddAssociation<TInput>, IAssociationAddedEvent> _newAssociationAddedEvent;
 
         public AddOneToManyAssociationHandler(
             IAggregateRepository repository,
-            Func<Guid, Commands.AddAssociation<TInput>, Events.IAssociationAddedEvent> newAssociationAddedEvent
+            Func<Guid, Commands.AddAssociation<TInput>, IAssociationAddedEvent> newAssociationAddedEvent
             )
         {
             _repository = repository;

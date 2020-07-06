@@ -1,5 +1,5 @@
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Command;
+using Icon.Infrastructure.Commands;
 
 namespace Icon.Commands
 {

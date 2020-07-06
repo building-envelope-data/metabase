@@ -1,10 +1,10 @@
-using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Aggregates;
 
 namespace Icon.Handlers
 {
     public abstract class GetAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate>
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-      where TAssociationAggregate : class, Aggregates.IAssociationAggregate, IConvertible<TAssociationModel>, new()
+      where TAssociationAggregate : class, IAssociationAggregate, IConvertible<TAssociationModel>, new()
     {
         protected readonly IAggregateRepository _repository;
 

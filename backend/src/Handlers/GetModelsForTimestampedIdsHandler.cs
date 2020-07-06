@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Aggregates;
+using Icon.Infrastructure.Models;
+using Icon.Infrastructure.Queries;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Handlers
@@ -11,7 +12,7 @@ namespace Icon.Handlers
     public sealed class GetModelsForTimestampedIdsHandler<M, A>
       : IQueryHandler<Queries.GetModelsForTimestampedIds<M>, IEnumerable<Result<M, Errors>>>,
         IGetModelsForTimestampedIdsHandler
-      where M : Models.IModel
+      where M : IModel
       where A : class, IEventSourcedAggregate, IConvertible<M>, new()
     {
         private readonly IAggregateRepository _repository;
@@ -51,7 +52,7 @@ namespace Icon.Handlers
                 );
         }
 
-        public async Task<IEnumerable<Result<Models.IModel, Errors>>> HandleX(
+        public async Task<IEnumerable<Result<IModel, Errors>>> HandleX(
             IAggregateRepositoryReadOnlySession session,
             IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
@@ -61,7 +62,7 @@ namespace Icon.Handlers
               (await Handle(session, timestampedIds, cancellationToken)
                .ConfigureAwait(false)
                )
-              .Select(r => r.Map(m => (Models.IModel)m));
+              .Select(r => r.Map(m => (IModel)m));
         }
     }
 }

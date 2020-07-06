@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Models;
 
 namespace Icon.Models
 {

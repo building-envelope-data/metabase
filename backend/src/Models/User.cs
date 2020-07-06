@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using Guid = System.Guid;
 

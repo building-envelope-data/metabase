@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Icon.Infrastructure.Events;
 using Guid = System.Guid;
 using Uri = System.Uri;
 

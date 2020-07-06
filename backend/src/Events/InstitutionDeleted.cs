@@ -1,3 +1,4 @@
+using Icon.Infrastructure.Events;
 using Guid = System.Guid;
 
 namespace Icon.Events

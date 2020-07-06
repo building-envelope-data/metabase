@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using GreenDonut;
 using HotChocolate;
-using IQueryBus = Icon.Infrastructure.Query.IQueryBus;
+using IQueryBus = Icon.Infrastructure.Queries.IQueryBus;
 using Uri = System.Uri;
 
 namespace Icon.GraphQl

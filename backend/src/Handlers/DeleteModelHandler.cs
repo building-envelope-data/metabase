@@ -2,8 +2,9 @@ using System; // Func
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
-using Icon.Infrastructure.Command;
+using Icon.Infrastructure.Aggregates;
+using Icon.Infrastructure.Commands;
+using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace Icon.Handlers
@@ -13,12 +14,12 @@ namespace Icon.Handlers
       where TAggregate : class, IEventSourcedAggregate, new()
     {
         private readonly IAggregateRepository _repository;
-        private readonly Func<Commands.Delete<TModel>, Events.IDeletedEvent> _newDeletedEvent;
+        private readonly Func<Commands.Delete<TModel>, IDeletedEvent> _newDeletedEvent;
         private readonly IEnumerable<Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>> _removeAssociations;
 
         public DeleteModelHandler(
             IAggregateRepository repository,
-            Func<Commands.Delete<TModel>, Events.IDeletedEvent> newDeletedEvent,
+            Func<Commands.Delete<TModel>, IDeletedEvent> newDeletedEvent,
             IEnumerable<Func<IAggregateRepositorySession, ValueObjects.TimestampedId, ValueObjects.Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
             )
         {

@@ -1,20 +1,22 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Aggregates;
+using Icon.Infrastructure.Queries;
+using Icon.Infrastructure.Events;
 using CancellationToken = System.Threading.CancellationToken;
+using Icon.Infrastructure.Models;
 
 namespace Icon.Handlers
 {
     public sealed class GetForwardOneToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>
       : GetOneToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>,
         IQueryHandler<Queries.GetForwardOneToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
-      where TAssociationModel : Models.IOneToManyAssociation
+      where TAssociationModel : IOneToManyAssociation
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-      where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+      where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-      where TAssociationAddedEvent : Events.IAssociationAddedEvent
+      where TAssociationAddedEvent : IAssociationAddedEvent
     {
         public GetForwardOneToManyAssociatesOfModelsHandler(
             IAggregateRepository repository

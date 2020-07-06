@@ -1,5 +1,5 @@
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Aggregates;
 using Marten.Schema;
 using Guid = System.Guid;
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Aggregates;
 using GraphQLRequest = GraphQL.GraphQLRequest;
 using Guid = System.Guid;
 

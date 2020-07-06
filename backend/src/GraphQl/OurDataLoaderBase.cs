@@ -1,5 +1,5 @@
 using GreenDonut;
-using Icon.Infrastructure.Query;
+using Icon.Infrastructure.Queries;
 
 namespace Icon.GraphQl
 {

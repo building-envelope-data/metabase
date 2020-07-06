@@ -1,6 +1,6 @@
 using System;
 using CSharpFunctionalExtensions;
-using Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Aggregates;
 using Marten.Schema;
 
 namespace Icon.Aggregates

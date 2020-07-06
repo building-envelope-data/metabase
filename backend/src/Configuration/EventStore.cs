@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Aggregate = Icon.Infrastructure.Aggregate;
+using Icon.Infrastructure.Aggregates;
 
 namespace Icon.Configuration
 {
@@ -17,7 +17,7 @@ namespace Icon.Configuration
                   serviceProvider.GetRequiredService<ILogger<EventStore>>()
                   )
                 );
-            services.AddScoped<Aggregate.IAggregateRepository, Aggregate.AggregateRepository>();
+            services.AddScoped<IAggregateRepository, AggregateRepository>();
         }
 
         public static Marten.IDocumentStore BuildDocumentStore(IWebHostEnvironment environment, AppSettings.DatabaseSettings databaseSettings, ILogger<EventStore> logger)

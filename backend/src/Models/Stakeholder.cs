@@ -1,3 +1,5 @@
+using Icon.Infrastructure.Models;
+
 namespace Icon.Models
 {
     public abstract class Stakeholder
