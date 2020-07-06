@@ -68,6 +68,10 @@ trace : ## Trace the dotnet process `Icon`
 			--providers Microsoft-Windows-DotNETRuntime
 .PHONY : trace
 
+# https://github.com/JosefPihrt/Roslynator/blob/master/docs/cli/README.md
+analyze : ## Analyze with Roslynator
+	dotnet tool run roslynator analyze
+
 play : ## Run facts in `Test.Play` (semi-alternative to the buggy `dotnet script` REPL)
 	dotnet test --filter "FullyQualifiedName~Test.Play"
 .PHONY : play
