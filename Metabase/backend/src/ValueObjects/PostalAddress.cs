@@ -23,6 +23,7 @@ namespace Metabase.ValueObjects
             postalAddress = postalAddress.Trim();
 
             if (postalAddress.Length == 0)
+            {
                 return Result.Failure<PostalAddress, Errors>(
                     Errors.One(
                     message: "Postal address is empty",
@@ -30,8 +31,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (postalAddress.Length > 256)
+            {
                 return Result.Failure<PostalAddress, Errors>(
                     Errors.One(
                     message: "Postal address is too long",
@@ -39,7 +41,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<PostalAddress, Errors>(
                 new PostalAddress(postalAddress)
                 );

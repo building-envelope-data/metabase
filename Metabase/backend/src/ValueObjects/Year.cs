@@ -22,6 +22,7 @@ namespace Metabase.ValueObjects
             )
         {
             if (year > DateTime.UtcNow.Year)
+            {
                 return Result.Failure<Year, Errors>(
                     Errors.One(
                     message: "Year is in the future",
@@ -29,7 +30,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Year, Errors>(new Year(year));
         }
 

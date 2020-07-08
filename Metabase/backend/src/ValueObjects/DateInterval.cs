@@ -30,6 +30,7 @@ namespace Metabase.ValueObjects
             )
         {
             if (start is null && end is null)
+            {
                 return Result.Failure<DateInterval, Errors>(
                     Errors.One(
                     message: "Start and end are both unspecified",
@@ -37,8 +38,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (!(start is null) && !(end is null) && start > end)
+            {
                 return Result.Failure<DateInterval, Errors>(
                     Errors.One(
                     message: "Start lies after end",
@@ -46,7 +48,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<DateInterval, Errors>(
                 new DateInterval(
                   start: start,

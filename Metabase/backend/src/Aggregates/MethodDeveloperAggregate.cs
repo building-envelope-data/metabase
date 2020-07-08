@@ -32,12 +32,13 @@ namespace Metabase.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
+            {
                 return Result.Combine(
                     base.Validate(),
                     ValidateEmpty(MethodId, nameof(MethodId)),
                     ValidateEmpty(StakeholderId, nameof(StakeholderId))
                     );
-
+            }
             return Result.Combine(
                   base.Validate(),
                   ValidateNonEmpty(MethodId, nameof(MethodId)),

@@ -23,6 +23,7 @@ namespace Metabase.ValueObjects
             name = name.Trim();
 
             if (name.Length == 0)
+            {
                 return Result.Failure<Name, Errors>(
                     Errors.One(
                     message: "Name is empty",
@@ -30,8 +31,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (name.Length > 128)
+            {
                 return Result.Failure<Name, Errors>(
                     Errors.One(
                     message: "Name is too long",
@@ -39,7 +41,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Name, Errors>(
                 new Name(name)
                 );

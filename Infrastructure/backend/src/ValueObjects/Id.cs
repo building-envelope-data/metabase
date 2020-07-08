@@ -32,6 +32,7 @@ namespace Infrastructure.ValueObjects
             )
         {
             if (id == Guid.Empty)
+            {
                 return Result.Failure<Id, Errors>(
                     Errors.One(
                     message: "Id is empty",
@@ -39,7 +40,7 @@ namespace Infrastructure.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Id, Errors>(new Id(id));
         }
 

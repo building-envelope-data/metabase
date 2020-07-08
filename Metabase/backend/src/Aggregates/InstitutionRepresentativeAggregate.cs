@@ -44,6 +44,7 @@ namespace Metabase.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
+            {
                 // All default values are listed under
                 // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/default-values
                 return Result.Combine(
@@ -52,7 +53,7 @@ namespace Metabase.Aggregates
                     ValidateEmpty(UserId, nameof(UserId)),
                     ValidateEquality(Role, ValueObjects.InstitutionRepresentativeRole.OWNER, nameof(Role))
                     );
-
+            }
             return Result.Combine(
                   base.Validate(),
                   ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),

@@ -21,8 +21,8 @@ namespace Metabase.ValueObjects
             )
         {
             section = section.Trim();
-
             if (section.Length == 0)
+            {
                 return Result.Failure<Section, Errors>(
                     Errors.One(
                     message: "Section is empty",
@@ -30,8 +30,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (section.Length > 128)
+            {
                 return Result.Failure<Section, Errors>(
                     Errors.One(
                     message: "Section is too long",
@@ -39,7 +40,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Section, Errors>(new Section(section));
         }
 

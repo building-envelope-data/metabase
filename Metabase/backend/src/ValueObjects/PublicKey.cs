@@ -21,8 +21,8 @@ namespace Metabase.ValueObjects
             )
         {
             publicKey = publicKey.Trim();
-
             if (publicKey.Length == 0)
+            {
                 return Result.Failure<PublicKey, Errors>(
                     Errors.One(
                     message: "Public key is empty",
@@ -30,8 +30,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (publicKey.Length > 512)
+            {
                 return Result.Failure<PublicKey, Errors>(
                     Errors.One(
                     message: "Public key is too long",
@@ -39,7 +40,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<PublicKey, Errors>(new PublicKey(publicKey));
         }
 

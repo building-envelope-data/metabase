@@ -23,6 +23,7 @@ namespace Metabase.ValueObjects
             mainNumber = mainNumber.Trim();
 
             if (mainNumber.Length == 0)
+            {
                 return Result.Failure<MainNumber, Errors>(
                     Errors.One(
                     message: "Main number is empty",
@@ -30,8 +31,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (mainNumber.Length > 128)
+            {
                 return Result.Failure<MainNumber, Errors>(
                     Errors.One(
                     message: "Main number is too long",
@@ -39,7 +41,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<MainNumber, Errors>(new MainNumber(mainNumber));
         }
 

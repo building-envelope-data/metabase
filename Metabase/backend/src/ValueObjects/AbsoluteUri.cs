@@ -22,6 +22,7 @@ namespace Metabase.ValueObjects
             )
         {
             if (!uri.IsAbsoluteUri)
+            {
                 return Result.Failure<AbsoluteUri, Errors>(
                     Errors.One(
                     message: "Uri is not absolute",
@@ -29,7 +30,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<AbsoluteUri, Errors>(new AbsoluteUri(uri));
         }
 

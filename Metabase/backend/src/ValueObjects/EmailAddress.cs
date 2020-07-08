@@ -24,6 +24,7 @@ namespace Metabase.ValueObjects
             emailAddress = emailAddress.Trim();
 
             if (emailAddress.Length == 0)
+            {
                 return Result.Failure<EmailAddress, Errors>(
                     Errors.One(
                     message: "Email address is empty",
@@ -31,8 +32,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (!Regex.IsMatch(emailAddress, @"^(.+)@(.+)$"))
+            {
                 return Result.Failure<EmailAddress, Errors>(
                     Errors.One(
                     message: "Email address is invalid",
@@ -40,7 +42,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<EmailAddress, Errors>(new EmailAddress(emailAddress));
         }
 

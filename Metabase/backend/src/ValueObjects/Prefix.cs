@@ -21,8 +21,8 @@ namespace Metabase.ValueObjects
             )
         {
             prefix = prefix.Trim();
-
             if (prefix.Length == 0)
+            {
                 return Result.Failure<Prefix, Errors>(
                     Errors.One(
                     message: "Prefix is empty",
@@ -30,8 +30,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (prefix.Length > 10)
+            {
                 return Result.Failure<Prefix, Errors>(
                     Errors.One(
                     message: "Prefix is too long",
@@ -39,7 +40,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Prefix, Errors>(new Prefix(prefix));
         }
 

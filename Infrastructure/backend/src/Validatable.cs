@@ -15,13 +15,14 @@ namespace Infrastructure
             )
         {
             if (!(@object is null))
+            {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} is non-null but has the value {@object}",
                       code: ErrorCodes.InvalidValue
                       )
                     );
-
+            }
             return Result.Ok<bool, Errors>(true);
         }
 
@@ -31,13 +32,14 @@ namespace Infrastructure
             )
         {
             if (@object is null)
+            {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} is null",
                       code: ErrorCodes.InvalidValue
                       )
                     );
-
+            }
             return Result.Ok<bool, Errors>(true);
         }
 
@@ -47,13 +49,14 @@ namespace Infrastructure
             )
         {
             if (id != Guid.Empty)
+            {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} is non-empty but but has the value {id}",
                       code: ErrorCodes.InvalidValue
                       )
                     );
-
+            }
             return Result.Ok<bool, Errors>(true);
         }
 
@@ -63,13 +66,14 @@ namespace Infrastructure
             )
         {
             if (id == Guid.Empty)
+            {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} is empty",
                       code: ErrorCodes.InvalidValue
                       )
                     );
-
+            }
             return Result.Ok<bool, Errors>(true);
         }
 
@@ -93,13 +97,14 @@ namespace Infrastructure
             )
         {
             if (!(dateTime == DateTime.MinValue))
+            {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} does not have the default value but the value {dateTime}",
                       code: ErrorCodes.InvalidValue
                       )
                     );
-
+            }
             return Result.Ok<bool, Errors>(true);
         }
 
@@ -109,13 +114,14 @@ namespace Infrastructure
             )
         {
             if (dateTime == DateTime.MinValue)
+            {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} has the default value {DateTime.MinValue}",
                       code: ErrorCodes.InvalidValue
                       )
                     );
-
+            }
             return Result.Ok<bool, Errors>(true);
         }
 
@@ -125,13 +131,14 @@ namespace Infrastructure
             )
         {
             if (!(number == 0))
+            {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} is not 0 but the number {number}",
                       code: ErrorCodes.InvalidValue
                       )
                     );
-
+            }
             return Result.Ok<bool, Errors>(true);
         }
 
@@ -141,13 +148,14 @@ namespace Infrastructure
             )
         {
             if (number == 0)
+            {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} is 0",
                       code: ErrorCodes.InvalidValue
                       )
                     );
-
+            }
             return Result.Ok<bool, Errors>(true);
         }
 
@@ -162,13 +170,14 @@ namespace Infrastructure
             // and
             // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/how-to-define-value-equality-for-a-type
             if (!object.Equals(@object, expected))
+            {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
                       message: $"{variableName} does not have the expected value {expected} but the value {@object}",
                       code: ErrorCodes.InvalidValue
                       )
                     );
-
+            }
             return Result.Ok<bool, Errors>(true);
         }
 

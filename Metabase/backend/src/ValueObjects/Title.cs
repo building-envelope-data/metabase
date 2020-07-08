@@ -21,8 +21,8 @@ namespace Metabase.ValueObjects
             )
         {
             title = title.Trim();
-
             if (title.Length == 0)
+            {
                 return Result.Failure<Title, Errors>(
                     Errors.One(
                     message: "Title is empty",
@@ -30,8 +30,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (title.Length > 128)
+            {
                 return Result.Failure<Title, Errors>(
                     Errors.One(
                     message: "Title is too long",
@@ -39,7 +40,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Title, Errors>(new Title(title));
         }
 

@@ -39,6 +39,7 @@ namespace Metabase.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
+            {
                 return Result.Combine(
                       base.Validate(),
                       ValidateNull(Name, nameof(Name)),
@@ -47,7 +48,7 @@ namespace Metabase.Aggregates
                       ValidateNull(EmailAddress, nameof(EmailAddress)),
                       ValidateNull(WebsiteLocator, nameof(WebsiteLocator))
                     );
-
+            }
             return Result.Combine(
                   base.Validate(),
                   ValidateNonNull(Name, nameof(Name)),

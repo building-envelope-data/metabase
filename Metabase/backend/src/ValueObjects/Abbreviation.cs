@@ -23,6 +23,7 @@ namespace Metabase.ValueObjects
             abbreviation = abbreviation.Trim();
 
             if (abbreviation.Length == 0)
+            {
                 return Result.Failure<Abbreviation, Errors>(
                     Errors.One(
                     message: "Abbreviation is empty",
@@ -30,8 +31,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (abbreviation.Length > 32)
+            {
                 return Result.Failure<Abbreviation, Errors>(
                     Errors.One(
                     message: "Abbreviation is too long",
@@ -39,7 +41,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Abbreviation, Errors>(
                 new Abbreviation(abbreviation)
                 );

@@ -23,6 +23,7 @@ namespace Metabase.ValueObjects
             description = description.Trim();
 
             if (description.Length == 0)
+            {
                 return Result.Failure<Description, Errors>(
                     Errors.One(
                     message: "Description is empty",
@@ -30,8 +31,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (description.Length > 512)
+            {
                 return Result.Failure<Description, Errors>(
                     Errors.One(
                     message: "Description is too long",
@@ -39,7 +41,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Description, Errors>(new Description(description));
         }
 

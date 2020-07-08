@@ -21,8 +21,8 @@ namespace Metabase.ValueObjects
             )
         {
             suffix = suffix.Trim();
-
             if (suffix.Length == 0)
+            {
                 return Result.Failure<Suffix, Errors>(
                     Errors.One(
                     message: "Suffix is empty",
@@ -30,8 +30,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (suffix.Length > 10)
+            {
                 return Result.Failure<Suffix, Errors>(
                     Errors.One(
                     message: "Suffix is too long",
@@ -39,7 +40,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Suffix, Errors>(new Suffix(suffix));
         }
 

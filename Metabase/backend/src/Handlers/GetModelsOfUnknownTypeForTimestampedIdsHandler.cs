@@ -103,11 +103,13 @@ namespace Metabase.Handlers
                     (session, aggregateType, timestampedIds, cancellationToken) =>
                     {
                         if (_aggregateTypeToGetHandler.ContainsKey(aggregateType))
+                        {
                             return _aggregateTypeToGetHandler[aggregateType].HandleX(
                                 session,
                                 timestampedIds,
                                 cancellationToken
                               );
+                        }
                         // TODO Return failure result instead.
                         throw new Exception($"The aggregate type {aggregateType} is not supported");
                         /* return Result.Failure<Models.MethodDeveloper, Errors>( */

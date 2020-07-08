@@ -31,6 +31,7 @@ namespace Infrastructure.ValueObjects
         {
             var nonNullNow = now ?? DateTime.UtcNow;
             if (timestamp > nonNullNow)
+            {
                 return Result.Failure<Timestamp, Errors>(
                     Errors.One(
                     message: $"Timestamp {timestamp} is in the future where {nonNullNow} is now",
@@ -38,7 +39,7 @@ namespace Infrastructure.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Timestamp, Errors>(
                 new Timestamp(timestamp)
                 );

@@ -35,13 +35,14 @@ namespace Metabase.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
+            {
                 return Result.Combine(
                     base.Validate(),
                     ValidateNull(Name, nameof(Name)),
                     ValidateNull(Description, nameof(Description)),
                     ValidateNull(Locator, nameof(Locator))
                   );
-
+            }
             return Result.Combine(
                   base.Validate(),
                   ValidateNonNull(Name, nameof(Name)),

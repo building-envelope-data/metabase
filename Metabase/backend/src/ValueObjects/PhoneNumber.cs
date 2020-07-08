@@ -21,8 +21,8 @@ namespace Metabase.ValueObjects
             )
         {
             phoneNumber = phoneNumber.Trim();
-
             if (phoneNumber.Length == 0)
+            {
                 return Result.Failure<PhoneNumber, Errors>(
                     Errors.One(
                     message: "Phone number is empty",
@@ -30,8 +30,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (phoneNumber.Length > 128)
+            {
                 return Result.Failure<PhoneNumber, Errors>(
                     Errors.One(
                     message: "Phone number is too long",
@@ -39,7 +40,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<PhoneNumber, Errors>(
                 new PhoneNumber(phoneNumber)
                 );

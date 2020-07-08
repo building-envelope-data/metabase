@@ -23,6 +23,7 @@ namespace Metabase.ValueObjects
             @abstract = @abstract.Trim();
 
             if (@abstract.Length == 0)
+            {
                 return Result.Failure<Abstract, Errors>(
                     Errors.One(
                     message: "Abstract is empty",
@@ -30,8 +31,9 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             if (@abstract.Length > 128)
+            {
                 return Result.Failure<Abstract, Errors>(
                     Errors.One(
                     message: "Abstract is too long",
@@ -39,7 +41,7 @@ namespace Metabase.ValueObjects
                     path: path
                     )
                     );
-
+            }
             return Result.Ok<Abstract, Errors>(new Abstract(@abstract));
         }
 

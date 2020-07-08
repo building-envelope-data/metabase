@@ -52,11 +52,9 @@ namespace Metabase.Handlers
                   .Bind(async aggregateType =>
                     {
                         if (aggregateType == typeof(Aggregates.InstitutionAggregate))
-                            return await _addInstitutionMethodDeveloperHandler.Handle(session, command, cancellationToken)
-                            .ConfigureAwait(false);
+                            return await _addInstitutionMethodDeveloperHandler.Handle(session, command, cancellationToken).ConfigureAwait(false);
                         if (aggregateType == typeof(Aggregates.PersonAggregate))
-                            return await _addPersonMethodDeveloperHandler.Handle(session, command, cancellationToken)
-                            .ConfigureAwait(false);
+                            return await _addPersonMethodDeveloperHandler.Handle(session, command, cancellationToken).ConfigureAwait(false);
                         return Result.Failure<TimestampedId, Errors>(
                         Errors.One(
                           message: $"The stakeholder with id {command.Input.StakeholderId} has the aggregate type {aggregateType} which is none of the expected types {typeof(Aggregates.InstitutionAggregate)} and {typeof(Aggregates.PersonAggregate)}",

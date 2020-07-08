@@ -63,8 +63,9 @@ namespace Infrastructure.Aggregates
         public override Result<bool, Errors> Validate()
         {
             if (IsVirgin())
+            {
                 return Result.Ok<bool, Errors>(true);
-
+            }
             return
               Result.Combine<bool, Errors>(
                 ValidateNonEmpty(Id, nameof(Id)),
@@ -76,6 +77,7 @@ namespace Infrastructure.Aggregates
         public Result<bool, Errors> ValidateNonVirgin()
         {
             if (IsVirgin())
+            {
                 return
                   Result.Failure<bool, Errors>(
                       Errors.One(
@@ -83,7 +85,7 @@ namespace Infrastructure.Aggregates
                         code: ErrorCodes.InvalidState
                         )
                       );
-
+            }
             return Validate();
         }
     }
