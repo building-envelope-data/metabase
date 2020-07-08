@@ -96,7 +96,7 @@ namespace Infrastructure
             string variableName
             )
         {
-            if (!(dateTime == DateTime.MinValue))
+            if (dateTime != DateTime.MinValue)
             {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
@@ -130,7 +130,7 @@ namespace Infrastructure
             string variableName
             )
         {
-            if (!(number == 0))
+            if (number != 0)
             {
                 return Result.Failure<bool, Errors>(
                     Errors.One(
