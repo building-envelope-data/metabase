@@ -234,7 +234,7 @@ namespace Infrastructure.Aggregates
               .Bind(nonEmptyId =>
                   timestampResult.Bind(timestamp =>
                     TimestampedId.From(
-                      id, timestamp
+                      nonEmptyId, timestamp
                       )
                     )
                   );
