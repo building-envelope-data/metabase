@@ -27,7 +27,7 @@ namespace Test.Integration.Web.Api.GraphQl.Query
         public async Task Empty()
         {
             // Act
-            var components = await Client.GetComponentsSuccessfully();
+            var components = await Client.GetComponentsSuccessfully().ConfigureAwait(false);
             // Assert
             components.Should().BeEmpty();
         }
@@ -47,9 +47,9 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                     categories: new ValueObjects.ComponentCategory[0] { }
                     )
                   )
-                );
+                ).ConfigureAwait(false);
             // Act
-            var components = await Client.GetComponentsSuccessfully();
+            var components = await Client.GetComponentsSuccessfully().ConfigureAwait(false);
             // Assert
             components
               .Should().NotBeEmpty()
@@ -76,7 +76,7 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                     categories: new ValueObjects.ComponentCategory[0] { }
                     )
                   )
-                ),
+                ).ConfigureAwait(false),
               await Client.CreateComponentSuccessfully(
                   new GraphQlClient.CreateComponentInput(
                     new GraphQlClient.ComponentInformationInput(
@@ -92,7 +92,7 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                       }
                       )
                     )
-                  ),
+                  ).ConfigureAwait(false),
               await Client.CreateComponentSuccessfully(
                   new GraphQlClient.CreateComponentInput(
                     new GraphQlClient.ComponentInformationInput(
@@ -108,7 +108,7 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                       }
                       )
                     )
-                  ),
+                  ).ConfigureAwait(false),
               await Client.CreateComponentSuccessfully(
                   new GraphQlClient.CreateComponentInput(
                     new GraphQlClient.ComponentInformationInput(
@@ -120,7 +120,7 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                       categories: new ValueObjects.ComponentCategory[0] { }
                       )
                     )
-                  ),
+                  ).ConfigureAwait(false),
               await Client.CreateComponentSuccessfully(
                   new GraphQlClient.CreateComponentInput(
                     new GraphQlClient.ComponentInformationInput(
@@ -135,10 +135,10 @@ namespace Test.Integration.Web.Api.GraphQl.Query
                       }
                       )
                     )
-                  )
+                  ).ConfigureAwait(false)
           };
             // Act
-            var components = await Client.GetComponentsSuccessfully();
+            var components = await Client.GetComponentsSuccessfully().ConfigureAwait(false);
             // Assert
             components
               .Should().NotBeEmpty()

@@ -25,7 +25,7 @@ namespace Test.Integration.Web.Api
                         /* Created = DateTime.UtcNow, */
                     },
                     "simonSIMON123@"
-                    );
+                    ).ConfigureAwait(false);
             // TODO fail if `!identityResult.Succeeded` and report `identityResult.Errors`, see https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.identityresult?view=aspnetcore-3.0
         }
 

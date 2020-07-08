@@ -53,7 +53,7 @@ namespace Metabase.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await Do(session, query.TimestampedIds, cancellationToken);
+                return await Do(session, query.TimestampedIds, cancellationToken).ConfigureAwait(false);
             }
         }
     }

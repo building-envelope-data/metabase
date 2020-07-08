@@ -37,7 +37,7 @@ namespace Test.Integration.Web.Api
         {
             using (var scope = Services.CreateScope())
             {
-                await what(scope.ServiceProvider);
+                await what(scope.ServiceProvider).ConfigureAwait(false);
             }
         }
 
@@ -118,7 +118,7 @@ namespace Test.Integration.Web.Api
         public async Task SeedUsers()
         {
             await DoAsync(
-                    async services => await SeedData.SeedUsers(services.GetRequiredService<UserManager<Models.UserX>>())
+                    async services => await SeedData.SeedUsers(services.GetRequiredService<UserManager<Models.UserX>>()).ConfigureAwait(false)
             ).ConfigureAwait(false);
         }
 

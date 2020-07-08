@@ -48,7 +48,7 @@ namespace Metabase.Handlers
             )
         {
             return await
-              (await session.Load<TAggregate>(command.TimestampedId, cancellationToken))
+              (await session.Load<TAggregate>(command.TimestampedId, cancellationToken).ConfigureAwait(false))
               .Bind(async _ =>
                   {
                       // We cannot aggregate the removal tasks and execute them in

@@ -57,7 +57,7 @@ namespace Metabase.GraphQl
               (
                await institutionLoader.LoadAsync(
                  TimestampHelpers.TimestampId(database.Id, database.RequestTimestamp)
-                 )
+                 ).ConfigureAwait(false)
               )
               .Id;
         }

@@ -29,7 +29,7 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
                     categories: new ValueObjects.ComponentCategory[0] { }
                     )
                 )
-                );
+                ).ConfigureAwait(false);
             // Assert
             errors.Count.Should().Be(1);
             errors[0]?.extensions?.code?.Should().Be("AUTH_NOT_AUTHENTICATED");
@@ -40,9 +40,9 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
         {
             // Arrange
             // TODO Instead of seeds we should use the public API as much as possible. Otherwise the state of the database may not be a possible state in production.
-            await Factory.SeedUsers();
+            await Factory.SeedUsers().ConfigureAwait(false);
             Factory.SeedAuth();
-            await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@");
+            await Authorize(HttpClient, "simon@icon.com", "simonSIMON123@").ConfigureAwait(false);
             var beforeTimestamp = DateTime.UtcNow;
             // Act
             var componentPayload = await Client.CreateComponentSuccessfully(
@@ -56,7 +56,7 @@ namespace Test.Integration.Web.Api.GraphQl.Mutation
                 categories: new ValueObjects.ComponentCategory[0] { }
                 )
                 )
-              );
+              ).ConfigureAwait(false);
             // Assert
             componentPayload.requestTimestamp
               .Should().BeAfter(beforeTimestamp)

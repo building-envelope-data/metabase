@@ -35,9 +35,9 @@ namespace Test.Integration.Web.Api.GraphQl
             httpResponse.EnsureSuccessStatusCode();
             var response =
               await JsonSerializer.DeserializeAsync<Response<TData, TError>>(
-                await httpResponse.Content.ReadAsStreamAsync(),
+                await httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false),
                 JsonSerializerOptions
-            );
+            ).ConfigureAwait(false);
             response.EnsureNoOverflow();
             return response;
         }

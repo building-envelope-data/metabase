@@ -22,14 +22,14 @@ namespace Test.Integration.Web.Api
 
                 UserName = emailAddress,
                 Password = password,
-            });
+            }).ConfigureAwait(false);
             if (response.IsError) throw new Exception(response.Error); // TODO Is this exception propagated?
             return response;
         }
 
         protected static async Task Authorize(HttpClient httpClient, string username, string password)
         {
-            var tokenResponse = await RequestAuthToken(httpClient, username, password);
+            var tokenResponse = await RequestAuthToken(httpClient, username, password).ConfigureAwait(false);
             httpClient.SetBearerToken(tokenResponse.AccessToken);
         }
 

@@ -27,9 +27,9 @@ namespace Metabase.Domain
                 creatorId: Guid.NewGuid()
                 );
             Session.Events.Append(id, 1, @event);
-            await Session.SaveChangesAsync();
+            await Session.SaveChangesAsync().ConfigureAwait(false);
             // Act
-            var aggregate = await Session.Events.AggregateStreamAsync<Aggregates.ComponentAggregate>(id);
+            var aggregate = await Session.Events.AggregateStreamAsync<Aggregates.ComponentAggregate>(id).ConfigureAwait(false);
             // Assert
             aggregate.Id.Should().Be(id);
             aggregate.Version.Should().Be(1);
