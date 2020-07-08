@@ -21,7 +21,7 @@ namespace Metabase.Handlers
         private readonly string _graphQlQueryName;
         private readonly string? _graphQlQueryFields;
 
-        public QueryDataOfComponentsFromDatabasesHandler(
+        protected QueryDataOfComponentsFromDatabasesHandler(
             string graphQlQueryName,
             string? graphQlQueryFields,
             IAggregateRepository repository
@@ -49,7 +49,7 @@ namespace Metabase.Handlers
                               timestamp: ""{timestampedId.Timestamp.InUtcFormat()}""
                             )"
                             +
-                            (_graphQlQueryFields is null ? $@"" : $@"{{{_graphQlQueryFields}}}")
+                            (_graphQlQueryFields is null ? "" : $"{{{_graphQlQueryFields}}}")
                           )
                         )
                     }
