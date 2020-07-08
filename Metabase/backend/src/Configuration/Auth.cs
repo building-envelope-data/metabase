@@ -137,10 +137,7 @@ namespace Metabase.Configuration
                       _.EnableCaching = true;
                       _.CacheDuration = TimeSpan.FromMinutes(10); // that's the default
                   })
-            .AddLocalApi(_ =>
-                {
-                    _.ExpectedScope = ApiName;
-                });
+            .AddLocalApi(_ => _.ExpectedScope = ApiName);
             services.AddAuthorization(_ =>
                 {
                     _.AddPolicy(IdentityServerConstants.LocalApi.PolicyName, policy =>

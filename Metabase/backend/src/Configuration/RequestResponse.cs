@@ -21,13 +21,7 @@ namespace Metabase.Configuration
             services.AddResponseCompression();
             // add CORS policy for non-IdentityServer endpoints
             // https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-3.0
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(policy =>
-                {
-                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-                });
-            });
+            services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
             // Using `AddControllersAsServices` makes controller custructors
             // being validated on startup with respect to the dependency
