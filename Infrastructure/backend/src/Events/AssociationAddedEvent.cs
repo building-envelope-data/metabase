@@ -11,10 +11,10 @@ namespace Infrastructure.Events
         public Guid AssociateId { get; set; }
 
 #nullable disable
-        public AssociationAddedEvent() { }
+        protected AssociationAddedEvent() { }
 #nullable enable
 
-        public AssociationAddedEvent(
+        protected AssociationAddedEvent(
             Guid aggregateId,
             Guid parentId,
             Guid associateId,

@@ -14,7 +14,7 @@ namespace Metabase.Handlers
             IEnumerable<TGraphQlDataResponse>
           >
     {
-        public QueryDataArrayOfComponentsFromDatabasesHandler(
+        protected QueryDataArrayOfComponentsFromDatabasesHandler(
             string graphQlQueryName,
             string? graphQlQueryFields,
             IAggregateRepository repository

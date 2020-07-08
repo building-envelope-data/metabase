@@ -7,10 +7,10 @@ namespace Metabase.Events
       : DeletedEvent, IDeletedEvent
     {
 #nullable disable
-        public DataDeletedEvent() { }
+        protected DataDeletedEvent() { }
 #nullable enable
 
-        public DataDeletedEvent(
+        protected DataDeletedEvent(
             Guid aggregateId,
             Guid creatorId
             )

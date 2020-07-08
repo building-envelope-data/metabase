@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
     {
         public Id MethodId { get; }
 
-        public CreateOrDeleteMethodPayload(
+        protected CreateOrDeleteMethodPayload(
             TimestampedId timestampedId
             )
           : base(timestampedId.Timestamp)

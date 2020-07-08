@@ -10,7 +10,7 @@ namespace Metabase.Handlers
       where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     {
-        public GetManyToManyAssociatesOfModelsHandler(
+        protected GetManyToManyAssociatesOfModelsHandler(
             IAggregateRepository repository
             )
           : base(repository)

@@ -7,7 +7,7 @@ namespace Metabase.GraphQl
         public Timestamp Timestamp { get; }
         public Timestamp RequestTimestamp { get; }
 
-        public Edge(
+        protected Edge(
             Id nodeId,
             Timestamp timestamp,
             Timestamp requestTimestamp

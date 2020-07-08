@@ -20,10 +20,10 @@ namespace Infrastructure.Events
         public Guid CreatorId { get; set; }
 
 #nullable disable
-        public Event() { }
+        protected Event() { }
 #nullable enable
 
-        public Event(Guid creatorId)
+        protected Event(Guid creatorId)
         {
             CreatorId = creatorId;
         }

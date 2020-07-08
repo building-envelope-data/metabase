@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
         public Id ComponentId { get; }
         public Id InstitutionId { get; }
 
-        public AddOrRemoveComponentManufacturerInput(
+        protected AddOrRemoveComponentManufacturerInput(
             Id componentId,
             Id institutionId
             )

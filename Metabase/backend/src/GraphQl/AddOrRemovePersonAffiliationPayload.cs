@@ -11,7 +11,7 @@ namespace Metabase.GraphQl
         public Id PersonId { get; }
         public Id InstitutionId { get; }
 
-        public AddOrRemovePersonAffiliationPayload(
+        protected AddOrRemovePersonAffiliationPayload(
             Id personId,
             Id institutionId,
             Timestamp requestTimestamp

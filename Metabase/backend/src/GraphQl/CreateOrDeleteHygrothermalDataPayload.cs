@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
     {
         public Id HygrothermalDataId { get; }
 
-        public CreateOrDeleteHygrothermalDataPayload(
+        protected CreateOrDeleteHygrothermalDataPayload(
             TimestampedId timestampedId
             )
           : base(timestampedId.Timestamp)

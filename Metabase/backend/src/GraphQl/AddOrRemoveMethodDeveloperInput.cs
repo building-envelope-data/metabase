@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
         public Id MethodId { get; }
         public Id StakeholderId { get; }
 
-        public AddOrRemoveMethodDeveloperInput(
+        protected AddOrRemoveMethodDeveloperInput(
             Id methodId,
             Id stakeholderId
             )

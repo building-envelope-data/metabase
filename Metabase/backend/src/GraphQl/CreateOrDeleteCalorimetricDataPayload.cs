@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
     {
         public Id CalorimetricDataId { get; }
 
-        public CreateOrDeleteCalorimetricDataPayload(
+        protected CreateOrDeleteCalorimetricDataPayload(
             TimestampedId timestampedId
             )
           : base(timestampedId.Timestamp)

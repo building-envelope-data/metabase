@@ -12,7 +12,7 @@ namespace Metabase.Aggregates
         public object? Data { get; set; }
 
 #nullable disable
-        public DataAggregate() { }
+        protected DataAggregate() { }
 #nullable enable
 
         protected void ApplyCreated<E>(Marten.Events.Event<E> @event)

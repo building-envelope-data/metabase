@@ -11,7 +11,7 @@ namespace Metabase.GraphQl
         public Id GeneralComponentId { get; }
         public Id ConcreteComponentId { get; }
 
-        public AddOrRemoveComponentConcretizationPayload(
+        protected AddOrRemoveComponentConcretizationPayload(
             Id generalComponentId,
             Id concreteComponentId,
             Timestamp requestTimestamp

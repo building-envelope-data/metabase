@@ -10,10 +10,10 @@ namespace Infrastructure.Events
         public Guid AggregateId { get; set; }
 
 #nullable disable
-        public CreatedEvent() { }
+        protected CreatedEvent() { }
 #nullable enable
 
-        public CreatedEvent(
+        protected CreatedEvent(
             Guid aggregateId,
             Guid creatorId
             )

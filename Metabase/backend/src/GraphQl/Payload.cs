@@ -5,7 +5,7 @@ namespace Metabase.GraphQl
     {
         public Timestamp RequestTimestamp { get; } // Alternative verbs: fetch, load, query
 
-        public Payload(Timestamp requestTimestamp)
+        protected Payload(Timestamp requestTimestamp)
         {
             RequestTimestamp = requestTimestamp;
         }

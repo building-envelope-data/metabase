@@ -7,7 +7,7 @@ namespace Metabase.GraphQl
         public Id ComponentId { get; }
         public object Data { get; }
 
-        public DataX(
+        protected DataX(
             Id id,
             Id componentId,
             object data,

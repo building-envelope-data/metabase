@@ -8,7 +8,7 @@ namespace Metabase.Handlers
     {
         protected readonly IAggregateRepository _repository;
 
-        public GetAssociationsOfModelsHandler(
+        protected GetAssociationsOfModelsHandler(
             IAggregateRepository repository
             )
         {

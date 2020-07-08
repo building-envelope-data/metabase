@@ -11,7 +11,7 @@ namespace Metabase.GraphQl
         public Id MethodId { get; }
         public Id StakeholderId { get; }
 
-        public AddOrRemoveMethodDeveloperPayload(
+        protected AddOrRemoveMethodDeveloperPayload(
             Id methodId,
             Id stakeholderId,
             Timestamp requestTimestamp

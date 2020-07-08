@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
         public Id Id { get; }
         public Timestamp Timestamp { get; }
 
-        public DeleteNodeInput(
+        protected DeleteNodeInput(
             Id id,
             Timestamp timestamp
             )

@@ -18,7 +18,7 @@ namespace Metabase.GraphQl
         private readonly Func<IReadOnlyList<TimestampedId>, Result<TQuery, Errors>> _newQuery;
         private readonly Func<TAssociateModel, Timestamp, TAssociateGraphQlObject> _mapAssociateModelToGraphQlObject;
 
-        public AssociatesOfModelDataLoader(
+        protected AssociatesOfModelDataLoader(
             Func<IReadOnlyList<TimestampedId>, Result<TQuery, Errors>> newQuery,
             Func<TAssociateModel, Timestamp, TAssociateGraphQlObject> mapAssociateModelToGraphQlObject,
             IQueryBus queryBus

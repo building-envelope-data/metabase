@@ -14,7 +14,7 @@ namespace Metabase.Events
         public Guid StakeholderId { get => AssociateId; }
 
 #nullable disable
-        public MethodDeveloperAdded() { }
+        protected MethodDeveloperAdded() { }
 #nullable enable
 
         protected MethodDeveloperAdded(

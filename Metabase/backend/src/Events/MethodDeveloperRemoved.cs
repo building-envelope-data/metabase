@@ -7,7 +7,7 @@ namespace Metabase.Events
       : AssociationRemovedEvent
     {
 #nullable disable
-        public MethodDeveloperRemoved() { }
+        protected MethodDeveloperRemoved() { }
 #nullable enable
 
         protected MethodDeveloperRemoved(

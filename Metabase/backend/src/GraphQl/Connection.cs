@@ -9,7 +9,7 @@ namespace Metabase.GraphQl
         public IPageInfo PageInfo { get; }
         public Timestamp RequestTimestamp { get; }
 
-        public Connection(
+        protected Connection(
             Id fromId,
             IPageInfo pageInfo,
             Timestamp requestTimestamp

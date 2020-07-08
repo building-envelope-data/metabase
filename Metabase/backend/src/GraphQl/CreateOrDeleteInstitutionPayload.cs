@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
     {
         public Id InstitutionId { get; }
 
-        public CreateOrDeleteInstitutionPayload(
+        protected CreateOrDeleteInstitutionPayload(
             TimestampedId timestampedId
             )
           : base(timestampedId.Timestamp)

@@ -7,7 +7,7 @@ namespace Metabase.GraphQl
     {
         protected IQueryBus QueryBus { get; }
 
-        public ResolversBase(IQueryBus queryBus)
+        protected ResolversBase(IQueryBus queryBus)
         {
             QueryBus = queryBus;
         }

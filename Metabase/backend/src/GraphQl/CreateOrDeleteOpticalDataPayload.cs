@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
     {
         public Id OpticalDataId { get; }
 
-        public CreateOrDeleteOpticalDataPayload(
+        protected CreateOrDeleteOpticalDataPayload(
             TimestampedId timestampedId
             )
           : base(timestampedId.Timestamp)

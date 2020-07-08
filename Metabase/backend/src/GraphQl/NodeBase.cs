@@ -61,7 +61,7 @@ namespace Metabase.GraphQl
         public Timestamp Timestamp { get; }
         public Timestamp RequestTimestamp { get; }
 
-        public NodeBase(
+        protected NodeBase(
             Id id,
             Timestamp timestamp,
             Timestamp requestTimestamp

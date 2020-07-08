@@ -11,7 +11,7 @@ namespace Metabase.GraphQl
         public Id BaseComponentId { get; }
         public Id VariantComponentId { get; }
 
-        public AddOrRemoveComponentVariantPayload(
+        protected AddOrRemoveComponentVariantPayload(
             Id baseComponentId,
             Id variantComponentId,
             Timestamp requestTimestamp

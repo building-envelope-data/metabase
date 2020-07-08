@@ -7,7 +7,7 @@ namespace Infrastructure.Models
         public Id Id { get; }
         public Timestamp Timestamp { get; }
 
-        public Model(
+        protected Model(
             Id id,
             Timestamp timestamp
             )

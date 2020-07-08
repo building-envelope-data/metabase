@@ -11,7 +11,7 @@ namespace Metabase.GraphQl
       : AssociatesOfModelDataLoader<TAssociationGraphQlObject, TModel, TAssociationModel, TAssociationModel, TQuery>
       where TQuery : IQuery<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
     {
-        public AssociationsOfModelDataLoader(
+        protected AssociationsOfModelDataLoader(
             Func<IReadOnlyList<TimestampedId>, Result<TQuery, Errors>> newQuery,
             Func<TAssociationModel, Timestamp, TAssociationGraphQlObject> mapAssociationModelToGraphQlObject,
             IQueryBus queryBus

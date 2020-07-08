@@ -12,10 +12,10 @@ namespace Metabase.Events
         public object? Data { get; set; }
 
 #nullable disable
-        public DataCreatedEvent() { }
+        protected DataCreatedEvent() { }
 #nullable enable
 
-        public DataCreatedEvent(
+        protected DataCreatedEvent(
             Guid dataId,
             Guid componentId,
             object? data,

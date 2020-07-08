@@ -19,7 +19,7 @@ namespace Metabase.Aggregates
         public Guid AssociateId { get => StakeholderId; }
 
 #nullable disable
-        public MethodDeveloperAggregate() { }
+        protected MethodDeveloperAggregate() { }
 #nullable enable
 
         protected void ApplyData(Events.MethodDeveloperAdded data)

@@ -18,7 +18,7 @@ namespace Metabase.GraphQl
         private readonly Func<IReadOnlyCollection<TimestampedId>, Result<TQuery, Errors>> _newQuery;
         private readonly Func<TDataModel, Timestamp, TDataGraphQlObject> _mapModelToGraphQlObject;
 
-        public DataOfComponentFromDatabasesDataLoader(
+        protected DataOfComponentFromDatabasesDataLoader(
             Func<IReadOnlyCollection<TimestampedId>, Result<TQuery, Errors>> newQuery,
             Func<TDataModel, Timestamp, TDataGraphQlObject> mapModelToGraphQlObject,
             IQueryBus queryBus

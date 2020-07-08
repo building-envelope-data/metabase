@@ -18,7 +18,7 @@ namespace Metabase.Handlers
     {
         private readonly IAggregateRepository _repository;
 
-        public QueryDatabasesHandler(IAggregateRepository repository)
+        protected QueryDatabasesHandler(IAggregateRepository repository)
         {
             _repository = repository;
         }

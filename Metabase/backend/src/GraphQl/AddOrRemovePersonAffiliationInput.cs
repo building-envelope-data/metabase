@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
         public Id PersonId { get; }
         public Id InstitutionId { get; }
 
-        public AddOrRemovePersonAffiliationInput(
+        protected AddOrRemovePersonAffiliationInput(
             Id personId,
             Id institutionId
             )

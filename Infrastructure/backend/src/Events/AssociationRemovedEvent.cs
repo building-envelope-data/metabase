@@ -6,10 +6,10 @@ namespace Infrastructure.Events
       : DeletedEvent, IAssociationRemovedEvent
     {
 #nullable disable
-        public AssociationRemovedEvent() { }
+        protected AssociationRemovedEvent() { }
 #nullable enable
 
-        public AssociationRemovedEvent(
+        protected AssociationRemovedEvent(
             Guid aggregateId,
             Guid creatorId
             )

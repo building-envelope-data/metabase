@@ -6,7 +6,7 @@ namespace Infrastructure.Commands
     {
         public Id CreatorId { get; }
 
-        public CommandBase(Id creatorId)
+        protected CommandBase(Id creatorId)
         {
             CreatorId = creatorId;
         }

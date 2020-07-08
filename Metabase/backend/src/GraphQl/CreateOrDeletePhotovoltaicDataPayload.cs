@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
     {
         public Id PhotovoltaicDataId { get; }
 
-        public CreateOrDeletePhotovoltaicDataPayload(
+        protected CreateOrDeletePhotovoltaicDataPayload(
             TimestampedId timestampedId
             )
           : base(timestampedId.Timestamp)
