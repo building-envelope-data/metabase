@@ -13,8 +13,7 @@ namespace Metabase.Configuration
     {
         public static void ConfigureServices(IServiceCollection services)
         {
-            // add CORS policy for non-IdentityServer endpoints
-            // https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-3.0
+            // https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-3.1
             services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
         }
 
