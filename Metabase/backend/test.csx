@@ -2,24 +2,26 @@
 
 using System;
 
-public enum E {
-  X,
-  Y
+public enum E
+{
+    X,
+    Y
 }
 
-public class T {
-public string S { get; set; }
-public bool B { get; set; }
-public char C { get; set; }
-public float F { get; set; }
-public E E { get; set; }
+public class T
+{
+    public string S { get; set; }
+    public bool B { get; set; }
+    public char C { get; set; }
+    public float F { get; set; }
+    public E E { get; set; }
 
 #nullable disable
-public T() { }
+    public T() { }
 #nullable enable
 }
 
-var t = new T();
+private var t = new T();
 
 Console.WriteLine(t.S == null);
 Console.WriteLine(t.B);
