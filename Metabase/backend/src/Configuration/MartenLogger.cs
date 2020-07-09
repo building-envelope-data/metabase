@@ -86,7 +86,7 @@ namespace Metabase.Configuration
         public void BeforeSaveChanges(IDocumentSession session)
         {
             _logger.LogDebug(
-                $"About to append the following pending changes to the event store:");
+                "About to append the following pending changes to the event store:");
             session.PendingChanges.Streams()
                   .Each(s => _logger.LogDebug(s.ToString()));
         }
@@ -94,7 +94,7 @@ namespace Metabase.Configuration
         public Task BeforeSaveChangesAsync(IDocumentSession session, CancellationToken token)
         {
             _logger.LogDebug(
-                $"About to append the following pending asynchronous changes to the event store:");
+                "About to append the following pending asynchronous changes to the event store:");
             session.PendingChanges.Streams()
                   .Each(s => _logger.LogDebug(s.ToString()));
             return Task.CompletedTask;

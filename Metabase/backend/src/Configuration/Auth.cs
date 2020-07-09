@@ -57,9 +57,9 @@ namespace Metabase.Configuration
 
             services.ConfigureApplicationCookie(_ =>
                 {
-                    _.LoginPath = $"/Account/Login";
-                    _.LogoutPath = $"/Account/Logout";
-                    _.AccessDeniedPath = $"/Account/AccessDenied";
+                    _.LoginPath = "/Account/Login";
+                    _.LogoutPath = "/Account/Logout";
+                    _.AccessDeniedPath = "/Account/AccessDenied";
                 });
         }
 

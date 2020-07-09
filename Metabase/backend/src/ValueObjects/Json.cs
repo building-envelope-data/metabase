@@ -312,7 +312,7 @@ namespace Metabase.ValueObjects
             }
             return Result.Failure<string, Errors>(
                 Errors.One(
-                  message: $"The JSON root element is not an object",
+                  message: $"The JSON root element {Value} is not an object but a {Value.Type}",
                   code: ErrorCodes.InvalidValue
                   )
                 );
