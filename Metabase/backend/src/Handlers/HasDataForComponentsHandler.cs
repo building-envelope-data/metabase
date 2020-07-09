@@ -67,7 +67,7 @@ namespace Metabase.Handlers
                   .Select(aggregateResults =>
                       // TODO Determine the number of existing data aggregates without loading them!
                       Result.Ok<bool, Errors>(
-                        aggregateResults.Count() >= 1
+                        aggregateResults.Any()
                         )
                       );
             }
