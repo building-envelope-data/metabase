@@ -103,17 +103,16 @@ namespace Metabase.GraphQl
                 );
         }
 
-        private async Task<TPayload> RemoveManyToManyAssociation<TAssociationModel, TInput, TValidatedInput, TPayload>(
+        private async Task<TPayload> RemoveManyToManyAssociation<TAssociationModel, TInput, TPayload>(
             TInput input,
-            Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
+            Func<TInput, IReadOnlyList<object>, Result<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>, Errors>> validateInput,
             Func<Id, Id, Timestamp, TPayload> newPayload
         )
-          where TValidatedInput : ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>
         {
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Commands.RemoveAssociation<TValidatedInput>.From(
+                    Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -122,7 +121,7 @@ namespace Metabase.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Commands.RemoveAssociation<TValidatedInput>,
+                Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>,
                 Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -133,17 +132,16 @@ namespace Metabase.GraphQl
                 );
         }
 
-        private async Task<TPayload> RemoveOneToManyAssociation<TAssociationModel, TInput, TValidatedInput, TPayload>(
+        private async Task<TPayload> RemoveOneToManyAssociation<TAssociationModel, TInput, TPayload>(
             TInput input,
-            Func<TInput, IReadOnlyList<object>, Result<TValidatedInput, Errors>> validateInput,
+            Func<TInput, IReadOnlyList<object>, Result<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>, Errors>> validateInput,
             Func<Id, Timestamp, TPayload> newPayload
         )
-          where TValidatedInput : ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>
         {
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Commands.RemoveAssociation<TValidatedInput>.From(
+                    Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -152,7 +150,7 @@ namespace Metabase.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Commands.RemoveAssociation<TValidatedInput>,
+                Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>,
                 Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -363,7 +361,6 @@ namespace Metabase.GraphQl
             return RemoveManyToManyAssociation<
               Models.ComponentConcretization,
               RemoveComponentConcretizationInput,
-              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentConcretization>,
               RemoveComponentConcretizationPayload
               >(
                 input,
@@ -397,7 +394,6 @@ namespace Metabase.GraphQl
             return RemoveManyToManyAssociation<
               Models.ComponentManufacturer,
               RemoveComponentManufacturerInput,
-              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>,
               RemoveComponentManufacturerPayload
               >(
                 input,
@@ -431,7 +427,6 @@ namespace Metabase.GraphQl
             return RemoveManyToManyAssociation<
               Models.ComponentPart,
               RemoveComponentPartInput,
-              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentPart>,
               RemoveComponentPartPayload
               >(
                 input,
@@ -465,7 +460,6 @@ namespace Metabase.GraphQl
             return RemoveManyToManyAssociation<
               Models.ComponentVariant,
               RemoveComponentVariantInput,
-              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVariant>,
               RemoveComponentVariantPayload
               >(
                 input,
@@ -499,7 +493,6 @@ namespace Metabase.GraphQl
             return RemoveManyToManyAssociation<
               Models.ComponentVersion,
               RemoveComponentVersionInput,
-              ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVersion>,
               RemoveComponentVersionPayload
               >(
                 input,
@@ -533,7 +526,6 @@ namespace Metabase.GraphQl
             return RemoveManyToManyAssociation<
               Models.InstitutionRepresentative,
               RemoveInstitutionRepresentativeInput,
-              ValueObjects.RemoveManyToManyAssociationInput<Models.InstitutionRepresentative>,
               RemoveInstitutionRepresentativePayload
               >(
                 input,
@@ -567,7 +559,6 @@ namespace Metabase.GraphQl
             return RemoveManyToManyAssociation<
               Models.MethodDeveloper,
               RemoveMethodDeveloperInput,
-              ValueObjects.RemoveManyToManyAssociationInput<Models.MethodDeveloper>,
               RemoveMethodDeveloperPayload
               >(
                 input,
@@ -601,7 +592,6 @@ namespace Metabase.GraphQl
             return RemoveManyToManyAssociation<
               Models.PersonAffiliation,
               RemovePersonAffiliationInput,
-              ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>,
               RemovePersonAffiliationPayload
               >(
                 input,
