@@ -83,7 +83,7 @@ namespace Metabase.Handlers
               .AsGraphQLHttpResponse<TGraphQlResponse>();
             if (
                 response.StatusCode != System.Net.HttpStatusCode.OK ||
-                (response.Errors != null && response.Errors.Length >= 1)
+                response.Errors?.Length >= 1 // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-value-types#lifted-operators
                 )
             {
                 // TODO Convert all `response.Errors` error to our `Errors` with proper path information!
