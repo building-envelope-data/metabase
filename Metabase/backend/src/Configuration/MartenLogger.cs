@@ -44,7 +44,7 @@ namespace Metabase.Configuration
         public void LogSuccess(NpgsqlCommand command)
         {
             _logger.LogDebug(command.CommandText);
-            foreach (var p in command.Parameters.OfType<NpgsqlParameter>())
+            foreach (var p in command.Parameters.Where(f => f != null))
             {
                 _logger.LogDebug($"  {p.ParameterName}: {p.Value}");
             }
@@ -54,7 +54,7 @@ namespace Metabase.Configuration
         {
             _logger.LogDebug("Postgresql command failed!");
             _logger.LogDebug(command.CommandText);
-            foreach (var p in command.Parameters.OfType<NpgsqlParameter>())
+            foreach (var p in command.Parameters.Where(f => f != null))
             {
                 _logger.LogDebug($"  {p.ParameterName}: {p.Value}");
             }
