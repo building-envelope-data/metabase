@@ -41,16 +41,6 @@ namespace Metabase.Configuration
                 );
             app.UseStatusCodePages();
 
-            // ASP.NET advices to not use HTTPS redirection for APIs, see the
-            // warning on https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-3.1&tabs=visual-studio
-            // TODO Use `app.UseHttpsRedirection();`. The problem right now is
-            // that requests from within the container to the container itself
-            // fails with the exceptions
-            // System.Net.Http.HttpRequestException: The SSL connection could not be established, see inner exception.
-            // ---> System.Security.Authentication.AuthenticationException: The remote certificate is invalid according to the validation procedure.
-            // Although, we added a self-signed root certificate to the
-            // container.
-
             app.UseStaticFiles();
             app.UseRouting();
             app.UseCors(Auth.ApiName);
