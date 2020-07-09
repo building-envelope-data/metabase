@@ -988,8 +988,8 @@ namespace Metabase.Configuration
 
         private static void AddGetManyToManyAssociationsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>(IServiceCollection services)
     where TModel : IModel
-    where TAssociateModel : IModel
     where TAssociationModel : IManyToManyAssociation
+    where TAssociateModel : IModel
     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
     where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
@@ -1082,8 +1082,8 @@ namespace Metabase.Configuration
 
         private static void AddGetOneToManyAssociationsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>(IServiceCollection services)
     where TModel : IModel
-    where TAssociateModel : IModel
     where TAssociationModel : IOneToManyAssociation
+    where TAssociateModel : IModel
     where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
     where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
