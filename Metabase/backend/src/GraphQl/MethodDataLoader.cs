@@ -1,3 +1,4 @@
+using Infrastructure.GraphQl;
 using IQueryBus = Infrastructure.Queries.IQueryBus;
 
 namespace Metabase.GraphQl

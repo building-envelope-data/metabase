@@ -8,7 +8,7 @@ namespace Metabase.Events
     {
         public static InstitutionRepresentativeRemoved From(
             Guid institutionRepresentativeId,
-            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.InstitutionRepresentative>> command
+            Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<Models.InstitutionRepresentative>> command
             )
         {
             return new InstitutionRepresentativeRemoved(

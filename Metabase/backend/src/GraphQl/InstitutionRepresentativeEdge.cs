@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Infrastructure.GraphQl;
 using Infrastructure.ValueObjects;
 
 namespace Metabase.GraphQl

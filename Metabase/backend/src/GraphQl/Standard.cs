@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Infrastructure.GraphQl;
 using Infrastructure.ValueObjects;
 using Uri = System.Uri;
 

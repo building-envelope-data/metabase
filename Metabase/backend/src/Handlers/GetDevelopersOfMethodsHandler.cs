@@ -11,7 +11,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Handlers
 {
     public sealed class GetDevelopersOfMethodsHandler
-      : IQueryHandler<Queries.GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
+      : IQueryHandler<GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
     {
         public static async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Do(
             IAggregateRepositoryReadOnlySession session,
@@ -47,7 +47,7 @@ namespace Metabase.Handlers
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Handle(
-            Queries.GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
+            GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder> query,
             CancellationToken cancellationToken
             )
         {

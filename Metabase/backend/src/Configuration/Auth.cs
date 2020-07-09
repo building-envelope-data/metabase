@@ -20,7 +20,13 @@ namespace Metabase.Configuration
         public static readonly string ApiName = "api";
         public static readonly string ApiSecret = "secret"; // TODO Put in environment variable.
 
-        public static void ConfigureServices(IServiceCollection services, IWebHostEnvironment environment, IConfiguration configuration, AppSettings appSettings, string migrationsAssembly)
+        public static void ConfigureServices(
+            IServiceCollection services,
+            IWebHostEnvironment environment,
+            IConfiguration configuration,
+            Infrastructure.AppSettings appSettings,
+            string migrationsAssembly
+            )
         {
             // https://fullstackmark.com/post/21/user-authentication-and-identity-with-angular-aspnet-core-and-identityserver
             // https://www.scottbrady91.com/Identity-Server/ASPNET-Core-Swagger-UI-Authorization-using-IdentityServer4
@@ -65,7 +71,11 @@ namespace Metabase.Configuration
 
         // https://github.com/IdentityServer/IdentityServer4.Demo
         // http://docs.identityserver.io/en/latest/topics/startup.html
-        private static void ConfigureIdentityServerServices(IServiceCollection services, IWebHostEnvironment environment, AppSettings appSettings, string migrationsAssembly)
+        private static void ConfigureIdentityServerServices(
+            IServiceCollection services,
+            IWebHostEnvironment environment,
+            Infrastructure.AppSettings appSettings, string migrationsAssembly
+            )
         {
             var builder = services.AddIdentityServer(_ =>
                 {

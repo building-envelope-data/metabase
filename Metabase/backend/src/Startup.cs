@@ -35,73 +35,29 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Metabase
 {
     public class Startup
+                : Infrastructure.Startup
     {
-        private readonly IWebHostEnvironment _environment;
-        private readonly IConfiguration _configuration;
-        private readonly AppSettings _appSettings;
-
         public Startup(IWebHostEnvironment environment)
+                        : base(environment)
         {
-            _environment = environment;
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(environment.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
-              .Build();
-            _appSettings = _configuration.Get<AppSettings>();
-            RegisterJsonSchemaFiles();
         }
 
-        private void RegisterJsonSchemaFiles()
+        public override void ConfigureServices(IServiceCollection services)
         {
-            // We force initialization of `JsonSchemaRegistry` on start-up as
-            // otherwise errors with the JSON Schemas are only encountered on
-            // the registry's first usage initiated by a GraphQL query and that
-            // query also takes rather long (because the JSON Schemas are
-            // loaded, validated, and registered).
-            var count = ValueObjects.JsonSchema.JsonSchemaRegistry.Count;
-            if (count is 0)
-            {
-                throw new Exception("There are no JSON Schemas in the registry");
-            }
-        }
-
-        private string GetMigrationsAssembly()
-        {
-            return typeof(Startup).GetTypeInfo().Assembly.GetName().Name.NotNull();
-        }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddSingleton<AppSettings>(_appSettings);
-            ConfigureDatabaseServices(services);
-            Configuration.Session.ConfigureServices(services);
-            Configuration.RequestResponse.ConfigureServices(services);
+            base.ConfigureServices(services);
+            Infrastructure.Configuration.Session.ConfigureServices(services);
+            Infrastructure.Configuration.RequestResponse.ConfigureServices(services);
             Configuration.Auth.ConfigureServices(services, _environment, _configuration, _appSettings, GetMigrationsAssembly());
             Configuration.GraphQl.ConfigureServices(services);
             Configuration.EventStore.ConfigureServices(services, _environment, _appSettings.Database);
             Configuration.QueryCommandAndEventBusses.ConfigureServices(services);
         }
 
-        private void ConfigureDatabaseServices(IServiceCollection services)
-        {
-            services.AddDbContext<ApplicationDbContext>(_ =>
-                {
-                    _.UseNpgsql(_appSettings.Database.ConnectionString /* , o => o.UseNodaTime() */)
-                      .EnableSensitiveDataLogging(_appSettings.Logging.EnableSensitiveDataLogging);
-                }
-              );
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.0
         public void Configure(IApplicationBuilder app)
         {
-            Configuration.RequestResponse.ConfigureRouting(app, _environment);
+            Infrastructure.Configuration.RequestResponse.ConfigureRouting(app, _environment);
             Configuration.Auth.Configure(app);
-            Configuration.Session.Configure(app);
+            Infrastructure.Configuration.Session.Configure(app);
             Configuration.GraphQl.Configure(app, _environment);
 
             // TODO Shall we do migrations here or in Program.cs?

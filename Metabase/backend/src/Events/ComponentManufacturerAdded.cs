@@ -11,7 +11,7 @@ namespace Metabase.Events
     {
         public static ComponentManufacturerAdded From(
               Guid componentManufacturerId,
-              Commands.AddAssociation<ValueObjects.AddComponentManufacturerInput> command
+              Infrastructure.Commands.AddAssociation<ValueObjects.AddComponentManufacturerInput> command
             )
         {
             return new ComponentManufacturerAdded(

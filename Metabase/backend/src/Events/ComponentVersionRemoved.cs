@@ -8,7 +8,7 @@ namespace Metabase.Events
     {
         public static ComponentVersionRemoved From(
             Guid componentVersionId,
-            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVersion>> command
+            Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentVersion>> command
             )
         {
             return new ComponentVersionRemoved(

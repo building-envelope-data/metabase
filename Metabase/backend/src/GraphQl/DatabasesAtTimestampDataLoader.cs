@@ -1,3 +1,4 @@
+using Infrastructure.GraphQl;
 using Infrastructure.ValueObjects;
 using IQueryBus = Infrastructure.Queries.IQueryBus;
 

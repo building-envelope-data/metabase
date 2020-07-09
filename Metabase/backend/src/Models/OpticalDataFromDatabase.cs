@@ -10,13 +10,13 @@ namespace Metabase.Models
     {
         public Id DatabaseId { get; }
         public Id ComponentId { get; }
-        public ValueObjects.OpticalDataJson Data { get; }
+        public OpticalDataJson Data { get; }
 
         private OpticalDataFromDatabase(
             Id id,
             Id databaseId,
             Id componentId,
-            ValueObjects.OpticalDataJson data,
+            OpticalDataJson data,
             Timestamp timestamp
             )
           : base(id, timestamp)
@@ -30,7 +30,7 @@ namespace Metabase.Models
             Id id,
             Id databaseId,
             Id componentId,
-            ValueObjects.OpticalDataJson data,
+            OpticalDataJson data,
             Timestamp timestamp
             )
         {

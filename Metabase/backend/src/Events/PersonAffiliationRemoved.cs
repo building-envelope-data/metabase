@@ -8,7 +8,7 @@ namespace Metabase.Events
     {
         public static PersonAffiliationRemoved From(
             Guid personAffiliationId,
-            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>> command
+            Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<Models.PersonAffiliation>> command
             )
         {
             return new PersonAffiliationRemoved(

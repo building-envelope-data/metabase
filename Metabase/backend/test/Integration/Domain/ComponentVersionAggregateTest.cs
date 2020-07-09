@@ -33,7 +33,7 @@ namespace Metabase.Domain
 
         /* private async Task<Aggregates.ComponentVersionAggregate> CreateComponentVersion(Guid componentId) */
         /* { */
-        /*     var command = new Commands.CreateComponentVersion(componentId, creatorId: Guid.NewGuid()); */
+        /*     var command = new Infrastructure.Commands.CreateComponentVersion(componentId, creatorId: Guid.NewGuid()); */
         /*     var @event = new Events.ComponentVersionCreated(Guid.NewGuid(), command); */
         /*     var componentVersion = Aggregates.ComponentVersionAggregate.Create(@event); */
         /*     var events = componentVersion.GetUncommittedEvents().ToArray(); */
@@ -44,7 +44,7 @@ namespace Metabase.Domain
 
         /* private async Task<Aggregates.ComponentAggregate> CreateComponent() */
         /* { */
-        /*     var @event = new Events.ComponentCreated(Guid.NewGuid(), new Commands.CreateComponent(creatorId: Guid.NewGuid())); */
+        /*     var @event = new Events.ComponentCreated(Guid.NewGuid(), new Infrastructure.Commands.CreateComponent(creatorId: Guid.NewGuid())); */
         /*     var component = Aggregates.ComponentAggregate.Create(@event); */
         /*     var events = component.GetUncommittedEvents().ToArray(); */
         /*     Session.Events.Append(component.Id, component.Version, events); */

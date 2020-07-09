@@ -44,6 +44,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../../../Infrastructure/backend/src/Infrastructure.csproj" />
+  </ItemGroup>
+
   <!-- <Target Name="PreCompileTarget" BeforeTargets="Build"> -->
     <!--   <Exec Command="npm run all" /> -->
     <!-- </Target> -->

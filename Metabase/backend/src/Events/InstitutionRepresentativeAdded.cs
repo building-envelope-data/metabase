@@ -11,7 +11,7 @@ namespace Metabase.Events
     {
         public static InstitutionRepresentativeAdded From(
             Guid institutionRepresentativeId,
-            Commands.AddAssociation<ValueObjects.AddInstitutionRepresentativeInput> command
+            Infrastructure.Commands.AddAssociation<ValueObjects.AddInstitutionRepresentativeInput> command
             )
         {
             return new InstitutionRepresentativeAdded(

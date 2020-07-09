@@ -7,7 +7,7 @@ namespace Metabase.Events
     {
         public static InstitutionMethodDeveloperRemoved From(
             Guid methodDeveloperId,
-            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.MethodDeveloper>> command
+            Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<Models.MethodDeveloper>> command
             )
         {
             return new InstitutionMethodDeveloperRemoved(

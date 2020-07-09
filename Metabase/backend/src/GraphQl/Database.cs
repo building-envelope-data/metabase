@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using GreenDonut;
 using HotChocolate;
+using Infrastructure.GraphQl;
 using Infrastructure.ValueObjects;
 using IQueryBus = Infrastructure.Queries.IQueryBus;
 using Uri = System.Uri;

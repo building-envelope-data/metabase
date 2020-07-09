@@ -9,7 +9,7 @@ namespace Metabase.Events
     {
         public static ComponentPartAdded From(
             Guid componentPartId,
-            Commands.AddAssociation<ValueObjects.AddComponentPartInput> command
+            Infrastructure.Commands.AddAssociation<ValueObjects.AddComponentPartInput> command
             )
         {
             return new ComponentPartAdded(

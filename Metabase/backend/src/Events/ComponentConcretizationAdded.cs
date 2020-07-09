@@ -9,7 +9,7 @@ namespace Metabase.Events
     {
         public static ComponentConcretizationAdded From(
             Guid componentConcretizationId,
-            Commands.AddAssociation<ValueObjects.AddComponentConcretizationInput> command
+            Infrastructure.Commands.AddAssociation<ValueObjects.AddComponentConcretizationInput> command
             )
         {
             return new ComponentConcretizationAdded(

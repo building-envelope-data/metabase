@@ -23,12 +23,12 @@ namespace Metabase.GraphQl
             Timestamp = timestamp;
         }
 
-        public static Result<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>, Errors> Validate(
+        public static Result<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>, Errors> Validate(
             RemoveComponentManufacturerInput self,
             IReadOnlyList<object> path
             )
         {
-            return ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>.From(
+            return Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>.From(
                 parentId: self.ComponentId,
                 associateId: self.InstitutionId,
                 timestamp: self.Timestamp

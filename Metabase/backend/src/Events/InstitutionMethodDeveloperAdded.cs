@@ -7,7 +7,7 @@ namespace Metabase.Events
     {
         public static InstitutionMethodDeveloperAdded From(
             Guid methodDeveloperId,
-            Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput> command
+            Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput> command
             )
         {
             return new InstitutionMethodDeveloperAdded(

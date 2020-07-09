@@ -1,3 +1,4 @@
+using Infrastructure.GraphQl;
 using Infrastructure.Models;
 using Infrastructure.ValueObjects;
 using Exception = System.Exception;

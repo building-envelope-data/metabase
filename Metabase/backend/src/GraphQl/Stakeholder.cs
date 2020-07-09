@@ -1,3 +1,5 @@
+using Infrastructure.GraphQl;
+
 namespace Metabase.GraphQl
 {
 #pragma warning disable SA1302

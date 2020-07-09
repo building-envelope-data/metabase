@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Xunit;
 using Aggregates = Metabase.Aggregates;
-using AppSettings = Metabase.AppSettings;
+using AppSettings = Infrastructure.AppSettings;
 
 namespace Test.Integration.EventStore
 {

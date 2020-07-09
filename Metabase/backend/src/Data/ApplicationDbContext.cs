@@ -12,7 +12,10 @@ namespace Metabase.Data
     {
         private readonly string _schemaName;
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, AppSettings appSettings)
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options,
+            Infrastructure.AppSettings appSettings
+            )
           : base(options)
         {
             _schemaName = appSettings.Database.SchemaName.Application;

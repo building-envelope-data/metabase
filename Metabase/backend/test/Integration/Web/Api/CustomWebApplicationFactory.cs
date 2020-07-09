@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using ApplicationDbContext = Metabase.Data.ApplicationDbContext;
-using AppSettings = Metabase.AppSettings;
+using AppSettings = Infrastructure.AppSettings;
 using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
 using IRelationalDatabaseCreator = Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator;
 using IsolationLevel = System.Data.IsolationLevel;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using HotChocolate;
+using Infrastructure.GraphQl;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;

@@ -8,7 +8,7 @@ namespace Metabase.Events
     {
         public static ComponentConcretizationRemoved From(
             Guid componentConcretizationId,
-            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentConcretization>> command
+            Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentConcretization>> command
             )
         {
             return new ComponentConcretizationRemoved(

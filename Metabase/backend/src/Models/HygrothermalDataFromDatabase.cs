@@ -10,13 +10,13 @@ namespace Metabase.Models
     {
         public Id DatabaseId { get; }
         public Id ComponentId { get; }
-        public ValueObjects.HygrothermalDataJson Data { get; }
+        public HygrothermalDataJson Data { get; }
 
         private HygrothermalDataFromDatabase(
             Id id,
             Id databaseId,
             Id componentId,
-            ValueObjects.HygrothermalDataJson data,
+            HygrothermalDataJson data,
             Timestamp timestamp
             )
           : base(id, timestamp)
@@ -30,7 +30,7 @@ namespace Metabase.Models
             Id id,
             Id databaseId,
             Id componentId,
-            ValueObjects.HygrothermalDataJson data,
+            HygrothermalDataJson data,
             Timestamp timestamp
             )
         {

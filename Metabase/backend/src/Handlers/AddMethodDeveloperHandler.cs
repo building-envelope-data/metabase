@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
 using Infrastructure.Commands;
+using Infrastructure.Handlers;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
 using ErrorCodes = Infrastructure.ErrorCodes;
@@ -12,31 +13,31 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Handlers
 {
     public sealed class AddMethodDeveloperHandler
-      : ICommandHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Result<TimestampedId, Errors>>
+      : ICommandHandler<Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Result<TimestampedId, Errors>>
     {
         private readonly IAggregateRepository _repository;
-        private readonly CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate> _addInstitutionMethodDeveloperHandler;
-        private readonly CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate> _addPersonMethodDeveloperHandler;
+        private readonly CreateModelHandler<Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate> _addInstitutionMethodDeveloperHandler;
+        private readonly CreateModelHandler<Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate> _addPersonMethodDeveloperHandler;
 
         public AddMethodDeveloperHandler(IAggregateRepository repository)
         {
             _repository = repository;
             _addInstitutionMethodDeveloperHandler =
-              new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate>(
+              new CreateModelHandler<Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.InstitutionMethodDeveloperAggregate>(
                   repository,
                   Events.InstitutionMethodDeveloperAdded.From,
-                  Enumerable.Empty<Func<IAggregateRepositorySession, Id, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<Id, Errors>>>>()
+                  Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<Id, Errors>>>>()
                   );
             _addPersonMethodDeveloperHandler =
-              new CreateModelHandler<Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate>(
+              new CreateModelHandler<Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, Aggregates.PersonMethodDeveloperAggregate>(
                   repository,
                   Events.PersonMethodDeveloperAdded.From,
-                  Enumerable.Empty<Func<IAggregateRepositorySession, Id, Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<Id, Errors>>>>()
+                  Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>, CancellationToken, Task<Result<Id, Errors>>>>()
                   );
         }
 
         public async Task<Result<TimestampedId, Errors>> Handle(
-            Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput> command,
+            Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput> command,
             CancellationToken cancellationToken
             )
         {

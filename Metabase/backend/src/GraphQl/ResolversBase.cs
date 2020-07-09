@@ -1,3 +1,4 @@
+using Infrastructure.GraphQl;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 

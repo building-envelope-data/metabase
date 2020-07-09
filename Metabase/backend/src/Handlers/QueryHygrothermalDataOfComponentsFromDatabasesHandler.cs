@@ -51,14 +51,14 @@ namespace Metabase.Handlers
             var componentIdResult = Infrastructure.ValueObjects.Id.From(hygrothermalDataResponse.ComponentId, path.Append("componentId").ToList().AsReadOnly());
             var dataResult =
               hygrothermalDataResponse.Data is null
-              ? Result.Failure<ValueObjects.HygrothermalDataJson, Errors>(
+              ? Result.Failure<HygrothermalDataJson, Errors>(
                   Errors.One(
                     message: $"The value for key `data` is of the hygrothermal data GraphQL response {hygrothermalDataResponse.Id} with timestamp {hygrothermalDataResponse.Timestamp} for component {hygrothermalDataResponse.ComponentId} from database {database.Id} is `null`",
                     code: ErrorCodes.InvalidValue,
                     path: path.Append("data").ToList().AsReadOnly()
                     )
                   )
-              : ValueObjects.HygrothermalDataJson.FromJsonElement(
+              : HygrothermalDataJson.FromJsonElement(
                   hygrothermalDataResponse.Data ?? throw new ArgumentNullException(nameof(hygrothermalDataResponse.Data)), // TODO Why does the null-forgiving operator `!` not work here?
                   path.Append("data").ToList().AsReadOnly()
                   );

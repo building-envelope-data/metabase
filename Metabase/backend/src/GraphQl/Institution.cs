@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using GreenDonut;
 using HotChocolate;
 using HotChocolate.Types.Relay;
+using Infrastructure.GraphQl;
 using Infrastructure.ValueObjects;
 using IQueryBus = Infrastructure.Queries.IQueryBus;
 
