@@ -38,7 +38,7 @@ services:
       - /home/me/.dotnet
     environment:
       # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
-      # - ICON_DATABASE__CONNECTION_STRING="Host=database;Port=5432;Database=icon_development;User Id=postgres;Password=postgres;"
+      # - XBASE_DATABASE__CONNECTION_STRING="Host=database;Port=5432;Database=xbase_development;User Id=postgres;Password=postgres;"
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
     extra_hosts:

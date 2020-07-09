@@ -25,7 +25,7 @@ services:
     ports:
       - 5010:8080
     environment:
-      - ICON_HOST="https://${ISE_HOST}:${ISE_HTTP_PORT}"
+      - XBASE_HOST="https://${ISE_HOST}:${ISE_HTTP_PORT}"
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https?view=aspnetcore-3.1#starting-a-container-with-https-support-using-docker-compose
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${ISE_SSL_CERTIFICATE_PASSWORD}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${ISE_SSL_CERTIFICATE_BASE_FILE_NAME}.pfx

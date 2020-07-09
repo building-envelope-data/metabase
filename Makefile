@@ -236,7 +236,7 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		database \
 		psql \
 		--username postgres \
-		--dbname icon_development
+		--dbname xbase_development
 .PHONY : psql
 
 # --------------------- #
