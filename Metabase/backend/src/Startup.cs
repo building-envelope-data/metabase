@@ -103,7 +103,6 @@ namespace Metabase
             Configuration.Auth.Configure(app);
             Configuration.Session.Configure(app);
             Configuration.GraphQl.Configure(app, _environment);
-            Configuration.RequestResponse.ConfigureEndpoints(app);
 
             // TODO Shall we do migrations here or in Program.cs?
             /* app.ApplicationServices.GetService<ClientsDbContext>().Database.Migrate(); */

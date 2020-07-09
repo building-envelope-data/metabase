@@ -56,18 +56,5 @@ namespace Metabase.Configuration
             app.UseRouting();
             app.UseCors(Auth.ApiName);
         }
-
-        public static void ConfigureEndpoints(IApplicationBuilder app)
-        {
-            app.UseEndpoints(endpoints =>
-                    {
-                        /* endpoints.MapHealthChecks("/health").RequireAuthorization(); // TODO Add healtch check services as described in https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.0 */
-                        endpoints.MapControllers();
-                        endpoints.MapControllerRoute(
-                            name: "default",
-                            pattern: "{controller=Home}/{action=Index}/{id?}");
-                        endpoints.MapRazorPages();
-                    });
-        }
     }
 }
