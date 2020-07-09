@@ -7,7 +7,7 @@ using Uri = System.Uri;
 
 namespace Metabase.ValueObjects
 {
-    public class MethodInformation
+    public sealed class MethodInformation
       : ValueObject
     {
         public Name Name { get; }

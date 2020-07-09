@@ -5,7 +5,7 @@ using Errors = Infrastructure.Errors;
 
 namespace Metabase.ValueObjects
 {
-    public class RemoveOneToManyAssociationInput<TAssociationModel>
+    public sealed class RemoveOneToManyAssociationInput<TAssociationModel>
       : ValueObject
     {
         public static Result<RemoveOneToManyAssociationInput<TAssociationModel>, Errors> From(

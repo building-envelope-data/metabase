@@ -5,7 +5,7 @@ using Errors = Infrastructure.Errors;
 
 namespace Metabase.ValueObjects
 {
-    public class CreateDatabaseInput
+    public sealed class CreateDatabaseInput
       : ValueObject
     {
         public Name Name { get; }

@@ -4,7 +4,7 @@ using Errors = Infrastructure.Errors;
 
 namespace Metabase.ValueObjects
 {
-    public class CreateStandardInput
+    public sealed class CreateStandardInput
       : ValueObject
     {
         public Title Title { get; }
