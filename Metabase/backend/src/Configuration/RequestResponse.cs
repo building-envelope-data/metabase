@@ -18,7 +18,6 @@ namespace Metabase.Configuration
             /*     options.KnownProxies.Add(IPAddress.Parse("10.0.0.100")); */
             /*     }); */
 
-            services.AddResponseCompression();
             // add CORS policy for non-IdentityServer endpoints
             // https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-3.0
             services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
@@ -77,7 +76,6 @@ namespace Metabase.Configuration
                 // https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-3.1&tabs=visual-studio
                 app.UseHsts();
             }
-
             // Forwarded Headers Middleware should run before other middleware except diagnostics and error handling middleware.
             // See https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#use-a-reverse-proxy-server
             app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -85,7 +83,6 @@ namespace Metabase.Configuration
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             }
                 );
-
             app.UseStatusCodePages();
 
             // ASP.NET advices to not use HTTPS redirection for APIs, see the
@@ -101,7 +98,6 @@ namespace Metabase.Configuration
             app.UseStaticFiles();
             app.UseRouting();
             app.UseCors(Auth.ApiName);
-            app.UseResponseCompression(); // TODO Using the server-based compression of, for example, Nginx is much faster. See https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-3.0
         }
 
         public static void ConfigureEndpoints(IApplicationBuilder app)
