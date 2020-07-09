@@ -79,7 +79,6 @@ namespace Metabase
             ConfigureDatabaseServices(services);
             Configuration.Session.ConfigureServices(services);
             Configuration.RequestResponse.ConfigureServices(services);
-            Configuration.Api.ConfigureServices(services);
             Configuration.Auth.ConfigureServices(services, _environment, _configuration, _appSettings, GetMigrationsAssembly());
             Configuration.GraphQl.ConfigureServices(services);
             Configuration.EventStore.ConfigureServices(services, _environment, _appSettings.Database);
@@ -101,7 +100,6 @@ namespace Metabase
         public void Configure(IApplicationBuilder app)
         {
             Configuration.RequestResponse.ConfigureRouting(app, _environment);
-            Configuration.Api.Configure(app);
             Configuration.Auth.Configure(app);
             Configuration.Session.Configure(app);
             Configuration.GraphQl.Configure(app, _environment);
