@@ -94,7 +94,7 @@ remove-data : ## Remove all data volumes
 .PHONY : remove-data
 
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
-up : ## (Re)create and start containers
+up : build ## (Re)create and start containers
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} up \
 		--remove-orphans \
