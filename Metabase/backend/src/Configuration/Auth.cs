@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Identity = Marten.AspNetCore.Identity;
 
 namespace Metabase.Configuration
 {
@@ -30,13 +31,18 @@ namespace Metabase.Configuration
         {
             // https://fullstackmark.com/post/21/user-authentication-and-identity-with-angular-aspnet-core-and-identityserver
             // https://www.scottbrady91.com/Identity-Server/ASPNET-Core-Swagger-UI-Authorization-using-IdentityServer4
-            ConfigureIdentityServices(services, configuration);
+            ConfigureIdentityServices(services, environment, configuration, appSettings);
             /* ConfigureIdentityServerServices(services, environment, appSettings, migrationsAssembly); */
         }
 
-        private static void ConfigureIdentityServices(IServiceCollection services, IConfiguration configuration)
+        private static void ConfigureIdentityServices(
+            IServiceCollection services,
+            IWebHostEnvironment environment,
+            IConfiguration configuration,
+            Infrastructure.AppSettings appSettings
+            )
         {
-            services.AddIdentity<Models.UserX, IdentityRole<Guid>>(_ =>
+            services.AddIdentity<Models.UserX, Models.RoleX>(_ =>
                 {
                     _.SignIn.RequireConfirmedAccount = true;
 
@@ -58,15 +64,49 @@ namespace Metabase.Configuration
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                     _.User.RequireUniqueEmail = false;
                 })
-            .AddEntityFrameworkStores<ApplicationDbContext>()
               .AddDefaultTokenProviders();
 
-            services.ConfigureApplicationCookie(_ =>
-                {
-                    _.LoginPath = "/Account/Login";
-                    _.LogoutPath = "/Account/Logout";
-                    _.AccessDeniedPath = "/Account/AccessDenied";
-                });
+            services.AddTransient<IUserStore<Models.UserX>, Identity.UserStore<Models.UserX>>();
+            services.AddTransient<IRoleStore<Models.RoleX>, Identity.RoleStore<Models.RoleX>>();
+
+            /* services.ConfigureApplicationCookie(_ => */
+            /*     { */
+            /*         _.LoginPath = "/Account/Login"; */
+            /*         _.LogoutPath = "/Account/Logout"; */
+            /*         _.AccessDeniedPath = "/Account/AccessDenied"; */
+            /*     }); */
+
+            // https://identityserver4.readthedocs.io/en/latest/topics/apis.html#the-identityserver-authentication-handler
+            services.AddAuthentication();
+            services.AddAuthorization();
+            /* services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme); */
+            /*   .AddIdentityServerAuthentication(_ => */
+            /*       { */
+            /*           // base-address of your identityserver */
+            /*           _.Authority = appSettings.Host; */
+            /*           _.RequireHttpsMetadata = !(environment.IsDevelopment() || environment.IsEnvironment("test")); */
+
+            /*           // name of the API resource */
+            /*           _.ApiName = ApiName; */
+            /*           _.ApiSecret = ApiSecret; */
+
+            /*           _.EnableCaching = true; */
+            /*           _.CacheDuration = TimeSpan.FromMinutes(10); // that's the default */
+            /*       }) */
+            /* .AddLocalApi(_ => _.ExpectedScope = ApiName); */
+            /* services.AddAuthorization(_ => */
+            /*     { */
+            /*         _.AddPolicy(IdentityServerConstants.LocalApi.PolicyName, policy => */
+            /*         { */
+            /*             policy.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme); */
+            /*             policy.RequireAuthenticatedUser(); */
+            /*         }); */
+            /*     }); */
+
+            // TODO? dotnet add package Microsoft.AspNetCore.Authentication.Cookies
+            /* .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, _ => */
+            /*    { */
+            /*    }); */
         }
 
         // https://github.com/IdentityServer/IdentityServer4.Demo
@@ -131,35 +171,6 @@ namespace Metabase.Configuration
                 // TODO https://identityserver4.readthedocs.io/en/latest/topics/startup.html#key-material
                 throw new Exception("need to configure key material");
             }
-
-            // https://identityserver4.readthedocs.io/en/latest/topics/apis.html#the-identityserver-authentication-handler
-            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-              .AddIdentityServerAuthentication(_ =>
-                  {
-                      // base-address of your identityserver
-                      _.Authority = appSettings.Host;
-                      _.RequireHttpsMetadata = !(environment.IsDevelopment() || environment.IsEnvironment("test"));
-
-                      // name of the API resource
-                      _.ApiName = ApiName;
-                      _.ApiSecret = ApiSecret;
-
-                      _.EnableCaching = true;
-                      _.CacheDuration = TimeSpan.FromMinutes(10); // that's the default
-                  })
-            .AddLocalApi(_ => _.ExpectedScope = ApiName);
-            services.AddAuthorization(_ =>
-                {
-                    _.AddPolicy(IdentityServerConstants.LocalApi.PolicyName, policy =>
-                    {
-                        policy.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme);
-                        policy.RequireAuthenticatedUser();
-                    });
-                });
-            // TODO? dotnet add package Microsoft.AspNetCore.Authentication.Cookies
-            /* .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, _ => */
-            /*    { */
-            /*    }); */
         }
 
         public static void Configure(IApplicationBuilder app)

@@ -49,6 +49,23 @@ namespace Infrastructure.Configuration
                     if (environment.IsDevelopment() || environment.IsEnvironment("test"))
                     {
                         _.AutoCreateSchemaObjects = Marten.AutoCreate.All;
+                        // TODO Why does this not work?
+                        // https://martendb.io/getting_started/#sec3
+                        // _.CreateDatabasesForTenants(c =>
+                        //     {
+                        //     // Specify a db to which to connect in case database needs to be created.
+                        //     // If not specified, defaults to 'postgres' on the connection for a tenant.
+                        //     c.MaintenanceDatabase(databaseSettings.ConnectionString);
+                        //     c.ForTenant()
+                        //     .CheckAgainstPgDatabase()
+                        //     .WithOwner("postgres")
+                        //     .WithEncoding("UTF-8")
+                        //     .ConnectionLimit(-1)
+                        //     .OnDatabaseCreated(_ =>
+                        //         {
+                        //         /* dbCreated = true; */
+                        //         });
+                        //     });
                     }
                     else
                     {

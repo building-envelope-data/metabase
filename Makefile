@@ -239,6 +239,44 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname xbase_development
 .PHONY : psql
 
+shelld : docker_compose = ${ikdb_docker_compose}
+shelld : ## Enter shell in a fresh `database` container
+	DOCKER_IP=${docker_ip} \
+		${docker_compose} run \
+		database \
+		ash
+.PHONY : shelld
+
+createdb : ## Create databases
+	DOCKER_IP=${docker_ip} \
+		${docker_compose} exec \
+		database \
+		bash -c " \
+			createdb --username postgres xbase_test ; \
+			createdb --username postgres xbase_development ; \
+			createdb --username postgres xbase_production \
+		"
+.PHONY : createdb
+
+createdb-ikdb : docker_compose = ${ikdb_docker_compose}
+createdb-ikdb : createdb ## Create IKDB databases
+.PHONY : createdb-ikdb
+
+createdb-ise : docker_compose = ${ise_docker_compose}
+createdb-ise : createdb ## Create ISE databases
+.PHONY : createdb-ise
+
+createdb-lbnl : docker_compose = ${lbnl_docker_compose}
+createdb-lbnl : createdb ## Create LBNL databases
+.PHONY : createdb-lbnl
+
+createdb-all : ## Create all databases
+createdb-all :
+	-make createdb-ikdb
+	-make createdb-ise
+	-make createdb-lbnl
+.PHONY : createdb-all
+
 # --------------------- #
 # Generate Certificates #
 # --------------------- #

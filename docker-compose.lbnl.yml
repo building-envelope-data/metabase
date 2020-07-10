@@ -8,10 +8,10 @@ services:
     command: [
       "dotnet", "run",
       "--no-launch-profile",
-      "--no-restore",
       "--runtime", "linux-musl-x64",
       "--project", "./src/Database.csproj"
       ]
+      # "--no-restore",
       # ["dotnet", "watch", "run", "--no-restore"]
     volumes:
       # The following items make the engine create a volume for the specified

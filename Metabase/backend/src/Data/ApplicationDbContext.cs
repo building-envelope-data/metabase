@@ -34,7 +34,7 @@ namespace Metabase.Data
 
             // https://stackoverflow.com/questions/19902756/asp-net-identity-dbcontext-confusion/35722688#35722688
             builder.Entity<Models.UserX>().ToTable("Users");
-            builder.Entity<IdentityRole<Guid>>().ToTable("Roles");
+            builder.Entity<Models.RoleX>().ToTable("Roles");
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");

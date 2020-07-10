@@ -11,7 +11,7 @@ namespace Metabase.Data
         {
             var logger = services.GetRequiredService<ILogger<SeedData>>();
             /* // TODO Shall we really migrate here? */
-            services.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+            /* services.GetRequiredService<ApplicationDbContext>().Database.Migrate(); */
             /* services.GetRequiredService<PersistedGrantDbContext>().Database.Migrate(); */
             /* /1* using (var persistedGrantDbContext = new PersistedGrantDbContext( *1/ */
             /* /1*     services.GetRequiredService<DbContextOptions<PersistedGrantDbContext>>())) *1/ */
