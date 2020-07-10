@@ -3,8 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <UserSecretsId>31666837686487542159</UserSecretsId>
-    <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
     <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
     <Nullable>enable</Nullable>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
@@ -54,8 +52,4 @@
   <ItemGroup>
     <ProjectReference Include="../../../Infrastructure/backend/src/Infrastructure.csproj" />
   </ItemGroup>
-
-  <!-- <Target Name="PreCompileTarget" BeforeTargets="Build"> -->
-    <!--   <Exec Command="npm run all" /> -->
-    <!-- </Target> -->
 </Project>
