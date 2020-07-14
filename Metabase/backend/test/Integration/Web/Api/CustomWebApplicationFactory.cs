@@ -12,13 +12,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using ApplicationDbContext = Metabase.Data.ApplicationDbContext;
 using AppSettings = Infrastructure.AppSettings;
-using ConfigurationDbContext = IdentityServer4.EntityFramework.DbContexts.ConfigurationDbContext;
 using IRelationalDatabaseCreator = Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator;
 using IsolationLevel = System.Data.IsolationLevel;
 using Models = Metabase.Models;
-using PersistedGrantDbContext = IdentityServer4.EntityFramework.DbContexts.PersistedGrantDbContext;
 using Startup = Metabase.Startup;
 
 namespace Test.Integration.Web.Api
@@ -91,22 +88,9 @@ namespace Test.Integration.Web.Api
             Do(
                 services =>
                     {
-                        SetUpDatabase(services.GetRequiredService<ApplicationDbContext>()/*, _applicationSchemaName */);
-                        SetUpDatabase(services.GetRequiredService<PersistedGrantDbContext>()/*, _identityServerPersistedGrantSchemaName */);
-                        SetUpDatabase(services.GetRequiredService<ConfigurationDbContext>()/*, _identityServerConfigurationSchemaName */);
                         SetUpEventStore();
                     }
             );
-        }
-
-        private void SetUpDatabase(DbContext dbContext/*, string schemaName */)
-        {
-            // https://docs.microsoft.com/en-us/ef/core/managing-schemas/ensure-created#multiple-dbcontext-classes
-            // dbContext.Model.SetDefaultSchema(schemaName);
-            var databaseCreator = dbContext.Database.GetService<IRelationalDatabaseCreator>();
-            if (!databaseCreator.Exists()) databaseCreator.Create();
-            DropDatabaseSchema(dbContext.Model.GetDefaultSchema());
-            databaseCreator.CreateTables();
         }
 
         private void SetUpEventStore()
@@ -124,9 +108,9 @@ namespace Test.Integration.Web.Api
 
         public void SeedAuth()
         {
-            Do(
-                    services => SeedData.SeedAuth(services.GetRequiredService<ConfigurationDbContext>())
-            );
+            /* Do( */
+            /*         services => SeedData.SeedAuth(services.GetRequiredService<ConfigurationDbContext>()) */
+            /* ); */
         }
 
         public new void Dispose()
@@ -135,9 +119,6 @@ namespace Test.Integration.Web.Api
             Do(
                 services =>
                     {
-                        DropDatabaseSchema(services.GetRequiredService<ApplicationDbContext>());
-                        DropDatabaseSchema(services.GetRequiredService<PersistedGrantDbContext>());
-                        DropDatabaseSchema(services.GetRequiredService<ConfigurationDbContext>());
                         DropDatabaseSchema(AppSettings.Database.SchemaName.EventStore);
                     }
             );
