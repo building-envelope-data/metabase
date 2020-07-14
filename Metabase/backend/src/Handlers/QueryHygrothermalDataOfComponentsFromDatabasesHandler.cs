@@ -21,7 +21,7 @@ namespace Metabase.Handlers
 
     public sealed class QueryHygrothermalDataOfComponentsFromDatabasesHandler
       : QueryDataArrayOfComponentsFromDatabasesHandler<
-          Models.HygrothermalDataFromDatabase,
+          Models.HygrothermalData,
           QueryHygrothermalDataOfComponentsFromDatabasesGraphQlResponse
         >
     {
@@ -41,7 +41,7 @@ namespace Metabase.Handlers
         {
         }
 
-        protected override Result<Models.HygrothermalDataFromDatabase, Errors> ParseGraphQlResponse(
+        protected override Result<Models.HygrothermalData, Errors> ParseGraphQlResponse(
             Models.Database database,
             QueryHygrothermalDataOfComponentsFromDatabasesGraphQlResponse hygrothermalDataResponse,
             IReadOnlyList<object> path
@@ -71,7 +71,7 @@ namespace Metabase.Handlers
                   timestampResult
                   )
               .Bind(_ =>
-                  Models.HygrothermalDataFromDatabase.From(
+                  Models.HygrothermalData.From(
                     id: idResult.Value,
                     databaseId: database.Id,
                     componentId: componentIdResult.Value,

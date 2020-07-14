@@ -2,10 +2,10 @@ using HotChocolate.Types;
 
 namespace Metabase.GraphQl
 {
-    public sealed class PhotovoltaicDataFromDatabaseType
-      : ObjectType<PhotovoltaicDataFromDatabase>
+    public sealed class PhotovoltaicDataType
+      : ObjectType<PhotovoltaicData>
     {
-        protected override void Configure(IObjectTypeDescriptor<PhotovoltaicDataFromDatabase> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<PhotovoltaicData> descriptor)
         {
             // `AnyType` https://github.com/ChilliCream/hotchocolate/issues/1051#issuecomment-613576432
             descriptor

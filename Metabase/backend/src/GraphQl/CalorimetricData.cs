@@ -6,15 +6,15 @@ using Infrastructure.ValueObjects;
 
 namespace Metabase.GraphQl
 {
-    public sealed class CalorimetricDataFromDatabase
+    public sealed class CalorimetricData
       : NodeBase
     {
-        public static CalorimetricDataFromDatabase FromModel(
-            Models.CalorimetricDataFromDatabase model,
+        public static CalorimetricData FromModel(
+            Models.CalorimetricData model,
             Timestamp requestTimestamp
             )
         {
-            return new CalorimetricDataFromDatabase(
+            return new CalorimetricData(
                 id: model.Id,
                 databaseId: model.DatabaseId,
                 componentId: model.ComponentId,
@@ -28,7 +28,7 @@ namespace Metabase.GraphQl
         public Id ComponentId { get; }
         public object Data { get; }
 
-        public CalorimetricDataFromDatabase(
+        public CalorimetricData(
             Id id,
             Id databaseId,
             Id componentId,
@@ -48,7 +48,7 @@ namespace Metabase.GraphQl
         }
 
         public Task<Database> GetDatabase(
-            [Parent] CalorimetricDataFromDatabase calorimetricData,
+            [Parent] CalorimetricData calorimetricData,
             [DataLoader] DatabaseDataLoader databaseLoader
             )
         {
@@ -58,7 +58,7 @@ namespace Metabase.GraphQl
         }
 
         public Task<Component> GetComponent(
-            [Parent] CalorimetricDataFromDatabase calorimetricData,
+            [Parent] CalorimetricData calorimetricData,
             [DataLoader] ComponentDataLoader componentLoader
             )
         {

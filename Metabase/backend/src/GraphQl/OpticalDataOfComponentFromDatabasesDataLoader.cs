@@ -3,13 +3,13 @@ using Infrastructure.Queries;
 namespace Metabase.GraphQl
 {
     public sealed class OpticalDataOfComponentFromDatabasesDataLoader
-      : DataArrayOfComponentFromDatabasesDataLoader<Models.OpticalDataFromDatabase, OpticalDataFromDatabase>
+      : DataArrayOfComponentFromDatabasesDataLoader<Models.OpticalData, OpticalData>
     {
         public OpticalDataOfComponentFromDatabasesDataLoader(
             IQueryBus queryBus
             )
           : base(
-              OpticalDataFromDatabase.FromModel,
+              OpticalData.FromModel,
               queryBus
               )
         {

@@ -6,15 +6,15 @@ using Infrastructure.ValueObjects;
 
 namespace Metabase.GraphQl
 {
-    public sealed class PhotovoltaicDataFromDatabase
+    public sealed class HygrothermalData
       : NodeBase
     {
-        public static PhotovoltaicDataFromDatabase FromModel(
-            Models.PhotovoltaicDataFromDatabase model,
+        public static HygrothermalData FromModel(
+            Models.HygrothermalData model,
             Timestamp requestTimestamp
             )
         {
-            return new PhotovoltaicDataFromDatabase(
+            return new HygrothermalData(
                 id: model.Id,
                 databaseId: model.DatabaseId,
                 componentId: model.ComponentId,
@@ -28,7 +28,7 @@ namespace Metabase.GraphQl
         public Id ComponentId { get; }
         public object Data { get; }
 
-        public PhotovoltaicDataFromDatabase(
+        public HygrothermalData(
             Id id,
             Id databaseId,
             Id componentId,
@@ -48,22 +48,22 @@ namespace Metabase.GraphQl
         }
 
         public Task<Database> GetDatabase(
-            [Parent] PhotovoltaicDataFromDatabase photovoltaicData,
+            [Parent] HygrothermalData hygrothermalData,
             [DataLoader] DatabaseDataLoader databaseLoader
             )
         {
             return databaseLoader.LoadAsync(
-                TimestampHelpers.TimestampId(photovoltaicData.DatabaseId, photovoltaicData.RequestTimestamp)
+                TimestampHelpers.TimestampId(hygrothermalData.DatabaseId, hygrothermalData.RequestTimestamp)
                 );
         }
 
         public Task<Component> GetComponent(
-            [Parent] PhotovoltaicDataFromDatabase photovoltaicData,
+            [Parent] HygrothermalData hygrothermalData,
             [DataLoader] ComponentDataLoader componentLoader
             )
         {
             return componentLoader.LoadAsync(
-                TimestampHelpers.TimestampId(photovoltaicData.ComponentId, photovoltaicData.RequestTimestamp)
+                TimestampHelpers.TimestampId(hygrothermalData.ComponentId, hygrothermalData.RequestTimestamp)
                 );
         }
     }

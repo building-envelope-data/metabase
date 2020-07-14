@@ -5,18 +5,18 @@ using Errors = Infrastructure.Errors;
 
 namespace Metabase.Models
 {
-    public sealed class PhotovoltaicDataFromDatabase
+    public sealed class CalorimetricData
       : Model
     {
         public Id DatabaseId { get; }
         public Id ComponentId { get; }
-        public PhotovoltaicDataJson Data { get; }
+        public CalorimetricDataJson Data { get; }
 
-        private PhotovoltaicDataFromDatabase(
+        private CalorimetricData(
             Id id,
             Id databaseId,
             Id componentId,
-            PhotovoltaicDataJson data,
+            CalorimetricDataJson data,
             Timestamp timestamp
             )
           : base(id, timestamp)
@@ -26,17 +26,17 @@ namespace Metabase.Models
             Data = data;
         }
 
-        public static Result<PhotovoltaicDataFromDatabase, Errors> From(
+        public static Result<CalorimetricData, Errors> From(
             Id id,
             Id databaseId,
             Id componentId,
-            PhotovoltaicDataJson data,
+            CalorimetricDataJson data,
             Timestamp timestamp
             )
         {
             return
-              Result.Ok<PhotovoltaicDataFromDatabase, Errors>(
-                  new PhotovoltaicDataFromDatabase(
+              Result.Ok<CalorimetricData, Errors>(
+                  new CalorimetricData(
                     id: id,
                     databaseId: databaseId,
                     componentId: componentId,

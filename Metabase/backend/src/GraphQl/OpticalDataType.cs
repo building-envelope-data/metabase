@@ -2,10 +2,10 @@ using HotChocolate.Types;
 
 namespace Metabase.GraphQl
 {
-    public sealed class OpticalDataFromDatabaseType
-      : ObjectType<OpticalDataFromDatabase>
+    public sealed class OpticalDataType
+      : ObjectType<OpticalData>
     {
-        protected override void Configure(IObjectTypeDescriptor<OpticalDataFromDatabase> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<OpticalData> descriptor)
         {
             // `AnyType` https://github.com/ChilliCream/hotchocolate/issues/1051#issuecomment-613576432
             descriptor

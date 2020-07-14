@@ -2,10 +2,10 @@ using HotChocolate.Types;
 
 namespace Metabase.GraphQl
 {
-    public sealed class HygrothermalDataFromDatabaseType
-      : ObjectType<HygrothermalDataFromDatabase>
+    public sealed class HygrothermalDataType
+      : ObjectType<HygrothermalData>
     {
-        protected override void Configure(IObjectTypeDescriptor<HygrothermalDataFromDatabase> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<HygrothermalData> descriptor)
         {
             // `AnyType` https://github.com/ChilliCream/hotchocolate/issues/1051#issuecomment-613576432
             descriptor

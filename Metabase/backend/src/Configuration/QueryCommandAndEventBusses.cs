@@ -233,14 +233,14 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.QueryDataArrayOfComponentsFromDatabases<Models.OpticalDataFromDatabase>,
-              IEnumerable<Result<IEnumerable<Result<Models.OpticalDataFromDatabase, Errors>>, Errors>>
+              Queries.QueryDataArrayOfComponentsFromDatabases<Models.OpticalData>,
+              IEnumerable<Result<IEnumerable<Result<Models.OpticalData, Errors>>, Errors>>
                 >,
               Handlers.QueryOpticalDataOfComponentsFromDatabasesHandler
                 >();
 
             // Who Has
-            AddWhichDatabasesHaveDataForComponentsHandler<Models.OpticalDataFromDatabase>(services, "hasOpticalData"); // TODO Get rid of magical string!
+            AddWhichDatabasesHaveDataForComponentsHandler<Models.OpticalData>(services, "hasOpticalData"); // TODO Get rid of magical string!
         }
 
         private static void AddCalorimetricDataHandlers(IServiceCollection services)
@@ -248,14 +248,14 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.QueryDataArrayOfComponentsFromDatabases<Models.CalorimetricDataFromDatabase>,
-              IEnumerable<Result<IEnumerable<Result<Models.CalorimetricDataFromDatabase, Errors>>, Errors>>
+              Queries.QueryDataArrayOfComponentsFromDatabases<Models.CalorimetricData>,
+              IEnumerable<Result<IEnumerable<Result<Models.CalorimetricData, Errors>>, Errors>>
                 >,
               Handlers.QueryCalorimetricDataOfComponentsFromDatabasesHandler
                 >();
 
             // Who Has
-            AddWhichDatabasesHaveDataForComponentsHandler<Models.CalorimetricDataFromDatabase>(services, "hasCalorimetricData"); // TODO Get rid of magical string!
+            AddWhichDatabasesHaveDataForComponentsHandler<Models.CalorimetricData>(services, "hasCalorimetricData"); // TODO Get rid of magical string!
         }
 
         private static void AddPhotovoltaicDataHandlers(IServiceCollection services)
@@ -263,14 +263,14 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.QueryDataArrayOfComponentsFromDatabases<Models.PhotovoltaicDataFromDatabase>,
-              IEnumerable<Result<IEnumerable<Result<Models.PhotovoltaicDataFromDatabase, Errors>>, Errors>>
+              Queries.QueryDataArrayOfComponentsFromDatabases<Models.PhotovoltaicData>,
+              IEnumerable<Result<IEnumerable<Result<Models.PhotovoltaicData, Errors>>, Errors>>
                 >,
               Handlers.QueryPhotovoltaicDataOfComponentsFromDatabasesHandler
                 >();
 
             // Who Has
-            AddWhichDatabasesHaveDataForComponentsHandler<Models.PhotovoltaicDataFromDatabase>(services, "hasPhotovoltaicData"); // TODO Get rid of magical string!
+            AddWhichDatabasesHaveDataForComponentsHandler<Models.PhotovoltaicData>(services, "hasPhotovoltaicData"); // TODO Get rid of magical string!
         }
 
         private static void AddHygrothermalDataHandlers(IServiceCollection services)
@@ -278,14 +278,14 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.QueryDataArrayOfComponentsFromDatabases<Models.HygrothermalDataFromDatabase>,
-              IEnumerable<Result<IEnumerable<Result<Models.HygrothermalDataFromDatabase, Errors>>, Errors>>
+              Queries.QueryDataArrayOfComponentsFromDatabases<Models.HygrothermalData>,
+              IEnumerable<Result<IEnumerable<Result<Models.HygrothermalData, Errors>>, Errors>>
                 >,
               Handlers.QueryHygrothermalDataOfComponentsFromDatabasesHandler
                 >();
 
             // Who Has
-            AddWhichDatabasesHaveDataForComponentsHandler<Models.HygrothermalDataFromDatabase>(services, "hasHygrothermalData"); // TODO Get rid of magical string!
+            AddWhichDatabasesHaveDataForComponentsHandler<Models.HygrothermalData>(services, "hasHygrothermalData"); // TODO Get rid of magical string!
         }
 
         private static void AddWhichDatabasesHaveDataForComponentsHandler<TDataModel>(

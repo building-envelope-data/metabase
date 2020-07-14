@@ -35,10 +35,10 @@ namespace Metabase.Configuration
                     .AddType<GraphQlX.StakeholderBase>()
                     .AddType<GraphQlX.ComponentType>()
 
-                    .AddType<GraphQlX.OpticalDataFromDatabaseType>()
-                    .AddType<GraphQlX.CalorimetricDataFromDatabaseType>()
-                    .AddType<GraphQlX.PhotovoltaicDataFromDatabaseType>()
-                    .AddType<GraphQlX.HygrothermalDataFromDatabaseType>()
+                    .AddType<GraphQlX.OpticalDataType>()
+                    .AddType<GraphQlX.CalorimetricDataType>()
+                    .AddType<GraphQlX.PhotovoltaicDataType>()
+                    .AddType<GraphQlX.HygrothermalDataType>()
                 );
         }
 

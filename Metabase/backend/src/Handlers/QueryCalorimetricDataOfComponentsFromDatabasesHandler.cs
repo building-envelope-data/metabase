@@ -21,7 +21,7 @@ namespace Metabase.Handlers
 
     public sealed class QueryCalorimetricDataOfComponentsFromDatabasesHandler
       : QueryDataArrayOfComponentsFromDatabasesHandler<
-          Models.CalorimetricDataFromDatabase,
+          Models.CalorimetricData,
           QueryCalorimetricDataOfComponentsFromDatabasesGraphQlResponse
         >
     {
@@ -41,7 +41,7 @@ namespace Metabase.Handlers
         {
         }
 
-        protected override Result<Models.CalorimetricDataFromDatabase, Errors> ParseGraphQlResponse(
+        protected override Result<Models.CalorimetricData, Errors> ParseGraphQlResponse(
             Models.Database database,
             QueryCalorimetricDataOfComponentsFromDatabasesGraphQlResponse calorimetricDataResponse,
             IReadOnlyList<object> path
@@ -71,7 +71,7 @@ namespace Metabase.Handlers
                   timestampResult
                   )
               .Bind(_ =>
-                  Models.CalorimetricDataFromDatabase.From(
+                  Models.CalorimetricData.From(
                     id: idResult.Value,
                     databaseId: database.Id,
                     componentId: componentIdResult.Value,

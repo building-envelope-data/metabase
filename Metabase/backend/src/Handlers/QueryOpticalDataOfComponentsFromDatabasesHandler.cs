@@ -21,7 +21,7 @@ namespace Metabase.Handlers
 
     public sealed class QueryOpticalDataOfComponentsFromDatabasesHandler
       : QueryDataArrayOfComponentsFromDatabasesHandler<
-          Models.OpticalDataFromDatabase,
+          Models.OpticalData,
           QueryOpticalDataOfComponentsFromDatabasesGraphQlResponse
         >
     {
@@ -41,7 +41,7 @@ namespace Metabase.Handlers
         {
         }
 
-        protected override Result<Models.OpticalDataFromDatabase, Errors> ParseGraphQlResponse(
+        protected override Result<Models.OpticalData, Errors> ParseGraphQlResponse(
             Models.Database database,
             QueryOpticalDataOfComponentsFromDatabasesGraphQlResponse opticalDataResponse,
             IReadOnlyList<object> path
@@ -71,7 +71,7 @@ namespace Metabase.Handlers
                   timestampResult
                   )
               .Bind(_ =>
-                  Models.OpticalDataFromDatabase.From(
+                  Models.OpticalData.From(
                     id: idResult.Value,
                     databaseId: database.Id,
                     componentId: componentIdResult.Value,

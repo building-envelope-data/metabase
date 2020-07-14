@@ -40,7 +40,7 @@ namespace Metabase.GraphQl
 
         // OpticalData //
 
-        public Task<IReadOnlyList<OpticalDataFromDatabase>> GetOpticalDataFromDatabases(
+        public Task<IReadOnlyList<OpticalData>> GetOpticalDataFromDatabases(
             Id componentId,
             Timestamp? timestamp,
             [DataLoader] OpticalDataOfComponentFromDatabasesDataLoader opticalDataLoader,
@@ -58,7 +58,7 @@ namespace Metabase.GraphQl
         public Task<IReadOnlyList<Database>> GetWhoHasOpticalData(
             Id componentId,
             Timestamp? timestamp,
-            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.OpticalDataFromDatabase> whoHasOpticalDataLoader,
+            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.OpticalData> whoHasOpticalDataLoader,
             IResolverContext resolverContext
             )
         {
@@ -72,7 +72,7 @@ namespace Metabase.GraphQl
 
         // Calorimetric //
 
-        public Task<IReadOnlyList<CalorimetricDataFromDatabase>> GetCalorimetricDataFromDatabases(
+        public Task<IReadOnlyList<CalorimetricData>> GetCalorimetricDataFromDatabases(
             Id componentId,
             Timestamp? timestamp,
             [DataLoader] CalorimetricDataOfComponentFromDatabasesDataLoader calorimetricDataLoader,
@@ -90,7 +90,7 @@ namespace Metabase.GraphQl
         public Task<IReadOnlyList<Database>> GetWhoHasCalorimetricData(
             Id componentId,
             Timestamp? timestamp,
-            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.CalorimetricDataFromDatabase> whoHasCalorimetricDataLoader,
+            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.CalorimetricData> whoHasCalorimetricDataLoader,
             IResolverContext resolverContext
             )
         {
@@ -104,7 +104,7 @@ namespace Metabase.GraphQl
 
         // Photovoltaic //
 
-        public Task<IReadOnlyList<PhotovoltaicDataFromDatabase>> GetPhotovoltaicDataFromDatabases(
+        public Task<IReadOnlyList<PhotovoltaicData>> GetPhotovoltaicDataFromDatabases(
             Id componentId,
             Timestamp? timestamp,
             [DataLoader] PhotovoltaicDataOfComponentFromDatabasesDataLoader photovoltaicDataLoader,
@@ -122,7 +122,7 @@ namespace Metabase.GraphQl
         public Task<IReadOnlyList<Database>> GetWhoHasPhotovoltaicData(
             Id componentId,
             Timestamp? timestamp,
-            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.PhotovoltaicDataFromDatabase> whoHasPhotovoltaicDataLoader,
+            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.PhotovoltaicData> whoHasPhotovoltaicDataLoader,
             IResolverContext resolverContext
             )
         {
@@ -136,7 +136,7 @@ namespace Metabase.GraphQl
 
         // Hygrothermal //
 
-        public Task<IReadOnlyList<HygrothermalDataFromDatabase>> GetHygrothermalDataFromDatabases(
+        public Task<IReadOnlyList<HygrothermalData>> GetHygrothermalDataFromDatabases(
             Id componentId,
             Timestamp? timestamp,
             [DataLoader] HygrothermalDataOfComponentFromDatabasesDataLoader hygrothermalDataLoader,
@@ -154,7 +154,7 @@ namespace Metabase.GraphQl
         public Task<IReadOnlyList<Database>> GetWhoHasHygrothermalData(
             Id componentId,
             Timestamp? timestamp,
-            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.HygrothermalDataFromDatabase> whoHasHygrothermalDataLoader,
+            [DataLoader] WhichDatabasesHaveDataForComponentDataLoader<Models.HygrothermalData> whoHasHygrothermalDataLoader,
             IResolverContext resolverContext
             )
         {

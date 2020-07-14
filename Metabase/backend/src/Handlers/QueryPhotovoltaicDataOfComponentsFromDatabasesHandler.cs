@@ -21,7 +21,7 @@ namespace Metabase.Handlers
 
     public sealed class QueryPhotovoltaicDataOfComponentsFromDatabasesHandler
       : QueryDataArrayOfComponentsFromDatabasesHandler<
-          Models.PhotovoltaicDataFromDatabase,
+          Models.PhotovoltaicData,
           QueryPhotovoltaicDataOfComponentsFromDatabasesGraphQlResponse
         >
     {
@@ -41,7 +41,7 @@ namespace Metabase.Handlers
         {
         }
 
-        protected override Result<Models.PhotovoltaicDataFromDatabase, Errors> ParseGraphQlResponse(
+        protected override Result<Models.PhotovoltaicData, Errors> ParseGraphQlResponse(
             Models.Database database,
             QueryPhotovoltaicDataOfComponentsFromDatabasesGraphQlResponse photovoltaicDataResponse,
             IReadOnlyList<object> path
@@ -71,7 +71,7 @@ namespace Metabase.Handlers
                   timestampResult
                   )
               .Bind(_ =>
-                  Models.PhotovoltaicDataFromDatabase.From(
+                  Models.PhotovoltaicData.From(
                     id: idResult.Value,
                     databaseId: database.Id,
                     componentId: componentIdResult.Value,

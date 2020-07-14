@@ -2,10 +2,10 @@ using HotChocolate.Types;
 
 namespace Metabase.GraphQl
 {
-    public sealed class CalorimetricDataFromDatabaseType
-      : ObjectType<CalorimetricDataFromDatabase>
+    public sealed class CalorimetricDataType
+      : ObjectType<CalorimetricData>
     {
-        protected override void Configure(IObjectTypeDescriptor<CalorimetricDataFromDatabase> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<CalorimetricData> descriptor)
         {
             // `AnyType` https://github.com/ChilliCream/hotchocolate/issues/1051#issuecomment-613576432
             descriptor

@@ -6,15 +6,15 @@ using Infrastructure.ValueObjects;
 
 namespace Metabase.GraphQl
 {
-    public sealed class OpticalDataFromDatabase
+    public sealed class PhotovoltaicData
       : NodeBase
     {
-        public static OpticalDataFromDatabase FromModel(
-            Models.OpticalDataFromDatabase model,
+        public static PhotovoltaicData FromModel(
+            Models.PhotovoltaicData model,
             Timestamp requestTimestamp
             )
         {
-            return new OpticalDataFromDatabase(
+            return new PhotovoltaicData(
                 id: model.Id,
                 databaseId: model.DatabaseId,
                 componentId: model.ComponentId,
@@ -28,7 +28,7 @@ namespace Metabase.GraphQl
         public Id ComponentId { get; }
         public object Data { get; }
 
-        public OpticalDataFromDatabase(
+        public PhotovoltaicData(
             Id id,
             Id databaseId,
             Id componentId,
@@ -48,22 +48,22 @@ namespace Metabase.GraphQl
         }
 
         public Task<Database> GetDatabase(
-            [Parent] OpticalDataFromDatabase opticalData,
+            [Parent] PhotovoltaicData photovoltaicData,
             [DataLoader] DatabaseDataLoader databaseLoader
             )
         {
             return databaseLoader.LoadAsync(
-                TimestampHelpers.TimestampId(opticalData.DatabaseId, opticalData.RequestTimestamp)
+                TimestampHelpers.TimestampId(photovoltaicData.DatabaseId, photovoltaicData.RequestTimestamp)
                 );
         }
 
         public Task<Component> GetComponent(
-            [Parent] OpticalDataFromDatabase opticalData,
+            [Parent] PhotovoltaicData photovoltaicData,
             [DataLoader] ComponentDataLoader componentLoader
             )
         {
             return componentLoader.LoadAsync(
-                TimestampHelpers.TimestampId(opticalData.ComponentId, opticalData.RequestTimestamp)
+                TimestampHelpers.TimestampId(photovoltaicData.ComponentId, photovoltaicData.RequestTimestamp)
                 );
         }
     }
