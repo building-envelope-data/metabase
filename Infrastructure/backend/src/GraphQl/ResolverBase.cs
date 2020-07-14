@@ -1,6 +1,6 @@
 namespace Infrastructure.GraphQl
 {
-    public abstract class ResolversBase
+    public abstract class ResolverBase
     {
         protected Queries.IQueryBus QueryBus { get; }
 
