@@ -1,5 +1,6 @@
 // Inspired by https://github.com/dotnet/aspnetcore/blob/master/src/Identity/EntityFrameworkCore/src/UserStore.cs
 // and https://github.com/roadkillwiki/Marten.AspNetIdentity/blob/master/src/Marten.AspNetIdentity/MartenUserStore.cs
+// and https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers?view=aspnetcore-3.1#customize-the-user-store
 
 using System;
 using System.Collections.Generic;
