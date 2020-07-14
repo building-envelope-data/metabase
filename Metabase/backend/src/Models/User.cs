@@ -33,6 +33,7 @@ namespace Metabase.Models
     }
 
     // TODO Combine `User` and `UserX` by creating an event sourced `IdentityUser`.
+    // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-3.1#customize-the-model
     public sealed class UserX : IdentityUser<Guid>
     {
     }
