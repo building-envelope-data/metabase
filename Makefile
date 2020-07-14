@@ -50,6 +50,13 @@ name-lbnl : ## Print value of variable `lbnl_name`
 # Interface with Docker Compose #
 # ----------------------------- #
 
+# TODO Try `buildkit` by setting the environment variables
+# ```
+# COMPOSE_DOCKER_CLI_BUILD=1 \
+# DOCKER_BUILDKIT=1 \
+# ```
+# See https://docs.docker.com/develop/develop-images/build_enhancements/
+# and https://www.docker.com/blog/faster-builds-in-compose-thanks-to-buildkit-support/
 build : ## Build images
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} build \
