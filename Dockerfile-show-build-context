@@ -1,0 +1,5 @@
+FROM busybox
+
+RUN mkdir /tmp/build/
+COPY . /tmp/build/
+RUN find /tmp/build/

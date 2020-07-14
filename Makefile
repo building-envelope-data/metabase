@@ -3,18 +3,18 @@
 
 include .env
 
-name = icon
-ise_name = ise_icon
-lbnl_name = lbnl_icon
+ikdb_name = ikdb
+ise_name = ise
+lbnl_name = lbnl
 
 # Inspired by https://docs.docker.com/engine/reference/commandline/run/#add-entries-to-container-hosts-file---add-host
 docker_ip = $(shell ip -4 addr show scope global dev docker0 | grep inet | awk '{print $$2}' | cut -d / -f 1)
 
-docker_compose = \
+ikdb_docker_compose = \
 	docker-compose \
 		--file docker-compose.common.yml \
-		--file docker-compose.yml \
-		--project-name ${name}
+		--file docker-compose.ikdb.yml \
+		--project-name ${ikdb_name}
 ise_docker_compose = \
 	docker-compose \
 		--file docker-compose.common.yml \
@@ -34,13 +34,9 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-# ----------------------------- #
-# Interface with Docker Compose #
-# ----------------------------- #
-
-name : ## Print value of variable `name`
-	@echo ${name}
-.PHONY : name
+name-ikdb : ## Print value of variable `ikdb_name`
+	@echo ${ikdb_name}
+.PHONY : name-ikdb
 
 name-ise : ## Print value of variable `ise_name`
 	@echo ${ise_name}
@@ -50,12 +46,27 @@ name-lbnl : ## Print value of variable `lbnl_name`
 	@echo ${lbnl_name}
 .PHONY : name-ise
 
+# ----------------------------- #
+# Interface with Docker Compose #
+# ----------------------------- #
+
+# TODO Try `buildkit` by setting the environment variables
+# ```
+# COMPOSE_DOCKER_CLI_BUILD=1 \
+# DOCKER_BUILDKIT=1 \
+# ```
+# See https://docs.docker.com/develop/develop-images/build_enhancements/
+# and https://www.docker.com/blog/faster-builds-in-compose-thanks-to-buildkit-support/
 build : ## Build images
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} build \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user)
 .PHONY : build
+
+build-ikdb : docker_compose = ${ikdb_docker_compose}
+build-ikdb : build ## Build IKDB images
+.PHONY : build-ikdb
 
 build-ise : docker_compose = ${ise_docker_compose}
 build-ise : build ## Build ISE images
@@ -65,10 +76,20 @@ build-lbnl : docker_compose = ${lbnl_docker_compose}
 build-lbnl : build ## Build LBNL images
 .PHONY : build-lbnl
 
+show-build-context : ## Show the build context configured by `.dockerignore`
+	docker build \
+		--file Dockerfile-show-build-context \
+		.
+.PHONY : show-build-context
+
 remove : ## Remove stopped containers
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} rm
 .PHONY : remove
+
+remove-ikdb : docker_compose = ${ikdb_docker_compose}
+remove-ikdb : remove ## Remove stopped IKDB containers
+.PHONY : remove-ikdb
 
 remove-ise : docker_compose = ${ise_docker_compose}
 remove-ise : remove ## Remove stopped ISE containers
@@ -86,12 +107,16 @@ remove-data : ## Remove all data volumes
 .PHONY : remove-data
 
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
-up : ## (Re)create and start containers
+up : build ## (Re)create and start containers
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} up \
 		--remove-orphans \
 		--detach
 .PHONY : up
+
+up-ikdb : docker_compose = ${ikdb_docker_compose}
+up-ikdb : up ## (Re)create and start IKDB containers
+.PHONY : up-ikdb
 
 up-ise : docker_compose = ${ise_docker_compose}
 up-ise : up ## (Re)create and start ISE containers
@@ -106,6 +131,10 @@ down : ## Stop containers and remove containers, networks, volumes, and images c
 		${docker_compose} down
 .PHONY : down
 
+down-ikdb : docker_compose = ${ikdb_docker_compose}
+down-ikdb : down ## Stop IKDB containers and remove containers, networks, volumes, and images created by `up-ikdb`
+.PHONY : down-ikdb
+
 down-ise : docker_compose = ${ise_docker_compose}
 down-ise : down ## Stop ISE containers and remove containers, networks, volumes, and images created by `up-ise`
 .PHONY : down-ise
@@ -118,6 +147,10 @@ restart : ## Restart all stopped and running containers
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} restart
 .PHONY : restart
+
+restart-ikdb : docker_compose = ${ikdb_docker_compose}
+restart-ikdb : restart ## Restart all stopped and running IKDB containers
+.PHONY : restart-ikdb
 
 restart-ise : docker_compose = ${ise_docker_compose}
 restart-ise : restart ## Restart all stopped and running ISE containers
@@ -133,6 +166,10 @@ logs : ## Follow logs
 		--follow
 .PHONY : logs
 
+logs-ikdb : docker_compose = ${ikdb_docker_compose}
+logs-ikdb : logs ## Follow IKDB logs
+.PHONY : logs-ikdb
+
 logs-ise : docker_compose = ${ise_docker_compose}
 logs-ise : logs ## Follow ISE logs
 .PHONY : logs-ise
@@ -141,7 +178,7 @@ logs-lbnl : docker_compose = ${lbnl_docker_compose}
 logs-lbnl : logs ## Follow LBNL logs
 .PHONY : logs-lbnl
 
-runf : ## Run the one-time command `${COMMAND}` against a fresh `frontend` container
+runf : build ## Run the one-time command `${COMMAND}` against a fresh `frontend` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} run \
 		--user $(shell id --user):$(shell id --group) \
@@ -149,13 +186,25 @@ runf : ## Run the one-time command `${COMMAND}` against a fresh `frontend` conta
 		${COMMAND}
 .PHONY : runf
 
-runb : ## Run the one-time command `${COMMAND}` against a fresh `backend` container
+runb : build ## Run the one-time command `${COMMAND}` against a fresh `backend` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} run \
 		--user $(shell id --user):$(shell id --group) \
 		backend \
 		${COMMAND}
 .PHONY : runb
+
+runb-ikdb : docker_compose = ${ikdb_docker_compose}
+runb-ikdb : runb ## Run the one-time command `${COMMAND}` against a fresh IKDB container
+.PHONY : runb-ikdb
+
+runb-ise : docker_compose = ${ise_docker_compose}
+runb-ise : runb ## Run the one-time command `${COMMAND}` against a fresh ISE container
+.PHONY : runb-ise
+
+runb-lbnl : docker_compose = ${lbnl_docker_compose}
+runb-lbnl : runb ## Run the one-time command `${COMMAND}` against a fresh LBNL container
+.PHONY : runb-lbnl
 
 shellf : COMMAND = ash
 shellf : runf ## Enter shell in a fresh `frontend` container
@@ -165,11 +214,24 @@ shellb : COMMAND = ash
 shellb : runb ## Enter shell in a fresh `backend` container
 .PHONY : shellb
 
+shellb-ikdb : docker_compose = ${ikdb_docker_compose}
+shellb-ikdb : shellb ## Enter shell in a fresh IKDB container
+.PHONY : shellb-ikdb
+
+shellb-ise : docker_compose = ${ise_docker_compose}
+shellb-ise : shellb ## Enter shell in a fresh ISE container
+.PHONY : shellb-ise
+
+shellb-lbnl : docker_compose = ${lbnl_docker_compose}
+shellb-lbnl : shellb ## Enter shell in a fresh LBNL container
+.PHONY : shellb-lbnl
+
 shellb-examples : COMMAND = bash -c "cd ./examples && bash"
-shellb-examples : runb ## Enter Bourne-again shell, aka, bash, in a fresh `backend` container
+shellb-examples : runb-ikdb ## Enter Bourne-again shell, aka, bash, in a fresh IKDB container
 .PHONY : shellb-examples
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
+traceb : docker_compose = ${ikdb_docker_compose}
 traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for example, `make CONTAINER_ID=c1b82eb6e03c trace-backend`
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
@@ -180,17 +242,60 @@ traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for examp
 				"
 .PHONY : traceb
 
+psql : docker_compose = ${ikdb_docker_compose}
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
 		database \
 		psql \
 		--username postgres \
-		--dbname icon_development
+		--dbname xbase_development
 .PHONY : psql
 
+shelld : docker_compose = ${ikdb_docker_compose}
+shelld : ## Enter shell in a fresh `database` container
+	DOCKER_IP=${docker_ip} \
+		${docker_compose} run \
+		database \
+		ash
+.PHONY : shelld
+
+createdb : ## Create databases
+	DOCKER_IP=${docker_ip} \
+		${docker_compose} exec \
+		database \
+		bash -c " \
+			createdb --username postgres xbase_test ; \
+			createdb --username postgres xbase_development ; \
+			createdb --username postgres xbase_production \
+		"
+.PHONY : createdb
+
+createdb-ikdb : docker_compose = ${ikdb_docker_compose}
+createdb-ikdb : createdb ## Create IKDB databases
+.PHONY : createdb-ikdb
+
+createdb-ise : docker_compose = ${ise_docker_compose}
+createdb-ise : createdb ## Create ISE databases
+.PHONY : createdb-ise
+
+createdb-lbnl : docker_compose = ${lbnl_docker_compose}
+createdb-lbnl : createdb ## Create LBNL databases
+.PHONY : createdb-lbnl
+
+createdb-all : ## Create all databases
+createdb-all :
+	-make createdb-ikdb
+	-make createdb-ise
+	-make createdb-lbnl
+.PHONY : createdb-all
+
+# --------------------- #
+# Generate Certificates #
+# --------------------- #
+
 ssl : generate-certificate-authority trust-certificate-authority ## Generate and trust certificate authority, and generate SSL certificates
-	make generate-ssl-certificate
+	make generate-ssl-certificate-ikdb
 	make generate-ssl-certificate-ise
 	make generate-ssl-certificate-lbnl
 .PHONY : ssl
@@ -273,8 +378,6 @@ generate-certificate-authority : ## Generate certificate authority ECDSA private
 				exit 0 \
 			) || echo \"PFX file is invalid\" \
 			"
-	mkdir --parents ./backend/ssl/
-	cp ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.* ./backend/ssl/
 .PHONY : generate-certificate-authority
 
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
@@ -392,9 +495,14 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 				exit 0 \
 			) || echo \"PFX file is invalid\" \
 			"
-	mkdir --parents ./backend/ssl/
-	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.* ./backend/ssl/
 .PHONY : generate-ssl-certificate
+
+generate-ssl-certificate-ikdb : HOST = ${IKDB_HOST}
+generate-ssl-certificate-ikdb : SSL_CERTIFICATE_BASE_FILE_NAME = ${IKDB_SSL_CERTIFICATE_BASE_FILE_NAME}
+generate-ssl-certificate-ikdb : SSL_CERTIFICATE_PASSWORD = ${IKDB_SSL_CERTIFICATE_PASSWORD}
+generate-ssl-certificate-ikdb : SSL_CERTIFICATE_SUBJECT = ${IKDB_SSL_CERTIFICATE_SUBJECT}
+generate-ssl-certificate-ikdb : generate-ssl-certificate ## Generate IKDB SSL certificate
+.PHONY : generate-ssl-certificate-ikdb
 
 generate-ssl-certificate-ise : HOST = ${ISE_HOST}
 generate-ssl-certificate-ise : SSL_CERTIFICATE_BASE_FILE_NAME = ${ISE_SSL_CERTIFICATE_BASE_FILE_NAME}
@@ -414,6 +522,11 @@ fetch-ssl-certificate : ## Fetch the SSL certificate of the server
 	openssl s_client ${HOST}:${HTTPS_PORT}
 .PHONY : fetch-ssl-certificate
 
+fetch-ssl-certificate-ikdb : HOST = ${IKDB_HOST}
+fetch-ssl-certificate-ikdb : HTTPS_PORT = ${IKDB_HTTPS_PORT}
+fetch-ssl-certificate-ikdb : fetch-ssl-certificate ## Fetch the SSL certificate of the IKDB server
+.PHONY : fetch-ssl-certificate-ikdb
+
 fetch-ssl-certificate-ise : HOST = ${ISE_HOST}
 fetch-ssl-certificate-ise : HTTPS_PORT = ${ISE_HTTPS_PORT}
 fetch-ssl-certificate-ise : fetch-ssl-certificate ## Fetch the SSL certificate of the ISE server
@@ -427,6 +540,73 @@ fetch-ssl-certificate-lbnl : fetch-ssl-certificate ## Fetch the SSL certificate 
 # ------------------------------------------------ #
 # Tasks to run, for example, in a Docker container #
 # ------------------------------------------------ #
+
+projects = Database Metabase Infrastructure
+
+# TODO Apply not only to `src` folder but ignore files and directories within .gitignore.
+#      With git installed there are various options, which all have some
+#      disadvantages, see
+#      https://unix.stackexchange.com/questions/358270/find-files-that-are-not-in-gitignore
+# Inspired by
+# * https://stackoverflow.com/questions/45240387/how-can-i-remove-the-bom-from-a-utf-8-file/45240995#45240995
+# * https://unix.stackexchange.com/questions/381230/how-can-i-remove-the-bom-from-a-utf-8-file/381263#381263
+dos2unix : ## Strip the byte-order mark, also known as, BOM, and remove carriage returns
+	find \
+		. \
+		\( -name "*.cs" -o -name "*.cshtml" \) \
+		-type f \
+		-exec sed -i -e "$(shell printf '1s/^\357\273\277//')" -e "s/\r//" {} +
+	# find . -type f -exec dos2unix {} \;
+.PHONY : dos2unix
+
+# TODO We run `dotnet-format` three times because subsequent runs sometimes
+# still make changes. It would be best if we'd check the output to figure out
+# whether changes have been made or not and run it again and again until no
+# more changes are made.
+dosformat : ## Format code and add byte-order marks
+	for project in ${projects} ; do ( \
+		cd ./$${project}/backend && \
+		dotnet tool run dotnet-format && \
+		dotnet tool run dotnet-format && \
+		dotnet tool run dotnet-format \
+	) ; done
+.PHONY : dosformat
+
+format : dosformat dos2unix ## Format code
+.PHONY : format
+
+update-packages : ## Update packages
+	for project in ${projects} ; do ( \
+		cd ./$${project}/backend && \
+		for subproject in src test ; do ( \
+			cd ./$${subproject} && \
+			dotnet list package | \
+				awk '/>/ {print $$2}' | \
+				xargs -n 1 dotnet add package \
+		) ; done \
+	) ; done
+.PHONY : update-packages
+
+update-tools : ## Update tools
+	dotnet tool list | \
+		tail -n +3 | \
+		awk '{print $$1}' | \
+		xargs -n 1 dotnet tool update
+	dotnet tool run dotnet-sos install
+.PHONY : update-tools
+
+update : update-packages update-tools ## Update packages and tools
+.PHONY : update
+
+dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for example, `make PATTERN="using Infrastructure.Aggregates" dedup`
+	find . -name "*.cs" \
+		| xargs -n 1 \
+				gawk -i inplace "{ \
+					if (/${PATTERN}/) \
+						{ if (!seen[$$0]++) { print } } \
+					else \
+						{ print } \
+					}"
 
 diagrams : ## Draw images from textual UML diagrams
 	plantuml diagrams/*.uml
