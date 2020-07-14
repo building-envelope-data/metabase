@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
+using Infrastructure.Models;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using Marten;
@@ -14,12 +15,13 @@ namespace Database.Handlers
 {
     public sealed class GetDataOfComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>
       : IQueryHandler<Queries.GetDataOfComponents<TDataModel>, IEnumerable<Result<IEnumerable<Result<TDataModel, Errors>>, Errors>>>
+      where TDataModel : IModel
       where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
       where TDataCreatedEvent : Events.DataCreatedEvent
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
 
-        public GetDataOfComponentsHandler(IAggregateRepository repository)
+        public GetDataOfComponentsHandler(IModelRepository repository)
         {
             _repository = repository;
         }
@@ -51,8 +53,8 @@ namespace Database.Handlers
                       );
                 return
                   (
-                   // TODO Avoid loading and discarding deleted data aggregates.
-                   await session.LoadAllThatExistedBatched<TDataAggregate>(
+                   // TODO Avoid loading and discarding deleted data models.
+                   await session.LoadAllThatExistedBatched<TDataModel, TDataAggregate>(
                      query.TimestampedIds.Select(timestampedId =>
                        (
                         timestampedId.Timestamp,
@@ -63,13 +65,9 @@ namespace Database.Handlers
                      )
                    .ConfigureAwait(false)
                   )
-                  .Select(aggregateResults =>
+                  .Select(modelResults =>
                       Result.Ok<IEnumerable<Result<TDataModel, Errors>>, Errors>(
-                        aggregateResults.Select(aggregateResult =>
-                          aggregateResult.Bind(aggregate =>
-                            aggregate.ToModel()
-                            )
-                          )
+                        modelResults
                         )
                       );
             }

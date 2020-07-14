@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
+using Infrastructure.Models;
 using Infrastructure.ValueObjects;
 using DateTime = System.DateTime;
 using ErrorCodes = Infrastructure.ErrorCodes;
@@ -26,7 +27,7 @@ namespace Metabase.Handlers
         >
     {
         public QueryOpticalDataOfComponentsFromDatabasesHandler(
-                        IAggregateRepository repository
+                        IModelRepository repository
                         )
           : base(
               graphQlQueryName: "opticalData",

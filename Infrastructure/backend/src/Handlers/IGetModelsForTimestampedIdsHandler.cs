@@ -12,7 +12,7 @@ namespace Infrastructure.Handlers
     public interface IGetModelsForTimestampedIdsHandler
     {
         public Task<IEnumerable<Result<IModel, Errors>>> HandleX(
-            IAggregateRepositoryReadOnlySession session,
+            ModelRepositoryReadOnlySession session,
             IEnumerable<TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             );

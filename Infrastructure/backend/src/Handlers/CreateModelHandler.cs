@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
 using Infrastructure.Commands;
 using Infrastructure.Events;
+using Infrastructure.Models;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
 using Errors = Infrastructure.Errors;
@@ -16,14 +17,14 @@ namespace Infrastructure.Handlers
       where TCommand : ICommand<Result<TimestampedId, Errors>>
       where TAggregate : class, IEventSourcedAggregate, new()
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
         private readonly Func<Guid, TCommand, ICreatedEvent> _newCreatedEvent;
-        private readonly IEnumerable<Func<IAggregateRepositorySession, Id, TCommand, CancellationToken, Task<Result<Id, Errors>>>> _addAssociations;
+        private readonly IEnumerable<Func<ModelRepositorySession, Id, TCommand, CancellationToken, Task<Result<Id, Errors>>>> _addAssociations;
 
         public CreateModelHandler(
-            IAggregateRepository repository,
+            IModelRepository repository,
             Func<Guid, TCommand, ICreatedEvent> newCreatedEvent,
-            IEnumerable<Func<IAggregateRepositorySession, Id, TCommand, CancellationToken, Task<Result<Id, Errors>>>> addAssociations
+            IEnumerable<Func<ModelRepositorySession, Id, TCommand, CancellationToken, Task<Result<Id, Errors>>>> addAssociations
             )
         {
             _repository = repository;
@@ -43,7 +44,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<Result<TimestampedId, Errors>> Handle(
-            IAggregateRepositorySession session,
+            ModelRepositorySession session,
             TCommand command,
             CancellationToken cancellationToken
             )

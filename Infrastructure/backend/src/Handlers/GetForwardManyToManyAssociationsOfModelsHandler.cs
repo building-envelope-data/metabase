@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
 using Infrastructure.Events;
+using Infrastructure.Models;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
@@ -13,11 +14,13 @@ namespace Infrastructure.Handlers
     public sealed class GetForwardManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>
       : GetManyToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate>,
         IQueryHandler<Queries.GetForwardManyToManyAssociationsOfModels<TModel, TAssociationModel>, IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAssociationAddedEvent : IAssociationAddedEvent
+          where TModel : IModel
+          where TAssociationModel : IManyToManyAssociation
+          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+          where TAssociationAddedEvent : IAssociationAddedEvent
     {
-        public GetForwardManyToManyAssociationsOfModelsHandler(IAggregateRepository repository)
+        public GetForwardManyToManyAssociationsOfModelsHandler(IModelRepository repository)
           : base(repository)
         {
         }

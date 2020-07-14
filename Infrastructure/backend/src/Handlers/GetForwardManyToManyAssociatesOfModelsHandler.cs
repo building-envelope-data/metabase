@@ -14,14 +14,16 @@ namespace Infrastructure.Handlers
     public sealed class GetForwardManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>
       : GetManyToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>,
         IQueryHandler<Queries.GetForwardManyToManyAssociatesOfModels<TModel, TAssociationModel, TAssociateModel>, IEnumerable<Result<IEnumerable<Result<TAssociateModel, Errors>>, Errors>>>
+      where TModel : IModel
       where TAssociationModel : IManyToManyAssociation
+      where TAssociateModel : IModel
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
       where TAssociationAddedEvent : IAssociationAddedEvent
     {
         public GetForwardManyToManyAssociatesOfModelsHandler(
-            IAggregateRepository repository
+            IModelRepository repository
             )
           : base(repository)
         {

@@ -5,13 +5,15 @@ namespace Infrastructure.Handlers
 {
     public abstract class GetOneToManyAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>
       : GetAssociatesOfModelsHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>
+      where TModel : IModel
       where TAssociationModel : IOneToManyAssociation
+      where TAssociateModel : IModel
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
       where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     {
         protected GetOneToManyAssociatesOfModelsHandler(
-            IAggregateRepository repository
+            IModelRepository repository
             )
           : base(repository)
         {

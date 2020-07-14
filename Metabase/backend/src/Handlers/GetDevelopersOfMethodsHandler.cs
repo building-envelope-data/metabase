@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
+using Infrastructure.Models;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
@@ -14,7 +15,7 @@ namespace Metabase.Handlers
       : IQueryHandler<GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>, IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>>
     {
         public static async Task<IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>> Do(
-            IAggregateRepositoryReadOnlySession session,
+            ModelRepositoryReadOnlySession session,
             IEnumerable<TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
@@ -39,9 +40,9 @@ namespace Metabase.Handlers
                 );
         }
 
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
 
-        public GetDevelopersOfMethodsHandler(IAggregateRepository repository)
+        public GetDevelopersOfMethodsHandler(IModelRepository repository)
         {
             _repository = repository;
         }

@@ -12,12 +12,12 @@ using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using AddAssociationCheck = Infrastructure.Aggregates.AddAssociationCheck;
+using AddAssociationCheck = Infrastructure.Models.AddAssociationCheck;
 using CancellationToken = System.Threading.CancellationToken;
 using Errors = Infrastructure.Errors;
-using IAggregateRepository = Infrastructure.Aggregates.IAggregateRepository;
-using IAggregateRepositorySession = Infrastructure.Aggregates.IAggregateRepositorySession;
 using IEventSourcedAggregate = Infrastructure.Aggregates.IEventSourcedAggregate;
+using ModelRepository = Infrastructure.Models.ModelRepository;
+using ModelRepositorySession = Infrastructure.Models.ModelRepositorySession;
 
 namespace Database.Configuration
 {
@@ -52,9 +52,9 @@ namespace Database.Configuration
             AddModelHandlers<Models.OpticalData, Aggregates.OpticalDataAggregate, ValueObjects.CreateOpticalDataInput, Events.OpticalDataCreated>(
                     services,
                     Events.OpticalDataCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateOpticalDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateOpticalDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.OpticalDataDeleted.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
+                    Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
             AddGetAndHasDataForComponentsHandler<Models.OpticalData, Aggregates.OpticalDataAggregate, Events.OpticalDataCreated>(services);
         }
@@ -64,9 +64,9 @@ namespace Database.Configuration
             AddModelHandlers<Models.CalorimetricData, Aggregates.CalorimetricDataAggregate, ValueObjects.CreateCalorimetricDataInput, Events.CalorimetricDataCreated>(
                     services,
                     Events.CalorimetricDataCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateCalorimetricDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateCalorimetricDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.CalorimetricDataDeleted.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
+                    Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
             AddGetAndHasDataForComponentsHandler<Models.CalorimetricData, Aggregates.CalorimetricDataAggregate, Events.CalorimetricDataCreated>(services);
         }
@@ -76,9 +76,9 @@ namespace Database.Configuration
             AddModelHandlers<Models.PhotovoltaicData, Aggregates.PhotovoltaicDataAggregate, ValueObjects.CreatePhotovoltaicDataInput, Events.PhotovoltaicDataCreated>(
                     services,
                     Events.PhotovoltaicDataCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreatePhotovoltaicDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreatePhotovoltaicDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.PhotovoltaicDataDeleted.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
+                    Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
             AddGetAndHasDataForComponentsHandler<Models.PhotovoltaicData, Aggregates.PhotovoltaicDataAggregate, Events.PhotovoltaicDataCreated>(services);
         }
@@ -88,9 +88,9 @@ namespace Database.Configuration
             AddModelHandlers<Models.HygrothermalData, Aggregates.HygrothermalDataAggregate, ValueObjects.CreateHygrothermalDataInput, Events.HygrothermalDataCreated>(
                     services,
                     Events.HygrothermalDataCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateHygrothermalDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateHygrothermalDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.HygrothermalDataDeleted.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
+                    Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
             AddGetAndHasDataForComponentsHandler<Models.HygrothermalData, Aggregates.HygrothermalDataAggregate, Events.HygrothermalDataCreated>(services);
         }
@@ -98,6 +98,7 @@ namespace Database.Configuration
         private static void AddGetAndHasDataForComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>(
             IServiceCollection services
             )
+          where TDataModel : IModel
           where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
           where TDataCreatedEvent : Events.DataCreatedEvent
         {
@@ -108,6 +109,7 @@ namespace Database.Configuration
         private static void AddGetDataOfComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>(
             IServiceCollection services
             )
+          where TDataModel : IModel
           where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
           where TDataCreatedEvent : Events.DataCreatedEvent
         {
@@ -123,6 +125,7 @@ namespace Database.Configuration
         private static void AddHasDataForComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>(
             IServiceCollection services
             )
+          where TDataModel : IModel
           where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
           where TDataCreatedEvent : Events.DataCreatedEvent
         {

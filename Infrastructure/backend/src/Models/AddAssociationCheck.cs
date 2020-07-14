@@ -1,4 +1,4 @@
-namespace Infrastructure.Aggregates
+namespace Infrastructure.Models
 {
     public enum AddAssociationCheck
     {

@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
 using Infrastructure.Commands;
 using Infrastructure.Events;
+using Infrastructure.Models;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
 using Errors = Infrastructure.Errors;
@@ -13,16 +14,17 @@ namespace Infrastructure.Handlers
 {
     public sealed class DeleteModelHandler<TModel, TAggregate>
       : ICommandHandler<Infrastructure.Commands.Delete<TModel>, Result<TimestampedId, Errors>>
-      where TAggregate : class, IEventSourcedAggregate, new()
+      where TModel : IModel
+      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
         private readonly Func<Infrastructure.Commands.Delete<TModel>, IDeletedEvent> _newDeletedEvent;
-        private readonly IEnumerable<Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> _removeAssociations;
+        private readonly IEnumerable<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> _removeAssociations;
 
         public DeleteModelHandler(
-            IAggregateRepository repository,
+            IModelRepository repository,
             Func<Infrastructure.Commands.Delete<TModel>, IDeletedEvent> newDeletedEvent,
-            IEnumerable<Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
+            IEnumerable<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
             )
         {
             _repository = repository;
@@ -42,13 +44,13 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<Result<TimestampedId, Errors>> Handle(
-            IAggregateRepositorySession session,
+            ModelRepositorySession session,
             Infrastructure.Commands.Delete<TModel> command,
             CancellationToken cancellationToken
             )
         {
             return await
-              (await session.Load<TAggregate>(command.TimestampedId, cancellationToken).ConfigureAwait(false))
+              (await session.Load<TModel, TAggregate>(command.TimestampedId, cancellationToken).ConfigureAwait(false))
               .Bind(async _ =>
                   {
                       // We cannot aggregate the removal tasks and execute them in

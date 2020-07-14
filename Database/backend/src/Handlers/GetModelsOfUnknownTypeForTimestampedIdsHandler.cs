@@ -17,7 +17,7 @@ namespace Database.Handlers
     public sealed class GetModelsOfUnknownTypeForTimestampedIdsHandler
       : Infrastructure.Handlers.GetModelsOfUnknownTypeForTimestampedIdsHandler
     {
-        public GetModelsOfUnknownTypeForTimestampedIdsHandler(IAggregateRepository repository)
+        public GetModelsOfUnknownTypeForTimestampedIdsHandler(IModelRepository repository)
           : base(
               repository,
               new Dictionary<Type, IGetModelsForTimestampedIdsHandler>

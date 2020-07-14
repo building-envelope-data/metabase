@@ -4,24 +4,28 @@ using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
 using Infrastructure.Commands;
 using Infrastructure.Events;
+using Infrastructure.Models;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
 using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.Handlers
 {
-    public sealed class AddOneToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>
+    public sealed class AddOneToManyAssociationHandler<TInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>
       : ICommandHandler<Infrastructure.Commands.AddAssociation<TInput>, Result<TimestampedId, Errors>>
       where TInput : Infrastructure.ValueObjects.AddOneToManyAssociationInput
-      where TAggregate : class, IEventSourcedAggregate, new()
-      where TAssociationAggregate : class, IOneToManyAssociationAggregate, new()
-      where TAssociateAggregate : class, IEventSourcedAggregate, new()
+      where TModel : IModel
+      where TAssociationModel : IOneToManyAssociation
+      where TAssociateModel : IModel
+      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+      where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
         private readonly Func<Guid, Infrastructure.Commands.AddAssociation<TInput>, IAssociationAddedEvent> _newAssociationAddedEvent;
 
         public AddOneToManyAssociationHandler(
-            IAggregateRepository repository,
+            IModelRepository repository,
             Func<Guid, Infrastructure.Commands.AddAssociation<TInput>, IAssociationAddedEvent> newAssociationAddedEvent
             )
         {
@@ -41,13 +45,13 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<Result<TimestampedId, Errors>> Handle(
-            IAggregateRepositorySession session,
+            ModelRepositorySession session,
             Infrastructure.Commands.AddAssociation<TInput> command,
             CancellationToken cancellationToken
             )
         {
             return await (
-              await session.AddOneToManyAssociation<TAggregate, TAssociationAggregate, TAssociateAggregate>(
+              await session.AddOneToManyAssociation<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
                 id => _newAssociationAddedEvent(id, command),
                 AddAssociationCheck.PARENT_AND_ASSOCIATE,
                 cancellationToken

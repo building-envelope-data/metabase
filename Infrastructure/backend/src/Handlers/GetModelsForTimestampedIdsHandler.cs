@@ -7,25 +7,24 @@ using Infrastructure.Models;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
-using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.Handlers
 {
-    public sealed class GetModelsForTimestampedIdsHandler<M, A>
-      : IQueryHandler<Queries.GetModelsForTimestampedIds<M>, IEnumerable<Result<M, Errors>>>,
+    public sealed class GetModelsForTimestampedIdsHandler<TModel, TAggregate>
+      : IQueryHandler<Queries.GetModelsForTimestampedIds<TModel>, IEnumerable<Result<TModel, Errors>>>,
         IGetModelsForTimestampedIdsHandler
-      where M : IModel
-      where A : class, IEventSourcedAggregate, IConvertible<M>, new()
+      where TModel : IModel
+      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
 
-        public GetModelsForTimestampedIdsHandler(IAggregateRepository repository)
+        public GetModelsForTimestampedIdsHandler(IModelRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Result<M, Errors>>> Handle(
-            Queries.GetModelsForTimestampedIds<M> query,
+        public async Task<IEnumerable<Result<TModel, Errors>>> Handle(
+            Queries.GetModelsForTimestampedIds<TModel> query,
             CancellationToken cancellationToken
             )
         {
@@ -35,27 +34,20 @@ namespace Infrastructure.Handlers
             }
         }
 
-        public async Task<IEnumerable<Result<M, Errors>>> Handle(
-            IAggregateRepositoryReadOnlySession session,
+        public Task<IEnumerable<Result<TModel, Errors>>> Handle(
+            ModelRepositoryReadOnlySession session,
             IEnumerable<TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
         {
-            return
-              (await session
-               .LoadAll<A>(
-                 timestampedIds,
-                 cancellationToken: cancellationToken
-                 )
-               .ConfigureAwait(false)
-              )
-              .Select(result =>
-                result.Bind(a => a.ToModel())
+            return session.LoadAll<TModel, TAggregate>(
+                timestampedIds,
+                cancellationToken: cancellationToken
                 );
         }
 
         public async Task<IEnumerable<Result<IModel, Errors>>> HandleX(
-            IAggregateRepositoryReadOnlySession session,
+            ModelRepositoryReadOnlySession session,
             IEnumerable<TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )

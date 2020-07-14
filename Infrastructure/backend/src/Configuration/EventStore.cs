@@ -1,5 +1,6 @@
 using System;
 using Infrastructure.Aggregates;
+using Infrastructure.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,7 +27,7 @@ namespace Infrastructure.Configuration
                   addEventTypes
                   )
                 );
-            services.AddScoped<IAggregateRepository, AggregateRepository>();
+            services.AddScoped<ModelRepository, ModelRepository>();
         }
 
         public static Marten.IDocumentStore BuildDocumentStore(

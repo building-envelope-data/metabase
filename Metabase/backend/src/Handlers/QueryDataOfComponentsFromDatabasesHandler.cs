@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
+using Infrastructure.Models;
 using Infrastructure.ValueObjects;
 using ErrorCodes = Infrastructure.ErrorCodes;
 using Errors = Infrastructure.Errors;
@@ -24,7 +25,7 @@ namespace Metabase.Handlers
         protected QueryDataOfComponentsFromDatabasesHandler(
             string graphQlQueryName,
             string? graphQlQueryFields,
-            IAggregateRepository repository
+            IModelRepository repository
             )
           : base(repository)
         {

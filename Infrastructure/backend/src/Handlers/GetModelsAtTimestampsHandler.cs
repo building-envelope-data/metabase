@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
 using Infrastructure.Events;
+using Infrastructure.Models;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
@@ -12,12 +13,13 @@ namespace Infrastructure.Handlers
 {
     public sealed class GetModelsAtTimestampsHandler<TModel, TAggregate, TCreatedEvent>
       : IQueryHandler<Queries.GetModelsAtTimestamps<TModel>, IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
+      where TModel : IModel
       where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
       where TCreatedEvent : ICreatedEvent
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
 
-        public GetModelsAtTimestampsHandler(IAggregateRepository repository)
+        public GetModelsAtTimestampsHandler(IModelRepository repository)
         {
             _repository = repository;
         }

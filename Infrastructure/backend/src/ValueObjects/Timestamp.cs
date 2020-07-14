@@ -20,7 +20,7 @@ namespace Infrastructure.ValueObjects
 
         private Timestamp(DateTime value)
         {
-            Value = value;
+            Value = value.ToUniversalTime();
         }
 
         public static Result<Timestamp, Errors> From(

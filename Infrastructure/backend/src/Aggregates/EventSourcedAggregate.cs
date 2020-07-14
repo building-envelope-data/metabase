@@ -54,7 +54,7 @@ namespace Infrastructure.Aggregates
         public bool IsVirgin()
         {
             return
-               // Id == Guid.Empty && // TODO For some reason the `Id` is set by `AggregateRepositoryReadOnlySession#Load<T>`. Why? How? Who?
+               // Id == Guid.Empty && // TODO For some reason the `Id` is set by `ModelRepositoryReadOnlySession#Load<T>`. Why? How? Who?
                Timestamp == DateTime.MinValue &&
                Version is 0 &&
                !Deleted;

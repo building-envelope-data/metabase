@@ -4,6 +4,7 @@ using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
 using Infrastructure.Commands;
 using Infrastructure.Events;
+using Infrastructure.Models;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
 using Errors = Infrastructure.Errors;
@@ -12,13 +13,14 @@ namespace Infrastructure.Handlers
 {
     public sealed class RemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>
       : ICommandHandler<Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Result<TimestampedId, Errors>>
-      where TAssociationAggregate : class, IManyToManyAssociationAggregate, new()
+      where TAssociationModel : IManyToManyAssociation
+      where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
         private readonly Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> _newAssociationRemovedEvent;
 
         public RemoveManyToManyAssociationHandler(
-            IAggregateRepository repository,
+            IModelRepository repository,
             Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
             )
         {
@@ -38,14 +40,14 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<Result<TimestampedId, Errors>> Handle(
-            IAggregateRepositorySession session,
+            ModelRepositorySession session,
             Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
             CancellationToken cancellationToken
             )
         {
             return await
               (
-               await session.RemoveManyToManyAssociation<TAssociationAggregate>(
+               await session.RemoveManyToManyAssociation<TAssociationModel, TAssociationAggregate>(
                  (command.Input.ParentId, command.Input.AssociateId),
                  command.Input.Timestamp,
                  id => _newAssociationRemovedEvent(id, command),
