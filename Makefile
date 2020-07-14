@@ -76,6 +76,12 @@ build-lbnl : docker_compose = ${lbnl_docker_compose}
 build-lbnl : build ## Build LBNL images
 .PHONY : build-lbnl
 
+show-build-context : ## Show the build context configured by `.dockerignore`
+	docker build \
+		--file Dockerfile-show-build-context \
+		.
+.PHONY : show-build-context
+
 remove : ## Remove stopped containers
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} rm
