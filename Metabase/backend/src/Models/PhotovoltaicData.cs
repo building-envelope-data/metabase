@@ -35,7 +35,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<PhotovoltaicData, Errors>(
+              Result.Success<PhotovoltaicData, Errors>(
                   new PhotovoltaicData(
                     id: id,
                     databaseId: databaseId,

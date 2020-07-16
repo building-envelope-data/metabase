@@ -34,7 +34,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<ComponentVariant, Errors>(
+              Result.Success<ComponentVariant, Errors>(
                   new ComponentVariant(
             id: id,
             baseComponentId: baseComponentId,

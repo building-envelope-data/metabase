@@ -67,7 +67,7 @@ namespace Database.Handlers
                   )
                   .Select(modelResults =>
                       // TODO Determine the number of existing data models without loading them!
-                      Result.Ok<bool, Errors>(
+                      Result.Success<bool, Errors>(
                         modelResults.Any()
                         )
                       );

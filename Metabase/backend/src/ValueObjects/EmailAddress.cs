@@ -43,7 +43,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<EmailAddress, Errors>(new EmailAddress(emailAddress));
+            return Result.Success<EmailAddress, Errors>(new EmailAddress(emailAddress));
         }
 
         protected override IEnumerable<object?> GetEqualityComponents()

@@ -42,7 +42,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<Abbreviation, Errors>(
+            return Result.Success<Abbreviation, Errors>(
                 new Abbreviation(abbreviation)
                 );
         }

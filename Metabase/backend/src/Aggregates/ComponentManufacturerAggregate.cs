@@ -57,7 +57,7 @@ namespace Metabase.Aggregates
                   base.Validate(),
                   ValidateNonEmpty(ComponentId, nameof(ComponentId)),
                   ValidateNonEmpty(InstitutionId, nameof(InstitutionId)),
-                  MarketingInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                  MarketingInformation?.Validate() ?? Result.Success<bool, Errors>(true)
                   );
         }
 

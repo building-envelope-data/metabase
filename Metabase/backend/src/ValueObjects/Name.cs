@@ -42,7 +42,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<Name, Errors>(
+            return Result.Success<Name, Errors>(
                 new Name(name)
                 );
         }

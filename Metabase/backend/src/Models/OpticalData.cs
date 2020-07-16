@@ -35,7 +35,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<OpticalData, Errors>(
+              Result.Success<OpticalData, Errors>(
                   new OpticalData(
                     id: id,
                     databaseId: databaseId,

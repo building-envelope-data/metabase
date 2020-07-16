@@ -96,7 +96,7 @@ namespace Metabase.Handlers
                       )
                     );
             }
-            return Result.Ok<TResponse, Errors>(
+            return Result.Success<TResponse, Errors>(
                   ParseGraphQlResponse(
                     database,
                     response.Data

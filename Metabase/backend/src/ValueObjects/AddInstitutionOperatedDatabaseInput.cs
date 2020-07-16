@@ -13,7 +13,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<AddInstitutionOperatedDatabaseInput, Errors>(
+              Result.Success<AddInstitutionOperatedDatabaseInput, Errors>(
                   new AddInstitutionOperatedDatabaseInput(
                     institutionId: institutionId,
                     databaseId: databaseId

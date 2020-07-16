@@ -34,7 +34,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<ComponentPart, Errors>(
+              Result.Success<ComponentPart, Errors>(
                   new ComponentPart(
             id: id,
             assembledComponentId: assembledComponentId,

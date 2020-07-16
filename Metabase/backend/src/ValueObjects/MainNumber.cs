@@ -42,7 +42,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<MainNumber, Errors>(new MainNumber(mainNumber));
+            return Result.Success<MainNumber, Errors>(new MainNumber(mainNumber));
         }
 
         protected override IEnumerable<object?> GetEqualityComponents()

@@ -23,7 +23,7 @@ namespace Infrastructure
                       )
                     );
             }
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateNonNull(
@@ -40,7 +40,7 @@ namespace Infrastructure
                       )
                     );
             }
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateEmpty(
@@ -57,7 +57,7 @@ namespace Infrastructure
                       )
                     );
             }
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateNonEmpty(
@@ -74,7 +74,7 @@ namespace Infrastructure
                       )
                     );
             }
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateNullOrNonEmpty(
@@ -83,7 +83,7 @@ namespace Infrastructure
             )
         {
             if (id is null)
-                return Result.Ok<bool, Errors>(true);
+                return Result.Success<bool, Errors>(true);
 
             // Why can't we use the null-forgiving operator `!` as follows?
             // return ValidateNonEmpty(id!, variableName);
@@ -105,7 +105,7 @@ namespace Infrastructure
                       )
                     );
             }
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateNotMinValue(
@@ -122,7 +122,7 @@ namespace Infrastructure
                       )
                     );
             }
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateZero(
@@ -139,7 +139,7 @@ namespace Infrastructure
                       )
                     );
             }
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateNonZero(
@@ -156,7 +156,7 @@ namespace Infrastructure
                       )
                     );
             }
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> ValidateEquality<T>(
@@ -178,7 +178,7 @@ namespace Infrastructure
                       )
                     );
             }
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public abstract Result<bool, Errors> Validate();

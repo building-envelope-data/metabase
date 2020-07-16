@@ -19,7 +19,7 @@ namespace Metabase.Queries
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {
-            return Result.Ok<WhichDatabasesHaveDataForComponents<TDataModel>, Errors>(
+            return Result.Success<WhichDatabasesHaveDataForComponents<TDataModel>, Errors>(
                 new WhichDatabasesHaveDataForComponents<TDataModel>(
                   timestampedIds: timestampedIds
                   )

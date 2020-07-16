@@ -21,7 +21,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<CreateComponentInput, Errors>(
+            return Result.Success<CreateComponentInput, Errors>(
                 new CreateComponentInput(
                   information: information
                   )

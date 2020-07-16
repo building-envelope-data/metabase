@@ -140,7 +140,7 @@ namespace Metabase.Handlers
             )
         {
             return
-              Result.Ok<IEnumerable<Result<TDataModel, Errors>>, Errors>(
+              Result.Success<IEnumerable<Result<TDataModel, Errors>>, Errors>(
                   dataResultsResults.SelectMany(dataResultsResult =>
                     dataResultsResult.IsSuccess
                     ? dataResultsResult.Value

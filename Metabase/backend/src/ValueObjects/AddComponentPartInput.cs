@@ -27,7 +27,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<AddComponentPartInput, Errors>(
+              Result.Success<AddComponentPartInput, Errors>(
                   new AddComponentPartInput(
                     assembledComponentId: assembledComponentId,
                     partComponentId: partComponentId

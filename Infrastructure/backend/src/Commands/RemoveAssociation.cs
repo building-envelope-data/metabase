@@ -26,7 +26,7 @@ namespace Infrastructure.Commands
             Id creatorId
             )
         {
-            return Result.Ok<RemoveAssociation<TInput>, Errors>(
+            return Result.Success<RemoveAssociation<TInput>, Errors>(
                     new RemoveAssociation<TInput>(
                         input: input,
                         creatorId: creatorId

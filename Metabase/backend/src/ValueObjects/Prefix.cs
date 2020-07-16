@@ -41,7 +41,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<Prefix, Errors>(new Prefix(prefix));
+            return Result.Success<Prefix, Errors>(new Prefix(prefix));
         }
 
         public static Result<Prefix, Errors>? MaybeFrom(

@@ -34,7 +34,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<MethodDeveloper, Errors>(
+              Result.Success<MethodDeveloper, Errors>(
                   new MethodDeveloper(
                     id: id,
                     methodId: methodId,

@@ -15,7 +15,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<AddComponentManufacturerInput, Errors>(
+              Result.Success<AddComponentManufacturerInput, Errors>(
                   new AddComponentManufacturerInput(
                     componentId: componentId,
                     institutionId: institutionId,

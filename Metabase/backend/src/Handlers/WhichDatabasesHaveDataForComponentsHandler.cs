@@ -34,11 +34,11 @@ namespace Metabase.Handlers
             )
         {
             return
-                            Result.Ok<IEnumerable<Result<Models.Database, Errors>>, Errors>(
+                            Result.Success<IEnumerable<Result<Models.Database, Errors>>, Errors>(
                                     response
                                     ? new Result<Models.Database, Errors>[]
                                     {
-                                    Result.Ok<Models.Database, Errors>(database)
+                                    Result.Success<Models.Database, Errors>(database)
                                     }
                                     : Enumerable.Empty<Result<Models.Database, Errors>>()
                                     );

@@ -54,7 +54,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<Numeration, Errors>(
+            return Result.Success<Numeration, Errors>(
                 new Numeration(
                   prefix,
                   mainNumber,

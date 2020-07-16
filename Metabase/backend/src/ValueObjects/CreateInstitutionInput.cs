@@ -41,7 +41,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<CreateInstitutionInput, Errors>(
+            return Result.Success<CreateInstitutionInput, Errors>(
                 new CreateInstitutionInput(
                   name: name,
                   abbreviation: abbreviation,

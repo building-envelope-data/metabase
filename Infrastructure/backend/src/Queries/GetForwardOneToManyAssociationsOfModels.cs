@@ -21,7 +21,7 @@ namespace Infrastructure.Queries
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {
-            return Result.Ok<GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel>, Errors>(
+            return Result.Success<GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel>, Errors>(
                 new GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel>(
                   timestampedIds: timestampedIds
                   )

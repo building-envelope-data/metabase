@@ -41,7 +41,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<PublicKey, Errors>(new PublicKey(publicKey));
+            return Result.Success<PublicKey, Errors>(new PublicKey(publicKey));
         }
 
         public static Result<PublicKey, Errors>? MaybeFrom(

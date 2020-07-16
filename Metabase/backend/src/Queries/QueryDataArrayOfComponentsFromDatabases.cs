@@ -19,7 +19,7 @@ namespace Metabase.Queries
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {
-            return Result.Ok<QueryDataArrayOfComponentsFromDatabases<TDataModel>, Errors>(
+            return Result.Success<QueryDataArrayOfComponentsFromDatabases<TDataModel>, Errors>(
                     new QueryDataArrayOfComponentsFromDatabases<TDataModel>(
                         timestampedIds
                         )

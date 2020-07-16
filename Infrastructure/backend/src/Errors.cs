@@ -113,7 +113,7 @@ namespace Infrastructure
             if (errors.Count > 0)
                 return Result.Failure<bool, Errors>(ConcatX(errors));
 
-            return Result.Ok<bool, Errors>(true);
+            return Result.Success<bool, Errors>(true);
         }
 
         public static Result<bool, Errors> Combine(params IResult[] results)

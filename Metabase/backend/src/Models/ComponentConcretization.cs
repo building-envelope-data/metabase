@@ -34,7 +34,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<ComponentConcretization, Errors>(
+              Result.Success<ComponentConcretization, Errors>(
                   new ComponentConcretization(
             id: id,
             generalComponentId: generalComponentId,

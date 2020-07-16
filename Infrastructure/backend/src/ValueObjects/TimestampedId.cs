@@ -48,7 +48,7 @@ namespace Infrastructure.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<TimestampedId, Errors>(
+            return Result.Success<TimestampedId, Errors>(
                 new TimestampedId(
                   id,
                   timestamp

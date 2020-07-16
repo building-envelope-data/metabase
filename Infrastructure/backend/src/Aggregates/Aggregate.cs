@@ -64,7 +64,7 @@ namespace Infrastructure.Aggregates
         {
             if (IsVirgin())
             {
-                return Result.Ok<bool, Errors>(true);
+                return Result.Success<bool, Errors>(true);
             }
             return
               Result.Combine<bool, Errors>(

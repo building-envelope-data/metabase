@@ -124,7 +124,7 @@ namespace Infrastructure.ValueObjects
             var validationResults = new Manatee.Json.Schema.MetaSchemaValidationResults(); // TODO jsonSchema.ValidateSchema(); // https://gregsdennis.github.io/Manatee.Json/api/Manatee.Json.Schema.MetaSchemaValidationResults.html
             if (validationResults.IsValid)
             {
-                return Result.Ok<JsonSchema, Errors>(
+                return Result.Success<JsonSchema, Errors>(
                     new JsonSchema(jsonSchema)
                     );
             }
@@ -191,7 +191,7 @@ namespace Infrastructure.ValueObjects
                       )
                     );
             }
-            return Result.Ok<string, Errors>(Value.Id);
+            return Result.Success<string, Errors>(Value.Id);
         }
 
         public Result<Json, Errors> Validate(
@@ -202,7 +202,7 @@ namespace Infrastructure.ValueObjects
             var validationResults = new Manatee.Json.Schema.SchemaValidationResults(); // TODO Value.Validate(json, _validationOptions);
             if (validationResults.IsValid)
             {
-                return Result.Ok<Json, Errors>(json);
+                return Result.Success<Json, Errors>(json);
             }
             return Result.Failure<Json, Errors>(
                 Errors.From(

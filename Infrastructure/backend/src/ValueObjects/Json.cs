@@ -92,23 +92,23 @@ namespace Infrastructure.ValueObjects
                         new JsonArray(jsonValues)
                         )
                       ),
-                bool boolean => Result.Ok<JsonValue, Errors>(new JsonValue(boolean)),
-                null => Result.Ok<JsonValue, Errors>(JsonValue.Null),
+                bool boolean => Result.Success<JsonValue, Errors>(new JsonValue(boolean)),
+                null => Result.Success<JsonValue, Errors>(JsonValue.Null),
                 // For the list of implicit conversions to `double` see
                 // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/numeric-conversions#implicit-numeric-conversions
                 // and for the explicit ones see
                 // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/numeric-conversions#explicit-numeric-conversions
-                sbyte number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-                byte number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-                short number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-                ushort number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-                int number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-                uint number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-                long number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-                ulong number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-                float number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
-                double number => Result.Ok<JsonValue, Errors>(new JsonValue(number)),
-                decimal number => Result.Ok<JsonValue, Errors>(new JsonValue((double)number)),
+                sbyte number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
+                byte number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
+                short number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
+                ushort number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
+                int number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
+                uint number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
+                long number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
+                ulong number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
+                float number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
+                double number => Result.Success<JsonValue, Errors>(new JsonValue(number)),
+                decimal number => Result.Success<JsonValue, Errors>(new JsonValue((double)number)),
                 IDictionary<string, object?> dictionary =>
                   dictionary.Select(pair =>
                       ConvertNestedCollectionsToJsonValue(
@@ -130,7 +130,7 @@ namespace Infrastructure.ValueObjects
                           )
                         )
                       ),
-                string @string => Result.Ok<JsonValue, Errors>(new JsonValue(@string)),
+                string @string => Result.Success<JsonValue, Errors>(new JsonValue(@string)),
                 // God-damned C# does not have switch expression exhaustiveness for
                 // enums as mentioned for example on https://github.com/dotnet/csharplang/issues/2266
                 _ => Result.Failure<JsonValue, Errors>(
@@ -164,9 +164,9 @@ namespace Infrastructure.ValueObjects
                         new JsonArray(jsonValues)
                         )
                       ),
-                JsonValueKind.False => Result.Ok<JsonValue, Errors>(new JsonValue(false)),
-                JsonValueKind.Null => Result.Ok<JsonValue, Errors>(JsonValue.Null),
-                JsonValueKind.Number => Result.Ok<JsonValue, Errors>(new JsonValue(jsonElement.GetDouble())),
+                JsonValueKind.False => Result.Success<JsonValue, Errors>(new JsonValue(false)),
+                JsonValueKind.Null => Result.Success<JsonValue, Errors>(JsonValue.Null),
+                JsonValueKind.Number => Result.Success<JsonValue, Errors>(new JsonValue(jsonElement.GetDouble())),
                 JsonValueKind.Object =>
                   jsonElement.EnumerateObject()
                   .Select(jsonProperty =>
@@ -189,8 +189,8 @@ namespace Infrastructure.ValueObjects
                           )
                         )
                       ),
-                JsonValueKind.String => Result.Ok<JsonValue, Errors>(new JsonValue(jsonElement.GetString())),
-                JsonValueKind.True => Result.Ok<JsonValue, Errors>(new JsonValue(true)),
+                JsonValueKind.String => Result.Success<JsonValue, Errors>(new JsonValue(jsonElement.GetString())),
+                JsonValueKind.True => Result.Success<JsonValue, Errors>(new JsonValue(true)),
                 JsonValueKind.Undefined => Result.Failure<JsonValue, Errors>(
                     Errors.One(
                       message: $"The JSON element `{jsonElement}` is of kind `{JsonValueKind.Undefined}`",
@@ -292,7 +292,7 @@ namespace Infrastructure.ValueObjects
                 {
                     if (rootObject[SchemaKey].Type == JsonValueType.String)
                     {
-                        return Result.Ok<string, Errors>(
+                        return Result.Success<string, Errors>(
                             rootObject[SchemaKey].String
                             );
                     }

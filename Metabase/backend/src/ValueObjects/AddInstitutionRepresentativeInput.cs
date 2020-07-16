@@ -32,7 +32,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<AddInstitutionRepresentativeInput, Errors>(
+              Result.Success<AddInstitutionRepresentativeInput, Errors>(
                   new AddInstitutionRepresentativeInput(
                     institutionId: institutionId,
                     userId: userId,

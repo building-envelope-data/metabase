@@ -37,7 +37,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<CreatePersonInput, Errors>(
+            return Result.Success<CreatePersonInput, Errors>(
                 new CreatePersonInput(
                   name: name,
                   phoneNumber: phoneNumber,

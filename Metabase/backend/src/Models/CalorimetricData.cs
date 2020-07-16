@@ -35,7 +35,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<CalorimetricData, Errors>(
+              Result.Success<CalorimetricData, Errors>(
                   new CalorimetricData(
                     id: id,
                     databaseId: databaseId,

@@ -27,7 +27,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<AddPersonAffiliationInput, Errors>(
+              Result.Success<AddPersonAffiliationInput, Errors>(
                   new AddPersonAffiliationInput(
                     personId: personId,
                     institutionId: institutionId

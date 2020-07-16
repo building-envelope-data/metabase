@@ -27,7 +27,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<Method, Errors>(
+              Result.Success<Method, Errors>(
                   new Method(
                     id: id,
                     information: information,

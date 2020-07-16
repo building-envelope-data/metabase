@@ -15,7 +15,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<SearchComponentsInput, Errors>(
+            return Result.Success<SearchComponentsInput, Errors>(
                 new SearchComponentsInput()
                 );
         }

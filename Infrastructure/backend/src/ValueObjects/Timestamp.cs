@@ -40,7 +40,7 @@ namespace Infrastructure.ValueObjects
                     )
                     );
             }
-            return Result.Ok<Timestamp, Errors>(
+            return Result.Success<Timestamp, Errors>(
                 new Timestamp(timestamp)
                 );
         }

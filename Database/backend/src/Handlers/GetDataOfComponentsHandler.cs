@@ -66,7 +66,7 @@ namespace Database.Handlers
                    .ConfigureAwait(false)
                   )
                   .Select(modelResults =>
-                      Result.Ok<IEnumerable<Result<TDataModel, Errors>>, Errors>(
+                      Result.Success<IEnumerable<Result<TDataModel, Errors>>, Errors>(
                         modelResults
                         )
                       );

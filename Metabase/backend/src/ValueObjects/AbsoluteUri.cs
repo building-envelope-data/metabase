@@ -31,7 +31,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<AbsoluteUri, Errors>(new AbsoluteUri(uri));
+            return Result.Success<AbsoluteUri, Errors>(new AbsoluteUri(uri));
         }
 
         public static Result<AbsoluteUri, Errors>? MaybeFrom(

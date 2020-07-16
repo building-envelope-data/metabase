@@ -24,7 +24,7 @@ namespace Infrastructure.Commands
             Id creatorId
             )
         {
-            return Result.Ok<Create<TInput>, Errors>(
+            return Result.Success<Create<TInput>, Errors>(
                     new Create<TInput>(
                         input: input,
                         creatorId: creatorId

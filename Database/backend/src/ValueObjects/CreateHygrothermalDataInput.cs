@@ -26,7 +26,7 @@ namespace Database.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<CreateHygrothermalDataInput, Errors>(
+            return Result.Success<CreateHygrothermalDataInput, Errors>(
                 new CreateHygrothermalDataInput(
                   componentId,
                   data

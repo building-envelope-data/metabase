@@ -173,7 +173,7 @@ namespace Infrastructure.Models
                     BuildNonExistentModelError(timestampedId.Id)
                     );
             }
-            return Result.Ok<int, Errors>(aggregate.Version);
+            return Result.Success<int, Errors>(aggregate.Version);
         }
 
         public async Task<Result<ValueObjects.Timestamp, Errors>> FetchTimestamp<TAggregate>(
@@ -245,7 +245,7 @@ namespace Infrastructure.Models
             {
                 return Result.Failure<Marten.Events.StreamState, Errors>(BuildNonExistentModelError(id));
             }
-            return Result.Ok<Marten.Events.StreamState, Errors>(streamState);
+            return Result.Success<Marten.Events.StreamState, Errors>(streamState);
         }
 
         private async
@@ -281,7 +281,7 @@ namespace Infrastructure.Models
             return ids.Zip(streamStates, (id, streamState) =>
                   streamState is null
                     ? Result.Failure<Marten.Events.StreamState, Errors>(BuildNonExistentModelError(id))
-                    : Result.Ok<Marten.Events.StreamState, Errors>(streamState)
+                    : Result.Success<Marten.Events.StreamState, Errors>(streamState)
                   );
         }
 
@@ -308,7 +308,7 @@ namespace Infrastructure.Models
               )
         {
             return streamState.AggregateType == typeof(TAggregate)
-            ? Result.Ok<Marten.Events.StreamState, Errors>(streamState)
+            ? Result.Success<Marten.Events.StreamState, Errors>(streamState)
             : Result.Failure<Marten.Events.StreamState, Errors>(
                     Errors.One(
                       message: $"The aggregate with id {id} is of type {streamState.AggregateType} and not of the expected type {typeof(TAggregate)}",
@@ -820,7 +820,7 @@ namespace Infrastructure.Models
             return aggregate!.ToModel()
               .Bind(model =>
                   (Guid)model.Id == aggregate.Id && (DateTime)model.Timestamp == aggregate.Timestamp
-                  ? Result.Ok<TModel, Errors>(model)
+                  ? Result.Success<TModel, Errors>(model)
                   : Result.Failure<TModel, Errors>(
                       Errors.One(
                         message: $"The conversion of the aggregate {aggregate} to the model {model} did not preserve the aggregate's identifier {aggregate.Id} or timestamp {aggregate.Timestamp} which became {(Guid)model.Id} and {(DateTime)model.Timestamp}",
@@ -866,7 +866,7 @@ namespace Infrastructure.Models
                .ConfigureAwait(false)
                 )
               .Select(results =>
-                  Result.Ok<IEnumerable<Result<TModel, Errors>>, Errors>(results)
+                  Result.Success<IEnumerable<Result<TModel, Errors>>, Errors>(results)
                   );
         }
 
@@ -996,7 +996,7 @@ namespace Infrastructure.Models
               .Zip(timestampedModelIds, (associationsResult, timestampedModelId) =>
                   associationsResult.Bind(associationResults =>
                     associationResults.Count() is 1
-                    ? Result.Ok<IEnumerable<Result<TAssociationModel, Errors>>, Errors>(associationResults)
+                    ? Result.Success<IEnumerable<Result<TAssociationModel, Errors>>, Errors>(associationResults)
                     : Result.Failure<IEnumerable<Result<TAssociationModel, Errors>>, Errors>(
                       Errors.One(
                         message: $"The model of type {typeof(TAssociateModel)} with identifier {timestampedModelId.Id} at timestamp {timestampedModelId.Timestamp} does not have one one-to-many association of type {typeof(TAssociationModel)} but {associationResults.Count()}",
@@ -1063,7 +1063,7 @@ namespace Infrastructure.Models
                 )
               .Zip(modelIds.Zip(doModelIdsExist), (results, modelIdAndExists) =>
                   modelIdAndExists.Second
-                  ? Result.Ok<IEnumerable<Result<TAssociateModel, Errors>>, Errors>(results)
+                  ? Result.Success<IEnumerable<Result<TAssociateModel, Errors>>, Errors>(results)
                   : Result.Failure<IEnumerable<Result<TAssociateModel, Errors>>, Errors>(
                     Errors.One(
                       message: $"There is no model with id {modelIdAndExists.First}",

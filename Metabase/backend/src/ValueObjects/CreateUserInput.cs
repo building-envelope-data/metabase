@@ -15,7 +15,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<CreateUserInput, Errors>(
+            return Result.Success<CreateUserInput, Errors>(
                 new CreateUserInput()
                 );
         }

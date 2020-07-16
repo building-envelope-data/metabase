@@ -24,7 +24,7 @@ namespace Infrastructure.Commands
             Id creatorId
             )
         {
-            return Result.Ok<AddAssociation<TInput>, Errors>(
+            return Result.Success<AddAssociation<TInput>, Errors>(
                     new AddAssociation<TInput>(
                         input: input,
                         creatorId: creatorId

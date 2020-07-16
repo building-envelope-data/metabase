@@ -186,7 +186,7 @@ namespace Infrastructure.Models
             _unsavedEvents = Enumerable.Empty<Events.IEvent>();
             return
               await Task.FromResult<Result<bool, Errors>>(
-                  Result.Ok<bool, Errors>(true)
+                  Result.Success<bool, Errors>(true)
                   )
               .ConfigureAwait(false);
         }
@@ -208,7 +208,7 @@ namespace Infrastructure.Models
             _unsavedEvents = _unsavedEvents.Concat(eventArray);
             return
               await Task.FromResult<Result<bool, Errors>>(
-                  Result.Ok<bool, Errors>(true)
+                  Result.Success<bool, Errors>(true)
                   )
               .ConfigureAwait(false);
         }
@@ -261,7 +261,7 @@ namespace Infrastructure.Models
                             code: ErrorCodes.AlreadyExistingAssociation
                             )
                           )
-                      : Result.Ok<bool, Errors>(true);
+                      : Result.Success<bool, Errors>(true);
                 },
                 addAssociationCheck,
                 cancellationToken
@@ -296,7 +296,7 @@ namespace Infrastructure.Models
                             code: ErrorCodes.AlreadyExistingAssociation
                             )
                           )
-                      : Result.Ok<bool, Errors>(true);
+                      : Result.Success<bool, Errors>(true);
                 },
                 addAssociationCheck,
                 cancellationToken
