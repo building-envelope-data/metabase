@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -111,67 +110,67 @@ namespace Metabase.Configuration
 
         // https://github.com/IdentityServer/IdentityServer4.Demo
         // http://docs.identityserver.io/en/latest/topics/startup.html
-        private static void ConfigureIdentityServerServices(
-            IServiceCollection services,
-            IWebHostEnvironment environment,
-            Infrastructure.AppSettings appSettings, string migrationsAssembly
-            )
-        {
-            var builder = services.AddIdentityServer(_ =>
-                {
-                    _.Events.RaiseSuccessEvents = true;
-                    _.Events.RaiseFailureEvents = true;
-                    _.Events.RaiseErrorEvents = true;
+        // private static void ConfigureIdentityServerServices(
+        //     IServiceCollection services,
+        //     IWebHostEnvironment environment,
+        //     Infrastructure.AppSettings appSettings, string migrationsAssembly
+        //     )
+        // {
+        //     var builder = services.AddIdentityServer(_ =>
+        //         {
+        //             _.Events.RaiseSuccessEvents = true;
+        //             _.Events.RaiseFailureEvents = true;
+        //             _.Events.RaiseErrorEvents = true;
 
-                    _.Discovery.ShowIdentityScopes = true;
-                    _.Discovery.ShowApiScopes = true;
-                    _.Discovery.ShowClaims = true;
-                    _.Discovery.ShowExtensionGrantTypes = true;
-                    _.Discovery.CustomEntries.Add("api", "~/api");
-                })
-            // this adds the config data from DB (clients, resources)
-            .AddConfigurationStore(_ =>
-                {
-                    _.DefaultSchema = appSettings.Database.SchemaName.IdentityServerConfiguration;
-                    _.ConfigureDbContext = builder =>
-                    builder.UseNpgsql(appSettings.Database.ConnectionString,
-                        sql =>
-                        {
-                            /* sql.UseNodaTime(); */
-                            sql.MigrationsAssembly(migrationsAssembly);
-                        });
-                })
-            // this adds the operational data from DB (codes, tokens, consents)
-            .AddOperationalStore(_ =>
-                {
-                    _.DefaultSchema = appSettings.Database.SchemaName.IdentityServerPersistedGrant;
-                    _.ConfigureDbContext = builder =>
-                      builder.UseNpgsql(appSettings.Database.ConnectionString,
-                          sql =>
-                          {
-                              /* sql.UseNodaTime(); */
-                              sql.MigrationsAssembly(migrationsAssembly);
-                          });
-                    // TODO enable token cleanup in production
-                    // this enables automatic token cleanup. this is optional.
-                    /* _.EnableTokenCleanup = true; */
-                    /* _.TokenCleanupInterval = 30; // interval in seconds */
-                })
-              .AddSecretParser<JwtBearerClientAssertionSecretParser>()
-              .AddSecretValidator<PrivateKeyJwtSecretValidator>() // https://identityserver4.readthedocs.io/en/latest/topics/secrets.html#beyond-shared-secrets
-              .AddAspNetIdentity<Models.UserX>()
-              .AddProfileService<ProfileService<Models.UserX>>();
-            /* builder.AddApiAuthorization<UserX, ApplicationDbContext>(); */
-            if (environment.IsDevelopment() || environment.IsEnvironment("test"))
-            {
-                builder.AddDeveloperSigningCredential();
-            }
-            else
-            {
-                // TODO https://identityserver4.readthedocs.io/en/latest/topics/startup.html#key-material
-                throw new Exception("need to configure key material");
-            }
-        }
+        //             _.Discovery.ShowIdentityScopes = true;
+        //             _.Discovery.ShowApiScopes = true;
+        //             _.Discovery.ShowClaims = true;
+        //             _.Discovery.ShowExtensionGrantTypes = true;
+        //             _.Discovery.CustomEntries.Add("api", "~/api");
+        //         })
+        //     // this adds the config data from DB (clients, resources)
+        //     .AddConfigurationStore(_ =>
+        //         {
+        //             _.DefaultSchema = appSettings.Database.SchemaName.IdentityServerConfiguration;
+        //             _.ConfigureDbContext = builder =>
+        //             builder.UseNpgsql(appSettings.Database.ConnectionString,
+        //                 sql =>
+        //                 {
+        //                     /* sql.UseNodaTime(); */
+        //                     sql.MigrationsAssembly(migrationsAssembly);
+        //                 });
+        //         })
+        //     // this adds the operational data from DB (codes, tokens, consents)
+        //     .AddOperationalStore(_ =>
+        //         {
+        //             _.DefaultSchema = appSettings.Database.SchemaName.IdentityServerPersistedGrant;
+        //             _.ConfigureDbContext = builder =>
+        //               builder.UseNpgsql(appSettings.Database.ConnectionString,
+        //                   sql =>
+        //                   {
+        //                       /* sql.UseNodaTime(); */
+        //                       sql.MigrationsAssembly(migrationsAssembly);
+        //                   });
+        //             // TODO enable token cleanup in production
+        //             // this enables automatic token cleanup. this is optional.
+        //             /* _.EnableTokenCleanup = true; */
+        //             /* _.TokenCleanupInterval = 30; // interval in seconds */
+        //         })
+        //       .AddSecretParser<JwtBearerClientAssertionSecretParser>()
+        //       .AddSecretValidator<PrivateKeyJwtSecretValidator>() // https://identityserver4.readthedocs.io/en/latest/topics/secrets.html#beyond-shared-secrets
+        //       .AddAspNetIdentity<Models.UserX>()
+        //       .AddProfileService<ProfileService<Models.UserX>>();
+        //     /* builder.AddApiAuthorization<UserX, ApplicationDbContext>(); */
+        //     if (environment.IsDevelopment() || environment.IsEnvironment("test"))
+        //     {
+        //         builder.AddDeveloperSigningCredential();
+        //     }
+        //     else
+        //     {
+        //         // TODO https://identityserver4.readthedocs.io/en/latest/topics/startup.html#key-material
+        //         throw new Exception("need to configure key material");
+        //     }
+        // }
 
         public static void Configure(IApplicationBuilder app)
         {
