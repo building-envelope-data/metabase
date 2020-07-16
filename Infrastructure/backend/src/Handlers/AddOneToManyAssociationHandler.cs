@@ -12,8 +12,8 @@ using Errors = Infrastructure.Errors;
 namespace Infrastructure.Handlers
 {
     public sealed class AddOneToManyAssociationHandler<TInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>
-      : ICommandHandler<Infrastructure.Commands.AddAssociation<TInput>, Result<TimestampedId, Errors>>
-      where TInput : Infrastructure.ValueObjects.AddOneToManyAssociationInput
+      : ICommandHandler<Commands.AddAssociation<TInput>, Result<TimestampedId, Errors>>
+      where TInput : ValueObjects.AddOneToManyAssociationInput
       where TModel : IModel
       where TAssociationModel : IOneToManyAssociation
       where TAssociateModel : IModel
@@ -22,11 +22,11 @@ namespace Infrastructure.Handlers
       where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
     {
         private readonly IModelRepository _repository;
-        private readonly Func<Guid, Infrastructure.Commands.AddAssociation<TInput>, IAssociationAddedEvent> _newAssociationAddedEvent;
+        private readonly Func<Guid, Commands.AddAssociation<TInput>, IAssociationAddedEvent> _newAssociationAddedEvent;
 
         public AddOneToManyAssociationHandler(
             IModelRepository repository,
-            Func<Guid, Infrastructure.Commands.AddAssociation<TInput>, IAssociationAddedEvent> newAssociationAddedEvent
+            Func<Guid, Commands.AddAssociation<TInput>, IAssociationAddedEvent> newAssociationAddedEvent
             )
         {
             _repository = repository;
@@ -34,7 +34,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<Result<TimestampedId, Errors>> Handle(
-            Infrastructure.Commands.AddAssociation<TInput> command,
+            Commands.AddAssociation<TInput> command,
             CancellationToken cancellationToken
             )
         {
@@ -46,7 +46,7 @@ namespace Infrastructure.Handlers
 
         public async Task<Result<TimestampedId, Errors>> Handle(
             ModelRepositorySession session,
-            Infrastructure.Commands.AddAssociation<TInput> command,
+            Commands.AddAssociation<TInput> command,
             CancellationToken cancellationToken
             )
         {

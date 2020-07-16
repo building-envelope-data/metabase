@@ -27,8 +27,8 @@ namespace Infrastructure.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            var idResult = Infrastructure.ValueObjects.Id.From(id, path: path);
-            var timestampResult = Infrastructure.ValueObjects.Timestamp.From(timestamp, path: path);
+            var idResult = ValueObjects.Id.From(id, path: path);
+            var timestampResult = ValueObjects.Timestamp.From(timestamp, path: path);
 
             return Errors.Combine(
                 idResult,

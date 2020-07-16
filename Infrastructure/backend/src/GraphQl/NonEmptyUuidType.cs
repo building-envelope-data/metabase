@@ -11,7 +11,7 @@ namespace Infrastructure.GraphQl
           : base(
               "NonEmptyUuid",
               new UuidType(),
-              guid => Infrastructure.ValueObjects.Id.From(guid),
+              guid => ValueObjects.Id.From(guid),
               id => id.Value
               )
         {

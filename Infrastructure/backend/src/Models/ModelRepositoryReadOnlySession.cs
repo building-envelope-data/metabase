@@ -217,7 +217,7 @@ namespace Infrastructure.Models
           where TAggregate : class, Aggregates.IAggregate, new()
         {
             var timestampResult = await FetchTimestamp<TAggregate>(id, cancellationToken).ConfigureAwait(false);
-            return Infrastructure.ValueObjects.Id.From(id)
+            return ValueObjects.Id.From(id)
               .Bind(nonEmptyId =>
                   timestampResult.Bind(timestamp =>
                     ValueObjects.TimestampedId.From(

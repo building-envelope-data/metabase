@@ -12,16 +12,16 @@ using Errors = Infrastructure.Errors;
 namespace Infrastructure.Handlers
 {
     public sealed class RemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>
-      : ICommandHandler<Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Result<TimestampedId, Errors>>
+      : ICommandHandler<Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, Result<TimestampedId, Errors>>
       where TAssociationModel : IManyToManyAssociation
       where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     {
         private readonly IModelRepository _repository;
-        private readonly Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> _newAssociationRemovedEvent;
+        private readonly Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> _newAssociationRemovedEvent;
 
         public RemoveManyToManyAssociationHandler(
             IModelRepository repository,
-            Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
+            Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
             )
         {
             _repository = repository;
@@ -29,7 +29,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<Result<TimestampedId, Errors>> Handle(
-            Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
             CancellationToken cancellationToken
             )
         {
@@ -41,7 +41,7 @@ namespace Infrastructure.Handlers
 
         public async Task<Result<TimestampedId, Errors>> Handle(
             ModelRepositorySession session,
-            Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
+            Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>> command,
             CancellationToken cancellationToken
             )
         {

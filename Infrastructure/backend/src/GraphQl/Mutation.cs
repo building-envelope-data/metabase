@@ -33,7 +33,7 @@ namespace Infrastructure.GraphQl
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Infrastructure.Commands.Create<TValidatedInput>.From(
+                    Commands.Create<TValidatedInput>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -42,7 +42,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
               await _commandBus
               .Send<
-              Infrastructure.Commands.Create<TValidatedInput>,
+              Commands.Create<TValidatedInput>,
               Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -58,7 +58,7 @@ namespace Infrastructure.GraphQl
             var command = ResultHelpers.HandleFailure(
                   TimestampedId.From(id, timestamp, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(timestampedId =>
-                    Infrastructure.Commands.Delete<TModel>.From(
+                    Commands.Delete<TModel>.From(
                       timestampedId: timestampedId,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -67,7 +67,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
               await _commandBus
               .Send<
-              Infrastructure.Commands.Delete<TModel>,
+              Commands.Delete<TModel>,
               Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -84,7 +84,7 @@ namespace Infrastructure.GraphQl
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Infrastructure.Commands.AddAssociation<TValidatedInput>.From(
+                    Commands.AddAssociation<TValidatedInput>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -93,7 +93,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Infrastructure.Commands.AddAssociation<TValidatedInput>,
+                Commands.AddAssociation<TValidatedInput>,
                 Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -104,14 +104,14 @@ namespace Infrastructure.GraphQl
 
         protected async Task<TPayload> RemoveManyToManyAssociation<TAssociationModel, TInput, TPayload>(
             TInput input,
-            Func<TInput, IReadOnlyList<object>, Result<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>, Errors>> validateInput,
+            Func<TInput, IReadOnlyList<object>, Result<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>, Errors>> validateInput,
             Func<Id, Id, Timestamp, TPayload> newPayload
         )
         {
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>.From(
+                    Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -120,7 +120,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>,
+                Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>,
                 Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -133,14 +133,14 @@ namespace Infrastructure.GraphQl
 
         protected async Task<TPayload> RemoveOneToManyAssociation<TAssociationModel, TInput, TPayload>(
             TInput input,
-            Func<TInput, IReadOnlyList<object>, Result<Infrastructure.ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>, Errors>> validateInput,
+            Func<TInput, IReadOnlyList<object>, Result<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>, Errors>> validateInput,
             Func<Id, Timestamp, TPayload> newPayload
         )
         {
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>.From(
+                    Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -149,7 +149,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>,
+                Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>,
                 Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );

@@ -12,7 +12,7 @@ namespace Infrastructure.ValueObjects
     {
         public static Timestamp Now
         {
-            get { return Infrastructure.ValueObjects.Timestamp.From(DateTime.UtcNow).Value; }
+            get { return ValueObjects.Timestamp.From(DateTime.UtcNow).Value; }
         }
 
         // TODO Use `NodaTime.ZonedDateTime`
