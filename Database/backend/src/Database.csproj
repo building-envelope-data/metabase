@@ -15,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpFunctionalExtensions" Version="2.9.0" />
-    <PackageReference Include="FluentValidation" Version="9.0.0" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.10.0" />
+    <PackageReference Include="FluentValidation" Version="9.0.1" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="10.4.3" />
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.4.3" />
     <PackageReference Include="HotChocolate.AspNetCore.GraphiQL" Version="10.4.3" />
@@ -24,8 +24,8 @@
     <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.4.3" />
     <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="10.4.3" />
     <PackageReference Include="Manatee.Json" Version="13.0.2" />
-    <PackageReference Include="Marten" Version="3.12.2" />
-    <PackageReference Include="Marten.NodaTime" Version="1.7.2" />
+    <PackageReference Include="Marten" Version="3.12.3" />
+    <PackageReference Include="Marten.NodaTime" Version="1.7.3" />
     <PackageReference Include="MediatR" Version="8.0.2" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
