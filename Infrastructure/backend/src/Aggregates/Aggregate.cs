@@ -10,8 +10,8 @@ using Validatable = Infrastructure.Validatable;
 
 namespace Infrastructure.Aggregates
 {
-    public abstract class EventSourcedAggregate
-      : Validatable, IEventSourcedAggregate
+    public abstract class Aggregate
+      : Validatable, IAggregate
     {
         // For indexing our event streams
         public Guid Id { get; set; }
@@ -23,7 +23,7 @@ namespace Infrastructure.Aggregates
 
         public bool Deleted { get; set; }
 
-        protected EventSourcedAggregate()
+        protected Aggregate()
         {
             Id = Guid.Empty;
             Timestamp = DateTime.MinValue;

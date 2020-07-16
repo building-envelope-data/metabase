@@ -15,7 +15,7 @@ namespace Infrastructure.Handlers
     public sealed class DeleteModelHandler<TModel, TAggregate>
       : ICommandHandler<Infrastructure.Commands.Delete<TModel>, Result<TimestampedId, Errors>>
       where TModel : IModel
-      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAggregate : class, IAggregate, IConvertible<TModel>, new()
     {
         private readonly IModelRepository _repository;
         private readonly Func<Infrastructure.Commands.Delete<TModel>, IDeletedEvent> _newDeletedEvent;

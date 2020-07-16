@@ -16,7 +16,7 @@ namespace Database.Handlers
     public sealed class GetDataOfComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>
       : IQueryHandler<Queries.GetDataOfComponents<TDataModel>, IEnumerable<Result<IEnumerable<Result<TDataModel, Errors>>, Errors>>>
       where TDataModel : IModel
-      where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
+      where TDataAggregate : class, IAggregate, IConvertible<TDataModel>, new()
       where TDataCreatedEvent : Events.DataCreatedEvent
     {
         private readonly IModelRepository _repository;

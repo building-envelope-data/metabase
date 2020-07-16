@@ -17,9 +17,9 @@ namespace Infrastructure.Handlers
       where TAssociateModel : IModel
       where TAssociationModel : IOneToManyAssociation
       where TModel : IModel
-      where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+      where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
       where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAggregate : class, IAggregate, IConvertible<TModel>, new()
       where TAssociationAddedEvent : IAssociationAddedEvent
     {
         public GetBackwardOneToManyAssociateOfModelsHandler(

@@ -7,7 +7,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class DatabaseAggregate
-      : EventSourcedAggregate, IConvertible<Models.Database>
+      : Aggregate, IConvertible<Models.Database>
     {
         public string Name { get; set; }
         public string Description { get; set; }

@@ -7,7 +7,7 @@ namespace Infrastructure.Handlers
       : GetAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate>
       where TModel : IModel
       where TAssociationModel : IOneToManyAssociation
-      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAggregate : class, IAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     {
         protected GetOneToManyAssociationsOfModelsHandler(

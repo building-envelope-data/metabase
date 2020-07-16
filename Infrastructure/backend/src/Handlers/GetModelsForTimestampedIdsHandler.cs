@@ -14,7 +14,7 @@ namespace Infrastructure.Handlers
       : IQueryHandler<Queries.GetModelsForTimestampedIds<TModel>, IEnumerable<Result<TModel, Errors>>>,
         IGetModelsForTimestampedIdsHandler
       where TModel : IModel
-      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAggregate : class, IAggregate, IConvertible<TModel>, new()
     {
         private readonly IModelRepository _repository;
 

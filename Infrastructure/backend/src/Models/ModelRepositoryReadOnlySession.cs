@@ -68,7 +68,7 @@ namespace Infrastructure.Models
         }
 
         public IMartenQueryable<TAggregate> QueryAggregates<TAggregate>()
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             return _session.Query<TAggregate>();
@@ -106,7 +106,7 @@ namespace Infrastructure.Models
             ValueObjects.TimestampedId timestampedId,
             CancellationToken cancellationToken
             )
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             var streamState =
@@ -122,7 +122,7 @@ namespace Infrastructure.Models
             IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             var batch = _session.CreateBatchQuery();
@@ -142,7 +142,7 @@ namespace Infrastructure.Models
             [NotNullWhen(true)] Marten.Events.StreamState? streamState,
             ValueObjects.Timestamp timestamp
             )
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             return
               streamState != null &&
@@ -153,7 +153,7 @@ namespace Infrastructure.Models
         public async Task<Result<int, Errors>> FetchVersion<TAggregate>(
             ValueObjects.TimestampedId timestampedId,
             CancellationToken cancellationToken
-            ) where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+            ) where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             // TODO For performance reasons it would be great if we could use
@@ -180,7 +180,7 @@ namespace Infrastructure.Models
             ValueObjects.Id id,
             CancellationToken cancellationToken
             )
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             return (await FetchStreamState<TAggregate>(id, cancellationToken).ConfigureAwait(false))
               .Bind(streamState =>
@@ -214,7 +214,7 @@ namespace Infrastructure.Models
             ValueObjects.Id id,
             CancellationToken cancellationToken
             )
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             var timestampResult = await FetchTimestamp<TAggregate>(id, cancellationToken).ConfigureAwait(false);
             return Infrastructure.ValueObjects.Id.From(id)
@@ -322,7 +322,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             ThrowIfDisposed();
             // Loading the materialized aggregate as follows
@@ -348,9 +348,9 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel1 : Models.IModel
-          where TAggregate1 : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel1>, new()
+          where TAggregate1 : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel1>, new()
           where TModel2 : Models.IModel
-          where TAggregate2 : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel2>, new()
+          where TAggregate2 : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel2>, new()
         {
             ThrowIfDisposed();
             return
@@ -358,7 +358,7 @@ namespace Infrastructure.Models
                {
                    (true, true) =>
                     await Load<TModel1, TAggregate1, TModel2, TAggregate2>(
-                     (ids.Item1.Value, ids.Item2.Value),
+                      (ids.Item1.Value, ids.Item2.Value),
                       cancellationToken
                       )
                       .ConfigureAwait(false),
@@ -387,9 +387,9 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel1 : Models.IModel
-          where TAggregate1 : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel1>, new()
+          where TAggregate1 : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel1>, new()
           where TModel2 : Models.IModel
-          where TAggregate2 : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel2>, new()
+          where TAggregate2 : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel2>, new()
         {
             ThrowIfDisposed();
             var batch = _session.CreateBatchQuery();
@@ -422,7 +422,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             ThrowIfDisposed();
             var aggregate =
@@ -441,7 +441,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             ThrowIfDisposed();
             var aggregateTypeResult = await FetchAggregateType(timestampedId.Id, cancellationToken).ConfigureAwait(false);
@@ -456,7 +456,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             return Load<TModel, TAggregate>(
                 timestampedId.Id,
@@ -470,7 +470,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             ThrowIfDisposed();
             var batch = _session.CreateBatchQuery();
@@ -502,7 +502,7 @@ namespace Infrastructure.Models
             IEnumerable<ValueObjects.Id> ids,
             CancellationToken cancellationToken
             )
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             var batch = _session.CreateBatchQuery();
@@ -521,7 +521,7 @@ namespace Infrastructure.Models
             IEnumerable<ValueObjects.TimestampedId> timestampedIds,
             CancellationToken cancellationToken
             )
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             var batch = _session.CreateBatchQuery();
@@ -547,7 +547,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             ThrowIfDisposed();
             return (await LoadAllRaw<TAggregate>(
@@ -650,7 +650,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             return Do(
                 ids.Select(id => ValueObjects.TimestampedId.From(id, timestamp)),
@@ -664,7 +664,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             ThrowIfDisposed();
             return (await LoadAllRaw<TAggregate>(
@@ -688,7 +688,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             ThrowIfDisposed();
             return await Do<ValueObjects.TimestampedId, TModel>(
@@ -711,7 +711,7 @@ namespace Infrastructure.Models
             IEnumerable<(ValueObjects.Timestamp, IEnumerable<ValueObjects.Id>)> timestampsAndIds,
             CancellationToken cancellationToken
             )
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             var batch = _session.CreateBatchQuery();
@@ -740,7 +740,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             ThrowIfDisposed();
             return (await LoadAllBatchedRaw<TAggregate>(
@@ -761,7 +761,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             ThrowIfDisposed();
             return
@@ -793,7 +793,7 @@ namespace Infrastructure.Models
         private bool DoesAggregateExist<TAggregate>(
             [NotNullWhen(true)] TAggregate? aggregate
             )
-          where TAggregate : class, Aggregates.IEventSourcedAggregate
+          where TAggregate : class, Aggregates.IAggregate
         {
             return
               !(aggregate is null) &&
@@ -806,7 +806,7 @@ namespace Infrastructure.Models
             TAggregate? aggregate
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
         {
             if (aggregate is null ||
                 aggregate.Version == 0 ||
@@ -840,7 +840,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
           where TCreatedEvent : Events.ICreatedEvent
         {
             var possibleIds = await QueryModelIds<TCreatedEvent>(cancellationToken).ConfigureAwait(false);
@@ -854,7 +854,7 @@ namespace Infrastructure.Models
             CancellationToken cancellationToken
             )
           where TModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
           where TCreatedEvent : Events.ICreatedEvent
         {
             var possibleIds = await QueryModelIds<TCreatedEvent>(cancellationToken).ConfigureAwait(false);
@@ -896,7 +896,7 @@ namespace Infrastructure.Models
             )
           where TModel : Models.IModel
           where TAssociationModel : Models.IManyToManyAssociation
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
           where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
@@ -914,7 +914,7 @@ namespace Infrastructure.Models
               )
           where TAssociateModel : Models.IModel
           where TAssociationModel : Models.IManyToManyAssociation
-          where TAssociateAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
           where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
@@ -933,7 +933,7 @@ namespace Infrastructure.Models
             )
           where TModel : Models.IModel
           where TAssociationModel : Models.IOneToManyAssociation
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
           where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
@@ -952,7 +952,7 @@ namespace Infrastructure.Models
             )
           where TAssociateModel : Models.IModel
           where TAssociationModel : Models.IOneToManyAssociation
-          where TAssociateAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
           where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
@@ -979,7 +979,7 @@ namespace Infrastructure.Models
             )
           where TAssociateModel : Models.IModel
           where TAssociationModel : Models.IOneToManyAssociation
-          where TAssociateAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
           where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
@@ -1016,8 +1016,8 @@ namespace Infrastructure.Models
             )
           where TModel : Models.IModel
           where TAssociateModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
-          where TAssociateAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
         {
             // TODO Make sure that model is valid by loading it!
             var modelIds =
@@ -1120,9 +1120,9 @@ namespace Infrastructure.Models
           where TModel : Models.IModel
           where TAssociationModel : Models.IManyToManyAssociation
           where TAssociateModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
           where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
-          where TAssociateAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return GetAssociatesOfModels<TAssociationModel, TAssociateModel, TAssociationAggregate, TAssociateAggregate>(
@@ -1142,9 +1142,9 @@ namespace Infrastructure.Models
           where TAssociateModel : Models.IModel
           where TAssociationModel : Models.IManyToManyAssociation
           where TModel : Models.IModel
-          where TAssociateAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
           where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return GetAssociatesOfModels<TAssociationModel, TModel, TAssociationAggregate, TAggregate>(
@@ -1164,9 +1164,9 @@ namespace Infrastructure.Models
           where TModel : Models.IModel
           where TAssociationModel : Models.IOneToManyAssociation
           where TAssociateModel : Models.IModel
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
           where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
-          where TAssociateAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return GetAssociatesOfModels<TAssociationModel, TAssociateModel, TAssociationAggregate, TAssociateAggregate>(
@@ -1186,9 +1186,9 @@ namespace Infrastructure.Models
           where TAssociateModel : Models.IModel
           where TAssociationModel : Models.IOneToManyAssociation
           where TModel : Models.IModel
-          where TAssociateAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
           where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
-          where TAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
           where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return
@@ -1226,7 +1226,7 @@ namespace Infrastructure.Models
           where TAssociationModel : IAssociation
           where TAssociateModel : Models.IModel
           where TAssociationAggregate : class, Aggregates.IAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
-          where TAssociateAggregate : class, Aggregates.IEventSourcedAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
         {
             var results =
               await getAssociations(

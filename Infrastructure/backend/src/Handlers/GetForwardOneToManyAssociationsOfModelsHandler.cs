@@ -16,7 +16,7 @@ namespace Infrastructure.Handlers
         IQueryHandler<Queries.GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel>, IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
           where TModel : IModel
           where TAssociationModel : IOneToManyAssociation
-          where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+          where TAggregate : class, IAggregate, IConvertible<TModel>, new()
           where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
           where TAssociationAddedEvent : IAssociationAddedEvent
     {

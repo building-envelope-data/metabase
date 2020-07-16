@@ -16,9 +16,9 @@ namespace Infrastructure.Handlers
       where TModel : IModel
       where TAssociationModel : IManyToManyAssociation
       where TAssociateModel : IModel
-      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAggregate : class, IAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-      where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+      where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
     {
         private readonly IModelRepository _repository;
         private readonly Func<Guid, Infrastructure.Commands.AddAssociation<TInput>, IAssociationAddedEvent> _newAssociationAddedEvent;

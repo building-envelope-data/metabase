@@ -14,7 +14,7 @@ namespace Infrastructure.Handlers
     public sealed class GetModelsAtTimestampsHandler<TModel, TAggregate, TCreatedEvent>
       : IQueryHandler<Queries.GetModelsAtTimestamps<TModel>, IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
       where TModel : IModel
-      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAggregate : class, IAggregate, IConvertible<TModel>, new()
       where TCreatedEvent : ICreatedEvent
     {
         private readonly IModelRepository _repository;

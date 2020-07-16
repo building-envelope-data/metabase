@@ -16,7 +16,7 @@ namespace Database.Handlers
     public sealed class HasDataForComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>
       : IQueryHandler<Queries.HasDataForComponents<TDataModel>, IEnumerable<Result<bool, Errors>>>
       where TDataModel : IModel
-      where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
+      where TDataAggregate : class, IAggregate, IConvertible<TDataModel>, new()
       where TDataCreatedEvent : Events.DataCreatedEvent
     {
         private readonly IModelRepository _repository;

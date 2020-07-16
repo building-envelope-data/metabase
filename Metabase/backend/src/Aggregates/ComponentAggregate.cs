@@ -6,7 +6,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class ComponentAggregate
-      : EventSourcedAggregate, IConvertible<Models.Component>
+      : Aggregate, IConvertible<Models.Component>
     {
         public ComponentInformationAggregateData Information { get; set; }
 

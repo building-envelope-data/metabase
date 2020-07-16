@@ -8,7 +8,7 @@ using Guid = System.Guid;
 namespace Metabase.Aggregates
 {
     public sealed class ComponentManufacturerAggregate
-      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentManufacturer>
+      : Aggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentManufacturer>
     {
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid ComponentId { get; set; }

@@ -7,9 +7,9 @@ namespace Infrastructure.Handlers
       where TModel : IModel
       where TAssociationModel : IAssociation
       where TAssociateModel : IModel
-      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAggregate : class, IAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, IAssociationAggregate, IConvertible<TAssociationModel>, new()
-      where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+      where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
     {
         protected readonly IModelRepository _repository;
 

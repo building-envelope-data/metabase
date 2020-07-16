@@ -15,7 +15,7 @@ namespace Infrastructure.Handlers
     public sealed class CreateModelHandler<TCommand, TAggregate>
       : ICommandHandler<TCommand, Result<TimestampedId, Errors>>
       where TCommand : ICommand<Result<TimestampedId, Errors>>
-      where TAggregate : class, IEventSourcedAggregate, new()
+      where TAggregate : class, IAggregate, new()
     {
         private readonly IModelRepository _repository;
         private readonly Func<Guid, TCommand, ICreatedEvent> _newCreatedEvent;

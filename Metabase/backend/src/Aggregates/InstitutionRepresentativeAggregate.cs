@@ -9,7 +9,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class InstitutionRepresentativeAggregate
-      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.InstitutionRepresentative>
+      : Aggregate, IManyToManyAssociationAggregate, IConvertible<Models.InstitutionRepresentative>
     {
         [ForeignKey(typeof(InstitutionAggregate))]
         public Guid InstitutionId { get; set; }

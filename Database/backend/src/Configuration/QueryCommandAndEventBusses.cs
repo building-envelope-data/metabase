@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using AddAssociationCheck = Infrastructure.Models.AddAssociationCheck;
 using CancellationToken = System.Threading.CancellationToken;
 using Errors = Infrastructure.Errors;
-using IEventSourcedAggregate = Infrastructure.Aggregates.IEventSourcedAggregate;
+using IAggregate = Infrastructure.Aggregates.IAggregate;
 using ModelRepository = Infrastructure.Models.ModelRepository;
 using ModelRepositorySession = Infrastructure.Models.ModelRepositorySession;
 
@@ -99,7 +99,7 @@ namespace Database.Configuration
             IServiceCollection services
             )
           where TDataModel : IModel
-          where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
+          where TDataAggregate : class, IAggregate, IConvertible<TDataModel>, new()
           where TDataCreatedEvent : Events.DataCreatedEvent
         {
             AddGetDataOfComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>(services);
@@ -110,7 +110,7 @@ namespace Database.Configuration
             IServiceCollection services
             )
           where TDataModel : IModel
-          where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
+          where TDataAggregate : class, IAggregate, IConvertible<TDataModel>, new()
           where TDataCreatedEvent : Events.DataCreatedEvent
         {
             services.AddScoped<
@@ -126,7 +126,7 @@ namespace Database.Configuration
             IServiceCollection services
             )
           where TDataModel : IModel
-          where TDataAggregate : class, IEventSourcedAggregate, IConvertible<TDataModel>, new()
+          where TDataAggregate : class, IAggregate, IConvertible<TDataModel>, new()
           where TDataCreatedEvent : Events.DataCreatedEvent
         {
             services.AddScoped<
