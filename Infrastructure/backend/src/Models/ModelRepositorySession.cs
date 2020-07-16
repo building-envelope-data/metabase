@@ -570,7 +570,7 @@ namespace Infrastructure.Models
                   .Bind(async associations =>
                     await Delete<TAssociationAggregate>(
                       associations.Select(association => (
-                         association.Timestamp, // TODO Casting to `TimestampedId` could result in a run-time error and must not be done!
+                         association.Timestamp,
                          (Events.IDeletedEvent)newAssociationRemovedEvent(association.Id)
                          )
                         ),
