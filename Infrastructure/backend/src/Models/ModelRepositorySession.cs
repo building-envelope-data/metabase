@@ -27,12 +27,12 @@ namespace Infrastructure.Models
             _unsavedEvents = Enumerable.Empty<Events.IEvent>();
         }
 
-        // TODO Register checks to perform before completing the transaction on save, that make sure that all models are valid afterwards.
-        public async Task<Result<ValueObjects.Id, Errors>> Create<T>(
+        // TODO Register checks to perform before completing the transaction on save, that make sure that all models are valid afterwards. For example, by adding `IsApplicable` methods to models, or applying the events to aggregates and converting the new aggregates to models. In both cases, we need to know the model class!
+        public async Task<Result<ValueObjects.Id, Errors>> Create<TAggregate>(
             Func<ValueObjects.Id, Events.ICreatedEvent> newCreatedEvent,
             CancellationToken cancellationToken
             )
-          where T : class, Aggregates.IAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             var id = await GenerateNewId(cancellationToken).ConfigureAwait(false);
@@ -42,7 +42,7 @@ namespace Infrastructure.Models
                 throw new Exception($"The aggregate identifier of the created event {@event.AggregateId} differs from the generated identifier {(Guid)id}");
             }
             return (
-              await Create<T>(
+              await Create<TAggregate>(
                   @event,
                   cancellationToken
                 )
@@ -51,11 +51,11 @@ namespace Infrastructure.Models
               .Map(_ => id);
         }
 
-        public Task<Result<ValueObjects.Id, Errors>> Create<T>(
+        public Task<Result<ValueObjects.Id, Errors>> Create<TAggregate>(
             Events.ICreatedEvent @event,
             CancellationToken cancellationToken
             )
-          where T : class, Aggregates.IAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             return
@@ -64,7 +64,7 @@ namespace Infrastructure.Models
               .Bind(async id =>
                   (await RegisterEvents(
                     new Events.IEvent[] { @event },
-                    eventArray => _session.Events.StartStream<T>(@event.AggregateId, eventArray),
+                    eventArray => _session.Events.StartStream<TAggregate>(@event.AggregateId, eventArray),
                     cancellationToken
                     )
                     .ConfigureAwait(false)
@@ -73,29 +73,30 @@ namespace Infrastructure.Models
                   );
         }
 
-        public Task<Result<bool, Errors>> Append<T>(
+        public Task<Result<bool, Errors>> Append<TAggregate>(
             ValueObjects.TimestampedId timestampedId,
             Events.IEvent @event,
             CancellationToken cancellationToken
-            ) where T : class, Aggregates.IAggregate, new()
+            )
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
-            return Append<T>(
+            return Append<TAggregate>(
                 timestampedId,
                 new Events.IEvent[] { @event },
                 cancellationToken
                 );
         }
 
-        public async Task<Result<bool, Errors>> Append<T>(
+        public async Task<Result<bool, Errors>> Append<TAggregate>(
             ValueObjects.TimestampedId timestampedId,
             IEnumerable<Events.IEvent> events,
             CancellationToken cancellationToken
             )
-          where T : class, Aggregates.IAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             return await (
-                await FetchVersion<T>(
+                await FetchVersion<TAggregate>(
                   timestampedId,
                   cancellationToken
                   )
@@ -114,12 +115,12 @@ namespace Infrastructure.Models
               .ConfigureAwait(false);
         }
 
-        public Task<Result<bool, Errors>> Delete<T>(
+        public Task<Result<bool, Errors>> Delete<TAggregate>(
             ValueObjects.Timestamp timestamp,
             Events.IDeletedEvent @event,
             CancellationToken cancellationToken
             )
-          where T : class, Aggregates.IAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             ThrowIfDisposed();
             return
@@ -127,8 +128,8 @@ namespace Infrastructure.Models
               .From(@event.AggregateId, timestamp)
               .Bind(timestampedId =>
                   {
-                      _session.Delete<T>(timestampedId.Id);
-                      return Append<T>(
+                      _session.Delete<TAggregate>(timestampedId.Id);
+                      return Append<TAggregate>(
                           timestampedId,
                           @event,
                           cancellationToken
@@ -137,17 +138,17 @@ namespace Infrastructure.Models
                   );
         }
 
-        public async Task<Result<bool, Errors>> Delete<T>(
+        public async Task<Result<bool, Errors>> Delete<TAggregate>(
             IEnumerable<(ValueObjects.Timestamp, Events.IDeletedEvent)> timestampsAndEvents,
             CancellationToken cancellationToken
             )
-          where T : class, Aggregates.IAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             var deletionResults = new List<Result<bool, Errors>>();
             foreach (var (timestamp, @event) in timestampsAndEvents)
             {
                 deletionResults.Add(
-                    await Delete<T>(
+                    await Delete<TAggregate>(
                       timestamp, @event, cancellationToken
                       )
                     .ConfigureAwait(false)
