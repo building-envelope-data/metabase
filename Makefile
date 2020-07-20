@@ -598,6 +598,13 @@ update-tools : ## Update tools
 update : update-packages update-tools ## Update packages and tools
 .PHONY : update
 
+restore : ## Restore packages and tools
+	for project in ${projects} ; do ( \
+		cd ./$${project}/backend && \
+		dotnet restore \
+	) ; done
+.PHONY : restore
+
 dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for example, `make PATTERN="using Infrastructure.Aggregates" dedup`
 	find . -name "*.cs" \
 		| xargs -n 1 \
