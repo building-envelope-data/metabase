@@ -8,7 +8,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class ComponentVersionAggregate
-      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentVersion>
+      : Aggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentVersion>
     {
         [ForeignKey(typeof(ComponentAggregate))]
         public Guid BaseComponentId { get; set; }

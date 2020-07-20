@@ -26,7 +26,7 @@ namespace Infrastructure.Commands
             Id creatorId
             )
         {
-            return Result.Ok<Delete<TModel>, Errors>(
+            return Result.Success<Delete<TModel>, Errors>(
                     new Delete<TModel>(
                         timestampedId: timestampedId,
                         creatorId: creatorId

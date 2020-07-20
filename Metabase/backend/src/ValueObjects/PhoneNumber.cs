@@ -41,7 +41,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<PhoneNumber, Errors>(
+            return Result.Success<PhoneNumber, Errors>(
                 new PhoneNumber(phoneNumber)
                 );
         }

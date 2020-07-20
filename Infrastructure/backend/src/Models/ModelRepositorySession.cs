@@ -1,43 +1,40 @@
-// Inspired by https://jasperfx.github.io/marten/documentation/scenarios/aggregates_events_repositories/
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using HotChocolate;
-using Infrastructure.Aggregates;
-using Infrastructure.Events;
 using Infrastructure.Models;
-using Infrastructure.ValueObjects;
 using Marten;
-using CancellationToken = System.Threading.CancellationToken;
-using ErrorCodes = Infrastructure.ErrorCodes;
-using Errors = Infrastructure.Errors;
 
-namespace Infrastructure.Aggregates
+namespace Infrastructure.Models
 {
-    public sealed class AggregateRepositorySession : AggregateRepositoryReadOnlySession, IAggregateRepositorySession
+    public sealed class ModelRepositorySession
+      : ModelRepositoryReadOnlySession
     {
-        private readonly IDocumentSession _session;
-        private readonly IEventBus _eventBus;
-        private IEnumerable<IEvent> _unsavedEvents;
+        private readonly Marten.IDocumentSession _session;
+        private readonly Events.IEventBus _eventBus;
+        private IEnumerable<Events.IEvent> _unsavedEvents;
 
-        public AggregateRepositorySession(IDocumentSession session, IEventBus eventBus)
+        public ModelRepositorySession(
+            Marten.IDocumentSession session,
+            Events.IEventBus eventBus
+            )
           : base(session)
         {
             _session = session;
             _eventBus = eventBus;
-            _unsavedEvents = Enumerable.Empty<IEvent>();
+            _unsavedEvents = Enumerable.Empty<Events.IEvent>();
         }
 
-        public async Task<Result<Id, Errors>> Create<T>(
-            Func<Guid, ICreatedEvent> newCreatedEvent,
+        // TODO Register checks to perform before completing the transaction on save, that make sure that all models are valid afterwards. For example, by adding `IsApplicable` methods to models, or applying the events to aggregates and converting the new aggregates to models. In both cases, we need to know the model class!
+        public async Task<Result<ValueObjects.Id, Errors>> Create<TAggregate>(
+            Func<ValueObjects.Id, Events.ICreatedEvent> newCreatedEvent,
             CancellationToken cancellationToken
             )
-          where T : class, IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
-            AssertNotDisposed();
+            ThrowIfDisposed();
             var id = await GenerateNewId(cancellationToken).ConfigureAwait(false);
             var @event = newCreatedEvent(id);
             if (@event.AggregateId != (Guid)id)
@@ -45,7 +42,7 @@ namespace Infrastructure.Aggregates
                 throw new Exception($"The aggregate identifier of the created event {@event.AggregateId} differs from the generated identifier {(Guid)id}");
             }
             return (
-              await Create<T>(
+              await Create<TAggregate>(
                   @event,
                   cancellationToken
                 )
@@ -54,20 +51,20 @@ namespace Infrastructure.Aggregates
               .Map(_ => id);
         }
 
-        public Task<Result<Id, Errors>> Create<T>(
-            ICreatedEvent @event,
+        public Task<Result<ValueObjects.Id, Errors>> Create<TAggregate>(
+            Events.ICreatedEvent @event,
             CancellationToken cancellationToken
             )
-          where T : class, IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
-            AssertNotDisposed();
+            ThrowIfDisposed();
             return
-              Id
+              ValueObjects.Id
               .From(@event.AggregateId)
               .Bind(async id =>
                   (await RegisterEvents(
-                    new IEvent[] { @event },
-                    eventArray => _session.Events.StartStream<T>(@event.AggregateId, eventArray),
+                    new Events.IEvent[] { @event },
+                    eventArray => _session.Events.StartStream<TAggregate>(@event.AggregateId, eventArray),
                     cancellationToken
                     )
                     .ConfigureAwait(false)
@@ -76,29 +73,30 @@ namespace Infrastructure.Aggregates
                   );
         }
 
-        public Task<Result<bool, Errors>> Append<T>(
-            TimestampedId timestampedId,
-            IEvent @event,
+        public Task<Result<bool, Errors>> Append<TAggregate>(
+            ValueObjects.TimestampedId timestampedId,
+            Events.IEvent @event,
             CancellationToken cancellationToken
-            ) where T : class, IEventSourcedAggregate, new()
+            )
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
-            return Append<T>(
+            return Append<TAggregate>(
                 timestampedId,
-                new IEvent[] { @event },
+                new Events.IEvent[] { @event },
                 cancellationToken
                 );
         }
 
-        public async Task<Result<bool, Errors>> Append<T>(
-            TimestampedId timestampedId,
-            IEnumerable<IEvent> events,
+        public async Task<Result<bool, Errors>> Append<TAggregate>(
+            ValueObjects.TimestampedId timestampedId,
+            IEnumerable<Events.IEvent> events,
             CancellationToken cancellationToken
             )
-          where T : class, IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
-            AssertNotDisposed();
+            ThrowIfDisposed();
             return await (
-                await FetchVersion<T>(
+                await FetchVersion<TAggregate>(
                   timestampedId,
                   cancellationToken
                   )
@@ -117,21 +115,21 @@ namespace Infrastructure.Aggregates
               .ConfigureAwait(false);
         }
 
-        public Task<Result<bool, Errors>> Delete<T>(
-            Timestamp timestamp,
-            IDeletedEvent @event,
+        public Task<Result<bool, Errors>> Delete<TAggregate>(
+            ValueObjects.Timestamp timestamp,
+            Events.IDeletedEvent @event,
             CancellationToken cancellationToken
             )
-          where T : class, IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
-            AssertNotDisposed();
+            ThrowIfDisposed();
             return
-              TimestampedId
+              ValueObjects.TimestampedId
               .From(@event.AggregateId, timestamp)
               .Bind(timestampedId =>
                   {
-                      _session.Delete<T>(timestampedId.Id);
-                      return Append<T>(
+                      _session.Delete<TAggregate>(timestampedId.Id);
+                      return Append<TAggregate>(
                           timestampedId,
                           @event,
                           cancellationToken
@@ -140,17 +138,17 @@ namespace Infrastructure.Aggregates
                   );
         }
 
-        public async Task<Result<bool, Errors>> Delete<T>(
-            IEnumerable<(Timestamp, IDeletedEvent)> timestampsAndEvents,
+        public async Task<Result<bool, Errors>> Delete<TAggregate>(
+            IEnumerable<(ValueObjects.Timestamp, Events.IDeletedEvent)> timestampsAndEvents,
             CancellationToken cancellationToken
             )
-          where T : class, IEventSourcedAggregate, new()
+          where TAggregate : class, Aggregates.IAggregate, new()
         {
             var deletionResults = new List<Result<bool, Errors>>();
             foreach (var (timestamp, @event) in timestampsAndEvents)
             {
                 deletionResults.Add(
-                    await Delete<T>(
+                    await Delete<TAggregate>(
                       timestamp, @event, cancellationToken
                       )
                     .ConfigureAwait(false)
@@ -186,22 +184,22 @@ namespace Infrastructure.Aggregates
                 );
             }
             await _eventBus.Publish(_unsavedEvents).ConfigureAwait(false);
-            _unsavedEvents = Enumerable.Empty<IEvent>();
+            _unsavedEvents = Enumerable.Empty<Events.IEvent>();
             return
               await Task.FromResult<Result<bool, Errors>>(
-                  Result.Ok<bool, Errors>(true)
+                  Result.Success<bool, Errors>(true)
                   )
               .ConfigureAwait(false);
         }
 
         private async Task<Result<bool, Errors>> RegisterEvents(
-            IEnumerable<IEvent> events,
-            Action<IEvent[]> action,
+            IEnumerable<Events.IEvent> events,
+            Action<Events.IEvent[]> action,
             CancellationToken cancellationToken
             )
         {
             var eventArray = events.ToArray();
-            Event.EnsureValid(eventArray);
+            Events.Event.EnsureValid(eventArray);
             await AssertExistenceOfCreators(
                 eventArray.Select(@event => @event.CreatorId),
                 cancellationToken
@@ -211,7 +209,7 @@ namespace Infrastructure.Aggregates
             _unsavedEvents = _unsavedEvents.Concat(eventArray);
             return
               await Task.FromResult<Result<bool, Errors>>(
-                  Result.Ok<bool, Errors>(true)
+                  Result.Success<bool, Errors>(true)
                   )
               .ConfigureAwait(false);
         }
@@ -233,21 +231,24 @@ namespace Infrastructure.Aggregates
         // Associations //
         //////////////////
 
-        public Task<Result<Id, Errors>> AddManyToManyAssociation<TParent, TAssociation, TAssociate>(
-            Func<Guid, Events.IAssociationAddedEvent> newAssociationAddedEvent,
+        public Task<Result<ValueObjects.Id, Errors>> AddManyToManyAssociation<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
+            Func<ValueObjects.Id, Events.IAssociationAddedEvent> newAssociationAddedEvent,
             AddAssociationCheck addAssociationCheck,
             CancellationToken cancellationToken
             )
-          where TParent : class, IEventSourcedAggregate, new()
-          where TAssociation : class, IManyToManyAssociationAggregate, new()
-          where TAssociate : class, IEventSourcedAggregate, new()
+          where TModel : Models.IModel
+          where TAssociationModel : Models.IManyToManyAssociation
+          where TAssociateModel : Models.IModel
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
         {
-            return AddAssociation<TParent, TAssociation, TAssociate>(
+            return AddAssociation<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
                 newAssociationAddedEvent,
                 async @event =>
                 {
                     var doesAssociationExist =
-                  await Query<TAssociation>()
+                  await QueryAggregates<TAssociationAggregate>()
                   .Where(a =>
                       a.ParentId == @event.ParentId &&
                       a.AssociateId == @event.AssociateId
@@ -257,99 +258,113 @@ namespace Infrastructure.Aggregates
                     return doesAssociationExist
                       ? Result.Failure<bool, Errors>(
                           Errors.One(
-                            message: $"There already is an association between {@event.ParentId} and {@event.AssociateId} of type {typeof(TAssociation)}",
+                            message: $"There already is an association between {@event.ParentId} and {@event.AssociateId} of type {typeof(TAssociationAggregate)}",
                             code: ErrorCodes.AlreadyExistingAssociation
                             )
                           )
-                      : Result.Ok<bool, Errors>(true);
+                      : Result.Success<bool, Errors>(true);
                 },
                 addAssociationCheck,
                 cancellationToken
                 );
         }
 
-        public Task<Result<Id, Errors>> AddOneToManyAssociation<TParent, TAssociation, TAssociate>(
-            Func<Guid, Events.IAssociationAddedEvent> newAssociationAddedEvent,
+        public Task<Result<ValueObjects.Id, Errors>> AddOneToManyAssociation<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
+            Func<ValueObjects.Id, Events.IAssociationAddedEvent> newAssociationAddedEvent,
             AddAssociationCheck addAssociationCheck,
             CancellationToken cancellationToken
             )
-          where TParent : class, IEventSourcedAggregate, new()
-          where TAssociation : class, IOneToManyAssociationAggregate, new()
-          where TAssociate : class, IEventSourcedAggregate, new()
+          where TModel : Models.IModel
+          where TAssociationModel : Models.IOneToManyAssociation
+          where TAssociateModel : Models.IModel
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
         {
-            return AddAssociation<TParent, TAssociation, TAssociate>(
+            return AddAssociation<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
                 newAssociationAddedEvent,
                 async @event =>
                 {
                     var doesAssociationExist =
-                  await Query<TAssociation>()
+                  await QueryAggregates<TAssociationAggregate>()
                   .Where(a => a.AssociateId == @event.AssociateId)
                   .AnyAsync(cancellationToken)
                   .ConfigureAwait(false);
                     return doesAssociationExist
                       ? Result.Failure<bool, Errors>(
                           Errors.One(
-                            message: $"There already is an association for {@event.AssociateId} of type {typeof(TAssociation)}",
+                            message: $"There already is an association for {@event.AssociateId} of type {typeof(TAssociationAggregate)}",
                             code: ErrorCodes.AlreadyExistingAssociation
                             )
                           )
-                      : Result.Ok<bool, Errors>(true);
+                      : Result.Success<bool, Errors>(true);
                 },
                 addAssociationCheck,
                 cancellationToken
                 );
         }
 
-        private async Task<Result<Id, Errors>> AddAssociation<TParent, TAssociation, TAssociate>(
-            Func<Guid, Events.IAssociationAddedEvent> newAssociationAddedEvent,
+        private async Task<Result<ValueObjects.Id, Errors>> AddAssociation<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
+            Func<ValueObjects.Id, Events.IAssociationAddedEvent> newAssociationAddedEvent,
             Func<Events.IAssociationAddedEvent, Task<Result<bool, Errors>>> failIfAssociationAlreadyExists, // The boolean is ignored. Instead, `Result#IsFailure` is used.
             AddAssociationCheck addAssociationCheck,
             CancellationToken cancellationToken
             )
-          where TParent : class, IEventSourcedAggregate, new()
-          where TAssociation : class, IAssociationAggregate, new()
-          where TAssociate : class, IEventSourcedAggregate, new()
+          where TModel : Models.IModel
+          where TAssociationModel : Models.IAssociation
+          where TAssociateModel : Models.IModel
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
+          where TAssociationAggregate : class, Aggregates.IAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
+          where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
         {
-            AssertNotDisposed();
+            ThrowIfDisposed();
             var id = await GenerateNewId(cancellationToken).ConfigureAwait(false);
             var @event = newAssociationAddedEvent(id);
             if (@event.AggregateId != (Guid)id)
             {
                 throw new Exception($"The aggregate identifier of the association added event {@event.AggregateId} differs from the generated identifier {(Guid)id}");
             }
-            (Result<TParent, Errors>? parentResult, Result<TAssociate, Errors>? associateResult) =
+            (Result<TModel, Errors>? parentResult, Result<TAssociateModel, Errors>? associateResult) =
               addAssociationCheck switch
               {
                   AddAssociationCheck.NONE =>
                     (null, null),
                   AddAssociationCheck.PARENT =>
                     (
-                      (Result<TParent, Errors>?)(
-                        await Load<TParent>(
-                        @event.ParentId,
-                        cancellationToken
+                      (Result<TModel, Errors>?)(
+                        await ValueObjects.Id.From(@event.ParentId)
+                        .Bind(async parentId =>
+                          await Load<TModel, TAggregate>(
+                          parentId,
+                          cancellationToken
+                          )
+                        .ConfigureAwait(false)
                         )
-                      .ConfigureAwait(false)
+                        .ConfigureAwait(false)
                       ),
                       null
                     ),
                   AddAssociationCheck.ASSOCIATE =>
                     (
                       null,
-                      (Result<TAssociate, Errors>?)(
-                        await Load<TAssociate>(
-                        @event.AssociateId,
-                        cancellationToken
+                      (Result<TAssociateModel, Errors>?)(
+                        await ValueObjects.Id.From(@event.AssociateId)
+                        .Bind(async associateId =>
+                          await Load<TAssociateModel, TAssociateAggregate>(
+                          associateId,
+                          cancellationToken
+                          )
+                        .ConfigureAwait(false)
                         )
-                      .ConfigureAwait(false)
+                        .ConfigureAwait(false)
                       )
                     ),
                   AddAssociationCheck.PARENT_AND_ASSOCIATE =>
-                    ((Result<TParent, Errors>?, Result<TAssociate, Errors>?))(
-                      await Load<TParent, TAssociate>(
+                    ((Result<TModel, Errors>?, Result<TAssociateModel, Errors>?))(
+                      await Load<TModel, TAggregate, TAssociateModel, TAssociateAggregate>(
                         (
-                         @event.ParentId,
-                         @event.AssociateId
+                         ValueObjects.Id.From(@event.ParentId),
+                         ValueObjects.Id.From(@event.AssociateId)
                         ),
                         cancellationToken
                         )
@@ -367,7 +382,7 @@ namespace Infrastructure.Aggregates
               .Bind(async _ => await
                     (await failIfAssociationAlreadyExists(@event).ConfigureAwait(false))
                     .Bind(async _ =>
-                      await Create<TAssociation>(
+                      await Create<TAssociationAggregate>(
                         @event,
                         cancellationToken
                         )
@@ -379,17 +394,18 @@ namespace Infrastructure.Aggregates
         }
 
         public async
-          Task<Result<Id, Errors>>
-          RemoveManyToManyAssociation<TAssociationAggregate>(
-            (Guid from, Guid to) ids,
-            Timestamp timestamp,
-            Func<Guid, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
+          Task<Result<ValueObjects.Id, Errors>>
+          RemoveManyToManyAssociation<TAssociationModel, TAssociationAggregate>(
+            (ValueObjects.Id from, ValueObjects.Id to) ids,
+            ValueObjects.Timestamp timestamp,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
-          where TAssociationAggregate : class, IManyToManyAssociationAggregate, new()
+          where TAssociationModel : Models.IManyToManyAssociation
+          where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
         {
             var maybeAssociationId =
-              await Query<TAssociationAggregate>()
+              await QueryAggregates<TAssociationAggregate>()
               .Where(a =>
                   a.ParentId == ids.from &&
                   a.AssociateId == ids.to
@@ -398,7 +414,7 @@ namespace Infrastructure.Aggregates
               .FirstOrDefaultAsync(cancellationToken)
               .ConfigureAwait(false);
             return
-              await Infrastructure.ValueObjects.Id.From(maybeAssociationId)
+              await ValueObjects.Id.From(maybeAssociationId)
               .Bind(async associationId =>
                   (
                    await Delete<TAssociationAggregate>(
@@ -414,23 +430,24 @@ namespace Infrastructure.Aggregates
         }
 
         public async
-          Task<Result<Id, Errors>>
-          RemoveOneToManyAssociation<TAssociationAggregate>(
-            Guid toId,
-            Timestamp timestamp,
-            Func<Guid, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
+          Task<Result<ValueObjects.Id, Errors>>
+          RemoveOneToManyAssociation<TAssociationModel, TAssociationAggregate>(
+            ValueObjects.Id toId,
+            ValueObjects.Timestamp timestamp,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
-          where TAssociationAggregate : class, IOneToManyAssociationAggregate, new()
+          where TAssociationModel : Models.IOneToManyAssociation
+          where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
         {
             var maybeAssociationId =
-              await Query<TAssociationAggregate>()
+              await QueryAggregates<TAssociationAggregate>()
               .Where(a => a.AssociateId == toId)
               .Select(a => a.Id)
               .FirstOrDefaultAsync(cancellationToken)
               .ConfigureAwait(false);
             return
-              await Infrastructure.ValueObjects.Id.From(maybeAssociationId)
+              await ValueObjects.Id.From(maybeAssociationId)
               .Bind(async associationId =>
                   (
                    await Delete<TAssociationAggregate>(
@@ -448,17 +465,17 @@ namespace Infrastructure.Aggregates
         public
           Task<Result<bool, Errors>>
           RemoveForwardManyToManyAssociationsOfModel<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
-            TimestampedId timestampedId,
-            Func<Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
+            ValueObjects.TimestampedId timestampedId,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
             where TModel : Models.IModel
             where TAssociationModel : Models.IManyToManyAssociation
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
-            return RemoveAssociationsOfModel<TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
+            return RemoveAssociationsOfModel<TAssociationModel, TAssociationAggregate, TAssociationAddedEvent>(
                 timestampedId,
                 newAssociationRemovedEvent,
                 GetForwardManyToManyAssociationsOfModels<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>,
@@ -469,17 +486,17 @@ namespace Infrastructure.Aggregates
         public
           Task<Result<bool, Errors>>
           RemoveBackwardManyToManyAssociationsOfModel<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
-            TimestampedId timestampedId,
-            Func<Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
+            ValueObjects.TimestampedId timestampedId,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
             where TAssociateModel : Models.IModel
             where TAssociationModel : Models.IManyToManyAssociation
-            where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+            where TAssociationAggregate : class, Aggregates.IManyToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
-            return RemoveAssociationsOfModel<TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
+            return RemoveAssociationsOfModel<TAssociationModel, TAssociationAggregate, TAssociationAddedEvent>(
                 timestampedId,
                 newAssociationRemovedEvent,
                 GetBackwardManyToManyAssociationsOfModels<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>,
@@ -490,17 +507,17 @@ namespace Infrastructure.Aggregates
         public
           Task<Result<bool, Errors>>
           RemoveForwardOneToManyAssociationsOfModel<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
-            TimestampedId timestampedId,
-            Func<Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
+            ValueObjects.TimestampedId timestampedId,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
             where TModel : Models.IModel
             where TAssociationModel : Models.IOneToManyAssociation
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-            where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
+            where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
-            return RemoveAssociationsOfModel<TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
+            return RemoveAssociationsOfModel<TAssociationModel, TAssociationAggregate, TAssociationAddedEvent>(
                 timestampedId,
                 newAssociationRemovedEvent,
                 GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>,
@@ -511,17 +528,17 @@ namespace Infrastructure.Aggregates
         public
           Task<Result<bool, Errors>>
           RemoveBackwardOneToManyAssociationOfModel<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
-            TimestampedId timestampedId,
-            Func<Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
+            ValueObjects.TimestampedId timestampedId,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
             CancellationToken cancellationToken
             )
             where TAssociateModel : Models.IModel
             where TAssociationModel : Models.IOneToManyAssociation
-            where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
-            where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
+            where TAssociationAggregate : class, Aggregates.IOneToManyAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
-            return RemoveAssociationsOfModel<TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(
+            return RemoveAssociationsOfModel<TAssociationModel, TAssociationAggregate, TAssociationAddedEvent>(
                 timestampedId,
                 newAssociationRemovedEvent,
                 GetBackwardOneToManyAssociationsOfModels<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>,
@@ -531,20 +548,19 @@ namespace Infrastructure.Aggregates
 
         private async
           Task<Result<bool, Errors>>
-          RemoveAssociationsOfModel<TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(
-            TimestampedId timestampedId,
-            Func<Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
-            Func<IEnumerable<TimestampedId>, CancellationToken, Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>> getAssociationsOfModels,
+          RemoveAssociationsOfModel<TAssociationModel, TAssociationAggregate, TAssociationAddedEvent>(
+            ValueObjects.TimestampedId timestampedId,
+            Func<ValueObjects.Id, Events.IAssociationRemovedEvent> newAssociationRemovedEvent,
+            Func<IEnumerable<ValueObjects.TimestampedId>, CancellationToken, Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>> getAssociationsOfModels,
             CancellationToken cancellationToken
             )
             where TAssociationModel : IAssociation
-            where TAggregate : class, IEventSourcedAggregate, new()
-            where TAssociationAggregate : class, IAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociationAggregate : class, Aggregates.IAssociationAggregate, Aggregates.IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : Events.IAssociationAddedEvent
         {
             return await (
                 await getAssociationsOfModels(
-                  new TimestampedId[] { timestampedId },
+                  new ValueObjects.TimestampedId[] { timestampedId },
                   cancellationToken
                   )
                   .ConfigureAwait(false)
@@ -555,8 +571,8 @@ namespace Infrastructure.Aggregates
                   .Bind(async associations =>
                     await Delete<TAssociationAggregate>(
                       associations.Select(association => (
-                         association.Timestamp, // TODO Casting to `TimestampedId` could result in a run-time error and must not be done!
-                         (IDeletedEvent)newAssociationRemovedEvent(association.Id)
+                         association.Timestamp,
+                         (Events.IDeletedEvent)newAssociationRemovedEvent(association.Id)
                          )
                         ),
                       cancellationToken

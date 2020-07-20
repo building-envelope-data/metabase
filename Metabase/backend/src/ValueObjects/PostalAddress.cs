@@ -42,7 +42,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<PostalAddress, Errors>(
+            return Result.Success<PostalAddress, Errors>(
                 new PostalAddress(postalAddress)
                 );
         }

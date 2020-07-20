@@ -8,7 +8,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public abstract class MethodDeveloperAggregate
-      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.MethodDeveloper>
+      : Aggregate, IManyToManyAssociationAggregate, IConvertible<Models.MethodDeveloper>
     {
         [ForeignKey(typeof(MethodAggregate))]
         public Guid MethodId { get; set; }

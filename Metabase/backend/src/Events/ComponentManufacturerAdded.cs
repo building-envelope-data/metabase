@@ -58,7 +58,7 @@ namespace Metabase.Events
             return
               Result.Combine(
                   base.Validate(),
-                  MarketingInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                  MarketingInformation?.Validate() ?? Result.Success<bool, Errors>(true)
                   );
         }
     }

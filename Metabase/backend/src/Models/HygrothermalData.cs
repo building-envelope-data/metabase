@@ -35,7 +35,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<HygrothermalData, Errors>(
+              Result.Success<HygrothermalData, Errors>(
                   new HygrothermalData(
                     id: id,
                     databaseId: databaseId,

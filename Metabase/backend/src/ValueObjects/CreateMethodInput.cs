@@ -42,7 +42,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<CreateMethodInput, Errors>(
+            return Result.Success<CreateMethodInput, Errors>(
                 new CreateMethodInput(
                   name: name,
                   description: description,

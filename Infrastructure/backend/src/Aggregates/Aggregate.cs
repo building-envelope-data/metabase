@@ -10,8 +10,8 @@ using Validatable = Infrastructure.Validatable;
 
 namespace Infrastructure.Aggregates
 {
-    public abstract class EventSourcedAggregate
-      : Validatable, IEventSourcedAggregate
+    public abstract class Aggregate
+      : Validatable, IAggregate
     {
         // For indexing our event streams
         public Guid Id { get; set; }
@@ -23,7 +23,7 @@ namespace Infrastructure.Aggregates
 
         public bool Deleted { get; set; }
 
-        protected EventSourcedAggregate()
+        protected Aggregate()
         {
             Id = Guid.Empty;
             Timestamp = DateTime.MinValue;
@@ -54,7 +54,7 @@ namespace Infrastructure.Aggregates
         public bool IsVirgin()
         {
             return
-               // Id == Guid.Empty && // TODO For some reason the `Id` is set by `AggregateRepositoryReadOnlySession#Load<T>`. Why? How? Who?
+               // Id == Guid.Empty && // TODO For some reason the `Id` is set by `ModelRepositoryReadOnlySession#Load<T>`. Why? How? Who?
                Timestamp == DateTime.MinValue &&
                Version is 0 &&
                !Deleted;
@@ -64,7 +64,7 @@ namespace Infrastructure.Aggregates
         {
             if (IsVirgin())
             {
-                return Result.Ok<bool, Errors>(true);
+                return Result.Success<bool, Errors>(true);
             }
             return
               Result.Combine<bool, Errors>(

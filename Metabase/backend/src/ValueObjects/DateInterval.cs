@@ -49,7 +49,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<DateInterval, Errors>(
+            return Result.Success<DateInterval, Errors>(
                 new DateInterval(
                   start: start,
                   end: end

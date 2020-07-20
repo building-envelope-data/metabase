@@ -9,7 +9,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class StandardAggregate
-      : EventSourcedAggregate, IConvertible<Models.Standard>
+      : Aggregate, IConvertible<Models.Standard>
     {
         public string Title { get; set; }
         public string Abstract { get; set; }

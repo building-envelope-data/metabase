@@ -26,7 +26,7 @@ namespace Database.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<CreatePhotovoltaicDataInput, Errors>(
+            return Result.Success<CreatePhotovoltaicDataInput, Errors>(
                 new CreatePhotovoltaicDataInput(
                   componentId,
                   data

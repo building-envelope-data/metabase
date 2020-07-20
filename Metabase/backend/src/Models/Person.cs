@@ -30,7 +30,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<Person, Errors>(
+              Result.Success<Person, Errors>(
                   new Person(
             id: id,
             name: name,

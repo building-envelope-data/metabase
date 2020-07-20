@@ -34,7 +34,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<PersonAffiliation, Errors>(
+              Result.Success<PersonAffiliation, Errors>(
                   new PersonAffiliation(
             id: id,
             personId: personId,

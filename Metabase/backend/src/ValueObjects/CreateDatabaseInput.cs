@@ -34,7 +34,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<CreateDatabaseInput, Errors>(
+              Result.Success<CreateDatabaseInput, Errors>(
                   new CreateDatabaseInput(
                     name: name,
                     description: description,

@@ -26,7 +26,7 @@ namespace Database.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<CreateCalorimetricDataInput, Errors>(
+            return Result.Success<CreateCalorimetricDataInput, Errors>(
                 new CreateCalorimetricDataInput(
                   componentId,
                   data

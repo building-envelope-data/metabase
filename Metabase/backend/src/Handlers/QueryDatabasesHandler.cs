@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using GraphQL.Client.Http; // AsGraphQLHttpResponse
 using Infrastructure.Aggregates;
+using Infrastructure.Models;
 using Infrastructure.Queries;
 using CancellationToken = System.Threading.CancellationToken;
 using ErrorCodes = Infrastructure.ErrorCodes;
@@ -16,9 +17,9 @@ namespace Metabase.Handlers
         : IQueryHandler<TQuery, TResponse>
         where TQuery : IQuery<TResponse>
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
 
-        protected QueryDatabasesHandler(IAggregateRepository repository)
+        protected QueryDatabasesHandler(IModelRepository repository)
         {
             _repository = repository;
         }
@@ -48,7 +49,7 @@ namespace Metabase.Handlers
         private async
           Task<IReadOnlyCollection<Models.Database>>
           LoadDatabases(
-              IAggregateRepositoryReadOnlySession session,
+              ModelRepositoryReadOnlySession session,
               CancellationToken cancellationToken
               )
         {
@@ -95,7 +96,7 @@ namespace Metabase.Handlers
                       )
                     );
             }
-            return Result.Ok<TResponse, Errors>(
+            return Result.Success<TResponse, Errors>(
                   ParseGraphQlResponse(
                     database,
                     response.Data

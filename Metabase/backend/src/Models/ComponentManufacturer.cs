@@ -38,7 +38,7 @@ namespace Metabase.Models
             )
         {
             return
-                Result.Ok<ComponentManufacturer, Errors>(
+                Result.Success<ComponentManufacturer, Errors>(
                     new ComponentManufacturer(
                         id: id,
                         componentId: componentId,

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
+using Infrastructure.Models;
 using Infrastructure.ValueObjects;
 using Errors = Infrastructure.Errors;
 
@@ -16,7 +17,7 @@ namespace Metabase.Handlers
     {
         public WhichDatabasesHaveDataForComponentsHandler(
                         string graphQlQueryName,
-                        IAggregateRepository repository
+                        IModelRepository repository
                         )
           : base(
                             graphQlQueryName: graphQlQueryName,
@@ -33,11 +34,11 @@ namespace Metabase.Handlers
             )
         {
             return
-                            Result.Ok<IEnumerable<Result<Models.Database, Errors>>, Errors>(
+                            Result.Success<IEnumerable<Result<Models.Database, Errors>>, Errors>(
                                     response
                                     ? new Result<Models.Database, Errors>[]
                                     {
-                                    Result.Ok<Models.Database, Errors>(database)
+                                    Result.Success<Models.Database, Errors>(database)
                                     }
                                     : Enumerable.Empty<Result<Models.Database, Errors>>()
                                     );

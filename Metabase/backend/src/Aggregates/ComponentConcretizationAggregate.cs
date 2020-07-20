@@ -8,7 +8,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class ComponentConcretizationAggregate
-      : EventSourcedAggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentConcretization>
+      : Aggregate, IManyToManyAssociationAggregate, IConvertible<Models.ComponentConcretization>
     {
         // The instance variables `GeneralCompId` and `ConcreteCompId` are
         // abbreviated to make the corresponding database index have less than

@@ -12,11 +12,11 @@ namespace Infrastructure.Handlers
     public abstract class GetModelsOfUnknownTypeForTimestampedIdsHandler
       : Queries.IQueryHandler<Queries.GetModelsForTimestampedIds<Models.IModel>, IEnumerable<Result<Models.IModel, Errors>>>
     {
-        private readonly Aggregates.IAggregateRepository _repository;
+        private readonly Models.IModelRepository _repository;
         private readonly IDictionary<Type, IGetModelsForTimestampedIdsHandler> _aggregateTypeToGetHandler;
 
         protected GetModelsOfUnknownTypeForTimestampedIdsHandler(
-            Aggregates.IAggregateRepository repository,
+            Models.IModelRepository repository,
             IDictionary<Type, IGetModelsForTimestampedIdsHandler> aggregateTypeToGetHandler
             )
         {
@@ -31,7 +31,7 @@ namespace Infrastructure.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await session.LoadAllX(
+                return await session.LoadAllX<Models.IModel>(
                     query.TimestampedIds,
                     (session, aggregateType, timestampedIds, cancellationToken) =>
                     {

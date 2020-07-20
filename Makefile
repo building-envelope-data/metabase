@@ -598,6 +598,14 @@ update-tools : ## Update tools
 update : update-packages update-tools ## Update packages and tools
 .PHONY : update
 
+restore : VERBOSITY = normal
+restore : ## Restore packages and tools with verbosity level `${VERBOSITY}` that defaults to `normal` (allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]), for example, `make VERBOSITY=detailed restore`
+	for project in ${projects} ; do ( \
+		cd ./$${project}/backend && \
+		dotnet restore --verbosity ${VERBOSITY} \
+	) ; done
+.PHONY : restore
+
 dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for example, `make PATTERN="using Infrastructure.Aggregates" dedup`
 	find . -name "*.cs" \
 		| xargs -n 1 \

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
 using Infrastructure.Handlers;
+using Infrastructure.Models;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
@@ -16,11 +17,11 @@ namespace Metabase.Handlers
     public sealed class GetStakeholdersHandler
       : IQueryHandler<GetModelsForTimestampedIds<Models.Stakeholder>, IEnumerable<Result<Models.Stakeholder, Errors>>>
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
         private readonly GetModelsForTimestampedIdsHandler<Models.Institution, Aggregates.InstitutionAggregate> _getInstitutionsHandler;
         private readonly GetModelsForTimestampedIdsHandler<Models.Person, Aggregates.PersonAggregate> _getPersonsHandler;
 
-        public GetStakeholdersHandler(IAggregateRepository repository)
+        public GetStakeholdersHandler(IModelRepository repository)
         {
             _repository = repository;
             _getInstitutionsHandler = new GetModelsForTimestampedIdsHandler<Models.Institution, Aggregates.InstitutionAggregate>(repository);
@@ -34,7 +35,7 @@ namespace Metabase.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await session.LoadAllX(
+                return await session.LoadAllX<Models.Stakeholder>(
                     query.TimestampedIds,
                     async (session, aggregateType, timestampedIds, cancellationToken) =>
                     {

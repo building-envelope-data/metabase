@@ -42,7 +42,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<Description, Errors>(new Description(description));
+            return Result.Success<Description, Errors>(new Description(description));
         }
 
         public static Result<Description, Errors>? MaybeFrom(

@@ -52,7 +52,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<Standard, Errors>(
+              Result.Success<Standard, Errors>(
                   new Standard(
             id: id,
             title: title,

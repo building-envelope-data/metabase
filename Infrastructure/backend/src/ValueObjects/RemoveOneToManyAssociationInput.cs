@@ -14,7 +14,7 @@ namespace Infrastructure.ValueObjects
             )
         {
             return
-              Result.Ok<RemoveOneToManyAssociationInput<TAssociationModel>, Errors>(
+              Result.Success<RemoveOneToManyAssociationInput<TAssociationModel>, Errors>(
                   new RemoveOneToManyAssociationInput<TAssociationModel>(
                     associateId: associateId,
                     timestamp: timestamp

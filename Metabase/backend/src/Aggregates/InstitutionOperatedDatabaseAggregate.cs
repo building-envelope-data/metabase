@@ -8,7 +8,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class InstitutionOperatedDatabaseAggregate
-      : EventSourcedAggregate, IOneToManyAssociationAggregate, IConvertible<Models.InstitutionOperatedDatabase>
+      : Aggregate, IOneToManyAssociationAggregate, IConvertible<Models.InstitutionOperatedDatabase>
     {
         [ForeignKey(typeof(InstitutionAggregate))]
         public Guid InstitutionId { get; set; }

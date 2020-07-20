@@ -31,7 +31,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<Year, Errors>(new Year(year));
+            return Result.Success<Year, Errors>(new Year(year));
         }
 
         protected override IEnumerable<object?> GetEqualityComponents()

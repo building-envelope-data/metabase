@@ -1,10 +1,10 @@
 using Guid = System.Guid;
-using IEventSourcedAggregate = Infrastructure.Aggregates.IEventSourcedAggregate;
+using IEventSourcedAggregate = Infrastructure.Aggregates.IAggregate;
 
 namespace Infrastructure.Aggregates
 {
     public interface IAssociationAggregate
-      : IEventSourcedAggregate
+      : IAggregate
     {
         public Guid ParentId { get; }
         public Guid AssociateId { get; }

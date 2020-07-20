@@ -26,7 +26,7 @@ namespace Database.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<CreateOpticalDataInput, Errors>(
+            return Result.Success<CreateOpticalDataInput, Errors>(
                 new CreateOpticalDataInput(
                   componentId,
                   data

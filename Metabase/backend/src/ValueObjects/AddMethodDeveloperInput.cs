@@ -27,7 +27,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<AddMethodDeveloperInput, Errors>(
+              Result.Success<AddMethodDeveloperInput, Errors>(
                   new AddMethodDeveloperInput(
                     methodId: methodId,
                     stakeholderId: stakeholderId

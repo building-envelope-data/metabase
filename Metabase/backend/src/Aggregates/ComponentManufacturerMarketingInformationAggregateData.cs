@@ -37,8 +37,8 @@ namespace Metabase.Aggregates
         {
             return
               Result.Combine(
-                  ComponentInformation?.Validate() ?? Result.Ok<bool, Errors>(true),
-                  InstitutionInformation?.Validate() ?? Result.Ok<bool, Errors>(true)
+                  ComponentInformation?.Validate() ?? Result.Success<bool, Errors>(true),
+                  InstitutionInformation?.Validate() ?? Result.Success<bool, Errors>(true)
                   );
         }
 

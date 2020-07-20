@@ -42,7 +42,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<Abstract, Errors>(new Abstract(@abstract));
+            return Result.Success<Abstract, Errors>(new Abstract(@abstract));
         }
 
         protected override IEnumerable<object?> GetEqualityComponents()

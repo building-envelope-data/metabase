@@ -38,7 +38,7 @@ namespace Metabase.ValueObjects
                     );
             }
 
-            return Result.Ok<ComponentManufacturerMarketingInformation, Errors>(
+            return Result.Success<ComponentManufacturerMarketingInformation, Errors>(
                 new ComponentManufacturerMarketingInformation(
                   componentInformation: componentInformation,
                   institutionInformation: institutionInformation

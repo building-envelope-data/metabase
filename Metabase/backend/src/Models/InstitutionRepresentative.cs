@@ -38,7 +38,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<InstitutionRepresentative, Errors>(
+              Result.Success<InstitutionRepresentative, Errors>(
                   new InstitutionRepresentative(
                     id: id,
                     institutionId: institutionId,

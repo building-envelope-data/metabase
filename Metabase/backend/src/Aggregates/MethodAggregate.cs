@@ -10,7 +10,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class MethodAggregate
-      : EventSourcedAggregate, IConvertible<Models.Method>
+      : Aggregate, IConvertible<Models.Method>
     {
         public string Name { get; set; }
         public string Description { get; set; }

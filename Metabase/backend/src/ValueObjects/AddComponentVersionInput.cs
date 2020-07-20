@@ -27,7 +27,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<AddComponentVersionInput, Errors>(
+              Result.Success<AddComponentVersionInput, Errors>(
                   new AddComponentVersionInput(
                     baseComponentId: baseComponentId,
                     versionComponentId: versionComponentId

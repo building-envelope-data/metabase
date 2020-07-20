@@ -27,7 +27,7 @@ namespace Metabase.Models
             )
         {
             return
-              Result.Ok<Component, Errors>(
+              Result.Success<Component, Errors>(
                   new Component(
             id: id,
             information: information,

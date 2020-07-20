@@ -7,7 +7,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class PersonAggregate
-      : EventSourcedAggregate, IConvertible<Models.Person>
+      : Aggregate, IConvertible<Models.Person>
     {
         public string Name { get; set; }
         public string PhoneNumber { get; set; }

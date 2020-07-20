@@ -38,7 +38,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<ComponentInformation, Errors>(
+            return Result.Success<ComponentInformation, Errors>(
                 new ComponentInformation(
                   name: name,
                   abbreviation: abbreviation,

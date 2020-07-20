@@ -41,7 +41,7 @@ namespace Metabase.ValueObjects
                     )
                     );
             }
-            return Result.Ok<Title, Errors>(new Title(title));
+            return Result.Success<Title, Errors>(new Title(title));
         }
 
         protected override IEnumerable<object?> GetEqualityComponents()

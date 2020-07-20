@@ -41,7 +41,7 @@ namespace Infrastructure.ValueObjects
                     )
                     );
             }
-            return Result.Ok<Id, Errors>(new Id(id));
+            return Result.Success<Id, Errors>(new Id(id));
         }
 
         public static Result<Id, Errors>? MaybeFrom(

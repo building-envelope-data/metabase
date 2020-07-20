@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Infrastructure;
 using Infrastructure.Aggregates;
 using Infrastructure.Commands;
 using Infrastructure.Events;
@@ -12,12 +11,7 @@ using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using AddAssociationCheck = Infrastructure.Aggregates.AddAssociationCheck;
 using CancellationToken = System.Threading.CancellationToken;
-using Errors = Infrastructure.Errors;
-using IAggregateRepository = Infrastructure.Aggregates.IAggregateRepository;
-using IAggregateRepositorySession = Infrastructure.Aggregates.IAggregateRepositorySession;
-using IEventSourcedAggregate = Infrastructure.Aggregates.IEventSourcedAggregate;
 
 namespace Infrastructure.Configuration
 {
@@ -37,13 +31,13 @@ namespace Infrastructure.Configuration
 
         protected static void AddModelHandlers<TModel, TAggregate, TCreateInput, TCreatedEvent>(
                 IServiceCollection services,
-                Func<Guid, Infrastructure.Commands.Create<TCreateInput>, ICreatedEvent> newCreatedEvent,
-                IEnumerable<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<TCreateInput>, CancellationToken, Task<Result<Id, Errors>>>> addAssociations,
-                Func<Infrastructure.Commands.Delete<TModel>, IDeletedEvent> newDeletedEvent,
-                IEnumerable<Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
+                Func<Guid, Commands.Create<TCreateInput>, ICreatedEvent> newCreatedEvent,
+                IEnumerable<Func<Models.ModelRepositorySession, Id, Commands.Create<TCreateInput>, CancellationToken, Task<Result<Id, Errors>>>> addAssociations,
+                Func<Commands.Delete<TModel>, IDeletedEvent> newDeletedEvent,
+                IEnumerable<Func<Models.ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
                     )
                 where TModel : IModel
-                where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+                where TAggregate : class, IAggregate, IConvertible<TModel>, new()
                 where TCreatedEvent : ICreatedEvent
         {
             AddCreateModelHandler<TCreateInput, TAggregate>(
@@ -58,19 +52,19 @@ namespace Infrastructure.Configuration
 
         protected static void AddCreateModelHandler<TInput, TAggregate>(
                 IServiceCollection services,
-                Func<Guid, Infrastructure.Commands.Create<TInput>, ICreatedEvent> newEvent,
-                IEnumerable<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<TInput>, CancellationToken, Task<Result<Id, Errors>>>> addAssociations
+                Func<Guid, Commands.Create<TInput>, ICreatedEvent> newEvent,
+                IEnumerable<Func<Models.ModelRepositorySession, Id, Commands.Create<TInput>, CancellationToken, Task<Result<Id, Errors>>>> addAssociations
         )
-          where TAggregate : class, IEventSourcedAggregate, new()
+          where TAggregate : class, IAggregate, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Infrastructure.Commands.Create<TInput>,
+              Commands.Create<TInput>,
               Result<TimestampedId, Errors>
                 >,
-              Handlers.CreateModelHandler<Infrastructure.Commands.Create<TInput>, TAggregate>>(serviceProvider =>
-                  new Handlers.CreateModelHandler<Infrastructure.Commands.Create<TInput>, TAggregate>(
-                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+              Handlers.CreateModelHandler<Commands.Create<TInput>, TAggregate>>(serviceProvider =>
+                  new Handlers.CreateModelHandler<Commands.Create<TInput>, TAggregate>(
+                    serviceProvider.GetRequiredService<Models.IModelRepository>(),
                     newEvent,
                     addAssociations
                     )
@@ -79,19 +73,20 @@ namespace Infrastructure.Configuration
 
         protected static void AddDeleteModelHandler<TModel, TAggregate>(
                 IServiceCollection services,
-                Func<Infrastructure.Commands.Delete<TModel>, IDeletedEvent> newEvent,
-                IEnumerable<Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
+                Func<Commands.Delete<TModel>, IDeletedEvent> newEvent,
+                IEnumerable<Func<Models.ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
         )
-          where TAggregate : class, IEventSourcedAggregate, new()
+          where TModel : IModel
+          where TAggregate : class, IAggregate, IConvertible<TModel>, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Infrastructure.Commands.Delete<TModel>,
+              Commands.Delete<TModel>,
               Result<TimestampedId, Errors>
                 >,
               Handlers.DeleteModelHandler<TModel, TAggregate>>(serviceProvider =>
                   new Handlers.DeleteModelHandler<TModel, TAggregate>(
-                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    serviceProvider.GetRequiredService<Models.IModelRepository>(),
                     newEvent,
                     removeAssociations
                     )
@@ -101,8 +96,9 @@ namespace Infrastructure.Configuration
         protected static void AddGetModelsAtTimestampsHandler<TModel, TAggregate, TCreatedEvent>(
                 IServiceCollection services
                 )
-                where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
-                where TCreatedEvent : ICreatedEvent
+          where TModel : IModel
+          where TAggregate : class, IAggregate, IConvertible<TModel>, new()
+          where TCreatedEvent : ICreatedEvent
         {
             services.AddScoped<
               MediatR.IRequestHandler<
@@ -117,7 +113,7 @@ namespace Infrastructure.Configuration
                 IServiceCollection services
                 )
                 where TModel : IModel
-                where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+                where TAggregate : class, IAggregate, IConvertible<TModel>, new()
         {
             services.AddScoped<
                 MediatR.IRequestHandler<
@@ -130,15 +126,15 @@ namespace Infrastructure.Configuration
 
         protected static void AddReflexiveManyToManyAssociationHandlers<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent, TAddInput, TAssociationRemovedEvent>(
                         IServiceCollection services,
-                        Func<Guid, Infrastructure.Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
-                        Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
+                        Func<Guid, Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
+                        Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
                         )
             where TModel : IModel
             where TAssociationModel : IManyToManyAssociation
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
-            where TAddInput : Infrastructure.ValueObjects.AddManyToManyAssociationInput
+            where TAddInput : ValueObjects.AddManyToManyAssociationInput
             where TAssociationRemovedEvent : IAssociationRemovedEvent
         {
             AddManyToManyAssociationHandlers<TModel, TAssociationModel, TModel, TAggregate, TAssociationAggregate, TAggregate, TAssociationAddedEvent, TAddInput, TAssociationRemovedEvent>(
@@ -150,17 +146,17 @@ namespace Infrastructure.Configuration
 
         protected static void AddManyToManyAssociationHandlersWithAssociationGetters<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent, TAddInput, TAssociationRemovedEvent>(
                         IServiceCollection services,
-                        Func<Guid, Infrastructure.Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
-                        Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
+                        Func<Guid, Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
+                        Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
                         )
                     where TModel : IModel
                     where TAssociationModel : IManyToManyAssociation
                     where TAssociateModel : IModel
-                    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+                    where TAggregate : class, IAggregate, IConvertible<TModel>, new()
                     where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-                    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+                    where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : IAssociationAddedEvent
-                    where TAddInput : Infrastructure.ValueObjects.AddManyToManyAssociationInput
+                    where TAddInput : ValueObjects.AddManyToManyAssociationInput
                     where TAssociationRemovedEvent : IAssociationRemovedEvent
         {
             AddManyToManyAssociationHandlers<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent, TAddInput, TAssociationRemovedEvent>(
@@ -173,42 +169,45 @@ namespace Infrastructure.Configuration
 
         protected static void AddManyToManyAssociationHandlers<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent, TAddInput, TAssociationRemovedEvent>(
                         IServiceCollection services,
-                        Func<Guid, Infrastructure.Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
-                        Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
+                        Func<Guid, Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
+                        Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
                         )
                     where TModel : IModel
                     where TAssociationModel : IManyToManyAssociation
                     where TAssociateModel : IModel
-                    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+                    where TAggregate : class, IAggregate, IConvertible<TModel>, new()
                     where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-                    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+                    where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : IAssociationAddedEvent
-                    where TAddInput : Infrastructure.ValueObjects.AddManyToManyAssociationInput
+                    where TAddInput : ValueObjects.AddManyToManyAssociationInput
                     where TAssociationRemovedEvent : IAssociationRemovedEvent
         {
-            AddAddManyToManyAssociationHandler<TAddInput, TAggregate, TAssociationAggregate, TAssociateAggregate>(services, newAssociationAddedEvent);
+            AddAddManyToManyAssociationHandler<TAddInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(services, newAssociationAddedEvent);
             AddRemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>(services, newAssociationRemovedEvent);
             AddGetHandler<TAssociationModel, TAssociationAggregate>(services);
             AddGetManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>(services);
         }
 
-        protected static void AddAddManyToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>(
+        protected static void AddAddManyToManyAssociationHandler<TInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
                 IServiceCollection services,
-                Func<Guid, Infrastructure.Commands.AddAssociation<TInput>, IAssociationAddedEvent> newEvent
+                Func<Guid, Commands.AddAssociation<TInput>, IAssociationAddedEvent> newEvent
                 )
-            where TInput : Infrastructure.ValueObjects.AddManyToManyAssociationInput
-            where TAggregate : class, IEventSourcedAggregate, new()
-            where TAssociationAggregate : class, IManyToManyAssociationAggregate, new()
-            where TAssociateAggregate : class, IEventSourcedAggregate, new()
+            where TInput : ValueObjects.AddManyToManyAssociationInput
+            where TModel : IModel
+            where TAssociationModel : IManyToManyAssociation
+            where TAssociateModel : IModel
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Infrastructure.Commands.AddAssociation<TInput>,
+              Commands.AddAssociation<TInput>,
               Result<TimestampedId, Errors>
                 >,
-              Handlers.AddManyToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>>(serviceProvider =>
-                  new Handlers.AddManyToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>(
-                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+              Handlers.AddManyToManyAssociationHandler<TInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>>(serviceProvider =>
+                  new Handlers.AddManyToManyAssociationHandler<TInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
+                    serviceProvider.GetRequiredService<Models.IModelRepository>(),
                     newEvent
                     )
                   );
@@ -216,18 +215,19 @@ namespace Infrastructure.Configuration
 
         protected static void AddRemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>(
                 IServiceCollection services,
-                Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newEvent
+                Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newEvent
                 )
-            where TAssociationAggregate : class, IManyToManyAssociationAggregate, new()
+            where TAssociationModel : IManyToManyAssociation
+            where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>,
+              Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>,
               Result<TimestampedId, Errors>
                 >,
               Handlers.RemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>>(serviceProvider =>
                   new Handlers.RemoveManyToManyAssociationHandler<TAssociationModel, TAssociationAggregate>(
-                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    serviceProvider.GetRequiredService<Models.IModelRepository>(),
                     newEvent
                     )
                   );
@@ -235,17 +235,17 @@ namespace Infrastructure.Configuration
 
         protected static void AddOneToManyAssociationHandlersWithAssociationGetters<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent, TAddInput, TAssociationRemovedEvent>(
                         IServiceCollection services,
-                        Func<Guid, Infrastructure.Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
-                        Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
+                        Func<Guid, Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
+                        Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
                         )
                     where TModel : IModel
                     where TAssociationModel : IOneToManyAssociation
                     where TAssociateModel : IModel
-                    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+                    where TAggregate : class, IAggregate, IConvertible<TModel>, new()
                     where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-                    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+                    where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : IAssociationAddedEvent
-                    where TAddInput : Infrastructure.ValueObjects.AddOneToManyAssociationInput
+                    where TAddInput : ValueObjects.AddOneToManyAssociationInput
                     where TAssociationRemovedEvent : IAssociationRemovedEvent
         {
             AddOneToManyAssociationHandlers<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent, TAddInput, TAssociationRemovedEvent>(
@@ -258,42 +258,45 @@ namespace Infrastructure.Configuration
 
         protected static void AddOneToManyAssociationHandlers<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent, TAddInput, TAssociationRemovedEvent>(
                         IServiceCollection services,
-                        Func<Guid, Infrastructure.Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
-                        Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
+                        Func<Guid, Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
+                        Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
                         )
                     where TModel : IModel
                     where TAssociationModel : IOneToManyAssociation
                     where TAssociateModel : IModel
-                    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+                    where TAggregate : class, IAggregate, IConvertible<TModel>, new()
                     where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-                    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+                    where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
                     where TAssociationAddedEvent : IAssociationAddedEvent
-                    where TAddInput : Infrastructure.ValueObjects.AddOneToManyAssociationInput
+                    where TAddInput : ValueObjects.AddOneToManyAssociationInput
                     where TAssociationRemovedEvent : IAssociationRemovedEvent
         {
-            AddAddOneToManyAssociationHandler<TAddInput, TAggregate, TAssociationAggregate, TAssociateAggregate>(services, newAssociationAddedEvent);
+            AddAddOneToManyAssociationHandler<TAddInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(services, newAssociationAddedEvent);
             AddRemoveOneToManyAssociationHandler<TAssociationModel, TAssociationAggregate>(services, newAssociationRemovedEvent);
             AddGetHandler<TAssociationModel, TAssociationAggregate>(services);
             AddGetOneToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>(services);
         }
 
-        protected static void AddAddOneToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>(
+        protected static void AddAddOneToManyAssociationHandler<TInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
                 IServiceCollection services,
-                Func<Guid, Infrastructure.Commands.AddAssociation<TInput>, IAssociationAddedEvent> newEvent
+                Func<Guid, Commands.AddAssociation<TInput>, IAssociationAddedEvent> newEvent
                 )
-            where TInput : Infrastructure.ValueObjects.AddOneToManyAssociationInput
-            where TAggregate : class, IEventSourcedAggregate, new()
-            where TAssociationAggregate : class, IOneToManyAssociationAggregate, new()
-            where TAssociateAggregate : class, IEventSourcedAggregate, new()
+            where TInput : ValueObjects.AddOneToManyAssociationInput
+            where TModel : IModel
+            where TAssociationModel : IOneToManyAssociation
+            where TAssociateModel : IModel
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
+            where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
+            where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Infrastructure.Commands.AddAssociation<TInput>,
+              Commands.AddAssociation<TInput>,
               Result<TimestampedId, Errors>
                 >,
-              Handlers.AddOneToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>>(serviceProvider =>
-                  new Handlers.AddOneToManyAssociationHandler<TInput, TAggregate, TAssociationAggregate, TAssociateAggregate>(
-                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+              Handlers.AddOneToManyAssociationHandler<TInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>>(serviceProvider =>
+                  new Handlers.AddOneToManyAssociationHandler<TInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>(
+                    serviceProvider.GetRequiredService<Models.IModelRepository>(),
                     newEvent
                     )
                   );
@@ -301,18 +304,19 @@ namespace Infrastructure.Configuration
 
         protected static void AddRemoveOneToManyAssociationHandler<TAssociationModel, TAssociationAggregate>(
                 IServiceCollection services,
-                Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newEvent
+                Func<Guid, Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newEvent
                 )
-            where TAssociationAggregate : class, IOneToManyAssociationAggregate, new()
+            where TAssociationModel : IOneToManyAssociation
+            where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>,
+              Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>,
               Result<TimestampedId, Errors>
                 >,
               Handlers.RemoveOneToManyAssociationHandler<TAssociationModel, TAssociationAggregate>>(serviceProvider =>
                   new Handlers.RemoveOneToManyAssociationHandler<TAssociationModel, TAssociationAggregate>(
-                    serviceProvider.GetRequiredService<IAggregateRepository>(),
+                    serviceProvider.GetRequiredService<Models.IModelRepository>(),
                     newEvent
                     )
                   );
@@ -320,7 +324,7 @@ namespace Infrastructure.Configuration
 
         protected static void AddGetHandler<TModel, TAggregate>(IServiceCollection services)
             where TModel : IModel
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
         {
             services.AddScoped<
               MediatR.IRequestHandler<
@@ -335,9 +339,9 @@ namespace Infrastructure.Configuration
             where TModel : IModel
             where TAssociationModel : IManyToManyAssociation
             where TAssociateModel : IModel
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+            where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
             AddGetForwardManyToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>(services);
@@ -348,9 +352,9 @@ namespace Infrastructure.Configuration
             where TModel : IModel
             where TAssociationModel : IManyToManyAssociation
             where TAssociateModel : IModel
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+            where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
             services.AddScoped<
@@ -366,9 +370,9 @@ namespace Infrastructure.Configuration
             where TAssociateModel : IModel
             where TAssociationModel : IManyToManyAssociation
             where TModel : IModel
-            where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+            where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
             services.AddScoped<
@@ -384,9 +388,9 @@ namespace Infrastructure.Configuration
     where TModel : IModel
     where TAssociationModel : IManyToManyAssociation
     where TAssociateModel : IModel
-    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+    where TAggregate : class, IAggregate, IConvertible<TModel>, new()
     where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+    where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
             AddGetForwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(services);
@@ -396,7 +400,7 @@ namespace Infrastructure.Configuration
         protected static void AddGetForwardManyToManyAssociationsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(IServiceCollection services)
     where TModel : IModel
     where TAssociationModel : IManyToManyAssociation
-    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+    where TAggregate : class, IAggregate, IConvertible<TModel>, new()
     where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -412,7 +416,7 @@ namespace Infrastructure.Configuration
         protected static void AddGetBackwardManyToManyAssociationsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(IServiceCollection services)
     where TAssociateModel : IModel
     where TAssociationModel : IManyToManyAssociation
-    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+    where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
     where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -429,9 +433,9 @@ namespace Infrastructure.Configuration
             where TModel : IModel
             where TAssociationModel : IOneToManyAssociation
             where TAssociateModel : IModel
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+            where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
             AddGetForwardOneToManyAssociatesHandler<TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate, TAssociationAddedEvent>(services);
@@ -442,9 +446,9 @@ namespace Infrastructure.Configuration
             where TModel : IModel
             where TAssociationModel : IOneToManyAssociation
             where TAssociateModel : IModel
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
             where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+            where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
             services.AddScoped<
@@ -460,9 +464,9 @@ namespace Infrastructure.Configuration
             where TAssociateModel : IModel
             where TAssociationModel : IOneToManyAssociation
             where TModel : IModel
-            where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+            where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
             where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-            where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+            where TAggregate : class, IAggregate, IConvertible<TModel>, new()
             where TAssociationAddedEvent : IAssociationAddedEvent
         {
             services.AddScoped<
@@ -478,9 +482,9 @@ namespace Infrastructure.Configuration
     where TModel : IModel
     where TAssociationModel : IOneToManyAssociation
     where TAssociateModel : IModel
-    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+    where TAggregate : class, IAggregate, IConvertible<TModel>, new()
     where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
-    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+    where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
             AddGetForwardOneToManyAssociationsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(services);
@@ -490,7 +494,7 @@ namespace Infrastructure.Configuration
         protected static void AddGetForwardOneToManyAssociationsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>(IServiceCollection services)
     where TModel : IModel
     where TAssociationModel : IOneToManyAssociation
-    where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+    where TAggregate : class, IAggregate, IConvertible<TModel>, new()
     where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {
@@ -506,7 +510,7 @@ namespace Infrastructure.Configuration
         protected static void AddGetBackwardOneToManyAssociationHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>(IServiceCollection services)
     where TAssociateModel : IModel
     where TAssociationModel : IOneToManyAssociation
-    where TAssociateAggregate : class, IEventSourcedAggregate, IConvertible<TAssociateModel>, new()
+    where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
     where TAssociationAggregate : class, IOneToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
     where TAssociationAddedEvent : IAssociationAddedEvent
         {

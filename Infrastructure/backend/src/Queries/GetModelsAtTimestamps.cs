@@ -22,7 +22,7 @@ namespace Infrastructure.Queries
             IReadOnlyCollection<Timestamp> timestamps
             )
         {
-            return Result.Ok<GetModelsAtTimestamps<M>, Errors>(
+            return Result.Success<GetModelsAtTimestamps<M>, Errors>(
                     new GetModelsAtTimestamps<M>(
                         timestamps
                         )

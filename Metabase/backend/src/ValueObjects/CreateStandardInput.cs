@@ -45,7 +45,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<CreateStandardInput, Errors>(
+              Result.Success<CreateStandardInput, Errors>(
                   new CreateStandardInput(
                     title: title,
                     @abstract: @abstract,

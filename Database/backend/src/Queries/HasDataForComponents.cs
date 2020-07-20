@@ -22,7 +22,7 @@ namespace Database.Queries
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {
-            return Result.Ok<HasDataForComponents<TDataModel>, Errors>(
+            return Result.Success<HasDataForComponents<TDataModel>, Errors>(
                 new HasDataForComponents<TDataModel>(
                   timestampedIds: timestampedIds
                   )

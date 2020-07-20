@@ -23,7 +23,7 @@ namespace Metabase.Models
             Timestamp timestamp
             )
         {
-            return Result.Ok<Role, Errors>(
+            return Result.Success<Role, Errors>(
                 new Role(
                   id: id,
                   timestamp: timestamp

@@ -6,7 +6,7 @@ using Errors = Infrastructure.Errors;
 namespace Metabase.Aggregates
 {
     public sealed class UserAggregate
-      : EventSourcedAggregate, IConvertible<Models.User>
+      : Aggregate, IConvertible<Models.User>
     {
 #nullable disable
         public UserAggregate() { }

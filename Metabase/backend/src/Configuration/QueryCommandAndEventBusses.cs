@@ -3,22 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Infrastructure;
 using Infrastructure.Aggregates;
-using Infrastructure.Commands;
 using Infrastructure.Events;
-using Infrastructure.Handlers;
 using Infrastructure.Models;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using AddAssociationCheck = Infrastructure.Aggregates.AddAssociationCheck;
+using AddAssociationCheck = Infrastructure.Models.AddAssociationCheck;
 using CancellationToken = System.Threading.CancellationToken;
 using Errors = Infrastructure.Errors;
-using IAggregateRepository = Infrastructure.Aggregates.IAggregateRepository;
-using IAggregateRepositorySession = Infrastructure.Aggregates.IAggregateRepositorySession;
-using IEventSourcedAggregate = Infrastructure.Aggregates.IEventSourcedAggregate;
+using ModelRepository = Infrastructure.Models.ModelRepository;
+using ModelRepositorySession = Infrastructure.Models.ModelRepositorySession;
 
 namespace Metabase.Configuration
 {
@@ -77,9 +72,9 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Component, Aggregates.ComponentAggregate, ValueObjects.CreateComponentInput, Events.ComponentCreated>(
                     services,
                     Events.ComponentCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateComponentInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateComponentInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.ComponentDeleted.From,
-                    new Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    new Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
                     (session, timestampedId, creatorId, cancellationToken) =>
                     session.RemoveForwardManyToManyAssociationsOfModel<Models.Component, Models.ComponentManufacturer, Aggregates.ComponentAggregate, Aggregates.ComponentManufacturerAggregate, Events.ComponentManufacturerAdded>(
@@ -144,17 +139,17 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Database, Aggregates.DatabaseAggregate, ValueObjects.CreateDatabaseInput, Events.DatabaseCreated>(
                     services,
                     Events.DatabaseCreated.From,
-                    new Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateDatabaseInput>, CancellationToken, Task<Result<Id, Errors>>>[]
+                    new Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateDatabaseInput>, CancellationToken, Task<Result<Id, Errors>>>[]
                     {
                     (session, databaseId, command, cancellationToken) =>
-                    session.AddOneToManyAssociation<Aggregates.InstitutionAggregate, Aggregates.InstitutionOperatedDatabaseAggregate, Aggregates.DatabaseAggregate>(
+                    session.AddOneToManyAssociation<Models.Institution, Models.InstitutionOperatedDatabase, Models.Database, Aggregates.InstitutionAggregate, Aggregates.InstitutionOperatedDatabaseAggregate, Aggregates.DatabaseAggregate>(
                         id => Events.InstitutionOperatedDatabaseAdded.From(id, databaseId, command),
                         AddAssociationCheck.PARENT,
                         cancellationToken
                         )
                     },
                     Events.DatabaseDeleted.From,
-                    new Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    new Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
                       (session, timestampedId, creatorId, cancellationToken) =>
                       session.RemoveBackwardOneToManyAssociationOfModel<Models.Database, Models.InstitutionOperatedDatabase, Aggregates.DatabaseAggregate, Aggregates.InstitutionOperatedDatabaseAggregate, Events.InstitutionOperatedDatabaseAdded>(
@@ -171,9 +166,9 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Institution, Aggregates.InstitutionAggregate, ValueObjects.CreateInstitutionInput, Events.InstitutionCreated>(
                     services,
                     Events.InstitutionCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateInstitutionInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateInstitutionInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.InstitutionDeleted.From,
-                    new Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    new Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
                       (session, timestampedId, creatorId, cancellationToken) =>
                       session.RemoveBackwardManyToManyAssociationsOfModel<Models.Institution, Models.PersonAffiliation, Aggregates.InstitutionAggregate, Aggregates.PersonAffiliationAggregate, Events.PersonAffiliationAdded>(
@@ -208,9 +203,9 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Method, Aggregates.MethodAggregate, ValueObjects.CreateMethodInput, Events.MethodCreated>(
                     services,
                     Events.MethodCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateMethodInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateMethodInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.MethodDeleted.From,
-                    new Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    new Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
                       (session, timestampedId, creatorId, cancellationToken) =>
                       session.RemoveForwardManyToManyAssociationsOfModel<Models.Method, Models.MethodDeveloper, Aggregates.MethodAggregate, Aggregates.PersonMethodDeveloperAggregate, Events.PersonMethodDeveloperAdded>(
@@ -303,7 +298,7 @@ namespace Metabase.Configuration
                 >(serviceProvider =>
                     new Handlers.WhichDatabasesHaveDataForComponentsHandler<TDataModel>(
                       graphQlQueryName,
-                      serviceProvider.GetRequiredService<IAggregateRepository>()
+                      serviceProvider.GetRequiredService<IModelRepository>()
                       )
                  );
         }
@@ -313,9 +308,9 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Person, Aggregates.PersonAggregate, ValueObjects.CreatePersonInput, Events.PersonCreated>(
                     services,
                     Events.PersonCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreatePersonInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreatePersonInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.PersonDeleted.From,
-                    new Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
+                    new Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
                       (session, timestampedId, creatorId, cancellationToken) =>
                       session.RemoveForwardManyToManyAssociationsOfModel<Models.Person, Models.PersonAffiliation, Aggregates.PersonAggregate, Aggregates.PersonAffiliationAggregate, Events.PersonAffiliationAdded>(
@@ -350,9 +345,9 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Standard, Aggregates.StandardAggregate, ValueObjects.CreateStandardInput, Events.StandardCreated>(
                     services,
                     Events.StandardCreated.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateStandardInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateStandardInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.StandardDeleted.From,
-                    Enumerable.Empty<Func<IAggregateRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
+                    Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
         }
 

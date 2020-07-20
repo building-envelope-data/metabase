@@ -6,7 +6,7 @@ using Errors = Infrastructure.Errors;
 namespace Database.Aggregates
 {
     public abstract class DataAggregate
-      : EventSourcedAggregate
+      : Aggregate
     {
         public Guid ComponentId { get; set; }
         public object? Data { get; set; }

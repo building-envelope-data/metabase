@@ -27,7 +27,7 @@ namespace Metabase.ValueObjects
             )
         {
             return
-              Result.Ok<AddComponentConcretizationInput, Errors>(
+              Result.Success<AddComponentConcretizationInput, Errors>(
                   new AddComponentConcretizationInput(
                     generalComponentId: generalComponentId,
                     concreteComponentId: concreteComponentId

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
 using Infrastructure.Handlers;
+using Infrastructure.Models;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
@@ -15,11 +16,11 @@ namespace Metabase.Handlers
     public sealed class GetMethodDevelopersHandler
       : IQueryHandler<GetModelsForTimestampedIds<Models.MethodDeveloper>, IEnumerable<Result<Models.MethodDeveloper, Errors>>>
     {
-        private readonly IAggregateRepository _repository;
+        private readonly IModelRepository _repository;
         private readonly GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate> _getInstitutionMethodDevelopersHandler;
         private readonly GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.PersonMethodDeveloperAggregate> _getPersonMethodDevelopersHandler;
 
-        public GetMethodDevelopersHandler(IAggregateRepository repository)
+        public GetMethodDevelopersHandler(IModelRepository repository)
         {
             _repository = repository;
             _getInstitutionMethodDevelopersHandler = new GetModelsForTimestampedIdsHandler<Models.MethodDeveloper, Aggregates.InstitutionMethodDeveloperAggregate>(repository);
@@ -33,7 +34,7 @@ namespace Metabase.Handlers
         {
             using (var session = _repository.OpenReadOnlySession())
             {
-                return await session.LoadAllX(
+                return await session.LoadAllX<Models.MethodDeveloper>(
                     query.TimestampedIds,
                     (session, aggregateType, timestampedIds, cancellationToken) =>
                     {

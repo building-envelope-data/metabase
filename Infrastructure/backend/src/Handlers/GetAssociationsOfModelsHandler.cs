@@ -1,15 +1,16 @@
 using Infrastructure.Aggregates;
+using Infrastructure.Models;
 
 namespace Infrastructure.Handlers
 {
     public abstract class GetAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate>
-      where TAggregate : class, IEventSourcedAggregate, IConvertible<TModel>, new()
+      where TAggregate : class, IAggregate, IConvertible<TModel>, new()
       where TAssociationAggregate : class, IAssociationAggregate, IConvertible<TAssociationModel>, new()
     {
-        protected readonly IAggregateRepository _repository;
+        protected readonly IModelRepository _repository;
 
         protected GetAssociationsOfModelsHandler(
-            IAggregateRepository repository
+            IModelRepository repository
             )
         {
             _repository = repository;

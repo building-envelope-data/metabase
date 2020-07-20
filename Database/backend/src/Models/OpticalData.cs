@@ -30,7 +30,7 @@ namespace Database.Models
             )
         {
             return
-              Result.Ok<OpticalData, Errors>(
+              Result.Success<OpticalData, Errors>(
                   new OpticalData(
                     id: id,
                     componentId: componentId,

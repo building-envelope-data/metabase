@@ -44,7 +44,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<MethodInformation, Errors>(
+            return Result.Success<MethodInformation, Errors>(
                 new MethodInformation(
                   name: name,
                   description: description,

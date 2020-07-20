@@ -34,7 +34,7 @@ namespace Metabase.ValueObjects
             IReadOnlyList<object>? path = null
             )
         {
-            return Result.Ok<ContactInformation, Errors>(
+            return Result.Success<ContactInformation, Errors>(
                 new ContactInformation(
                   phoneNumber: phoneNumber,
                   postalAddress: postalAddress,
