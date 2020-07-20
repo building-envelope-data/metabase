@@ -33,11 +33,11 @@ namespace Infrastructure.GraphQl
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.GetBackwardOneToManyAssociateOfModels<TAssociateModel, TAssociationModel, TModel>.From(timestampedIds)
+                  Queries.GetBackwardOneToManyAssociateOfModelsQuery<TAssociateModel, TAssociationModel, TModel>.From(timestampedIds)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.GetBackwardOneToManyAssociateOfModels<TAssociateModel, TAssociationModel, TModel>,
+                  Queries.GetBackwardOneToManyAssociateOfModelsQuery<TAssociateModel, TAssociationModel, TModel>,
                   IEnumerable<Result<TModel, Errors>>
                >(query).ConfigureAwait(false);
             return ResultHelpers.ToDataLoaderResults<TGraphQlObject>(

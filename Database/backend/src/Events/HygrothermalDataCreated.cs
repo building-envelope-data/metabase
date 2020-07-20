@@ -7,7 +7,7 @@ namespace Database.Events
     {
         public static HygrothermalDataCreated From(
             Guid hygrothermalDataId,
-            Infrastructure.Commands.Create<ValueObjects.CreateHygrothermalDataInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateHygrothermalDataInput> command
             )
         {
             return new HygrothermalDataCreated(

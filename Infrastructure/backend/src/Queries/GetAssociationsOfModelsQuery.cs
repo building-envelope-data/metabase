@@ -3,11 +3,11 @@ using Infrastructure.ValueObjects;
 
 namespace Infrastructure.Queries
 {
-    public abstract class GetAssociationsOfModels<TModel, TAssociationModel>
+    public abstract class GetAssociationsOfModelsQuery<TModel, TAssociationModel>
     {
         public IReadOnlyCollection<TimestampedId> TimestampedIds { get; }
 
-        protected GetAssociationsOfModels(
+        protected GetAssociationsOfModelsQuery(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {

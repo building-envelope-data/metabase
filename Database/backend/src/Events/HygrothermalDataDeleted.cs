@@ -7,7 +7,7 @@ namespace Database.Events
       : DataDeletedEvent
     {
         public static HygrothermalDataDeleted From<TModel>(
-            Infrastructure.Commands.Delete<TModel> command
+            Infrastructure.Commands.DeleteCommand<TModel> command
             )
         {
             return new HygrothermalDataDeleted(

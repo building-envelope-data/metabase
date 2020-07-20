@@ -10,7 +10,7 @@ namespace Metabase.Events
     {
         public static InstitutionCreated From(
             Guid institutionId,
-            Infrastructure.Commands.Create<ValueObjects.CreateInstitutionInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateInstitutionInput> command
             )
         {
             return new InstitutionCreated(

@@ -10,7 +10,7 @@ using Type = System.Type;
 namespace Infrastructure.Handlers
 {
     public abstract class GetModelsOfUnknownTypeForTimestampedIdsHandler
-      : Queries.IQueryHandler<Queries.GetModelsForTimestampedIds<Models.IModel>, IEnumerable<Result<Models.IModel, Errors>>>
+      : Queries.IQueryHandler<Queries.GetModelsForTimestampedIdsQuery<Models.IModel>, IEnumerable<Result<Models.IModel, Errors>>>
     {
         private readonly Models.IModelRepository _repository;
         private readonly IDictionary<Type, IGetModelsForTimestampedIdsHandler> _aggregateTypeToGetHandler;
@@ -25,7 +25,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<IEnumerable<Result<Models.IModel, Errors>>> Handle(
-            Queries.GetModelsForTimestampedIds<Models.IModel> query,
+            Queries.GetModelsForTimestampedIdsQuery<Models.IModel> query,
             CancellationToken cancellationToken
             )
         {

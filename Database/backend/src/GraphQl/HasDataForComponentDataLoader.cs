@@ -26,11 +26,11 @@ namespace Database.GraphQl
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.HasDataForComponents<TDataModel>.From(timestampedIds)
+                  Queries.HasDataForComponentsQuery<TDataModel>.From(timestampedIds)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.HasDataForComponents<TDataModel>,
+                  Queries.HasDataForComponentsQuery<TDataModel>,
                   IEnumerable<Result<bool, Errors>>
                >(query).ConfigureAwait(false);
             return ResultHelpers.ToDataLoaderResults<bool>(results);

@@ -606,6 +606,13 @@ restore : ## Restore packages and tools with verbosity level `${VERBOSITY}` that
 	) ; done
 .PHONY : restore
 
+dotbuild : ## Build projects
+	for project in ${projects} ; do ( \
+		cd ./$${project}/backend && \
+		dotnet build \
+	) ; done
+.PHONY : dotbuild
+
 dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for example, `make PATTERN="using Infrastructure.Aggregates" dedup`
 	find . -name "*.cs" \
 		| xargs -n 1 \

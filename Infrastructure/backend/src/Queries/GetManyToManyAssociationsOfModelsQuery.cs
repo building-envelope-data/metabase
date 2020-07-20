@@ -6,11 +6,11 @@ using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.Queries
 {
-    public abstract class GetManyToManyAssociationsOfModels<TModel, TAssociationModel>
-      : GetAssociationsOfModels<TModel, TAssociationModel>,
+    public abstract class GetManyToManyAssociationsOfModelsQuery<TModel, TAssociationModel>
+      : GetAssociationsOfModelsQuery<TModel, TAssociationModel>,
         IQuery<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
     {
-        protected GetManyToManyAssociationsOfModels(
+        protected GetManyToManyAssociationsOfModelsQuery(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
           : base(timestampedIds)

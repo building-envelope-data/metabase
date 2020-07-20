@@ -7,7 +7,7 @@ namespace Database.Events
     {
         public static PhotovoltaicDataCreated From(
             Guid photovoltaicDataId,
-            Infrastructure.Commands.Create<ValueObjects.CreatePhotovoltaicDataInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreatePhotovoltaicDataInput> command
             )
         {
             return new PhotovoltaicDataCreated(

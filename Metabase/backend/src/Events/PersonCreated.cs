@@ -11,7 +11,7 @@ namespace Metabase.Events
     {
         public static PersonCreated From(
             Guid personId,
-            Infrastructure.Commands.Create<ValueObjects.CreatePersonInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreatePersonInput> command
             )
         {
             return new PersonCreated(

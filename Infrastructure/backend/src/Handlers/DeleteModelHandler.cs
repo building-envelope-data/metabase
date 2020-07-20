@@ -13,17 +13,17 @@ using Errors = Infrastructure.Errors;
 namespace Infrastructure.Handlers
 {
     public sealed class DeleteModelHandler<TModel, TAggregate>
-      : ICommandHandler<Commands.Delete<TModel>, Result<TimestampedId, Errors>>
+      : ICommandHandler<Commands.DeleteCommand<TModel>, Result<TimestampedId, Errors>>
       where TModel : IModel
       where TAggregate : class, IAggregate, IConvertible<TModel>, new()
     {
         private readonly IModelRepository _repository;
-        private readonly Func<Commands.Delete<TModel>, IDeletedEvent> _newDeletedEvent;
+        private readonly Func<Commands.DeleteCommand<TModel>, IDeletedEvent> _newDeletedEvent;
         private readonly IEnumerable<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> _removeAssociations;
 
         public DeleteModelHandler(
             IModelRepository repository,
-            Func<Commands.Delete<TModel>, IDeletedEvent> newDeletedEvent,
+            Func<Commands.DeleteCommand<TModel>, IDeletedEvent> newDeletedEvent,
             IEnumerable<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>> removeAssociations
             )
         {
@@ -33,7 +33,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<Result<TimestampedId, Errors>> Handle(
-            Commands.Delete<TModel> command,
+            Commands.DeleteCommand<TModel> command,
             CancellationToken cancellationToken
             )
         {
@@ -45,7 +45,7 @@ namespace Infrastructure.Handlers
 
         public async Task<Result<TimestampedId, Errors>> Handle(
             ModelRepositorySession session,
-            Commands.Delete<TModel> command,
+            Commands.DeleteCommand<TModel> command,
             CancellationToken cancellationToken
             )
         {

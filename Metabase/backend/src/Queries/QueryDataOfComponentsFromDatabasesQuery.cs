@@ -6,12 +6,12 @@ using Errors = Infrastructure.Errors;
 
 namespace Metabase.Queries
 {
-    public abstract class QueryDataOfComponentsFromDatabases<TData>
+    public abstract class QueryDataOfComponentsFromDatabasesQuery<TData>
       : IQuery<IEnumerable<Result<TData, Errors>>>
     {
         public IReadOnlyCollection<TimestampedId> TimestampedIds { get; }
 
-        protected QueryDataOfComponentsFromDatabases(
+        protected QueryDataOfComponentsFromDatabasesQuery(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {

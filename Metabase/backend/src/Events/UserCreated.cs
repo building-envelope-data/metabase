@@ -10,7 +10,7 @@ namespace Metabase.Events
     {
         public static UserCreated From(
             Guid userId,
-            Infrastructure.Commands.Create<ValueObjects.CreateUserInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateUserInput> command
             )
         {
             return new UserCreated(

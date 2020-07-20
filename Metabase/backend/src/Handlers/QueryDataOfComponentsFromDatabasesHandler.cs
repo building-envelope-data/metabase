@@ -17,7 +17,7 @@ namespace Metabase.Handlers
             IEnumerable<Result<TData, Errors>>,
             IDictionary<string, TGraphQlResponse>
           >
-      where TQuery : Queries.QueryDataOfComponentsFromDatabases<TData>
+      where TQuery : Queries.QueryDataOfComponentsFromDatabasesQuery<TData>
     {
         private readonly string _graphQlQueryName;
         private readonly string? _graphQlQueryFields;

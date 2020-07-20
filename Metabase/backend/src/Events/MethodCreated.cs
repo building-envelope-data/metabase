@@ -13,7 +13,7 @@ namespace Metabase.Events
     {
         public static MethodCreated From(
             Guid methodId,
-            Infrastructure.Commands.Create<ValueObjects.CreateMethodInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateMethodInput> command
             )
         {
             return new MethodCreated(

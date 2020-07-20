@@ -10,7 +10,7 @@ namespace Metabase.Events
         public static InstitutionOperatedDatabaseAdded From(
             Guid institutionOperatedDatabaseId,
             Guid databaseId,
-            Infrastructure.Commands.Create<ValueObjects.CreateDatabaseInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateDatabaseInput> command
             )
         {
             return new InstitutionOperatedDatabaseAdded(
@@ -23,7 +23,7 @@ namespace Metabase.Events
 
         public static InstitutionOperatedDatabaseAdded From(
             Guid institutionOperatedDatabaseId,
-            Infrastructure.Commands.AddAssociation<ValueObjects.AddInstitutionOperatedDatabaseInput> command
+            Infrastructure.Commands.AddAssociationCommand<ValueObjects.AddInstitutionOperatedDatabaseInput> command
             )
         {
             return new InstitutionOperatedDatabaseAdded(

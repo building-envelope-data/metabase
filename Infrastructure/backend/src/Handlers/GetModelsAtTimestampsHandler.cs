@@ -12,7 +12,7 @@ using Errors = Infrastructure.Errors;
 namespace Infrastructure.Handlers
 {
     public sealed class GetModelsAtTimestampsHandler<TModel, TAggregate, TCreatedEvent>
-      : IQueryHandler<Queries.GetModelsAtTimestamps<TModel>, IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
+      : IQueryHandler<Queries.GetModelsAtTimestampsQuery<TModel>, IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>>
       where TModel : IModel
       where TAggregate : class, IAggregate, IConvertible<TModel>, new()
       where TCreatedEvent : ICreatedEvent
@@ -25,7 +25,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<TModel, Errors>>, Errors>>> Handle(
-            Queries.GetModelsAtTimestamps<TModel> query,
+            Queries.GetModelsAtTimestampsQuery<TModel> query,
             CancellationToken cancellationToken
             )
         {

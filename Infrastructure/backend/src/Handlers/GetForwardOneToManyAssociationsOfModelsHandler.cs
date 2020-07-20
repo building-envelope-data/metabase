@@ -13,7 +13,7 @@ namespace Infrastructure.Handlers
 {
     public sealed class GetForwardOneToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate, TAssociationAddedEvent>
       : GetOneToManyAssociationsOfModelsHandler<TModel, TAssociationModel, TAggregate, TAssociationAggregate>,
-        IQueryHandler<Queries.GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel>, IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
+        IQueryHandler<Queries.GetForwardOneToManyAssociationsOfModelsQuery<TModel, TAssociationModel>, IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
           where TModel : IModel
           where TAssociationModel : IOneToManyAssociation
           where TAggregate : class, IAggregate, IConvertible<TModel>, new()
@@ -26,7 +26,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>> Handle(
-            Queries.GetForwardOneToManyAssociationsOfModels<TModel, TAssociationModel> query,
+            Queries.GetForwardOneToManyAssociationsOfModelsQuery<TModel, TAssociationModel> query,
             CancellationToken cancellationToken
             )
         {

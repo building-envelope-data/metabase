@@ -33,11 +33,11 @@ namespace Database.GraphQl
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.GetDataOfComponents<TDataModel>.From(timestampedIds)
+                  Queries.GetDataOfComponentsQuery<TDataModel>.From(timestampedIds)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.GetDataOfComponents<TDataModel>,
+                  Queries.GetDataOfComponentsQuery<TDataModel>,
                   IEnumerable<Result<IEnumerable<Result<TDataModel, Errors>>, Errors>>
                >(query).ConfigureAwait(false);
             return ResultHelpers.ToDataLoaderResultsX<TDataGraphQlObject>(

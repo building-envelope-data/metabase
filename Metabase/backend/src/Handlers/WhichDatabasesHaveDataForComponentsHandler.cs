@@ -10,7 +10,7 @@ namespace Metabase.Handlers
 {
     public sealed class WhichDatabasesHaveDataForComponentsHandler<TDataModel>
       : QueryDataOfComponentsFromDatabasesHandler<
-          Queries.WhichDatabasesHaveDataForComponents<TDataModel>,
+          Queries.WhichDatabasesHaveDataForComponentsQuery<TDataModel>,
           IEnumerable<Result<Models.Database, Errors>>,
           bool
         >

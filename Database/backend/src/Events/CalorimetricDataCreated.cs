@@ -7,7 +7,7 @@ namespace Database.Events
     {
         public static CalorimetricDataCreated From(
             Guid opticalDataId,
-            Infrastructure.Commands.Create<ValueObjects.CreateCalorimetricDataInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateCalorimetricDataInput> command
             )
         {
             return new CalorimetricDataCreated(

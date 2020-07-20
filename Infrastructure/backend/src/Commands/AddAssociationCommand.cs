@@ -5,14 +5,12 @@ using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.Commands
 {
-    // The difference between the words `remove` and `delete` is explained on
-    // https://english.stackexchange.com/questions/52508/difference-between-delete-and-remove
-    public sealed class RemoveAssociation<TInput>
+    public sealed class AddAssociationCommand<TInput>
       : CommandBase<Result<TimestampedId, Errors>>
     {
         public TInput Input { get; }
 
-        private RemoveAssociation(
+        private AddAssociationCommand(
             TInput input,
             Id creatorId
             )
@@ -21,13 +19,13 @@ namespace Infrastructure.Commands
             Input = input;
         }
 
-        public static Result<RemoveAssociation<TInput>, Errors> From(
+        public static Result<AddAssociationCommand<TInput>, Errors> From(
             TInput input,
             Id creatorId
             )
         {
-            return Result.Success<RemoveAssociation<TInput>, Errors>(
-                    new RemoveAssociation<TInput>(
+            return Result.Success<AddAssociationCommand<TInput>, Errors>(
+                    new AddAssociationCommand<TInput>(
                         input: input,
                         creatorId: creatorId
                         )

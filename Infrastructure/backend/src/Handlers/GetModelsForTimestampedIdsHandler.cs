@@ -11,7 +11,7 @@ using CancellationToken = System.Threading.CancellationToken;
 namespace Infrastructure.Handlers
 {
     public sealed class GetModelsForTimestampedIdsHandler<TModel, TAggregate>
-      : IQueryHandler<Queries.GetModelsForTimestampedIds<TModel>, IEnumerable<Result<TModel, Errors>>>,
+      : IQueryHandler<Queries.GetModelsForTimestampedIdsQuery<TModel>, IEnumerable<Result<TModel, Errors>>>,
         IGetModelsForTimestampedIdsHandler
       where TModel : IModel
       where TAggregate : class, IAggregate, IConvertible<TModel>, new()
@@ -24,7 +24,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<IEnumerable<Result<TModel, Errors>>> Handle(
-            Queries.GetModelsForTimestampedIds<TModel> query,
+            Queries.GetModelsForTimestampedIdsQuery<TModel> query,
             CancellationToken cancellationToken
             )
         {

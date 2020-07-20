@@ -10,7 +10,7 @@ namespace Metabase.Handlers
 {
     public abstract class QueryDataArrayOfComponentsFromDatabasesHandler<TDataModel, TGraphQlDataResponse>
         : QueryDataOfComponentsFromDatabasesHandler<
-            Queries.QueryDataArrayOfComponentsFromDatabases<TDataModel>,
+            Queries.QueryDataArrayOfComponentsFromDatabasesQuery<TDataModel>,
             IEnumerable<Result<TDataModel, Errors>>,
             IEnumerable<TGraphQlDataResponse>
           >

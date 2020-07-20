@@ -14,7 +14,7 @@ namespace Metabase.GraphQl
 {
     public abstract class DataOfComponentFromDatabasesDataLoader<TQuery, TDataModel, TDataGraphQlObject>
       : OurDataLoaderBase<TimestampedId, IReadOnlyList<TDataGraphQlObject>>
-      where TQuery : Queries.QueryDataOfComponentsFromDatabases<IEnumerable<Result<TDataModel, Errors>>>
+      where TQuery : Queries.QueryDataOfComponentsFromDatabasesQuery<IEnumerable<Result<TDataModel, Errors>>>
     {
         private readonly Func<IReadOnlyCollection<TimestampedId>, Result<TQuery, Errors>> _newQuery;
         private readonly Func<TDataModel, Timestamp, TDataGraphQlObject> _mapModelToGraphQlObject;
