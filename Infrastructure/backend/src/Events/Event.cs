@@ -9,14 +9,6 @@ namespace Infrastructure.Events
     public abstract class Event
       : Validatable, IEvent
     {
-        public static void EnsureValid(IEnumerable<IEvent> events)
-        {
-            foreach (var @event in events)
-            {
-                @event.EnsureValid();
-            }
-        }
-
         public Guid CreatorId { get; set; }
 
 #nullable disable

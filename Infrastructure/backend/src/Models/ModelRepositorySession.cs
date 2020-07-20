@@ -199,27 +199,43 @@ namespace Infrastructure.Models
             )
         {
             var eventArray = events.ToArray();
-            Events.Event.EnsureValid(eventArray);
-            await AssertExistenceOfCreators(
-                eventArray.Select(@event => @event.CreatorId),
-                cancellationToken
-                )
-              .ConfigureAwait(false);
-            action(eventArray);
-            _unsavedEvents = _unsavedEvents.Concat(eventArray);
             return
-              await Task.FromResult<Result<bool, Errors>>(
-                  Result.Success<bool, Errors>(true)
+              await Errors.CombineX(
+                eventArray.Select(@event => (IResult)@event.Validate())
+                )
+              .Bind(async _ =>
+                  await
+                  (
+                   await CheckExistenceOfCreators(
+                     eventArray.Select(@event => @event.CreatorId),
+                     cancellationToken
+                     )
+                   .ConfigureAwait(false)
+                  )
+                  .Bind(async _ =>
+                  {
+                      action(eventArray);
+                      _unsavedEvents = _unsavedEvents.Concat(eventArray);
+                      return
+                        await Task.FromResult<Result<bool, Errors>>(
+                            Result.Success<bool, Errors>(true)
+                            )
+                        .ConfigureAwait(false);
+                  }
+                  )
+                   .ConfigureAwait(false)
                   )
               .ConfigureAwait(false);
         }
 
-        private Task AssertExistenceOfCreators(
+        private Task<Result<bool, Errors>> CheckExistenceOfCreators(
             IEnumerable<Guid> creatorIds,
             CancellationToken cancellationToken
             )
         {
-            return Task.CompletedTask;
+            return Task.FromResult<Result<bool, Errors>>(
+                Result.Success<bool, Errors>(true)
+                );
             /* foreach (var creatorId in creatorIds) */
             /* { */
             /*   if (!_session.Query<UserAggregate>().AnyAsync(user => user.Id == creatorId, cancellationToken)) */
