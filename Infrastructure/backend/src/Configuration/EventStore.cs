@@ -27,7 +27,7 @@ namespace Infrastructure.Configuration
                   addEventTypes
                   )
                 );
-            services.AddScoped<ModelRepository, ModelRepository>();
+            services.AddScoped<IModelRepository, ModelRepository>();
         }
 
         public static Marten.IDocumentStore BuildDocumentStore(
