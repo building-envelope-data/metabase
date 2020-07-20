@@ -8,7 +8,7 @@ namespace Metabase.Events
     {
         public static ComponentManufacturerRemoved From(
               Guid componentManufacturerId,
-              Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>> command
+              Infrastructure.Commands.RemoveAssociationCommand<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<Models.ComponentManufacturer>> command
             )
         {
             return new ComponentManufacturerRemoved(

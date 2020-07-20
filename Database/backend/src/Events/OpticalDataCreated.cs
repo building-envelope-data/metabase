@@ -7,7 +7,7 @@ namespace Database.Events
     {
         public static OpticalDataCreated From(
             Guid opticalDataId,
-            Infrastructure.Commands.Create<ValueObjects.CreateOpticalDataInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateOpticalDataInput> command
             )
         {
             return new OpticalDataCreated(

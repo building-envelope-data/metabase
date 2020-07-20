@@ -60,7 +60,7 @@ namespace Metabase.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              GetModelsForTimestampedIds<IModel>,
+              GetModelsForTimestampedIdsQuery<IModel>,
               IEnumerable<Result<IModel, Errors>>
                 >,
               Handlers.GetModelsOfUnknownTypeForTimestampedIdsHandler
@@ -72,7 +72,7 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Component, Aggregates.ComponentAggregate, ValueObjects.CreateComponentInput, Events.ComponentCreated>(
                     services,
                     Events.ComponentCreated.From,
-                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateComponentInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreateComponentInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.ComponentDeleted.From,
                     new Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -139,7 +139,7 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Database, Aggregates.DatabaseAggregate, ValueObjects.CreateDatabaseInput, Events.DatabaseCreated>(
                     services,
                     Events.DatabaseCreated.From,
-                    new Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateDatabaseInput>, CancellationToken, Task<Result<Id, Errors>>>[]
+                    new Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreateDatabaseInput>, CancellationToken, Task<Result<Id, Errors>>>[]
                     {
                     (session, databaseId, command, cancellationToken) =>
                     session.AddOneToManyAssociation<Models.Institution, Models.InstitutionOperatedDatabase, Models.Database, Aggregates.InstitutionAggregate, Aggregates.InstitutionOperatedDatabaseAggregate, Aggregates.DatabaseAggregate>(
@@ -166,7 +166,7 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Institution, Aggregates.InstitutionAggregate, ValueObjects.CreateInstitutionInput, Events.InstitutionCreated>(
                     services,
                     Events.InstitutionCreated.From,
-                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateInstitutionInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreateInstitutionInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.InstitutionDeleted.From,
                     new Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -203,7 +203,7 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Method, Aggregates.MethodAggregate, ValueObjects.CreateMethodInput, Events.MethodCreated>(
                     services,
                     Events.MethodCreated.From,
-                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateMethodInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreateMethodInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.MethodDeleted.From,
                     new Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -228,7 +228,7 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.QueryDataArrayOfComponentsFromDatabases<Models.OpticalData>,
+              Queries.QueryDataArrayOfComponentsFromDatabasesQuery<Models.OpticalData>,
               IEnumerable<Result<IEnumerable<Result<Models.OpticalData, Errors>>, Errors>>
                 >,
               Handlers.QueryOpticalDataOfComponentsFromDatabasesHandler
@@ -243,7 +243,7 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.QueryDataArrayOfComponentsFromDatabases<Models.CalorimetricData>,
+              Queries.QueryDataArrayOfComponentsFromDatabasesQuery<Models.CalorimetricData>,
               IEnumerable<Result<IEnumerable<Result<Models.CalorimetricData, Errors>>, Errors>>
                 >,
               Handlers.QueryCalorimetricDataOfComponentsFromDatabasesHandler
@@ -258,7 +258,7 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.QueryDataArrayOfComponentsFromDatabases<Models.PhotovoltaicData>,
+              Queries.QueryDataArrayOfComponentsFromDatabasesQuery<Models.PhotovoltaicData>,
               IEnumerable<Result<IEnumerable<Result<Models.PhotovoltaicData, Errors>>, Errors>>
                 >,
               Handlers.QueryPhotovoltaicDataOfComponentsFromDatabasesHandler
@@ -273,7 +273,7 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.QueryDataArrayOfComponentsFromDatabases<Models.HygrothermalData>,
+              Queries.QueryDataArrayOfComponentsFromDatabasesQuery<Models.HygrothermalData>,
               IEnumerable<Result<IEnumerable<Result<Models.HygrothermalData, Errors>>, Errors>>
                 >,
               Handlers.QueryHygrothermalDataOfComponentsFromDatabasesHandler
@@ -291,7 +291,7 @@ namespace Metabase.Configuration
             // Who Has
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.WhichDatabasesHaveDataForComponents<TDataModel>,
+              Queries.WhichDatabasesHaveDataForComponentsQuery<TDataModel>,
               IEnumerable<Result<IEnumerable<Result<Models.Database, Errors>>, Errors>>
                 >,
               Handlers.WhichDatabasesHaveDataForComponentsHandler<TDataModel>
@@ -308,7 +308,7 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Person, Aggregates.PersonAggregate, ValueObjects.CreatePersonInput, Events.PersonCreated>(
                     services,
                     Events.PersonCreated.From,
-                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreatePersonInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreatePersonInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.PersonDeleted.From,
                     new Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>[]
                     {
@@ -333,7 +333,7 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              GetModelsForTimestampedIds<Models.Stakeholder>,
+              GetModelsForTimestampedIdsQuery<Models.Stakeholder>,
               IEnumerable<Result<Models.Stakeholder, Errors>>
                 >,
               Handlers.GetStakeholdersHandler
@@ -345,7 +345,7 @@ namespace Metabase.Configuration
             AddModelHandlers<Models.Standard, Aggregates.StandardAggregate, ValueObjects.CreateStandardInput, Events.StandardCreated>(
                     services,
                     Events.StandardCreated.From,
-                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateStandardInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreateStandardInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.StandardDeleted.From,
                     Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
@@ -413,8 +413,8 @@ namespace Metabase.Configuration
 
         private static void AddReflexiveManyToManyComponentAssociationHandlers<TAssociationModel, TAssociationAggregate, TAssociationAddedEvent, TAddInput, TAssociationRemovedEvent>(
                         IServiceCollection services,
-                        Func<Guid, Infrastructure.Commands.AddAssociation<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
-                        Func<Guid, Infrastructure.Commands.RemoveAssociation<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
+                        Func<Guid, Infrastructure.Commands.AddAssociationCommand<TAddInput>, IAssociationAddedEvent> newAssociationAddedEvent,
+                        Func<Guid, Infrastructure.Commands.RemoveAssociationCommand<Infrastructure.ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>, IAssociationRemovedEvent> newAssociationRemovedEvent
                         )
             where TAssociationModel : IManyToManyAssociation
             where TAssociationAggregate : class, IManyToManyAssociationAggregate, IConvertible<TAssociationModel>, new()
@@ -491,7 +491,7 @@ namespace Metabase.Configuration
             // Add
             services.AddScoped<
               MediatR.IRequestHandler<
-              Infrastructure.Commands.AddAssociation<ValueObjects.AddMethodDeveloperInput>,
+              Infrastructure.Commands.AddAssociationCommand<ValueObjects.AddMethodDeveloperInput>,
               Result<TimestampedId, Errors>
                 >,
               Handlers.AddMethodDeveloperHandler>();
@@ -501,7 +501,7 @@ namespace Metabase.Configuration
             // Get
             services.AddScoped<
               MediatR.IRequestHandler<
-              GetModelsForTimestampedIds<Models.MethodDeveloper>,
+              GetModelsForTimestampedIdsQuery<Models.MethodDeveloper>,
               IEnumerable<Result<Models.MethodDeveloper, Errors>>
                 >,
               Handlers.GetMethodDevelopersHandler
@@ -510,7 +510,7 @@ namespace Metabase.Configuration
             // Get associates
             services.AddScoped<
               MediatR.IRequestHandler<
-              GetForwardManyToManyAssociatesOfModels<Models.Method, Models.MethodDeveloper, Models.Stakeholder>,
+              GetForwardManyToManyAssociatesOfModelsQuery<Models.Method, Models.MethodDeveloper, Models.Stakeholder>,
               IEnumerable<Result<IEnumerable<Result<Models.Stakeholder, Errors>>, Errors>>
                 >,
               Handlers.GetDevelopersOfMethodsHandler

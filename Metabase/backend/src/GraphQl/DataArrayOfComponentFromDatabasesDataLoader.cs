@@ -6,7 +6,7 @@ namespace Metabase.GraphQl
 {
     public abstract class DataArrayOfComponentFromDatabasesDataLoader<TDataModel, TDataGraphQlObject>
       : DataOfComponentFromDatabasesDataLoader<
-                    Queries.QueryDataArrayOfComponentsFromDatabases<TDataModel>,
+                    Queries.QueryDataArrayOfComponentsFromDatabasesQuery<TDataModel>,
                     TDataModel,
                     TDataGraphQlObject
                 >
@@ -16,7 +16,7 @@ namespace Metabase.GraphQl
             IQueryBus queryBus
             )
           : base(
-              timestampedIds => Queries.QueryDataArrayOfComponentsFromDatabases<TDataModel>.From(timestampedIds),
+              timestampedIds => Queries.QueryDataArrayOfComponentsFromDatabasesQuery<TDataModel>.From(timestampedIds),
               mapModelToGraphQlObject,
               queryBus
               )

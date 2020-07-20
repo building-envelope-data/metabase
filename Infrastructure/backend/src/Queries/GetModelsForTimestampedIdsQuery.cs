@@ -6,24 +6,24 @@ using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.Queries
 {
-    public sealed class GetModelsForTimestampedIds<M>
+    public sealed class GetModelsForTimestampedIdsQuery<M>
       : IQuery<IEnumerable<Result<M, Errors>>>
     {
         public IReadOnlyCollection<TimestampedId> TimestampedIds { get; }
 
-        private GetModelsForTimestampedIds(
+        private GetModelsForTimestampedIdsQuery(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {
             TimestampedIds = timestampedIds;
         }
 
-        public static Result<GetModelsForTimestampedIds<M>, Errors> From(
+        public static Result<GetModelsForTimestampedIdsQuery<M>, Errors> From(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {
-            return Result.Success<GetModelsForTimestampedIds<M>, Errors>(
-                    new GetModelsForTimestampedIds<M>(
+            return Result.Success<GetModelsForTimestampedIdsQuery<M>, Errors>(
+                    new GetModelsForTimestampedIdsQuery<M>(
                         timestampedIds
                         )
                     );

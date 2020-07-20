@@ -5,12 +5,12 @@ using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.Commands
 {
-    public sealed class AddAssociation<TInput>
+    public sealed class CreateCommand<TInput>
       : CommandBase<Result<TimestampedId, Errors>>
     {
         public TInput Input { get; }
 
-        private AddAssociation(
+        private CreateCommand(
             TInput input,
             Id creatorId
             )
@@ -19,13 +19,13 @@ namespace Infrastructure.Commands
             Input = input;
         }
 
-        public static Result<AddAssociation<TInput>, Errors> From(
+        public static Result<CreateCommand<TInput>, Errors> From(
             TInput input,
             Id creatorId
             )
         {
-            return Result.Success<AddAssociation<TInput>, Errors>(
-                    new AddAssociation<TInput>(
+            return Result.Success<CreateCommand<TInput>, Errors>(
+                    new CreateCommand<TInput>(
                         input: input,
                         creatorId: creatorId
                         )

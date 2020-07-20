@@ -14,7 +14,7 @@ using Guid = System.Guid;
 namespace Database.Handlers
 {
     public sealed class HasDataForComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>
-      : IQueryHandler<Queries.HasDataForComponents<TDataModel>, IEnumerable<Result<bool, Errors>>>
+      : IQueryHandler<Queries.HasDataForComponentsQuery<TDataModel>, IEnumerable<Result<bool, Errors>>>
       where TDataModel : IModel
       where TDataAggregate : class, IAggregate, IConvertible<TDataModel>, new()
       where TDataCreatedEvent : Events.DataCreatedEvent
@@ -27,7 +27,7 @@ namespace Database.Handlers
         }
 
         public async Task<IEnumerable<Result<bool, Errors>>> Handle(
-            Queries.HasDataForComponents<TDataModel> query,
+            Queries.HasDataForComponentsQuery<TDataModel> query,
             CancellationToken cancellationToken
             )
         {

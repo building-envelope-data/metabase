@@ -11,7 +11,7 @@ using CancellationToken = System.Threading.CancellationToken;
 namespace Infrastructure.Handlers
 {
     public sealed class AddManyToManyAssociationHandler<TInput, TModel, TAssociationModel, TAssociateModel, TAggregate, TAssociationAggregate, TAssociateAggregate>
-      : ICommandHandler<Commands.AddAssociation<TInput>, Result<TimestampedId, Errors>>
+      : ICommandHandler<Commands.AddAssociationCommand<TInput>, Result<TimestampedId, Errors>>
       where TInput : ValueObjects.AddManyToManyAssociationInput
       where TModel : IModel
       where TAssociationModel : IManyToManyAssociation
@@ -21,11 +21,11 @@ namespace Infrastructure.Handlers
       where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
     {
         private readonly IModelRepository _repository;
-        private readonly Func<Guid, Commands.AddAssociation<TInput>, IAssociationAddedEvent> _newAssociationAddedEvent;
+        private readonly Func<Guid, Commands.AddAssociationCommand<TInput>, IAssociationAddedEvent> _newAssociationAddedEvent;
 
         public AddManyToManyAssociationHandler(
             IModelRepository repository,
-            Func<Guid, Commands.AddAssociation<TInput>, IAssociationAddedEvent> newAssociationAddedEvent
+            Func<Guid, Commands.AddAssociationCommand<TInput>, IAssociationAddedEvent> newAssociationAddedEvent
             )
         {
             _repository = repository;
@@ -33,7 +33,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<Result<TimestampedId, Errors>> Handle(
-            Commands.AddAssociation<TInput> command,
+            Commands.AddAssociationCommand<TInput> command,
             CancellationToken cancellationToken
             )
         {
@@ -45,7 +45,7 @@ namespace Infrastructure.Handlers
 
         public async Task<Result<TimestampedId, Errors>> Handle(
             ModelRepositorySession session,
-            Commands.AddAssociation<TInput> command,
+            Commands.AddAssociationCommand<TInput> command,
             CancellationToken cancellationToken
             )
         {

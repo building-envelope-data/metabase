@@ -4,7 +4,7 @@ namespace Metabase.GraphQl
 {
     public sealed class WhichDatabasesHaveDataForComponentDataLoader<TDataModel>
       : DataOfComponentFromDatabasesDataLoader<
-          Queries.WhichDatabasesHaveDataForComponents<TDataModel>,
+          Queries.WhichDatabasesHaveDataForComponentsQuery<TDataModel>,
           Models.Database,
           Database
         >
@@ -13,7 +13,7 @@ namespace Metabase.GraphQl
             IQueryBus queryBus
             )
           : base(
-              Queries.WhichDatabasesHaveDataForComponents<TDataModel>.From,
+              Queries.WhichDatabasesHaveDataForComponentsQuery<TDataModel>.From,
               Database.FromModel,
               queryBus
               )

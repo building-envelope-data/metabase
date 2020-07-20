@@ -10,7 +10,7 @@ namespace Metabase.Events
     {
         public static ComponentCreated From(
             Guid componentId,
-            Infrastructure.Commands.Create<ValueObjects.CreateComponentInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateComponentInput> command
             )
         {
             return new ComponentCreated(

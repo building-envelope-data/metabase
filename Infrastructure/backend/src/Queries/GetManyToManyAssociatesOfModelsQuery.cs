@@ -3,10 +3,10 @@ using Infrastructure.ValueObjects;
 
 namespace Infrastructure.Queries
 {
-    public abstract class GetOneToManyAssociationsOfModels<TModel, TAssociationModel>
-      : GetAssociationsOfModels<TModel, TAssociationModel>
+    public abstract class GetManyToManyAssociatesOfModelsQuery<TModel, TAssociationModel, TAssociateModel>
+      : GetAssociatesOfModelsQuery<TModel, TAssociationModel, TAssociateModel>
     {
-        protected GetOneToManyAssociationsOfModels(
+        protected GetManyToManyAssociatesOfModelsQuery(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
           : base(timestampedIds)

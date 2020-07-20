@@ -40,7 +40,7 @@ namespace Database.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              GetModelsForTimestampedIds<IModel>,
+              GetModelsForTimestampedIdsQuery<IModel>,
               IEnumerable<Result<IModel, Errors>>
                 >,
               Handlers.GetModelsOfUnknownTypeForTimestampedIdsHandler
@@ -52,7 +52,7 @@ namespace Database.Configuration
             AddModelHandlers<Models.OpticalData, Aggregates.OpticalDataAggregate, ValueObjects.CreateOpticalDataInput, Events.OpticalDataCreated>(
                     services,
                     Events.OpticalDataCreated.From,
-                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateOpticalDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreateOpticalDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.OpticalDataDeleted.From,
                     Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
@@ -64,7 +64,7 @@ namespace Database.Configuration
             AddModelHandlers<Models.CalorimetricData, Aggregates.CalorimetricDataAggregate, ValueObjects.CreateCalorimetricDataInput, Events.CalorimetricDataCreated>(
                     services,
                     Events.CalorimetricDataCreated.From,
-                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateCalorimetricDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreateCalorimetricDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.CalorimetricDataDeleted.From,
                     Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
@@ -76,7 +76,7 @@ namespace Database.Configuration
             AddModelHandlers<Models.PhotovoltaicData, Aggregates.PhotovoltaicDataAggregate, ValueObjects.CreatePhotovoltaicDataInput, Events.PhotovoltaicDataCreated>(
                     services,
                     Events.PhotovoltaicDataCreated.From,
-                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreatePhotovoltaicDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreatePhotovoltaicDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.PhotovoltaicDataDeleted.From,
                     Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
@@ -88,7 +88,7 @@ namespace Database.Configuration
             AddModelHandlers<Models.HygrothermalData, Aggregates.HygrothermalDataAggregate, ValueObjects.CreateHygrothermalDataInput, Events.HygrothermalDataCreated>(
                     services,
                     Events.HygrothermalDataCreated.From,
-                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.Create<ValueObjects.CreateHygrothermalDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
+                    Enumerable.Empty<Func<ModelRepositorySession, Id, Infrastructure.Commands.CreateCommand<ValueObjects.CreateHygrothermalDataInput>, CancellationToken, Task<Result<Id, Errors>>>>(),
                     Events.HygrothermalDataDeleted.From,
                     Enumerable.Empty<Func<ModelRepositorySession, TimestampedId, Id, CancellationToken, Task<Result<bool, Errors>>>>()
                     );
@@ -115,7 +115,7 @@ namespace Database.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.GetDataOfComponents<TDataModel>,
+              Queries.GetDataOfComponentsQuery<TDataModel>,
               IEnumerable<Result<IEnumerable<Result<TDataModel, Errors>>, Errors>>
                 >,
               Handlers.GetDataOfComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>
@@ -131,7 +131,7 @@ namespace Database.Configuration
         {
             services.AddScoped<
               MediatR.IRequestHandler<
-              Queries.HasDataForComponents<TDataModel>,
+              Queries.HasDataForComponentsQuery<TDataModel>,
               IEnumerable<Result<bool, Errors>>
                 >,
               Handlers.HasDataForComponentsHandler<TDataModel, TDataAggregate, TDataCreatedEvent>

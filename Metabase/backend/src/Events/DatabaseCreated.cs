@@ -11,7 +11,7 @@ namespace Metabase.Events
     {
         public static DatabaseCreated From(
             Guid databaseId,
-            Infrastructure.Commands.Create<ValueObjects.CreateDatabaseInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateDatabaseInput> command
             )
         {
             return new DatabaseCreated(

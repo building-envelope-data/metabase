@@ -8,7 +8,7 @@ namespace Metabase.Events
       : DeletedEvent
     {
         public static StandardDeleted From<TModel>(
-            Infrastructure.Commands.Delete<TModel> command
+            Infrastructure.Commands.DeleteCommand<TModel> command
             )
         {
             return new StandardDeleted(

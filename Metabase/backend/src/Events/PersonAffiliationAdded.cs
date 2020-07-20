@@ -9,7 +9,7 @@ namespace Metabase.Events
     {
         public static PersonAffiliationAdded From(
             Guid personAffiliationId,
-            Infrastructure.Commands.AddAssociation<ValueObjects.AddPersonAffiliationInput> command
+            Infrastructure.Commands.AddAssociationCommand<ValueObjects.AddPersonAffiliationInput> command
             )
         {
             return new PersonAffiliationAdded(

@@ -13,7 +13,7 @@ namespace Metabase.Events
     {
         public static StandardCreated From(
             Guid standardId,
-            Infrastructure.Commands.Create<ValueObjects.CreateStandardInput> command
+            Infrastructure.Commands.CreateCommand<ValueObjects.CreateStandardInput> command
             )
         {
             return new StandardCreated(

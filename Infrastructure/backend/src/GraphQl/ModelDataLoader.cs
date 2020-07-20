@@ -31,11 +31,11 @@ namespace Infrastructure.GraphQl
         {
             var query =
               ResultHelpers.HandleFailure(
-                  Queries.GetModelsForTimestampedIds<TModel>.From(timestampedIds)
+                  Queries.GetModelsForTimestampedIdsQuery<TModel>.From(timestampedIds)
                   );
             var results =
               await QueryBus.Send<
-                  Queries.GetModelsForTimestampedIds<TModel>,
+                  Queries.GetModelsForTimestampedIdsQuery<TModel>,
                   IEnumerable<Result<TModel, Errors>>
                >(query).ConfigureAwait(false);
             return ResultHelpers.ToDataLoaderResults<TGraphQlObject>(

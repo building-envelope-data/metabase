@@ -13,7 +13,7 @@ namespace Infrastructure.Handlers
 {
     public sealed class GetBackwardManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate, TAssociationAddedEvent>
       : GetManyToManyAssociationsOfModelsHandler<TAssociateModel, TAssociationModel, TAssociateAggregate, TAssociationAggregate>,
-        IQueryHandler<Queries.GetBackwardManyToManyAssociationsOfModels<TAssociateModel, TAssociationModel>, IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
+        IQueryHandler<Queries.GetBackwardManyToManyAssociationsOfModelsQuery<TAssociateModel, TAssociationModel>, IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>>
       where TAssociateModel : IModel
       where TAssociationModel : IManyToManyAssociation
       where TAssociateAggregate : class, IAggregate, IConvertible<TAssociateModel>, new()
@@ -26,7 +26,7 @@ namespace Infrastructure.Handlers
         }
 
         public async Task<IEnumerable<Result<IEnumerable<Result<TAssociationModel, Errors>>, Errors>>> Handle(
-            Queries.GetBackwardManyToManyAssociationsOfModels<TAssociateModel, TAssociationModel> query,
+            Queries.GetBackwardManyToManyAssociationsOfModelsQuery<TAssociateModel, TAssociationModel> query,
             CancellationToken cancellationToken
             )
         {

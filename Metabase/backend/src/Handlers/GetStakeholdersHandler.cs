@@ -15,7 +15,7 @@ using Exception = System.Exception;
 namespace Metabase.Handlers
 {
     public sealed class GetStakeholdersHandler
-      : IQueryHandler<GetModelsForTimestampedIds<Models.Stakeholder>, IEnumerable<Result<Models.Stakeholder, Errors>>>
+      : IQueryHandler<GetModelsForTimestampedIdsQuery<Models.Stakeholder>, IEnumerable<Result<Models.Stakeholder, Errors>>>
     {
         private readonly IModelRepository _repository;
         private readonly GetModelsForTimestampedIdsHandler<Models.Institution, Aggregates.InstitutionAggregate> _getInstitutionsHandler;
@@ -29,7 +29,7 @@ namespace Metabase.Handlers
         }
 
         public async Task<IEnumerable<Result<Models.Stakeholder, Errors>>> Handle(
-            GetModelsForTimestampedIds<Models.Stakeholder> query,
+            GetModelsForTimestampedIdsQuery<Models.Stakeholder> query,
             CancellationToken cancellationToken
             )
         {

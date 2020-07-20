@@ -6,24 +6,24 @@ using Errors = Infrastructure.Errors;
 
 namespace Database.Queries
 {
-    public sealed class HasDataForComponents<TDataModel>
+    public sealed class HasDataForComponentsQuery<TDataModel>
       : IQuery<IEnumerable<Result<bool, Errors>>>
     {
         public IReadOnlyCollection<TimestampedId> TimestampedIds { get; }
 
-        private HasDataForComponents(
+        private HasDataForComponentsQuery(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {
             TimestampedIds = timestampedIds;
         }
 
-        public static Result<HasDataForComponents<TDataModel>, Errors> From(
+        public static Result<HasDataForComponentsQuery<TDataModel>, Errors> From(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {
-            return Result.Success<HasDataForComponents<TDataModel>, Errors>(
-                new HasDataForComponents<TDataModel>(
+            return Result.Success<HasDataForComponentsQuery<TDataModel>, Errors>(
+                new HasDataForComponentsQuery<TDataModel>(
                   timestampedIds: timestampedIds
                   )
                 );

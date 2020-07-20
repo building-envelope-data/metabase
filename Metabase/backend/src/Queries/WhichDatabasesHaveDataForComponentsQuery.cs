@@ -5,22 +5,22 @@ using Errors = Infrastructure.Errors;
 
 namespace Metabase.Queries
 {
-    public sealed class WhichDatabasesHaveDataForComponents<TDataModel>
-      : QueryDataOfComponentsFromDatabases<IEnumerable<Result<Models.Database, Errors>>>
+    public sealed class WhichDatabasesHaveDataForComponentsQuery<TDataModel>
+      : QueryDataOfComponentsFromDatabasesQuery<IEnumerable<Result<Models.Database, Errors>>>
     {
-        private WhichDatabasesHaveDataForComponents(
+        private WhichDatabasesHaveDataForComponentsQuery(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
           : base(timestampedIds)
         {
         }
 
-        public static Result<WhichDatabasesHaveDataForComponents<TDataModel>, Errors> From(
+        public static Result<WhichDatabasesHaveDataForComponentsQuery<TDataModel>, Errors> From(
             IReadOnlyCollection<TimestampedId> timestampedIds
             )
         {
-            return Result.Success<WhichDatabasesHaveDataForComponents<TDataModel>, Errors>(
-                new WhichDatabasesHaveDataForComponents<TDataModel>(
+            return Result.Success<WhichDatabasesHaveDataForComponentsQuery<TDataModel>, Errors>(
+                new WhichDatabasesHaveDataForComponentsQuery<TDataModel>(
                   timestampedIds: timestampedIds
                   )
                 );

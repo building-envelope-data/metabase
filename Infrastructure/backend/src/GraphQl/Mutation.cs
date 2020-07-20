@@ -33,7 +33,7 @@ namespace Infrastructure.GraphQl
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Commands.Create<TValidatedInput>.From(
+                    Commands.CreateCommand<TValidatedInput>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -42,7 +42,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
               await _commandBus
               .Send<
-              Commands.Create<TValidatedInput>,
+              Commands.CreateCommand<TValidatedInput>,
               Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -58,7 +58,7 @@ namespace Infrastructure.GraphQl
             var command = ResultHelpers.HandleFailure(
                   TimestampedId.From(id, timestamp, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(timestampedId =>
-                    Commands.Delete<TModel>.From(
+                    Commands.DeleteCommand<TModel>.From(
                       timestampedId: timestampedId,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -67,7 +67,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
               await _commandBus
               .Send<
-              Commands.Delete<TModel>,
+              Commands.DeleteCommand<TModel>,
               Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -84,7 +84,7 @@ namespace Infrastructure.GraphQl
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Commands.AddAssociation<TValidatedInput>.From(
+                    Commands.AddAssociationCommand<TValidatedInput>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -93,7 +93,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Commands.AddAssociation<TValidatedInput>,
+                Commands.AddAssociationCommand<TValidatedInput>,
                 Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -111,7 +111,7 @@ namespace Infrastructure.GraphQl
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>.From(
+                    Commands.RemoveAssociationCommand<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -120,7 +120,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Commands.RemoveAssociation<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>,
+                Commands.RemoveAssociationCommand<ValueObjects.RemoveManyToManyAssociationInput<TAssociationModel>>,
                 Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );
@@ -140,7 +140,7 @@ namespace Infrastructure.GraphQl
             var command = ResultHelpers.HandleFailure(
                   validateInput(input, Array.Empty<object>()) // TODO What is the proper path for variables?
                   .Bind(validatedInput =>
-                    Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>.From(
+                    Commands.RemoveAssociationCommand<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>.From(
                       input: validatedInput,
                       creatorId: Id.New() // TODO Use current user!
                       )
@@ -149,7 +149,7 @@ namespace Infrastructure.GraphQl
             var timestampedId = ResultHelpers.HandleFailure(
                 await _commandBus
                 .Send<
-                Commands.RemoveAssociation<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>,
+                Commands.RemoveAssociationCommand<ValueObjects.RemoveOneToManyAssociationInput<TAssociationModel>>,
                 Result<TimestampedId, Errors>
                 >(command).ConfigureAwait(false)
                 );

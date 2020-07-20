@@ -9,7 +9,7 @@ namespace Metabase.Events
     {
         public static ComponentVariantAdded From(
             Guid componentVariantId,
-            Infrastructure.Commands.AddAssociation<ValueObjects.AddComponentVariantInput> command
+            Infrastructure.Commands.AddAssociationCommand<ValueObjects.AddComponentVariantInput> command
             )
         {
             return new ComponentVariantAdded(
