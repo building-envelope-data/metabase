@@ -4,7 +4,7 @@ namespace Infrastructure.GraphQl
     {
         protected Queries.IQueryBus QueryBus { get; }
 
-        protected ResolversBase(Queries.IQueryBus queryBus)
+        protected ResolverBase(Queries.IQueryBus queryBus)
         {
             QueryBus = queryBus;
         }
