@@ -707,6 +707,30 @@ namespace Infrastructure.Models
                 .ConfigureAwait(false);
         }
 
+        public async Task<IEnumerable<Result<TModel, Errors>>> LoadAllThatExisted<TModel, TAggregate>(
+            IEnumerable<ValueObjects.TimestampedId> possibleTimestampedIds,
+            CancellationToken cancellationToken
+            )
+          where TModel : Models.IModel
+          where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
+        {
+            ThrowIfDisposed();
+            return (
+                await LoadAllRaw<TAggregate>(
+                  possibleTimestampedIds,
+                  cancellationToken
+                  )
+                .ConfigureAwait(false)
+                )
+                .Where(((ValueObjects.TimestampedId timestampedId, TAggregate? aggregate) t) =>
+                    HasAggregateNeverExisted(t.aggregate) ||
+                    DoesAggregateExist(t.aggregate)
+                    ) // Exclude the aggregates that existed once but not at the given timestamp, that is, the ones whose version is `0`. But include aggregates that never existed at all, that is, the ones that are `null`, with the effect that they are reported as errors by `BuildResult<TModel, TAggregate>`.
+                .Select(((ValueObjects.TimestampedId timestampedId, TAggregate? aggregate) t) =>
+                    BuildResult<TModel, TAggregate>(t.timestampedId.Id, t.aggregate)
+                    );
+        }
+
         private async Task<IEnumerable<(ValueObjects.Timestamp, IEnumerable<(ValueObjects.Id, TAggregate?)>)>> LoadAllBatchedRaw<TAggregate>(
             IEnumerable<(ValueObjects.Timestamp, IEnumerable<ValueObjects.Id>)> timestampsAndIds,
             CancellationToken cancellationToken
@@ -1019,7 +1043,7 @@ namespace Infrastructure.Models
           where TAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TModel>, new()
           where TAssociateAggregate : class, Aggregates.IAggregate, Aggregates.IConvertible<TAssociateModel>, new()
         {
-            // TODO Make sure that model is valid by loading it!
+            // TODO? Make sure that model is valid by loading it?
             var modelIds =
               timestampedModelIds
               .Select(timestampedId => timestampedId.Id);
