@@ -3,7 +3,7 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class InstitutionRepresentative
-      : NodeBase
+      : Node
     {
         public static InstitutionRepresentative FromModel(
             Models.InstitutionRepresentative model,

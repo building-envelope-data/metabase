@@ -4,7 +4,7 @@ using Infrastructure.ValueObjects;
 namespace Database.GraphQl
 {
     public abstract class DataX
-      : NodeBase
+      : Node
     {
         public Id ComponentId { get; }
         public object Data { get; }

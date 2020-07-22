@@ -3,10 +3,10 @@ using Exception = System.Exception;
 
 namespace Metabase.GraphQl
 {
-    public sealed class StakeholderBase
-      : HotChocolate.Types.UnionType<Stakeholder>
+    public abstract class StakeholderBase
+      : Node, IStakeholder
     {
-        public static Stakeholder FromModel(
+        public static IStakeholder FromModel(
             Models.Stakeholder model,
             Timestamp requestTimestamp
             )
@@ -23,5 +23,17 @@ namespace Metabase.GraphQl
                   throw new Exception($"The model {model} fell through")
             };
         }
+
+        protected StakeholderBase(
+            Id id,
+            Timestamp timestamp,
+            Timestamp requestTimestamp
+            )
+          : base(
+              id: id,
+              timestamp: timestamp,
+              requestTimestamp: requestTimestamp
+              )
+        { }
     }
 }

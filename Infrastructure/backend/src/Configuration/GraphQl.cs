@@ -74,7 +74,7 @@ namespace Infrastructure.Configuration
                     .BindClrType<DateTime, GraphQlX.PreciseDateTimeType>()
                     .BindClrType<DateTimeOffset, GraphQlX.PreciseDateTimeType>()
 
-                    .AddType<GraphQlX.Node>()
+                    .AddType<GraphQlX.NodeType>()
                     .AddType<HotChocolate.Types.Relay.PageInfoType>();
         }
 

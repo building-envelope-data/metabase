@@ -3,7 +3,7 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class ComponentVersion
-      : NodeBase
+      : Node
     {
         public static ComponentVersion FromModel(
             Models.ComponentVersion model,

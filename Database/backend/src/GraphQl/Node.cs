@@ -5,10 +5,10 @@ using Exception = System.Exception;
 
 namespace Database.GraphQl
 {
-    public abstract class NodeBase
-      : Infrastructure.GraphQl.NodeBase
+    public abstract class Node
+      : Infrastructure.GraphQl.Node
     {
-        public static Node FromModel(
+        public static INode FromModel(
             IModel model,
             Timestamp requestTimestamp
             )
@@ -28,7 +28,7 @@ namespace Database.GraphQl
             };
         }
 
-        protected NodeBase(
+        protected Node(
             Id id,
             Timestamp timestamp,
             Timestamp requestTimestamp

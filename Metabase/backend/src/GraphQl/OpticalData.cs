@@ -7,7 +7,7 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class OpticalData
-      : NodeBase
+      : Node
     {
         public static OpticalData FromModel(
             Models.OpticalData model,

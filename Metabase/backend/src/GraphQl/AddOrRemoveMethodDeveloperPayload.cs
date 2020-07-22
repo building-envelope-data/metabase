@@ -32,7 +32,7 @@ namespace Metabase.GraphQl
                 );
         }
 
-        public Task<Stakeholder> GetStakeholder(
+        public Task<IStakeholder> GetStakeholder(
             [DataLoader] StakeholderDataLoader stakeholderLoader
             )
         {

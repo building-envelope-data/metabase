@@ -19,7 +19,7 @@ namespace Database.GraphQl
         }
 
         // TODO Use `EnableRelaySupport` in `Metabase.Configuration.GraphQl` instead
-        public Task<Node> GetNode(
+        public Task<INode> GetNode(
             Id id,
             Timestamp? timestamp,
             [DataLoader] NodeDataLoader nodeLoader,

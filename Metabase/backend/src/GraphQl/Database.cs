@@ -9,7 +9,7 @@ using Uri = System.Uri;
 namespace Metabase.GraphQl
 {
     public sealed class Database
-      : NodeBase
+      : Node
     {
         public static Database FromModel(
             Models.Database model,
