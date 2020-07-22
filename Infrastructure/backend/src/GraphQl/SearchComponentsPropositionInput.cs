@@ -107,7 +107,8 @@ namespace Infrastructure.GraphQl
                   )
               .Bind(_ =>
                   ValueObjects.AndProposition<ValueObjects.SearchComponentsVariable>.From(
-                    new ValueObjects.Proposition<ValueObjects.SearchComponentsVariable>[] {
+                    new ValueObjects.Proposition<ValueObjects.SearchComponentsVariable>[]
+                    {
                         andResult.Value,
                         orResult.Value,
                         notResult.Value,

@@ -4,8 +4,6 @@ using System;
 using CSharpFunctionalExtensions;
 using Infrastructure.Events;
 using Infrastructure.ValueObjects;
-using ErrorCodes = Infrastructure.ErrorCodes;
-using Errors = Infrastructure.Errors;
 using Validatable = Infrastructure.Validatable;
 
 namespace Infrastructure.Aggregates

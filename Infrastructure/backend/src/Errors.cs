@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using ErrorBuilder = HotChocolate.ErrorBuilder;
-using Errors = Infrastructure.Errors;
 using IError = HotChocolate.IError;
 
 namespace Infrastructure

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Errors = Infrastructure.Errors;
 using QueryException = HotChocolate.Execution.QueryException;
 
 namespace Infrastructure.GraphQl

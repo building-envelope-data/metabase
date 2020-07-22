@@ -4,8 +4,6 @@ using System.Collections.ObjectModel; // ReadOnlyDictionary
 using System.IO;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using ErrorCodes = Infrastructure.ErrorCodes;
-using Errors = Infrastructure.Errors;
 using JsonArray = Manatee.Json.JsonArray;
 using JsonElement = System.Text.Json.JsonElement;
 using JsonObject = Manatee.Json.JsonObject;

@@ -1,7 +1,5 @@
 using System;
 using CSharpFunctionalExtensions;
-using ErrorCodes = Infrastructure.ErrorCodes;
-using Errors = Infrastructure.Errors;
 using IValidatable = Infrastructure.IValidatable;
 using Validatable = Infrastructure.Validatable;
 

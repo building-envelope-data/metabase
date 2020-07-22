@@ -1,5 +1,4 @@
 using CSharpFunctionalExtensions;
-using Errors = Infrastructure.Errors;
 using Guid = System.Guid;
 
 namespace Infrastructure.Events

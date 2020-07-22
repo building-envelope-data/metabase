@@ -1,5 +1,3 @@
-using Infrastructure.ValueObjects;
-
 namespace Infrastructure.ValueObjects
 {
     public abstract class AddOneToManyAssociationInput

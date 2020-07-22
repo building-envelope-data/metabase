@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Errors = Infrastructure.Errors;
 using Guid = System.Guid;
 using Validatable = Infrastructure.Validatable;
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
-using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.GraphQl
 {

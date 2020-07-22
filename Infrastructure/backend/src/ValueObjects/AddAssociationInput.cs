@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Infrastructure.ValueObjects;
 
 namespace Infrastructure.ValueObjects
 {

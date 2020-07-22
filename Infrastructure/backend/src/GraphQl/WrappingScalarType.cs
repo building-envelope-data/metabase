@@ -4,7 +4,6 @@
 using System; // Func
 using CSharpFunctionalExtensions;
 using HotChocolate.Types;
-using Errors = Infrastructure.Errors;
 using IValueNode = HotChocolate.Language.IValueNode;
 using NameString = HotChocolate.NameString;
 using Type = System.Type;

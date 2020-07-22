@@ -1,4 +1,3 @@
-using Infrastructure.Models;
 namespace Infrastructure.Models
 {
     public interface IModelRepository
