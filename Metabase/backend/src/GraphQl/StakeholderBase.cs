@@ -15,12 +15,12 @@ namespace Metabase.GraphQl
             // cannot have class methods in C#.
             return model switch
             {
-              Models.Institution institution =>
-                Institution.FromModel(institution, requestTimestamp),
-              Models.Person person =>
-                Person.FromModel(person, requestTimestamp),
-              _ =>
-                throw new Exception($"The model {model} fell through")
+                Models.Institution institution =>
+                  Institution.FromModel(institution, requestTimestamp),
+                Models.Person person =>
+                  Person.FromModel(person, requestTimestamp),
+                _ =>
+                  throw new Exception($"The model {model} fell through")
             };
         }
     }

@@ -182,12 +182,12 @@ namespace Database.GraphQl
                 );
         }
 
-        // TODO !
-        /* public IReadOnlyList<Id> GetSearchComponents( */
-        /*     SearchComponentsInput input */
-        /*     ) */
-        /* { */
-        /*     return new Id[] { }; */
-        /* } */
+        public IReadOnlyList<TimestampedId> SearchComponents(
+            SearchComponentsPropositionInput where,
+            Timestamp? timestamp
+            )
+        {
+            return new TimestampedId[] { };
+        }
     }
 }
