@@ -166,12 +166,12 @@ namespace Metabase.GraphQl
                 );
         }
 
-        public IReadOnlyList<TimestampedId> SearchComponents(
+        public SearchComponentsResult SearchComponents(
             SearchComponentsPropositionInput where,
             Timestamp? timestamp
             )
         {
-            return new TimestampedId[] { };
+            return null!;
         }
 
         ////////////

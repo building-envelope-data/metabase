@@ -26,10 +26,10 @@ namespace Infrastructure.GraphQl
         }
 
         public static
-          Result<ValueObjects.AndProposition<ValueObjects.SearchComponentsVariable>, Errors>
-          Validate(
+          Result<ValueObjects.AndProposition<TVariable>, Errors>
+          Validate<TVariable>(
             PercentagePropositionInput self,
-            ValueObjects.SearchComponentsVariable variable,
+            TVariable variable,
             IReadOnlyList<object> path
             )
         {
@@ -38,7 +38,7 @@ namespace Infrastructure.GraphQl
                 path.Append("equalTo").ToList().AsReadOnly()
                 )
               .Bind(percentage =>
-                  ValueObjects.EqualToProposition<ValueObjects.SearchComponentsVariable, ValueObjects.Percentage>.From(
+                  ValueObjects.EqualToProposition<TVariable, ValueObjects.Percentage>.From(
                     variable,
                     percentage,
                     path.Append("equalTo").ToList().AsReadOnly()
@@ -49,7 +49,7 @@ namespace Infrastructure.GraphQl
                 path.Append("greaterThanOrEqualTo").ToList().AsReadOnly()
                 )
               .Bind(percentage =>
-                  ValueObjects.GreaterThanOrEqualToProposition<ValueObjects.SearchComponentsVariable, ValueObjects.Percentage>.From(
+                  ValueObjects.GreaterThanOrEqualToProposition<TVariable, ValueObjects.Percentage>.From(
                     variable,
                     percentage,
                     path.Append("greaterThanOrEqualTo").ToList().AsReadOnly()
@@ -60,7 +60,7 @@ namespace Infrastructure.GraphQl
                 path.Append("lessThanOrLessThanOrEqualTo").ToList().AsReadOnly()
                 )
               .Bind(percentage =>
-                  ValueObjects.LessThanOrEqualToProposition<ValueObjects.SearchComponentsVariable, ValueObjects.Percentage>.From(
+                  ValueObjects.LessThanOrEqualToProposition<TVariable, ValueObjects.Percentage>.From(
                     variable,
                     percentage,
                     path.Append("lessThanOrEqualTo").ToList().AsReadOnly()
@@ -71,7 +71,7 @@ namespace Infrastructure.GraphQl
                 path.Append("inClosedInterval").ToList().AsReadOnly()
                 )
               .Bind(closedInterval =>
-                  ValueObjects.InClosedIntervalProposition<ValueObjects.SearchComponentsVariable, ValueObjects.Percentage>.From(
+                  ValueObjects.InClosedIntervalProposition<TVariable, ValueObjects.Percentage>.From(
                     variable,
                     closedInterval,
                     path.Append("inClosedInterval").ToList().AsReadOnly()
@@ -86,8 +86,8 @@ namespace Infrastructure.GraphQl
                   inClosedIntervalResult
                   )
               .Bind(_ =>
-                  ValueObjects.AndProposition<ValueObjects.SearchComponentsVariable>.From(
-                    new ValueObjects.Proposition<ValueObjects.SearchComponentsVariable>[]
+                  ValueObjects.AndProposition<TVariable>.From(
+                    new ValueObjects.Proposition<TVariable>[]
                     {
                         equalToResult.Value,
                         greaterThanOrEqualToResult.Value,

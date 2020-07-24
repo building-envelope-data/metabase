@@ -18,19 +18,20 @@ namespace Infrastructure.GraphQl
     // https://hasura.io/docs/1.0/graphql/manual/api-reference/graphql-api/query.html#whereexp
     // and
     // https://hasura.io/docs/1.0/graphql/manual/queries/query-filters.html
-    public sealed class SearchComponentsPropositionInput
+    public abstract class SearchComponentsPropositionInput<TSubclass, TVariable>
+      where TSubclass : SearchComponentsPropositionInput<TSubclass, TVariable>
     {
-        public IReadOnlyList<SearchComponentsPropositionInput> And { get; }
-        public IReadOnlyList<SearchComponentsPropositionInput> Or { get; }
-        public SearchComponentsPropositionInput Not { get; }
+        public IReadOnlyList<TSubclass> And { get; }
+        public IReadOnlyList<TSubclass> Or { get; }
+        public TSubclass Not { get; }
         public PercentagePropositionInput GValue { get; }
         public PercentagePropositionInput UValue { get; }
         public PercentagePropositionInput NearnormalHemisphericalVisibleTransmittance { get; }
 
-        public SearchComponentsPropositionInput(
-            IReadOnlyList<SearchComponentsPropositionInput> and,
-            IReadOnlyList<SearchComponentsPropositionInput> or,
-            SearchComponentsPropositionInput not,
+        protected SearchComponentsPropositionInput(
+            IReadOnlyList<TSubclass> and,
+            IReadOnlyList<TSubclass> or,
+            TSubclass not,
             PercentagePropositionInput gValue,
             PercentagePropositionInput uValue,
             PercentagePropositionInput nearnormalHemisphericalVisibleTransmittance
@@ -45,9 +46,12 @@ namespace Infrastructure.GraphQl
         }
 
         public static
-          Result<ValueObjects.AndProposition<ValueObjects.SearchComponentsVariable>, Errors>
+          Result<ValueObjects.AndProposition<TVariable>, Errors>
           Validate(
-            SearchComponentsPropositionInput self,
+            TSubclass self,
+            TVariable gValueVariable,
+            TVariable uValueVariable,
+            TVariable nearnormalHemisphericalVisibleTransmittanceVariable,
             IReadOnlyList<object> path
             )
         {
@@ -55,12 +59,15 @@ namespace Infrastructure.GraphQl
               self.And.Select((proposition, index) =>
                   Validate(
                     proposition,
+                    gValueVariable: gValueVariable,
+                    uValueVariable: uValueVariable,
+                    nearnormalHemisphericalVisibleTransmittanceVariable: nearnormalHemisphericalVisibleTransmittanceVariable,
                     path.Append("and").Append(index).ToList().AsReadOnly()
                     )
                   )
               .Combine()
               .Bind(propositions =>
-                  ValueObjects.AndProposition<ValueObjects.SearchComponentsVariable>.From(
+                  ValueObjects.AndProposition<TVariable>.From(
                       propositions,
                       path.Append("and").ToList().AsReadOnly()
                   )
@@ -69,12 +76,15 @@ namespace Infrastructure.GraphQl
               self.Or.Select((proposition, index) =>
                   Validate(
                     proposition,
+                    gValueVariable: gValueVariable,
+                    uValueVariable: uValueVariable,
+                    nearnormalHemisphericalVisibleTransmittanceVariable: nearnormalHemisphericalVisibleTransmittanceVariable,
                     path.Append("or").Append(index).ToList().AsReadOnly()
                     )
                   )
               .Combine()
               .Bind(propositions =>
-                  ValueObjects.OrProposition<ValueObjects.SearchComponentsVariable>.From(
+                  ValueObjects.OrProposition<TVariable>.From(
                       propositions,
                       path.Append("or").ToList().AsReadOnly()
                   )
@@ -82,30 +92,33 @@ namespace Infrastructure.GraphQl
             var notResult =
               Validate(
                   self.Not,
+                  gValueVariable: gValueVariable,
+                  uValueVariable: uValueVariable,
+                  nearnormalHemisphericalVisibleTransmittanceVariable: nearnormalHemisphericalVisibleTransmittanceVariable,
                   path.Append("not").ToList().AsReadOnly()
                   )
               .Bind(proposition =>
-                  ValueObjects.NotProposition<ValueObjects.SearchComponentsVariable>.From(
+                  ValueObjects.NotProposition<TVariable>.From(
                     proposition,
                     path.Append("not").ToList().AsReadOnly()
                     )
                   );
             var gValueResult =
-              PercentagePropositionInput.Validate(
+              PercentagePropositionInput.Validate<TVariable>(
                   self.GValue,
-                  ValueObjects.SearchComponentsVariable.G_VALUE,
+                  gValueVariable,
                   path.Append("gValue").ToList().AsReadOnly()
                   );
             var uValueResult =
-              PercentagePropositionInput.Validate(
+              PercentagePropositionInput.Validate<TVariable>(
                   self.UValue,
-                  ValueObjects.SearchComponentsVariable.G_VALUE,
+                  gValueVariable,
                   path.Append("uValue").ToList().AsReadOnly()
                   );
             var nearnormalHemisphericalVisibleTransmittancelueResult =
-              PercentagePropositionInput.Validate(
+              PercentagePropositionInput.Validate<TVariable>(
                   self.NearnormalHemisphericalVisibleTransmittance,
-                  ValueObjects.SearchComponentsVariable.NEARNORMAL_HEMISPHERICAL_VISIBLE_TRANSMITTANCE,
+                  nearnormalHemisphericalVisibleTransmittanceVariable,
                   path.Append("nearnormalHemisphericalVisibleTransmittance").ToList().AsReadOnly()
                   );
 
@@ -119,8 +132,8 @@ namespace Infrastructure.GraphQl
                   nearnormalHemisphericalVisibleTransmittancelueResult
                   )
               .Bind(_ =>
-                  ValueObjects.AndProposition<ValueObjects.SearchComponentsVariable>.From(
-                    new ValueObjects.Proposition<ValueObjects.SearchComponentsVariable>[]
+                  ValueObjects.AndProposition<TVariable>.From(
+                    new ValueObjects.Proposition<TVariable>[]
                     {
                         andResult.Value,
                         orResult.Value,
