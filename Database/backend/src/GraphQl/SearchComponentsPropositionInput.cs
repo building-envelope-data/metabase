@@ -29,7 +29,7 @@ namespace Database.GraphQl
         }
 
         public static
-          Result<AndProposition<ValueObjects.SearchComponentsVariable>, Errors>
+          Result<Proposition<ValueObjects.SearchComponentsVariable>, Errors>
           Validate(
             SearchComponentsPropositionInput self,
             IReadOnlyList<object> path

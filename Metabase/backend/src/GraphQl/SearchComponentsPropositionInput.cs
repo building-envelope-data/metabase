@@ -43,14 +43,14 @@ namespace Metabase.GraphQl
         }
 
         public static
-          Result<AndProposition<ValueObjects.SearchComponentsVariable>, Errors>
+          Result<Proposition<ValueObjects.SearchComponentsVariable>, Errors>
           Validate(
             SearchComponentsPropositionInput self,
             IReadOnlyList<object> path
             )
         {
             var baseResult =
-              (Result<AndProposition<ValueObjects.SearchComponentsVariable>, Errors>?)Infrastructure.GraphQl.SearchComponentsPropositionInput<SearchComponentsPropositionInput, ValueObjects.SearchComponentsVariable>.Validate(
+              (Result<Proposition<ValueObjects.SearchComponentsVariable>, Errors>?)Infrastructure.GraphQl.SearchComponentsPropositionInput<SearchComponentsPropositionInput, ValueObjects.SearchComponentsVariable>.Validate(
                 self,
                 gValueVariable: ValueObjects.SearchComponentsVariable.G_VALUE,
                 uValueVariable: ValueObjects.SearchComponentsVariable.U_VALUE,
@@ -101,7 +101,8 @@ namespace Metabase.GraphQl
                     .OfType<Proposition<ValueObjects.SearchComponentsVariable>>(), // excludes null values
                     path
                     )
-                  );
+                  )
+                  .Map(andProposition => (Proposition<ValueObjects.SearchComponentsVariable>)andProposition);
         }
     }
 }

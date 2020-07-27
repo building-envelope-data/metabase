@@ -46,7 +46,7 @@ namespace Infrastructure.GraphQl
         }
 
         public static
-          Result<ValueObjects.AndProposition<TVariable>, Errors>
+          Result<ValueObjects.Proposition<TVariable>, Errors>
           Validate(
             TSubclass self,
             TVariable gValueVariable,
@@ -157,7 +157,8 @@ namespace Infrastructure.GraphQl
                     .OfType<ValueObjects.Proposition<TVariable>>(), // excludes null values
                     path
                     )
-                  );
+                  )
+                  .Map(andProposition => (Proposition<ValueObjects.SearchComponentsVariable>)andProposition);
         }
     }
 }
