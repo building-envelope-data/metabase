@@ -10,12 +10,12 @@ namespace Database.GraphQl
       : Infrastructure.GraphQl.SearchComponentsPropositionInput<SearchComponentsPropositionInput, ValueObjects.SearchComponentsVariable>
     {
         public SearchComponentsPropositionInput(
-            IReadOnlyList<SearchComponentsPropositionInput> and,
-            IReadOnlyList<SearchComponentsPropositionInput> or,
-            SearchComponentsPropositionInput not,
-            PercentagePropositionInput gValue,
-            PercentagePropositionInput uValue,
-            PercentagePropositionInput nearnormalHemisphericalVisibleTransmittance
+            IReadOnlyList<SearchComponentsPropositionInput>? and,
+            IReadOnlyList<SearchComponentsPropositionInput>? or,
+            SearchComponentsPropositionInput? not,
+            PercentagePropositionInput? gValue,
+            PercentagePropositionInput? uValue,
+            PercentagePropositionInput? nearnormalHemisphericalVisibleTransmittance
             )
           : base(
               and: and,

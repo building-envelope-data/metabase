@@ -10,23 +10,23 @@ namespace Metabase.GraphQl
     public sealed class SearchComponentsPropositionInput
       : Infrastructure.GraphQl.SearchComponentsPropositionInput<SearchComponentsPropositionInput, ValueObjects.SearchComponentsVariable>
     {
-        public StringPropositionInput Name { get; }
-        public StringPropositionInput Abbreviation { get; }
-        public StringPropositionInput Description { get; }
+        public StringPropositionInput? Name { get; }
+        public StringPropositionInput? Abbreviation { get; }
+        public StringPropositionInput? Description { get; }
         // TODO
         /* public DateIntervalPropositionInput<ValueObjects.SearchComponentsVariable> Availability { get; } */
         /* public Categories { get; } */
 
         public SearchComponentsPropositionInput(
-            IReadOnlyList<SearchComponentsPropositionInput> and,
-            IReadOnlyList<SearchComponentsPropositionInput> or,
-            SearchComponentsPropositionInput not,
-            PercentagePropositionInput gValue,
-            PercentagePropositionInput uValue,
-            PercentagePropositionInput nearnormalHemisphericalVisibleTransmittance,
-            StringPropositionInput name,
-            StringPropositionInput abbreviation,
-            StringPropositionInput description
+            IReadOnlyList<SearchComponentsPropositionInput>? and,
+            IReadOnlyList<SearchComponentsPropositionInput>? or,
+            SearchComponentsPropositionInput? not,
+            PercentagePropositionInput? gValue,
+            PercentagePropositionInput? uValue,
+            PercentagePropositionInput? nearnormalHemisphericalVisibleTransmittance,
+            StringPropositionInput? name,
+            StringPropositionInput? abbreviation,
+            StringPropositionInput? description
             )
           : base(
               and: and,
@@ -50,7 +50,7 @@ namespace Metabase.GraphQl
             )
         {
             var baseResult =
-              Infrastructure.GraphQl.SearchComponentsPropositionInput<SearchComponentsPropositionInput, ValueObjects.SearchComponentsVariable>.Validate(
+              (Result<AndProposition<ValueObjects.SearchComponentsVariable>, Errors>?)Infrastructure.GraphQl.SearchComponentsPropositionInput<SearchComponentsPropositionInput, ValueObjects.SearchComponentsVariable>.Validate(
                 self,
                 gValueVariable: ValueObjects.SearchComponentsVariable.G_VALUE,
                 uValueVariable: ValueObjects.SearchComponentsVariable.U_VALUE,
@@ -58,26 +58,32 @@ namespace Metabase.GraphQl
                 path: path
                 );
             var nameResult =
-              StringPropositionInput.Validate<ValueObjects.SearchComponentsVariable>(
+              self.Name is null
+              ? null
+              : (Result<AndProposition<ValueObjects.SearchComponentsVariable>, Errors>?)StringPropositionInput.Validate<ValueObjects.SearchComponentsVariable>(
                   self.Name,
                   ValueObjects.SearchComponentsVariable.NAME,
                   path.Append("name").ToList().AsReadOnly()
                   );
             var abbreviationResult =
-              StringPropositionInput.Validate<ValueObjects.SearchComponentsVariable>(
+              self.Abbreviation is null
+              ? null
+              : (Result<AndProposition<ValueObjects.SearchComponentsVariable>, Errors>?)StringPropositionInput.Validate<ValueObjects.SearchComponentsVariable>(
                   self.Abbreviation,
                   ValueObjects.SearchComponentsVariable.ABBREVIATION,
                   path.Append("abbreviation").ToList().AsReadOnly()
                   );
             var descriptionResult =
-              StringPropositionInput.Validate<ValueObjects.SearchComponentsVariable>(
+              self.Description is null
+              ? null
+              : (Result<AndProposition<ValueObjects.SearchComponentsVariable>, Errors>?)StringPropositionInput.Validate<ValueObjects.SearchComponentsVariable>(
                   self.Description,
                   ValueObjects.SearchComponentsVariable.DESCRIPTION,
                   path.Append("description").ToList().AsReadOnly()
                   );
 
             return
-              Errors.Combine(
+              Errors.CombineExistent(
                   baseResult,
                   nameResult,
                   abbreviationResult,
@@ -85,13 +91,14 @@ namespace Metabase.GraphQl
                   )
               .Bind(_ =>
                   AndProposition<ValueObjects.SearchComponentsVariable>.From(
-                    new Proposition<ValueObjects.SearchComponentsVariable>[]
+                    new Proposition<ValueObjects.SearchComponentsVariable>?[]
                     {
-                        baseResult.Value,
-                        nameResult.Value,
-                        abbreviationResult.Value,
-                        descriptionResult.Value
-                    },
+                        baseResult?.Value,
+                        nameResult?.Value,
+                        abbreviationResult?.Value,
+                        descriptionResult?.Value
+                    }
+                    .OfType<Proposition<ValueObjects.SearchComponentsVariable>>(), // excludes null values
                     path
                     )
                   );

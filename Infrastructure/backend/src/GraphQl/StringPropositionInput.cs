@@ -7,12 +7,12 @@ namespace Infrastructure.GraphQl
 {
     public sealed class StringPropositionInput
     {
-        public string EqualTo { get; }
-        public string Like { get; }
+        public string? EqualTo { get; }
+        public string? Like { get; }
 
         public StringPropositionInput(
-            string equalTo,
-            string like
+            string? equalTo,
+            string? like
             )
         {
             EqualTo = equalTo;
@@ -28,12 +28,17 @@ namespace Infrastructure.GraphQl
             )
         {
             var equalToResult =
-              ValueObjects.EqualToProposition<TVariable, string>.From(
+              self.EqualTo is null
+              ? null
+              : (Result<ValueObjects.EqualToProposition<TVariable, string>, Errors>?)ValueObjects.EqualToProposition<TVariable, string>.From(
                     variable,
                     self.EqualTo,
                     path.Append("equalTo").ToList().AsReadOnly()
                   );
-            var likeResult = ValueObjects.LikePattern.From(
+            var likeResult =
+              self.Like is null
+              ? null
+              : (Result<ValueObjects.LikeProposition<TVariable>, Errors>?)ValueObjects.LikePattern.From(
                 self.Like,
                 path.Append("like").ToList().AsReadOnly()
                 )
@@ -46,17 +51,18 @@ namespace Infrastructure.GraphQl
                   );
 
             return
-              Errors.Combine(
+              Errors.CombineExistent(
                   equalToResult,
                   likeResult
                   )
               .Bind(_ =>
                   ValueObjects.AndProposition<TVariable>.From(
-                    new ValueObjects.Proposition<TVariable>[]
+                    new ValueObjects.Proposition<TVariable>?[]
                     {
-                        equalToResult.Value,
-                        likeResult.Value
-                    },
+                        equalToResult?.Value,
+                        likeResult?.Value
+                    }
+                    .OfType<ValueObjects.Proposition<TVariable>>(), // excludes null values
                     path
                     )
                   );

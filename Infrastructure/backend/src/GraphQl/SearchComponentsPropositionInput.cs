@@ -21,20 +21,20 @@ namespace Infrastructure.GraphQl
     public abstract class SearchComponentsPropositionInput<TSubclass, TVariable>
       where TSubclass : SearchComponentsPropositionInput<TSubclass, TVariable>
     {
-        public IReadOnlyList<TSubclass> And { get; }
-        public IReadOnlyList<TSubclass> Or { get; }
-        public TSubclass Not { get; }
-        public PercentagePropositionInput GValue { get; }
-        public PercentagePropositionInput UValue { get; }
-        public PercentagePropositionInput NearnormalHemisphericalVisibleTransmittance { get; }
+        public IReadOnlyList<TSubclass>? And { get; }
+        public IReadOnlyList<TSubclass>? Or { get; }
+        public TSubclass? Not { get; }
+        public PercentagePropositionInput? GValue { get; }
+        public PercentagePropositionInput? UValue { get; }
+        public PercentagePropositionInput? NearnormalHemisphericalVisibleTransmittance { get; }
 
         protected SearchComponentsPropositionInput(
-            IReadOnlyList<TSubclass> and,
-            IReadOnlyList<TSubclass> or,
-            TSubclass not,
-            PercentagePropositionInput gValue,
-            PercentagePropositionInput uValue,
-            PercentagePropositionInput nearnormalHemisphericalVisibleTransmittance
+            IReadOnlyList<TSubclass>? and,
+            IReadOnlyList<TSubclass>? or,
+            TSubclass? not,
+            PercentagePropositionInput? gValue,
+            PercentagePropositionInput? uValue,
+            PercentagePropositionInput? nearnormalHemisphericalVisibleTransmittance
             )
         {
             And = and;
@@ -56,7 +56,9 @@ namespace Infrastructure.GraphQl
             )
         {
             var andResult =
-              self.And.Select((proposition, index) =>
+              self.And is null
+              ? null
+              : (Result<ValueObjects.AndProposition<TVariable>, Errors>?)self.And.Select((proposition, index) =>
                   Validate(
                     proposition,
                     gValueVariable: gValueVariable,
@@ -73,7 +75,9 @@ namespace Infrastructure.GraphQl
                   )
                   );
             var orResult =
-              self.Or.Select((proposition, index) =>
+              self.Or is null
+              ? null
+              : (Result<ValueObjects.OrProposition<TVariable>, Errors>?)self.Or.Select((proposition, index) =>
                   Validate(
                     proposition,
                     gValueVariable: gValueVariable,
@@ -90,7 +94,9 @@ namespace Infrastructure.GraphQl
                   )
                   );
             var notResult =
-              Validate(
+              self.Not is null
+              ? null
+              : (Result<ValueObjects.NotProposition<TVariable>, Errors>?)Validate(
                   self.Not,
                   gValueVariable: gValueVariable,
                   uValueVariable: uValueVariable,
@@ -104,26 +110,32 @@ namespace Infrastructure.GraphQl
                     )
                   );
             var gValueResult =
-              PercentagePropositionInput.Validate<TVariable>(
+              self.GValue is null
+              ? null
+              : (Result<ValueObjects.AndProposition<TVariable>, Errors>?)PercentagePropositionInput.Validate<TVariable>(
                   self.GValue,
                   gValueVariable,
                   path.Append("gValue").ToList().AsReadOnly()
                   );
             var uValueResult =
-              PercentagePropositionInput.Validate<TVariable>(
+              self.UValue is null
+              ? null
+              : (Result<ValueObjects.AndProposition<TVariable>, Errors>?)PercentagePropositionInput.Validate<TVariable>(
                   self.UValue,
                   gValueVariable,
                   path.Append("uValue").ToList().AsReadOnly()
                   );
             var nearnormalHemisphericalVisibleTransmittancelueResult =
-              PercentagePropositionInput.Validate<TVariable>(
+              self.NearnormalHemisphericalVisibleTransmittance is null
+              ? null
+              : (Result<ValueObjects.AndProposition<TVariable>, Errors>?)PercentagePropositionInput.Validate<TVariable>(
                   self.NearnormalHemisphericalVisibleTransmittance,
                   nearnormalHemisphericalVisibleTransmittanceVariable,
                   path.Append("nearnormalHemisphericalVisibleTransmittance").ToList().AsReadOnly()
                   );
 
             return
-              Errors.Combine(
+              Errors.CombineExistent(
                   andResult,
                   orResult,
                   notResult,
@@ -133,15 +145,16 @@ namespace Infrastructure.GraphQl
                   )
               .Bind(_ =>
                   ValueObjects.AndProposition<TVariable>.From(
-                    new ValueObjects.Proposition<TVariable>[]
+                    new ValueObjects.Proposition<TVariable>?[]
                     {
-                        andResult.Value,
-                        orResult.Value,
-                        notResult.Value,
-                        gValueResult.Value,
-                        uValueResult.Value,
-                        nearnormalHemisphericalVisibleTransmittancelueResult.Value
-                    },
+                        andResult?.Value,
+                        orResult?.Value,
+                        notResult?.Value,
+                        gValueResult?.Value,
+                        uValueResult?.Value,
+                        nearnormalHemisphericalVisibleTransmittancelueResult?.Value
+                    }
+                    .OfType<ValueObjects.Proposition<TVariable>>(), // excludes null values
                     path
                     )
                   );
