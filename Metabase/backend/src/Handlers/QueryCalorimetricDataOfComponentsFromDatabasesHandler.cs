@@ -60,7 +60,7 @@ namespace Metabase.Handlers
                     )
                   )
               : CalorimetricDataJson.FromJsonElement(
-                  calorimetricDataResponse.Data ?? throw new ArgumentNullException(nameof(calorimetricDataResponse.Data)), // TODO Why does the null-forgiving operator `!` not work here?
+                  calorimetricDataResponse.Data.Value,
                   path.Append("data").ToList().AsReadOnly()
                   );
             var timestampResult = Infrastructure.ValueObjects.Timestamp.From(calorimetricDataResponse.Timestamp, path: path.Append("timestamp").ToList().AsReadOnly());

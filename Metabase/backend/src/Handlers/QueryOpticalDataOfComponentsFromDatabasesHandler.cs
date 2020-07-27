@@ -60,7 +60,7 @@ namespace Metabase.Handlers
                     )
                   )
               : OpticalDataJson.FromJsonElement(
-                  opticalDataResponse.Data ?? throw new ArgumentNullException(nameof(opticalDataResponse.Data)), // TODO Why does the null-forgiving operator `!` not work here?
+                  opticalDataResponse.Data.Value,
                   path.Append("data").ToList().AsReadOnly()
                   );
             var timestampResult = Infrastructure.ValueObjects.Timestamp.From(opticalDataResponse.Timestamp, path: path.Append("timestamp").ToList().AsReadOnly());

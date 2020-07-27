@@ -48,12 +48,10 @@ namespace Infrastructure.ValueObjects
             )
         {
             if (id is null)
+            {
                 return null;
-
-            // Why can't we use the null-forgiving operator `!` as follows?
-            // return From(id: id!, path: path);
-            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/null-forgiving
-            return From(id: id ?? throw new ArgumentNullException(nameof(id)), path: path);
+            }
+            return From(id: id.Value, path: path);
         }
 
         protected override IEnumerable<object?> GetEqualityComponents()
