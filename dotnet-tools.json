@@ -9,13 +9,13 @@
       ]
     },
     "dotnet-counters": {
-      "version": "3.1.135903",
+      "version": "3.1.137102",
       "commands": [
         "dotnet-counters"
       ]
     },
     "dotnet-dump": {
-      "version": "3.1.135903",
+      "version": "3.1.137102",
       "commands": [
         "dotnet-dump"
       ]
@@ -39,19 +39,19 @@
       ]
     },
     "dotnet-trace": {
-      "version": "3.1.135903",
+      "version": "3.1.137102",
       "commands": [
         "dotnet-trace"
       ]
     },
     "dotnet-gcdump": {
-      "version": "3.1.135903",
+      "version": "3.1.137102",
       "commands": [
         "dotnet-gcdump"
       ]
     },
     "dotnet-sos": {
-      "version": "3.1.135903",
+      "version": "3.1.137102",
       "commands": [
         "dotnet-sos"
       ]
