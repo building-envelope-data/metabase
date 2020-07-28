@@ -4,14 +4,8 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class SearchComponentResult
+      : Infrastructure.GraphQl.SearchComponentResult<OpticalData, CalorimetricData, PhotovoltaicData, HygrothermalData>
     {
-        public Id Id { get; }
-        public IReadOnlyList<OpticalData> OpticalData { get; }
-        public IReadOnlyList<CalorimetricData> CalorimetricData { get; }
-        public IReadOnlyList<PhotovoltaicData> PhotovoltaicData { get; }
-        public IReadOnlyList<HygrothermalData> HygrothermalData { get; }
-        public Timestamp RequestTimestamp { get; }
-
         public SearchComponentResult(
             Id id,
             IReadOnlyList<OpticalData> opticalData,
@@ -20,13 +14,15 @@ namespace Metabase.GraphQl
             IReadOnlyList<HygrothermalData> hygrothermalData,
             Timestamp requestTimestamp
             )
+          : base(
+              id,
+              opticalData,
+              calorimetricData,
+              photovoltaicData,
+              hygrothermalData,
+              requestTimestamp
+              )
         {
-            Id = id;
-            OpticalData = opticalData;
-            CalorimetricData = calorimetricData;
-            PhotovoltaicData = photovoltaicData;
-            HygrothermalData = hygrothermalData;
-            RequestTimestamp = requestTimestamp;
         }
     }
 }

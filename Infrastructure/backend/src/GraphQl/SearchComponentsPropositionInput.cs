@@ -158,7 +158,7 @@ namespace Infrastructure.GraphQl
                     path
                     )
                   )
-                  .Map(andProposition => (Proposition<ValueObjects.SearchComponentsVariable>)andProposition);
+                  .Map(andProposition => (ValueObjects.Proposition<TVariable>)andProposition);
         }
     }
 }

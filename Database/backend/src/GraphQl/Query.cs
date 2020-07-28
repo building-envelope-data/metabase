@@ -185,9 +185,17 @@ namespace Database.GraphQl
         public SearchComponentsResult SearchComponents(
             SearchComponentsPropositionInput where,
             Timestamp? timestamp
+            /* [DataLoader] SearchComponentsDataLoader searchComponentsDataLoader, */
+            /* IResolverContext resolverContext */
             )
         {
-            return null!;
+          return null!;
+          /* return searchComponentsDataLoader.LoadAsync( */
+          /*     ( */
+          /*      SearchComponentsPropositionInput.Validate(where, new List<object>().AsReadOnly()), */
+          /*      timestamp ?? TimestampHelpers.Fetch(resolverContext) */
+          /*     ) */
+          /*     ); */
         }
     }
 }

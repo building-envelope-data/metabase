@@ -9,17 +9,17 @@ using IQueryBus = Infrastructure.Queries.IQueryBus;
 namespace Database.GraphQl
 {
     public sealed class SearchComponentsResult
+      : Infrastructure.GraphQl.SearchComponentsResult<SearchComponentResult>
     {
-        public IReadOnlyList<SearchComponentResult> Components { get; }
-        public Timestamp RequestTimestamp { get; }
-
         public SearchComponentsResult(
             IReadOnlyList<SearchComponentResult> components,
             Timestamp requestTimestamp
             )
+          : base(
+              components,
+              requestTimestamp
+              )
         {
-            Components = components;
-            RequestTimestamp = requestTimestamp;
         }
     }
 }
