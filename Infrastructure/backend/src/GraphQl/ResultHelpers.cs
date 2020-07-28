@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -39,13 +40,28 @@ namespace Infrastructure.GraphQl
             return results.Select(ToDataLoaderResult).ToList().AsReadOnly();
         }
 
-        public static IReadOnlyList<GreenDonut.Result<IReadOnlyList<T>>> ToDataLoaderResultsX<T>(IEnumerable<Result<IEnumerable<Result<T, Errors>>, Errors>> results)
+        public static
+          IReadOnlyList<GreenDonut.Result<IReadOnlyList<T>>> ToDataLoaderResultsX<T>(
+            IEnumerable<Result<IEnumerable<Result<T, Errors>>, Errors>> results
+            )
+        {
+          return ToDataLoaderResultsX<T, IReadOnlyList<T>>(
+              results,
+              enumerable => enumerable.ToList().AsReadOnly()
+              );
+        }
+
+        public static
+          IReadOnlyList<GreenDonut.Result<TCombined>> ToDataLoaderResultsX<T, TCombined>(
+            IEnumerable<Result<IEnumerable<Result<T, Errors>>, Errors>> results,
+            Func<IEnumerable<T>, TCombined> combine
+            )
         {
             return results.Select(result =>
                 {
                     if (result.IsFailure)
                     {
-                        return GreenDonut.Result<IReadOnlyList<T>>.Reject(new QueryException(result.Error));
+                        return GreenDonut.Result<TCombined>.Reject(new QueryException(result.Error));
                     }
                     // TODO If one of the results in `result.Value` is a failure, then
                     // `combinedResult` is a failure even if there are many successful
@@ -56,9 +72,11 @@ namespace Infrastructure.GraphQl
                     var combinedResult = result.Value.Combine();
                     if (combinedResult.IsFailure)
                     {
-                        return GreenDonut.Result<IReadOnlyList<T>>.Reject(new QueryException(combinedResult.Error));
+                        return GreenDonut.Result<TCombined>.Reject(new QueryException(combinedResult.Error));
                     }
-                    return GreenDonut.Result<IReadOnlyList<T>>.Resolve(combinedResult.Value.ToList().AsReadOnly());
+                    return GreenDonut.Result<TCombined>.Resolve(
+                        combine(combinedResult.Value)
+                        );
                 }
               ).ToList().AsReadOnly();
         }
