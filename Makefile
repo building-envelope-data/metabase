@@ -294,6 +294,7 @@ createdb-all :
 # Generate Certificates #
 # --------------------- #
 
+# For an introduction to how HTTPS works see https://howhttps.works
 ssl : generate-certificate-authority trust-certificate-authority ## Generate and trust certificate authority, and generate SSL certificates
 	make generate-ssl-certificate-ikdb
 	make generate-ssl-certificate-ise
