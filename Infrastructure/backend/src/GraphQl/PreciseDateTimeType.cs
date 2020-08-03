@@ -18,6 +18,7 @@ namespace Infrastructure.GraphQl
     public sealed class PreciseDateTimeType
         : DateTimeTypeBase
     {
+        // https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings
         private const string _utcFormat = "yyyy-MM-ddTHH\\:mm\\:ss.ffffffZ";
         private const string _localFormat = "yyyy-MM-ddTHH\\:mm\\:ss.ffffffzzz";
 
