@@ -39,6 +39,7 @@ introduces custom scalar types for creating precise type-safe GraphQL schemas.
 We took some inspiration from
 [GitHub GraphQL API](https://docs.github.com/en/graphql).
 """
+scalar TodoRemoveThisScalarItIsHereJustSoThatTheAboveCommentIsNotASyntaxError
 
 """
 [RFC 4122](https://tools.ietf.org/html/rfc4122)
@@ -122,6 +123,11 @@ compliant
 string without unnecessary white-space for the present schema.
 """
 scalar JsonGraphQlResponse
+
+"""
+Anything
+"""
+scalar Any
 
 type Query {
   data(id: Uuid!, timestamp: DateTime, locale: Locale): Data!
@@ -275,7 +281,7 @@ interface Data {
   """
   Approval by the database of the result without the field `approval` itself.
   """
-  approval: SignatureAndKeyFingerprint!
+  approval: ResponseApproval!
 }
 
 type OpticalData implements Data {
@@ -377,19 +383,13 @@ type AppliedMethod {
 
 type MethodParameter {
   name: String!
-  value: IntOrFloatOrStringOrBoolean!
+  value: Any!
 }
 
 type MethodSource {
   name: String!
   value: CrossDatabaseReference!
 }
-
-union IntOrFloatOrStringOrBoolean =
-    Int
-  | Float
-  | String
-  | Boolean
 
 type CrossDatabaseReference {
   id: Uuid!
@@ -398,28 +398,15 @@ type CrossDatabaseReference {
 
 """Open-ended data and time range"""
 type OpenEndedDateTimeRange {
-  """From beginning of time, or some date and time"""
-  from: FromDateTime!
-  """Until some date and time, or end of time"""
-  until: UntilDateTime!
-}
+  """
+  From beginning of time represented by `null`, or some date and time
+  """
+  from: DateTime
 
-union FromDateTime =
-    BeginningOfTime
-  | DateTime
-
-"""Constant designating the beginning of time"""
-enum BeginningOfTime {
-  BEGINNING_OF_TIME
-}
-
-union UntilDateTime =
-    DateTime
-  | EndOfTime
-
-"""Constant designating the end of time"""
-enum EndOfTime {
-  END_OF_TIME
+  """
+  Until some date and time, or end of time represented by `null`
+  """
+  until: DateTime
 }
 
 """
