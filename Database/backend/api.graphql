@@ -1,4 +1,10 @@
 """
+TODO: Multiple resources describing the same data in different formats
+        "file": {
+          "$ref": "common.json#/$defs/file",
+          "description": "The optical data can be provided as a file. If the data is provided as a file and as explicit values below, than it MUST be the same data only in different formats. If one data is derived from another data, it MUST be stored as separate items in the array optical/basics and origin SHOULD be used to identify the method of derivation."
+        }
+
 The
 [Internet Engineering Task Force (IETF)](https://www.ietf.org)
 is an Internet standards organization. It publishes standards in
@@ -131,25 +137,24 @@ scalar Any
 
 type Query {
   data(id: Uuid!, timestamp: DateTime, locale: Locale): Data!
-  hasOpticalData(componentId: Uuid!, timestamp: DateTime, locale: Locale): Boolean!
-  opticalData(componentId: Uuid!, timestamp: DateTime, locale: Locale): [OpticalData!]!
+  hasOpticalData(
+    componentId: Uuid!
+    timestamp: DateTime
+    locale: Locale
+  ): Boolean!
+  opticalData(
+    componentId: Uuid!
+    timestamp: DateTime
+    locale: Locale
+  ): [OpticalData!]!
   calorimetricData(
     componentId: Uuid!
     timestamp: DateTime
     locale: Locale
   ): [CalorimetricData!]!
-  hasCalorimetricData(
-    componentId: Uuid!
-    timestamp: DateTime
-  ): Boolean!
-  hasHygrothermalData(
-    componentId: Uuid!
-    timestamp: DateTime
-  ): Boolean!
-  hasPhotovoltaicData(
-    componentId: Uuid!
-    timestamp: DateTime
-  ): Boolean!
+  hasCalorimetricData(componentId: Uuid!, timestamp: DateTime): Boolean!
+  hasHygrothermalData(componentId: Uuid!, timestamp: DateTime): Boolean!
+  hasPhotovoltaicData(componentId: Uuid!, timestamp: DateTime): Boolean!
   hygrothermalData(
     componentId: Uuid!
     timestamp: DateTime
@@ -234,10 +239,14 @@ interface Data {
   """
   componentId: Uuid!
 
-  """Name"""
+  """
+  Name
+  """
   name: String
 
-  """Description"""
+  """
+  Description
+  """
   description: String
 
   """
@@ -253,7 +262,9 @@ interface Data {
   """
   creatorId: Uuid!
 
-  """Creation timestamp"""
+  """
+  Creation timestamp
+  """
   creationTimestamp: DateTime!
 
   """
@@ -261,7 +272,9 @@ interface Data {
   """
   appliedMethod: AppliedMethod!
 
-  """Validity date and time range"""
+  """
+  Validity date and time range
+  """
   validity: OpenEndedDateTimeRange!
 
   """
@@ -321,9 +334,13 @@ type CalorimetricData implements Data {
   resources: [GetHttpsResource!]!
   approvals: [DataApproval!]!
   approval: ResponseApproval!
-  """Mirrored `g` values that occur in the data"""
+  """
+  Mirrored `g` values that occur in the data
+  """
   gValues: [Float!]!
-  """Mirrored `u` values that occur in the data"""
+  """
+  Mirrored `u` values that occur in the data
+  """
   uValues: [Float!]!
 }
 
@@ -396,7 +413,9 @@ type CrossDatabaseReference {
   databaseId: Uuid!
 }
 
-"""Open-ended data and time range"""
+"""
+Open-ended data and time range
+"""
 type OpenEndedDateTimeRange {
   """
   From beginning of time represented by `null`, or some date and time
