@@ -295,10 +295,12 @@ createdb-all :
 # --------------------- #
 
 # For an introduction to how HTTPS works see https://howhttps.works
-ssl : generate-certificate-authority trust-certificate-authority ## Generate and trust certificate authority, and generate SSL certificates
+ssl : ## Generate and trust certificate authority, and generate SSL certificates
+	make generate-certificate-authority
 	make generate-ssl-certificate-metabase
 	make generate-ssl-certificate-ise
 	make generate-ssl-certificate-lbnl
+	make trust-certificate-authority
 .PHONY : ssl
 
 # Creating Self-Signed ECDSA SSL Certificate using OpenSSL: http://www.guyrutenberg.com/2013/12/28/creating-self-signed-ecdsa-ssl-certificate-using-openssl/
