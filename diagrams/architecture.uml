@@ -4,7 +4,7 @@ skinparam componentStyle uml2
 
 actor "User" as User
 
-package "IKDB" as Ikdb {
+package "Metabase" as Metabase {
   interface "GraphQL Endpoint" as GraphQlEndpoint
 
   /' package "C#" as CSharp { '/

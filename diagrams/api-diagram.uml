@@ -5,16 +5,16 @@ skinparam componentStyle uml2
 package "Front Ends" {
     component [Website X] as Website
     component [Software X] as Software
-    component [ES-SO] as ESSO
+    component [ES-SO] as Esso
 }
 
-package "IKDB" as IKDBX {
-    interface API as IKDBAPI
+package "Metabase" as MetabaseX {
+    interface API as MetabaseApi
     interface "OAuth 2.0" as OAuth2
-    component [Middle Tier] as IKDBMid
-    database "IKDB" as IKDB
+    component [Middle Tier] as MetabaseMid
+    database "Metabase" as Metabase
 }
-note left of IKDBX
+note left of MetabaseX
     * Issues unique identifiers
     * Stores meta information
       of components, measurment methods,
@@ -24,43 +24,43 @@ note left of IKDBX
     * Provides authentication and authorization
 end note
 
-package "IGSDB" as IGSDBX {
-    interface API as IGSDBAPI
-    component [Middle Tier] as IGSDBMid
-    database "IGSDB" as IGSDB
+package "IGSDB" as IgsdbX {
+    interface API as IgsdbApi
+    component [Middle Tier] as IgsdbMid
+    database "IGSDB" as Igsdb
 }
 
-package "ESSDA" as ESSDAX {
-    interface API as ESSDAAPI
-    component [Middle Tier] as ESSDAMid
-    database "ES-SDA" as ESSDA
+package "ES-SDA" as EssdaX {
+    interface API as EssdaApi
+    component [Middle Tier] as EssdaMid
+    database "ES-SDA" as Essda
 }
 
-package "ISEDB" as ISEDBX {
-    interface API as ISEAPI
-    component [Middle Tier] as ISEMid
-    database "ISEDB" as ISE
+package "ISE-DB" as IseDBX {
+    interface API as IseApi
+    component [Middle Tier] as IseMid
+    database "ISE-DB" as Ise
 }
 
-Website -down-( IKDBAPI
-Software -down-( IKDBAPI
-ESSO -down-( ESSDAAPI
+Website -down-( MetabaseApi
+Software -down-( MetabaseApi
+Esso -down-( EssdaApi
 
-IKDBAPI -down- IKDBMid
-OAuth2 -down- IKDBMid
-IKDBMid -down- IKDB
+MetabaseApi -down- MetabaseMid
+OAuth2 -down- MetabaseMid
+MetabaseMid -down- Metabase
 
-IKDBMid -down-( IGSDBAPI
-IGSDBAPI -down- IGSDBMid
-IGSDBMid -down- IGSDB
+MetabaseMid -down-( IgsdbApi
+IgsdbApi -down- IgsdbMid
+IgsdbMid -down- Igsdb
 
-IKDBMid -down-( ESSDAAPI
-ESSDAAPI -down- ESSDAMid
-ESSDAMid -down- ESSDA
-ESSDAMid ..up..( OAuth2: Authenticate and Authorize
+MetabaseMid -down-( EssdaApi
+EssdaApi -down- EssdaMid
+EssdaMid -down- Essda
+EssdaMid ..up..( OAuth2: Authenticate and Authorize
 
-IKDBMid -down-( ISEAPI
-ISEAPI -down- ISEMid
-ISEMid -down- ISE
+MetabaseMid -down-( IseApi
+IseApi -down- IseMid
+IseMid -down- Ise
 
 @enduml

@@ -5,7 +5,7 @@
 begin_chapter "Who has optical data"
 
 query \
-  $ikdb_graphql_url \
+  $metabase_graphql_url \
   whoHasOpticalData.graphql \
   "{ \
     \"glazingComponentId\": \"$GLAZING_COMPONENT_ID\", \

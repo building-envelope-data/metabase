@@ -2,11 +2,11 @@
 
 . ./functions.sh
 
-begin_chapter "Verify that IKDB is empty"
+begin_chapter "Verify that METABASE is empty"
 
 query \
-  $ikdb_graphql_url \
-  verifyThatIkdbIsEmpty.graphql \
+  $metabase_graphql_url \
+  verifyThatMetabaseIsEmpty.graphql \
   "{}" \
   > /dev/null
 

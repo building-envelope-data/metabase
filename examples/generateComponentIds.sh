@@ -6,7 +6,7 @@ begin_chapter "Generate component identifiers"
 
 json_file_path=$(
   query \
-    $ikdb_graphql_url \
+    $metabase_graphql_url \
     generateComponentIds.graphql \
     "{}" \
 )

@@ -3,18 +3,18 @@
 
 include .env
 
-ikdb_name = ikdb
+metabase_name = metabase
 ise_name = ise
 lbnl_name = lbnl
 
 # Inspired by https://docs.docker.com/engine/reference/commandline/run/#add-entries-to-container-hosts-file---add-host
 docker_ip = $(shell ip -4 addr show scope global dev docker0 | grep inet | awk '{print $$2}' | cut -d / -f 1)
 
-ikdb_docker_compose = \
+metabase_docker_compose = \
 	docker-compose \
 		--file docker-compose.common.yml \
-		--file docker-compose.ikdb.yml \
-		--project-name ${ikdb_name}
+		--file docker-compose.metabase.yml \
+		--project-name ${metabase_name}
 ise_docker_compose = \
 	docker-compose \
 		--file docker-compose.common.yml \
@@ -34,9 +34,9 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name-ikdb : ## Print value of variable `ikdb_name`
-	@echo ${ikdb_name}
-.PHONY : name-ikdb
+name-metabase : ## Print value of variable `metabase_name`
+	@echo ${metabase_name}
+.PHONY : name-metabase
 
 name-ise : ## Print value of variable `ise_name`
 	@echo ${ise_name}
@@ -64,9 +64,9 @@ build : ## Build images
 		--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
-build-ikdb : docker_compose = ${ikdb_docker_compose}
-build-ikdb : build ## Build IKDB images
-.PHONY : build-ikdb
+build-metabase : docker_compose = ${metabase_docker_compose}
+build-metabase : build ## Build metabase images
+.PHONY : build-metabase
 
 build-ise : docker_compose = ${ise_docker_compose}
 build-ise : build ## Build ISE images
@@ -87,9 +87,9 @@ remove : ## Remove stopped containers
 		${docker_compose} rm
 .PHONY : remove
 
-remove-ikdb : docker_compose = ${ikdb_docker_compose}
-remove-ikdb : remove ## Remove stopped IKDB containers
-.PHONY : remove-ikdb
+remove-metabase : docker_compose = ${metabase_docker_compose}
+remove-metabase : remove ## Remove stopped metabase containers
+.PHONY : remove-metabase
 
 remove-ise : docker_compose = ${ise_docker_compose}
 remove-ise : remove ## Remove stopped ISE containers
@@ -114,9 +114,9 @@ up : build ## (Re)create and start containers
 		--detach
 .PHONY : up
 
-up-ikdb : docker_compose = ${ikdb_docker_compose}
-up-ikdb : up ## (Re)create and start IKDB containers
-.PHONY : up-ikdb
+up-metabase : docker_compose = ${metabase_docker_compose}
+up-metabase : up ## (Re)create and start metabase containers
+.PHONY : up-metabase
 
 up-ise : docker_compose = ${ise_docker_compose}
 up-ise : up ## (Re)create and start ISE containers
@@ -131,9 +131,9 @@ down : ## Stop containers and remove containers, networks, volumes, and images c
 		${docker_compose} down
 .PHONY : down
 
-down-ikdb : docker_compose = ${ikdb_docker_compose}
-down-ikdb : down ## Stop IKDB containers and remove containers, networks, volumes, and images created by `up-ikdb`
-.PHONY : down-ikdb
+down-metabase : docker_compose = ${metabase_docker_compose}
+down-metabase : down ## Stop metabase containers and remove containers, networks, volumes, and images created by `up-metabase`
+.PHONY : down-metabase
 
 down-ise : docker_compose = ${ise_docker_compose}
 down-ise : down ## Stop ISE containers and remove containers, networks, volumes, and images created by `up-ise`
@@ -148,9 +148,9 @@ restart : ## Restart all stopped and running containers
 		${docker_compose} restart
 .PHONY : restart
 
-restart-ikdb : docker_compose = ${ikdb_docker_compose}
-restart-ikdb : restart ## Restart all stopped and running IKDB containers
-.PHONY : restart-ikdb
+restart-metabase : docker_compose = ${metabase_docker_compose}
+restart-metabase : restart ## Restart all stopped and running metabase containers
+.PHONY : restart-metabase
 
 restart-ise : docker_compose = ${ise_docker_compose}
 restart-ise : restart ## Restart all stopped and running ISE containers
@@ -166,9 +166,9 @@ logs : ## Follow logs
 		--follow
 .PHONY : logs
 
-logs-ikdb : docker_compose = ${ikdb_docker_compose}
-logs-ikdb : logs ## Follow IKDB logs
-.PHONY : logs-ikdb
+logs-metabase : docker_compose = ${metabase_docker_compose}
+logs-metabase : logs ## Follow metabase logs
+.PHONY : logs-metabase
 
 logs-ise : docker_compose = ${ise_docker_compose}
 logs-ise : logs ## Follow ISE logs
@@ -194,9 +194,9 @@ runb : build ## Run the one-time command `${COMMAND}` against a fresh `backend` 
 		${COMMAND}
 .PHONY : runb
 
-runb-ikdb : docker_compose = ${ikdb_docker_compose}
-runb-ikdb : runb ## Run the one-time command `${COMMAND}` against a fresh IKDB container
-.PHONY : runb-ikdb
+runb-metabase : docker_compose = ${metabase_docker_compose}
+runb-metabase : runb ## Run the one-time command `${COMMAND}` against a fresh metabase container
+.PHONY : runb-metabase
 
 runb-ise : docker_compose = ${ise_docker_compose}
 runb-ise : runb ## Run the one-time command `${COMMAND}` against a fresh ISE container
@@ -214,9 +214,9 @@ shellb : COMMAND = ash
 shellb : runb ## Enter shell in a fresh `backend` container
 .PHONY : shellb
 
-shellb-ikdb : docker_compose = ${ikdb_docker_compose}
-shellb-ikdb : shellb ## Enter shell in a fresh IKDB container
-.PHONY : shellb-ikdb
+shellb-metabase : docker_compose = ${metabase_docker_compose}
+shellb-metabase : shellb ## Enter shell in a fresh metabase container
+.PHONY : shellb-metabase
 
 shellb-ise : docker_compose = ${ise_docker_compose}
 shellb-ise : shellb ## Enter shell in a fresh ISE container
@@ -227,11 +227,11 @@ shellb-lbnl : shellb ## Enter shell in a fresh LBNL container
 .PHONY : shellb-lbnl
 
 shellb-examples : COMMAND = bash -c "cd ./examples && bash"
-shellb-examples : runb-ikdb ## Enter Bourne-again shell, aka, bash, in a fresh IKDB container
+shellb-examples : runb-metabase ## Enter Bourne-again shell, aka, bash, in a fresh metabase container
 .PHONY : shellb-examples
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
-traceb : docker_compose = ${ikdb_docker_compose}
+traceb : docker_compose = ${metabase_docker_compose}
 traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for example, `make CONTAINER_ID=c1b82eb6e03c trace-backend`
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
@@ -242,7 +242,7 @@ traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for examp
 				"
 .PHONY : traceb
 
-psql : docker_compose = ${ikdb_docker_compose}
+psql : docker_compose = ${metabase_docker_compose}
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
@@ -252,7 +252,7 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname xbase_development
 .PHONY : psql
 
-shelld : docker_compose = ${ikdb_docker_compose}
+shelld : docker_compose = ${metabase_docker_compose}
 shelld : ## Enter shell in a fresh `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} run \
@@ -271,9 +271,9 @@ createdb : ## Create databases
 		"
 .PHONY : createdb
 
-createdb-ikdb : docker_compose = ${ikdb_docker_compose}
-createdb-ikdb : createdb ## Create IKDB databases
-.PHONY : createdb-ikdb
+createdb-metabase : docker_compose = ${metabase_docker_compose}
+createdb-metabase : createdb ## Create metabase databases
+.PHONY : createdb-metabase
 
 createdb-ise : docker_compose = ${ise_docker_compose}
 createdb-ise : createdb ## Create ISE databases
@@ -285,7 +285,7 @@ createdb-lbnl : createdb ## Create LBNL databases
 
 createdb-all : ## Create all databases
 createdb-all :
-	-make createdb-ikdb
+	-make createdb-metabase
 	-make createdb-ise
 	-make createdb-lbnl
 .PHONY : createdb-all
@@ -296,7 +296,7 @@ createdb-all :
 
 # For an introduction to how HTTPS works see https://howhttps.works
 ssl : generate-certificate-authority trust-certificate-authority ## Generate and trust certificate authority, and generate SSL certificates
-	make generate-ssl-certificate-ikdb
+	make generate-ssl-certificate-metabase
 	make generate-ssl-certificate-ise
 	make generate-ssl-certificate-lbnl
 .PHONY : ssl
@@ -498,12 +498,12 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 			"
 .PHONY : generate-ssl-certificate
 
-generate-ssl-certificate-ikdb : HOST = ${IKDB_HOST}
-generate-ssl-certificate-ikdb : SSL_CERTIFICATE_BASE_FILE_NAME = ${IKDB_SSL_CERTIFICATE_BASE_FILE_NAME}
-generate-ssl-certificate-ikdb : SSL_CERTIFICATE_PASSWORD = ${IKDB_SSL_CERTIFICATE_PASSWORD}
-generate-ssl-certificate-ikdb : SSL_CERTIFICATE_SUBJECT = ${IKDB_SSL_CERTIFICATE_SUBJECT}
-generate-ssl-certificate-ikdb : generate-ssl-certificate ## Generate IKDB SSL certificate
-.PHONY : generate-ssl-certificate-ikdb
+generate-ssl-certificate-metabase : HOST = ${METABASE_HOST}
+generate-ssl-certificate-metabase : SSL_CERTIFICATE_BASE_FILE_NAME = ${METABASE_SSL_CERTIFICATE_BASE_FILE_NAME}
+generate-ssl-certificate-metabase : SSL_CERTIFICATE_PASSWORD = ${METABASE_SSL_CERTIFICATE_PASSWORD}
+generate-ssl-certificate-metabase : SSL_CERTIFICATE_SUBJECT = ${METABASE_SSL_CERTIFICATE_SUBJECT}
+generate-ssl-certificate-metabase : generate-ssl-certificate ## Generate metabase SSL certificate
+.PHONY : generate-ssl-certificate-metabase
 
 generate-ssl-certificate-ise : HOST = ${ISE_HOST}
 generate-ssl-certificate-ise : SSL_CERTIFICATE_BASE_FILE_NAME = ${ISE_SSL_CERTIFICATE_BASE_FILE_NAME}
@@ -523,10 +523,10 @@ fetch-ssl-certificate : ## Fetch the SSL certificate of the server
 	openssl s_client ${HOST}:${HTTPS_PORT}
 .PHONY : fetch-ssl-certificate
 
-fetch-ssl-certificate-ikdb : HOST = ${IKDB_HOST}
-fetch-ssl-certificate-ikdb : HTTPS_PORT = ${IKDB_HTTPS_PORT}
-fetch-ssl-certificate-ikdb : fetch-ssl-certificate ## Fetch the SSL certificate of the IKDB server
-.PHONY : fetch-ssl-certificate-ikdb
+fetch-ssl-certificate-metabase : HOST = ${METABASE_HOST}
+fetch-ssl-certificate-metabase : HTTPS_PORT = ${METABASE_HTTPS_PORT}
+fetch-ssl-certificate-metabase : fetch-ssl-certificate ## Fetch the SSL certificate of the metabase server
+.PHONY : fetch-ssl-certificate-metabase
 
 fetch-ssl-certificate-ise : HOST = ${ISE_HOST}
 fetch-ssl-certificate-ise : HTTPS_PORT = ${ISE_HTTPS_PORT}

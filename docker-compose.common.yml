@@ -42,7 +42,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
     extra_hosts:
-      - ${IKDB_HOST}:${DOCKER_IP}
+      - ${METABASE_HOST}:${DOCKER_IP}
       - ${ISE_HOST}:${DOCKER_IP}
       - ${LBNL_HOST}:${DOCKER_IP}
     depends_on:

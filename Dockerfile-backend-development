@@ -199,7 +199,7 @@ RUN \
 # var response =
 #    await client
 #    .PostAsync(
-#    "https://ikdb.org:4041/graphql/",
+#    "https://metabase.org:4041/graphql/",
 #    content
 #    );
 # ```

@@ -4,7 +4,7 @@ begin_chapter "Register institutions ISE and LBNL"
 
 json_file_path=$(
   query \
-    $ikdb_graphql_url \
+    $metabase_graphql_url \
     registerInstitutionsIseAndLbnl.graphql \
     "{}" \
 )
