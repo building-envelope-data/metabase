@@ -67,6 +67,12 @@
       "commands": [
         "roslynator"
       ]
+    },
+    "jetbrains.resharper.globaltools": {
+      "version": "2020.2.1",
+      "commands": [
+        "jb"
+      ]
     }
   }
 }
