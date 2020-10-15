@@ -1,0 +1,90 @@
+@startuml "Approvals"
+
+actor "ISE Representative" as User
+participant "Certificate Authority (CA)" as CertificateAuthority
+participant "Pretty Good Privacy (PGP) Key Server" as PgpKeyServer
+participant "LBNL Database" as Database
+participant "European Solar-Shading Organization (ES-SO)" as Esso
+
+[-> User: start signing key process
+activate User #LightGreen
+
+User -> User: generate PGP signing key with GnuPG
+User -> CertificateAuthority: request signature for key giving credibility to its authenticity
+activate CertificateAuthority #LightPink
+
+CertificateAuthority -> User: validate authenticity using phone, mail, URL, ...
+activate User
+User --> CertificateAuthority
+deactivate User
+CertificateAuthority -> User: return signature
+deactivate CertificateAuthority
+
+User -> PgpKeyServer: store signed key
+activate PgpKeyServer #LightSteelBlue
+PgpKeyServer --> User
+deactivate PgpKeyServer
+[<- User: end
+deactivate User
+
+[-> User: start data process
+activate User #LightBlue
+User -> User: measure photovoltaic module
+
+User -> Database: submit measured data with meta information
+activate Database #LightSlateGray
+Database -> Database: review data
+activate Database
+Database -> User: ask for clarification/correction
+activate User
+User --> Database: return clarification/correction
+deactivate User
+Database -> Database: incorporate changes
+Database -> Database: finish review
+deactivate Database
+Database -> User: request verification and signature
+activate User
+
+User -> Database: query data
+activate Database
+Database --> User: response
+deactivate Database
+
+User -> User: verify and sign query response
+
+User -> Database: submit signature with query and response
+activate Database
+Database -> Database: check signature, query, and response
+Database -> Database: add signature to data
+Database -> Database: publish data
+Database --> User
+deactivate Database
+User --> Database
+deactivate User
+
+Database --> User
+deactivate Database
+
+[<- User: end
+deactivate User
+
+Esso <-]: start approval process
+activate Esso #LightCoral
+Database <- Esso: query data
+activate Database #LightSlateGray
+Database --> Esso: response
+deactivate Database
+
+Esso --> Esso: review and sign query response with statement "fulfills European standard EN ISO ..."
+Database <- Esso: submit signature with query, response, and statement
+activate Database #LightSlateGray
+Database -> Database: check signature, query, response, and statement
+Database -> Database: add signature and statement to data
+Database --> Esso
+deactivate Database
+Esso ->]: end
+deactivate Esso
+
+deactivate User
+
+@enduml
