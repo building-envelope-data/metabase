@@ -3,7 +3,7 @@
 actor "ISE Representative" as User
 participant "Certificate Authority (CA)" as CertificateAuthority
 participant "Pretty Good Privacy (PGP) Key Server" as PgpKeyServer
-participant "LBNL Database" as Database
+participant "Building-Envelope Database" as Database
 participant "European Solar-Shading Organization (ES-SO)" as Esso
 
 [-> User: start signing key process
