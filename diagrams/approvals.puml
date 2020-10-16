@@ -53,7 +53,21 @@ activate User #LightBlue
 
             User -> Database: submit signature with query and response
             activate Database
-                Database -> Database: check signature, query, and response
+                Database -> PgpKeyServer: get ISE PGP key with CA signature
+                activate PgpKeyServer
+                PgpKeyServer --> Database: response
+                deactivate PgpKeyServer
+
+                Database -> Database: check key authenticity
+                activate Database
+                    Database -> CertificateAuthority: how do you establish authenticity?
+                    activate CertificateAuthority
+                    CertificateAuthority --> Database: response
+                    deactivate CertificateAuthority
+                Database --> Database: response
+                deactivate Database
+
+                Database -> Database: check signature, query reproducibility, and whether response matches query
                 Database -> Database: add signature to data
                 Database -> Database: publish data
             Database --> User
@@ -76,7 +90,21 @@ activate Esso #LightCoral
 
     Database <- Esso: submit signature with query, response, and statement
     activate Database #LightSlateGray
-        Database -> Database: check signature, query, response, and statement
+        Database -> PgpKeyServer: get ES-SO PGP key with CA signature
+        activate PgpKeyServer
+        PgpKeyServer --> Database: response
+        deactivate PgpKeyServer
+
+        Database -> Database: check key authenticity
+        activate Database
+            Database -> CertificateAuthority: how do you establish authenticity?
+            activate CertificateAuthority
+            CertificateAuthority --> Database: response
+            deactivate CertificateAuthority
+        Database --> Database: response
+        deactivate Database
+
+        Database -> Database: check signature, query reproducibility, whether response matches query, and statement
         Database -> Database: add signature and statement to data
     Database --> Esso
     deactivate Database
