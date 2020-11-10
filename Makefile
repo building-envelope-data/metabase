@@ -627,5 +627,5 @@ dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for exampl
 					}"
 
 diagrams : ## Draw images from textual UML diagrams
-	plantuml diagrams/*.uml
+	plantuml diagrams/*.puml
 .PHONY : diagrams
