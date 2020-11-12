@@ -1,8 +1,9 @@
 # Inspired by https://mherman.org/blog/dockerizing-a-react-app/
-FROM node:12.10.0-alpine
+FROM node:14.15.0-alpine3.12
 
-ARG GROUP_ID=1000
-ARG USER_ID=1000
+ARG GROUP_ID
+ARG USER_ID
+ARG PROJECT_NAME
 
 #############
 # As `root` #
@@ -15,20 +16,22 @@ RUN \
 
 ENV HOME=/home/node
 RUN \
-  mkdir ${HOME}/app && \
+  mkdir --parents ${HOME}/app/${PROJECT_NAME}/frontend && \
   chown node:node ${HOME}/app && \
+  chown node:node ${HOME}/app/${PROJECT_NAME} && \
+  chown node:node ${HOME}/app/${PROJECT_NAME}/frontend && \
   ln -s ${HOME}/app /app
 
 #############
 # As `node` #
 #############
 USER node
-WORKDIR /app
+WORKDIR /app/${PROJECT_NAME}/frontend
 
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH=/app/${PROJECT_NAME}/frontend/node_modules/.bin:$PATH
 COPY \
   --chown=node:node \
-  package.json ./
+  ./${PROJECT_NAME}/frontend/package.json ./
 RUN npm install
 
 EXPOSE 3000

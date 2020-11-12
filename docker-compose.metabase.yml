@@ -30,6 +30,13 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${METABASE_SSL_CERTIFICATE_PASSWORD}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${METABASE_SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
 
+  frontend:
+    build:
+      args:
+        - PROJECT_NAME=Metabase
+    volumes:
+      - frontend_node_modules:/app/Metabase/frontend/node_modules
+
   nginx:
     ports:
       - ${METABASE_HTTP_PORT}:80

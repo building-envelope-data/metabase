@@ -1,0 +1,19 @@
+docker build --build-arg PROJECT_NAME=Metabase --tag registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-backend-production:0.1.0 --file Dockerfile-backend-production .
+
+docker run --publish 9393:80 --env ASPNETCORE_ENVIRONMENT=production registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-backend-production:0.1.0
+
+cat registry-access-token | docker login registry.gitlab.cc-asp.fraunhofer.de:4567 --username sim69815 --password-stdin
+docker push registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-backend-production:0.1.0
+
+
+
+docker build --build-arg PROJECT_NAME=Metabase --tag registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-frontend-production:0.1.0 --file Dockerfile-frontend-production .
+
+docker run --publish 9292:80 registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-frontend-production:0.1.0
+
+cat registry-access-token | docker login registry.gitlab.cc-asp.fraunhofer.de:4567 --username sim69815 --password-stdin
+docker push registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-frontend-production:0.1.0
+
+
+
+docker-compose --file docker-compose.production.yml up

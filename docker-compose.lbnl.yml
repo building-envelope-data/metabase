@@ -30,6 +30,13 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${LBNL_SSL_CERTIFICATE_PASSWORD}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${LBNL_SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
 
+  frontend:
+    build:
+      args:
+        - PROJECT_NAME=Database
+    volumes:
+      - frontend_node_modules:/app/Database/frontend/node_modules
+
   nginx:
     ports:
       - ${LBNL_HTTP_PORT}:80

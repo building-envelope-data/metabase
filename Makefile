@@ -210,20 +210,32 @@ shellf : COMMAND = ash
 shellf : runf ## Enter shell in a fresh `frontend` container
 .PHONY : shellf
 
+shellf-metabase : docker_compose = ${metabase_docker_compose}
+shellf-metabase : shellf ## Enter shell in a fresh metabase frontend container
+.PHONY : shellf-metabase
+
+shellf-ise : docker_compose = ${ise_docker_compose}
+shellf-ise : shellf ## Enter shell in a fresh ISE frontend container
+.PHONY : shellf-ise
+
+shellf-lbnl : docker_compose = ${lbnl_docker_compose}
+shellf-lbnl : shellf ## Enter shell in a fresh LBNL frontend container
+.PHONY : shellf-lbnl
+
 shellb : COMMAND = ash
 shellb : runb ## Enter shell in a fresh `backend` container
 .PHONY : shellb
 
 shellb-metabase : docker_compose = ${metabase_docker_compose}
-shellb-metabase : shellb ## Enter shell in a fresh metabase container
+shellb-metabase : shellb ## Enter shell in a fresh metabase backend container
 .PHONY : shellb-metabase
 
 shellb-ise : docker_compose = ${ise_docker_compose}
-shellb-ise : shellb ## Enter shell in a fresh ISE container
+shellb-ise : shellb ## Enter shell in a fresh ISE backend container
 .PHONY : shellb-ise
 
 shellb-lbnl : docker_compose = ${lbnl_docker_compose}
-shellb-lbnl : shellb ## Enter shell in a fresh LBNL container
+shellb-lbnl : shellb ## Enter shell in a fresh LBNL backend container
 .PHONY : shellb-lbnl
 
 shellb-examples : COMMAND = bash -c "cd ./examples && bash"

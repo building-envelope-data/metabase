@@ -1,0 +1,58 @@
+# See https://docs.docker.com/compose/production/
+
+version: '3.7'
+
+services:
+  database:
+    restart: always
+    image: postgres:11.5-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_DB=postgres
+    secrets:
+      - postgres_password
+    volumes:
+      - data:/var/lib/postgresql/data
+
+  backend:
+    restart: always
+    image: registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-backend-production:0.1.0
+    ports:
+      - 8002:80
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ASPNETCORE_ENVIRONMENT=production
+    depends_on:
+      - database
+
+  frontend:
+    restart: always
+    image: registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-frontend-production:0.1.0
+    ports:
+      - 8001:80
+    depends_on:
+      - backend
+
+  nginx:
+    restart: always
+    image: nginx:1.19.4-alpine
+    command: [
+      "nginx",
+      "-g", "daemon off;"
+      ]
+    ports:
+      - 8000:80
+    volumes:
+      - ./nginx/templates/production:/etc/nginx/templates:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  data:
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
