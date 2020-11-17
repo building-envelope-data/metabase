@@ -89,13 +89,13 @@ namespace Infrastructure.Configuration
                           EnableSubscriptions = false
                       }
                       );
-            if (environment.IsDevelopment())
-            {
+            /* if (environment.IsDevelopment()) */
+            /* { */
                 graphQl
                   .UseGraphiQL("/graphql")
                 .UsePlayground("/graphql")
                 .UseVoyager("/graphql");
-            }
+            /* } */
         }
     }
 }

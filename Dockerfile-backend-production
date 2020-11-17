@@ -7,8 +7,8 @@
 # BUILD #
 #########
 
-# https://hub.docker.com/_/microsoft-dotnet-core-sdk
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1.302-alpine3.12 AS build
+# https://hub.docker.com/_/microsoft-dotnet-sdk
+FROM mcr.microsoft.com/dotnet/sdk:5.0.100-alpine3.12-amd64 AS build
 
 ARG PROJECT_NAME
 
@@ -32,7 +32,7 @@ RUN \
 ###########
 
 # https://hub.docker.com/_/microsoft-dotnet-core-aspnet
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.6-alpine3.12
+FROM mcr.microsoft.com/dotnet/aspnet:5.0.0-alpine3.12-amd64
 
 ARG PROJECT_NAME
 
@@ -54,4 +54,4 @@ ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "App.dll"]
+CMD ["dotnet", "App.dll"]

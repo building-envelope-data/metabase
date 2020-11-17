@@ -42,14 +42,13 @@ server {
   add_header X-Frame-Options DENY;
   add_header X-Content-Type-Options nosniff; # Secure from MIME-type sniffing: https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#mime-type-sniffing
 
-  location /graphql {
-    proxy_pass http://backend;
+  location / {
+    proxy_pass http://frontend;
     limit_req  zone=one burst=10 nodelay;
   }
 
-  #Redirects all traffic
-  location / {
-    proxy_pass http://frontend;
+  location /graphql {
+    proxy_pass http://backend;
     limit_req  zone=one burst=10 nodelay;
   }
 }
