@@ -311,7 +311,8 @@ createdb-all :
 # Production #
 # ---------- #
 
-postgres_password : ## Generate PostgreSQL password file
+# TODO The entrypoint file of the PostgreSQL image uses the file refered to by `POSTGRES_PASSWORD_FILE` and this file needs to be accessible by `other`. Why? We do not want all people to be able to read secrets!
+postgres_password : ## Generate PostgreSQL password file with nothing but one password in plain text (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
 	mkdir -p ./secrets
 	chmod 0755 ./secrets
 	touch ./secrets/postgres_password
@@ -323,28 +324,14 @@ postgres_password : ## Generate PostgreSQL password file
 		# | awk '{print $$2}' \
 
 # https://www.postgresql.org/docs/current/libpq-pgpass.html
-# hostname:port:database:username:password
-pgpass : postgres_password ## Generate PostgreSQL password file
+postgres_passwords : postgres_password ## Generate PostgreSQL passwords file whose entries are of the form `hostname:port:database:username:password` (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
 	mkdir -p ./secrets
 	chmod 0755 ./secrets
-	touch ./secrets/pgpass
-	chmod 0600 ./secrets/pgpass
+	touch ./secrets/postgres_passwords
+	chmod 0600 ./secrets/postgres_passwords
 	echo "*:*:*:*:$$(cat ./secrets/postgres_password)" \
-		> ./secrets/pgpass
-.PHONY : pgpass
-
-# TODO For some reason accessing the database does sometimes not work due to wrong passwords. Why? Debug it with
-# ```
-# make shellb-metabase-production
-# apk add postgresql-client
-# psql "host=database port=5432 user=postgres passfile=/run/secrets/pgpass"
-# ```
-# and change the password with
-# ```
-# docker-compose --file docker-compose.production.yml --file docker-compose.metabase.production.yml --project-name metabase exec database ash
-# psql --user postgres
-# ALTER USER postgres with password '...';
-# ```
+		> ./secrets/postgres_passwords
+.PHONY : postgres_passwords
 
 up-production : ## (Re)create and start containers
 	${docker_compose} up \
@@ -369,7 +356,7 @@ logs-metabase-production : logs ## Follow metabase logs
 .PHONY : logs-metabase-production
 
 shellb-metabase-production : docker_compose = ${metabase_production_docker_compose}
-shellb-metabase-production : ## Enter shell in a fresh metabase backend container
+shellb-metabase-production : ## Enter shell in a running metabase backend container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
 	${docker_compose} exec \
 		backend \
 		ash

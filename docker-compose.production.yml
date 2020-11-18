@@ -27,7 +27,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=production
     # secrets: # https://docs.docker.com/compose/compose-file/#secrets
     #   - source: postgres_password
-    #     target: /run/secrets/pgpass
+    #     target: /run/secrets/postgres_passwords
     #     mode: 0400
     volumes:
       - ./secrets:/run/secrets:ro
@@ -61,5 +61,5 @@ volumes:
 # secrets:
 #   postgres_password:
 #     file: ./secrets/postgres_password
-#   pgpass:
-#     file: ./secrets/pgpass
+#   postgres_passwords:
+#     file: ./secrets/postgres_passwords
