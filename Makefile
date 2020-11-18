@@ -313,9 +313,9 @@ createdb-all :
 
 postgres_password : ## Generate PostgreSQL password file
 	mkdir -p ./secrets
-	chmod 0700 ./secrets
+	chmod 0755 ./secrets
 	touch ./secrets/postgres_password
-	chmod 0600 ./secrets/postgres_password
+	chmod 0644 ./secrets/postgres_password
 	openssl rand -base64 32 \
 		> ./secrets/postgres_password
 .PHONY : postgres_password
@@ -326,7 +326,7 @@ postgres_password : ## Generate PostgreSQL password file
 # hostname:port:database:username:password
 pgpass : postgres_password ## Generate PostgreSQL password file
 	mkdir -p ./secrets
-	chmod 0700 ./secrets
+	chmod 0755 ./secrets
 	touch ./secrets/pgpass
 	chmod 0600 ./secrets/pgpass
 	echo "*:*:*:*:$$(cat ./secrets/postgres_password)" \
@@ -361,7 +361,7 @@ down-metabase-production : down ## Stop metabase containers
 .PHONY : down-metabase-production
 
 restart-metabase-production : docker_compose = ${metabase_production_docker_compose}
-restart-metabase-production : pgpass restart ## Restart all stopped and running metabase containers
+restart-metabase-production : restart ## Restart all stopped and running metabase containers
 .PHONY : restart-metabase-production
 
 logs-metabase-production : docker_compose = ${metabase_production_docker_compose}
