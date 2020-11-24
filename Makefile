@@ -10,27 +10,21 @@ lbnl_name = lbnl
 # Inspired by https://docs.docker.com/engine/reference/commandline/run/#add-entries-to-container-hosts-file---add-host
 docker_ip = $(shell ip -4 addr show scope global dev docker0 | grep inet | awk '{print $$2}' | cut -d / -f 1)
 
-metabase_development_docker_compose = \
+metabase_docker_compose = \
 	docker-compose \
 		--file docker-compose.development.yml \
 		--file docker-compose.metabase.development.yml \
 		--project-name ${metabase_name}
-ise_development_docker_compose = \
+ise_docker_compose = \
 	docker-compose \
 		--file docker-compose.development.yml \
 		--file docker-compose.ise.development.yml \
 		--project-name ${ise_name}
-lbnl_development_docker_compose = \
+lbnl_docker_compose = \
 	docker-compose \
 		--file docker-compose.development.yml \
 		--file docker-compose.lbnl.development.yml \
 		--project-name ${lbnl_name}
-
-metabase_production_docker_compose = \
-	docker-compose \
-		--file docker-compose.production.yml \
-		--file docker-compose.metabase.production.yml \
-		--project-name ${metabase_name}
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
@@ -70,15 +64,15 @@ build : ## Build images
 		--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
-build-metabase : docker_compose = ${metabase_development_docker_compose}
+build-metabase : docker_compose = ${metabase_docker_compose}
 build-metabase : build ## Build metabase images
 .PHONY : build-metabase
 
-build-ise : docker_compose = ${ise_development_docker_compose}
+build-ise : docker_compose = ${ise_docker_compose}
 build-ise : build ## Build ISE images
 .PHONY : build-ise
 
-build-lbnl : docker_compose = ${lbnl_development_docker_compose}
+build-lbnl : docker_compose = ${lbnl_docker_compose}
 build-lbnl : build ## Build LBNL images
 .PHONY : build-lbnl
 
@@ -93,15 +87,15 @@ remove : ## Remove stopped containers
 		${docker_compose} rm
 .PHONY : remove
 
-remove-metabase : docker_compose = ${metabase_development_docker_compose}
+remove-metabase : docker_compose = ${metabase_docker_compose}
 remove-metabase : remove ## Remove stopped metabase containers
 .PHONY : remove-metabase
 
-remove-ise : docker_compose = ${ise_development_docker_compose}
+remove-ise : docker_compose = ${ise_docker_compose}
 remove-ise : remove ## Remove stopped ISE containers
 .PHONY : remove-ise
 
-remove-lbnl : docker_compose = ${lbnl_development_docker_compose}
+remove-lbnl : docker_compose = ${lbnl_docker_compose}
 remove-lbnl : remove ## Remove stopped LBNL containers
 .PHONY : remove-lbnl
 
@@ -120,15 +114,15 @@ up : build ## (Re)create and start containers
 		--detach
 .PHONY : up
 
-up-metabase : docker_compose = ${metabase_development_docker_compose}
+up-metabase : docker_compose = ${metabase_docker_compose}
 up-metabase : up ## (Re)create and start metabase containers
 .PHONY : up-metabase
 
-up-ise : docker_compose = ${ise_development_docker_compose}
+up-ise : docker_compose = ${ise_docker_compose}
 up-ise : up ## (Re)create and start ISE containers
 .PHONY : up-ise
 
-up-lbnl : docker_compose = ${lbnl_development_docker_compose}
+up-lbnl : docker_compose = ${lbnl_docker_compose}
 up-lbnl : up ## (Re)create and start LBNL containers
 .PHONY : up-lbnl
 
@@ -137,15 +131,15 @@ down : ## Stop containers and remove containers, networks, volumes, and images c
 		${docker_compose} down
 .PHONY : down
 
-down-metabase : docker_compose = ${metabase_development_docker_compose}
+down-metabase : docker_compose = ${metabase_docker_compose}
 down-metabase : down ## Stop metabase containers and remove containers, networks, volumes, and images created by `up-metabase`
 .PHONY : down-metabase
 
-down-ise : docker_compose = ${ise_development_docker_compose}
+down-ise : docker_compose = ${ise_docker_compose}
 down-ise : down ## Stop ISE containers and remove containers, networks, volumes, and images created by `up-ise`
 .PHONY : down-ise
 
-down-lbnl : docker_compose = ${lbnl_development_docker_compose}
+down-lbnl : docker_compose = ${lbnl_docker_compose}
 down-lbnl : down ## Stop LBNL containers and remove containers, networks, volumes, and images created by `up-lbnl`
 .PHONY : down-lbnl
 
@@ -154,15 +148,15 @@ restart : ## Restart all stopped and running containers
 		${docker_compose} restart
 .PHONY : restart
 
-restart-metabase : docker_compose = ${metabase_development_docker_compose}
+restart-metabase : docker_compose = ${metabase_docker_compose}
 restart-metabase : restart ## Restart all stopped and running metabase containers
 .PHONY : restart-metabase
 
-restart-ise : docker_compose = ${ise_development_docker_compose}
+restart-ise : docker_compose = ${ise_docker_compose}
 restart-ise : restart ## Restart all stopped and running ISE containers
 .PHONY : restart-ise
 
-restart-lbnl : docker_compose = ${lbnl_development_docker_compose}
+restart-lbnl : docker_compose = ${lbnl_docker_compose}
 restart-lbnl : restart ## Restart all stopped and running LBNL containers
 .PHONY : restart-lbnl
 
@@ -172,15 +166,15 @@ logs : ## Follow logs
 		--follow
 .PHONY : logs
 
-logs-metabase : docker_compose = ${metabase_development_docker_compose}
+logs-metabase : docker_compose = ${metabase_docker_compose}
 logs-metabase : logs ## Follow metabase logs
 .PHONY : logs-metabase
 
-logs-ise : docker_compose = ${ise_development_docker_compose}
+logs-ise : docker_compose = ${ise_docker_compose}
 logs-ise : logs ## Follow ISE logs
 .PHONY : logs-ise
 
-logs-lbnl : docker_compose = ${lbnl_development_docker_compose}
+logs-lbnl : docker_compose = ${lbnl_docker_compose}
 logs-lbnl : logs ## Follow LBNL logs
 .PHONY : logs-lbnl
 
@@ -200,15 +194,15 @@ runb : build ## Run the one-time command `${COMMAND}` against a fresh `backend` 
 		${COMMAND}
 .PHONY : runb
 
-runb-metabase : docker_compose = ${metabase_development_docker_compose}
+runb-metabase : docker_compose = ${metabase_docker_compose}
 runb-metabase : runb ## Run the one-time command `${COMMAND}` against a fresh metabase container
 .PHONY : runb-metabase
 
-runb-ise : docker_compose = ${ise_development_docker_compose}
+runb-ise : docker_compose = ${ise_docker_compose}
 runb-ise : runb ## Run the one-time command `${COMMAND}` against a fresh ISE container
 .PHONY : runb-ise
 
-runb-lbnl : docker_compose = ${lbnl_development_docker_compose}
+runb-lbnl : docker_compose = ${lbnl_docker_compose}
 runb-lbnl : runb ## Run the one-time command `${COMMAND}` against a fresh LBNL container
 .PHONY : runb-lbnl
 
@@ -216,15 +210,15 @@ shellf : COMMAND = ash
 shellf : runf ## Enter shell in a fresh `frontend` container
 .PHONY : shellf
 
-shellf-metabase : docker_compose = ${metabase_development_docker_compose}
+shellf-metabase : docker_compose = ${metabase_docker_compose}
 shellf-metabase : shellf ## Enter shell in a fresh metabase frontend container
 .PHONY : shellf-metabase
 
-shellf-ise : docker_compose = ${ise_development_docker_compose}
+shellf-ise : docker_compose = ${ise_docker_compose}
 shellf-ise : shellf ## Enter shell in a fresh ISE frontend container
 .PHONY : shellf-ise
 
-shellf-lbnl : docker_compose = ${lbnl_development_docker_compose}
+shellf-lbnl : docker_compose = ${lbnl_docker_compose}
 shellf-lbnl : shellf ## Enter shell in a fresh LBNL frontend container
 .PHONY : shellf-lbnl
 
@@ -232,15 +226,15 @@ shellb : COMMAND = ash
 shellb : runb ## Enter shell in a fresh `backend` container
 .PHONY : shellb
 
-shellb-metabase : docker_compose = ${metabase_development_docker_compose}
+shellb-metabase : docker_compose = ${metabase_docker_compose}
 shellb-metabase : shellb ## Enter shell in a fresh metabase backend container
 .PHONY : shellb-metabase
 
-shellb-ise : docker_compose = ${ise_development_docker_compose}
+shellb-ise : docker_compose = ${ise_docker_compose}
 shellb-ise : shellb ## Enter shell in a fresh ISE backend container
 .PHONY : shellb-ise
 
-shellb-lbnl : docker_compose = ${lbnl_development_docker_compose}
+shellb-lbnl : docker_compose = ${lbnl_docker_compose}
 shellb-lbnl : shellb ## Enter shell in a fresh LBNL backend container
 .PHONY : shellb-lbnl
 
@@ -249,7 +243,7 @@ shellb-examples : runb-metabase ## Enter Bourne-again shell, aka, bash, in a fre
 .PHONY : shellb-examples
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
-traceb : docker_compose = ${metabase_development_docker_compose}
+traceb : docker_compose = ${metabase_docker_compose}
 traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for example, `make CONTAINER_ID=c1b82eb6e03c trace-backend`
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
@@ -260,17 +254,17 @@ traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for examp
 				"
 .PHONY : traceb
 
-psql : docker_compose = ${metabase_development_docker_compose}
+psql : docker_compose = ${metabase_docker_compose}
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
 		database \
 		psql \
 		--username postgres \
-		--dbname xbase_development
+		--dbname xbase
 .PHONY : psql
 
-shelld : docker_compose = ${metabase_development_docker_compose}
+shelld : docker_compose = ${metabase_docker_compose}
 shelld : ## Enter shell in a fresh `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} run \
@@ -284,19 +278,19 @@ createdb : ## Create databases
 		database \
 		bash -c " \
 			createdb --username postgres xbase_test ; \
-			createdb --username postgres xbase_development \
+			createdb --username postgres xbase \
 		"
 .PHONY : createdb
 
-createdb-metabase : docker_compose = ${metabase_development_docker_compose}
+createdb-metabase : docker_compose = ${metabase_docker_compose}
 createdb-metabase : createdb ## Create metabase databases
 .PHONY : createdb-metabase
 
-createdb-ise : docker_compose = ${ise_development_docker_compose}
+createdb-ise : docker_compose = ${ise_docker_compose}
 createdb-ise : createdb ## Create ISE databases
 .PHONY : createdb-ise
 
-createdb-lbnl : docker_compose = ${lbnl_development_docker_compose}
+createdb-lbnl : docker_compose = ${lbnl_docker_compose}
 createdb-lbnl : createdb ## Create LBNL databases
 .PHONY : createdb-lbnl
 
@@ -307,76 +301,25 @@ createdb-all :
 	-make createdb-lbnl
 .PHONY : createdb-all
 
-# ---------- #
-# Production #
-# ---------- #
+# ------ #
+# Deploy #
+# ------ #
 
-# TODO The entrypoint file of the PostgreSQL image uses the file refered to by `POSTGRES_PASSWORD_FILE` and this file needs to be accessible by `other`. Why? We do not want all people to be able to read secrets!
-postgres_password : ## Generate PostgreSQL password file with nothing but one password in plain text (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
-	mkdir -p ./secrets
-	chmod 0755 ./secrets
-	touch ./secrets/postgres_password
-	chmod 0644 ./secrets/postgres_password
-	openssl rand -base64 32 \
-		> ./secrets/postgres_password
-.PHONY : postgres_password
-		# | openssl md5 \
-		# | awk '{print $$2}' \
+jump_host = sg.ise.fhg.de
+remote_user="root"
+remote_host="sx14666"
 
-# https://www.postgresql.org/docs/current/libpq-pgpass.html
-postgres_passwords : postgres_password ## Generate PostgreSQL passwords file whose entries are of the form `hostname:port:database:username:password` (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
-	mkdir -p ./secrets
-	chmod 0755 ./secrets
-	touch ./secrets/postgres_passwords
-	chmod 0600 ./secrets/postgres_passwords
-	echo "*:*:*:*:$$(cat ./secrets/postgres_password)" \
-		> ./secrets/postgres_passwords
-.PHONY : postgres_passwords
+metabase_production_docker_compose = \
+	docker-compose \
+		--file docker-compose.production.yml \
+		--file docker-compose.metabase.production.yml \
+		--project-name ${metabase_name}
 
-up-production : ## (Re)create and start containers
-	${docker_compose} up \
-		--remove-orphans \
-		--detach
-.PHONY : up-production
-
-up-metabase-production : docker_compose = ${metabase_production_docker_compose}
-up-metabase-production : up-production ## (Re)create and start metabase containers
-.PHONY : up-metabase-production
-
-down-metabase-production : docker_compose = ${metabase_production_docker_compose}
-down-metabase-production : down ## Stop metabase containers
-.PHONY : down-metabase-production
-
-restart-metabase-production : docker_compose = ${metabase_production_docker_compose}
-restart-metabase-production : restart ## Restart all stopped and running metabase containers
-.PHONY : restart-metabase-production
-
-logs-metabase-production : docker_compose = ${metabase_production_docker_compose}
-logs-metabase-production : logs ## Follow metabase logs
-.PHONY : logs-metabase-production
-
-shellb-metabase-production : docker_compose = ${metabase_production_docker_compose}
-shellb-metabase-production : ## Enter shell in a running metabase backend container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
-	${docker_compose} exec \
-		backend \
-		ash
-.PHONY : shellb-metabase-production
-
-createdb-metabase-production : docker_compose = ${metabase_production_docker_compose}
-createdb-metabase-production : ## Create metabase database
-	${docker_compose} exec \
-		database \
-		bash -c "createdb --username postgres xbase"
-.PHONY : createdb-metabase-production
-
-psql-production : docker_compose = ${metabase_production_docker_compose}
-psql-production : ## Enter PostgreSQL interactive terminal in the running `database` container
-	${docker_compose} exec \
-		database \
-		psql \
-		--username postgres \
-		--dbname xbase
-.PHONY : psql-production
+# 1. Run `make register-*` to build (and register) the images.
+# 2. Update the image names in `docker-compose.*.production.yml`.
+# 3. Run `deploy.sh` to upload the images, Makefile,
+#    docker-compose.*.production.yml files, and NGINX files to the server, and to
+#    restart the containers.
 
 # TODO Keep access token somewhere safe for example in an SSH vault.
 login : ## Login as `${USER_NAME}` to the Fraunhofer registry with the access token in the file with path `${ACCESS_TOKEN}`, for example, `make USER_NAME=sim69815 ACCESS_TOKEN=./registry-access-token.txt login`
@@ -407,6 +350,60 @@ register-metabase-frontend : END = frontend
 register-metabase-frontend : PROJECT_NAME = Metabase
 register-metabase-frontend : register ## Build and register metabase frontend image
 .PHONY : register-metabase-frontend
+
+deploy : upload restart-server ## Deploy, for example, `make JUMP_USER=swacker deploy`
+.PHONY : deploy
+
+upload : upload-images upload-files ## Upload images and files
+.PHONY : upload
+
+upload-images : ## Upload images
+	for image in $(shell make --silent metabase-images-production | tr '\n' ' '); do \
+		make IMAGE=$${image} JUMP_USER=${JUMP_USER} upload-image ; \
+	done
+.PHONY : upload-images
+
+# Inspired by https://advancedweb.hu/deploying-docker-images-via-ssh/
+upload-image : ## Upload image
+	docker save ${IMAGE} \
+		| bzip2 \
+		| pv \
+		| ssh \
+			-J ${JUMP_USER}@${jump_host} \
+			${remote_user}@${remote_host} \
+			'bunzip2 | docker load'
+.PHONY : upload-image
+
+images-production : ## Image names
+	${docker_compose} config \
+		| yq r - "services.*.image"
+.PHONY : images-production
+
+metabase-images-production : docker_compose = ${metabase_production_docker_compose}
+metabase-images-production : images-production ## Metabase image names
+.PHONY : metabase-images-production
+
+# TODO Clean-up files first or use `rsync`?
+upload-files : ## Upload files
+	scp \
+		-r \
+		-o "ProxyJump ${JUMP_USER}@${jump_host}" \
+		./Makefile.production \
+		./docker-compose.*production.yml \
+		./nginx \
+		${remote_user}@${remote_host}:'~/app'
+.PHONY : upload-files
+
+restart-server : ## Restart server
+	ssh -t \
+		-J ${JUMP_USER}@${jump_host} \
+		${remote_user}@${remote_host} \
+		" \
+			cd ~/app && \
+			make --file Makefile.production restart-metabase && \
+			exit \
+		"
+.PHONY : restart-server
 
 # --------------------- #
 # Generate Certificates #
