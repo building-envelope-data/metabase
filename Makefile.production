@@ -39,7 +39,6 @@ down-metabase : docker_compose = ${metabase_docker_compose}
 down-metabase : down ## Stop metabase containers
 .PHONY : down-metabase
 
-
 restart : ## Restart all stopped and running containers
 	${docker_compose} restart
 .PHONY : restart
