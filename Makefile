@@ -304,6 +304,11 @@ createdb-all :
 # ------ #
 # Deploy #
 # ------ #
+# 1. Run `make register-*` to build (and register) the images.
+# 2. Update the image names in `docker-compose.*.production.yml`.
+# 3. Run `make deploy` to upload the images, Makefile,
+#    docker-compose.*.production.yml files, and NGINX files to the server, and
+#    to restart the services with the new configuration.
 
 jump_host = sg.ise.fhg.de
 remote_user="root"
@@ -314,12 +319,6 @@ metabase_production_docker_compose = \
 		--file docker-compose.production.yml \
 		--file docker-compose.metabase.production.yml \
 		--project-name ${metabase_name}
-
-# 1. Run `make register-*` to build (and register) the images.
-# 2. Update the image names in `docker-compose.*.production.yml`.
-# 3. Run `deploy.sh` to upload the images, Makefile,
-#    docker-compose.*.production.yml files, and NGINX files to the server, and to
-#    restart the containers.
 
 # TODO Keep access token somewhere safe for example in an SSH vault.
 login : ## Login as `${USER_NAME}` to the Fraunhofer registry with the access token in the file with path `${ACCESS_TOKEN}`, for example, `make USER_NAME=sim69815 ACCESS_TOKEN=./registry-access-token.txt login`
@@ -332,13 +331,13 @@ login : ## Login as `${USER_NAME}` to the Fraunhofer registry with the access to
 register : VERSION = $(shell git describe --tags | head --lines=1)
 register : LOWER_PROJECT_NAME = $(shell echo ${PROJECT_NAME} | tr '[:upper:]' '[:lower:]')
 register : REGISTRY_URL = registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon
-register : IMAGE_NAME = ${LOWER_PROJECT_NAME}-${END}-production
+register : IMAGE = ${LOWER_PROJECT_NAME}-${END}-production
 register : ## Build and register the production `${END}` image for project `${PROJECT_NAME}`
 	docker build \
 		--build-arg PROJECT_NAME=${PROJECT_NAME} \
-		--tag ${REGISTRY_URL}/${IMAGE_NAME}:${VERSION} \
+		--tag ${REGISTRY_URL}/${IMAGE}:${VERSION} \
 		--file Dockerfile-${END}-production .
-	docker push ${REGISTRY_URL}/${IMAGE_NAME}:${VERSION}
+	docker push ${REGISTRY_URL}/${IMAGE}:${VERSION}
 .PHONY : register
 
 register-metabase-backend : END = backend
@@ -354,16 +353,40 @@ register-metabase-frontend : register ## Build and register metabase frontend im
 deploy : upload restart-server ## Deploy, for example, `make JUMP_USER=swacker deploy`
 .PHONY : deploy
 
+deploy-metabase : docker_compose = ${metabase_production_docker_compose}
+deploy-metabase : deploy ## Deploy metabase, for example, `make JUMP_USER=swacker deploy`
+.PHONY : deploy-metabase
+
 upload : upload-images upload-files ## Upload images and files
 .PHONY : upload
 
 upload-images : ## Upload images
-	for image in $(shell make --silent metabase-images-production | tr '\n' ' '); do \
-		make IMAGE=$${image} JUMP_USER=${JUMP_USER} upload-image ; \
+	for image in $(shell make --silent docker_compose='${docker_compose}' images-production | tr '\n' ' '); do \
+		make \
+			IMAGE=$${image} \
+			JUMP_USER=${JUMP_USER} \
+			upload-image-if-needed ; \
 	done
 .PHONY : upload-images
 
 # Inspired by https://advancedweb.hu/deploying-docker-images-via-ssh/
+upload-image-if-needed : REMOTE_IMAGE_ID = $(shell ssh -J ${JUMP_USER}@${jump_host} ${remote_user}@${remote_host} "docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep ${IMAGE} | cut --delimiter ' ' --fields 2")
+upload-image-if-needed : LOCAL_IMAGE_ID = $(shell docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep ${IMAGE} | cut --delimiter ' ' --fields 2)
+upload-image-if-needed : ## Upload image if needed
+	if [ \
+		"${REMOTE_IMAGE_ID}" \
+		!= "${LOCAL_IMAGE_ID}" \
+		] ; \
+	then \
+		make \
+			IMAGE=${IMAGE} \
+			JUMP_USER=${JUMP_USER} \
+			upload-image ; \
+  else \
+		echo "Remote image ${IMAGE} is up-to-date" ; \
+	fi
+.PHONY : upload-image-if-needed
+
 upload-image : ## Upload image
 	docker save ${IMAGE} \
 		| bzip2 \
@@ -379,11 +402,6 @@ images-production : ## Image names
 		| yq r - "services.*.image"
 .PHONY : images-production
 
-metabase-images-production : docker_compose = ${metabase_production_docker_compose}
-metabase-images-production : images-production ## Metabase image names
-.PHONY : metabase-images-production
-
-# TODO Clean-up files first or use `rsync`?
 upload-files : ## Upload files
 	scp \
 		-r \
@@ -400,7 +418,10 @@ restart-server : ## Restart server
 		${remote_user}@${remote_host} \
 		" \
 			cd ~/app && \
-			make --file Makefile.production restart-metabase && \
+			make \
+				--file Makefile.production \
+				docker_compose='${docker_compose}' \
+				restart && \
 			exit \
 		"
 .PHONY : restart-server
