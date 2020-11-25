@@ -350,7 +350,7 @@ register-metabase-frontend : PROJECT_NAME = Metabase
 register-metabase-frontend : register ## Build and register metabase frontend image
 .PHONY : register-metabase-frontend
 
-deploy : upload restart-server ## Deploy, for example, `make JUMP_USER=swacker deploy`
+deploy : upload down-and-up-server ## Deploy, for example, `make JUMP_USER=swacker deploy`
 .PHONY : deploy
 
 deploy-metabase : docker_compose = ${metabase_production_docker_compose}
@@ -412,7 +412,7 @@ upload-files : ## Upload files
 		${remote_user}@${remote_host}:'~/app'
 .PHONY : upload-files
 
-restart-server : ## Restart server
+down-and-up-server : ## Down and up server (note that a restart would not reflect configuration changes)
 	ssh -t \
 		-J ${JUMP_USER}@${jump_host} \
 		${remote_user}@${remote_host} \
@@ -421,10 +421,11 @@ restart-server : ## Restart server
 			make \
 				--file Makefile.production \
 				docker_compose='${docker_compose}' \
-				restart && \
+				down \
+				up && \
 			exit \
 		"
-.PHONY : restart-server
+.PHONY : down-and-up-server
 
 # --------------------- #
 # Generate Certificates #
