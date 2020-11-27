@@ -5,6 +5,8 @@ cd icon
 git submodule init
 git submodule update
 ```
+For an introduction to submodules see
+[Git submodules](https://www.atlassian.com/git/tutorials/git-submodule)
 
 The product identifier service should provide the following endpoints:
 * Obtain a new product identifier possibly associating internal meta information with it, like a custom string or a JSON blob
