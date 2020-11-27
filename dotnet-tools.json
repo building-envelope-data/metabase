@@ -56,12 +56,6 @@
         "dotnet-sos"
       ]
     },
-    "dotnet-certificate-tool": {
-      "version": "2.0.1",
-      "commands": [
-        "certificate-tool"
-      ]
-    },
     "roslynator.dotnet.cli": {
       "version": "0.1.0",
       "commands": [
@@ -72,6 +66,12 @@
       "version": "2020.3.0-eap07",
       "commands": [
         "jb"
+      ]
+    },
+    "dotnet-certificate-tool": {
+      "version": "2.0.2",
+      "commands": [
+        "certificate-tool"
       ]
     }
   }
