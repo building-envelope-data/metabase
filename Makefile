@@ -3,27 +3,27 @@
 
 include .env
 
-ikdb_name = ikdb
+metabase_name = metabase
 ise_name = ise
 lbnl_name = lbnl
 
 # Inspired by https://docs.docker.com/engine/reference/commandline/run/#add-entries-to-container-hosts-file---add-host
 docker_ip = $(shell ip -4 addr show scope global dev docker0 | grep inet | awk '{print $$2}' | cut -d / -f 1)
 
-ikdb_docker_compose = \
+metabase_docker_compose = \
 	docker-compose \
-		--file docker-compose.common.yml \
-		--file docker-compose.ikdb.yml \
-		--project-name ${ikdb_name}
+		--file docker-compose.development.yml \
+		--file docker-compose.metabase.development.yml \
+		--project-name ${metabase_name}
 ise_docker_compose = \
 	docker-compose \
-		--file docker-compose.common.yml \
-		--file docker-compose.ise.yml \
+		--file docker-compose.development.yml \
+		--file docker-compose.ise.development.yml \
 		--project-name ${ise_name}
 lbnl_docker_compose = \
 	docker-compose \
-		--file docker-compose.common.yml \
-		--file docker-compose.lbnl.yml \
+		--file docker-compose.development.yml \
+		--file docker-compose.lbnl.development.yml \
 		--project-name ${lbnl_name}
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
@@ -34,9 +34,9 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name-ikdb : ## Print value of variable `ikdb_name`
-	@echo ${ikdb_name}
-.PHONY : name-ikdb
+name-metabase : ## Print value of variable `metabase_name`
+	@echo ${metabase_name}
+.PHONY : name-metabase
 
 name-ise : ## Print value of variable `ise_name`
 	@echo ${ise_name}
@@ -64,9 +64,9 @@ build : ## Build images
 		--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
-build-ikdb : docker_compose = ${ikdb_docker_compose}
-build-ikdb : build ## Build IKDB images
-.PHONY : build-ikdb
+build-metabase : docker_compose = ${metabase_docker_compose}
+build-metabase : build ## Build metabase images
+.PHONY : build-metabase
 
 build-ise : docker_compose = ${ise_docker_compose}
 build-ise : build ## Build ISE images
@@ -87,9 +87,9 @@ remove : ## Remove stopped containers
 		${docker_compose} rm
 .PHONY : remove
 
-remove-ikdb : docker_compose = ${ikdb_docker_compose}
-remove-ikdb : remove ## Remove stopped IKDB containers
-.PHONY : remove-ikdb
+remove-metabase : docker_compose = ${metabase_docker_compose}
+remove-metabase : remove ## Remove stopped metabase containers
+.PHONY : remove-metabase
 
 remove-ise : docker_compose = ${ise_docker_compose}
 remove-ise : remove ## Remove stopped ISE containers
@@ -114,9 +114,9 @@ up : build ## (Re)create and start containers
 		--detach
 .PHONY : up
 
-up-ikdb : docker_compose = ${ikdb_docker_compose}
-up-ikdb : up ## (Re)create and start IKDB containers
-.PHONY : up-ikdb
+up-metabase : docker_compose = ${metabase_docker_compose}
+up-metabase : up ## (Re)create and start metabase containers
+.PHONY : up-metabase
 
 up-ise : docker_compose = ${ise_docker_compose}
 up-ise : up ## (Re)create and start ISE containers
@@ -131,9 +131,9 @@ down : ## Stop containers and remove containers, networks, volumes, and images c
 		${docker_compose} down
 .PHONY : down
 
-down-ikdb : docker_compose = ${ikdb_docker_compose}
-down-ikdb : down ## Stop IKDB containers and remove containers, networks, volumes, and images created by `up-ikdb`
-.PHONY : down-ikdb
+down-metabase : docker_compose = ${metabase_docker_compose}
+down-metabase : down ## Stop metabase containers and remove containers, networks, volumes, and images created by `up-metabase`
+.PHONY : down-metabase
 
 down-ise : docker_compose = ${ise_docker_compose}
 down-ise : down ## Stop ISE containers and remove containers, networks, volumes, and images created by `up-ise`
@@ -148,9 +148,9 @@ restart : ## Restart all stopped and running containers
 		${docker_compose} restart
 .PHONY : restart
 
-restart-ikdb : docker_compose = ${ikdb_docker_compose}
-restart-ikdb : restart ## Restart all stopped and running IKDB containers
-.PHONY : restart-ikdb
+restart-metabase : docker_compose = ${metabase_docker_compose}
+restart-metabase : restart ## Restart all stopped and running metabase containers
+.PHONY : restart-metabase
 
 restart-ise : docker_compose = ${ise_docker_compose}
 restart-ise : restart ## Restart all stopped and running ISE containers
@@ -166,9 +166,9 @@ logs : ## Follow logs
 		--follow
 .PHONY : logs
 
-logs-ikdb : docker_compose = ${ikdb_docker_compose}
-logs-ikdb : logs ## Follow IKDB logs
-.PHONY : logs-ikdb
+logs-metabase : docker_compose = ${metabase_docker_compose}
+logs-metabase : logs ## Follow metabase logs
+.PHONY : logs-metabase
 
 logs-ise : docker_compose = ${ise_docker_compose}
 logs-ise : logs ## Follow ISE logs
@@ -194,9 +194,9 @@ runb : build ## Run the one-time command `${COMMAND}` against a fresh `backend` 
 		${COMMAND}
 .PHONY : runb
 
-runb-ikdb : docker_compose = ${ikdb_docker_compose}
-runb-ikdb : runb ## Run the one-time command `${COMMAND}` against a fresh IKDB container
-.PHONY : runb-ikdb
+runb-metabase : docker_compose = ${metabase_docker_compose}
+runb-metabase : runb ## Run the one-time command `${COMMAND}` against a fresh metabase container
+.PHONY : runb-metabase
 
 runb-ise : docker_compose = ${ise_docker_compose}
 runb-ise : runb ## Run the one-time command `${COMMAND}` against a fresh ISE container
@@ -210,28 +210,40 @@ shellf : COMMAND = ash
 shellf : runf ## Enter shell in a fresh `frontend` container
 .PHONY : shellf
 
+shellf-metabase : docker_compose = ${metabase_docker_compose}
+shellf-metabase : shellf ## Enter shell in a fresh metabase frontend container
+.PHONY : shellf-metabase
+
+shellf-ise : docker_compose = ${ise_docker_compose}
+shellf-ise : shellf ## Enter shell in a fresh ISE frontend container
+.PHONY : shellf-ise
+
+shellf-lbnl : docker_compose = ${lbnl_docker_compose}
+shellf-lbnl : shellf ## Enter shell in a fresh LBNL frontend container
+.PHONY : shellf-lbnl
+
 shellb : COMMAND = ash
 shellb : runb ## Enter shell in a fresh `backend` container
 .PHONY : shellb
 
-shellb-ikdb : docker_compose = ${ikdb_docker_compose}
-shellb-ikdb : shellb ## Enter shell in a fresh IKDB container
-.PHONY : shellb-ikdb
+shellb-metabase : docker_compose = ${metabase_docker_compose}
+shellb-metabase : shellb ## Enter shell in a fresh metabase backend container
+.PHONY : shellb-metabase
 
 shellb-ise : docker_compose = ${ise_docker_compose}
-shellb-ise : shellb ## Enter shell in a fresh ISE container
+shellb-ise : shellb ## Enter shell in a fresh ISE backend container
 .PHONY : shellb-ise
 
 shellb-lbnl : docker_compose = ${lbnl_docker_compose}
-shellb-lbnl : shellb ## Enter shell in a fresh LBNL container
+shellb-lbnl : shellb ## Enter shell in a fresh LBNL backend container
 .PHONY : shellb-lbnl
 
 shellb-examples : COMMAND = bash -c "cd ./examples && bash"
-shellb-examples : runb-ikdb ## Enter Bourne-again shell, aka, bash, in a fresh IKDB container
+shellb-examples : runb-metabase ## Enter Bourne-again shell, aka, bash, in a fresh metabase container
 .PHONY : shellb-examples
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
-traceb : docker_compose = ${ikdb_docker_compose}
+traceb : docker_compose = ${metabase_docker_compose}
 traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for example, `make CONTAINER_ID=c1b82eb6e03c trace-backend`
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
@@ -242,17 +254,17 @@ traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for examp
 				"
 .PHONY : traceb
 
-psql : docker_compose = ${ikdb_docker_compose}
+psql : docker_compose = ${metabase_docker_compose}
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
 		database \
 		psql \
 		--username postgres \
-		--dbname xbase_development
+		--dbname xbase
 .PHONY : psql
 
-shelld : docker_compose = ${ikdb_docker_compose}
+shelld : docker_compose = ${metabase_docker_compose}
 shelld : ## Enter shell in a fresh `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} run \
@@ -266,14 +278,13 @@ createdb : ## Create databases
 		database \
 		bash -c " \
 			createdb --username postgres xbase_test ; \
-			createdb --username postgres xbase_development ; \
-			createdb --username postgres xbase_production \
+			createdb --username postgres xbase \
 		"
 .PHONY : createdb
 
-createdb-ikdb : docker_compose = ${ikdb_docker_compose}
-createdb-ikdb : createdb ## Create IKDB databases
-.PHONY : createdb-ikdb
+createdb-metabase : docker_compose = ${metabase_docker_compose}
+createdb-metabase : createdb ## Create metabase databases
+.PHONY : createdb-metabase
 
 createdb-ise : docker_compose = ${ise_docker_compose}
 createdb-ise : createdb ## Create ISE databases
@@ -285,19 +296,148 @@ createdb-lbnl : createdb ## Create LBNL databases
 
 createdb-all : ## Create all databases
 createdb-all :
-	-make createdb-ikdb
+	-make createdb-metabase
 	-make createdb-ise
 	-make createdb-lbnl
 .PHONY : createdb-all
+
+# ------ #
+# Deploy #
+# ------ #
+# 1. Run `make register-*` to build (and register) the images.
+# 2. Update the image names in `docker-compose.*.production.yml`.
+# 3. Run `make deploy` to upload the images, Makefile,
+#    docker-compose.*.production.yml files, and NGINX files to the server, and
+#    to restart the services with the new configuration.
+
+jump_host = sg.ise.fhg.de
+remote_user="root"
+remote_host="sx14666"
+
+metabase_production_docker_compose = \
+	docker-compose \
+		--file docker-compose.production.yml \
+		--file docker-compose.metabase.production.yml \
+		--project-name ${metabase_name}
+
+# TODO Keep access token somewhere safe for example in an SSH vault.
+login : ## Login as `${USER_NAME}` to the Fraunhofer registry with the access token in the file with path `${ACCESS_TOKEN}`, for example, `make USER_NAME=sim69815 ACCESS_TOKEN=./registry-access-token.txt login`
+	cat ${ACCESS_TOKEN} | \
+		docker login registry.gitlab.cc-asp.fraunhofer.de:4567 \
+			--username ${USER_NAME} \
+			--password-stdin
+.PHONY : login
+
+register : VERSION = $(shell git describe --tags | head --lines=1)
+register : LOWER_PROJECT_NAME = $(shell echo ${PROJECT_NAME} | tr '[:upper:]' '[:lower:]')
+register : REGISTRY_URL = registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon
+register : IMAGE = ${LOWER_PROJECT_NAME}-${END}-production
+register : ## Build and register the production `${END}` image for project `${PROJECT_NAME}`
+	docker build \
+		--build-arg PROJECT_NAME=${PROJECT_NAME} \
+		--tag ${REGISTRY_URL}/${IMAGE}:${VERSION} \
+		--file Dockerfile-${END}-production .
+	docker push ${REGISTRY_URL}/${IMAGE}:${VERSION}
+.PHONY : register
+
+register-metabase-backend : END = backend
+register-metabase-backend : PROJECT_NAME = Metabase
+register-metabase-backend : register ## Build and register metabase backend image
+.PHONY : register-metabase-backend
+
+register-metabase-frontend : END = frontend
+register-metabase-frontend : PROJECT_NAME = Metabase
+register-metabase-frontend : register ## Build and register metabase frontend image
+.PHONY : register-metabase-frontend
+
+deploy : upload down-and-up-server ## Deploy, for example, `make JUMP_USER=swacker deploy`
+.PHONY : deploy
+
+deploy-metabase : docker_compose = ${metabase_production_docker_compose}
+deploy-metabase : deploy ## Deploy metabase, for example, `make JUMP_USER=swacker deploy`
+.PHONY : deploy-metabase
+
+upload : upload-images upload-files ## Upload images and files
+.PHONY : upload
+
+upload-images : ## Upload images
+	for image in $(shell make --silent docker_compose='${docker_compose}' images-production | tr '\n' ' '); do \
+		make \
+			IMAGE=$${image} \
+			JUMP_USER=${JUMP_USER} \
+			upload-image-if-needed ; \
+	done
+.PHONY : upload-images
+
+# Inspired by https://advancedweb.hu/deploying-docker-images-via-ssh/
+upload-image-if-needed : REMOTE_IMAGE_ID = $(shell ssh -J ${JUMP_USER}@${jump_host} ${remote_user}@${remote_host} "docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep ${IMAGE} | cut --delimiter ' ' --fields 2")
+upload-image-if-needed : LOCAL_IMAGE_ID = $(shell docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep ${IMAGE} | cut --delimiter ' ' --fields 2)
+upload-image-if-needed : ## Upload image if needed
+	if [ \
+		"${REMOTE_IMAGE_ID}" \
+		!= "${LOCAL_IMAGE_ID}" \
+		] ; \
+	then \
+		make \
+			IMAGE=${IMAGE} \
+			JUMP_USER=${JUMP_USER} \
+			upload-image ; \
+  else \
+		echo "Remote image ${IMAGE} is up-to-date" ; \
+	fi
+.PHONY : upload-image-if-needed
+
+upload-image : ## Upload image
+	docker save ${IMAGE} \
+		| bzip2 \
+		| pv \
+		| ssh \
+			-J ${JUMP_USER}@${jump_host} \
+			${remote_user}@${remote_host} \
+			'bunzip2 | docker load'
+.PHONY : upload-image
+
+images-production : ## Image names
+	${docker_compose} config \
+		| yq r - "services.*.image"
+.PHONY : images-production
+
+upload-files : ## Upload files
+	scp \
+		-r \
+		-o "ProxyJump ${JUMP_USER}@${jump_host}" \
+		./Makefile.production \
+		./docker-compose.*production.yml \
+		./nginx \
+		${remote_user}@${remote_host}:'~/app'
+.PHONY : upload-files
+
+down-and-up-server : ## Down and up server (note that a restart would not reflect configuration changes)
+	ssh -t \
+		-J ${JUMP_USER}@${jump_host} \
+		${remote_user}@${remote_host} \
+		" \
+			cd ~/app && \
+			make \
+				--file Makefile.production \
+				docker_compose='${docker_compose}' \
+				down \
+				up && \
+			exit \
+		"
+.PHONY : down-and-up-server
 
 # --------------------- #
 # Generate Certificates #
 # --------------------- #
 
-ssl : generate-certificate-authority trust-certificate-authority ## Generate and trust certificate authority, and generate SSL certificates
-	make generate-ssl-certificate-ikdb
+# For an introduction to how HTTPS works see https://howhttps.works
+ssl : ## Generate and trust certificate authority, and generate SSL certificates
+	make generate-certificate-authority
+	make generate-ssl-certificate-metabase
 	make generate-ssl-certificate-ise
 	make generate-ssl-certificate-lbnl
+	make trust-certificate-authority
 .PHONY : ssl
 
 # Creating Self-Signed ECDSA SSL Certificate using OpenSSL: http://www.guyrutenberg.com/2013/12/28/creating-self-signed-ecdsa-ssl-certificate-using-openssl/
@@ -497,12 +637,12 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 			"
 .PHONY : generate-ssl-certificate
 
-generate-ssl-certificate-ikdb : HOST = ${IKDB_HOST}
-generate-ssl-certificate-ikdb : SSL_CERTIFICATE_BASE_FILE_NAME = ${IKDB_SSL_CERTIFICATE_BASE_FILE_NAME}
-generate-ssl-certificate-ikdb : SSL_CERTIFICATE_PASSWORD = ${IKDB_SSL_CERTIFICATE_PASSWORD}
-generate-ssl-certificate-ikdb : SSL_CERTIFICATE_SUBJECT = ${IKDB_SSL_CERTIFICATE_SUBJECT}
-generate-ssl-certificate-ikdb : generate-ssl-certificate ## Generate IKDB SSL certificate
-.PHONY : generate-ssl-certificate-ikdb
+generate-ssl-certificate-metabase : HOST = ${METABASE_HOST}
+generate-ssl-certificate-metabase : SSL_CERTIFICATE_BASE_FILE_NAME = ${METABASE_SSL_CERTIFICATE_BASE_FILE_NAME}
+generate-ssl-certificate-metabase : SSL_CERTIFICATE_PASSWORD = ${METABASE_SSL_CERTIFICATE_PASSWORD}
+generate-ssl-certificate-metabase : SSL_CERTIFICATE_SUBJECT = ${METABASE_SSL_CERTIFICATE_SUBJECT}
+generate-ssl-certificate-metabase : generate-ssl-certificate ## Generate metabase SSL certificate
+.PHONY : generate-ssl-certificate-metabase
 
 generate-ssl-certificate-ise : HOST = ${ISE_HOST}
 generate-ssl-certificate-ise : SSL_CERTIFICATE_BASE_FILE_NAME = ${ISE_SSL_CERTIFICATE_BASE_FILE_NAME}
@@ -522,10 +662,10 @@ fetch-ssl-certificate : ## Fetch the SSL certificate of the server
 	openssl s_client ${HOST}:${HTTPS_PORT}
 .PHONY : fetch-ssl-certificate
 
-fetch-ssl-certificate-ikdb : HOST = ${IKDB_HOST}
-fetch-ssl-certificate-ikdb : HTTPS_PORT = ${IKDB_HTTPS_PORT}
-fetch-ssl-certificate-ikdb : fetch-ssl-certificate ## Fetch the SSL certificate of the IKDB server
-.PHONY : fetch-ssl-certificate-ikdb
+fetch-ssl-certificate-metabase : HOST = ${METABASE_HOST}
+fetch-ssl-certificate-metabase : HTTPS_PORT = ${METABASE_HTTPS_PORT}
+fetch-ssl-certificate-metabase : fetch-ssl-certificate ## Fetch the SSL certificate of the metabase server
+.PHONY : fetch-ssl-certificate-metabase
 
 fetch-ssl-certificate-ise : HOST = ${ISE_HOST}
 fetch-ssl-certificate-ise : HTTPS_PORT = ${ISE_HTTPS_PORT}
@@ -624,5 +764,5 @@ dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for exampl
 					}"
 
 diagrams : ## Draw images from textual UML diagrams
-	plantuml diagrams/*.uml
+	plantuml diagrams/*.puml
 .PHONY : diagrams

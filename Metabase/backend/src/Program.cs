@@ -10,9 +10,9 @@ namespace Metabase
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main(string[] commandLineArguments)
         {
-            var host = CreateHostBuilder(args).Build();
+            var host = CreateHostBuilder(commandLineArguments).Build();
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -30,14 +30,19 @@ namespace Metabase
         }
 
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] commandLineArguments)
         {
-            return Host.CreateDefaultBuilder(args)
+            return Host.CreateDefaultBuilder(commandLineArguments)
               .ConfigureWebHostDefaults(webBuilder =>
                   webBuilder
                   .UseKestrel() // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-3.1
                   .UseContentRoot(Directory.GetCurrentDirectory())
-                  .UseStartup<Startup>()
+                  .UseStartup<Startup>(webHostBuilderContext =>
+                    new Startup(
+                      webHostBuilderContext.HostingEnvironment,
+                      commandLineArguments
+                      )
+                    )
                   );
         }
     }

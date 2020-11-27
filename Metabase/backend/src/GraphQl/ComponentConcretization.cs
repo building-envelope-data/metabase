@@ -3,7 +3,7 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class ComponentConcretization
-      : NodeBase
+      : Node
     {
         public static ComponentConcretization FromModel(
             Models.ComponentConcretization model,

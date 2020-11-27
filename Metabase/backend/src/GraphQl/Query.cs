@@ -22,7 +22,7 @@ namespace Metabase.GraphQl
         }
 
         // TODO Use `EnableRelaySupport` in `Metabase.Configuration.GraphQl` instead
-        public Task<Node> GetNode(
+        public Task<INode> GetNode(
             Id id,
             Timestamp? timestamp,
             [DataLoader] NodeDataLoader nodeLoader,
@@ -40,7 +40,7 @@ namespace Metabase.GraphQl
 
         // OpticalData //
 
-        public Task<IReadOnlyList<OpticalData>> GetOpticalDataFromDatabases(
+        public Task<IReadOnlyList<OpticalData>> GetOpticalData(
             Id componentId,
             Timestamp? timestamp,
             [DataLoader] OpticalDataOfComponentFromDatabasesDataLoader opticalDataLoader,
@@ -72,7 +72,7 @@ namespace Metabase.GraphQl
 
         // Calorimetric //
 
-        public Task<IReadOnlyList<CalorimetricData>> GetCalorimetricDataFromDatabases(
+        public Task<IReadOnlyList<CalorimetricData>> GetCalorimetricData(
             Id componentId,
             Timestamp? timestamp,
             [DataLoader] CalorimetricDataOfComponentFromDatabasesDataLoader calorimetricDataLoader,
@@ -104,7 +104,7 @@ namespace Metabase.GraphQl
 
         // Photovoltaic //
 
-        public Task<IReadOnlyList<PhotovoltaicData>> GetPhotovoltaicDataFromDatabases(
+        public Task<IReadOnlyList<PhotovoltaicData>> GetPhotovoltaicData(
             Id componentId,
             Timestamp? timestamp,
             [DataLoader] PhotovoltaicDataOfComponentFromDatabasesDataLoader photovoltaicDataLoader,
@@ -136,7 +136,7 @@ namespace Metabase.GraphQl
 
         // Hygrothermal //
 
-        public Task<IReadOnlyList<HygrothermalData>> GetHygrothermalDataFromDatabases(
+        public Task<IReadOnlyList<HygrothermalData>> GetHygrothermalData(
             Id componentId,
             Timestamp? timestamp,
             [DataLoader] HygrothermalDataOfComponentFromDatabasesDataLoader hygrothermalDataLoader,
@@ -166,12 +166,12 @@ namespace Metabase.GraphQl
                 );
         }
 
-        public IReadOnlyList<Id> GetSearchComponents(
-            SearchComponentsInput input
+        public SearchComponentsResult SearchComponents(
+            SearchComponentsPropositionInput where,
+            Timestamp? timestamp
             )
         {
-            // TODO !
-            return new Id[] { };
+            return null!;
         }
 
         ////////////

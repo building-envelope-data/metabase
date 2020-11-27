@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel; // ReadOnlyDictionary
 using System.Linq;
 using CSharpFunctionalExtensions;
-using ErrorCodes = Infrastructure.ErrorCodes;
-using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.ValueObjects
 {

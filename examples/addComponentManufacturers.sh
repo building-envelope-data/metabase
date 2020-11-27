@@ -1,7 +1,7 @@
 begin_chapter "Add component manufacturers"
 
 query \
-  $ikdb_graphql_url \
+  $metabase_graphql_url \
   addComponentManufacturers.graphql \
   "{ \
     \"glazingComponentId\": \"$GLAZING_COMPONENT_ID\", \

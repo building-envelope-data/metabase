@@ -3,7 +3,7 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class PersonAffiliation
-      : NodeBase
+      : Node
     {
         public static PersonAffiliation FromModel(
             Models.PersonAffiliation model,

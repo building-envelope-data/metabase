@@ -7,7 +7,6 @@ using HotChocolate;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using CancellationToken = System.Threading.CancellationToken;
-using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.GraphQl
 {

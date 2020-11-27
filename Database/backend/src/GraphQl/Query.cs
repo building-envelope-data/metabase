@@ -19,7 +19,7 @@ namespace Database.GraphQl
         }
 
         // TODO Use `EnableRelaySupport` in `Metabase.Configuration.GraphQl` instead
-        public Task<Node> GetNode(
+        public Task<INode> GetNode(
             Id id,
             Timestamp? timestamp,
             [DataLoader] NodeDataLoader nodeLoader,
@@ -182,12 +182,20 @@ namespace Database.GraphQl
                 );
         }
 
-        // TODO !
-        /* public IReadOnlyList<Id> GetSearchComponents( */
-        /*     SearchComponentsInput input */
-        /*     ) */
-        /* { */
-        /*     return new Id[] { }; */
-        /* } */
+        public SearchComponentsResult SearchComponents(
+            SearchComponentsPropositionInput where,
+            Timestamp? timestamp
+            /* [DataLoader] SearchComponentsDataLoader searchComponentsDataLoader, */
+            /* IResolverContext resolverContext */
+            )
+        {
+          return null!;
+          /* return searchComponentsDataLoader.LoadAsync( */
+          /*     ( */
+          /*      SearchComponentsPropositionInput.Validate(where, new List<object>().AsReadOnly()), */
+          /*      timestamp ?? TimestampHelpers.Fetch(resolverContext) */
+          /*     ) */
+          /*     ); */
+        }
     }
 }

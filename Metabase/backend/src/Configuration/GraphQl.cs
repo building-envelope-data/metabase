@@ -28,12 +28,11 @@ namespace Metabase.Configuration
                 services,
                 schemaBuilder =>
                     schemaBuilder
-                    .AddQueryType<GraphQlX.QueryType>()
+                    .AddQueryType<GraphQlX.Query>()
                     .AddMutationType<GraphQlX.Mutation>()
                     // .AddSubscriptionType<SubscriptionType>()
 
-                    .AddType<GraphQlX.StakeholderBase>()
-                    .AddType<GraphQlX.ComponentType>()
+                    .AddType<GraphQlX.StakeholderType>()
 
                     .AddType<GraphQlX.OpticalDataType>()
                     .AddType<GraphQlX.CalorimetricDataType>()

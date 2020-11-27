@@ -12,8 +12,14 @@ namespace Database
     public class Startup
             : Infrastructure.Startup
     {
-        public Startup(IWebHostEnvironment environment)
-                    : base(environment)
+        public Startup(
+            IWebHostEnvironment environment,
+            string[] commandLineArguments
+            )
+          : base(
+              environment,
+              commandLineArguments
+              )
         {
         }
 

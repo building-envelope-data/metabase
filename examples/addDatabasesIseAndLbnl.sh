@@ -5,7 +5,7 @@
 begin_chapter "Add databases ISE and LBNL"
 
 query \
-  $ikdb_graphql_url \
+  $metabase_graphql_url \
   addDatabasesIseAndLbnl.graphql \
   "{ \
     \"iseDatabaseLocator\": \"$ise_graphql_url\", \

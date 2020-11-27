@@ -9,19 +9,24 @@ namespace Database
 {
     public static class Program
     {
-        public static void Main(string[] args)
+        public static void Main(string[] commandLineArguments)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(commandLineArguments).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] commandLineArguments)
         {
-            return Host.CreateDefaultBuilder(args)
+            return Host.CreateDefaultBuilder(commandLineArguments)
               .ConfigureWebHostDefaults(webBuilder =>
                   webBuilder
                   .UseKestrel()
                   .UseContentRoot(Directory.GetCurrentDirectory())
-                  .UseStartup<Startup>()
+                  .UseStartup<Startup>(webHostBuilderContext =>
+                    new Startup(
+                      webHostBuilderContext.HostingEnvironment,
+                      commandLineArguments
+                      )
+                    )
                   );
         }
     }

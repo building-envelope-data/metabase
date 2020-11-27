@@ -5,11 +5,9 @@ using CSharpFunctionalExtensions;
 using GreenDonut;
 using HotChocolate;
 using Infrastructure.Commands;
-using Infrastructure.GraphQl;
 using Infrastructure.Queries;
 using Infrastructure.ValueObjects;
 using Microsoft.AspNetCore.Identity;
-using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.GraphQl
 {

@@ -7,7 +7,7 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class CalorimetricData
-      : NodeBase
+      : Node
     {
         public static CalorimetricData FromModel(
             Models.CalorimetricData model,

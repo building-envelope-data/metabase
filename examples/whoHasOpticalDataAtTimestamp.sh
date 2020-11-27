@@ -7,7 +7,7 @@ begin_chapter \
   "after optical data was added to the LBNL database for the glazing component\nand before any data was added to the ISE database"
 
 query \
-  $ikdb_graphql_url \
+  $metabase_graphql_url \
   whoHasOpticalDataAtTimestamp.graphql \
   "{ \
     \"glazingComponentId\": \"$GLAZING_COMPONENT_ID\", \

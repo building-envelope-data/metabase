@@ -1,31 +1,57 @@
-# Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
-
-###########
-# BUILDTIME
-###########
-# https://hub.docker.com/_/microsoft-dotnet-core-sdk
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1.302-alpine3.12 AS buildtime
-WORKDIR /app
-
-# copy csproj and restore as distinct layers
-COPY *.csproj .
-RUN dotnet restore
-
-# copy everything else and build app
-COPY . .
-WORKDIR /app
-RUN dotnet publish -c Release -o out
+# Inspired by
+# https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
+# and
+# https://docs.docker.com/engine/examples/dotnetcore/
 
 #########
-# RUNTIME
+# BUILD #
 #########
+
+# https://hub.docker.com/_/microsoft-dotnet-sdk
+FROM mcr.microsoft.com/dotnet/sdk:5.0.100-alpine3.12-amd64 AS build
+
+ARG PROJECT_NAME
+
+COPY ./ /app
+
+WORKDIR /app/${PROJECT_NAME}/backend
+
+RUN \
+  dotnet restore \
+    --runtime linux-musl-x64
+RUN \
+  dotnet publish \
+    --runtime linux-musl-x64 \
+    --configuration release \
+    --output out \
+    --self-contained false \
+    --no-restore
+
+###########
+# RUNTIME #
+###########
+
 # https://hub.docker.com/_/microsoft-dotnet-core-aspnet
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.6-alpine3.12 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:5.0.0-alpine3.12-amd64
+
+ARG PROJECT_NAME
+
 WORKDIR /app
-COPY --from=buildtime /app/out ./
-RUN apk add --no-cache \
-      dumb-init
-# RUN dotnet user-secrets set SendGridUser myuser && \
-#     dotnet user-secrets set SendGridKey mykey
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["dotnet", "aspnetapp.dll"]
+
+COPY \
+  --from=build \
+  /app/${PROJECT_NAME}/backend/out \
+  ./
+
+RUN \
+  ln -s ${PROJECT_NAME}.dll App.dll
+
+# See: https://github.com/dotnet/announcements/issues/20
+# Uncomment to enable globalization APIs
+#ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT false
+#RUN apk add --no-cache icu-libs
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+
+EXPOSE 8080
+CMD ["dotnet", "App.dll"]

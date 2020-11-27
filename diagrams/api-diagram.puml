@@ -1,0 +1,66 @@
+@startuml "API Diagram"
+
+skinparam componentStyle uml2
+
+package "Front Ends" {
+    component [Website X] as Website
+    component [Software X] as Software
+    component [ES-SO] as Esso
+}
+
+package "Metabase" as MetabaseX {
+    interface API as MetabaseApi
+    interface "OAuth 2.0" as OAuth2
+    component [Middle Tier] as MetabaseMid
+    database "Metabase" as Metabase
+}
+note left of MetabaseX
+    * Issues unique identifiers
+    * Stores meta information
+      of components, measurment methods,
+      institutions, and databases
+    * Acts as gateway to databases
+      with measurment data for components
+    * Provides authentication and authorization
+end note
+
+package "IGSDB" as IgsdbX {
+    interface API as IgsdbApi
+    component [Middle Tier] as IgsdbMid
+    database "IGSDB" as Igsdb
+}
+
+package "ES-SDA" as EssdaX {
+    interface API as EssdaApi
+    component [Middle Tier] as EssdaMid
+    database "ES-SDA" as Essda
+}
+
+package "ISE-DB" as IseDBX {
+    interface API as IseApi
+    component [Middle Tier] as IseMid
+    database "ISE-DB" as Ise
+}
+
+Website -down-( MetabaseApi
+Software -down-( MetabaseApi
+Esso -down-( EssdaApi
+
+MetabaseApi -down- MetabaseMid
+OAuth2 -down- MetabaseMid
+MetabaseMid -down- Metabase
+
+MetabaseMid -down-( IgsdbApi
+IgsdbApi -down- IgsdbMid
+IgsdbMid -down- Igsdb
+
+MetabaseMid -down-( EssdaApi
+EssdaApi -down- EssdaMid
+EssdaMid -down- Essda
+EssdaMid ..up..( OAuth2: Authenticate and Authorize
+
+MetabaseMid -down-( IseApi
+IseApi -down- IseMid
+IseMid -down- Ise
+
+@enduml

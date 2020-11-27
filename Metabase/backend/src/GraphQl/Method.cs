@@ -9,7 +9,7 @@ using IQueryBus = Infrastructure.Queries.IQueryBus;
 namespace Metabase.GraphQl
 {
     public sealed class Method
-      : NodeBase
+      : Node
     {
         public static Method FromModel(
             Models.Method model,
@@ -41,7 +41,7 @@ namespace Metabase.GraphQl
             Information = information;
         }
 
-        public Task<IReadOnlyList<Stakeholder>> GetDevelopers(
+        public Task<IReadOnlyList<IStakeholder>> GetDevelopers(
             [Parent] Method method,
             [DataLoader] DevelopersOfMethodDataLoader developersLoader
             )
@@ -52,7 +52,7 @@ namespace Metabase.GraphQl
         }
 
         public sealed class DevelopersOfMethodDataLoader
-            : ForwardManyToManyAssociatesOfModelDataLoader<Stakeholder, Models.Method, Models.MethodDeveloper, Models.Stakeholder>
+            : ForwardManyToManyAssociatesOfModelDataLoader<IStakeholder, Models.Method, Models.MethodDeveloper, Models.Stakeholder>
         {
             public DevelopersOfMethodDataLoader(IQueryBus queryBus)
               : base(StakeholderBase.FromModel, queryBus)

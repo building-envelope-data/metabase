@@ -64,8 +64,9 @@ namespace Metabase.ValueObjects
             )
         {
             if (start is null && end is null)
+            {
                 return null;
-
+            }
             return From(start: start, end: end, path: path);
         }
 

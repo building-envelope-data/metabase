@@ -9,7 +9,7 @@ using IQueryBus = Infrastructure.Queries.IQueryBus;
 namespace Metabase.GraphQl
 {
     public sealed class User
-      : NodeBase
+      : Node
     {
         public static User FromModel(
             Models.User model,

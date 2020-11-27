@@ -41,7 +41,7 @@ namespace Infrastructure.Configuration
             var martenLogger = new MartenLogger(logger);
             return Marten.DocumentStore.For(_ =>
                 {
-                    _.Connection(databaseSettings.ConnectionString);
+                    _.Connection(databaseSettings.ConnectionString); // https://www.npgsql.org/doc/connection-string-parameters.html#basic-connection
                     _.DatabaseSchemaName = databaseSettings.SchemaName.EventStore;
                     _.Events.DatabaseSchemaName = databaseSettings.SchemaName.EventStore;
                     /* _.UseNodaTime(); */

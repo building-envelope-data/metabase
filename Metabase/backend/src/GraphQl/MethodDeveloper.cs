@@ -3,7 +3,7 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class MethodDeveloper
-      : NodeBase
+      : Node
     {
         public static MethodDeveloper FromModel(
             Models.MethodDeveloper model,

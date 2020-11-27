@@ -1,4 +1,3 @@
-using ErrorCodes = Infrastructure.ErrorCodes;
 // HotChocolate's error codes can be found at
 // https://github.com/ChilliCream/hotchocolate/blob/master/src/Core/Abstractions/ErrorCodes.cs
 

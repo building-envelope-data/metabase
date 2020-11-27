@@ -15,7 +15,10 @@ namespace Infrastructure
         protected readonly IConfiguration _configuration;
         protected readonly AppSettings _appSettings;
 
-        public Startup(IWebHostEnvironment environment)
+        public Startup(
+            IWebHostEnvironment environment,
+            string[] commandLineArguments
+            )
         {
             _environment = environment;
             _configuration = new ConfigurationBuilder()
@@ -23,6 +26,7 @@ namespace Infrastructure
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
+                .AddCommandLine(commandLineArguments)
               .Build();
             _appSettings = _configuration.Get<AppSettings>();
             RegisterJsonSchemaFiles();

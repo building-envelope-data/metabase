@@ -7,7 +7,7 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class PhotovoltaicData
-      : NodeBase
+      : Node
     {
         public static PhotovoltaicData FromModel(
             Models.PhotovoltaicData model,

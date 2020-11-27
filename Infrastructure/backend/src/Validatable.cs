@@ -1,7 +1,5 @@
 using System;
 using CSharpFunctionalExtensions;
-using ErrorCodes = Infrastructure.ErrorCodes;
-using Errors = Infrastructure.Errors;
 using IValidatable = Infrastructure.IValidatable;
 using Validatable = Infrastructure.Validatable;
 
@@ -83,12 +81,10 @@ namespace Infrastructure
             )
         {
             if (id is null)
+            {
                 return Result.Success<bool, Errors>(true);
-
-            // Why can't we use the null-forgiving operator `!` as follows?
-            // return ValidateNonEmpty(id!, variableName);
-            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/null-forgiving
-            return ValidateNonEmpty(id ?? throw new ArgumentNullException(nameof(id)), variableName);
+            }
+            return ValidateNonEmpty(id.Value, variableName);
         }
 
         public static Result<bool, Errors> ValidateMinValue(

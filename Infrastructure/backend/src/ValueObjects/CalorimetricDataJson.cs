@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using CSharpFunctionalExtensions;
-using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.ValueObjects
 {

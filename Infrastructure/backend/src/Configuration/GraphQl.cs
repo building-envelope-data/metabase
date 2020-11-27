@@ -74,7 +74,7 @@ namespace Infrastructure.Configuration
                     .BindClrType<DateTime, GraphQlX.PreciseDateTimeType>()
                     .BindClrType<DateTimeOffset, GraphQlX.PreciseDateTimeType>()
 
-                    .AddType<GraphQlX.Node>()
+                    .AddType<GraphQlX.NodeType>()
                     .AddType<HotChocolate.Types.Relay.PageInfoType>();
         }
 
@@ -89,13 +89,13 @@ namespace Infrastructure.Configuration
                           EnableSubscriptions = false
                       }
                       );
-            if (environment.IsDevelopment())
-            {
+            /* if (environment.IsDevelopment()) */
+            /* { */
                 graphQl
                   .UseGraphiQL("/graphql")
                 .UsePlayground("/graphql")
                 .UseVoyager("/graphql");
-            }
+            /* } */
         }
     }
 }

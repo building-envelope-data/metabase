@@ -1,6 +1,6 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 # See https://hub.docker.com/_/microsoft-dotnet-core-sdk
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1.302-alpine3.12
+FROM mcr.microsoft.com/dotnet/sdk:5.0.100-alpine3.12-amd64
 
 ARG GROUP_ID
 ARG USER_ID
@@ -86,9 +86,18 @@ WORKDIR /app/${PROJECT_NAME}/backend
 COPY \
   --chown=me:us \
   ./dotnet-tools.json ./
+COPY \
+  --chown=me:us \
+  ./dotnet-certificate-tool ./dotnet-certificate-tool
 RUN \
+	dotnet publish \
+		-c Release \
+		-o ./dotnet-certificate-tool/release \
+		./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
   dotnet tool restore \
-    --tool-manifest ./dotnet-tools.json
+    --tool-manifest ./dotnet-tools.json \
+    --add-source ./dotnet-certificate-tool/src/nupkg && \
+  rm -rf ./dotnet-certificate-tool
 
 RUN \
   mkdir ./src && \
@@ -199,7 +208,7 @@ RUN \
 # var response =
 #    await client
 #    .PostAsync(
-#    "https://ikdb.org:4041/graphql/",
+#    "https://metabase.org:4041/graphql/",
 #    content
 #    );
 # ```
@@ -273,18 +282,7 @@ RUN \
     certificate-tool add \
       --file ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
       --store-name Root \
-      --password ${CERTIFICATE_AUTHORITY_PASSWORD} \
-      --thumbprint $( \
-        openssl pkcs12 \
-          -nodes \
-          -in ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
-          -passin pass:${CERTIFICATE_AUTHORITY_PASSWORD} | \
-        openssl x509 \
-          -noout \
-          -fingerprint | \
-        sed -e "s/^SHA1 Fingerprint=//" | \
-        tr -d ":" \
-        )
+      --password ${CERTIFICATE_AUTHORITY_PASSWORD}
 
 # COPY \
 #   --chown=me:us \

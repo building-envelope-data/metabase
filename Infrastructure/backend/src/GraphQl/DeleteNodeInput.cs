@@ -1,4 +1,3 @@
-using Infrastructure.GraphQl;
 using Infrastructure.ValueObjects;
 
 namespace Infrastructure.GraphQl

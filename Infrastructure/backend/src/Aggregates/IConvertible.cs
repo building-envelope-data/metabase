@@ -1,6 +1,5 @@
 using CSharpFunctionalExtensions;
 using Infrastructure.Aggregates;
-using Errors = Infrastructure.Errors;
 
 namespace Infrastructure.Aggregates
 {

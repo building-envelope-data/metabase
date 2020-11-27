@@ -6,7 +6,7 @@ using Uri = System.Uri;
 namespace Metabase.GraphQl
 {
     public sealed class Standard
-      : NodeBase
+      : Node
     {
         public static Standard FromModel(
             Models.Standard model,

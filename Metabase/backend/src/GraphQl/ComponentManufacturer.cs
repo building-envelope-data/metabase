@@ -3,7 +3,7 @@ using Infrastructure.ValueObjects;
 namespace Metabase.GraphQl
 {
     public sealed class ComponentManufacturer
-      : NodeBase
+      : Node
     {
         public static ComponentManufacturer FromModel(
             Models.ComponentManufacturer model,

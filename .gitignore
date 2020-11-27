@@ -1,5 +1,6 @@
-/ssl/*
 /examples/*.json
+/secrets
+/ssl
 
 .env
 .vscode

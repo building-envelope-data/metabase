@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Infrastructure.Models;
 using Marten;
 using Marten.Linq;
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-. ./verifyThatIkdbIsEmpty.sh;                               press_any_key_to "continue" > /dev/null
+. ./verifyThatMetabaseIsEmpty.sh;                           press_any_key_to "continue" > /dev/null
 . ./registerInstitutionsIseAndLbnl.sh;                      press_any_key_to "continue" > /dev/null
 . ./addDatabasesIseAndLbnl.sh;                              press_any_key_to "continue" > /dev/null
 . ./generateComponentIds.sh;                                press_any_key_to "continue" > /dev/null

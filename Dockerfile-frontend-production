@@ -1,0 +1,38 @@
+# Inspired by https://mherman.org/blog/dockerizing-a-react-app/
+
+#########
+# BUILD #
+#########
+
+FROM node:14.15.0-alpine3.12 as build
+
+ARG PROJECT_NAME
+
+COPY ./ /app
+
+WORKDIR /app/${PROJECT_NAME}/frontend
+
+ENV PATH=/app/${PROJECT_NAME}/frontend/node_modules/.bin:$PATH
+
+RUN npm install
+RUN npm run build
+
+###########
+# RUNTIME #
+###########
+
+FROM nginx:1.19.4-alpine
+
+ARG PROJECT_NAME
+
+COPY \
+  --from=build \
+  /app/${PROJECT_NAME}/frontend/build \
+  /usr/share/nginx/html
+
+COPY \
+  ./Infrastructure/frontend/nginx.conf \
+  /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]

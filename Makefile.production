@@ -1,0 +1,111 @@
+# Concise introduction to GNU Make:
+# https://swcarpentry.github.io/make-novice/reference.html
+
+metabase_name = metabase
+
+metabase_docker_compose = \
+	docker-compose \
+		--file docker-compose.production.yml \
+		--file docker-compose.metabase.production.yml \
+		--project-name ${metabase_name}
+
+# Taken from https://www.client9.com/self-documenting-makefiles/
+help : ## Print this help
+	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
+		printf "\033[36m%-30s\033[0m %s\n", $$1, $$NF \
+	}' $(MAKEFILE_LIST)
+.PHONY : help
+.DEFAULT_GOAL := help
+
+name-metabase : ## Print value of variable `metabase_name`
+	@echo ${metabase_name}
+.PHONY : name-metabase
+
+up : ## (Re)create and start containers
+	${docker_compose} up \
+		--remove-orphans \
+		--detach
+.PHONY : up
+
+up-metabase : docker_compose = ${metabase_docker_compose}
+up-metabase : up ## (Re)create and start metabase containers
+.PHONY : up-metabase
+
+down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
+	${docker_compose} down
+.PHONY : down
+
+down-metabase : docker_compose = ${metabase_docker_compose}
+down-metabase : down ## Stop metabase containers
+.PHONY : down-metabase
+
+restart : ## Restart all stopped and running containers
+	${docker_compose} restart
+.PHONY : restart
+
+restart-metabase : docker_compose = ${metabase_docker_compose}
+restart-metabase : restart ## Restart all stopped and running metabase containers
+.PHONY : restart-metabase
+
+logs : ## Follow logs
+	${docker_compose} logs \
+		--follow
+.PHONY : logs
+
+logs-metabase : docker_compose = ${metabase_docker_compose}
+logs-metabase : logs ## Follow metabase logs
+.PHONY : logs-metabase
+
+shellb : ## Enter shell in a running `backend` container
+	${docker_compose} exec \
+		backend \
+		ash
+.PHONY : shellb
+
+shellb-metabase : docker_compose = ${metabase_docker_compose}
+shellb-metabase : shellb ## Enter shell in a running metabase backend container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
+.PHONY : shellb-metabase
+
+createdb : ## Create metabase database
+	${docker_compose} exec \
+		database \
+		bash -c "createdb --username postgres xbase"
+.PHONY : createdb
+
+createdb-metabase : docker_compose = ${metabase_docker_compose}
+createdb-metabase : createdb ## Create metabase database
+.PHONY : createdb-metabase
+
+psql : ## Enter PostgreSQL interactive terminal in the running `database` service
+	${docker_compose} exec \
+		database \
+		psql \
+		--username postgres \
+		--dbname xbase
+.PHONY : psql
+
+psql-metabase : docker_compose = ${metabase_docker_compose}
+psql-metabase : psql ## Enter PostgreSQL interactive terminal in the running metabase `database` service
+.PHONY : psql-metabase
+
+# TODO The entrypoint file of the PostgreSQL image uses the file refered to by `POSTGRES_PASSWORD_FILE` and this file needs to be accessible by `other`. Why? We do not want all people to be able to read secrets!
+postgres_password : ## Generate PostgreSQL password file with nothing but one password in plain text (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
+	mkdir -p ./secrets
+	chmod 0755 ./secrets
+	touch ./secrets/postgres_password
+	chmod 0644 ./secrets/postgres_password
+	openssl rand -base64 32 \
+		> ./secrets/postgres_password
+.PHONY : postgres_password
+		# | openssl md5 \
+		# | awk '{print $$2}' \
+
+# https://www.postgresql.org/docs/current/libpq-pgpass.html
+postgres_passwords : postgres_password ## Generate PostgreSQL passwords file whose entries are of the form `hostname:port:database:username:password` (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
+	mkdir -p ./secrets
+	chmod 0755 ./secrets
+	touch ./secrets/postgres_passwords
+	chmod 0600 ./secrets/postgres_passwords
+	echo "*:*:*:*:$$(cat ./secrets/postgres_password)" \
+		> ./secrets/postgres_passwords
+.PHONY : postgres_passwords

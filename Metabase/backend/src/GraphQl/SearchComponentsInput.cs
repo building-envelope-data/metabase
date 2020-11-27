@@ -22,7 +22,7 @@ namespace Metabase.GraphQl
         }
 
         public static Result<ValueObjects.SearchComponentsInput, Errors> Validate(
-            CreateMethodInput self,
+            SearchComponentsInput self,
             IReadOnlyList<object> path
             )
         {
