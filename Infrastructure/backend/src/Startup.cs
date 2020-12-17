@@ -1,11 +1,11 @@
-using System;
-using System.Reflection;
 using Infrastructure.Extensions;
-using Infrastructure.ValueObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+using System;
+/* using AutoMapper; */
 
 namespace Infrastructure
 {
@@ -29,21 +29,6 @@ namespace Infrastructure
                 .AddCommandLine(commandLineArguments)
               .Build();
             _appSettings = _configuration.Get<AppSettings>();
-            RegisterJsonSchemaFiles();
-        }
-
-        private void RegisterJsonSchemaFiles()
-        {
-            // We force initialization of `JsonSchemaRegistry` on start-up as
-            // otherwise errors with the JSON Schemas are only encountered on
-            // the registry's first usage initiated by a GraphQL query and that
-            // query also takes rather long (because the JSON Schemas are
-            // loaded, validated, and registered).
-            var count = ValueObjects.JsonSchema.JsonSchemaRegistry.Count;
-            if (count is 0)
-            {
-                throw new Exception("There are no JSON Schemas in the registry");
-            }
         }
 
         protected string GetMigrationsAssembly()
@@ -53,6 +38,7 @@ namespace Infrastructure
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
+            /* services.AddAutoMapper(GetType()); */
             services.AddSingleton<AppSettings>(_appSettings);
         }
     }

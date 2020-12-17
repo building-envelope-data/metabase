@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RazorViewEngine = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine;
 using RazorViewEngineOptions = Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions;
+using HotChocolate;
 
 namespace Infrastructure.Configuration
 {
@@ -42,6 +43,13 @@ namespace Infrastructure.Configuration
             app.UseStaticFiles();
             app.UseRouting();
             app.UseCors();
+
+            /* app.UseWebSockets(); */
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGraphQL();
+            });
+
         }
     }
 }

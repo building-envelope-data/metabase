@@ -1,21 +1,21 @@
 using System;
-using IdentityServer4;
-using IdentityServer4.AccessTokenValidation;
-using IdentityServer4.AspNetIdentity;
-using IdentityServer4.Validation;
-using Metabase.Data;
+/* using IdentityServer4; */
+/* using IdentityServer4.AccessTokenValidation; */
+/* using IdentityServer4.AspNetIdentity; */
+/* using IdentityServer4.Validation; */
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
+/* using Microsoft.AspNetCore.Identity.UI.Services; */
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Identity = Marten.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Metabase.Configuration
 {
-    public sealed class Auth
+    public abstract class Auth
     {
         public static readonly string ApiName = "api";
         public static readonly string ApiSecret = "secret"; // TODO Put in environment variable.
@@ -30,7 +30,7 @@ namespace Metabase.Configuration
         {
             // https://fullstackmark.com/post/21/user-authentication-and-identity-with-angular-aspnet-core-and-identityserver
             // https://www.scottbrady91.com/Identity-Server/ASPNET-Core-Swagger-UI-Authorization-using-IdentityServer4
-            ConfigureIdentityServices(services, environment, configuration, appSettings);
+          ConfigureIdentityServices(services, environment, configuration, appSettings);
             /* ConfigureIdentityServerServices(services, environment, appSettings, migrationsAssembly); */
         }
 
@@ -41,7 +41,7 @@ namespace Metabase.Configuration
             Infrastructure.AppSettings appSettings
             )
         {
-            services.AddIdentity<Models.UserX, Models.RoleX>(_ =>
+            services.AddIdentity<Data.User, Data.Role>(_ =>
                 {
                     _.SignIn.RequireConfirmedAccount = true;
 
@@ -61,12 +61,19 @@ namespace Metabase.Configuration
                     // User settings.
                     _.User.AllowedUserNameCharacters =
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                    _.User.RequireUniqueEmail = false;
+                    _.User.RequireUniqueEmail = true;
                 })
+              .AddEntityFrameworkStores<Data.ApplicationDbContext>()
               .AddDefaultTokenProviders();
 
-            services.AddTransient<IUserStore<Models.UserX>, Identity.UserStore<Models.UserX>>();
-            services.AddTransient<IRoleStore<Models.RoleX>, Identity.RoleStore<Models.RoleX>>();
+            // Making services that were designed to be scoped transient is troublesome.
+            /* services.AddTransient<IUserStore<Data.User>, UserStore<Data.User, Data.Role, Data.ApplicationDbContext, Guid, Data.UserClaim, Data.UserRole, Data.UserLogin, Data.UserToken, Data.RoleClaim>>(); */
+            /* services.AddTransient<IRoleStore<Data.Role>, RoleStore<Data.Role, Data.ApplicationDbContext, Guid, Data.UserRole, Data.RoleClaim>>(); */
+            /* services.AddTransient<UserManager<Data.User>>(); */
+            /* services.AddTransient<IUserValidator<Data.User>, UserValidator<Data.User>>(); */
+            /* services.AddTransient<RoleManager<Data.Role>>(); */
+            /* services.AddTransient<IRoleValidator<Data.Role>, RoleValidator<Data.Role>>(); */
+            /* services.AddTransient<SignInManager<Data.User>>(); */
 
             /* services.ConfigureApplicationCookie(_ => */
             /*     { */
@@ -76,7 +83,13 @@ namespace Metabase.Configuration
             /*     }); */
 
             // https://identityserver4.readthedocs.io/en/latest/topics/apis.html#the-identityserver-authentication-handler
-            services.AddAuthentication();
+            // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-5.0
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+              .AddJwtBearer(
+                  JwtBearerDefaults.AuthenticationScheme,
+                  options => configuration.Bind("JwtSettings", options)
+                  );
+              /* .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => configuration.Bind("CookieSettings", options)); */
             services.AddAuthorization();
             /* services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme); */
             /*   .AddIdentityServerAuthentication(_ => */
@@ -113,7 +126,7 @@ namespace Metabase.Configuration
         // private static void ConfigureIdentityServerServices(
         //     IServiceCollection services,
         //     IWebHostEnvironment environment,
-        //     Infrastructure.AppSettings appSettings, string migrationsAssembly
+        //     Metabase.AppSettings appSettings, string migrationsAssembly
         //     )
         // {
         //     var builder = services.AddIdentityServer(_ =>
@@ -158,9 +171,9 @@ namespace Metabase.Configuration
         //         })
         //       .AddSecretParser<JwtBearerClientAssertionSecretParser>()
         //       .AddSecretValidator<PrivateKeyJwtSecretValidator>() // https://identityserver4.readthedocs.io/en/latest/topics/secrets.html#beyond-shared-secrets
-        //       .AddAspNetIdentity<Models.UserX>()
-        //       .AddProfileService<ProfileService<Models.UserX>>();
-        //     /* builder.AddApiAuthorization<UserX, ApplicationDbContext>(); */
+        //       .AddAspNetIdentity<Data.User>()
+        //       .AddProfileService<ProfileService<Data.User>>();
+        //     /* builder.AddApiAuthorization<User, ApplicationDbContext>(); */
         //     if (environment.IsDevelopment() || environment.IsEnvironment("test"))
         //     {
         //         builder.AddDeveloperSigningCredential();

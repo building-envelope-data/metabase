@@ -1,7 +1,5 @@
 using System;
 using System.Reflection;
-using Infrastructure.Extensions;
-using Infrastructure.ValueObjects;
 using Metabase.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -55,8 +53,7 @@ namespace Metabase
             Infrastructure.Configuration.RequestResponse.ConfigureServices(services);
             Configuration.Auth.ConfigureServices(services, _environment, _configuration, _appSettings, GetMigrationsAssembly());
             Configuration.GraphQl.ConfigureServices(services);
-            Configuration.EventStore.ConfigureServices(services, _environment, _appSettings.Database);
-            Configuration.QueryCommandAndEventBusses.ConfigureServices(services);
+            Configuration.Database.ConfigureServices(services, _appSettings.Database);
         }
 
         public void Configure(IApplicationBuilder app)
@@ -64,7 +61,6 @@ namespace Metabase
             Infrastructure.Configuration.RequestResponse.ConfigureRouting(app, _environment);
             Configuration.Auth.Configure(app);
             Infrastructure.Configuration.Session.Configure(app);
-            Configuration.GraphQl.Configure(app, _environment);
 
             // TODO Shall we do migrations here or in Program.cs?
             /* app.ApplicationServices.GetService<ClientsDbContext>().Database.Migrate(); */
