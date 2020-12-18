@@ -8,6 +8,8 @@ namespace Metabase.GraphQl.Users
         // TODO Use proper type like https://docs.microsoft.com/en-us/dotnet/api/system.identitymodel.tokens.jwt.jwtsecuritytoken?view=azure-dotnet
         public string? JwtAccessToken { get; }
 
+        public bool? RequiresTwoFactor { get; }
+
         public IReadOnlyCollection<LoginUserError>? Errors { get; }
 
         public LoginUserPayload(
@@ -17,6 +19,15 @@ namespace Metabase.GraphQl.Users
           : base(user)
         {
             JwtAccessToken = jwtAccessToken;
+            RequiresTwoFactor = false;
+        }
+
+        public LoginUserPayload(
+            Data.User user
+            )
+          : base(user)
+        {
+            RequiresTwoFactor = true;
         }
 
         public LoginUserPayload(

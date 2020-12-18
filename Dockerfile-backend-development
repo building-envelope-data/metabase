@@ -103,9 +103,7 @@ RUN \
   mkdir ./src && \
   mkdir ./test && \
   mkdir -p /app/Infrastructure/backend/src && \
-  mkdir -p /app/Infrastructure/backend/test && \
-  mkdir -p /app/Identity/backend/src && \
-  mkdir -p /app/Identity/backend/test
+  mkdir -p /app/Infrastructure/backend/test
 COPY \
   --chown=me:us \
   ./${PROJECT_NAME}/backend/src/${PROJECT_NAME}.csproj \
@@ -122,14 +120,6 @@ COPY \
   --chown=me:us \
   ./Infrastructure/backend/test/Test.csproj \
   /app/Infrastructure/backend/test
-COPY \
-  --chown=me:us \
-  ./Identity/backend/src/Identity.csproj \
-  /app/Identity/backend/src
-COPY \
-  --chown=me:us \
-  ./Identity/backend/test/Test.csproj \
-  /app/Identity/backend/test
 
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/aspnetapp/Dockerfile.alpine-x64
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/run-aspnetcore-https-development.md
@@ -300,10 +290,6 @@ RUN \
   mkdir -p /app/Infrastructure/backend/src/bin && \
   mkdir -p /app/Infrastructure/backend/src/obj && \
   mkdir -p /app/Infrastructure/backend/test/bin && \
-  mkdir -p /app/Infrastructure/backend/test/obj && \
-  mkdir -p /app/Identity/backend/src/bin && \
-  mkdir -p /app/Identity/backend/src/obj && \
-  mkdir -p /app/Identity/backend/test/bin && \
-  mkdir -p /app/Identity/backend/test/obj
+  mkdir -p /app/Infrastructure/backend/test/obj
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
