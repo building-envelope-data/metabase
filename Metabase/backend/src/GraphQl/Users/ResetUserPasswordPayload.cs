@@ -20,8 +20,8 @@ namespace Metabase.GraphQl.Users
         public ResetUserPasswordPayload(
             ResetUserPasswordError error
             )
+          : this(new [] { error })
         {
-          Errors = new [] { error };
         }
     }
 }

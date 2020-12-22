@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Infrastructure.Data;
 
 namespace Metabase.Configuration
 {
@@ -14,7 +15,9 @@ namespace Metabase.Configuration
             )
         {
           services.AddPooledDbContextFactory<Data.ApplicationDbContext>(options =>
-              options.UseNpgsql(databaseSettings.ConnectionString)
+              options
+              .UseNpgsql(databaseSettings.ConnectionString)
+              .UseSchemaName(databaseSettings.SchemaName)
               /* .UseNodaTime() */ // https://www.npgsql.org/efcore/mapping/nodatime.html
               );
           // Database contexts are used by `Identity`.

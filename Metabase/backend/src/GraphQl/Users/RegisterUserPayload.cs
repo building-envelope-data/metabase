@@ -3,10 +3,8 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.Users
 {
   public sealed class RegisterUserPayload
-    : UserPayload
+    : UserPayload<RegisterUserError>
     {
-      public IReadOnlyCollection<RegisterUserError>? Errors { get; }
-
       public RegisterUserPayload(
           Data.User user
           )
@@ -17,15 +15,15 @@ namespace Metabase.GraphQl.Users
       public RegisterUserPayload(
           IReadOnlyCollection<RegisterUserError> errors
           )
+        : base(errors)
         {
-          Errors = errors;
         }
 
         public RegisterUserPayload(
             RegisterUserError error
             )
+          : base(error)
         {
-          Errors = new [] { error };
         }
     }
 }

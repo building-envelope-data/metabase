@@ -3,10 +3,8 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.Users
 {
   public sealed class ConfirmUserEmailChangePayload
-    : UserPayload
+    : UserPayload<ConfirmUserEmailChangeError>
     {
-      public IReadOnlyCollection<ConfirmUserEmailChangeError>? Errors { get; }
-
       public ConfirmUserEmailChangePayload(
           Data.User user
           )
@@ -17,15 +15,15 @@ namespace Metabase.GraphQl.Users
       public ConfirmUserEmailChangePayload(
           IReadOnlyCollection<ConfirmUserEmailChangeError> errors
           )
+        : base(errors)
       {
-        Errors = errors;
       }
 
       public ConfirmUserEmailChangePayload(
           ConfirmUserEmailChangeError error
           )
+        : base(error)
       {
-        Errors = new [] { error };
       }
     }
 }

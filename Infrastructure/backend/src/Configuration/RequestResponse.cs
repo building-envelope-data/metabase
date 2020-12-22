@@ -43,13 +43,6 @@ namespace Infrastructure.Configuration
             app.UseStaticFiles();
             app.UseRouting();
             app.UseCors();
-
-            /* app.UseWebSockets(); */
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGraphQL();
-            });
-
         }
     }
 }

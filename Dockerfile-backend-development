@@ -110,7 +110,7 @@ COPY \
   ./src/
 COPY \
   --chown=me:us \
-  ./${PROJECT_NAME}/backend/test/Test.csproj \
+  ./${PROJECT_NAME}/backend/test/${PROJECT_NAME}.Tests.csproj \
   ./test/
 COPY \
   --chown=me:us \
@@ -118,7 +118,7 @@ COPY \
   /app/Infrastructure/backend/src
 COPY \
   --chown=me:us \
-  ./Infrastructure/backend/test/Test.csproj \
+  ./Infrastructure/backend/test/Infrastructure.Tests.csproj \
   /app/Infrastructure/backend/test
 
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/aspnetapp/Dockerfile.alpine-x64

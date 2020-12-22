@@ -1,0 +1,512 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+}
+
+"The node interface is implemented by entities that have a global unique identifier."
+interface Node {
+  id: ID!
+}
+
+type ChangeUserEmailError {
+  code: ChangeUserEmailErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ChangeUserEmailPayload {
+  errors: [ChangeUserEmailError!]
+  user: User
+}
+
+type ChangeUserPasswordError {
+  code: ChangeUserPasswordErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ChangeUserPasswordPayload {
+  errors: [ChangeUserPasswordError!]
+  user: User
+}
+
+type Component implements Node {
+  abbreviation: String
+  availability: OpenEndedDateTimeRange
+  categories: [ComponentCategory!]!
+  description: String!
+  id: ID!
+  name: String!
+}
+
+"A connection to a list of items."
+type ComponentConnection {
+  "A list of edges."
+  edges: [ComponentEdge!]
+  "A flattened list of the nodes."
+  nodes: [Component!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type ComponentEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Component!
+}
+
+type ConfirmUserEmailChangeError {
+  code: ConfirmUserEmailChangeErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ConfirmUserEmailChangePayload {
+  errors: [ConfirmUserEmailChangeError!]
+  user: User
+}
+
+type ConfirmUserEmailError {
+  code: ConfirmUserEmailErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ConfirmUserEmailPayload {
+  errors: [ConfirmUserEmailError!]
+  user: User
+}
+
+type CreateComponentPayload {
+  component: Component!
+}
+
+type DeletePersonalUserDataError {
+  code: DeletePersonalUserDataErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type DeletePersonalUserDataPayload {
+  errors: [DeletePersonalUserDataError!]
+  user: User
+}
+
+type GenerateUserTwoFactorRecoveryCodesError {
+  code: GenerateUserTwoFactorRecoveryCodesErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type GenerateUserTwoFactorRecoveryCodesPayload {
+  errors: [GenerateUserTwoFactorRecoveryCodesError!]
+  twoFactorRecoveryCodes: [String!]
+  user: User
+}
+
+type LoginUserError {
+  code: LoginUserErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type LoginUserPayload {
+  errors: [LoginUserError!]
+  jwtAccessToken: String
+  requiresTwoFactor: Boolean
+  user: User
+}
+
+type Mutation {
+  changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(apply: BEFORE_RESOLVER)
+  changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
+  confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
+  confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload!
+  createComponent(input: CreateComponentInput!): CreateComponentPayload! @authorize(apply: BEFORE_RESOLVER)
+  deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
+  generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER)
+  loginUser(input: LoginUserInput!): LoginUserPayload!
+  registerUser(input: RegisterUserInput!): RegisterUserPayload!
+  requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
+  resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
+  resendUserEmailVerification(input: ResendUserEmailVerificationInput!): ResendUserEmailVerificationPayload! @authorize(apply: BEFORE_RESOLVER)
+  resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload!
+  setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
+  setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER)
+}
+
+type OpenEndedDateTimeRange {
+  from: DateTime
+  to: DateTime
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+}
+
+type Query {
+  component(id: ID!): Component!
+  components(after: String before: String first: Int last: Int order: [ComponentSortInput!]): ComponentConnection
+  node(id: ID!): Node
+}
+
+type RegisterUserError {
+  code: RegisterUserErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RegisterUserPayload {
+  errors: [RegisterUserError!]
+  user: User
+}
+
+type RequestUserPasswordResetError {
+  code: RequestUserPasswordResetErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RequestUserPasswordResetPayload {
+  errors: [RequestUserPasswordResetError!]
+}
+
+type ResendUserEmailConfirmationError {
+  code: ResendUserEmailConfirmationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ResendUserEmailConfirmationPayload {
+  errors: [ResendUserEmailConfirmationError!]
+}
+
+type ResendUserEmailVerificationError {
+  code: ResendUserEmailVerificationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ResendUserEmailVerificationPayload {
+  errors: [ResendUserEmailVerificationError!]
+  user: User
+}
+
+type ResetUserPasswordError {
+  code: ResetUserPasswordErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ResetUserPasswordPayload {
+  errors: [ResetUserPasswordError!]
+}
+
+type SetUserPasswordError {
+  code: SetUserPasswordErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type SetUserPasswordPayload {
+  errors: [SetUserPasswordError!]
+  user: User
+}
+
+type SetUserPhoneNumberError {
+  code: SetUserPhoneNumberErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type SetUserPhoneNumberPayload {
+  errors: [SetUserPhoneNumberError!]
+  user: User
+}
+
+type User implements Node {
+  email: String
+  id: ID!
+}
+
+"A connection to a list of items."
+type UserConnection {
+  "A list of edges."
+  edges: [UserEdge!]
+  "A flattened list of the nodes."
+  nodes: [User!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type UserEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: User!
+}
+
+type UserQueries {
+  users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
+}
+
+input ChangeUserEmailInput {
+  newEmail: String!
+}
+
+input ChangeUserPasswordInput {
+  currentPassword: String!
+  newPassword: String!
+  newPasswordConfirmation: String!
+}
+
+input ComponentSortInput {
+  abbreviation: SortEnumType
+  availability: SortEnumType
+  description: SortEnumType
+  id: SortEnumType
+  name: SortEnumType
+  xmin: SortEnumType
+}
+
+input ConfirmUserEmailChangeInput {
+  confirmationCode: String!
+  currentEmail: String!
+  newEmail: String!
+}
+
+input ConfirmUserEmailInput {
+  confirmationCode: String!
+  email: String!
+}
+
+input CreateComponentInput {
+  abbreviation: String
+  availability: OpenEndedDateTimeRangeInput
+  categories: [ComponentCategory!]!
+  description: String!
+  name: String!
+}
+
+input DeletePersonalUserDataInput {
+  password: String!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
+}
+
+input OpenEndedDateTimeRangeInput {
+  from: DateTime
+  to: DateTime
+}
+
+input RegisterUserInput {
+  email: String!
+  password: String!
+  passwordConfirmation: String!
+}
+
+input RequestUserPasswordResetInput {
+  email: String!
+}
+
+input ResendUserEmailConfirmationInput {
+  email: String!
+}
+
+input ResendUserEmailVerificationInput {
+  email: String!
+}
+
+input ResetUserPasswordInput {
+  email: String!
+  password: String!
+  passwordConfirmation: String!
+  resetCode: String!
+}
+
+input SetUserPasswordInput {
+  password: String!
+  passwordConfirmation: String!
+}
+
+input SetUserPhoneNumberInput {
+  phoneNumber: String!
+}
+
+input UserSortInput {
+  accessFailedCount: SortEnumType
+  concurrencyStamp: SortEnumType
+  email: SortEnumType
+  emailConfirmed: SortEnumType
+  id: SortEnumType
+  lockoutEnabled: SortEnumType
+  lockoutEnd: SortEnumType
+  normalizedEmail: SortEnumType
+  normalizedUserName: SortEnumType
+  passwordHash: SortEnumType
+  phoneNumber: SortEnumType
+  phoneNumberConfirmed: SortEnumType
+  securityStamp: SortEnumType
+  twoFactorEnabled: SortEnumType
+  userName: SortEnumType
+}
+
+enum ApplyPolicy {
+  BEFORE_RESOLVER
+  AFTER_RESOLVER
+}
+
+enum ChangeUserEmailErrorCode {
+  UNKNOWN
+  USER_NOT_FOUND
+  UNCHANGED_EMAIL
+  INVALID_EMAIL
+}
+
+enum ChangeUserPasswordErrorCode {
+  UNKNOWN
+  USER_NOT_FOUND
+  NO_PASSWORD
+  PASSWORD_CONFIRMATION_MISMATCH
+  PASSWORD_REQUIRES_DIGIT
+  PASSWORD_REQUIRES_LOWER
+  PASSWORD_REQUIRES_NON_ALPHANUMERIC
+  PASSWORD_REQUIRES_UPPER
+  PASSWORD_TOO_SHORT
+}
+
+enum ComponentCategory {
+  MATERIAL
+  LAYER
+  UNIT
+}
+
+enum ConfirmUserEmailChangeErrorCode {
+  UNKNOWN
+  DUPLICATE_EMAIL
+  INVALID_CONFIRMATION_TOKEN
+  USER_NOT_FOUND
+}
+
+enum ConfirmUserEmailErrorCode {
+  UNKNOWN
+  USER_NOT_FOUND
+  INVALID_CONFIRMATION_TOKEN
+}
+
+enum DeletePersonalUserDataErrorCode {
+  UNKNOWN
+  USER_NOT_FOUND
+  INCORRECT_PASSWORD
+}
+
+enum GenerateUserTwoFactorRecoveryCodesErrorCode {
+  UNKNOWN
+  USER_NOT_FOUND
+  TWO_FACTOR_AUTHENTICATION_DISABLED
+}
+
+enum LoginUserErrorCode {
+  INVALID
+  LOCKED_OUT
+  NOT_ALLOWED
+}
+
+enum RegisterUserErrorCode {
+  UNKNOWN
+  PASSWORD_CONFIRMATION_MISMATCH
+  DUPLICATE_EMAIL
+  INVALID_EMAIL
+  PASSWORD_REQUIRES_DIGIT
+  PASSWORD_REQUIRES_LOWER
+  PASSWORD_REQUIRES_NON_ALPHANUMERIC
+  PASSWORD_REQUIRES_UPPER
+  PASSWORD_TOO_SHORT
+  NULL_OR_EMPTY_EMAIL
+}
+
+enum RequestUserPasswordResetErrorCode {
+  UNKNOWN
+}
+
+enum ResendUserEmailConfirmationErrorCode {
+  UNKNOWN
+}
+
+enum ResendUserEmailVerificationErrorCode {
+  UNKNOWN
+  USER_NOT_FOUND
+}
+
+enum ResetUserPasswordErrorCode {
+  UNKNOWN
+  PASSWORD_CONFIRMATION_MISMATCH
+  PASSWORD_REQUIRES_DIGIT
+  PASSWORD_REQUIRES_LOWER
+  PASSWORD_REQUIRES_NON_ALPHANUMERIC
+  PASSWORD_REQUIRES_UPPER
+  PASSWORD_TOO_SHORT
+}
+
+enum SetUserPasswordErrorCode {
+  UNKNOWN
+  USER_NOT_FOUND
+  EXISTING_PASSWORD
+  PASSWORD_CONFIRMATION_MISMATCH
+  PASSWORD_REQUIRES_DIGIT
+  PASSWORD_REQUIRES_LOWER
+  PASSWORD_REQUIRES_NON_ALPHANUMERIC
+  PASSWORD_REQUIRES_UPPER
+  PASSWORD_TOO_SHORT
+}
+
+enum SetUserPhoneNumberErrorCode {
+  UNKNOWN
+  USER_NOT_FOUND
+  UNCHANGED_PHONE_NUMBER
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+directive @authorize("Defines when when the resolver shall be executed.By default the resolver is executed after the policy has determined that the current user is allowed to access the field." apply: ApplyPolicy! = BEFORE_RESOLVER "The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!]) repeatable on SCHEMA | OBJECT | FIELD_DEFINITION
+
+"The `@defer` directive may be provided for fragment spreads and inline fragments to inform the executor to delay the execution of the current fragment to indicate deprioritization of the current fragment. A query with `@defer` directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred is delivered in a subsequent response. `@include` and `@skip` take precedence over `@defer`."
+directive @defer("Deferred when true." if: Boolean "If this argument label has a value other than null, it will be passed on to the result of this defer directive. This label is intended to give client applications a way to identify to which fragment a deferred result belongs to." label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"The @deprecated directive is used within the type system definition language to indicate deprecated portions of a GraphQL service’s schema,such as deprecated fields on a type or deprecated enum values."
+directive @deprecated("Deprecations include a reason for why it is deprecated, which is formatted using Markdown syntax (as specified by CommonMark)." reason: String = "No longer supported") on FIELD_DEFINITION | ENUM_VALUE
+
+"Directs the executor to include this field or fragment only when the `if` argument is true."
+directive @include("Included when true." if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Directs the executor to skip this field or fragment when the `if` argument is true."
+directive @skip("Skipped when true." if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
+"The `@stream` directive may be provided for a field of `List` type so that the backend can leverage technology such as asynchronous iterators to provide a partial list in the initial response, and additional list items in subsequent responses. `@include` and `@skip` take precedence over `@stream`."
+directive @stream("Streamed when true." if: Boolean! "The initial elements that shall be send down to the consumer." initialCount: Int! "If this argument label has a value other than null, it will be passed on to the result of this stream directive. This label is intended to give client applications a way to identify to which fragment a streamed result belongs to." label: String) on FIELD
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The `UInt` scalar represents a 32-bit unsigned integer type."
+scalar UInt

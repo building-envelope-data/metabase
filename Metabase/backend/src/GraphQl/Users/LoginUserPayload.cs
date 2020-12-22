@@ -3,14 +3,12 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.Users
 {
   public sealed class LoginUserPayload
-    : UserPayload
+    : UserPayload<LoginUserError>
     {
         // TODO Use proper type like https://docs.microsoft.com/en-us/dotnet/api/system.identitymodel.tokens.jwt.jwtsecuritytoken?view=azure-dotnet
         public string? JwtAccessToken { get; }
 
         public bool? RequiresTwoFactor { get; }
-
-        public IReadOnlyCollection<LoginUserError>? Errors { get; }
 
         public LoginUserPayload(
             string jwtAccessToken,
@@ -33,15 +31,15 @@ namespace Metabase.GraphQl.Users
         public LoginUserPayload(
             IReadOnlyCollection<LoginUserError> errors
             )
+          : base(errors)
         {
-            Errors = errors;
         }
 
         public LoginUserPayload(
             LoginUserError error
             )
+          : base(error)
         {
-          Errors = new [] { error };
         }
     }
 }

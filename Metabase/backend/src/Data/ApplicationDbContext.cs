@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Npgsql;
+using SchemaNameOptionsExtension = Infrastructure.Data.SchemaNameOptionsExtension;
 
 namespace Metabase.Data
 {
@@ -13,10 +14,10 @@ namespace Metabase.Data
   public sealed class ApplicationDbContext
     : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
     {
-        private static void RegisterEnumerations()
+        private static void RegisterEnumerations(string schemaName)
         {
           // https://www.npgsql.org/efcore/mapping/enum.html#mapping-your-enum
-          NpgsqlConnection.GlobalTypeMapper.MapEnum<ValueObjects.ComponentCategory>();
+          NpgsqlConnection.GlobalTypeMapper.MapEnum<ValueObjects.ComponentCategory>($"{schemaName}.component_category");
         }
 
         private static void CreateEnumerations(ModelBuilder builder)
@@ -56,25 +57,25 @@ namespace Metabase.Data
             builder.Entity<UserToken>().ToTable("user_token");
         }
 
-        /* TODO private readonly string _schemaName; */
+        private readonly string _schemaName;
 
         // https://docs.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
         public DbSet<Component> Components { get; private set; } = default!;
 
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options
-            /* Infrastructure.AppSettings appSettings */
             )
           : base(options)
         {
-            /* _schemaName = appSettings.Database.SchemaName.Application; */
-            RegisterEnumerations();
+            var schemaNameOptions = options.FindExtension<SchemaNameOptionsExtension>();
+            _schemaName = schemaNameOptions is null ? "metabase" : schemaNameOptions.SchemaName;
+            RegisterEnumerations(_schemaName);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            /* builder.HasDefaultSchema(_schemaName); */
+            builder.HasDefaultSchema(_schemaName);
             builder.HasPostgresExtension("pgcrypto"); // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
             CreateEnumerations(builder);
             ConfigureIdentityEntities(builder);

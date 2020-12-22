@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metabase", "src\Metabase.csproj", "{F72B77F5-D7CB-4E2A-A7C2-977443FC8390}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "test\Test.csproj", "{B467E845-22A0-4AA5-9876-DE800B29DA1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metabase.Tests", "test\Metabase.Tests.csproj", "{B467E845-22A0-4AA5-9876-DE800B29DA1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

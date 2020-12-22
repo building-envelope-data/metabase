@@ -4,6 +4,8 @@ namespace Metabase.GraphQl.Users
 {
   public sealed class RequestUserPasswordResetPayload
     {
+        public IReadOnlyCollection<RequestUserPasswordResetError>? Errors { get; }
+
         public RequestUserPasswordResetPayload()
         {
         }

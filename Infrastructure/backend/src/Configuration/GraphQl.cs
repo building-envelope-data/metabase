@@ -38,7 +38,7 @@ namespace Infrastructure.Configuration
               // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Configuration/Contracts/ISchemaOptions.cs
               options.StrictValidation = true;
               options.UseXmlDocumentation = false;
-              options.SortFieldsByName = false;
+              options.SortFieldsByName = true;
               options.RemoveUnreachableTypes = false;
               options.DefaultBindingBehavior = HotChocolate.Types.BindingBehavior.Implicit;
               /* options.FieldMiddleware = ... */
