@@ -1,0 +1,13 @@
+mutation {
+  registerUser(input: {
+    email: "",
+    password: "aaaAAA123$!@",
+    passwordConfirmation: "aaaAAA123$!@"
+  }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

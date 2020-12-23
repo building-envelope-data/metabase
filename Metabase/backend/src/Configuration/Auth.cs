@@ -50,7 +50,7 @@ namespace Metabase.Configuration
                     _.Password.RequireLowercase = true;
                     _.Password.RequireNonAlphanumeric = true;
                     _.Password.RequireUppercase = true;
-                    _.Password.RequiredLength = 6;
+                    _.Password.RequiredLength = 8;
                     _.Password.RequiredUniqueChars = 1;
 
                     // Lockout settings.

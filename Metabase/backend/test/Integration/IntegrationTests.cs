@@ -1,5 +1,9 @@
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using IdentityModel.Client;
 using Xunit;
@@ -9,57 +13,13 @@ using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebA
 namespace Metabase.Tests.Integration
 {
   public abstract class IntegrationTests
-    : IClassFixture<CustomWebApplicationFactory>
     {
-      protected static async Task<TokenResponse> RequestAuthToken(
-          HttpClient httpClient,
-          string emailAddress,
-          string password
-          )
-        {
-          var response =
-            await httpClient.RequestPasswordTokenAsync(
-              new PasswordTokenRequest
-            {
-                Address = "https://localhost:5001/connect/token",
-
-                ClientId = "test",
-                ClientSecret = "secret",
-                Scope = "api",
-
-                UserName = emailAddress,
-                Password = password,
-                }
-                )
-            .ConfigureAwait(false);
-            if (response.IsError)
-            {
-              throw new Exception(response.Error); // TODO Is this exception propagated?
-            }
-            return response;
-        }
-
-      protected static async Task Authorize(
-          HttpClient httpClient,
-          string username,
-          string password
-          )
-        {
-          var tokenResponse =
-            await RequestAuthToken(
-                httpClient, username, password
-                )
-            .ConfigureAwait(false);
-            httpClient.SetBearerToken(tokenResponse.AccessToken);
-        }
-
         protected CustomWebApplicationFactory Factory { get; }
         protected HttpClient HttpClient { get; }
 
-        protected IntegrationTests(CustomWebApplicationFactory factory)
+        protected IntegrationTests()
         {
-            Factory = factory;
-            Factory.SetUp();
+            Factory = new CustomWebApplicationFactory();
             HttpClient = CreateHttpClient();
         }
 
@@ -75,5 +35,99 @@ namespace Metabase.Tests.Integration
             }
             );
         }
+
+      protected async Task<TokenResponse> RequestAuthToken(
+          string emailAddress,
+          string password
+          )
+        {
+          var response =
+            await HttpClient.RequestPasswordTokenAsync(
+              new PasswordTokenRequest
+            {
+                Address = "https://localhost:5001/connect/token",
+
+                ClientId = "test",
+                ClientSecret = "secret",
+                Scope = "api",
+
+                UserName = emailAddress,
+                Password = password,
+                }
+                )
+            .ConfigureAwait(false);
+            if (response.IsError)
+            {
+              throw new Exception(response.Error);
+            }
+            return response;
+        }
+
+      protected async Task Authorize(
+          string username,
+          string password
+          )
+        {
+          var tokenResponse =
+            await RequestAuthToken(
+                username, password
+                )
+            .ConfigureAwait(false);
+            HttpClient.SetBearerToken(tokenResponse.AccessToken);
+        }
+
+        protected Task<HttpResponseMessage> QueryGraphQl(
+            string query,
+            string? operationName = null,
+            Dictionary<string, object?>? variables = null
+            )
+        {
+            return HttpClient.PostAsync(
+                "/graphql",
+                MakeJsonHttpContent(
+                  new GraphQlRequest(
+                      query: query,
+                      operationName: operationName,
+                      variables: variables
+                    )
+                  )
+                );
+        }
+
+      private HttpContent MakeJsonHttpContent<TContent>(
+          TContent content
+          )
+        {
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new JsonStringEnumConverter());
+            var result =
+              new ByteArrayContent(
+                JsonSerializer.SerializeToUtf8Bytes<TContent>(
+                  content,
+                  options
+                  )
+                );
+            result.Headers.ContentType =
+              new MediaTypeHeaderValue("application/json");
+            return result;
+        }
+
+    private sealed class GraphQlRequest
+    {
+        public string query { get; }
+        public string? operationName { get; }
+        public Dictionary<string, object?>? variables { get; }
+
+        public GraphQlRequest(
+            string query,
+            string? operationName,
+            Dictionary<string, object?>? variables
+            )
+        {
+            this.query = query;
+            this.operationName = operationName;
+            this.variables = variables;
+        }
+    }
     }
 }

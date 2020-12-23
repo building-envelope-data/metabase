@@ -1,0 +1,17 @@
+mutation {
+  registerUser(input: {
+    email: "john.doe@ise.fraunhofer.de",
+    password: "aaaAAA123$!@",
+    passwordConfirmation: "aaaAAA123$!@"
+  }) {
+    user {
+      id
+      email
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

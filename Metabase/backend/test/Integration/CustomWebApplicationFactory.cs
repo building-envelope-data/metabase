@@ -23,6 +23,11 @@ namespace Metabase.Tests.Integration
   public sealed class CustomWebApplicationFactory
     : WebApplicationFactory<Startup>
     {
+        public CustomWebApplicationFactory()
+        {
+            SetUp();
+        }
+
         private void Do(Action<IServiceProvider> what)
         {
             using (var scope = Services.CreateScope())
@@ -58,10 +63,6 @@ namespace Metabase.Tests.Integration
             }
         }
 
-        public CustomWebApplicationFactory()
-        {
-        }
-
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("test");
@@ -70,16 +71,17 @@ namespace Metabase.Tests.Integration
                 using (var scope = serviceCollection.BuildServiceProvider().CreateScope())
                 {
                 var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
-                appSettings.Database.SchemaName += Guid.NewGuid().ToString().Replace("-", "");
-                /* var appSettingsServiceDescriptor = */
-                /* serviceCollection.SingleOrDefault( */
-                /*     d => d.ServiceType == typeof(AppSettings) */
-                /*     ); */
-                /* if (appSettingsServiceDescriptor is not null) */
-                /* { */
-                /* serviceCollection.Remove(appSettingsServiceDescriptor); */
-                /* } */
-                /* serviceCollection.AddSingleton<AppSettings>(appSettings); */
+                // appSettings.Database.SchemaName += Guid.NewGuid().ToString().Replace("-", ""); // does not work because enumeration types in public schema cannot be created when they already exist
+                appSettings.Database.ConnectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres;";
+                // var appSettingsServiceDescriptor =
+                // serviceCollection.SingleOrDefault(
+                //     d => d.ServiceType == typeof(AppSettings)
+                //     );
+                // if (appSettingsServiceDescriptor is not null)
+                // {
+                // serviceCollection.Remove(appSettingsServiceDescriptor);
+                // }
+                // serviceCollection.AddSingleton<AppSettings>(appSettings);
                 }
                 }
             );

@@ -148,24 +148,22 @@ namespace Metabase.GraphQl.Users
               }
               foreach (var error in setUserNameIdentityResult.Errors)
               {
-                errors.Add(
-                    // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
-                    error.Code switch
-                    {
-                    "DuplicateUserName" =>
-                    new ConfirmUserEmailChangeError(
-                        ConfirmUserEmailChangeErrorCode.DUPLICATE_EMAIL,
-                        error.Description,
-                        new [] { "input", "newEmail" }
-                        ),
-                    _ =>
-                    new ConfirmUserEmailChangeError(
-                        ConfirmUserEmailChangeErrorCode.UNKNOWN,
-                        error.Description,
-                        new [] { "input" }
-                        )
-                    }
-                    );
+                // Ignore `*UserName` errors that have corresponding `*Email` errors because we use `Email` as `UserName`.
+                if (error.Code != "DuplicateUserName")
+                {
+                  errors.Add(
+                      // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
+                      error.Code switch
+                      {
+                      _ =>
+                      new ConfirmUserEmailChangeError(
+                          ConfirmUserEmailChangeErrorCode.UNKNOWN,
+                          error.Description,
+                          new [] { "input" }
+                          )
+                      }
+                      );
+                }
               }
               return new ConfirmUserEmailChangePayload(errors);
             }
@@ -326,66 +324,71 @@ namespace Metabase.GraphQl.Users
             var errors = new List<RegisterUserError>();
             foreach (var error in identityResult.Errors)
             {
-              errors.Add(
-                  // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
-                  error.Code switch
-                  {
-                  "DuplicateEmail" or "DuplicateUserName" =>
-                  new RegisterUserError(
-                      RegisterUserErrorCode.DUPLICATE_EMAIL,
-                      error.Description,
-                      new [] { "input", "email" }
-                      ),
-                  "InvalidEmail" or "InvalidUserName" =>
-                  new RegisterUserError(
-                      RegisterUserErrorCode.INVALID_EMAIL,
-                      error.Description,
-                      new [] { "input", "email" }
-                      ),
-                  "PasswordRequiresDigit" =>
-                  new RegisterUserError(
-                      RegisterUserErrorCode.PASSWORD_REQUIRES_DIGIT,
-                      error.Description,
-                      new [] { "input", "password" }
-                      ),
-                  "PasswordRequiresLower" =>
+              // Ignore `*UserName` errors that have corresponding `*Email` errors because we use `Email` as `UserName`.
+              if (error.Code != "DuplicateUserName"
+                  && error.Code != "InvalidUserName")
+              {
+                errors.Add(
+                    // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
+                    error.Code switch
+                    {
+                    "DuplicateEmail" =>
                     new RegisterUserError(
-                        RegisterUserErrorCode.PASSWORD_REQUIRES_LOWER,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                  "PasswordRequiresNonAlphanumeric" =>
-                    new RegisterUserError(
-                        RegisterUserErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                  "PasswordRequiresUpper" =>
-                    new RegisterUserError(
-                        RegisterUserErrorCode.PASSWORD_REQUIRES_UPPER,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                  "PasswordTooShort" =>
-                    new RegisterUserError(
-                        RegisterUserErrorCode.PASSWORD_TOO_SHORT,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                  "PropertyTooShort" =>
-                    new RegisterUserError(
-                        RegisterUserErrorCode.NULL_OR_EMPTY_EMAIL,
+                        RegisterUserErrorCode.DUPLICATE_EMAIL,
                         error.Description,
                         new [] { "input", "email" }
                         ),
-                  _ =>
+                    "InvalidEmail" =>
                     new RegisterUserError(
-                        RegisterUserErrorCode.UNKNOWN,
-                        $"{error.Description} (error code `{error.Code}`)",
-                        new [] { "input" }
-                        )
-                  }
-              );
+                        RegisterUserErrorCode.INVALID_EMAIL,
+                        error.Description,
+                        new [] { "input", "email" }
+                        ),
+                    "PasswordRequiresDigit" =>
+                    new RegisterUserError(
+                        RegisterUserErrorCode.PASSWORD_REQUIRES_DIGIT,
+                        error.Description,
+                        new [] { "input", "password" }
+                        ),
+                    "PasswordRequiresLower" =>
+                      new RegisterUserError(
+                          RegisterUserErrorCode.PASSWORD_REQUIRES_LOWER,
+                          error.Description,
+                          new [] { "input", "password" }
+                          ),
+                    "PasswordRequiresNonAlphanumeric" =>
+                      new RegisterUserError(
+                          RegisterUserErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
+                          error.Description,
+                          new [] { "input", "password" }
+                          ),
+                    "PasswordRequiresUpper" =>
+                      new RegisterUserError(
+                          RegisterUserErrorCode.PASSWORD_REQUIRES_UPPER,
+                          error.Description,
+                          new [] { "input", "password" }
+                          ),
+                    "PasswordTooShort" =>
+                      new RegisterUserError(
+                          RegisterUserErrorCode.PASSWORD_TOO_SHORT,
+                          error.Description,
+                          new [] { "input", "password" }
+                          ),
+                    "PropertyTooShort" =>
+                      new RegisterUserError(
+                          RegisterUserErrorCode.NULL_OR_EMPTY_EMAIL,
+                          error.Description,
+                          new [] { "input", "email" }
+                          ),
+                    _ =>
+                      new RegisterUserError(
+                          RegisterUserErrorCode.UNKNOWN,
+                          $"{error.Description} (error code `{error.Code}`)",
+                          new [] { "input" }
+                          )
+                    }
+                );
+              }
             }
             return new RegisterUserPayload(errors);
           }

@@ -33,6 +33,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="**\*.graphql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../src/Metabase.csproj" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,1 @@
+﻿{"data":{"registerUser":{"errors":[{"code":"DUPLICATE_EMAIL","message":"Email \u0027john.doe@ise.fraunhofer.de\u0027 is already taken.","path":["input","email"]}]}}}

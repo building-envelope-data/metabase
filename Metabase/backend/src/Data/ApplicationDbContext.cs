@@ -14,16 +14,22 @@ namespace Metabase.Data
   public sealed class ApplicationDbContext
     : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
     {
-        private static void RegisterEnumerations(string schemaName)
+        static ApplicationDbContext()
+        {
+            RegisterEnumerations();
+        }
+
+        private static void RegisterEnumerations()
         {
           // https://www.npgsql.org/efcore/mapping/enum.html#mapping-your-enum
-          NpgsqlConnection.GlobalTypeMapper.MapEnum<ValueObjects.ComponentCategory>($"{schemaName}.component_category");
+          NpgsqlConnection.GlobalTypeMapper.MapEnum<ValueObjects.ComponentCategory>();
         }
 
         private static void CreateEnumerations(ModelBuilder builder)
         {
           // https://www.npgsql.org/efcore/mapping/enum.html#creating-your-database-enum
-          builder.HasPostgresEnum<ValueObjects.ComponentCategory>();
+          // Create enumerations in public schema because that is where `NpgsqlConnection.GlobalTypeMapper.MapEnum` expects them to be by default.
+          builder.HasPostgresEnum<ValueObjects.ComponentCategory>("public");
         }
 
         private static
@@ -69,7 +75,6 @@ namespace Metabase.Data
         {
             var schemaNameOptions = options.FindExtension<SchemaNameOptionsExtension>();
             _schemaName = schemaNameOptions is null ? "metabase" : schemaNameOptions.SchemaName;
-            RegisterEnumerations(_schemaName);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
