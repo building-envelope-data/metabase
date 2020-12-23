@@ -86,18 +86,9 @@ WORKDIR /app/${PROJECT_NAME}/backend
 COPY \
   --chown=me:us \
   ./dotnet-tools.json ./
-COPY \
-  --chown=me:us \
-  ./dotnet-certificate-tool ./dotnet-certificate-tool
 RUN \
-	dotnet publish \
-		-c Release \
-		-o ./dotnet-certificate-tool/release \
-		./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
   dotnet tool restore \
-    --tool-manifest ./dotnet-tools.json \
-    --add-source ./dotnet-certificate-tool/src/nupkg && \
-  rm -rf ./dotnet-certificate-tool
+    --tool-manifest ./dotnet-tools.json
 
 RUN \
   mkdir ./src && \
