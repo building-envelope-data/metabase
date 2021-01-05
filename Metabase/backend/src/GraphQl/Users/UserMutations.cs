@@ -1,20 +1,16 @@
 using System.Linq;
+using Array = System.Array;
 using System.Threading;
 using System.Text;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using HotChocolate;
 using HotChocolate.Data;
-using HotChocolate.Subscriptions;
 using HotChocolate.Types;
 using HotChocolate.AspNetCore.Authorization;
-using NpgsqlTypes;
-using DateTime = System.DateTime;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.WebUtilities;
-using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Users
 {
@@ -34,52 +30,51 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<ConfirmUserEmailPayload> ConfirmUserEmailAsync(
             ConfirmUserEmailInput input,
-            [ScopedService] UserManager<Data.User> userManager,
-            CancellationToken cancellationToken
+            [ScopedService] UserManager<Data.User> userManager
             )
         {
-            var user = await userManager.FindByEmailAsync(input.Email);
+            var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
             if (user is null)
             {
-              return new ConfirmUserEmailPayload(
-                  new ConfirmUserEmailError(
-                    ConfirmUserEmailErrorCode.USER_NOT_FOUND,
-                    $"Unable to load user with email address {input.Email}.",
-                    new [] { "input", "email" }
-                    )
-                  );
+                return new ConfirmUserEmailPayload(
+                    new ConfirmUserEmailError(
+                      ConfirmUserEmailErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with email address {input.Email}.",
+                      new[] { "input", "email" }
+                      )
+                    );
             }
             var confirmationToken = Encoding.UTF8.GetString(
                 WebEncoders.Base64UrlDecode(
                   input.ConfirmationCode
                   )
                 );
-            var identityResult = await userManager.ConfirmEmailAsync(user, confirmationToken);
+            var identityResult = await userManager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
-              var errors = new List<ConfirmUserEmailError>();
-              foreach (var error in identityResult.Errors)
-              {
-                errors.Add(
-                    // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
-                    error.Code switch
-                    {
-                    "InvalidToken" =>
-                    new ConfirmUserEmailError(
-                        ConfirmUserEmailErrorCode.INVALID_CONFIRMATION_TOKEN,
-                        error.Description,
-                        new [] { "input", "confirmationToken" }
-                        ),
-                    _ =>
-                    new ConfirmUserEmailError(
-                        ConfirmUserEmailErrorCode.UNKNOWN,
-                        error.Description,
-                        new [] { "input" }
-                        )
-                    }
-                    );
-              }
-              return new ConfirmUserEmailPayload(errors);
+                var errors = new List<ConfirmUserEmailError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Add(
+                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
+                        error.Code switch
+                        {
+                            "InvalidToken" =>
+                        new ConfirmUserEmailError(
+                            ConfirmUserEmailErrorCode.INVALID_CONFIRMATION_TOKEN,
+                            error.Description,
+                            new[] { "input", "confirmationToken" }
+                            ),
+                            _ =>
+                        new ConfirmUserEmailError(
+                            ConfirmUserEmailErrorCode.UNKNOWN,
+                            error.Description,
+                            new[] { "input" }
+                            )
+                        }
+                        );
+                }
+                return new ConfirmUserEmailPayload(errors);
             }
             return new ConfirmUserEmailPayload(user);
         }
@@ -91,20 +86,19 @@ namespace Metabase.GraphQl.Users
         public async Task<ConfirmUserEmailChangePayload> ConfirmUserEmailChangeAsync(
             ConfirmUserEmailChangeInput input,
             [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager,
-            CancellationToken cancellationToken
+            [ScopedService] SignInManager<Data.User> signInManager
             )
         {
-            var user = await userManager.FindByEmailAsync(input.CurrentEmail);
+            var user = await userManager.FindByEmailAsync(input.CurrentEmail).ConfigureAwait(false);
             if (user is null)
             {
-              return new ConfirmUserEmailChangePayload(
-                  new ConfirmUserEmailChangeError(
-                    ConfirmUserEmailChangeErrorCode.USER_NOT_FOUND,
-                    $"Unable to load user with email address {input.CurrentEmail}.",
-                    new [] { "input", "currentEmail" }
-                    )
-                  );
+                return new ConfirmUserEmailChangePayload(
+                    new ConfirmUserEmailChangeError(
+                      ConfirmUserEmailChangeErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with email address {input.CurrentEmail}.",
+                      new[] { "input", "currentEmail" }
+                      )
+                    );
             }
             var confirmationToken =
               Encoding.UTF8.GetString(
@@ -112,62 +106,62 @@ namespace Metabase.GraphQl.Users
                     input.ConfirmationCode
                     )
                 );
-            var changeEmailIdentityResult = await userManager.ChangeEmailAsync(user, input.NewEmail, confirmationToken);
+            var changeEmailIdentityResult = await userManager.ChangeEmailAsync(user, input.NewEmail, confirmationToken).ConfigureAwait(false);
             // For us email and user name are one and the same, so when we
             // update the email we need to update the user name.
-            var setUserNameIdentityResult = await userManager.SetUserNameAsync(user, input.NewEmail);
+            var setUserNameIdentityResult = await userManager.SetUserNameAsync(user, input.NewEmail).ConfigureAwait(false);
             if (!(changeEmailIdentityResult.Succeeded && setUserNameIdentityResult.Succeeded))
             {
-              var errors = new List<ConfirmUserEmailChangeError>();
-              foreach (var error in changeEmailIdentityResult.Errors)
-              {
-                errors.Add(
-                    // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
-                    error.Code switch
-                    {
-                    "DuplicateEmail" =>
-                    new ConfirmUserEmailChangeError(
-                        ConfirmUserEmailChangeErrorCode.DUPLICATE_EMAIL,
-                        error.Description,
-                        new [] { "input", "newEmail" }
-                        ),
-                    "InvalidToken" =>
-                    new ConfirmUserEmailChangeError(
-                        ConfirmUserEmailChangeErrorCode.INVALID_CONFIRMATION_TOKEN,
-                        $"Invalid confirmation token.",
-                        new [] { "input", "confirmationToken" }
-                        ),
-                    _ =>
-                    new ConfirmUserEmailChangeError(
-                        ConfirmUserEmailChangeErrorCode.UNKNOWN,
-                        error.Description,
-                        new [] { "input" }
-                        )
-                    }
-                    );
-              }
-              foreach (var error in setUserNameIdentityResult.Errors)
-              {
-                // Ignore `*UserName` errors that have corresponding `*Email` errors because we use `Email` as `UserName`.
-                if (error.Code != "DuplicateUserName")
+                var errors = new List<ConfirmUserEmailChangeError>();
+                foreach (var error in changeEmailIdentityResult.Errors)
                 {
-                  errors.Add(
-                      // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
-                      error.Code switch
-                      {
-                      _ =>
-                      new ConfirmUserEmailChangeError(
-                          ConfirmUserEmailChangeErrorCode.UNKNOWN,
-                          error.Description,
-                          new [] { "input" }
-                          )
-                      }
-                      );
+                    errors.Add(
+                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
+                        error.Code switch
+                        {
+                            "DuplicateEmail" =>
+                        new ConfirmUserEmailChangeError(
+                            ConfirmUserEmailChangeErrorCode.DUPLICATE_EMAIL,
+                            error.Description,
+                            new[] { "input", "newEmail" }
+                            ),
+                            "InvalidToken" =>
+                        new ConfirmUserEmailChangeError(
+                            ConfirmUserEmailChangeErrorCode.INVALID_CONFIRMATION_TOKEN,
+                            "Invalid confirmation token.",
+                            new[] { "input", "confirmationToken" }
+                            ),
+                            _ =>
+                        new ConfirmUserEmailChangeError(
+                            ConfirmUserEmailChangeErrorCode.UNKNOWN,
+                            error.Description,
+                            new[] { "input" }
+                            )
+                        }
+                        );
                 }
-              }
-              return new ConfirmUserEmailChangePayload(errors);
+                foreach (var error in setUserNameIdentityResult.Errors)
+                {
+                    // Ignore `*UserName` errors that have corresponding `*Email` errors because we use `Email` as `UserName`.
+                    if (error.Code != "DuplicateUserName")
+                    {
+                        errors.Add(
+                            // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
+                            error.Code switch
+                            {
+                                _ =>
+                          new ConfirmUserEmailChangeError(
+                              ConfirmUserEmailChangeErrorCode.UNKNOWN,
+                              error.Description,
+                              new[] { "input" }
+                              )
+                            }
+                            );
+                    }
+                }
+                return new ConfirmUserEmailChangePayload(errors);
             }
-            await signInManager.RefreshSignInAsync(user);
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new ConfirmUserEmailChangePayload(user);
         }
 
@@ -178,54 +172,53 @@ namespace Metabase.GraphQl.Users
         public async Task<LoginUserPayload> LoginUserAsync(
             LoginUserInput input,
             [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager,
-            CancellationToken cancellationToken
+            [ScopedService] SignInManager<Data.User> signInManager
             )
         {
-          var signInResult = await signInManager.PasswordSignInAsync(
-              input.Email,
-              input.Password,
-              isPersistent: false,
-              lockoutOnFailure: true
-              );
-          // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinresult?view=aspnetcore-5.0
-          if (signInResult.IsLockedOut)
-          {
-            return new LoginUserPayload(
-                new LoginUserError(
-                  LoginUserErrorCode.LOCKED_OUT,
-                  "User is locked out.",
-                  new [] { "input" }
-                  )
-                );
-          }
-          if (signInResult.IsNotAllowed)
-          {
-            return new LoginUserPayload(
-                new LoginUserError(
-                  LoginUserErrorCode.NOT_ALLOWED,
-                  "User is not allowed to login.",
-                  new [] { "input" }
-                  )
-                );
-          }
-          if (!signInResult.Succeeded && !signInResult.RequiresTwoFactor)
-          {
-            return new LoginUserPayload(
-                new LoginUserError(
-                  LoginUserErrorCode.INVALID,
-                  "Invalid login attempt.",
-                  new [] { "input" }
-                  )
-                );
-          }
-          // TODO Only load the user if requested in the GraphQl query. Use resolver in payload and just pass email address.
-          var user = await userManager.FindByEmailAsync(input.Email);
-          if (signInResult.RequiresTwoFactor)
-          {
-            return new LoginUserPayload(user);
-          }
-          return new LoginUserPayload("TODO Generate JWT Access Token", user);
+            var signInResult = await signInManager.PasswordSignInAsync(
+                input.Email,
+                input.Password,
+                isPersistent: false,
+                lockoutOnFailure: true
+                ).ConfigureAwait(false);
+            // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinresult?view=aspnetcore-5.0
+            if (signInResult.IsLockedOut)
+            {
+                return new LoginUserPayload(
+                    new LoginUserError(
+                      LoginUserErrorCode.LOCKED_OUT,
+                      "User is locked out.",
+                      new[] { "input" }
+                      )
+                    );
+            }
+            if (signInResult.IsNotAllowed)
+            {
+                return new LoginUserPayload(
+                    new LoginUserError(
+                      LoginUserErrorCode.NOT_ALLOWED,
+                      "User is not allowed to login.",
+                      new[] { "input" }
+                      )
+                    );
+            }
+            if (!signInResult.Succeeded && !signInResult.RequiresTwoFactor)
+            {
+                return new LoginUserPayload(
+                    new LoginUserError(
+                      LoginUserErrorCode.INVALID,
+                      "Invalid login attempt.",
+                      new[] { "input" }
+                      )
+                    );
+            }
+            // TODO Only load the user if requested in the GraphQl query. Use resolver in payload and just pass email address.
+            var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+            if (signInResult.RequiresTwoFactor)
+            {
+                return new LoginUserPayload(user);
+            }
+            return new LoginUserPayload("TODO Generate JWT Access Token", user);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWith2fa.cs.cshtml
@@ -237,8 +230,7 @@ namespace Metabase.GraphQl.Users
         /* public async Task<LoginUserWithTwoFactorPayload> LoginUserWithTwoFactorAsync( */
         /*     LoginUserWithTwoFactorInput input, */
         /*     [ScopedService] UserManager<Data.User> userManager, */
-        /*     [ScopedService] SignInManager<Data.User> signInManager, */
-        /*     CancellationToken cancellationToken */
+        /*     [ScopedService] SignInManager<Data.User> signInManager */
         /*     ) */
         /* { */
         /*     var user = await signInManager.GetTwoFactorAuthenticationUserAsync(); */
@@ -283,8 +275,7 @@ namespace Metabase.GraphQl.Users
         /* public async Task<LogOutUserPayload> LogoutUserAsync( */
         /*     LogoutUserInput input, */
         /*     [ScopedService] UserManager<Data.User> userManager, */
-        /*     [ScopedService] SignInManager<Data.User> signInManager, */
-        /*     CancellationToken cancellationToken */
+        /*     [ScopedService] SignInManager<Data.User> signInManager */
         /*     ) */
         /* { */
         /*   // TODO Invalidate JWT token? */
@@ -296,124 +287,125 @@ namespace Metabase.GraphQl.Users
         public async Task<RegisterUserPayload> RegisterUserAsync(
             RegisterUserInput input,
             [ScopedService] UserManager<Data.User> userManager,
-            CancellationToken cancellationToken
+            [Service] Services.IEmailSender emailSender
             )
         {
-          var user = new Data.User {
-            UserName = input.Email,
-            Email = input.Email
-          };
-          if (input.Password != input.PasswordConfirmation)
-          {
-            return new RegisterUserPayload(
-                new RegisterUserError(
-                  RegisterUserErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
-                  "Password and confirmation password do not match.",
-                  new [] { "input", "passwordConfirmation" }
-                  )
-                );
-          }
-          var identityResult =
-            await userManager.CreateAsync(
-              user,
-              input.Password
-              );
-
-          if (!identityResult.Succeeded)
-          {
-            var errors = new List<RegisterUserError>();
-            foreach (var error in identityResult.Errors)
+            var user = new Data.User
             {
-              // Ignore `*UserName` errors that have corresponding `*Email` errors because we use `Email` as `UserName`.
-              if (error.Code != "DuplicateUserName"
-                  && error.Code != "InvalidUserName")
-              {
-                errors.Add(
-                    // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
-                    error.Code switch
-                    {
-                    "DuplicateEmail" =>
+                UserName = input.Email,
+                Email = input.Email
+            };
+            if (input.Password != input.PasswordConfirmation)
+            {
+                return new RegisterUserPayload(
                     new RegisterUserError(
-                        RegisterUserErrorCode.DUPLICATE_EMAIL,
-                        error.Description,
-                        new [] { "input", "email" }
-                        ),
-                    "InvalidEmail" =>
-                    new RegisterUserError(
-                        RegisterUserErrorCode.INVALID_EMAIL,
-                        error.Description,
-                        new [] { "input", "email" }
-                        ),
-                    "PasswordRequiresDigit" =>
-                    new RegisterUserError(
-                        RegisterUserErrorCode.PASSWORD_REQUIRES_DIGIT,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                    "PasswordRequiresLower" =>
-                      new RegisterUserError(
-                          RegisterUserErrorCode.PASSWORD_REQUIRES_LOWER,
-                          error.Description,
-                          new [] { "input", "password" }
-                          ),
-                    "PasswordRequiresNonAlphanumeric" =>
-                      new RegisterUserError(
-                          RegisterUserErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
-                          error.Description,
-                          new [] { "input", "password" }
-                          ),
-                    "PasswordRequiresUpper" =>
-                      new RegisterUserError(
-                          RegisterUserErrorCode.PASSWORD_REQUIRES_UPPER,
-                          error.Description,
-                          new [] { "input", "password" }
-                          ),
-                    "PasswordTooShort" =>
-                      new RegisterUserError(
-                          RegisterUserErrorCode.PASSWORD_TOO_SHORT,
-                          error.Description,
-                          new [] { "input", "password" }
-                          ),
-                    "PropertyTooShort" =>
-                      new RegisterUserError(
-                          RegisterUserErrorCode.NULL_OR_EMPTY_EMAIL,
-                          error.Description,
-                          new [] { "input", "email" }
-                          ),
-                    _ =>
-                      new RegisterUserError(
-                          RegisterUserErrorCode.UNKNOWN,
-                          $"{error.Description} (error code `{error.Code}`)",
-                          new [] { "input" }
-                          )
-                    }
-                );
-              }
+                      RegisterUserErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
+                      "Password and confirmation password do not match.",
+                      new[] { "input", "passwordConfirmation" }
+                      )
+                    );
             }
-            return new RegisterUserPayload(errors);
-          }
-          // TODO The confirmation also confirms the registration/account. Should we use another email text then?
-          await SendUserEmailConfirmation(input.Email, user, userManager);
-          return new RegisterUserPayload(user);
+            var identityResult =
+              await userManager.CreateAsync(
+                user,
+                input.Password
+                ).ConfigureAwait(false);
+
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<RegisterUserError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    // Ignore `*UserName` errors that have corresponding `*Email` errors because we use `Email` as `UserName`.
+                    if (error.Code != "DuplicateUserName"
+                        && error.Code != "InvalidUserName")
+                    {
+                        errors.Add(
+                            // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
+                            error.Code switch
+                            {
+                                "DuplicateEmail" =>
+                        new RegisterUserError(
+                            RegisterUserErrorCode.DUPLICATE_EMAIL,
+                            error.Description,
+                            new[] { "input", "email" }
+                            ),
+                                "InvalidEmail" =>
+                        new RegisterUserError(
+                            RegisterUserErrorCode.INVALID_EMAIL,
+                            error.Description,
+                            new[] { "input", "email" }
+                            ),
+                                "PasswordRequiresDigit" =>
+                        new RegisterUserError(
+                            RegisterUserErrorCode.PASSWORD_REQUIRES_DIGIT,
+                            error.Description,
+                            new[] { "input", "password" }
+                            ),
+                                "PasswordRequiresLower" =>
+                          new RegisterUserError(
+                              RegisterUserErrorCode.PASSWORD_REQUIRES_LOWER,
+                              error.Description,
+                              new[] { "input", "password" }
+                              ),
+                                "PasswordRequiresNonAlphanumeric" =>
+                          new RegisterUserError(
+                              RegisterUserErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
+                              error.Description,
+                              new[] { "input", "password" }
+                              ),
+                                "PasswordRequiresUpper" =>
+                          new RegisterUserError(
+                              RegisterUserErrorCode.PASSWORD_REQUIRES_UPPER,
+                              error.Description,
+                              new[] { "input", "password" }
+                              ),
+                                "PasswordTooShort" =>
+                          new RegisterUserError(
+                              RegisterUserErrorCode.PASSWORD_TOO_SHORT,
+                              error.Description,
+                              new[] { "input", "password" }
+                              ),
+                                "PropertyTooShort" =>
+                          new RegisterUserError(
+                              RegisterUserErrorCode.NULL_OR_EMPTY_EMAIL,
+                              error.Description,
+                              new[] { "input", "email" }
+                              ),
+                                _ =>
+                          new RegisterUserError(
+                              RegisterUserErrorCode.UNKNOWN,
+                              $"{error.Description} (error code `{error.Code}`)",
+                              new[] { "input" }
+                              )
+                            }
+                        );
+                    }
+                }
+                return new RegisterUserPayload(errors);
+            }
+            // TODO The confirmation also confirms the registration/account. Should we use another email text then?
+            await SendUserEmailConfirmation(input.Email, user, userManager, emailSender).ConfigureAwait(false);
+            return new RegisterUserPayload(user);
         }
 
-        private async Task SendUserEmailConfirmation(
+        private static async Task SendUserEmailConfirmation(
             string email,
             Data.User user,
-            UserManager<Data.User> userManager
+            UserManager<Data.User> userManager,
+            Services.IEmailSender emailSender
             )
         {
-          var confirmationCode =
-            WebEncoders.Base64UrlEncode(
-                Encoding.UTF8.GetBytes(
-                  await userManager.GenerateEmailConfirmationTokenAsync(user)
-                  )
-                );
-          /* TODO await emailSender.SendEmailAsync( */
-          /*     email, */
-          /*     "Confirm your email", */
-          /*     $"Please confirm your email address with the confirmation code {confirmationCode}."); */
-          System.Console.WriteLine($"Confirmation Code: {confirmationCode}");
+            var confirmationCode =
+              WebEncoders.Base64UrlEncode(
+                  Encoding.UTF8.GetBytes(
+                    await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false)
+                    )
+                  );
+            await emailSender.SendEmailAsync(
+                email,
+                "Confirm your email",
+                $"Please confirm your email address with the confirmation code {confirmationCode}.").ConfigureAwait(false);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResendEmailConfirmation.cs.cshtml
@@ -422,16 +414,16 @@ namespace Metabase.GraphQl.Users
         public async Task<ResendUserEmailConfirmationPayload> ResendUserEmailConfirmationAsync(
             ResendUserEmailConfirmationInput input,
             [ScopedService] UserManager<Data.User> userManager,
-            CancellationToken cancellationToken
+            [Service] Services.IEmailSender emailSender
             )
         {
-          var user = await userManager.FindByEmailAsync(input.Email);
-          // Don't reveal that the user does not exist.
-          if (user is not null)
-          {
-            await SendUserEmailConfirmation(input.Email, user, userManager);
-          }
-          return new ResendUserEmailConfirmationPayload();
+            var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+            // Don't reveal that the user does not exist.
+            if (user is not null)
+            {
+                await SendUserEmailConfirmation(input.Email, user, userManager, emailSender).ConfigureAwait(false);
+            }
+            return new ResendUserEmailConfirmationPayload();
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ForgotPassword.cs.cshtml
@@ -439,29 +431,28 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<RequestUserPasswordResetPayload> RequestUserPasswordResetAsync(
             RequestUserPasswordResetInput input,
-            [ScopedService] UserManager<Data.User> userManager,
-            CancellationToken cancellationToken
+            [ScopedService] UserManager<Data.User> userManager
             )
         {
-          var user = await userManager.FindByEmailAsync(input.Email);
-          // Don't reveal that the user does not exist or is not confirmed
-          if (user is not null && await userManager.IsEmailConfirmedAsync(user))
-          {
-            // For more information on how to enable account confirmation and password reset please
-            // visit https://docs.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-5.0
-            var resetCode =
-              WebEncoders.Base64UrlEncode(
-                  Encoding.UTF8.GetBytes(
-                    await userManager.GeneratePasswordResetTokenAsync(user)
-                    )
-                  );
-            /* TODO await _emailSender.SendEmailAsync( */
-            /*     input.Email, */
-            /*     "Reset Password", */
-            /*     $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>."); */
-            System.Console.WriteLine($"Reset Code: {resetCode}");
-          }
-          return new RequestUserPasswordResetPayload();
+            var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+            // Don't reveal that the user does not exist or is not confirmed
+            if (user is not null && await userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
+            {
+                // For more information on how to enable account confirmation and password reset please
+                // visit https://docs.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-5.0
+                var resetCode =
+                  WebEncoders.Base64UrlEncode(
+                      Encoding.UTF8.GetBytes(
+                        await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
+                        )
+                      );
+                /* TODO await _emailSender.SendEmailAsync( */
+                /*     input.Email, */
+                /*     "Reset Password", */
+                /*     $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>."); */
+                System.Console.WriteLine($"Reset Code: {resetCode}");
+            }
+            return new RequestUserPasswordResetPayload();
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResetPassword.cs.cshtml
@@ -469,77 +460,76 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<ResetUserPasswordPayload> ResetUserPasswordAsync(
             ResetUserPasswordInput input,
-            [ScopedService] UserManager<Data.User> userManager,
-            CancellationToken cancellationToken
+            [ScopedService] UserManager<Data.User> userManager
             )
         {
-          var user = await userManager.FindByEmailAsync(input.Email);
-          if (input.Password != input.PasswordConfirmation)
-          {
-            return new ResetUserPasswordPayload(
-                new ResetUserPasswordError(
-                  ResetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
-                  "Password and confirmation password do not match.",
-                  new [] { "input", "passwordConfirmation" }
-                  )
-                );
-          }
-          // Don't reveal that the user does not exist
-          if (user is not null)
-          {
-            var identityResult = await userManager.ResetPasswordAsync(user, input.ResetCode, input.Password);
-            if (!identityResult.Succeeded)
+            var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+            if (input.Password != input.PasswordConfirmation)
             {
-              var errors = new List<ResetUserPasswordError>();
-              foreach (var error in identityResult.Errors)
-              {
-                errors.Add(
-                    // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
-                    error.Code switch
-                    {
-                    "PasswordRequiresDigit" =>
+                return new ResetUserPasswordPayload(
                     new ResetUserPasswordError(
-                        ResetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                    "PasswordRequiresLower" =>
-                      new ResetUserPasswordError(
-                          ResetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
-                          error.Description,
-                          new [] { "input", "password" }
-                          ),
-                    "PasswordRequiresNonAlphanumeric" =>
-                      new ResetUserPasswordError(
-                          ResetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
-                          error.Description,
-                          new [] { "input", "password" }
-                          ),
-                    "PasswordRequiresUpper" =>
-                      new ResetUserPasswordError(
-                          ResetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
-                          error.Description,
-                          new [] { "input", "password" }
-                          ),
-                    "PasswordTooShort" =>
-                      new ResetUserPasswordError(
-                          ResetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
-                          error.Description,
-                          new [] { "input", "password" }
-                          ),
-                    _ =>
-                      new ResetUserPasswordError(
-                          ResetUserPasswordErrorCode.UNKNOWN,
-                          $"{error.Description} (error code `{error.Code}`)",
-                          new [] { "input" }
-                          )
-                    }
-                );
-              }
-              return new ResetUserPasswordPayload(errors);
+                      ResetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
+                      "Password and confirmation password do not match.",
+                      new[] { "input", "passwordConfirmation" }
+                      )
+                    );
             }
-          }
-          return new ResetUserPasswordPayload();
+            // Don't reveal that the user does not exist
+            if (user is not null)
+            {
+                var identityResult = await userManager.ResetPasswordAsync(user, input.ResetCode, input.Password).ConfigureAwait(false);
+                if (!identityResult.Succeeded)
+                {
+                    var errors = new List<ResetUserPasswordError>();
+                    foreach (var error in identityResult.Errors)
+                    {
+                        errors.Add(
+                            // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
+                            error.Code switch
+                            {
+                                "PasswordRequiresDigit" =>
+                        new ResetUserPasswordError(
+                            ResetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
+                            error.Description,
+                            new[] { "input", "password" }
+                            ),
+                                "PasswordRequiresLower" =>
+                          new ResetUserPasswordError(
+                              ResetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
+                              error.Description,
+                              new[] { "input", "password" }
+                              ),
+                                "PasswordRequiresNonAlphanumeric" =>
+                          new ResetUserPasswordError(
+                              ResetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
+                              error.Description,
+                              new[] { "input", "password" }
+                              ),
+                                "PasswordRequiresUpper" =>
+                          new ResetUserPasswordError(
+                              ResetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
+                              error.Description,
+                              new[] { "input", "password" }
+                              ),
+                                "PasswordTooShort" =>
+                          new ResetUserPasswordError(
+                              ResetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
+                              error.Description,
+                              new[] { "input", "password" }
+                              ),
+                                _ =>
+                          new ResetUserPasswordError(
+                              ResetUserPasswordErrorCode.UNKNOWN,
+                              $"{error.Description} (error code `{error.Code}`)",
+                              new[] { "input" }
+                              )
+                            }
+                        );
+                    }
+                    return new ResetUserPasswordPayload(errors);
+                }
+            }
+            return new ResetUserPasswordPayload();
         }
 
         ////////////////////
@@ -555,94 +545,93 @@ namespace Metabase.GraphQl.Users
             ChangeUserPasswordInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager,
-            CancellationToken cancellationToken
+            [ScopedService] SignInManager<Data.User> signInManager
             )
         {
-          var user = await userManager.GetUserAsync(claimsPrincipal);
-          if (user is null)
-          {
-            return new ChangeUserPasswordPayload(
-                new ChangeUserPasswordError(
-                  ChangeUserPasswordErrorCode.USER_NOT_FOUND,
-                  $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                  new string [] { }
-                  )
-                );
-          }
-          if (!(await userManager.HasPasswordAsync(user)))
-          {
-            return new ChangeUserPasswordPayload(
-                new ChangeUserPasswordError(
-                  ChangeUserPasswordErrorCode.NO_PASSWORD,
-                  $"You do not have a password yet.",
-                  new string [] {  }
-                  )
-                );
-          }
-          if (input.NewPassword != input.NewPasswordConfirmation)
-          {
-            return new ChangeUserPasswordPayload(
-                new ChangeUserPasswordError(
-                  ChangeUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
-                  "Password and confirmation password do not match.",
-                  new [] { "input", "passwordConfirmation" }
-                  )
-                );
-          }
-          var identityResult = await userManager.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword);
-          if (!identityResult.Succeeded)
-          {
-            var errors = new List<ChangeUserPasswordError>();
-            foreach (var error in identityResult.Errors)
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
             {
-              errors.Add(
-                  // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
-                  error.Code switch
-                  {
-                  "PasswordRequiresDigit" =>
-                  new ChangeUserPasswordError(
-                      ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
-                      error.Description,
-                      new [] { "input", "password" }
-                      ),
-                  "PasswordRequiresLower" =>
-                  new ChangeUserPasswordError(
-                      ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
-                      error.Description,
-                      new [] { "input", "password" }
-                      ),
-                  "PasswordRequiresNonAlphanumeric" =>
-                  new ChangeUserPasswordError(
-                      ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
-                      error.Description,
-                      new [] { "input", "password" }
-                      ),
-                  "PasswordRequiresUpper" =>
+                return new ChangeUserPasswordPayload(
                     new ChangeUserPasswordError(
-                        ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                  "PasswordTooShort" =>
-                    new ChangeUserPasswordError(
-                        ChangeUserPasswordErrorCode.PASSWORD_TOO_SHORT,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                  _ =>
-                    new ChangeUserPasswordError(
-                        ChangeUserPasswordErrorCode.UNKNOWN,
-                        $"{error.Description} (error code `{error.Code}`)",
-                        new [] { "input" }
-                        )
-                  }
-              );
+                      ChangeUserPasswordErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
             }
-            return new ChangeUserPasswordPayload(errors);
-          }
-          await signInManager.RefreshSignInAsync(user); // TODO What exactly does this do? Refresh the cookie? Then it is unnecessary for us! https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinmanager-1.refreshsigninasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Identity_SignInManager_1_RefreshSignInAsync__0_
-          return new ChangeUserPasswordPayload(user);
+            if (!await userManager.HasPasswordAsync(user).ConfigureAwait(false))
+            {
+                return new ChangeUserPasswordPayload(
+                    new ChangeUserPasswordError(
+                      ChangeUserPasswordErrorCode.NO_PASSWORD,
+                      "You do not have a password yet.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            if (input.NewPassword != input.NewPasswordConfirmation)
+            {
+                return new ChangeUserPasswordPayload(
+                    new ChangeUserPasswordError(
+                      ChangeUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
+                      "Password and confirmation password do not match.",
+                      new[] { "input", "passwordConfirmation" }
+                      )
+                    );
+            }
+            var identityResult = await userManager.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<ChangeUserPasswordError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Add(
+                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
+                        error.Code switch
+                        {
+                            "PasswordRequiresDigit" =>
+                      new ChangeUserPasswordError(
+                          ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
+                          error.Description,
+                          new[] { "input", "password" }
+                          ),
+                            "PasswordRequiresLower" =>
+                      new ChangeUserPasswordError(
+                          ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
+                          error.Description,
+                          new[] { "input", "password" }
+                          ),
+                            "PasswordRequiresNonAlphanumeric" =>
+                      new ChangeUserPasswordError(
+                          ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
+                          error.Description,
+                          new[] { "input", "password" }
+                          ),
+                            "PasswordRequiresUpper" =>
+                        new ChangeUserPasswordError(
+                            ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
+                            error.Description,
+                            new[] { "input", "password" }
+                            ),
+                            "PasswordTooShort" =>
+                        new ChangeUserPasswordError(
+                            ChangeUserPasswordErrorCode.PASSWORD_TOO_SHORT,
+                            error.Description,
+                            new[] { "input", "password" }
+                            ),
+                            _ =>
+                        new ChangeUserPasswordError(
+                            ChangeUserPasswordErrorCode.UNKNOWN,
+                            $"{error.Description} (error code `{error.Code}`)",
+                            new[] { "input" }
+                            )
+                        }
+                    );
+                }
+                return new ChangeUserPasswordPayload(errors);
+            }
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO What exactly does this do? Refresh the cookie? Then it is unnecessary for us! https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinmanager-1.refreshsigninasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Identity_SignInManager_1_RefreshSignInAsync__0_
+            return new ChangeUserPasswordPayload(user);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.DeletePersonalData.cs.cshtml
@@ -654,57 +643,56 @@ namespace Metabase.GraphQl.Users
             DeletePersonalUserDataInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager,
-            CancellationToken cancellationToken
+            [ScopedService] SignInManager<Data.User> signInManager
             )
         {
-          var user = await userManager.GetUserAsync(claimsPrincipal);
-          if (user is null)
-          {
-            return new DeletePersonalUserDataPayload(
-                new DeletePersonalUserDataError(
-                  DeletePersonalUserDataErrorCode.USER_NOT_FOUND,
-                  $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                  new string [] { }
-                  )
-                );
-          }
-          if (await userManager.HasPasswordAsync(user))
-          {
-            if (!(await userManager.CheckPasswordAsync(user, input.Password)))
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
             {
-              return new DeletePersonalUserDataPayload(
-                  new DeletePersonalUserDataError(
-                    DeletePersonalUserDataErrorCode.INCORRECT_PASSWORD,
-                    $"Incorrect password.",
-                    new [] { "input", "password" }
-                    )
-                  );
-            }
-          }
-          var identityResult = await userManager.DeleteAsync(user);
-          if (!identityResult.Succeeded)
-          {
-            var errors = new List<DeletePersonalUserDataError>();
-            foreach (var error in identityResult.Errors)
-            {
-              errors.Add(
-                  // TODO Which errors can occur here?
-                  error.Code switch
-                  {
-                  _ =>
+                return new DeletePersonalUserDataPayload(
                     new DeletePersonalUserDataError(
-                        DeletePersonalUserDataErrorCode.UNKNOWN,
-                        $"{error.Description} (error code `{error.Code}`)",
-                        new [] { "input" }
-                        )
-                  }
-              );
+                      DeletePersonalUserDataErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
             }
-            return new DeletePersonalUserDataPayload(errors);
-          }
-          await signInManager.SignOutAsync(); // TODO Invalidate access tokens here!
-          return new DeletePersonalUserDataPayload(user);
+            if (await userManager.HasPasswordAsync(user).ConfigureAwait(false))
+            {
+                if (!(await userManager.CheckPasswordAsync(user, input.Password).ConfigureAwait(false)))
+                {
+                    return new DeletePersonalUserDataPayload(
+                        new DeletePersonalUserDataError(
+                          DeletePersonalUserDataErrorCode.INCORRECT_PASSWORD,
+                          "Incorrect password.",
+                          new[] { "input", "password" }
+                          )
+                        );
+                }
+            }
+            var identityResult = await userManager.DeleteAsync(user).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<DeletePersonalUserDataError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Add(
+                        // TODO Which errors can occur here?
+                        error.Code switch
+                        {
+                            _ =>
+                        new DeletePersonalUserDataError(
+                            DeletePersonalUserDataErrorCode.UNKNOWN,
+                            $"{error.Description} (error code `{error.Code}`)",
+                            new[] { "input" }
+                            )
+                        }
+                    );
+                }
+                return new DeletePersonalUserDataPayload(errors);
+            }
+            await signInManager.SignOutAsync().ConfigureAwait(false); // TODO Invalidate access tokens here!
+            return new DeletePersonalUserDataPayload(user);
         }
 
         // TODO Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Disable2fa.cs.cshtml
@@ -716,44 +704,43 @@ namespace Metabase.GraphQl.Users
         public async Task<ChangeUserEmailPayload> ChangeUserEmailAsync(
             ChangeUserEmailInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            CancellationToken cancellationToken
+            [ScopedService] UserManager<Data.User> userManager
             )
         {
-          var user = await userManager.GetUserAsync(claimsPrincipal);
-          if (user is null)
-          {
-            return new ChangeUserEmailPayload(
-                new ChangeUserEmailError(
-                  ChangeUserEmailErrorCode.USER_NOT_FOUND,
-                  $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                  new string [] { }
-                  )
-                );
-          }
-          var currentEmail = await userManager.GetEmailAsync(user);
-          if (currentEmail == input.NewEmail)
-          {
-            return new ChangeUserEmailPayload(
-                new ChangeUserEmailError(
-                  ChangeUserEmailErrorCode.UNCHANGED_EMAIL,
-                  $"Your email is unchanged.",
-                  new string [] { "input", "newEmail" }
-                  )
-                );
-          }
-          var changeEmailCode =
-            WebEncoders.Base64UrlEncode(
-                Encoding.UTF8.GetBytes(
-                  await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail)
-                  )
-                );
-          /* TODO await emailSender.SendEmailAsync( */
-          /*     input.NewEmail, */
-          /*     "Confirm your email", */
-          /*     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>."); */
-          System.Console.WriteLine($"Change Email Code: {changeEmailCode}");
-          return new ChangeUserEmailPayload(user);
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new ChangeUserEmailPayload(
+                    new ChangeUserEmailError(
+                      ChangeUserEmailErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            var currentEmail = await userManager.GetEmailAsync(user).ConfigureAwait(false);
+            if (currentEmail == input.NewEmail)
+            {
+                return new ChangeUserEmailPayload(
+                    new ChangeUserEmailError(
+                      ChangeUserEmailErrorCode.UNCHANGED_EMAIL,
+                      "Your email is unchanged.",
+                      new string[] { "input", "newEmail" }
+                      )
+                    );
+            }
+            var changeEmailCode =
+              WebEncoders.Base64UrlEncode(
+                  Encoding.UTF8.GetBytes(
+                    await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false)
+                    )
+                  );
+            /* TODO await emailSender.SendEmailAsync( */
+            /*     input.NewEmail, */
+            /*     "Confirm your email", */
+            /*     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>."); */
+            System.Console.WriteLine($"Change Email Code: {changeEmailCode}");
+            return new ChangeUserEmailPayload(user);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
@@ -761,29 +748,29 @@ namespace Metabase.GraphQl.Users
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<ResendUserEmailVerificationPayload> ResendUserEmailVerificationAsync(
-            ResendUserEmailVerificationInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [ScopedService] UserManager<Data.User> userManager,
-            CancellationToken cancellationToken
+            [Service] Services.IEmailSender emailSender
             )
         {
-          var user = await userManager.GetUserAsync(claimsPrincipal);
-          if (user is null)
-          {
-            return new ResendUserEmailVerificationPayload(
-                new ResendUserEmailVerificationError(
-                  ResendUserEmailVerificationErrorCode.USER_NOT_FOUND,
-                  $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                  new string [] { }
-                  )
-                );
-          }
-          await SendUserEmailConfirmation(
-              await userManager.GetEmailAsync(user),
-              user,
-              userManager
-              );
-          return new ResendUserEmailVerificationPayload(user);
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new ResendUserEmailVerificationPayload(
+                    new ResendUserEmailVerificationError(
+                      ResendUserEmailVerificationErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            await SendUserEmailConfirmation(
+                await userManager.GetEmailAsync(user).ConfigureAwait(false),
+                user,
+                userManager,
+                emailSender
+                ).ConfigureAwait(false);
+            return new ResendUserEmailVerificationPayload(user);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.GenerateRecoveryCodes.cs.cshtml
@@ -792,35 +779,34 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<GenerateUserTwoFactorRecoveryCodesPayload> GenerateUserTwoFactorRecoveryCodesAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            CancellationToken cancellationToken
+            [ScopedService] UserManager<Data.User> userManager
             )
         {
-          var user = await userManager.GetUserAsync(claimsPrincipal);
-          if (user is null)
-          {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new GenerateUserTwoFactorRecoveryCodesPayload(
+                    new GenerateUserTwoFactorRecoveryCodesError(
+                      GenerateUserTwoFactorRecoveryCodesErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            if (!await userManager.GetTwoFactorEnabledAsync(user).ConfigureAwait(false))
+            {
+                return new GenerateUserTwoFactorRecoveryCodesPayload(
+                    new GenerateUserTwoFactorRecoveryCodesError(
+                      GenerateUserTwoFactorRecoveryCodesErrorCode.TWO_FACTOR_AUTHENTICATION_DISABLED,
+                      "You have disabled two-factor authentication.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
             return new GenerateUserTwoFactorRecoveryCodesPayload(
-                new GenerateUserTwoFactorRecoveryCodesError(
-                  GenerateUserTwoFactorRecoveryCodesErrorCode.USER_NOT_FOUND,
-                  $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                  new string [] { }
-                  )
+                user,
+                (await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false)).ToList().AsReadOnly()
                 );
-          }
-          if (!(await userManager.GetTwoFactorEnabledAsync(user)))
-          {
-            return new GenerateUserTwoFactorRecoveryCodesPayload(
-                new GenerateUserTwoFactorRecoveryCodesError(
-                  GenerateUserTwoFactorRecoveryCodesErrorCode.TWO_FACTOR_AUTHENTICATION_DISABLED,
-                  $"You have disabled two-factor authentication.",
-                  new string [] { }
-                  )
-                );
-          }
-          return new GenerateUserTwoFactorRecoveryCodesPayload(
-              user,
-              (await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10)).ToList().AsReadOnly()
-              );
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Index.cs.cshtml
@@ -831,55 +817,54 @@ namespace Metabase.GraphQl.Users
             SetUserPhoneNumberInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager,
-            CancellationToken cancellationToken
+            [ScopedService] SignInManager<Data.User> signInManager
             )
         {
-          var user = await userManager.GetUserAsync(claimsPrincipal);
-          if (user is null)
-          {
-            return new SetUserPhoneNumberPayload(
-                new SetUserPhoneNumberError(
-                  SetUserPhoneNumberErrorCode.USER_NOT_FOUND,
-                  $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                  new string [] { }
-                  )
-                );
-          }
-          var currentPhoneNumber = await userManager.GetPhoneNumberAsync(user);
-          if (currentPhoneNumber == input.PhoneNumber)
-          {
-            return new SetUserPhoneNumberPayload(
-                new SetUserPhoneNumberError(
-                  SetUserPhoneNumberErrorCode.UNCHANGED_PHONE_NUMBER,
-                  $"Your phone number is unchanged.",
-                  new string [] { "input", "phoneNumber" }
-                  )
-                );
-          }
-          var identityResult = await userManager.SetPhoneNumberAsync(user, input.PhoneNumber);
-          if (!identityResult.Succeeded)
-          {
-            var errors = new List<SetUserPhoneNumberError>();
-            foreach (var error in identityResult.Errors)
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
             {
-              errors.Add(
-                  // TODO Which errors can occur?
-                  error.Code switch
-                  {
-                  _ =>
+                return new SetUserPhoneNumberPayload(
                     new SetUserPhoneNumberError(
-                        SetUserPhoneNumberErrorCode.UNKNOWN,
-                        $"{error.Description} (error code `{error.Code}`)",
-                        new [] { "input" }
-                        )
-                  }
-              );
+                      SetUserPhoneNumberErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
             }
-            return new SetUserPhoneNumberPayload(errors);
-          }
-          await signInManager.RefreshSignInAsync(user); // TODO Refresh access token?
-          return new SetUserPhoneNumberPayload(user);
+            var currentPhoneNumber = await userManager.GetPhoneNumberAsync(user).ConfigureAwait(false);
+            if (currentPhoneNumber == input.PhoneNumber)
+            {
+                return new SetUserPhoneNumberPayload(
+                    new SetUserPhoneNumberError(
+                      SetUserPhoneNumberErrorCode.UNCHANGED_PHONE_NUMBER,
+                      "Your phone number is unchanged.",
+                      new string[] { "input", "phoneNumber" }
+                      )
+                    );
+            }
+            var identityResult = await userManager.SetPhoneNumberAsync(user, input.PhoneNumber).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<SetUserPhoneNumberError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Add(
+                        // TODO Which errors can occur?
+                        error.Code switch
+                        {
+                            _ =>
+                        new SetUserPhoneNumberError(
+                            SetUserPhoneNumberErrorCode.UNKNOWN,
+                            $"{error.Description} (error code `{error.Code}`)",
+                            new[] { "input" }
+                            )
+                        }
+                    );
+                }
+                return new SetUserPhoneNumberPayload(errors);
+            }
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO Refresh access token?
+            return new SetUserPhoneNumberPayload(user);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.SetPassword.cs.cshtml
@@ -891,94 +876,93 @@ namespace Metabase.GraphQl.Users
             SetUserPasswordInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager,
-            CancellationToken cancellationToken
+            [ScopedService] SignInManager<Data.User> signInManager
             )
         {
-          var user = await userManager.GetUserAsync(claimsPrincipal);
-          if (user is null)
-          {
-            return new SetUserPasswordPayload(
-                new SetUserPasswordError(
-                  SetUserPasswordErrorCode.USER_NOT_FOUND,
-                  $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                  new string [] { }
-                  )
-                );
-          }
-          if (await userManager.HasPasswordAsync(user))
-          {
-            return new SetUserPasswordPayload(
-                new SetUserPasswordError(
-                  SetUserPasswordErrorCode.EXISTING_PASSWORD,
-                  $"You already have a password.",
-                  new string [] {  }
-                  )
-                );
-          }
-          if (input.Password != input.PasswordConfirmation)
-          {
-            return new SetUserPasswordPayload(
-                new SetUserPasswordError(
-                  SetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
-                  "Password and confirmation password do not match.",
-                  new [] { "input", "passwordConfirmation" }
-                  )
-                );
-          }
-          var identityResult = await userManager.AddPasswordAsync(user, input.Password);
-          if (!identityResult.Succeeded)
-          {
-            var errors = new List<SetUserPasswordError>();
-            foreach (var error in identityResult.Errors)
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
             {
-              errors.Add(
-                  // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
-                  error.Code switch
-                  {
-                  "PasswordRequiresDigit" =>
-                  new SetUserPasswordError(
-                      SetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
-                      error.Description,
-                      new [] { "input", "password" }
-                      ),
-                  "PasswordRequiresLower" =>
-                  new SetUserPasswordError(
-                      SetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
-                      error.Description,
-                      new [] { "input", "password" }
-                      ),
-                  "PasswordRequiresNonAlphanumeric" =>
-                  new SetUserPasswordError(
-                      SetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
-                      error.Description,
-                      new [] { "input", "password" }
-                      ),
-                  "PasswordRequiresUpper" =>
+                return new SetUserPasswordPayload(
                     new SetUserPasswordError(
-                        SetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                  "PasswordTooShort" =>
-                    new SetUserPasswordError(
-                        SetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
-                        error.Description,
-                        new [] { "input", "password" }
-                        ),
-                  _ =>
-                    new SetUserPasswordError(
-                        SetUserPasswordErrorCode.UNKNOWN,
-                        $"{error.Description} (error code `{error.Code}`)",
-                        new [] { "input" }
-                        )
-                  }
-              );
+                      SetUserPasswordErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
             }
-            return new SetUserPasswordPayload(errors);
-          }
-          await signInManager.RefreshSignInAsync(user); // TODO What exactly does this do? Refresh the cookie? Then it is unnecessary for us! https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinmanager-1.refreshsigninasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Identity_SignInManager_1_RefreshSignInAsync__0_
-          return new SetUserPasswordPayload(user);
+            if (await userManager.HasPasswordAsync(user).ConfigureAwait(false))
+            {
+                return new SetUserPasswordPayload(
+                    new SetUserPasswordError(
+                      SetUserPasswordErrorCode.EXISTING_PASSWORD,
+                      "You already have a password.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            if (input.Password != input.PasswordConfirmation)
+            {
+                return new SetUserPasswordPayload(
+                    new SetUserPasswordError(
+                      SetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
+                      "Password and confirmation password do not match.",
+                      new[] { "input", "passwordConfirmation" }
+                      )
+                    );
+            }
+            var identityResult = await userManager.AddPasswordAsync(user, input.Password).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<SetUserPasswordError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Add(
+                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
+                        error.Code switch
+                        {
+                            "PasswordRequiresDigit" =>
+                      new SetUserPasswordError(
+                          SetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
+                          error.Description,
+                          new[] { "input", "password" }
+                          ),
+                            "PasswordRequiresLower" =>
+                      new SetUserPasswordError(
+                          SetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
+                          error.Description,
+                          new[] { "input", "password" }
+                          ),
+                            "PasswordRequiresNonAlphanumeric" =>
+                      new SetUserPasswordError(
+                          SetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
+                          error.Description,
+                          new[] { "input", "password" }
+                          ),
+                            "PasswordRequiresUpper" =>
+                        new SetUserPasswordError(
+                            SetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
+                            error.Description,
+                            new[] { "input", "password" }
+                            ),
+                            "PasswordTooShort" =>
+                        new SetUserPasswordError(
+                            SetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
+                            error.Description,
+                            new[] { "input", "password" }
+                            ),
+                            _ =>
+                        new SetUserPasswordError(
+                            SetUserPasswordErrorCode.UNKNOWN,
+                            $"{error.Description} (error code `{error.Code}`)",
+                            new[] { "input" }
+                            )
+                        }
+                    );
+                }
+                return new SetUserPasswordPayload(errors);
+            }
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO What exactly does this do? Refresh the cookie? Then it is unnecessary for us! https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinmanager-1.refreshsigninasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Identity_SignInManager_1_RefreshSignInAsync__0_
+            return new SetUserPasswordPayload(user);
         }
     }
 }
