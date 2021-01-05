@@ -131,7 +131,7 @@ type Mutation {
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
   resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
-  resendUserEmailVerification(input: ResendUserEmailVerificationInput!): ResendUserEmailVerificationPayload! @authorize(apply: BEFORE_RESOLVER)
+  resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(apply: BEFORE_RESOLVER)
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload!
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER)
@@ -324,10 +324,6 @@ input RequestUserPasswordResetInput {
 }
 
 input ResendUserEmailConfirmationInput {
-  email: String!
-}
-
-input ResendUserEmailVerificationInput {
   email: String!
 }
 

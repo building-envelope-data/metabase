@@ -42,6 +42,13 @@ namespace Infrastructure.Configuration
             app.UseStatusCodePages();
             app.UseStaticFiles();
             app.UseRouting();
+            // TODO Do we really want this? See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0
+            app.UseRequestLocalization(options =>
+            {
+                options.AddSupportedCultures("en-US", "de-DE");
+                options.AddSupportedUICultures("en-US", "de-DE");
+                options.SetDefaultCulture("en-US");
+            });
             app.UseCors();
         }
     }

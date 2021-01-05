@@ -18,6 +18,7 @@ namespace Metabase.Configuration
               options
               .UseNpgsql(databaseSettings.ConnectionString)
               .UseSchemaName(databaseSettings.SchemaName)
+              .UseOpenIddict()
               /* .UseNodaTime() */ // https://www.npgsql.org/efcore/mapping/nodatime.html
               );
           // Database contexts are used by `Identity`.

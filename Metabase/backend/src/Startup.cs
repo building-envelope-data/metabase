@@ -36,9 +36,12 @@ namespace Metabase
         {
             base.ConfigureServices(services);
             services.AddHealthChecks();
+            // TODO Find better place for message senders?
+            services.AddTransient<Services.IEmailSender, Services.MessageSender>();
+            services.AddTransient<Services.ISmsSender, Services.MessageSender>();
             Infrastructure.Configuration.Session.ConfigureServices(services);
             Infrastructure.Configuration.RequestResponse.ConfigureServices(services);
-            Configuration.Auth.ConfigureServices(services, _environment, _configuration, _appSettings, GetMigrationsAssembly());
+            Configuration.Auth.ConfigureServices(services, _environment, _configuration, GetAssemblyName());
             Configuration.GraphQl.ConfigureServices(services);
             Configuration.Database.ConfigureServices(services, _appSettings.Database);
         }
@@ -50,8 +53,9 @@ namespace Metabase
             Configuration.Auth.Configure(app);
             app.UseHealthChecks(
                 "/health",
-                new HealthCheckOptions {
-                ResponseWriter = JsonResponseWriter
+                new HealthCheckOptions
+                {
+                    ResponseWriter = JsonResponseWriter
                 }
                 );
             /* app.UseWebSockets(); */
@@ -68,12 +72,13 @@ namespace Metabase
             context.Response.ContentType = "application/json";
             await JsonSerializer.SerializeAsync(
                 context.Response.Body,
-                new {
-                Status = report.Status.ToString()
+                new
+                {
+                    Status = report.Status.ToString()
                 },
                 new JsonSerializerOptions
                 {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 }
                 );
         }

@@ -31,7 +31,7 @@ namespace Infrastructure
             _appSettings = _configuration.Get<AppSettings>();
         }
 
-        protected string GetMigrationsAssembly()
+        protected string GetAssemblyName()
         {
             return GetType().GetTypeInfo().Assembly.GetName().Name.NotNull();
         }

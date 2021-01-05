@@ -31,6 +31,19 @@
     <!--   <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets> -->
     <!--   <PrivateAssets>all</PrivateAssets> -->
     <!-- </PackageReference> -->
+    <PackageReference Include="OpenIddict.AspNetCore" Version="3.0.0" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.0.0" />
+    <PackageReference Include="OpenIddict.Quartz" Version="3.0.0" />
+    <PackageReference Include="Quartz" Version="3.2.3" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="./jwt-signing-certificate.pfx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="./jwt-encryption-certificate.pfx" />
   </ItemGroup>
 
   <ItemGroup>
