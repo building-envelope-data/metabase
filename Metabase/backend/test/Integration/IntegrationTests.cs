@@ -109,7 +109,15 @@ namespace Metabase.Tests.Integration
                 operationName,
                 variables
                 ).ConfigureAwait(false);
-            httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+            {
+                // We wrap this check in an if-condition such that the message
+                // content is only read when the status code is not 200.
+                httpResponseMessage.StatusCode.Should().Be(
+                    HttpStatusCode.OK,
+                    await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false)
+                    );
+            }
             return httpResponseMessage.Content;
         }
 
@@ -163,7 +171,7 @@ namespace Metabase.Tests.Integration
             options.Converters.Add(new JsonStringEnumConverter());
             var result =
               new ByteArrayContent(
-                JsonSerializer.SerializeToUtf8Bytes<TContent>(
+                JsonSerializer.SerializeToUtf8Bytes(
                   content,
                   options
                   )

@@ -1,0 +1,21 @@
+mutation loginUser(
+    $email: String! = "john.doe@ise.fraunhofer.de",
+    $password: String! = "aaaAAA123$!@"
+) {
+  loginUser(input: {
+    email: $email,
+    password: $password
+  }) {
+    jwtAccessToken
+    requiresTwoFactor
+    user {
+      id
+      email
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

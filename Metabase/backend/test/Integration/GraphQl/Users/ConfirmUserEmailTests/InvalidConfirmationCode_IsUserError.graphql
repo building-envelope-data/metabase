@@ -1,8 +1,9 @@
-mutation {
-  registerUser(input: {
+mutation confirmUserEmail(
+  $confirmationCode: String!
+  ) {
+  confirmUserEmail(input: {
     email: "john.doe@ise.fraunhofer.de",
-    password: "aaaAAA123$!@",
-    passwordConfirmation: "aaaAAA123$!@"
+    confirmationCode: $confirmationCode
   }) {
     user {
       id

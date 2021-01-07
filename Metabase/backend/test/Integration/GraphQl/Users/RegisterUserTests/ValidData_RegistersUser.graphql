@@ -1,0 +1,21 @@
+mutation registerUser(
+    $email: String! = "john.doe@ise.fraunhofer.de",
+    $password: String! = "aaaAAA123$!@",
+    $passwordConfirmation: String! = "aaaAAA123$!@"
+) {
+  registerUser(input: {
+    email: $email,
+    password: $password,
+    passwordConfirmation: $passwordConfirmation
+  }) {
+    user {
+      id
+      email
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

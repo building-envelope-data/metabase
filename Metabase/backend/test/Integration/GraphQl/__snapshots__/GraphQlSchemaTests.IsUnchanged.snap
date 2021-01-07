@@ -394,14 +394,14 @@ enum ComponentCategory {
 enum ConfirmUserEmailChangeErrorCode {
   UNKNOWN
   DUPLICATE_EMAIL
-  INVALID_CONFIRMATION_TOKEN
+  INVALID_CONFIRMATION_CODE
   USER_NOT_FOUND
 }
 
 enum ConfirmUserEmailErrorCode {
   UNKNOWN
   USER_NOT_FOUND
-  INVALID_CONFIRMATION_TOKEN
+  INVALID_CONFIRMATION_CODE
 }
 
 enum DeletePersonalUserDataErrorCode {

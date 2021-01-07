@@ -61,9 +61,9 @@ namespace Metabase.GraphQl.Users
                         {
                             "InvalidToken" =>
                         new ConfirmUserEmailError(
-                            ConfirmUserEmailErrorCode.INVALID_CONFIRMATION_TOKEN,
+                            ConfirmUserEmailErrorCode.INVALID_CONFIRMATION_CODE,
                             error.Description,
-                            new[] { "input", "confirmationToken" }
+                            new[] { "input", "confirmationCode" }
                             ),
                             _ =>
                         new ConfirmUserEmailError(
@@ -127,9 +127,9 @@ namespace Metabase.GraphQl.Users
                             ),
                             "InvalidToken" =>
                         new ConfirmUserEmailChangeError(
-                            ConfirmUserEmailChangeErrorCode.INVALID_CONFIRMATION_TOKEN,
-                            "Invalid confirmation token.",
-                            new[] { "input", "confirmationToken" }
+                            ConfirmUserEmailChangeErrorCode.INVALID_CONFIRMATION_CODE,
+                            error.Description,
+                            new[] { "input", "confirmationCode" }
                             ),
                             _ =>
                         new ConfirmUserEmailChangeError(

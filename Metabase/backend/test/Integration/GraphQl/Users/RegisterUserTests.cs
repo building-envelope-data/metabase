@@ -1,35 +1,28 @@
-using System;
 using FluentAssertions;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.Execution;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Snapshooter.Xunit;
 using Xunit;
-using System.Linq;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
     public sealed class RegisterUserTests
-      : IntegrationTests
+      : UserIntegrationTests
     {
         [Fact]
-        public async Task ValidData_RegistersUserWithoutErrors()
+        public async Task ValidData_RegistersUser()
         {
             // Act
             var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/ValidData_RegistersUserWithoutErrors.graphql")
+                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/ValidData_RegistersUser.graphql")
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
-                matchOptions => matchOptions.IgnoreField("data.registerUser.user.id")
-                /* matchOptions => matchOptions.Assert( */
-                /*   fieldOptions => Assert.NotEqual(Guid.Empty, fieldOptions.Field<Guid>("data.registerUser.user.id")) */
-                /*   ) */
+                // matchOptions => matchOptions.IgnoreField("data.registerUser.user.id")
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.registerUser.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
                 );
             EmailsShouldContainSingle(
                 address: "john.doe@ise.fraunhofer.de",

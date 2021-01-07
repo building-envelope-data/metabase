@@ -1,0 +1,19 @@
+mutation confirmUserEmail(
+  $email: String! = "john.doe@ise.fraunhofer.de",
+  $confirmationCode: String!
+  ) {
+  confirmUserEmail(input: {
+    email: $email,
+    confirmationCode: $confirmationCode
+  }) {
+    user {
+      id
+      email
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
