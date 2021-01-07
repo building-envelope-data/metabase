@@ -84,13 +84,18 @@ namespace Metabase.Configuration
               .AddJwtBearer(_ =>
                   {
                       _.Authority = "http://localhost:8080"; // TODO Make this configurable via environment variables through `configuration` (maybe its `AppSettings`).
-                      _.Audience = "auth_server_api"; // TODO This must be included in ticket creation. What does this mean?
+                      _.Audience = "resource_server"; // TODO This must be included in ticket creation. What does this mean?
                       _.RequireHttpsMetadata = false;
                       _.IncludeErrorDetails = true; //
                       _.TokenValidationParameters = new TokenValidationParameters()
                       {
                           NameClaimType = OpenIddictConstants.Claims.Subject,
                           RoleClaimType = OpenIddictConstants.Claims.Role,
+                          // TODO Configure the following as in https://github.com/openiddict/openiddict-samples/issues/63#issuecomment-396785919 ?
+                          // ValidateIssuer = true,
+                          // ValidateIssuerSigningKey = true,
+                          // ValidAudiences = new List<string> { "resource-server" },
+                          // IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("953183eb-988d-403e-8b8a-7dd9cd44e303")) // using same GUID secret as above
                       };
                   });
             services.AddAuthorization();
@@ -168,11 +173,13 @@ namespace Metabase.Configuration
                     {
                         _.AddDevelopmentEncryptionCertificate()
                         .AddDevelopmentSigningCertificate();
+                        // _.AddEphemeralSigningKey()
                     }
                     else if (environment.IsEnvironment("test"))
                     {
                         _.AddDevelopmentEncryptionCertificate(new X500DistinguishedName($"CN=OpenIddict Server Encryption Certificate {Guid.NewGuid()}"))
                         .AddDevelopmentSigningCertificate(new X500DistinguishedName($"CN=OpenIddict Server Signing Certificate {Guid.NewGuid()}"));
+                        // _.AddSigningKey(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())))
                     }
                     else
                     {
@@ -194,7 +201,8 @@ namespace Metabase.Configuration
                         resource: "Metabase.jwt-signing-certificate.pfx",
                         password: "password"
                         );
-
+                        // TODO Or shall we use symmetric keys? (of course without hard-coding it here)
+                        // options.AddSigningKey(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("953183eb-988d-403e-8b8a-7dd9cd44e303")));
                     }
                     // Force client applications to use Proof Key for Code Exchange (PKCE).
                     _.RequireProofKeyForCodeExchange();

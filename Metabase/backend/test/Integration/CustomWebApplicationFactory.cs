@@ -4,9 +4,7 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -15,41 +13,41 @@ using Npgsql;
 using AppSettings = Infrastructure.AppSettings;
 using IRelationalDatabaseCreator = Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator;
 using IsolationLevel = System.Data.IsolationLevel;
-using Startup = Metabase.Startup;
-using Data = Metabase.Data;
 
 namespace Metabase.Tests.Integration
 {
-  public sealed class CustomWebApplicationFactory
-    : WebApplicationFactory<Startup>
+    public sealed class CustomWebApplicationFactory
+      : WebApplicationFactory<Startup>
     {
+        public CollectingEmailSender EmailSender { get; }
+        public CollectingSmsSender SmsSender { get; }
+
         public CustomWebApplicationFactory()
         {
-            SetUp();
+            EmailSender = new CollectingEmailSender();
+            SmsSender = new CollectingSmsSender();
+            Do(
+                services =>
+                    SetUpDatabase(services.GetRequiredService<Data.ApplicationDbContext>())
+            );
         }
 
         private void Do(Action<IServiceProvider> what)
         {
-            using (var scope = Services.CreateScope())
-            {
-                what(scope.ServiceProvider);
-            }
+            using var scope = Services.CreateScope();
+            what(scope.ServiceProvider);
         }
 
-        private async Task DoAsync(Func<IServiceProvider, Task> what)
-        {
-            using (var scope = Services.CreateScope())
-            {
-                await what(scope.ServiceProvider).ConfigureAwait(false);
-            }
-        }
+        // private async Task DoAsync(Func<IServiceProvider, Task> what)
+        // {
+        //     using var scope = Services.CreateScope();
+        //     await what(scope.ServiceProvider).ConfigureAwait(false);
+        // }
 
         private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
         {
-            using (var scope = Services.CreateScope())
-            {
-                return what(scope.ServiceProvider);
-            }
+            using var scope = Services.CreateScope();
+            return what(scope.ServiceProvider);
         }
 
         private AppSettings AppSettings
@@ -68,30 +66,31 @@ namespace Metabase.Tests.Integration
             builder.UseEnvironment("test");
             builder.ConfigureServices(serviceCollection =>
                 {
-                using (var scope = serviceCollection.BuildServiceProvider().CreateScope())
-                {
-                var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
-                // appSettings.Database.SchemaName += Guid.NewGuid().ToString().Replace("-", ""); // does not work because enumeration types in public schema cannot be created when they already exist
-                appSettings.Database.ConnectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres;";
-                // var appSettingsServiceDescriptor =
-                // serviceCollection.SingleOrDefault(
-                //     d => d.ServiceType == typeof(AppSettings)
-                //     );
-                // if (appSettingsServiceDescriptor is not null)
-                // {
-                // serviceCollection.Remove(appSettingsServiceDescriptor);
-                // }
-                // serviceCollection.AddSingleton<AppSettings>(appSettings);
+                    using var scope = serviceCollection.BuildServiceProvider().CreateScope();
+                    var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
+                    // appSettings.Database.SchemaName += Guid.NewGuid().ToString().Replace("-", ""); // does not work because enumeration types in public schema cannot be created when they already exist. We therefore create a whole new database for each test instead of just a new schema.
+                    appSettings.Database.ConnectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres;";
+                    // Configure `IEmailSender`
+                    var emailSenderServiceDescriptor =
+                    serviceCollection.SingleOrDefault(d =>
+                     d.ServiceType == typeof(Services.IEmailSender)
+                        );
+                    if (emailSenderServiceDescriptor is not null)
+                    {
+                        serviceCollection.Remove(emailSenderServiceDescriptor);
+                    }
+                    serviceCollection.AddTransient<Services.IEmailSender>(_ => EmailSender);
+                    // Configure `ISmsSender`
+                    var smsSenderServiceDescriptor =
+                    serviceCollection.SingleOrDefault(d =>
+                     d.ServiceType == typeof(Services.ISmsSender)
+                        );
+                    if (smsSenderServiceDescriptor is not null)
+                    {
+                        serviceCollection.Remove(smsSenderServiceDescriptor);
+                    }
+                    serviceCollection.AddTransient<Services.ISmsSender>(_ => SmsSender);
                 }
-                }
-            );
-        }
-
-        public void SetUp()
-        {
-            Do(
-                services =>
-                    SetUpDatabase(services.GetRequiredService<Data.ApplicationDbContext>())
             );
         }
 
@@ -101,31 +100,32 @@ namespace Metabase.Tests.Integration
             var databaseCreator = dbContext.Database.GetService<IRelationalDatabaseCreator>();
             if (databaseCreator.Exists())
             {
-              DropDatabaseSchema(dbContext);
+                DropDatabaseSchema(dbContext);
             }
-            else {
-              databaseCreator.Create();
+            else
+            {
+                databaseCreator.Create();
             }
             databaseCreator.CreateTables();
         }
 
-        public async Task SeedUsers()
-        {
-            /* await DoAsync( */
-            /*     async services => */
-            /*     await SeedData.SeedUsers( */
-            /*       services.GetRequiredService<UserManager<Models.UserX>>() */
-            /*       ) */
-            /*     .ConfigureAwait(false) */
-            /* ).ConfigureAwait(false); */
-        }
+        // public async Task SeedUsers()
+        // {
+        //     await DoAsync(
+        //          async services =>
+        //          await SeedData.SeedUsers(
+        //            services.GetRequiredService<UserManager<Models.UserX>>()
+        //            )
+        //          .ConfigureAwait(false)
+        //      ).ConfigureAwait(false);
+        // }
 
-        public void SeedAuth()
-        {
-            /* Do( */
-            /*         services => SeedData.SeedAuth(services.GetRequiredService<ConfigurationDbContext>()) */
-            /* ); */
-        }
+        // public void SeedAuth()
+        // {
+        //     Do(
+        //         services => SeedData.SeedAuth(services.GetRequiredService<ConfigurationDbContext>())
+        //     );
+        // }
 
         public new void Dispose()
         {
@@ -140,24 +140,20 @@ namespace Metabase.Tests.Integration
 
         private void DropDatabaseSchema(DbContext dbContext)
         {
-          DropDatabaseSchema(
-              dbContext.Model.GetDefaultSchema()
-              );
+            DropDatabaseSchema(
+                dbContext.Model.GetDefaultSchema()
+                );
         }
 
         private void DropDatabaseSchema(string schemaName)
         {
-            using (var connection = new NpgsqlConnection(AppSettings.Database.ConnectionString))
-            {
-                connection.Open();
-                using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
-                {
-                    var command = connection.CreateCommand();
-                    command.CommandText = $"DROP SCHEMA IF EXISTS {schemaName} CASCADE;";
-                    command.ExecuteNonQuery();
-                    transaction.Commit();
-                }
-            }
+            using var connection = new NpgsqlConnection(AppSettings.Database.ConnectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
+            var command = connection.CreateCommand();
+            command.CommandText = $"DROP SCHEMA IF EXISTS {schemaName} CASCADE;";
+            command.ExecuteNonQuery();
+            transaction.Commit();
         }
     }
 }

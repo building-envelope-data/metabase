@@ -1,10 +1,6 @@
-using System;
 using System.Net;
 using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.Execution;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using FluentAssertions;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -16,13 +12,11 @@ namespace Metabase.Tests.Integration.GraphQl
         [Fact]
         public async Task IsUnchanged()
         {
-            // Arrange
-            // ...
             // Act
-            var response = await HttpClient.GetAsync("/graphql?sdl");
+            var response = await HttpClient.GetAsync("/graphql?sdl").ConfigureAwait(false);
             // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var schema = await response.Content.ReadAsStringAsync();
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var schema = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             Snapshot.Match(schema);
         }
     }
