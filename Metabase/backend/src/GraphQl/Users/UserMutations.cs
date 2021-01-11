@@ -44,11 +44,7 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
-            var confirmationToken = Encoding.UTF8.GetString(
-                WebEncoders.Base64UrlDecode(
-                  input.ConfirmationCode
-                  )
-                );
+            var confirmationToken = DecodeCode(input.ConfirmationCode);
             var identityResult = await userManager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
@@ -100,12 +96,7 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
-            var confirmationToken =
-              Encoding.UTF8.GetString(
-                  WebEncoders.Base64UrlDecode(
-                    input.ConfirmationCode
-                    )
-                );
+            var confirmationToken = DecodeCode(input.ConfirmationCode);
             var changeEmailIdentityResult = await userManager.ChangeEmailAsync(user, input.NewEmail, confirmationToken).ConfigureAwait(false);
             // For us email and user name are one and the same, so when we
             // update the email we need to update the user name.
@@ -385,27 +376,45 @@ namespace Metabase.GraphQl.Users
                 return new RegisterUserPayload(errors);
             }
             // TODO The confirmation also confirms the registration/account. Should we use another email text then?
-            await SendUserEmailConfirmation(input.Email, user, userManager, emailSender).ConfigureAwait(false);
+            await SendUserEmailConfirmation(
+                input.Email,
+                await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
+                emailSender
+                ).ConfigureAwait(false);
             return new RegisterUserPayload(user);
         }
 
         private static async Task SendUserEmailConfirmation(
             string email,
-            Data.User user,
-            UserManager<Data.User> userManager,
+            string confirmationToken,
             Services.IEmailSender emailSender
             )
         {
-            var confirmationCode =
-              WebEncoders.Base64UrlEncode(
-                  Encoding.UTF8.GetBytes(
-                    await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false)
-                    )
-                  );
+            var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendEmailAsync(
                 email,
                 "Confirm your email",
                 $"Please confirm your email address with the confirmation code {confirmationCode}.").ConfigureAwait(false);
+        }
+
+        private static string EncodeToken(string token)
+        {
+            return
+              WebEncoders.Base64UrlEncode(
+                  Encoding.UTF8.GetBytes(
+                    token
+                    )
+                  );
+        }
+
+        private static string DecodeCode(string code)
+        {
+            return
+              Encoding.UTF8.GetString(
+                WebEncoders.Base64UrlDecode(
+                  code
+                  )
+                );
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResendEmailConfirmation.cs.cshtml
@@ -421,7 +430,11 @@ namespace Metabase.GraphQl.Users
             // Don't reveal that the user does not exist.
             if (user is not null)
             {
-                await SendUserEmailConfirmation(input.Email, user, userManager, emailSender).ConfigureAwait(false);
+                await SendUserEmailConfirmation(
+                    input.Email,
+                    await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
+                    emailSender
+                    ).ConfigureAwait(false);
             }
             return new ResendUserEmailConfirmationPayload();
         }
@@ -431,7 +444,8 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<RequestUserPasswordResetPayload> RequestUserPasswordResetAsync(
             RequestUserPasswordResetInput input,
-            [ScopedService] UserManager<Data.User> userManager
+            [ScopedService] UserManager<Data.User> userManager,
+            [Service] Services.IEmailSender emailSender
             )
         {
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -446,11 +460,11 @@ namespace Metabase.GraphQl.Users
                         await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
                         )
                       );
-                /* TODO await _emailSender.SendEmailAsync( */
-                /*     input.Email, */
-                /*     "Reset Password", */
-                /*     $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>."); */
-                System.Console.WriteLine($"Reset Code: {resetCode}");
+                await emailSender.SendEmailAsync(
+                    input.Email,
+                    "Reset Password",
+                    $"Please reset your password with the reset code {resetCode}."
+                    ).ConfigureAwait(false);
             }
             return new RequestUserPasswordResetPayload();
         }
@@ -704,7 +718,8 @@ namespace Metabase.GraphQl.Users
         public async Task<ChangeUserEmailPayload> ChangeUserEmailAsync(
             ChangeUserEmailInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager
+            [ScopedService] UserManager<Data.User> userManager,
+            [Service] Services.IEmailSender emailSender
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -729,17 +744,11 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
-            var changeEmailCode =
-              WebEncoders.Base64UrlEncode(
-                  Encoding.UTF8.GetBytes(
-                    await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false)
-                    )
-                  );
-            /* TODO await emailSender.SendEmailAsync( */
-            /*     input.NewEmail, */
-            /*     "Confirm your email", */
-            /*     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>."); */
-            System.Console.WriteLine($"Change Email Code: {changeEmailCode}");
+            await SendUserEmailConfirmation(
+                input.NewEmail,
+                await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),
+                emailSender
+                ).ConfigureAwait(false);
             return new ChangeUserEmailPayload(user);
         }
 
@@ -766,8 +775,7 @@ namespace Metabase.GraphQl.Users
             }
             await SendUserEmailConfirmation(
                 await userManager.GetEmailAsync(user).ConfigureAwait(false),
-                user,
-                userManager,
+                await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender
                 ).ConfigureAwait(false);
             return new ResendUserEmailVerificationPayload(user);
