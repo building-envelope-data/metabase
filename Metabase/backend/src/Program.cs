@@ -21,23 +21,23 @@ namespace Metabase
 
         public static async Task CreateAndSeedDbIfNotExists(IHost host)
         {
-            // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro?view=aspnetcore-5.0#initialize-db-with-test-data
-            using (var scope = host.Services.CreateScope())
+            // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
+            using var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            try
             {
-                var services = scope.ServiceProvider;
-                try
+                using var dbContext =
+                 services.GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
+                 .CreateDbContext();
+                if (dbContext.Database.EnsureCreated())
                 {
-                    using var dbContext = services.GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>().CreateDbContext();
-                    if (dbContext.Database.EnsureCreated())
-                    {
-                        await Data.DbSeeder.Do(services).ConfigureAwait(false);
-                    }
+                    await Data.DbSeeder.DoAsync(services, testEnvironment: false).ConfigureAwait(false);
                 }
-                catch (Exception exception)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(exception, "An error occurred creating and seeding the database.");
-                }
+            }
+            catch (Exception exception)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(exception, "An error occurred creating and seeding the database.");
             }
         }
 
@@ -47,9 +47,9 @@ namespace Metabase
             return Host.CreateDefaultBuilder(commandLineArguments)
               .ConfigureWebHostDefaults(webBuilder =>
                   webBuilder
-                  .UseKestrel() // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-3.1
+                  .UseKestrel() // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel
                   .UseContentRoot(Directory.GetCurrentDirectory())
-                  .UseStartup<Startup>(webHostBuilderContext =>
+                  .UseStartup(webHostBuilderContext =>
                     new Startup(
                       webHostBuilderContext.HostingEnvironment,
                       commandLineArguments

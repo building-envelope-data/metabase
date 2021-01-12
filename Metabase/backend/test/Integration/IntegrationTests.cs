@@ -11,6 +11,8 @@ using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebA
 using FluentAssertions;
 using System.Net;
 using System.Linq;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Metabase.Tests.Integration
 {
@@ -20,6 +22,8 @@ namespace Metabase.Tests.Integration
         protected CollectingEmailSender EmailSender { get => Factory.EmailSender; }
         protected CollectingSmsSender SmsSender { get => Factory.SmsSender; }
         protected HttpClient HttpClient { get; }
+        public const string DefaultEmail = "john.doe@ise.fraunhofer.de";
+        public const string DefaultPassword = "aaaAAA123$!@";
 
         protected IntegrationTests()
         {
@@ -49,16 +53,14 @@ namespace Metabase.Tests.Integration
               await HttpClient.RequestPasswordTokenAsync(
                 new PasswordTokenRequest
                 {
-                    Address = "https://localhost:5001/connect/token",
-
-                    ClientId = "test",
+                    Address = "http://localhost/connect/token",
+                    ClientId = "metabase",
                     ClientSecret = "secret",
                     Scope = "api",
-
                     UserName = emailAddress,
                     Password = password,
                 }
-                  )
+              )
               .ConfigureAwait(false);
             if (response.IsError)
             {
@@ -68,16 +70,76 @@ namespace Metabase.Tests.Integration
         }
 
         protected async Task Authorize(
-            string username,
+            string email,
             string password
             )
         {
             var tokenResponse =
               await RequestAuthToken(
-                  username, password
+                  emailAddress: email,
+                  password: password
                   )
               .ConfigureAwait(false);
             HttpClient.SetBearerToken(tokenResponse.AccessToken);
+        }
+
+        protected async Task<string> RegisterUser(
+            string email = DefaultEmail,
+            string password = DefaultPassword
+        )
+        {
+            await SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/ValidData_RegistersUser.graphql"),
+                variables: new Dictionary<string, object?>
+                {
+                    ["email"] = email,
+                    ["password"] = password,
+                    ["passwordConfirmation"] = password
+                }
+                ).ConfigureAwait(false);
+            return Regex.Match(
+                EmailSender.Emails.Single().Message,
+                @"confirmation code (?<confirmationCode>\w+)"
+                )
+                .Groups["confirmationCode"]
+                .Captures
+                .Single()
+                .Value;
+        }
+
+        protected async Task ConfirmUserEmail(
+            string confirmationCode,
+            string email = DefaultEmail
+            )
+        {
+            await SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmailTests/ValidData_ConfirmsUserEmail.graphql"),
+                variables: new Dictionary<string, object?>
+                {
+                    ["email"] = email,
+                    ["confirmationCode"] = confirmationCode
+                }
+                ).ConfigureAwait(false);
+        }
+
+        protected async Task RegisterAndConfirmAndAuthorizeUser(
+            string email,
+            string password
+        )
+        {
+            var confirmationCode =
+                await RegisterUser(
+                    email: email,
+                    password: password
+                    ).ConfigureAwait(false);
+            await ConfirmUserEmail(
+                confirmationCode: confirmationCode,
+                email: email
+                ).ConfigureAwait(false);
+            await Authorize(
+                email: email,
+                password: password
+            ).ConfigureAwait(false);
         }
 
         protected Task<HttpResponseMessage> QueryGraphQl(

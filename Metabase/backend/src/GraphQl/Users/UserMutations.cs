@@ -11,6 +11,7 @@ using HotChocolate.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Metabase.GraphQl.Users
 {

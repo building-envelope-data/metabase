@@ -12,11 +12,14 @@ using OpenIddict.Abstractions;
 using System.Reflection;
 using Quartz;
 using System.Security.Cryptography.X509Certificates;
+using System.Collections.Generic;
 
 namespace Metabase.Configuration
 {
     public abstract class Auth
     {
+        public static string ApiScope { get; } = "api";
+
         public static void ConfigureServices(
             IServiceCollection services,
             IWebHostEnvironment environment,
@@ -27,7 +30,7 @@ namespace Metabase.Configuration
             // https://fullstackmark.com/post/21/user-authentication-and-identity-with-angular-aspnet-core-and-identityserver
             // https://www.scottbrady91.com/Identity-Server/ASPNET-Core-Swagger-UI-Authorization-using-IdentityServer4
             ConfigureIdentityServices(services);
-            ConfigureAuthenticiationAndAuthorizationServices(services, configuration);
+            ConfigureAuthenticiationAndAuthorizationServices(services, environment, configuration);
             ConfigureTaskScheduling(services, environment);
             ConfigureOpenIddictServices(services, environment, assemblyName);
         }
@@ -72,6 +75,7 @@ namespace Metabase.Configuration
 
         private static void ConfigureAuthenticiationAndAuthorizationServices(
             IServiceCollection services,
+            IWebHostEnvironment environment,
             IConfiguration configuration
             )
         {
@@ -83,8 +87,8 @@ namespace Metabase.Configuration
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
               .AddJwtBearer(_ =>
                   {
-                      _.Authority = "http://localhost:8080"; // TODO Make this configurable via environment variables through `configuration` (maybe its `AppSettings`).
-                      _.Audience = "resource_server"; // TODO This must be included in ticket creation. What does this mean?
+                      _.Authority = environment.IsEnvironment("test") ? "http://localhost" : "http://localhost:8080"; // TODO Make this configurable via environment variables through `configuration` (maybe its `AppSettings`).
+                      _.Audience = "metabase"; // TODO This must be included in ticket creation. What does this mean?
                       _.RequireHttpsMetadata = false;
                       _.IncludeErrorDetails = true; //
                       _.TokenValidationParameters = new TokenValidationParameters()
@@ -94,7 +98,7 @@ namespace Metabase.Configuration
                           // TODO Configure the following as in https://github.com/openiddict/openiddict-samples/issues/63#issuecomment-396785919 ?
                           // ValidateIssuer = true,
                           // ValidateIssuerSigningKey = true,
-                          // ValidAudiences = new List<string> { "resource-server" },
+                          // ValidAudiences = new List<string> { "metabase" },
                           // IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("953183eb-988d-403e-8b8a-7dd9cd44e303")) // using same GUID secret as above
                       };
                   });
@@ -151,23 +155,26 @@ namespace Metabase.Configuration
                     _.SetAuthorizationEndpointUris("/connect/authorize")
                                .SetDeviceEndpointUris("/connect/device")
                                .SetLogoutEndpointUris("/connect/logout")
+                               .SetIntrospectionEndpointUris("/connect/introspect")
                                .SetTokenEndpointUris("/connect/token")
                                .SetUserinfoEndpointUris("/connect/userinfo")
                                .SetVerificationEndpointUris("/connect/verify");
                     // Mark the "email", "profile" and "roles" scopes as supported scopes.
-                    // TODO What is `demo_api` good for?
                     _.RegisterScopes(
                         OpenIddictConstants.Scopes.Email,
-                         OpenIddictConstants.Scopes.Profile,
-                          OpenIddictConstants.Scopes.Roles,
-                          "demo_api"
-                          );
-                    // Note: this sample only uses the authorization code flow but you can enable
-                    // the other flows if you need to support implicit, password or client credentials.
+                        OpenIddictConstants.Scopes.Profile,
+                        OpenIddictConstants.Scopes.Roles,
+                        ApiScope
+                        );
+                    // Allow flows.
                     _.AllowAuthorizationCodeFlow()
                       .AllowDeviceCodeFlow()
-                      .AllowPasswordFlow()
                       .AllowRefreshTokenFlow();
+                    // .AllowHybridFlow()
+                    if (environment.IsEnvironment("test"))
+                    {
+                        _.AllowPasswordFlow();
+                    }
                     // Register the signing and encryption credentials.
                     if (environment.IsDevelopment())
                     {
@@ -214,40 +221,45 @@ namespace Metabase.Configuration
                                .EnableTokenEndpointPassthrough()
                                .EnableUserinfoEndpointPassthrough()
                                .EnableVerificationEndpointPassthrough()
-                               .DisableTransportSecurityRequirement(); // During development, you can disable the HTTPS requirement.
-                                                                       // Note: if you don't want to specify a client_id when sending
-                                                                       // a token or revocation request, uncomment the following line:
-                                                                       //
-                                                                       // options.AcceptAnonymousClients();
-
+                               .DisableTransportSecurityRequirement();
+                    // Note: if you don't want to specify a client_id when sending
+                    // a token or revocation request, uncomment the following line:
+                    // _.AcceptAnonymousClients();
                     // Note: if you want to process authorization and token requests
                     // that specify non-registered scopes, uncomment the following line:
-                    //
-                    // options.DisableScopeValidation();
-
+                    // _.DisableScopeValidation();
                     // Note: if you don't want to use permissions, you can disable
                     // permission enforcement by uncommenting the following lines:
-                    //
-                    // options.IgnoreEndpointPermissions()
+                    // _.IgnoreEndpointPermissions()
                     //        .IgnoreGrantTypePermissions()
                     //        .IgnoreResponseTypePermissions()
                     //        .IgnoreScopePermissions();
-
                     // Note: when issuing access tokens used by third-party APIs
                     // you don't own, you can disable access token encryption:
-                    //
-                    // options.DisableAccessTokenEncryption();
+                    // _.DisableAccessTokenEncryption();
                 }
             )
               // Register the OpenIddict validation components.
               .AddValidation(_ =>
                   {
                       // Configure the audience accepted by this resource server.
-                      _.AddAudiences("resource_server");
+                      _.AddAudiences("metabase");
                       // Import the configuration from the local OpenIddict server instance.
                       _.UseLocalServer();
                       // Register the ASP.NET Core host.
                       _.UseAspNetCore();
+                      // TODO ?
+                      // Note: the validation handler uses OpenID Connect discovery
+                      // to retrieve the address of the introspection endpoint.
+                      //options.SetIssuer("http://localhost:12345/");
+                      // Configure the validation handler to use introspection and register the client
+                      // credentials used when communicating with the remote introspection endpoint.
+                      //options.UseIntrospection()
+                      //       .SetClientId("resource_server_1")
+                      //       .SetClientSecret("846B62D0-DEF9-4215-A99D-86E6B8DAB342");
+                      // Register the System.Net.Http integration.
+                      //options.UseSystemNetHttp();
+
                   });
             // Register the worker responsible of seeding the database with the sample clients.
             // Note: in a real world application, this step should be part of a setup script.

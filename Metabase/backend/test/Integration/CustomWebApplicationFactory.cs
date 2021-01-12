@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -38,11 +39,11 @@ namespace Metabase.Tests.Integration
             what(scope.ServiceProvider);
         }
 
-        // private async Task DoAsync(Func<IServiceProvider, Task> what)
-        // {
-        //     using var scope = Services.CreateScope();
-        //     await what(scope.ServiceProvider).ConfigureAwait(false);
-        // }
+        private async Task DoAsync(Func<IServiceProvider, Task> what)
+        {
+            using var scope = Services.CreateScope();
+            await what(scope.ServiceProvider).ConfigureAwait(false);
+        }
 
         private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
         {
@@ -107,6 +108,9 @@ namespace Metabase.Tests.Integration
                 databaseCreator.Create();
             }
             databaseCreator.CreateTables();
+            Task.Run(async () =>
+                await SeedAuth().ConfigureAwait(false)
+             ).GetAwaiter().GetResult();
         }
 
         // public async Task SeedUsers()
@@ -120,12 +124,13 @@ namespace Metabase.Tests.Integration
         //      ).ConfigureAwait(false);
         // }
 
-        // public void SeedAuth()
-        // {
-        //     Do(
-        //         services => SeedData.SeedAuth(services.GetRequiredService<ConfigurationDbContext>())
-        //     );
-        // }
+        private async Task SeedAuth()
+        {
+            await DoAsync(
+                async services =>
+                 await Data.DbSeeder.DoAsync(services, testEnvironment: true).ConfigureAwait(false)
+            ).ConfigureAwait(false);
+        }
 
         public new void Dispose()
         {

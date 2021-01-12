@@ -39,7 +39,7 @@ namespace Infrastructure.Configuration
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             }
                 );
-            app.UseStatusCodePages();
+            // app.UseStatusCodePages();
             app.UseStaticFiles();
             app.UseRouting();
             // TODO Do we really want this? See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0

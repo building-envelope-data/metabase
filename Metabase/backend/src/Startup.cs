@@ -39,11 +39,12 @@ namespace Metabase
             // TODO Find better place for message senders?
             services.AddTransient<Services.IEmailSender, Services.MessageSender>();
             services.AddTransient<Services.ISmsSender, Services.MessageSender>();
-            Infrastructure.Configuration.Session.ConfigureServices(services);
             Infrastructure.Configuration.RequestResponse.ConfigureServices(services);
+            Infrastructure.Configuration.Session.ConfigureServices(services);
             Configuration.Auth.ConfigureServices(services, _environment, _configuration, GetAssemblyName());
             Configuration.GraphQl.ConfigureServices(services);
             Configuration.Database.ConfigureServices(services, _appSettings.Database);
+            services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app)
@@ -59,9 +60,13 @@ namespace Metabase
                 }
                 );
             /* app.UseWebSockets(); */
-            app.UseEndpoints(endpoints =>
+            app.UseEndpoints(_ =>
             {
-                endpoints.MapGraphQL();
+                _.MapGraphQL();
+                _.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}"
+                );
             });
             // TODO Shall we do migrations here or in Program.cs?
             /* app.ApplicationServices.GetService<ClientsDbContext>().Database.Migrate(); */
@@ -80,7 +85,7 @@ namespace Metabase
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 }
-                );
+                ).ConfigureAwait(false);
         }
     }
 }
