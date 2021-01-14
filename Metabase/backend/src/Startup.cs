@@ -1,22 +1,16 @@
 using System;
-using System.Reflection;
 using System.Text.Json;
-using Metabase.Data;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Hosting;
 
 // TODO Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth
-
-// TODO For client libraries use https://identitymodel.readthedocs.io/en/latest/
 
 namespace Metabase
 {
@@ -41,8 +35,8 @@ namespace Metabase
             // TODO Find better place for message senders?
             services.AddTransient<Services.IEmailSender, Services.MessageSender>();
             services.AddTransient<Services.ISmsSender, Services.MessageSender>();
-            Infrastructure.Configuration.RequestResponse.ConfigureServices(services);
-            Infrastructure.Configuration.Session.ConfigureServices(services);
+            services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+            ConfigureSessionServices(services);
             Configuration.Auth.ConfigureServices(services, _environment, _appSettings);
             Configuration.GraphQl.ConfigureServices(services);
             Configuration.Database.ConfigureServices(services, _appSettings.Database);
@@ -51,6 +45,20 @@ namespace Metabase
             services.Configure<ForwardedHeadersOptions>(_ =>
                 _.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             );
+        }
+
+        private static void ConfigureSessionServices(IServiceCollection services)
+        {
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+                {
+                    // Set a short timeout for easy testing.
+                    options.IdleTimeout = TimeSpan.FromSeconds(10);
+                    options.Cookie.HttpOnly = true;
+                    // Make the session cookie essential
+                    options.Cookie.IsEssential = true;
+                });
         }
 
         public void Configure(IApplicationBuilder app)
