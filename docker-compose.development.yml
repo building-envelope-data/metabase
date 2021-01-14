@@ -1,6 +1,6 @@
 # Inspired by https://mherman.org/blog/dockerizing-a-react-app/
 
-version: '3.8'
+version: '3.3'
 
 services:
   database:
