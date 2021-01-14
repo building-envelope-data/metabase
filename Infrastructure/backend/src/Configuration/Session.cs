@@ -19,11 +19,5 @@ namespace Infrastructure.Configuration
                     options.Cookie.IsEssential = true;
                 });
         }
-
-        public static void Configure(IApplicationBuilder app)
-        {
-            app.UseCookiePolicy();
-            app.UseSession();
-        }
     }
 }
