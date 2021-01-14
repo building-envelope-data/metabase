@@ -5,7 +5,7 @@ namespace Infrastructure
     public sealed class AppSettings
     {
         public string Host { get; set; }
-        = "https://icon.com";
+        = "";
 
         public LoggingSettings Logging { get; set; }
         = new LoggingSettings();
@@ -16,16 +16,27 @@ namespace Infrastructure
             = false;
         }
 
+        public JsonWebTokenSettings JsonWebToken { get; set; }
+
+        public sealed class JsonWebTokenSettings
+        {
+            public string EncryptionKey { get; set; }
+            = "";
+
+            public string SigningKey { get; set; }
+            = "";
+        }
+
         public DatabaseSettings Database { get; set; }
         = new DatabaseSettings();
 
         public sealed class DatabaseSettings
         {
             public string ConnectionString { get; set; }
-            = "Host=database;Port=5432;Database=icon;";
+            = "";
 
             public string SchemaName { get; set; }
-            = "metabase";
+            = "";
         }
     }
 }

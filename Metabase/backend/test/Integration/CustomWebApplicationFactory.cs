@@ -109,22 +109,11 @@ namespace Metabase.Tests.Integration
             }
             databaseCreator.CreateTables();
             Task.Run(async () =>
-                await SeedAuth().ConfigureAwait(false)
+                await SeedDatabase().ConfigureAwait(false)
              ).GetAwaiter().GetResult();
         }
 
-        // public async Task SeedUsers()
-        // {
-        //     await DoAsync(
-        //          async services =>
-        //          await SeedData.SeedUsers(
-        //            services.GetRequiredService<UserManager<Models.UserX>>()
-        //            )
-        //          .ConfigureAwait(false)
-        //      ).ConfigureAwait(false);
-        // }
-
-        private async Task SeedAuth()
+        private async Task SeedDatabase()
         {
             await DoAsync(
                 async services =>

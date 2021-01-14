@@ -11,6 +11,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Hosting;
 
 // TODO Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth
 
@@ -41,17 +43,56 @@ namespace Metabase
             services.AddTransient<Services.ISmsSender, Services.MessageSender>();
             Infrastructure.Configuration.RequestResponse.ConfigureServices(services);
             Infrastructure.Configuration.Session.ConfigureServices(services);
-            Configuration.Auth.ConfigureServices(services, _environment, _configuration, GetAssemblyName());
+            Configuration.Auth.ConfigureServices(services, _environment, _appSettings);
             Configuration.GraphQl.ConfigureServices(services);
             Configuration.Database.ConfigureServices(services, _appSettings.Database);
             services.AddControllers();
+            // services.AddDatabaseDeveloperPageExceptionFilter();
+            services.Configure<ForwardedHeadersOptions>(_ =>
+                _.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            );
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            Infrastructure.Configuration.RequestResponse.ConfigureRouting(app, _environment);
-            Infrastructure.Configuration.Session.Configure(app);
-            Configuration.Auth.Configure(app);
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/
+            if (_environment.IsDevelopment() || _environment.IsEnvironment("test"))
+            {
+                app.UseDeveloperExceptionPage();
+                // app.UseMigrationsEndPoint();
+                // Forwarded Headers Middleware must run before other middleware except diagnostics and error handling middleware. In particular before HSTS middleware.
+                // See https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#other-proxy-server-and-load-balancer-scenarios
+                app.UseForwardedHeaders();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                // Forwarded Headers Middleware must run before other middleware except diagnostics and error handling middleware. In particular before HSTS middleware.
+                // See https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#other-proxy-server-and-load-balancer-scenarios
+                app.UseForwardedHeaders();
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                // ASP.NET advices to not use HSTS for APIs, see the warning on
+                // https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl
+                app.UseHsts();
+            }
+            // app.UseStatusCodePages();
+            // app.UseHttpsRedirection(); // Done by Nginx
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
+            app.UseRouting();
+            // TODO Do we really want this? See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0
+            app.UseRequestLocalization(options =>
+            {
+                options.AddSupportedCultures("en-US", "de-DE");
+                options.AddSupportedUICultures("en-US", "de-DE");
+                options.SetDefaultCulture("en-US");
+            });
+            app.UseCors();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseSession();
+            // app.UseResponseCompression(); // Done by Nginx
+            // app.UseResponseCaching(); // Done by Nginx
             app.UseHealthChecks(
                 "/health",
                 new HealthCheckOptions
@@ -63,10 +104,7 @@ namespace Metabase
             app.UseEndpoints(_ =>
             {
                 _.MapGraphQL();
-                _.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}"
-                );
+                _.MapControllers();
             });
             // TODO Shall we do migrations here or in Program.cs?
             /* app.ApplicationServices.GetService<ClientsDbContext>().Database.Migrate(); */

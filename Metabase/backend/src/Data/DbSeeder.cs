@@ -95,7 +95,7 @@ namespace Metabase.Data
                         Name = Configuration.Auth.ApiScope,
                         Resources =
                         {
-                            "metabase"
+                            Configuration.Auth.ServerName
                         }
                     }
                 ).ConfigureAwait(false);

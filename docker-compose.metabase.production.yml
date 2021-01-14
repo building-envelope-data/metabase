@@ -5,6 +5,10 @@ services:
     image: registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-backend-production:v0.0.0-482-g8c3c73a
     ports:
       - 8002:80
+    environment:
+      - XBASE_HOST=TODO
+      - XBASE_JsonWebToken__EncryptionKey=${METABASE_JSON_WEB_TOKEN_ENCRYPTION_KEY}
+      - XBASE_JsonWebToken__SigningKey=${METABASE_JSON_WEB_TOKEN_SIGNING_KEY}
 
   frontend:
     image: registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-frontend-production:v0.0.0-482-g8c3c73a

@@ -25,8 +25,10 @@ services:
     ports:
       - 5000:8080
     environment:
-      - XBASE_HOST="https://${METABASE_HOST}:${METABASE_HTTP_PORT}"
-      # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https?view=aspnetcore-3.1#starting-a-container-with-https-support-using-docker-compose
+      - XBASE_HOST=https://${METABASE_HOST}:${METABASE_HTTP_PORT}
+      - XBASE_JsonWebToken__EncryptionKey=${METABASE_JSON_WEB_TOKEN_ENCRYPTION_KEY}
+      - XBASE_JsonWebToken__SigningKey=${METABASE_JSON_WEB_TOKEN_SIGNING_KEY}
+      # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${METABASE_SSL_CERTIFICATE_PASSWORD}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${METABASE_SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
 

@@ -34,7 +34,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.loginUser.user.id").Should().NotBeNullOrWhiteSpace()
+                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
                  )
                 );
         }

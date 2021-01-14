@@ -17,11 +17,11 @@
   <ItemGroup>
     <!-- <PackageReference Include="AutoMapper" Version="10.1.1" /> -->
     <!-- <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" /> -->
-    <PackageReference Include="HotChocolate" Version="11.0.5" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.5" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.5" />
-    <PackageReference Include="HotChocolate.Data" Version="11.0.5" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="11.0.5" />
+    <PackageReference Include="HotChocolate" Version="11.0.7" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.7" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.7" />
+    <PackageReference Include="HotChocolate.Data" Version="11.0.7" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="11.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.1" />
