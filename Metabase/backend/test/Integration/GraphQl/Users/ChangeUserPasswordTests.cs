@@ -117,7 +117,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 newPasswordConfirmation: "other" + password
                 ).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
             await LoginUser(
                 email: email,
                 password: password
@@ -140,7 +145,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 newPassword: "aabb@$CCDD"
                 ).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
             await LoginUser(
                 email: email,
                 password: password
@@ -163,7 +173,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 newPassword: "AABB@$567"
                 ).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
             await LoginUser(
                 email: email,
                 password: password
@@ -186,7 +201,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 newPassword: "aaBBccDDeeFF123"
                 ).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
             await LoginUser(
                 email: email,
                 password: password
@@ -209,7 +229,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 newPassword: "aabb@$567"
                 ).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
             await LoginUser(
                 email: email,
                 password: password
@@ -232,7 +257,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 newPassword: "aA@$567"
                 ).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
             await LoginUser(
                 email: email,
                 password: password
