@@ -71,7 +71,7 @@ namespace Metabase.GraphQl.Users
                         }
                         );
                 }
-                return new ConfirmUserEmailPayload(user, errors);
+                return new ConfirmUserEmailPayload(errors);
             }
             return new ConfirmUserEmailPayload(user);
         }
@@ -151,7 +151,7 @@ namespace Metabase.GraphQl.Users
                             );
                     }
                 }
-                return new ConfirmUserEmailChangePayload(user, errors);
+                return new ConfirmUserEmailChangePayload(errors);
             }
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new ConfirmUserEmailChangePayload(user);
