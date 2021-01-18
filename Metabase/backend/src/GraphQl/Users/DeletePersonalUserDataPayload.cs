@@ -13,16 +13,25 @@ namespace Metabase.GraphQl.Users
         }
 
         public DeletePersonalUserDataPayload(
-            IReadOnlyCollection<DeletePersonalUserDataError> errors
+            DeletePersonalUserDataError error
             )
-          : base(errors)
+          : base(error)
         {
         }
 
         public DeletePersonalUserDataPayload(
+            Data.User user,
+            IReadOnlyCollection<DeletePersonalUserDataError> errors
+            )
+          : base(user, errors)
+        {
+        }
+
+        public DeletePersonalUserDataPayload(
+            Data.User user,
             DeletePersonalUserDataError error
             )
-          : base(error)
+          : base(user, error)
         {
         }
     }

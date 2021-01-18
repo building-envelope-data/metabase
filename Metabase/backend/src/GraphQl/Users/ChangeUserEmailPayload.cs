@@ -13,16 +13,17 @@ namespace Metabase.GraphQl.Users
         }
 
         public ChangeUserEmailPayload(
-            IReadOnlyCollection<ChangeUserEmailError> errors
+            ChangeUserEmailError error
             )
-          : base(errors)
+          : base(error)
         {
         }
 
         public ChangeUserEmailPayload(
+            Data.User user,
             ChangeUserEmailError error
             )
-          : base(error)
+          : base(user, error)
         {
         }
     }

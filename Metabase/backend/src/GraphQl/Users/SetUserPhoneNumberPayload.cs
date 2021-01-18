@@ -13,16 +13,25 @@ namespace Metabase.GraphQl.Users
         }
 
         public SetUserPhoneNumberPayload(
-            IReadOnlyCollection<SetUserPhoneNumberError> errors
+            SetUserPhoneNumberError error
             )
-          : base(errors)
+          : base(error)
         {
         }
 
         public SetUserPhoneNumberPayload(
+            Data.User user,
+            IReadOnlyCollection<SetUserPhoneNumberError> errors
+            )
+          : base(user, errors)
+        {
+        }
+
+        public SetUserPhoneNumberPayload(
+            Data.User user,
             SetUserPhoneNumberError error
             )
-          : base(error)
+          : base(user, error)
         {
         }
     }

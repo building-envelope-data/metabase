@@ -17,16 +17,17 @@ namespace Metabase.GraphQl.Users
         }
 
         public GenerateUserTwoFactorRecoveryCodesPayload(
-            IReadOnlyCollection<GenerateUserTwoFactorRecoveryCodesError> errors
+            GenerateUserTwoFactorRecoveryCodesError error
             )
-          : base(errors)
+          : base(error)
         {
         }
 
         public GenerateUserTwoFactorRecoveryCodesPayload(
+            Data.User user,
             GenerateUserTwoFactorRecoveryCodesError error
             )
-          : base(error)
+          : base(user, error)
         {
         }
     }

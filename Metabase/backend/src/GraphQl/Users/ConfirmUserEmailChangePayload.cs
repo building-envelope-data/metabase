@@ -13,9 +13,10 @@ namespace Metabase.GraphQl.Users
       }
 
       public ConfirmUserEmailChangePayload(
+          Data.User user,
           IReadOnlyCollection<ConfirmUserEmailChangeError> errors
           )
-        : base(errors)
+        : base(user, errors)
       {
       }
 

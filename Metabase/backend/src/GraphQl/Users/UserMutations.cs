@@ -71,7 +71,7 @@ namespace Metabase.GraphQl.Users
                         }
                         );
                 }
-                return new ConfirmUserEmailPayload(errors);
+                return new ConfirmUserEmailPayload(user, errors);
             }
             return new ConfirmUserEmailPayload(user);
         }
@@ -151,7 +151,7 @@ namespace Metabase.GraphQl.Users
                             );
                     }
                 }
-                return new ConfirmUserEmailChangePayload(errors);
+                return new ConfirmUserEmailChangePayload(user, errors);
             }
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new ConfirmUserEmailChangePayload(user);
@@ -679,6 +679,7 @@ namespace Metabase.GraphQl.Users
                 if (!(await userManager.CheckPasswordAsync(user, input.Password).ConfigureAwait(false)))
                 {
                     return new DeletePersonalUserDataPayload(
+                        user,
                         new DeletePersonalUserDataError(
                           DeletePersonalUserDataErrorCode.INCORRECT_PASSWORD,
                           "Incorrect password.",
@@ -706,7 +707,7 @@ namespace Metabase.GraphQl.Users
                         }
                     );
                 }
-                return new DeletePersonalUserDataPayload(errors);
+                return new DeletePersonalUserDataPayload(user, errors);
             }
             await signInManager.SignOutAsync().ConfigureAwait(false); // TODO Invalidate access tokens here!
             return new DeletePersonalUserDataPayload(user);
@@ -740,6 +741,7 @@ namespace Metabase.GraphQl.Users
             if (currentEmail == input.NewEmail)
             {
                 return new ChangeUserEmailPayload(
+                    user,
                     new ChangeUserEmailError(
                       ChangeUserEmailErrorCode.UNCHANGED_EMAIL,
                       "Your email is unchanged.",
@@ -807,6 +809,7 @@ namespace Metabase.GraphQl.Users
             if (!await userManager.GetTwoFactorEnabledAsync(user).ConfigureAwait(false))
             {
                 return new GenerateUserTwoFactorRecoveryCodesPayload(
+                    user,
                     new GenerateUserTwoFactorRecoveryCodesError(
                       GenerateUserTwoFactorRecoveryCodesErrorCode.TWO_FACTOR_AUTHENTICATION_DISABLED,
                       "You have disabled two-factor authentication.",
@@ -846,6 +849,7 @@ namespace Metabase.GraphQl.Users
             if (currentPhoneNumber == input.PhoneNumber)
             {
                 return new SetUserPhoneNumberPayload(
+                    user,
                     new SetUserPhoneNumberError(
                       SetUserPhoneNumberErrorCode.UNCHANGED_PHONE_NUMBER,
                       "Your phone number is unchanged.",
@@ -872,7 +876,7 @@ namespace Metabase.GraphQl.Users
                         }
                     );
                 }
-                return new SetUserPhoneNumberPayload(errors);
+                return new SetUserPhoneNumberPayload(user, errors);
             }
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO Refresh access token?
             return new SetUserPhoneNumberPayload(user);
@@ -904,6 +908,7 @@ namespace Metabase.GraphQl.Users
             if (await userManager.HasPasswordAsync(user).ConfigureAwait(false))
             {
                 return new SetUserPasswordPayload(
+                    user,
                     new SetUserPasswordError(
                       SetUserPasswordErrorCode.EXISTING_PASSWORD,
                       "You already have a password.",
@@ -914,6 +919,7 @@ namespace Metabase.GraphQl.Users
             if (input.Password != input.PasswordConfirmation)
             {
                 return new SetUserPasswordPayload(
+                    user,
                     new SetUserPasswordError(
                       SetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
@@ -970,7 +976,7 @@ namespace Metabase.GraphQl.Users
                         }
                     );
                 }
-                return new SetUserPasswordPayload(errors);
+                return new SetUserPasswordPayload(user, errors);
             }
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO What exactly does this do? Refresh the cookie? Then it is unnecessary for us! https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinmanager-1.refreshsigninasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Identity_SignInManager_1_RefreshSignInAsync__0_
             return new SetUserPasswordPayload(user);

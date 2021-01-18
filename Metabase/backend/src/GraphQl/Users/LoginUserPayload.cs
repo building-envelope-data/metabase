@@ -29,13 +29,6 @@ namespace Metabase.GraphQl.Users
         }
 
         public LoginUserPayload(
-            IReadOnlyCollection<LoginUserError> errors
-            )
-          : base(errors)
-        {
-        }
-
-        public LoginUserPayload(
             LoginUserError error
             )
           : base(error)
