@@ -13,8 +13,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidDataOfRegisteredAndConfirmedUser_LogsInUser()
         {
             // Arrange
+            await RegisterUser().ConfigureAwait(false);
             await ConfirmUserEmail(
-                await RegisterUser().ConfigureAwait(false)
+                ExtractConfirmationCodeFromRegistrationEmail()
                 ).ConfigureAwait(false);
             // Act
             var response = await SuccessfullyQueryGraphQlContentAsString(

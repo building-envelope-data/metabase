@@ -14,14 +14,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidData_ConfirmsUserEmail()
         {
             // Arrange
-            var confirmationCode = await RegisterUser();
+            var email = "john.doe@ise.fraunhofer.de";
+            await RegisterUser(email: email).ConfigureAwait(false);
+            var confirmationCode = ExtractConfirmationCodeFromRegistrationEmail();
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmailTests/ValidData_ConfirmsUserEmail.graphql"),
-                variables: new Dictionary<string, object?>
-                {
-                    ["confirmationCode"] = confirmationCode
-                }
+            var response = await ConfirmUserEmail(
+                email: email,
+                confirmationCode: confirmationCode
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
@@ -36,14 +35,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task UnknownUser_IsUserError()
         {
             // Arrange
-            var confirmationCode = await RegisterUser();
+            var email = "john.doe@ise.fraunhofer.de";
+            await RegisterUser(email: email).ConfigureAwait(false);
+            var confirmationCode = ExtractConfirmationCodeFromRegistrationEmail();
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmailTests/UnknownUser_IsUserError.graphql"),
-                variables: new Dictionary<string, object?>
-                {
-                    ["confirmationCode"] = confirmationCode
-                }
+            var response = await ConfirmUserEmail(
+                email: "unknown." + email,
+                confirmationCode: confirmationCode
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -53,14 +51,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task InvalidConfirmationCode_IsUserError()
         {
             // Arrange
-            var confirmationCode = await RegisterUser();
+            var email = "john.doe@ise.fraunhofer.de";
+            await RegisterUser(email: email).ConfigureAwait(false);
+            var confirmationCode = ExtractConfirmationCodeFromRegistrationEmail();
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmailTests/InvalidConfirmationCode_IsUserError.graphql"),
-                variables: new Dictionary<string, object?>
-                {
-                    ["confirmationCode"] = "invalid" + confirmationCode
-                }
+            var response = await ConfirmUserEmail(
+                email: email,
+                confirmationCode: "invalid" + confirmationCode
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);

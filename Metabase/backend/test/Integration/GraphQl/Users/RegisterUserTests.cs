@@ -13,30 +13,33 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidData_RegistersUser()
         {
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/ValidData_RegistersUser.graphql")
+            var response = await RegisterUser(
+                email: "john.doe@ise.fraunhofer.de",
+                password: "aaaAAA123$!@"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 // matchOptions => matchOptions.IgnoreField("data.registerUser.user.id")
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.registerUser.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
+                  fieldOptions.Field<string>("data.registerUser.user.id").Should().NotBeNullOrWhiteSpace()
+                  )
                 );
             EmailsShouldContainSingle(
                 address: "john.doe@ise.fraunhofer.de",
                 subject: "Confirm your email",
                 messageRegEx: @"^Please confirm your email address with the confirmation code \w+\.$"
-            );
+                );
         }
 
         [Fact]
         public async Task PasswordConfirmationMismatch_IsUserError()
         {
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/PasswordConfirmationMismatch_IsUserError.graphql")
+            var response = await RegisterUser(
+                email: "john.doe@ise.fraunhofer.de",
+                password: "aaaAAA123$!@",
+                passwordConfirmation: "baaAAA123$!@"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -47,13 +50,15 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task DuplicateEmail_IsUserError()
         {
             // Arrange
-            await QueryGraphQl(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/DuplicateEmail_IsUserError.graphql")
+            await RegisterUser(
+                email: "john.doe@ise.fraunhofer.de",
+                password: "aaaAAA123$!@"
                 ).ConfigureAwait(false);
             EmailSender.Clear();
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/DuplicateEmail_IsUserError.graphql")
+            var response = await RegisterUser(
+                email: "john.doe@ise.fraunhofer.de",
+                password: "aaaAAA123$!@"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -64,8 +69,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task InvalidEmail_IsUserError()
         {
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/InvalidEmail_IsUserError.graphql")
+            var response = await RegisterUser(
+                email: "john.doeise.fraunhofer.de",
+                password: "aaaAAA123$!@"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -76,8 +82,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordRequiresDigit_IsUserError()
         {
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/PasswordRequiresDigit_IsUserError.graphql")
+            var response = await RegisterUser(
+                email: "john.doe@ise.fraunhofer.de",
+                password: "aabb@$CCDD"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -88,8 +95,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordRequiresLower_IsUserError()
         {
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/PasswordRequiresLower_IsUserError.graphql")
+            var response = await RegisterUser(
+                email: "john.doe@ise.fraunhofer.de",
+                password: "AABB@$567"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -100,8 +108,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordRequiresNonAlphanumeric_IsUserError()
         {
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/PasswordRequiresNonAlphanumeric_IsUserError.graphql")
+            var response = await RegisterUser(
+                email: "john.doe@ise.fraunhofer.de",
+                password: "aaBBccDDeeFF123"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -112,8 +121,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordRequiresUpper_IsUserError()
         {
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/PasswordRequiresUpper_IsUserError.graphql")
+            var response = await RegisterUser(
+                email: "john.doe@ise.fraunhofer.de",
+                password: "aabb@$567"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -124,8 +134,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordTooShort_IsUserError()
         {
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/PasswordTooShort_IsUserError.graphql")
+            var response = await RegisterUser(
+                email: "john.doe@ise.fraunhofer.de",
+                password: "aA@$567"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -136,8 +147,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task NullOrEmptyEmail_IsUserError()
         {
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/NullOrEmptyEmail_IsUserError.graphql")
+            var response = await RegisterUser(
+                email: "",
+                password: "aaaAAA123$!@"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);

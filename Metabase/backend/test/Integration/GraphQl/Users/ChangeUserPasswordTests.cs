@@ -10,25 +10,37 @@ namespace Metabase.Tests.Integration.GraphQl.Users
     public sealed class ChangeUserPasswordTests
       : UserIntegrationTests
     {
+        private async Task<string> ChangeUserPassword(
+            string currentPassword,
+            string newPassword,
+            string? newPasswordConfirmation = null
+            )
+        {
+            return await SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/ChangeUserPassword.graphql"),
+                variables: new Dictionary<string, object?>
+                {
+                    ["currentPassword"] = currentPassword,
+                    ["newPassword"] = newPassword,
+                    ["newPasswordConfirmation"] = newPasswordConfirmation ?? newPassword
+                }
+                ).ConfigureAwait(false);
+        }
+
         [Fact]
         public async Task ValidDataOfRegisteredAndConfirmedAndLoggedInUser_ChangesUserPassword()
         {
             // Arrange
-            var email = DefaultEmail;
-            var password = DefaultPassword;
-            await RegisterAndConfirmAndAuthorizeUser(
+            var email = "john.doe@ise.fraunhofer.de";
+            var password = "aaaAAA123$!@";
+            await RegisterAndConfirmAndLoginUser(
                 email: email,
                 password: password
             ).ConfigureAwait(false);
             // Act
-            var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/ChangeUserPasswordTests/ValidDataOfRegisteredAndConfirmedAndLoggedInUser_ChangesUserPassword.graphql"),
-                variables: new Dictionary<string, object?>
-                {
-                    ["currentPassword"] = password,
-                    ["newPassword"] = "new" + password,
-                    ["newPasswordConfirmation"] = "new" + password
-                }
+            var response = await ChangeUserPassword(
+                currentPassword: password,
+                newPassword: "new" + password
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(

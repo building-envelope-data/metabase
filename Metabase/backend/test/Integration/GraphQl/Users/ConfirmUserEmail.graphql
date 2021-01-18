@@ -1,8 +1,9 @@
 mutation confirmUserEmail(
+  $email: String!,
   $confirmationCode: String!
   ) {
   confirmUserEmail(input: {
-    email: "john.doe@ise.fraunhofer.de",
+    email: $email,
     confirmationCode: $confirmationCode
   }) {
     user {

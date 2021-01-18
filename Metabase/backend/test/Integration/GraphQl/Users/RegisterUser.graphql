@@ -1,7 +1,7 @@
 mutation registerUser(
-    $email: String! = "john.doe@ise.fraunhofer.de",
-    $password: String! = "aaaAAA123$!@",
-    $passwordConfirmation: String! = "aaaAAA123$!@"
+    $email: String!,
+    $password: String!,
+    $passwordConfirmation: String!
 ) {
   registerUser(input: {
     email: $email,

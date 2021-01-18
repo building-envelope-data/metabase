@@ -69,7 +69,7 @@ namespace Metabase.Tests.Integration
             return response;
         }
 
-        protected async Task Authorize(
+        protected async Task Login(
             string email,
             string password
             )
@@ -85,18 +85,23 @@ namespace Metabase.Tests.Integration
 
         protected async Task<string> RegisterUser(
             string email = DefaultEmail,
-            string password = DefaultPassword
+            string password = DefaultPassword,
+            string? passwordConfirmation = null
         )
         {
-            await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/RegisterUserTests/ValidData_RegistersUser.graphql"),
+            return await SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/RegisterUser.graphql"),
                 variables: new Dictionary<string, object?>
                 {
                     ["email"] = email,
                     ["password"] = password,
-                    ["passwordConfirmation"] = password
+                    ["passwordConfirmation"] = passwordConfirmation ?? password
                 }
                 ).ConfigureAwait(false);
+        }
+
+        protected string ExtractConfirmationCodeFromRegistrationEmail()
+        {
             return Regex.Match(
                 EmailSender.Emails.Single().Message,
                 @"confirmation code (?<confirmationCode>\w+)"
@@ -107,13 +112,13 @@ namespace Metabase.Tests.Integration
                 .Value;
         }
 
-        protected async Task ConfirmUserEmail(
+        protected async Task<string> ConfirmUserEmail(
             string confirmationCode,
             string email = DefaultEmail
             )
         {
-            await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmailTests/ValidData_ConfirmsUserEmail.graphql"),
+            return await SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmail.graphql"),
                 variables: new Dictionary<string, object?>
                 {
                     ["email"] = email,
@@ -122,21 +127,21 @@ namespace Metabase.Tests.Integration
                 ).ConfigureAwait(false);
         }
 
-        protected async Task RegisterAndConfirmAndAuthorizeUser(
+        protected async Task RegisterAndConfirmAndLoginUser(
             string email,
             string password
         )
         {
-            var confirmationCode =
-                await RegisterUser(
+            await RegisterUser(
                     email: email,
                     password: password
                     ).ConfigureAwait(false);
+            var confirmationCode = ExtractConfirmationCodeFromRegistrationEmail();
             await ConfirmUserEmail(
                 confirmationCode: confirmationCode,
                 email: email
                 ).ConfigureAwait(false);
-            await Authorize(
+            await Login(
                 email: email,
                 password: password
             ).ConfigureAwait(false);
