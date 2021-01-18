@@ -577,6 +577,7 @@ namespace Metabase.GraphQl.Users
             if (!await userManager.HasPasswordAsync(user).ConfigureAwait(false))
             {
                 return new ChangeUserPasswordPayload(
+                    user,
                     new ChangeUserPasswordError(
                       ChangeUserPasswordErrorCode.NO_PASSWORD,
                       "You do not have a password yet.",
@@ -587,6 +588,7 @@ namespace Metabase.GraphQl.Users
             if (input.NewPassword != input.NewPasswordConfirmation)
             {
                 return new ChangeUserPasswordPayload(
+                    user,
                     new ChangeUserPasswordError(
                       ChangeUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
@@ -643,7 +645,7 @@ namespace Metabase.GraphQl.Users
                         }
                     );
                 }
-                return new ChangeUserPasswordPayload(errors);
+                return new ChangeUserPasswordPayload(user, errors);
             }
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO What exactly does this do? Refresh the cookie? Then it is unnecessary for us! https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinmanager-1.refreshsigninasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Identity_SignInManager_1_RefreshSignInAsync__0_
             return new ChangeUserPasswordPayload(user);

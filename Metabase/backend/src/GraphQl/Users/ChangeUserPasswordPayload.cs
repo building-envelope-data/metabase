@@ -13,16 +13,25 @@ namespace Metabase.GraphQl.Users
         }
 
         public ChangeUserPasswordPayload(
-            IReadOnlyCollection<ChangeUserPasswordError> errors
+            ChangeUserPasswordError error
             )
-          : base(errors)
+          : base(error)
         {
         }
 
         public ChangeUserPasswordPayload(
+            Data.User user,
+            IReadOnlyCollection<ChangeUserPasswordError> errors
+            )
+          : base(user, errors)
+        {
+        }
+
+        public ChangeUserPasswordPayload(
+            Data.User user,
             ChangeUserPasswordError error
             )
-          : base(error)
+          : base(user, error)
         {
         }
     }

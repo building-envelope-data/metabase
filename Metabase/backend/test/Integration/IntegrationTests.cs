@@ -69,7 +69,7 @@ namespace Metabase.Tests.Integration
             return response;
         }
 
-        protected async Task Login(
+        protected async Task LoginUser(
             string email,
             string password
             )
@@ -127,7 +127,7 @@ namespace Metabase.Tests.Integration
                 ).ConfigureAwait(false);
         }
 
-        protected async Task RegisterAndConfirmAndLoginUser(
+        protected async Task RegisterAndConfirmUser(
             string email,
             string password
         )
@@ -141,7 +141,33 @@ namespace Metabase.Tests.Integration
                 confirmationCode: confirmationCode,
                 email: email
                 ).ConfigureAwait(false);
-            await Login(
+        }
+
+        // protected async Task RegisterAndLoginUser(
+        //     string email,
+        //     string password
+        // )
+        // {
+        //     await RegisterUser(
+        //             email: email,
+        //             password: password
+        //             ).ConfigureAwait(false);
+        //     await LoginUser(
+        //         email: email,
+        //         password: password
+        //     ).ConfigureAwait(false);
+        // }
+
+        protected async Task RegisterAndConfirmAndLoginUser(
+            string email,
+            string password
+        )
+        {
+            await RegisterAndConfirmUser(
+                    email: email,
+                    password: password
+                    ).ConfigureAwait(false);
+            await LoginUser(
                 email: email,
                 password: password
             ).ConfigureAwait(false);
@@ -188,6 +214,29 @@ namespace Metabase.Tests.Integration
             return httpResponseMessage.Content;
         }
 
+        protected async Task<HttpContent> UnsuccessfullyQueryGraphQlContent(
+            string query,
+            string? operationName = null,
+            Dictionary<string, object?>? variables = null
+            )
+        {
+            var httpResponseMessage = await QueryGraphQl(
+                query,
+                operationName,
+                variables
+                ).ConfigureAwait(false);
+            if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+            {
+                // We wrap this check in an if-condition such that the message
+                // content is only read when the status code is not 200.
+                httpResponseMessage.StatusCode.Should().NotBe(
+                    HttpStatusCode.OK,
+                    await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false)
+                    );
+            }
+            return httpResponseMessage.Content;
+        }
+
         protected async Task<string> SuccessfullyQueryGraphQlContentAsString(
             string query,
             string? operationName = null,
@@ -196,6 +245,24 @@ namespace Metabase.Tests.Integration
         {
             return await (
                await SuccessfullyQueryGraphQlContent(
+                query,
+                operationName,
+                variables
+                )
+                .ConfigureAwait(false)
+            )
+            .ReadAsStringAsync()
+            .ConfigureAwait(false);
+        }
+
+        protected async Task<string> UnsuccessfullyQueryGraphQlContentAsString(
+            string query,
+            string? operationName = null,
+            Dictionary<string, object?>? variables = null
+            )
+        {
+            return await (
+               await UnsuccessfullyQueryGraphQlContent(
                 query,
                 operationName,
                 variables

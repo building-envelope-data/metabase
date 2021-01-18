@@ -29,5 +29,22 @@ namespace Metabase.GraphQl.Users
           : this(new [] { error })
         {
         }
+
+        protected UserPayload(
+            Data.User user,
+            IReadOnlyCollection<TUserError> errors
+            )
+        {
+            User = user;
+            Errors = errors;
+        }
+
+        protected UserPayload(
+            Data.User user,
+            TUserError error
+            )
+          : this(user, new [] { error })
+        {
+        }
     }
 }
