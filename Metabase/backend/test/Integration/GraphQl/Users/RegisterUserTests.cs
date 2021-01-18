@@ -13,8 +13,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidData_RegistersUser()
         {
             // Act
+            var email = "john.doe@ise.fraunhofer.de";
             var response = await RegisterUser(
-                email: "john.doe@ise.fraunhofer.de",
+                email: email,
                 password: "aaaAAA123$!@"
                 ).ConfigureAwait(false);
             // Assert
@@ -26,7 +27,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                   )
                 );
             EmailsShouldContainSingle(
-                address: "john.doe@ise.fraunhofer.de",
+                address: email,
                 subject: "Confirm your email",
                 messageRegEx: @"^Please confirm your email address with the confirmation code \w+\.$"
                 );

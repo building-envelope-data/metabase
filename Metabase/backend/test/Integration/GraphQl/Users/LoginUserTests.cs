@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Snapshooter.Xunit;
 using Xunit;
+using System.Collections.Generic;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
@@ -13,13 +14,17 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidDataOfRegisteredAndConfirmedUser_LogsInUser()
         {
             // Arrange
-            await RegisterUser().ConfigureAwait(false);
-            await ConfirmUserEmail(
-                ExtractConfirmationCodeFromRegistrationEmail()
-                ).ConfigureAwait(false);
+            var email = "john.doe@ise.fraunhofer.de";
+            var password = "aaaAAA123$!@";
+            await RegisterAndConfirmUser(email: email, password: password).ConfigureAwait(false);
             // Act
             var response = await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/LoginUserTests/ValidDataOfRegisteredAndConfirmedUser_LogsInUser.graphql")
+                File.ReadAllText("Integration/GraphQl/Users/LoginUser.graphql"),
+                variables: new Dictionary<string, object?>
+                {
+                    ["email"] = email,
+                    ["password"] = password
+                }
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(

@@ -70,8 +70,8 @@ namespace Metabase.Tests.Integration
         }
 
         protected async Task LoginUser(
-            string email,
-            string password
+            string email = DefaultEmail,
+            string password = DefaultPassword
             )
         {
             var tokenResponse =
@@ -100,13 +100,25 @@ namespace Metabase.Tests.Integration
                 ).ConfigureAwait(false);
         }
 
-        protected string ExtractConfirmationCodeFromRegistrationEmail()
+        protected string ExtractConfirmationCodeFromEmail()
         {
             return Regex.Match(
                 EmailSender.Emails.Single().Message,
                 @"confirmation code (?<confirmationCode>\w+)"
                 )
                 .Groups["confirmationCode"]
+                .Captures
+                .Single()
+                .Value;
+        }
+
+        protected string ExtractResetCodeFromEmail()
+        {
+            return Regex.Match(
+                EmailSender.Emails.Single().Message,
+                @"reset code (?<resetCode>\w+)"
+                )
+                .Groups["resetCode"]
                 .Captures
                 .Single()
                 .Value;
@@ -128,15 +140,15 @@ namespace Metabase.Tests.Integration
         }
 
         protected async Task RegisterAndConfirmUser(
-            string email,
-            string password
+            string email = DefaultEmail,
+            string password = DefaultPassword
         )
         {
             await RegisterUser(
                     email: email,
                     password: password
                     ).ConfigureAwait(false);
-            var confirmationCode = ExtractConfirmationCodeFromRegistrationEmail();
+            var confirmationCode = ExtractConfirmationCodeFromEmail();
             await ConfirmUserEmail(
                 confirmationCode: confirmationCode,
                 email: email
@@ -159,8 +171,8 @@ namespace Metabase.Tests.Integration
         // }
 
         protected async Task RegisterAndConfirmAndLoginUser(
-            string email,
-            string password
+            string email = DefaultEmail,
+            string password = DefaultPassword
         )
         {
             await RegisterAndConfirmUser(

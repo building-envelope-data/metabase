@@ -10,23 +10,6 @@ namespace Metabase.Tests.Integration.GraphQl.Users
     public sealed class ChangeUserPasswordTests
       : UserIntegrationTests
     {
-        private async Task<string> ChangeUserPassword(
-            string currentPassword,
-            string newPassword,
-            string? newPasswordConfirmation = null
-            )
-        {
-            return await SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/ChangeUserPassword.graphql"),
-                variables: new Dictionary<string, object?>
-                {
-                    ["currentPassword"] = currentPassword,
-                    ["newPassword"] = newPassword,
-                    ["newPasswordConfirmation"] = newPasswordConfirmation ?? newPassword
-                }
-                ).ConfigureAwait(false);
-        }
-
         [Fact]
         public async Task ValidData_ChangesUserPassword()
         {

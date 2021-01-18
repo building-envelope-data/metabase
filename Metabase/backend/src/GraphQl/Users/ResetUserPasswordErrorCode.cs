@@ -3,6 +3,7 @@ namespace Metabase.GraphQl.Users
     public enum ResetUserPasswordErrorCode
     {
       UNKNOWN,
+      INVALID_RESET_CODE,
       PASSWORD_CONFIRMATION_MISMATCH,
       PASSWORD_REQUIRES_DIGIT,
       PASSWORD_REQUIRES_LOWER,

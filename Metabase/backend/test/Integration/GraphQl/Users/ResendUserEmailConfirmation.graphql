@@ -1,0 +1,13 @@
+mutation resendUserEmailConfirmation(
+  $email: String!
+  ) {
+  resendUserEmailConfirmation(input: {
+    email: $email
+  }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

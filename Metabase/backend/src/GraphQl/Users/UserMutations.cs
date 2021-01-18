@@ -302,7 +302,6 @@ namespace Metabase.GraphQl.Users
                 user,
                 input.Password
                 ).ConfigureAwait(false);
-
             if (!identityResult.Succeeded)
             {
                 var errors = new List<RegisterUserError>();
@@ -455,15 +454,12 @@ namespace Metabase.GraphQl.Users
             {
                 // For more information on how to enable account confirmation and password reset please
                 // visit https://docs.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-5.0
-                var resetCode =
-                  WebEncoders.Base64UrlEncode(
-                      Encoding.UTF8.GetBytes(
-                        await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
-                        )
+                var resetCode = EncodeToken(
+                      await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
                       );
                 await emailSender.SendEmailAsync(
                     input.Email,
-                    "Reset Password",
+                    "Reset password",
                     $"Please reset your password with the reset code {resetCode}."
                     ).ConfigureAwait(false);
             }
@@ -490,9 +486,14 @@ namespace Metabase.GraphQl.Users
                     );
             }
             // Don't reveal that the user does not exist
+            // TODO As said above, do not reveal that the user does or does not exist. However, right now we reveal whether the user exists or not because errors with the password are only reported when the user exists and not otherwise.
             if (user is not null)
             {
-                var identityResult = await userManager.ResetPasswordAsync(user, input.ResetCode, input.Password).ConfigureAwait(false);
+                var identityResult = await userManager.ResetPasswordAsync(
+                    user,
+                    DecodeCode(input.ResetCode),
+                    input.Password
+                    ).ConfigureAwait(false);
                 if (!identityResult.Succeeded)
                 {
                     var errors = new List<ResetUserPasswordError>();
@@ -502,6 +503,12 @@ namespace Metabase.GraphQl.Users
                             // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
                             error.Code switch
                             {
+                            "InvalidToken" =>
+                        new ResetUserPasswordError(
+                            ResetUserPasswordErrorCode.INVALID_RESET_CODE,
+                            error.Description,
+                            new[] { "input", "resetCode" }
+                            ),
                                 "PasswordRequiresDigit" =>
                         new ResetUserPasswordError(
                             ResetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,

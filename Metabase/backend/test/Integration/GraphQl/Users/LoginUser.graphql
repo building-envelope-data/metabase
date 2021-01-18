@@ -1,6 +1,6 @@
 mutation loginUser(
-    $email: String! = "john.doe@ise.fraunhofer.de",
-    $password: String! = "aaaAAA123$!@"
+    $email: String!
+    $password: String!
 ) {
   loginUser(input: {
     email: $email,
