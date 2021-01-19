@@ -30,7 +30,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Fact]
-        public async Task ValidDataWithConfirmationCodeFromResendEmail_ConfirmsUserEmail()
+        public async Task ValidDataWithConfirmationCodeFromResendUserEmailConfirmation_ConfirmsUserEmail()
         {
             // Arrange
             var email = "john.doe@ise.fraunhofer.de";
@@ -39,6 +39,29 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             await ResendUserEmailConfirmation(
                 email
                 ).ConfigureAwait(false);
+            var confirmationCode = ExtractConfirmationCodeFromEmail();
+            // Act
+            var response = await ConfirmUserEmail(
+                email: email,
+                confirmationCode: confirmationCode
+                ).ConfigureAwait(false);
+            // Assert
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
+        }
+
+        [Fact]
+        public async Task ValidDataWithConfirmationCodeFromResendUserEmailVerification_ConfirmsUserEmail()
+        {
+            // Arrange
+            var email = "john.doe@ise.fraunhofer.de";
+            await RegisterAndConfirmAndLoginUser(email: email).ConfigureAwait(false);
+            EmailSender.Clear();
+            await ResendUserEmailVerification().ConfigureAwait(false);
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act
             var response = await ConfirmUserEmail(
@@ -70,7 +93,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 confirmationCode: ExtractConfirmationCodeFromEmail()
             ).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+            );
         }
 
 

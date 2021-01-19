@@ -2,23 +2,26 @@ using FluentAssertions;
 using System.Threading.Tasks;
 using Snapshooter.Xunit;
 using Xunit;
+using System.IO;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    public sealed class ResendUserEmailConfirmationTests
+    public sealed class ResendUserEmailVerificationTests
       : UserIntegrationTests
     {
         [Fact]
-        public async Task ExistingEmailAddress_ResendsUserEmailConfirmation()
+        public async Task LoggedInUser_ResendsUserEmailVerification()
         {
             // Arrange
             var email = "john.doe@ise.fraunhofer.de";
-            await RegisterUser(email: email).ConfigureAwait(false);
+            var password = DefaultPassword;
+            await RegisterAndConfirmAndLoginUser(
+                email: email,
+                password: password
+                ).ConfigureAwait(false);
             EmailSender.Clear();
             // Act
-            var response = await ResendUserEmailConfirmation(
-                email
-                ).ConfigureAwait(false);
+            var response = await ResendUserEmailVerification().ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             EmailsShouldContainSingle(
@@ -29,19 +32,21 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Fact]
-        public async Task UnknownEmailAddress_DoesNothing()
+        public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
             var email = "john.doe@ise.fraunhofer.de";
-            await RegisterUser(email: email).ConfigureAwait(false);
-            EmailSender.Clear();
+            var password = DefaultPassword;
+            await RegisterAndConfirmUser(
+                email: email,
+                password: password
+            ).ConfigureAwait(false);
             // Act
-            var response = await ResendUserEmailConfirmation(
-                "unknown." + email
+            var response = await UnsuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailVerification.graphql")
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
-            EmailSender.Emails.Should().BeEmpty();
         }
     }
 }

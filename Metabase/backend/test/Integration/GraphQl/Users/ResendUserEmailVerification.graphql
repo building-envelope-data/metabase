@@ -1,0 +1,13 @@
+mutation {
+    resendUserEmailVerification {
+        user {
+            id
+            email
+        }
+        errors {
+            code
+            message
+            path
+        }
+    }
+}

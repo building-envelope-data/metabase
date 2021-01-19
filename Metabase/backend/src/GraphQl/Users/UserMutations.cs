@@ -156,7 +156,7 @@ namespace Metabase.GraphQl.Users
                 }
                 return new ConfirmUserEmailChangePayload(errors);
             }
-            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO Refresh access token?
             return new ConfirmUserEmailChangePayload(user);
         }
 
@@ -385,39 +385,6 @@ namespace Metabase.GraphQl.Users
                 emailSender
                 ).ConfigureAwait(false);
             return new RegisterUserPayload(user);
-        }
-
-        private static async Task SendUserEmailConfirmation(
-            string email,
-            string confirmationToken,
-            Services.IEmailSender emailSender
-            )
-        {
-            var confirmationCode = EncodeToken(confirmationToken);
-            await emailSender.SendEmailAsync(
-                email,
-                "Confirm your email",
-                $"Please confirm your email address with the confirmation code {confirmationCode}.").ConfigureAwait(false);
-        }
-
-        private static string EncodeToken(string token)
-        {
-            return
-              WebEncoders.Base64UrlEncode(
-                  Encoding.UTF8.GetBytes(
-                    token
-                    )
-                  );
-        }
-
-        private static string DecodeCode(string code)
-        {
-            return
-              Encoding.UTF8.GetString(
-                WebEncoders.Base64UrlDecode(
-                  code
-                  )
-                );
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResendEmailConfirmation.cs.cshtml
@@ -1002,6 +969,39 @@ namespace Metabase.GraphQl.Users
             }
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO What exactly does this do? Refresh the cookie? Then it is unnecessary for us! https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinmanager-1.refreshsigninasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Identity_SignInManager_1_RefreshSignInAsync__0_
             return new SetUserPasswordPayload(user);
+        }
+
+        private static async Task SendUserEmailConfirmation(
+            string email,
+            string confirmationToken,
+            Services.IEmailSender emailSender
+            )
+        {
+            var confirmationCode = EncodeToken(confirmationToken);
+            await emailSender.SendEmailAsync(
+                email,
+                "Confirm your email",
+                $"Please confirm your email address with the confirmation code {confirmationCode}.").ConfigureAwait(false);
+        }
+
+        private static string EncodeToken(string token)
+        {
+            return
+              WebEncoders.Base64UrlEncode(
+                  Encoding.UTF8.GetBytes(
+                    token
+                    )
+                  );
+        }
+
+        private static string DecodeCode(string code)
+        {
+            return
+              Encoding.UTF8.GetString(
+                WebEncoders.Base64UrlDecode(
+                  code
+                  )
+                );
         }
     }
 }

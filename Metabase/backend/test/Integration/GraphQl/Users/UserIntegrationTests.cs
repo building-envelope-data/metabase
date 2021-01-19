@@ -7,6 +7,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
     public abstract class UserIntegrationTests
       : IntegrationTests
     {
+        protected Task<string> GetPersonalUserData()
+        {
+            return SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/PersonalUserData.graphql")
+                );
+        }
+
         protected Task<string> ChangeUserPassword(
             string currentPassword,
             string newPassword,
@@ -112,10 +119,10 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        protected Task<string> GetPersonalUserData()
+        protected Task<string> ResendUserEmailVerification()
         {
             return SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/PersonalUserData.graphql")
+                File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailVerification.graphql")
                 );
         }
     }
