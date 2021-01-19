@@ -331,9 +331,9 @@ namespace Metabase.Tests.Integration
 
         private sealed class GraphQlRequest
         {
-            public string query { get; }
-            public string? operationName { get; }
-            public object? variables { get; }
+            public string Query { get; }
+            public string? OperationName { get; }
+            public object? Variables { get; }
 
             public GraphQlRequest(
                 string query,
@@ -341,9 +341,9 @@ namespace Metabase.Tests.Integration
                 object? variables
                 )
             {
-                this.query = query;
-                this.operationName = operationName;
-                this.variables = variables;
+                Query = query;
+                OperationName = operationName;
+                Variables = variables;
             }
         }
     }
