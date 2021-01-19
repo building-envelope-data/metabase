@@ -1,23 +1,18 @@
-using System.Threading;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using HotChocolate;
 using HotChocolate.Data;
-using HotChocolate.Subscriptions;
 using HotChocolate.Types;
 using HotChocolate.AspNetCore.Authorization;
-using NpgsqlTypes;
-using DateTime = System.DateTime;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.WebUtilities;
 using System.Linq;
+using System.Security.Claims;
+using System;
 
 namespace Metabase.GraphQl.Users
 {
-  public sealed class UserQueries
-  {
+    [ExtendObjectType(Name = nameof(GraphQl.Query))]
+    public sealed class UserQueries
+    {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UsePaging]
         /* TODO [UseProjection] // fails without an explicit error message in the logs */
@@ -27,11 +22,33 @@ namespace Metabase.GraphQl.Users
             [ScopedService] Data.ApplicationDbContext context
             )
         {
-          return context.Users;
+            return context.Users;
         }
 
-        // TODO https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.DownloadPersonalData.cs.cshtml
-        // TODO https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.PersonalData.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.PersonalData.cs.cshtml
+        // and https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.DownloadPersonalData.cs.cshtml
+        [Authorize]
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<PersonalUserDataPayload> GetPersonalUserDataAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager
+            )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new PersonalUserDataPayload(
+                    new PersonalUserDataError(
+                      PersonalUserDataErrorCode.USER_NOT_FOUND,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            return new PersonalUserDataPayload(user);
+        }
+
         // TODO https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
-  }
+    }
 }

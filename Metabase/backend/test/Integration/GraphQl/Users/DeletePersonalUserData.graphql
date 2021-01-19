@@ -1,0 +1,17 @@
+mutation deletePersonalUserData(
+    $password: String!,
+) {
+  deletePersonalUserData(input: {
+    password: $password
+  }) {
+    user {
+      id
+      email
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

@@ -1,0 +1,1 @@
+﻿{"data":{"confirmUserEmailChange":{"user":null,"errors":[{"code":"INVALID_CONFIRMATION_CODE","message":"Invalid token.","path":["input","confirmationCode"]}]}}}

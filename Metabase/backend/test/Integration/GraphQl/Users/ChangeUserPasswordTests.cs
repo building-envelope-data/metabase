@@ -62,6 +62,10 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
+            await LoginUser(
+                email: email,
+                password: password
+                ).ConfigureAwait(false);
         }
 
         // [Fact]

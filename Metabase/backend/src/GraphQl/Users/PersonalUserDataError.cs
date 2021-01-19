@@ -2,11 +2,11 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Users
 {
-    public sealed class DeletePersonalUserDataError
-      : UserErrorBase<DeletePersonalUserDataErrorCode>
+    public sealed class PersonalUserDataError
+      : UserErrorBase<PersonalUserDataErrorCode>
     {
-        public DeletePersonalUserDataError(
-            DeletePersonalUserDataErrorCode code,
+        public PersonalUserDataError(
+            PersonalUserDataErrorCode code,
             string message,
             IReadOnlyList<string> path
             )

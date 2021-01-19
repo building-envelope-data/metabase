@@ -68,5 +68,55 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 }
                 );
         }
+
+        protected Task<string> DeletePersonalUserData(
+            string? password
+        )
+        {
+            return SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/DeletePersonalUserData.graphql"),
+                variables: new Dictionary<string, object?>
+                {
+                    ["password"] = password,
+                }
+                );
+        }
+
+        protected Task<string> ChangeUserEmail(
+            string newEmail
+        )
+        {
+            return SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/ChangeUserEmail.graphql"),
+                variables: new Dictionary<string, object?>
+                {
+                    ["newEmail"] = newEmail
+                }
+                );
+        }
+
+        protected Task<string> ConfirmUserEmailChange(
+            string currentEmail,
+            string newEmail,
+            string confirmationCode
+        )
+        {
+            return SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmailChange.graphql"),
+                variables: new Dictionary<string, object?>
+                {
+                    ["currentEmail"] = currentEmail,
+                    ["newEmail"] = newEmail,
+                    ["confirmationCode"] = confirmationCode
+                }
+                );
+        }
+
+        protected Task<string> GetPersonalUserData()
+        {
+            return SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Users/PersonalUserData.graphql")
+                );
+        }
     }
 }

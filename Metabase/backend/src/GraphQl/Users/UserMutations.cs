@@ -1,6 +1,5 @@
 using System.Linq;
 using Array = System.Array;
-using System.Threading;
 using System.Text;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,7 +10,6 @@ using HotChocolate.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Metabase.GraphQl.Users
 {
@@ -86,6 +84,7 @@ namespace Metabase.GraphQl.Users
             [ScopedService] SignInManager<Data.User> signInManager
             )
         {
+            // TODO This public endpoint can be used to test whether there is a user for the given email address. Is this a problem? In other endpoints like `ResetUserPasswordAsync` do not do that on purpose. Why exactly?
             var user = await userManager.FindByEmailAsync(input.CurrentEmail).ConfigureAwait(false);
             if (user is null)
             {
@@ -97,8 +96,12 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
-            var confirmationToken = DecodeCode(input.ConfirmationCode);
-            var changeEmailIdentityResult = await userManager.ChangeEmailAsync(user, input.NewEmail, confirmationToken).ConfigureAwait(false);
+            var changeEmailIdentityResult =
+                await userManager.ChangeEmailAsync(
+                    user,
+                    input.NewEmail,
+                    DecodeCode(input.ConfirmationCode)
+                    ).ConfigureAwait(false);
             // For us email and user name are one and the same, so when we
             // update the email we need to update the user name.
             var setUserNameIdentityResult = await userManager.SetUserNameAsync(user, input.NewEmail).ConfigureAwait(false);
@@ -503,12 +506,12 @@ namespace Metabase.GraphQl.Users
                             // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
                             error.Code switch
                             {
-                            "InvalidToken" =>
-                        new ResetUserPasswordError(
-                            ResetUserPasswordErrorCode.INVALID_RESET_CODE,
-                            error.Description,
-                            new[] { "input", "resetCode" }
-                            ),
+                                "InvalidToken" =>
+                            new ResetUserPasswordError(
+                                ResetUserPasswordErrorCode.INVALID_RESET_CODE,
+                                error.Description,
+                                new[] { "input", "resetCode" }
+                                ),
                                 "PasswordRequiresDigit" =>
                         new ResetUserPasswordError(
                             ResetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
@@ -683,7 +686,18 @@ namespace Metabase.GraphQl.Users
             }
             if (await userManager.HasPasswordAsync(user).ConfigureAwait(false))
             {
-                if (!(await userManager.CheckPasswordAsync(user, input.Password).ConfigureAwait(false)))
+                if (input.Password is null)
+                {
+                    return new DeletePersonalUserDataPayload(
+                        user,
+                        new DeletePersonalUserDataError(
+                          DeletePersonalUserDataErrorCode.MISSING_PASSWORD,
+                          "Missing password.",
+                          new[] { "input", "password" }
+                          )
+                        );
+                }
+                if (!await userManager.CheckPasswordAsync(user, input.Password).ConfigureAwait(false))
                 {
                     return new DeletePersonalUserDataPayload(
                         user,
@@ -756,6 +770,7 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
+            // TODO Check validity of `input.NewEmail` (use error code `INVALID_EMAIL`)
             await SendUserEmailConfirmation(
                 input.NewEmail,
                 await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),

@@ -4,6 +4,7 @@ namespace Metabase.GraphQl.Users
     {
       UNKNOWN,
       USER_NOT_FOUND,
+      MISSING_PASSWORD,
       INCORRECT_PASSWORD
     }
 }
