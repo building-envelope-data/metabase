@@ -1,11 +1,11 @@
 using FluentAssertions;
-using System.IO;
 using System.Threading.Tasks;
 using Snapshooter.Xunit;
 using Xunit;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
+    [Collection(nameof(Data.User))]
     public sealed class RegisterUserTests
       : UserIntegrationTests
     {

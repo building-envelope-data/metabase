@@ -6,6 +6,7 @@ using System.IO;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
+    [Collection(nameof(Data.User))]
     public sealed class ResendUserEmailVerificationTests
       : UserIntegrationTests
     {
@@ -23,7 +24,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await ResendUserEmailVerification().ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.resendUserEmailVerification.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
             EmailsShouldContainSingle(
                 address: email,
                 subject: "Confirm your email",

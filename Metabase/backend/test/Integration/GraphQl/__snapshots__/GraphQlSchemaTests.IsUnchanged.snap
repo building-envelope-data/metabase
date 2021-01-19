@@ -154,10 +154,23 @@ type PageInfo {
   startCursor: String
 }
 
+type PersonalUserDataError {
+  code: PersonalUserDataErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type PersonalUserDataPayload {
+  errors: [PersonalUserDataError!]
+  user: User
+}
+
 type Query {
   component(id: ID!): Component!
   components(after: String before: String first: Int last: Int order: [ComponentSortInput!]): ComponentConnection
   node(id: ID!): Node
+  personalUserData: PersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
+  users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
 }
 
 type RegisterUserError {
@@ -257,10 +270,6 @@ type UserEdge {
   node: User!
 }
 
-type UserQueries {
-  users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
-}
-
 input ChangeUserEmailInput {
   newEmail: String!
 }
@@ -300,7 +309,7 @@ input CreateComponentInput {
 }
 
 input DeletePersonalUserDataInput {
-  password: String!
+  password: String
 }
 
 input LoginUserInput {
@@ -407,6 +416,7 @@ enum ConfirmUserEmailErrorCode {
 enum DeletePersonalUserDataErrorCode {
   UNKNOWN
   USER_NOT_FOUND
+  MISSING_PASSWORD
   INCORRECT_PASSWORD
 }
 
@@ -420,6 +430,11 @@ enum LoginUserErrorCode {
   INVALID
   LOCKED_OUT
   NOT_ALLOWED
+}
+
+enum PersonalUserDataErrorCode {
+  UNKNOWN
+  USER_NOT_FOUND
 }
 
 enum RegisterUserErrorCode {
@@ -450,6 +465,7 @@ enum ResendUserEmailVerificationErrorCode {
 
 enum ResetUserPasswordErrorCode {
   UNKNOWN
+  INVALID_RESET_CODE
   PASSWORD_CONFIRMATION_MISMATCH
   PASSWORD_REQUIRES_DIGIT
   PASSWORD_REQUIRES_LOWER

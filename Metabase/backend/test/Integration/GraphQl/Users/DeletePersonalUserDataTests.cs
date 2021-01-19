@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
+    [Collection(nameof(Data.User))]
     public sealed class DeletePersonalUserDataTests
       : UserIntegrationTests
     {
@@ -49,7 +50,10 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
             var response = await GetPersonalUserData().ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.IgnoreField("data.personalUserData.errors[*].message")
+                );
         }
 
         [Fact]
@@ -92,9 +96,18 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                     ["password"] = password
                 }
                 ).ConfigureAwait(false);
+            await LoginUser(
+                email: email,
+                password: password
+            ).ConfigureAwait(false);
             var response = await GetPersonalUserData().ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.personalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
         }
 
         [Fact]
@@ -112,7 +125,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 null
                 ).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.deletePersonalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
         }
 
         [Fact]
@@ -131,7 +149,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
             var response = await GetPersonalUserData().ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.personalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
         }
 
         [Fact]
@@ -149,7 +172,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 "incorrect" + password
                 ).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.deletePersonalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
         }
 
         [Fact]
@@ -168,7 +196,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
             var response = await GetPersonalUserData().ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.personalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
         }
     }
 }

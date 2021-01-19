@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
+    [Collection(nameof(Data.User))]
     public sealed class ResetUserPasswordTests
       : UserIntegrationTests
     {

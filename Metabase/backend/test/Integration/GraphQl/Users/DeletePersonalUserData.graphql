@@ -1,5 +1,5 @@
 mutation deletePersonalUserData(
-    $password: String!,
+    $password: String,
 ) {
   deletePersonalUserData(input: {
     password: $password
