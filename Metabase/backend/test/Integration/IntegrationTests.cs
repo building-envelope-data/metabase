@@ -188,7 +188,7 @@ namespace Metabase.Tests.Integration
         protected Task<HttpResponseMessage> QueryGraphQl(
             string query,
             string? operationName = null,
-            Dictionary<string, object?>? variables = null
+            object? variables = null
             )
         {
             return HttpClient.PostAsync(
@@ -206,7 +206,7 @@ namespace Metabase.Tests.Integration
         protected async Task<HttpContent> SuccessfullyQueryGraphQlContent(
             string query,
             string? operationName = null,
-            Dictionary<string, object?>? variables = null
+            object? variables = null
             )
         {
             var httpResponseMessage = await QueryGraphQl(
@@ -229,7 +229,7 @@ namespace Metabase.Tests.Integration
         protected async Task<HttpContent> UnsuccessfullyQueryGraphQlContent(
             string query,
             string? operationName = null,
-            Dictionary<string, object?>? variables = null
+            object? variables = null
             )
         {
             var httpResponseMessage = await QueryGraphQl(
@@ -252,7 +252,7 @@ namespace Metabase.Tests.Integration
         protected async Task<string> SuccessfullyQueryGraphQlContentAsString(
             string query,
             string? operationName = null,
-            Dictionary<string, object?>? variables = null
+            object? variables = null
             )
         {
             return await (
@@ -270,7 +270,7 @@ namespace Metabase.Tests.Integration
         protected async Task<string> UnsuccessfullyQueryGraphQlContentAsString(
             string query,
             string? operationName = null,
-            Dictionary<string, object?>? variables = null
+            object? variables = null
             )
         {
             return await (
@@ -313,7 +313,9 @@ namespace Metabase.Tests.Integration
             TContent content
             )
         {
-            var options = new JsonSerializerOptions();
+          var options = new JsonSerializerOptions {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+          };
             options.Converters.Add(new JsonStringEnumConverter());
             var result =
               new ByteArrayContent(
@@ -331,12 +333,12 @@ namespace Metabase.Tests.Integration
         {
             public string query { get; }
             public string? operationName { get; }
-            public Dictionary<string, object?>? variables { get; }
+            public object? variables { get; }
 
             public GraphQlRequest(
                 string query,
                 string? operationName,
-                Dictionary<string, object?>? variables
+                object? variables
                 )
             {
                 this.query = query;

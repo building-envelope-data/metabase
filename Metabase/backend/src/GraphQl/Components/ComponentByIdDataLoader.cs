@@ -10,7 +10,7 @@ using Guid = System.Guid;
 
 namespace Metabase.GraphQl.Components
 {
-  public class ComponentByIdDataLoader
+  public sealed class ComponentByIdDataLoader
     : BatchDataLoader<Guid, Data.Component>
     {
         private readonly IDbContextFactory<Data.ApplicationDbContext> _dbContextFactory;

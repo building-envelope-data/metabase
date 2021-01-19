@@ -9,7 +9,8 @@ using HotChocolate.Types;
 
 namespace Metabase.GraphQl.Components
 {
-    public sealed class ComponentType : ObjectType<Data.Component>
+    public sealed class ComponentType
+      : ObjectType<Data.Component>
     {
       protected override void Configure(
           IObjectTypeDescriptor<Data.Component> descriptor

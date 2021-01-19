@@ -1,0 +1,31 @@
+mutation createComponent(
+    $name: String!,
+    $abbreviation: String,
+    $description: String!,
+    $availability: OpenEndedDateTimeRangeInput,
+    $categories: [ComponentCategory!]!
+) {
+    createComponent(input: {
+        name: $name,
+        abbreviation: $abbreviation,
+        description: $description,
+        availability: $availability,
+        categories: $categories
+    }) {
+        component {
+            name
+            abbreviation
+            description
+            availability {
+              from
+              to
+            }
+            categories
+        }
+        errors {
+            code
+            message
+            path
+        }
+    }
+}

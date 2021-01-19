@@ -1,7 +1,7 @@
 namespace Metabase.GraphQl.Components
 {
   public sealed class CreateComponentPayload
-    : ComponentPayload
+    : ComponentPayload<CreateComponentError>
     {
       public CreateComponentPayload(
           Data.Component component
