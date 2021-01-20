@@ -61,6 +61,17 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                         }
                  );
 
+        protected static IEnumerable<CreateComponentInput> ComponentInputs
+        {
+            get
+            {
+                yield return MinimalComponentInput;
+                yield return FromAndToRestrictedAvailabilityComponentInput;
+                yield return ToRestrictedAvailabilityComponentInput;
+                yield return FromRestrictedAvailabilityComponentInput;
+            }
+        }
+
         protected static IEnumerable<object[]> EnumerateComponentInputs()
         {
             yield return new object[] { nameof(MinimalComponentInput), MinimalComponentInput };
@@ -72,7 +83,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         protected Task<string> GetComponents()
         {
             return SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Components/Components.graphql")
+                File.ReadAllText("Integration/GraphQl/Components/GetComponents.graphql")
                 );
         }
 
@@ -94,6 +105,16 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
                 variables: input
                 );
+        }
+
+        protected async Task<string> CreateComponentReturningId(
+            CreateComponentInput input
+        )
+        {
+            return ExtractString(
+                "$.data.createComponent.component.id",
+                await CreateComponentAsJson(input).ConfigureAwait(false)
+            );
         }
     }
 }

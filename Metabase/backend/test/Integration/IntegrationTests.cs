@@ -84,6 +84,11 @@ namespace Metabase.Tests.Integration
             HttpClient.SetBearerToken(tokenResponse.AccessToken);
         }
 
+        protected void LogoutUser()
+        {
+            HttpClient.SetBearerToken(null);
+        }
+
         protected async Task<string> RegisterUser(
             string email = DefaultEmail,
             string password = DefaultPassword,

@@ -69,11 +69,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             // Arrange
             await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
-            var componentId =
-                ExtractString(
-                    "$.data.createComponent.component.id",
-                    await CreateComponentAsJson(input).ConfigureAwait(false)
-                );
+            var componentId = await CreateComponentReturningId(input).ConfigureAwait(false);
             var response = await GetComponents().ConfigureAwait(false);
             // Assert
             Snapshot.Match(

@@ -10,7 +10,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         protected Task<string> GetPersonalUserData()
         {
             return SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/PersonalUserData.graphql")
+                File.ReadAllText("Integration/GraphQl/Users/GetPersonalUserData.graphql")
                 );
         }
 
