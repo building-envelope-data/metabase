@@ -1,0 +1,15 @@
+query component(
+    $id: ID!
+) {
+    component(id: $id) {
+        id
+        name
+        abbreviation
+        description
+        availability {
+            from
+            to
+        }
+        categories
+    }
+}

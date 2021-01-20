@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.Components
             [ScopedService] Data.ApplicationDbContext context
             )
         {
-          return context.Components;
+            return context.Components;
         }
 
         /* public Task<IEnumerable<Component>> GetComponents( */
@@ -36,16 +36,17 @@ namespace Metabase.GraphQl.Components
         /*       ); */
         /* } */
 
-        public Task<Data.Component> GetComponentAsync(
+        public Task<Data.Component?> GetComponentAsync(
             [ID(nameof(Data.Component))] Guid id,
             ComponentByIdDataLoader componentById,
             CancellationToken cancellationToken
             )
         {
-          return componentById.LoadAsync(
-              id,
-              cancellationToken
-              );
+            // TODO Remove the exclamation mark below once HotChocolate released a fix for https://github.com/ChilliCream/hotchocolate/issues/2911
+            return componentById.LoadAsync(
+                id,
+                cancellationToken
+                )!;
         }
     }
 }

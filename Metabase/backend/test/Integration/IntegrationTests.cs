@@ -330,6 +330,20 @@ namespace Metabase.Tests.Integration
             ?? throw new Exception("String is null");
         }
 
+        protected static string Base64Encode(string text)
+        {
+            return Convert.ToBase64String(
+                System.Text.Encoding.UTF8.GetBytes(text)
+            );
+        }
+
+        protected static string Base64Decode(string text)
+        {
+            return System.Text.Encoding.UTF8.GetString(
+                Convert.FromBase64String(text)
+            );
+        }
+
         protected void EmailsShouldContainSingle(
             string address,
             string subject,

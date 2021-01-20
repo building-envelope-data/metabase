@@ -10,8 +10,8 @@ using Guid = System.Guid;
 
 namespace Metabase.GraphQl.Components
 {
-  public sealed class ComponentByIdDataLoader
-    : BatchDataLoader<Guid, Data.Component>
+    public sealed class ComponentByIdDataLoader
+      : BatchDataLoader<Guid, Data.Component>
     {
         private readonly IDbContextFactory<Data.ApplicationDbContext> _dbContextFactory;
 
@@ -29,11 +29,12 @@ namespace Metabase.GraphQl.Components
             CancellationToken cancellationToken
             )
         {
-            await using Data.ApplicationDbContext dbContext =
+            await using var dbContext =
                 _dbContextFactory.CreateDbContext();
             return await dbContext.Components
                 .Where(entity => ids.Contains(entity.Id))
-                .ToDictionaryAsync(entity => entity.Id, cancellationToken);
+                .ToDictionaryAsync(entity => entity.Id, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }

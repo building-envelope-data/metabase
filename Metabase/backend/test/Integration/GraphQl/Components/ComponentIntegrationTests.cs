@@ -87,6 +87,17 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 );
         }
 
+        protected Task<string> GetComponent(string id)
+        {
+            return SuccessfullyQueryGraphQlContentAsString(
+                File.ReadAllText("Integration/GraphQl/Components/GetComponent.graphql"),
+                variables: new Dictionary<string, object?>
+                {
+                    ["id"] = id
+                }
+                );
+        }
+
         protected Task<string> CreateComponent(
             CreateComponentInput input
             )
