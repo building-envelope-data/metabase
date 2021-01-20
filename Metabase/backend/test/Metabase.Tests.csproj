@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JsonPath.Net" Version="0.1.4" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="IdentityModel" Version="4.5.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />

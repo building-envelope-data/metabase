@@ -2,9 +2,9 @@ using System.IO;
 using System.Threading.Tasks;
 using Snapshooter.Xunit;
 using Xunit;
-using System;
 using Metabase.GraphQl.Components;
 using FluentAssertions;
+using Snapshooter;
 
 namespace Metabase.Tests.Integration.GraphQl.Components
 {
@@ -19,14 +19,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             var response =
              await UnsuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-                variables: new CreateComponentInput
-                (
-                    Name: "Component A",
-                    Abbreviation: "C!A",
-                    Description: "Best component ever!",
-                    Availability: null,
-                    Categories: Array.Empty<ValueObjects.ComponentCategory>()
-                 )
+                variables: MinimalComponentInput
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -38,64 +31,56 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             // Act
             await UnsuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-                variables: new CreateComponentInput
-                (
-                    Name: "Component A",
-                    Abbreviation: "C!A",
-                    Description: "Best component ever!",
-                    Availability: null,
-                    Categories: Array.Empty<ValueObjects.ComponentCategory>()
-                 )
+                variables: MinimalComponentInput
                 ).ConfigureAwait(false);
             var response = await GetComponents().ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }
 
-        [Fact]
-        public async Task LoggedInUser_IsSuccess()
+        [Theory]
+        [MemberData(nameof(EnumerateComponentInputs))]
+        public async Task LoggedInUser_IsSuccess(
+            string key,
+            CreateComponentInput input
+        )
         {
             // Arrange
             await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
-            var response =
-            await CreateComponent(
-                new CreateComponentInput
-                (
-                    Name: "Component A",
-                    Abbreviation: "C!A",
-                    Description: "Best component ever!",
-                    Availability: null,
-                    Categories: Array.Empty<ValueObjects.ComponentCategory>()
-                 )
-            ).ConfigureAwait(false);
+            var response = await CreateComponent(input).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(response);
+            Snapshot.Match(
+                response,
+                SnapshotNameExtension.Create(key),
+                matchOptions => matchOptions.Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.createComponent.component.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                );
         }
 
-        [Fact]
-        public async Task LoggedInUser_CreatesComponent()
+        [Theory]
+        [MemberData(nameof(EnumerateComponentInputs))]
+        public async Task LoggedInUser_CreatesComponent(
+            string key,
+            CreateComponentInput input
+        )
         {
             // Arrange
             await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
-            // TODO Extract id from `CreateComponent` response and check that that id is the one contained in the `Components` response.
-            await CreateComponent(
-                new CreateComponentInput
-                (
-                    Name: "Component A",
-                    Abbreviation: "C!A",
-                    Description: "Best component ever!",
-                    Availability: null,
-                    Categories: Array.Empty<ValueObjects.ComponentCategory>()
-                 )
-            ).ConfigureAwait(false);
+            var componentId =
+                ExtractString(
+                    "$.data.createComponent.component.id",
+                    await CreateComponentAsJson(input).ConfigureAwait(false)
+                );
             var response = await GetComponents().ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
+                SnapshotNameExtension.Create(key),
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.components.edges[*].node.id").Should().NotBeNullOrWhiteSpace()
+                 fieldOptions.Field<string>("data.components.edges[*].node.id").Should().Be(componentId)
                  )
                 );
         }

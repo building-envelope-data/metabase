@@ -1,4 +1,5 @@
 using System;
+using Json.Path;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
@@ -267,6 +268,28 @@ namespace Metabase.Tests.Integration
             .ConfigureAwait(false);
         }
 
+        protected async Task<JsonElement> SuccessfullyQueryGraphQlContentAsJson(
+            string query,
+            string? operationName = null,
+            object? variables = null
+            )
+        {
+            return (
+                await JsonDocument.ParseAsync(
+                await (
+               await SuccessfullyQueryGraphQlContent(
+                query,
+                operationName,
+                variables
+                )
+                .ConfigureAwait(false)
+            )
+            .ReadAsStreamAsync()
+            .ConfigureAwait(false)
+            ).ConfigureAwait(false)
+            ).RootElement;
+        }
+
         protected async Task<string> UnsuccessfullyQueryGraphQlContentAsString(
             string query,
             string? operationName = null,
@@ -283,6 +306,23 @@ namespace Metabase.Tests.Integration
             )
             .ReadAsStringAsync()
             .ConfigureAwait(false);
+        }
+
+        protected static string ExtractString(
+            string jsonPath,
+            JsonElement jsonElement
+            )
+        {
+            var pathResult =
+                JsonPath.Parse(jsonPath).Evaluate(
+                    jsonElement
+                );
+            if (pathResult.Error is not null)
+            {
+                throw new Exception(pathResult.Error);
+            }
+            return pathResult.Matches.Single().Value.GetString()
+            ?? throw new Exception("String is null");
         }
 
         protected void EmailsShouldContainSingle(
@@ -313,9 +353,10 @@ namespace Metabase.Tests.Integration
             TContent content
             )
         {
-          var options = new JsonSerializerOptions {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-          };
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
             options.Converters.Add(new JsonStringEnumConverter());
             var result =
               new ByteArrayContent(

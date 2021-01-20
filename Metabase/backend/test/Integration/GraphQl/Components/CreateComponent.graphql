@@ -13,6 +13,7 @@ mutation createComponent(
         categories: $categories
     }) {
         component {
+            id
             name
             abbreviation
             description
