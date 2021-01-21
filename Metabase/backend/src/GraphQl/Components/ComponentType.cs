@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 
@@ -12,18 +6,25 @@ namespace Metabase.GraphQl.Components
     public sealed class ComponentType
       : ObjectType<Data.Component>
     {
-      protected override void Configure(
-          IObjectTypeDescriptor<Data.Component> descriptor
-          )
+        protected override void Configure(
+            IObjectTypeDescriptor<Data.Component> descriptor
+            )
         {
             descriptor
                 .ImplementsNode()
                 .IdField(t => t.Id)
                 .ResolveNode((context, id) =>
                     context
-                    .DataLoader<GraphQl.Components.ComponentByIdDataLoader>()
+                    .DataLoader<ComponentByIdDataLoader>()
                     .LoadAsync(id, context.RequestAborted)
                     );
+
+            descriptor
+              .Field("uuid")
+              .Type<NonNullType<UuidType>>()
+              .Resolve(context =>
+                  context.Parent<Data.Component>().Id
+                  );
 
             // TODO Do we want to expose this, require it as input, and use it to discover concurrent writes?
             descriptor
