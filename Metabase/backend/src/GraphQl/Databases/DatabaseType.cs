@@ -1,4 +1,3 @@
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
 
 namespace Metabase.GraphQl.Databases
@@ -11,6 +10,11 @@ namespace Metabase.GraphQl.Databases
             )
         {
             base.Configure(descriptor);
+            descriptor
+                .Field(t => t.Operator)
+                .ResolveWith<DatabaseResolvers>(t => t.GetOperatorAsync(default!, default!, default));
+            descriptor
+                .Field(t => t.OperatorId).Ignore();
         }
     }
 }

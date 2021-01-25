@@ -1,5 +1,5 @@
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.Components
 {
@@ -11,29 +11,14 @@ namespace Metabase.GraphQl.Components
             )
         {
             base.Configure(descriptor);
-            /* descriptor */
-            /*     .Field(t => t.SessionsComponents) */
-            /*     .ResolveWith<ComponentResolvers>(t => t.GetSessionsAsync(default!, default!, default!, default)) */
-            /*     .UseDbContext<ApplicationDbContext>() */
-            /*     .Name("sessions"); */
+            // TODO Can we use paging with custom edges with additional fields?
+            descriptor
+                .Field(t => t.Manufacturers)
+                .ResolveWith<ComponentResolvers>(t => t.GetManufacturersAsync(default!, default!, default!, default))
+                .UseDbContext<Data.ApplicationDbContext>()
+                .UsePaging<NonNullType<InstitutionType>>();
+            descriptor
+                .Field(t => t.ManufacturerEdges).Ignore();
         }
-
-        /* private class ComponentResolvers */
-        /* { */
-        /*     public async Task<IEnumerable<Session>> GetSessionsAsync( */
-        /*         Data.Component component, */
-        /*         [ScopedService] ApplicationDbContext dbContext, */
-        /*         SessionByIdDataLoader sessionById, */
-        /*         CancellationToken cancellationToken) */
-        /*     { */
-        /*         int[] speakerIds = await dbContext.Components */
-        /*             .Where(a => a.Id == component.Id) */
-        /*             .Include(a => a.SessionsComponents) */
-        /*             .SelectMany(a => a.SessionsComponents.Select(t => t.SessionId)) */
-        /*             .ToArrayAsync(); */
-
-        /*         return await sessionById.LoadAsync(speakerIds, cancellationToken); */
-        /*     } */
-        /* } */
     }
 }

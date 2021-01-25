@@ -11,6 +11,10 @@ namespace Metabase.GraphQl.Institutions
             )
         {
             base.Configure(descriptor);
+            descriptor
+                .Field(t => t.OperatedDatabases)
+                .ResolveWith<InstitutionResolvers>(t => t.GetOperatedDatabasesAsync(default!, default!, default!, default))
+                .UseDbContext<Data.ApplicationDbContext>();
         }
     }
 }
