@@ -42,11 +42,10 @@ namespace Metabase.GraphQl.Components
             CancellationToken cancellationToken
             )
         {
-            // TODO Remove the exclamation mark below once HotChocolate released a fix for https://github.com/ChilliCream/hotchocolate/issues/2911
             return componentById.LoadAsync(
                 id,
                 cancellationToken
-                )!;
+                );
         }
     }
 }

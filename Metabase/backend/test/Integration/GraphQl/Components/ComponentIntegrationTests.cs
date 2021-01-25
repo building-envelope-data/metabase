@@ -16,7 +16,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                     Abbreviation: "C!A",
                     Description: "Best component ever!",
                     Availability: null,
-                    Categories: Array.Empty<ValueObjects.ComponentCategory>()
+                    Categories: Array.Empty<Enumerations.ComponentCategory>()
                  );
 
         protected static CreateComponentInput FromAndToRestrictedAvailabilityComponentInput { get; } = new(
@@ -28,8 +28,8 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                       To: new DateTime(2020, 11, 5, 20, 0, 0, DateTimeKind.Utc)
                       ),
                     Categories: new[] {
-                        ValueObjects.ComponentCategory.MATERIAL,
-                        ValueObjects.ComponentCategory.UNIT,
+                        Enumerations.ComponentCategory.MATERIAL,
+                        Enumerations.ComponentCategory.UNIT,
                         }
                  );
 
@@ -42,7 +42,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                       To: new DateTime(2021, 11, 5, 20, 0, 0, DateTimeKind.Utc)
                       ),
                     Categories: new[] {
-                        ValueObjects.ComponentCategory.UNIT,
+                        Enumerations.ComponentCategory.UNIT,
                         }
                  );
 
@@ -55,9 +55,9 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                       To: null
                       ),
                     Categories: new[] {
-                        ValueObjects.ComponentCategory.LAYER,
-                        ValueObjects.ComponentCategory.MATERIAL,
-                        ValueObjects.ComponentCategory.UNIT,
+                        Enumerations.ComponentCategory.LAYER,
+                        Enumerations.ComponentCategory.MATERIAL,
+                        Enumerations.ComponentCategory.UNIT,
                         }
                  );
 

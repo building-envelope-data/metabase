@@ -1,4 +1,4 @@
-namespace Metabase.ValueObjects
+namespace Metabase.Enumerations
 {
     public enum ComponentCategory
     {

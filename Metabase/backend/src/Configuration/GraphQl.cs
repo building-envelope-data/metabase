@@ -1,17 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.AspNetCore;
-using HotChocolate.Execution;
 using Microsoft.Extensions.DependencyInjection;
-using HotChocolate.Types;
-using HotChocolate.Data.Filters;
-using Microsoft.Extensions.Hosting; // Provides `IsDevelopment` for `IWebHostEnvironment`, see https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostenvironment?view=dotnet-plat-ext-3.1 and https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.iwebhostenvironment?view=aspnetcore-3.1
-// using Microsoft.AspNetCore.Builder; // UseWebSockets
 using GraphQlX = Metabase.GraphQl;
-using IApplicationBuilder = Microsoft.AspNetCore.Builder.IApplicationBuilder;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
-using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 
 namespace Metabase.Configuration
 {
@@ -37,16 +27,24 @@ namespace Metabase.Configuration
                     // Object Types
                     .AddType<GraphQlX.Users.UserType>()
                     .AddType<GraphQlX.Components.ComponentType>()
+                    .AddType<GraphQlX.Databases.DatabaseType>()
+                    .AddType<GraphQlX.Institutions.InstitutionType>()
+                    .AddType<GraphQlX.Methods.MethodType>()
+                    .AddType<GraphQlX.Persons.PersonType>()
                     // Data Loaders
                     .AddDataLoader<GraphQlX.Components.ComponentByIdDataLoader>()
-                    // Filtering
-                    /* .AddConvention<IFilterConvention>( */
-                    /*   new FilterConventionExtension(descriptor => */
-                    /*     { */
-                    /*     descriptor.BindRuntimeType<Data.Component, GraphQlX.Components.ComponentFilterType>(); */
-                    /*     } */
-                    /*     ) */
-                    /*   ) */
+                    .AddDataLoader<GraphQlX.Databases.DatabaseByIdDataLoader>()
+                    .AddDataLoader<GraphQlX.Institutions.InstitutionByIdDataLoader>()
+                    .AddDataLoader<GraphQlX.Methods.MethodByIdDataLoader>()
+                    .AddDataLoader<GraphQlX.Persons.PersonByIdDataLoader>()
+                // Filtering
+                /* .AddConvention<IFilterConvention>( */
+                /*   new FilterConventionExtension(descriptor => */
+                /*     { */
+                /*     descriptor.BindRuntimeType<Data.Component, GraphQlX.Components.ComponentFilterType>(); */
+                /*     } */
+                /*     ) */
+                /*   ) */
                 );
         }
     }

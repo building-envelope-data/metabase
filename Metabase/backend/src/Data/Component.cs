@@ -1,15 +1,16 @@
-using System.Collections.Generic;
 using DateTime = System.DateTime;
 using NpgsqlTypes;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace Metabase.Data
 {
     public sealed class Component
       : Infrastructure.Data.Entity
     {
-        // https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations?view=net-5.0
-        // https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-5.0#built-in-attributes
+        // Entity Framework Core Read-Only Properties https://docs.microsoft.com/en-us/ef/core/modeling/constructors#read-only-properties
+        // Data Annotations https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations
+        // Built-In Validation Attributes https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation#built-in-attributes
 
         [MinLength(1)]
         public string Name { get; private set; }
@@ -23,14 +24,23 @@ namespace Metabase.Data
         public NpgsqlRange<DateTime>? Availability { get; private set; } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
 
         // https://www.npgsql.org/efcore/mapping/array.html
-        public ValueObjects.ComponentCategory[] Categories { get; private set; }
+        public Enumerations.ComponentCategory[] Categories { get; private set; }
+
+        public ICollection<ComponentConcretizationAndGeneralization> ConcretizationEdges { get; } = new List<ComponentConcretizationAndGeneralization>();
+        public ICollection<Component> Concretizations { get; } = new List<Component>();
+
+        public ICollection<ComponentConcretizationAndGeneralization> GeneralizationEdges { get; } = new List<ComponentConcretizationAndGeneralization>();
+        public ICollection<Component> Generalizations { get; } = new List<Component>();
+
+        public ICollection<ComponentManufacturer> ManufacturerEdges { get; } = new List<ComponentManufacturer>();
+        public ICollection<Institution> Manufacturers { get; } = new List<Institution>();
 
         public Component(
             string name,
             string? abbreviation,
             string description,
             NpgsqlRange<DateTime>? availability,
-            ValueObjects.ComponentCategory[] categories
+            Enumerations.ComponentCategory[] categories
             )
         {
             Name = name;

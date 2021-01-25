@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Components
 {
-  public abstract class ComponentPayload<TComponentError>
-    : GraphQl.Payload
-    where TComponentError : UserError
+    public abstract class ComponentPayload<TComponentError>
+      : Payload
+      where TComponentError : UserError
     {
         public Data.Component? Component { get; }
         public IReadOnlyCollection<TComponentError>? Errors { get; }
@@ -26,7 +26,7 @@ namespace Metabase.GraphQl.Components
         protected ComponentPayload(
             TComponentError error
             )
-          : this(new [] { error })
+          : this(new[] { error })
         {
         }
 
@@ -43,7 +43,10 @@ namespace Metabase.GraphQl.Components
             Data.Component component,
             TComponentError error
             )
-          : this(component, new [] { error })
+          : this(
+              component,
+              new[] { error }
+              )
         {
         }
     }

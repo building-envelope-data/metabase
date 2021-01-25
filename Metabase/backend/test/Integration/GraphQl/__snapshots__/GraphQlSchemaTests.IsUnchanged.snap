@@ -34,9 +34,25 @@ type Component implements Node {
   abbreviation: String
   availability: OpenEndedDateTimeRange
   categories: [ComponentCategory!]!
+  concretizationEdges: [ComponentConcretizationAndGeneralization!]!
+  concretizations: [Component!]!
   description: String!
+  generalizationEdges: [ComponentConcretizationAndGeneralization!]!
+  generalizations: [Component!]!
   id: ID!
+  manufacturerEdges: [ComponentManufacturer!]!
+  manufacturers: [Institution!]!
   name: String!
+  uuid: Uuid!
+}
+
+type ComponentConcretizationAndGeneralization {
+  concreteComponent: Component!
+  concreteComponentId: Uuid!
+  generalComponent: Component!
+  generalComponentId: Uuid!
+  id: Uuid!
+  xmin: UInt!
 }
 
 "A connection to a list of items."
@@ -55,6 +71,13 @@ type ComponentEdge {
   cursor: String!
   "The item at the end of the edge."
   node: Component!
+}
+
+type ComponentManufacturer {
+  component: Component!
+  componentId: Uuid!
+  institution: Institution!
+  institutionId: Uuid!
 }
 
 type ConfirmUserEmailChangeError {
@@ -79,8 +102,32 @@ type ConfirmUserEmailPayload {
   user: User
 }
 
+type ContactInformation {
+  emailAddress: String
+  phoneNumber: String
+  postalAddress: String
+  websiteLocator: String
+}
+
+type CreateComponentError {
+  code: CreateComponentErrorCode!
+  message: String!
+  path: [String!]!
+}
+
 type CreateComponentPayload {
-  component: Component!
+  component: Component
+  errors: [CreateComponentError!]
+}
+
+type Database {
+  description: String!
+  id: Uuid!
+  locator: String!
+  name: String!
+  operator: Institution!
+  operatorId: Uuid!
+  xmin: UInt!
 }
 
 type DeletePersonalUserDataError {
@@ -106,6 +153,43 @@ type GenerateUserTwoFactorRecoveryCodesPayload {
   user: User
 }
 
+type Institution {
+  abbreviation: String
+  affiliatedPersonEdges: [PersonAffiliation!]!
+  affiliatedPersons: [Person!]!
+  description: String
+  developedMethodEdges: [InstitutionMethodDeveloper!]!
+  developedMethods: [Method!]!
+  id: Uuid!
+  manufacturedComponentEdges: [ComponentManufacturer!]!
+  manufacturedComponents: [Component!]!
+  name: String!
+  operatedDatabases: [Database!]!
+  publicKey: String
+  representativeEdges: [InstitutionRepresentative!]!
+  representatives: [User!]!
+  state: InstitutionState!
+  websiteLocator: String
+  xmin: UInt!
+}
+
+type InstitutionMethodDeveloper {
+  id: Uuid!
+  institution: Institution!
+  institutionId: Uuid!
+  method: Method!
+  methodId: Uuid!
+  xmin: UInt!
+}
+
+type InstitutionRepresentative {
+  institution: Institution!
+  institutionId: Uuid!
+  role: InstitutionRepresentativeRole!
+  user: User!
+  userId: Uuid!
+}
+
 type LoginUserError {
   code: LoginUserErrorCode!
   message: String!
@@ -117,6 +201,23 @@ type LoginUserPayload {
   jwtAccessToken: String
   requiresTwoFactor: Boolean
   user: User
+}
+
+type Method {
+  categories: [MethodCategory!]!
+  codeLocator: String
+  description: String!
+  developers: [Stakeholder!]!
+  id: Uuid!
+  institutionDeveloperEdges: [InstitutionMethodDeveloper!]!
+  institutionDevelopers: [Institution!]!
+  name: String!
+  personDeveloperEdges: [PersonMethodDeveloper!]!
+  personDevelopers: [Person!]!
+  publicationLocator: String
+  standard: Standard
+  standardId: Uuid
+  xmin: UInt!
 }
 
 type Mutation {
@@ -137,6 +238,12 @@ type Mutation {
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER)
 }
 
+type Numeration {
+  mainNumber: String!
+  prefix: String
+  suffix: String
+}
+
 type OpenEndedDateTimeRange {
   from: DateTime
   to: DateTime
@@ -154,6 +261,35 @@ type PageInfo {
   startCursor: String
 }
 
+type Person {
+  affiliatedInstitutionEdges: [PersonAffiliation!]!
+  affiliatedInstitutions: [Institution!]!
+  contactInformation: ContactInformation!
+  developedMethodEdges: [PersonMethodDeveloper!]!
+  developedMethods: [Method!]!
+  id: Uuid!
+  name: String!
+  xmin: UInt!
+}
+
+type PersonAffiliation {
+  id: Uuid!
+  institution: Institution!
+  institutionId: Uuid!
+  person: Person!
+  personId: Uuid!
+  xmin: UInt!
+}
+
+type PersonMethodDeveloper {
+  id: Uuid!
+  method: Method!
+  methodId: Uuid!
+  person: Person!
+  personId: Uuid!
+  xmin: UInt!
+}
+
 type PersonalUserDataError {
   code: PersonalUserDataErrorCode!
   message: String!
@@ -166,7 +302,7 @@ type PersonalUserDataPayload {
 }
 
 type Query {
-  component(id: ID!): Component!
+  component(id: ID!): Component
   components(after: String before: String first: Int last: Int order: [ComponentSortInput!]): ComponentConnection
   node(id: ID!): Node
   personalUserData: PersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
@@ -245,6 +381,23 @@ type SetUserPhoneNumberError {
 type SetUserPhoneNumberPayload {
   errors: [SetUserPhoneNumberError!]
   user: User
+}
+
+type Stakeholder {
+  id: Uuid!
+  xmin: UInt!
+}
+
+type Standard {
+  abstract: String!
+  id: Uuid!
+  locator: String!
+  numeration: Numeration!
+  section: String!
+  standardizers: [Standardizer!]!
+  title: String!
+  xmin: UInt!
+  year: Int!
 }
 
 type User implements Node {
@@ -413,6 +566,10 @@ enum ConfirmUserEmailErrorCode {
   INVALID_CONFIRMATION_CODE
 }
 
+enum CreateComponentErrorCode {
+  UNKNOWN
+}
+
 enum DeletePersonalUserDataErrorCode {
   UNKNOWN
   USER_NOT_FOUND
@@ -426,10 +583,27 @@ enum GenerateUserTwoFactorRecoveryCodesErrorCode {
   TWO_FACTOR_AUTHENTICATION_DISABLED
 }
 
+enum InstitutionRepresentativeRole {
+  OWNER
+  MAINTAINER
+  ASSISTANT
+}
+
+enum InstitutionState {
+  UNKNOWN
+  OPERATIVE
+  INOPERATIVE
+}
+
 enum LoginUserErrorCode {
   INVALID
   LOCKED_OUT
   NOT_ALLOWED
+}
+
+enum MethodCategory {
+  MEASUREMENT
+  CALCULATION
 }
 
 enum PersonalUserDataErrorCode {
@@ -497,6 +671,33 @@ enum SortEnumType {
   DESC
 }
 
+enum Standardizer {
+  AERC
+  AGI
+  ASHRAE
+  BREEAM
+  BS
+  BSI
+  CEN
+  CIE
+  DGNB
+  DIN
+  DVWG
+  IEC
+  IES
+  IFT
+  ISO
+  JIS
+  LEED
+  NFRC
+  RIBA
+  UL
+  UNECE
+  VDI
+  VFF
+  WELL
+}
+
 directive @authorize("Defines when when the resolver shall be executed.By default the resolver is executed after the policy has determined that the current user is allowed to access the field." apply: ApplyPolicy! = BEFORE_RESOLVER "The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!]) repeatable on SCHEMA | OBJECT | FIELD_DEFINITION
 
 "The `@defer` directive may be provided for fragment spreads and inline fragments to inform the executor to delay the execution of the current fragment to indicate deprioritization of the current fragment. A query with `@defer` directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred is delivered in a subsequent response. `@include` and `@skip` take precedence over `@defer`."
@@ -522,3 +723,5 @@ scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time"
 
 "The `UInt` scalar represents a 32-bit unsigned integer type."
 scalar UInt
+
+scalar Uuid

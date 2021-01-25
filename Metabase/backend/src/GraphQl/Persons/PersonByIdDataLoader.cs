@@ -2,19 +2,19 @@ using Microsoft.EntityFrameworkCore;
 using GreenDonut;
 using Metabase.GraphQl.Entitys;
 
-namespace Metabase.GraphQl.Components
+namespace Metabase.GraphQl.Persons
 {
-    public sealed class ComponentByIdDataLoader
-      : EntityByIdDataLoader<Data.Component>
+    public sealed class PersonByIdDataLoader
+      : EntityByIdDataLoader<Data.Person>
     {
-        public ComponentByIdDataLoader(
+        public PersonByIdDataLoader(
             IBatchScheduler batchScheduler,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
                 dbContextFactory,
-                dbContext => dbContext.Components
+                dbContext => dbContext.Persons
                 )
         {
         }

@@ -4,34 +4,13 @@ using HotChocolate.Types;
 namespace Metabase.GraphQl.Components
 {
     public sealed class ComponentType
-      : ObjectType<Data.Component>
+      : EntityType<Data.Component, ComponentByIdDataLoader>
     {
         protected override void Configure(
             IObjectTypeDescriptor<Data.Component> descriptor
             )
         {
-            descriptor
-                .ImplementsNode()
-                .IdField(t => t.Id)
-                .ResolveNode((context, id) =>
-                    context
-                    .DataLoader<ComponentByIdDataLoader>()
-                    .LoadAsync(id, context.RequestAborted)
-                    );
-
-            descriptor
-              .Field("uuid")
-              .Type<NonNullType<UuidType>>()
-              .Resolve(context =>
-                  context.Parent<Data.Component>().Id
-                  );
-
-            // TODO Do we want to expose this, require it as input, and use it to discover concurrent writes?
-            descriptor
-              .Field(t => t.xmin)
-              .Name("version")
-              .Ignore();
-
+            base.Configure(descriptor);
             /* descriptor */
             /*     .Field(t => t.SessionsComponents) */
             /*     .ResolveWith<ComponentResolvers>(t => t.GetSessionsAsync(default!, default!, default!, default)) */
