@@ -20,6 +20,9 @@ namespace Metabase.Configuration
                     .AddQueryType(d => d.Name(nameof(GraphQlX.Query)))
                         .AddType<GraphQlX.Users.UserQueries>()
                         .AddType<GraphQlX.Components.ComponentQueries>()
+                        .AddType<GraphQlX.Databases.DatabaseQueries>()
+                        .AddType<GraphQlX.Institutions.InstitutionQueries>()
+                        .AddType<GraphQlX.Methods.MethodQueries>()
                     .AddMutationType(d => d.Name(nameof(GraphQlX.Mutation)))
                         .AddType<GraphQlX.Users.UserMutations>()
                         .AddType<GraphQlX.Components.ComponentMutations>()
@@ -43,6 +46,9 @@ namespace Metabase.Configuration
                      new FilterConventionExtension(descriptor =>
                        {
                            descriptor.BindRuntimeType<Data.Component, GraphQlX.Components.ComponentFilterType>();
+                           descriptor.BindRuntimeType<Data.Database, GraphQlX.Databases.DatabaseFilterType>();
+                           descriptor.BindRuntimeType<Data.Institution, GraphQlX.Institutions.InstitutionFilterType>();
+                           descriptor.BindRuntimeType<Data.Method, GraphQlX.Methods.MethodFilterType>();
                        }
                        )
                      )

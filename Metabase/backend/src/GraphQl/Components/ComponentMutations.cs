@@ -1,9 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using HotChocolate;
 using HotChocolate.Data;
-using HotChocolate.Subscriptions;
 using HotChocolate.Types;
 using HotChocolate.AspNetCore.Authorization;
 using NpgsqlTypes;
@@ -36,7 +34,7 @@ namespace Metabase.GraphQl.Components
                 categories: input.Categories
             );
             context.Components.Add(component);
-            await context.SaveChangesAsync(cancellationToken);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new CreateComponentPayload(component);
         }
     }
