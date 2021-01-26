@@ -1,8 +1,9 @@
 query component(
-    $id: ID!
+    $uuid: Uuid!
 ) {
-    component(id: $id) {
+    component(uuid: $uuid) {
         id
+        uuid
         name
         abbreviation
         description

@@ -4,6 +4,7 @@ using Xunit;
 using System.Linq;
 using FluentAssertions;
 using System.Collections.Generic;
+using System;
 
 namespace Metabase.Tests.Integration.GraphQl.Components
 {
@@ -25,15 +26,19 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         {
             // Arrange
             await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var componentId = await CreateComponentReturningId(MinimalComponentInput).ConfigureAwait(false);
+            var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(MinimalComponentInput).ConfigureAwait(false);
             LogoutUser();
             // Act
             var response = await GetComponents().ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
-                matchOptions => matchOptions.Assert(fieldOptions =>
+                matchOptions => matchOptions
+                .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.components.edges[*].node.id").Should().Be(componentId)
+                 )
+                .Assert(fieldOptions =>
+                 fieldOptions.Field<Guid>("data.components.edges[*].node.uuid").Should().Be(componentUuid)
                  )
                 );
         }
@@ -43,11 +48,11 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         {
             // Arrange
             await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var componentIds = new List<string>();
+            var componentIdsAndUuids = new List<(string, string)>();
             foreach (var input in ComponentInputs)
             {
-                componentIds.Add(
-                    await CreateComponentReturningId(input).ConfigureAwait(false)
+                componentIdsAndUuids.Add(
+                    await CreateComponentReturningIdAndUuid(input).ConfigureAwait(false)
                     );
             }
             LogoutUser();
@@ -57,11 +62,18 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             Snapshot.Match(
                 response,
                 matchOptions =>
-                    componentIds.Select((componentId, index) => (componentId, index)).Aggregate(
+                    componentIdsAndUuids.Select(
+                        ((string componentId, string componentUuid) componentIdAndUuid, int index)
+                         => (componentIdAndUuid.componentId, componentIdAndUuid.componentUuid, index)
+                     ).Aggregate(
                         matchOptions,
-                        (accumulatedMatchOptions, componentIdAndIndex) =>
-                            accumulatedMatchOptions.Assert(fieldOptions =>
-                                fieldOptions.Field<string>($"data.components.edges[{componentIdAndIndex.index}].node.id").Should().Be(componentIdAndIndex.componentId)
+                        (accumulatedMatchOptions, componentIdAndUuidAndIndex) =>
+                            accumulatedMatchOptions
+                            .Assert(fieldOptions =>
+                                fieldOptions.Field<string>($"data.components.edges[{componentIdAndUuidAndIndex.index}].node.id").Should().Be(componentIdAndUuidAndIndex.componentId)
+                                )
+                            .Assert(fieldOptions =>
+                                fieldOptions.Field<Guid>($"data.components.edges[{componentIdAndUuidAndIndex.index}].node.uuid").Should().Be(componentIdAndUuidAndIndex.componentUuid)
                                 )
                 )
             );

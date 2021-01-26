@@ -87,13 +87,13 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 );
         }
 
-        protected Task<string> GetComponent(string id)
+        protected Task<string> GetComponent(string uuid)
         {
             return SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Components/GetComponent.graphql"),
                 variables: new Dictionary<string, object?>
                 {
-                    ["id"] = id
+                    ["uuid"] = uuid
                 }
                 );
         }
@@ -118,13 +118,20 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 );
         }
 
-        protected async Task<string> CreateComponentReturningId(
+        protected async Task<(string, string)> CreateComponentReturningIdAndUuid(
             CreateComponentInput input
         )
         {
-            return ExtractString(
+            var response = await CreateComponentAsJson(input).ConfigureAwait(false);
+            return (
+                ExtractString(
                 "$.data.createComponent.component.id",
-                await CreateComponentAsJson(input).ConfigureAwait(false)
+                response
+                ),
+                ExtractString(
+                "$.data.createComponent.component.uuid",
+                response
+                )
             );
         }
     }

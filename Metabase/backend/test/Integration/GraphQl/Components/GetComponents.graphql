@@ -3,6 +3,7 @@ query {
     edges {
       node {
         id
+        uuid
         name
         abbreviation
         description

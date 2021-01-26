@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Data.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using GraphQlX = Metabase.GraphQl;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
@@ -37,14 +38,14 @@ namespace Metabase.Configuration
                     .AddDataLoader<GraphQlX.Institutions.InstitutionByIdDataLoader>()
                     .AddDataLoader<GraphQlX.Methods.MethodByIdDataLoader>()
                     .AddDataLoader<GraphQlX.Persons.PersonByIdDataLoader>()
-                // Filtering
-                /* .AddConvention<IFilterConvention>( */
-                /*   new FilterConventionExtension(descriptor => */
-                /*     { */
-                /*     descriptor.BindRuntimeType<Data.Component, GraphQlX.Components.ComponentFilterType>(); */
-                /*     } */
-                /*     ) */
-                /*   ) */
+                    // Filtering
+                    .AddConvention<IFilterConvention>(
+                     new FilterConventionExtension(descriptor =>
+                       {
+                           descriptor.BindRuntimeType<Data.Component, GraphQlX.Components.ComponentFilterType>();
+                       }
+                       )
+                     )
                 );
         }
     }

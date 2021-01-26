@@ -5,6 +5,7 @@ using Xunit;
 using Metabase.GraphQl.Components;
 using FluentAssertions;
 using Snapshooter;
+using System;
 
 namespace Metabase.Tests.Integration.GraphQl.Components
 {
@@ -53,8 +54,12 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             Snapshot.Match(
                 response,
                 SnapshotNameExtension.Create(key),
-                matchOptions => matchOptions.Assert(fieldOptions =>
+                matchOptions => matchOptions
+                .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.createComponent.component.id").Should().NotBeNullOrWhiteSpace()
+                 )
+                 .Assert(fieldOptions =>
+                 fieldOptions.Field<Guid>("data.createComponent.component.uuid").Should().NotBe(Guid.Empty)
                  )
                 );
         }
@@ -69,14 +74,18 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             // Arrange
             await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
-            var componentId = await CreateComponentReturningId(input).ConfigureAwait(false);
+            var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(input).ConfigureAwait(false);
             var response = await GetComponents().ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 SnapshotNameExtension.Create(key),
-                matchOptions => matchOptions.Assert(fieldOptions =>
+                matchOptions => matchOptions
+                .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.components.edges[*].node.id").Should().Be(componentId)
+                 )
+                .Assert(fieldOptions =>
+                 fieldOptions.Field<Guid>("data.components.edges[*].node.uuid").Should().Be(componentUuid)
                  )
                 );
         }

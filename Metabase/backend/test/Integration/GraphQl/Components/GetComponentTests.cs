@@ -3,6 +3,7 @@ using Snapshooter.Xunit;
 using Xunit;
 using FluentAssertions;
 using System.Collections.Generic;
+using System;
 
 namespace Metabase.Tests.Integration.GraphQl.Components
 {
@@ -15,7 +16,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         {
             // Act
             var response = await GetComponent(
-                "Q29tcG9uZW50CmdiYzZlNGM5ZDM4Y2M0MWJjODllM2Y2MjkxNmIyYmI1Yg=="
+                "68ccd42538d8490095051f4d0beb2837"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -26,13 +27,13 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         {
             // Arrange
             await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            await CreateComponentReturningId(MinimalComponentInput).ConfigureAwait(false);
+            await CreateComponentReturningIdAndUuid(MinimalComponentInput).ConfigureAwait(false);
             LogoutUser();
             // Act
             // There is some tiny probability that the hard-coded identifier is
             // the one of the component in which case this test fails.
             var response = await GetComponent(
-                "Q29tcG9uZW50CmdjYjMwMjI4ZTA4Zjk0ZTNiYjY4NTA1ODA1NWYyY2I0Mw=="
+                "68ccd42538d8490095051f4d0beb2837"
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -43,21 +44,25 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         {
             // Arrange
             await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var componentIds = new List<string>();
+            var componentIdsAndUuids = new List<(string, string)>();
             foreach (var input in ComponentInputs)
             {
-                componentIds.Add(
-                    await CreateComponentReturningId(input).ConfigureAwait(false)
+                componentIdsAndUuids.Add(
+                    await CreateComponentReturningIdAndUuid(input).ConfigureAwait(false)
                     );
             }
             LogoutUser();
             // Act
-            var response = await GetComponent(componentIds[1]).ConfigureAwait(false);
+            var response = await GetComponent(componentIdsAndUuids[1].Item2).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
-                matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.component.id").Should().Be(componentIds[1])
+                matchOptions => matchOptions
+                .Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.component.id").Should().Be(componentIdsAndUuids[1].Item1)
+                 )
+                .Assert(fieldOptions =>
+                 fieldOptions.Field<Guid>("data.component.uuid").Should().Be(componentIdsAndUuids[1].Item2)
                  )
             );
         }
