@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Types;
-using HotChocolate.Types.Relay;
 using Guid = System.Guid;
 
 namespace Metabase.GraphQl.Components
@@ -14,8 +13,8 @@ namespace Metabase.GraphQl.Components
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UsePaging]
-        /* TODO [UseProjection] // fails without an explicit error message in the logs */
-        // [UseFiltering] // wait for https://github.com/ChilliCream/hotchocolate/issues/2672 */
+        [UseProjection]
+        [UseFiltering]
         [UseSorting]
         public IQueryable<Data.Component> GetComponents(
             [ScopedService] Data.ApplicationDbContext context

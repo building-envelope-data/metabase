@@ -41,6 +41,11 @@ namespace Metabase.Data
                 );
         }
 
+        public Method()
+        {
+            // Parameterless constructor is needed by HotChocolate's `UseProjection`
+        }
+
         public Method(
             string name,
             string description,

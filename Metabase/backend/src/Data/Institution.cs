@@ -39,6 +39,11 @@ namespace Metabase.Data
         public ICollection<InstitutionRepresentative> RepresentativeEdges { get; } = new List<InstitutionRepresentative>();
         public ICollection<User> Representatives { get; } = new List<User>();
 
+        public Institution()
+        {
+            // Parameterless constructor is needed by HotChocolate's `UseProjection`
+        }
+
         public Institution(
             string name,
             string? abbreviation,

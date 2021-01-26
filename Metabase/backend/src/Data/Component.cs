@@ -35,6 +35,11 @@ namespace Metabase.Data
         public ICollection<ComponentManufacturer> ManufacturerEdges { get; } = new List<ComponentManufacturer>();
         public ICollection<Institution> Manufacturers { get; } = new List<Institution>();
 
+        public Component()
+        {
+            // Parameterless constructor is needed by HotChocolate's `UseProjection`
+        }
+
         public Component(
             string name,
             string? abbreviation,

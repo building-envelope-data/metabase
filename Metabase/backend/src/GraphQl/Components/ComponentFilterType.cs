@@ -9,9 +9,13 @@ namespace Metabase.GraphQl.Components
           IFilterInputTypeDescriptor<Data.Component> descriptor
           )
         {
+            descriptor.BindFieldsExplicitly();
+            descriptor.Field(x => x.Id);
+            descriptor.Field(x => x.Name);
+            descriptor.Field(x => x.Abbreviation);
+            descriptor.Field(x => x.Description);
+            descriptor.Field(x => x.Categories);
             // TODO Allow filtering by Availability. How? See https://chillicream.com/docs/hotchocolate/fetching-data/filtering/#customization
-            // This does not work right now but will in the future, see https://github.com/ChilliCream/hotchocolate/issues/2666
-            descriptor.Field(x => x.Availability).Ignore();
         }
     }
 }

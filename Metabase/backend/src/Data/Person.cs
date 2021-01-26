@@ -17,6 +17,11 @@ namespace Metabase.Data
         public ICollection<PersonMethodDeveloper> DevelopedMethodEdges { get; } = new List<PersonMethodDeveloper>();
         public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
 
+        public Person()
+        {
+            // Parameterless constructor is needed by HotChocolate's `UseProjection`
+        }
+
         public Person(
             string name
             )

@@ -21,6 +21,11 @@ namespace Metabase.Data
         [InverseProperty(nameof(Institution.OperatedDatabases))]
         public Institution Operator { get; set; } = default!;
 
+        public Database()
+        {
+            // Parameterless constructor is needed by HotChocolate's `UseProjection`
+        }
+
         public Database(
             string name,
             string description,
