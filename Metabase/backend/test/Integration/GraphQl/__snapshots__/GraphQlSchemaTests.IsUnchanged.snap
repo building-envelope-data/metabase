@@ -40,8 +40,7 @@ type Component implements Node {
   generalizationEdges: [ComponentConcretizationAndGeneralization!]!
   generalizations: [Component!]!
   id: ID!
-  manufacturerEdges: [ComponentManufacturer!]!
-  manufacturers: [Institution!]!
+  manufacturers(after: String before: String first: Int last: Int): InstitutionConnection
   name: String!
   uuid: Uuid!
 }
@@ -120,14 +119,64 @@ type CreateComponentPayload {
   errors: [CreateComponentError!]
 }
 
-type Database {
+type CreateDatabaseError {
+  code: CreateDatabaseErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type CreateDatabasePayload {
+  database: Database
+  errors: [CreateDatabaseError!]
+}
+
+type CreateInstitutionError {
+  code: CreateInstitutionErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type CreateInstitutionPayload {
+  errors: [CreateInstitutionError!]
+  institution: Institution
+}
+
+type CreateMethodError {
+  code: CreateMethodErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type CreateMethodPayload {
+  errors: [CreateMethodError!]
+  method: Method
+}
+
+type Database implements Node {
   description: String!
-  id: Uuid!
+  id: ID!
   locator: String!
   name: String!
-  operator: Institution!
-  operatorId: Uuid!
-  xmin: UInt!
+  operator: Institution
+  uuid: Uuid!
+}
+
+"A connection to a list of items."
+type DatabaseConnection {
+  "A list of edges."
+  edges: [DatabaseEdge!]
+  "A flattened list of the nodes."
+  nodes: [Database!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type DatabaseEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Database!
 }
 
 type DeletePersonalUserDataError {
@@ -153,24 +202,42 @@ type GenerateUserTwoFactorRecoveryCodesPayload {
   user: User
 }
 
-type Institution {
+type Institution implements Node {
   abbreviation: String
   affiliatedPersonEdges: [PersonAffiliation!]!
   affiliatedPersons: [Person!]!
   description: String
   developedMethodEdges: [InstitutionMethodDeveloper!]!
   developedMethods: [Method!]!
-  id: Uuid!
+  id: ID!
   manufacturedComponentEdges: [ComponentManufacturer!]!
   manufacturedComponents: [Component!]!
   name: String!
-  operatedDatabases: [Database!]!
+  operatedDatabases: [Database]
   publicKey: String
   representativeEdges: [InstitutionRepresentative!]!
   representatives: [User!]!
   state: InstitutionState!
+  uuid: Uuid!
   websiteLocator: String
-  xmin: UInt!
+}
+
+"A connection to a list of items."
+type InstitutionConnection {
+  "A list of edges."
+  edges: [InstitutionEdge!]
+  "A flattened list of the nodes."
+  nodes: [Institution]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type InstitutionEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Institution
 }
 
 type InstitutionMethodDeveloper {
@@ -203,12 +270,12 @@ type LoginUserPayload {
   user: User
 }
 
-type Method {
+type Method implements Node {
   categories: [MethodCategory!]!
   codeLocator: String
   description: String!
   developers: [Stakeholder!]!
-  id: Uuid!
+  id: ID!
   institutionDeveloperEdges: [InstitutionMethodDeveloper!]!
   institutionDevelopers: [Institution!]!
   name: String!
@@ -217,7 +284,25 @@ type Method {
   publicationLocator: String
   standard: Standard
   standardId: Uuid
-  xmin: UInt!
+  uuid: Uuid!
+}
+
+"A connection to a list of items."
+type MethodConnection {
+  "A list of edges."
+  edges: [MethodEdge!]
+  "A flattened list of the nodes."
+  nodes: [Method!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type MethodEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Method!
 }
 
 type Mutation {
@@ -226,6 +311,9 @@ type Mutation {
   confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
   confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload!
   createComponent(input: CreateComponentInput!): CreateComponentPayload! @authorize(apply: BEFORE_RESOLVER)
+  createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload! @authorize(apply: BEFORE_RESOLVER)
+  createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER)
+  createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(apply: BEFORE_RESOLVER)
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER)
   loginUser(input: LoginUserInput!): LoginUserPayload!
@@ -261,15 +349,15 @@ type PageInfo {
   startCursor: String
 }
 
-type Person {
+type Person implements Node {
   affiliatedInstitutionEdges: [PersonAffiliation!]!
   affiliatedInstitutions: [Institution!]!
   contactInformation: ContactInformation!
   developedMethodEdges: [PersonMethodDeveloper!]!
   developedMethods: [Method!]!
-  id: Uuid!
+  id: ID!
   name: String!
-  xmin: UInt!
+  uuid: Uuid!
 }
 
 type PersonAffiliation {
@@ -302,8 +390,14 @@ type PersonalUserDataPayload {
 }
 
 type Query {
-  component(id: ID!): Component
-  components(after: String before: String first: Int last: Int order: [ComponentSortInput!]): ComponentConnection
+  component(uuid: Uuid!): Component
+  components(after: String before: String first: Int last: Int order: [ComponentSortInput!] where: ComponentFilterInput): ComponentConnection
+  database(uuid: Uuid!): Database
+  databases(after: String before: String first: Int last: Int order: [DatabaseSortInput!] where: DatabaseFilterInput): DatabaseConnection
+  institution(uuid: Uuid!): Institution
+  institutions(after: String before: String first: Int last: Int order: [InstitutionSortInput!] where: InstitutionFilterInput): InstitutionConnection
+  method(uuid: Uuid!): Method
+  methods(after: String before: String first: Int last: Int order: [MethodSortInput!] where: MethodFilterInput): MethodConnection
   node(id: ID!): Node
   personalUserData: PersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
   users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
@@ -433,6 +527,38 @@ input ChangeUserPasswordInput {
   newPasswordConfirmation: String!
 }
 
+input ComparableGuidOperationFilterInput {
+  eq: Uuid
+  gt: Uuid
+  gte: Uuid
+  in: [Uuid!]
+  lt: Uuid
+  lte: Uuid
+  neq: Uuid
+  ngt: Uuid
+  ngte: Uuid
+  nin: [Uuid!]
+  nlt: Uuid
+  nlte: Uuid
+}
+
+input ComponentCategoryOperationFilterInput {
+  eq: ComponentCategory
+  in: [ComponentCategory!]
+  neq: ComponentCategory
+  nin: [ComponentCategory!]
+}
+
+input ComponentFilterInput {
+  abbreviation: StringOperationFilterInput
+  and: [ComponentFilterInput!]
+  categories: ListComponentCategoryOperationFilterInput
+  description: StringOperationFilterInput
+  id: ComparableGuidOperationFilterInput
+  name: StringOperationFilterInput
+  or: [ComponentFilterInput!]
+}
+
 input ComponentSortInput {
   abbreviation: SortEnumType
   availability: SortEnumType
@@ -461,13 +587,125 @@ input CreateComponentInput {
   name: String!
 }
 
+input CreateDatabaseInput {
+  description: String!
+  locator: String!
+  name: String!
+}
+
+input CreateInstitutionInput {
+  abbreviation: String
+  description: String!
+  name: String!
+  publicKey: String
+  state: InstitutionState!
+  websiteLocator: String
+}
+
+input CreateMethodInput {
+  categories: [MethodCategory!]!
+  codeLocator: String
+  description: String!
+  name: String!
+  publicationLocator: String
+}
+
+input DatabaseFilterInput {
+  and: [DatabaseFilterInput!]
+  description: StringOperationFilterInput
+  id: ComparableGuidOperationFilterInput
+  locator: StringOperationFilterInput
+  name: StringOperationFilterInput
+  or: [DatabaseFilterInput!]
+}
+
+input DatabaseSortInput {
+  description: SortEnumType
+  id: SortEnumType
+  locator: SortEnumType
+  name: SortEnumType
+  operator: InstitutionSortInput
+  operatorId: SortEnumType
+  xmin: SortEnumType
+}
+
 input DeletePersonalUserDataInput {
   password: String
+}
+
+input InstitutionFilterInput {
+  abbreviation: StringOperationFilterInput
+  and: [InstitutionFilterInput!]
+  description: StringOperationFilterInput
+  id: ComparableGuidOperationFilterInput
+  name: StringOperationFilterInput
+  or: [InstitutionFilterInput!]
+  websiteLocator: StringOperationFilterInput
+}
+
+input InstitutionSortInput {
+  abbreviation: SortEnumType
+  description: SortEnumType
+  id: SortEnumType
+  name: SortEnumType
+  publicKey: SortEnumType
+  state: SortEnumType
+  websiteLocator: SortEnumType
+  xmin: SortEnumType
+}
+
+input ListComponentCategoryOperationFilterInput {
+  all: ComponentCategoryOperationFilterInput
+  any: Boolean
+  none: ComponentCategoryOperationFilterInput
+  some: ComponentCategoryOperationFilterInput
+}
+
+input ListMethodCategoryOperationFilterInput {
+  all: MethodCategoryOperationFilterInput
+  any: Boolean
+  none: MethodCategoryOperationFilterInput
+  some: MethodCategoryOperationFilterInput
 }
 
 input LoginUserInput {
   email: String!
   password: String!
+}
+
+input MethodCategoryOperationFilterInput {
+  eq: MethodCategory
+  in: [MethodCategory!]
+  neq: MethodCategory
+  nin: [MethodCategory!]
+}
+
+input MethodFilterInput {
+  and: [MethodFilterInput!]
+  categories: ListMethodCategoryOperationFilterInput
+  codeLocator: StringOperationFilterInput
+  description: StringOperationFilterInput
+  id: ComparableGuidOperationFilterInput
+  name: StringOperationFilterInput
+  or: [MethodFilterInput!]
+  publicationLocator: StringOperationFilterInput
+}
+
+input MethodSortInput {
+  codeLocator: SortEnumType
+  description: SortEnumType
+  id: SortEnumType
+  name: SortEnumType
+  publicationLocator: SortEnumType
+  standard: StandardSortInput
+  standardId: SortEnumType
+  xmin: SortEnumType
+}
+
+input NumerationSortInput {
+  mainNumber: SortEnumType
+  prefix: SortEnumType
+  suffix: SortEnumType
 }
 
 input OpenEndedDateTimeRangeInput {
@@ -503,6 +741,32 @@ input SetUserPasswordInput {
 
 input SetUserPhoneNumberInput {
   phoneNumber: String!
+}
+
+input StandardSortInput {
+  abstract: SortEnumType
+  id: SortEnumType
+  locator: SortEnumType
+  numeration: NumerationSortInput
+  section: SortEnumType
+  title: SortEnumType
+  xmin: SortEnumType
+  year: SortEnumType
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  contains: String
+  endsWith: String
+  eq: String
+  in: [String]
+  ncontains: String
+  nendsWith: String
+  neq: String
+  nin: [String]
+  nstartsWith: String
+  or: [StringOperationFilterInput!]
+  startsWith: String
 }
 
 input UserSortInput {
@@ -567,6 +831,18 @@ enum ConfirmUserEmailErrorCode {
 }
 
 enum CreateComponentErrorCode {
+  UNKNOWN
+}
+
+enum CreateDatabaseErrorCode {
+  UNKNOWN
+}
+
+enum CreateInstitutionErrorCode {
+  UNKNOWN
+}
+
+enum CreateMethodErrorCode {
   UNKNOWN
 }
 

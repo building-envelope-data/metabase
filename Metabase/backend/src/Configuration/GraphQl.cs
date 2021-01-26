@@ -26,6 +26,9 @@ namespace Metabase.Configuration
                     .AddMutationType(d => d.Name(nameof(GraphQlX.Mutation)))
                         .AddType<GraphQlX.Users.UserMutations>()
                         .AddType<GraphQlX.Components.ComponentMutations>()
+                        .AddType<GraphQlX.Databases.DatabaseMutations>()
+                        .AddType<GraphQlX.Institutions.InstitutionMutations>()
+                        .AddType<GraphQlX.Methods.MethodMutations>()
                     /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
                     /*     .AddType<ComponentSubscriptions>() */
                     // Object Types

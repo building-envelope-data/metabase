@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.Institutions
     public sealed class InstitutionQueries
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
-        [UsePaging]
+        [UsePaging(typeof(InstitutionType))]
         [UseProjection]
         [UseFiltering]
         [UseSorting]

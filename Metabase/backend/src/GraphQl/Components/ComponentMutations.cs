@@ -9,7 +9,7 @@ using DateTime = System.DateTime;
 
 namespace Metabase.GraphQl.Components
 {
-    [ExtendObjectType(Name = nameof(GraphQl.Mutation))]
+    [ExtendObjectType(Name = nameof(Mutation))]
     public sealed class ComponentMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]

@@ -16,7 +16,7 @@ namespace Metabase.GraphQl.Components
                 .Field(t => t.Manufacturers)
                 .ResolveWith<ComponentResolvers>(t => t.GetManufacturersAsync(default!, default!, default!, default))
                 .UseDbContext<Data.ApplicationDbContext>()
-                .UsePaging<NonNullType<InstitutionType>>();
+                .UsePaging<InstitutionType>();
             descriptor
                 .Field(t => t.ManufacturerEdges).Ignore();
         }

@@ -49,7 +49,7 @@ namespace Metabase.Data
             string? abbreviation,
             string? description,
             string? websiteLocator,
-            string publicKey,
+            string? publicKey,
             Enumerations.InstitutionState state
             )
         {
