@@ -1,6 +1,5 @@
+using System;
 using System.Collections.Generic;
-using NpgsqlTypes;
-using DateTime = System.DateTime;
 
 namespace Metabase.GraphQl.Institutions
 {
@@ -10,6 +9,7 @@ namespace Metabase.GraphQl.Institutions
           string Description,
           string? WebsiteLocator,
           string? PublicKey,
-          Enumerations.InstitutionState State
+          Enumerations.InstitutionState State,
+          IReadOnlyList<Guid> OwnerIds
         );
 }

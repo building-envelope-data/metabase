@@ -8,6 +8,18 @@ interface Node {
   id: ID!
 }
 
+type AddInstitutionRepresentativeError {
+  code: AddInstitutionRepresentativeErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddInstitutionRepresentativePayload {
+  errors: [AddInstitutionRepresentativeError!]
+  institutionRepresentativeEdge: InstitutionRepresentativeEdge
+  representedInstitutionEdge: RepresentedInstitutionEdge
+}
+
 type ChangeUserEmailError {
   code: ChangeUserEmailErrorCode!
   message: String!
@@ -70,13 +82,6 @@ type ComponentEdge {
   cursor: String!
   "The item at the end of the edge."
   node: Component!
-}
-
-type ComponentManufacturer {
-  component: Component!
-  componentId: Uuid!
-  institution: Institution!
-  institutionId: Uuid!
 }
 
 type ConfirmUserEmailChangeError {
@@ -207,16 +212,13 @@ type Institution implements Node {
   affiliatedPersonEdges: [PersonAffiliation!]!
   affiliatedPersons: [Person!]!
   description: String
-  developedMethodEdges: [InstitutionMethodDeveloper!]!
   developedMethods: [Method!]!
   id: ID!
-  manufacturedComponentEdges: [ComponentManufacturer!]!
-  manufacturedComponents: [Component!]!
+  manufacturedComponents: InstitutionManufacturedComponentConnection
   name: String!
-  operatedDatabases: [Database]
+  operatedDatabases: InstitutionOperatedDatabaseConnection
   publicKey: String
-  representativeEdges: [InstitutionRepresentative!]!
-  representatives: [User!]!
+  representatives: InstitutionRepresentativeConnection
   state: InstitutionState!
   uuid: Uuid!
   websiteLocator: String
@@ -240,6 +242,14 @@ type InstitutionEdge {
   node: Institution
 }
 
+type InstitutionManufacturedComponentConnection {
+  edges: [InstitutionManufacturedComponentEdge!]!
+}
+
+type InstitutionManufacturedComponentEdge {
+  node: Component!
+}
+
 type InstitutionMethodDeveloper {
   id: Uuid!
   institution: Institution!
@@ -249,12 +259,21 @@ type InstitutionMethodDeveloper {
   xmin: UInt!
 }
 
-type InstitutionRepresentative {
-  institution: Institution!
-  institutionId: Uuid!
+type InstitutionOperatedDatabaseConnection {
+  edges: [InstitutionOperatedDatabaseEdge!]!
+}
+
+type InstitutionOperatedDatabaseEdge {
+  node: Database!
+}
+
+type InstitutionRepresentativeConnection {
+  edges: [InstitutionRepresentativeEdge!]!
+}
+
+type InstitutionRepresentativeEdge {
+  node: User!
   role: InstitutionRepresentativeRole!
-  user: User!
-  userId: Uuid!
 }
 
 type LoginUserError {
@@ -306,6 +325,7 @@ type MethodEdge {
 }
 
 type Mutation {
+  addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER)
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(apply: BEFORE_RESOLVER)
   changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
   confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
@@ -414,6 +434,11 @@ type RegisterUserPayload {
   user: User
 }
 
+type RepresentedInstitutionEdge {
+  node: Institution!
+  role: InstitutionRepresentativeRole!
+}
+
 type RequestUserPasswordResetError {
   code: RequestUserPasswordResetErrorCode!
   message: String!
@@ -517,6 +542,12 @@ type UserEdge {
   node: User!
 }
 
+input AddInstitutionRepresentativeInput {
+  institutionId: Uuid!
+  role: InstitutionRepresentativeRole!
+  userId: Uuid!
+}
+
 input ChangeUserEmailInput {
   newEmail: String!
 }
@@ -597,6 +628,7 @@ input CreateInstitutionInput {
   abbreviation: String
   description: String!
   name: String!
+  ownerIds: [Uuid!]!
   publicKey: String
   state: InstitutionState!
   websiteLocator: String
@@ -787,6 +819,13 @@ input UserSortInput {
   userName: SortEnumType
 }
 
+enum AddInstitutionRepresentativeErrorCode {
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+  UNKNOWN_USER
+  DUPLICATE
+}
+
 enum ApplyPolicy {
   BEFORE_RESOLVER
   AFTER_RESOLVER
@@ -840,6 +879,7 @@ enum CreateDatabaseErrorCode {
 
 enum CreateInstitutionErrorCode {
   UNKNOWN
+  NO_OWNER
 }
 
 enum CreateMethodErrorCode {

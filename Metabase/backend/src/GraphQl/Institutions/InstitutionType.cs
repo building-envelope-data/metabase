@@ -11,10 +11,44 @@ namespace Metabase.GraphQl.Institutions
             )
         {
             base.Configure(descriptor);
+            // TODO AffiliatedPersons
+            // descriptor
+            //     .Field(t => t.DevelopedMethods)
+            //     .ResolveWith<InstitutionResolvers>(t => t.GetDevelopedMethodsAsync(default!, default!, default!, default))
+            //     .UseDbContext<Data.ApplicationDbContext>();
+            descriptor
+                .Field(t => t.DevelopedMethodEdges)
+                .Ignore();
+            descriptor
+                .Field(t => t.ManufacturedComponents)
+                .Resolve(context =>
+                    new InstitutionManufacturedComponentConnection(
+                        context.Parent<Data.Institution>()
+                        )
+                    )
+                .UseDbContext<Data.ApplicationDbContext>();
+            descriptor
+                .Field(t => t.ManufacturedComponentEdges)
+                .Ignore();
             descriptor
                 .Field(t => t.OperatedDatabases)
-                .ResolveWith<InstitutionResolvers>(t => t.GetOperatedDatabasesAsync(default!, default!, default!, default))
+                .Resolve(context =>
+                    new InstitutionOperatedDatabaseConnection(
+                        context.Parent<Data.Institution>()
+                        )
+                    )
                 .UseDbContext<Data.ApplicationDbContext>();
+            descriptor
+                .Field(t => t.Representatives)
+                .Resolve(context =>
+                    new InstitutionRepresentativeConnection(
+                        context.Parent<Data.Institution>()
+                        )
+                    )
+                .UseDbContext<Data.ApplicationDbContext>();
+            descriptor
+                .Field(t => t.RepresentativeEdges)
+                .Ignore();
         }
     }
 }

@@ -9,5 +9,12 @@ namespace Metabase.GraphQl.Institutions
               : base(institution)
         {
         }
+
+        public CreateInstitutionPayload(
+            CreateInstitutionError error
+            )
+              : base(error)
+        {
+        }
     }
 }

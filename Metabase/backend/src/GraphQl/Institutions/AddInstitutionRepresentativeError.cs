@@ -2,11 +2,11 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Institutions
 {
-    public sealed class CreateInstitutionError
-      : UserErrorBase<CreateInstitutionErrorCode>
+    public sealed class AddInstitutionRepresentativeError
+      : UserErrorBase<AddInstitutionRepresentativeErrorCode>
     {
-        public CreateInstitutionError(
-            CreateInstitutionErrorCode code,
+        public AddInstitutionRepresentativeError(
+            AddInstitutionRepresentativeErrorCode code,
             string message,
             IReadOnlyList<string> path
             )
