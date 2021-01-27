@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Users
 {
-  public sealed class GenerateUserTwoFactorRecoveryCodesPayload
-    : UserPayload<GenerateUserTwoFactorRecoveryCodesError>
+    public sealed class GenerateUserTwoFactorRecoveryCodesPayload
+      : UserPayload<GenerateUserTwoFactorRecoveryCodesError>
     {
         public IReadOnlyCollection<string>? TwoFactorRecoveryCodes { get; }
 

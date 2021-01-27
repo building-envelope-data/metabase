@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Users
 {
-  public sealed class SetUserPasswordPayload
-    : UserPayload<SetUserPasswordError>
+    public sealed class SetUserPasswordPayload
+      : UserPayload<SetUserPasswordError>
     {
         public SetUserPasswordPayload(
             Data.User user

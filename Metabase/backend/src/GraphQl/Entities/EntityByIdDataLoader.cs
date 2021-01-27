@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using GreenDonut;
 using HotChocolate.DataLoader;
+using Microsoft.EntityFrameworkCore;
 using Guid = System.Guid;
 
 namespace Metabase.GraphQl.Entitys

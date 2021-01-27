@@ -1,17 +1,17 @@
-using Guid = System.Guid;
-using InvalidOperationException = System.InvalidOperationException;
-using Microsoft.AspNetCore.Http;
-using IServiceProvider = System.IServiceProvider;
-using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
 using HotChocolate;
-using Microsoft.Extensions.DependencyInjection;
 using HotChocolate.Types;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Guid = System.Guid;
+using InvalidOperationException = System.InvalidOperationException;
+using IServiceProvider = System.IServiceProvider;
 
 namespace Metabase.GraphQl.Users
 {

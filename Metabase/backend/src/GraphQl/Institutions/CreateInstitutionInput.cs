@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using DateTime = System.DateTime;
 using NpgsqlTypes;
+using DateTime = System.DateTime;
 
 namespace Metabase.GraphQl.Institutions
 {

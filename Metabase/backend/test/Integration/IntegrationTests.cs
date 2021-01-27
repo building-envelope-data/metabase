@@ -1,19 +1,19 @@
 using System;
-using Json.Path;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FluentAssertions;
 using IdentityModel.Client;
+using Json.Path;
 using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
-using FluentAssertions;
-using System.Net;
-using System.Linq;
-using System.IO;
-using System.Text.RegularExpressions;
 
 namespace Metabase.Tests.Integration
 {

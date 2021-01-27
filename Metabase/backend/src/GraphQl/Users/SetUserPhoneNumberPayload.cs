@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Users
 {
-  public sealed class SetUserPhoneNumberPayload
-    : UserPayload<SetUserPhoneNumberError>
+    public sealed class SetUserPhoneNumberPayload
+      : UserPayload<SetUserPhoneNumberError>
     {
         public SetUserPhoneNumberPayload(
             Data.User user

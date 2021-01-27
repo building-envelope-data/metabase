@@ -1,12 +1,12 @@
-using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.Data;
-using HotChocolate.Types;
-using HotChocolate.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using System;
 using System.Linq;
 using System.Security.Claims;
-using System;
+using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.AspNetCore.Authorization;
+using HotChocolate.Data;
+using HotChocolate.Types;
+using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Users
 {

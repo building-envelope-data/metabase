@@ -1,17 +1,17 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using Quartz;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using AppSettings = Infrastructure.AppSettings;
-using System.Reflection;
 
 namespace Metabase.Configuration
 {

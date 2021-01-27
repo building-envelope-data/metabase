@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using Guid = System.Guid;
-using System.Collections.Generic;
 
 // TODO Make `User`, `Role`, ... subtype `Entity` and use `xmin` to catch update conflicts. Add interface `IEntity`.
 namespace Metabase.Data

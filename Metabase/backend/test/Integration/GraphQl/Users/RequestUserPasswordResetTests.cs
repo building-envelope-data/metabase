@@ -1,5 +1,5 @@
-using FluentAssertions;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Snapshooter.Xunit;
 using Xunit;
 

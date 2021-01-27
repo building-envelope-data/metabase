@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
-using HotChocolate.AspNetCore.Authorization;
 using NpgsqlTypes;
 using DateTime = System.DateTime;
 

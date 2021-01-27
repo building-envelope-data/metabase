@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using GreenDonut;
 using Metabase.GraphQl.Entitys;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Methods
 {

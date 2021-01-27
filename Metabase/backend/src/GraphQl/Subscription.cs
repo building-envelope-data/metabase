@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl
 {
-  public sealed class Subscription
-  {
-  }
+    public sealed class Subscription
+    {
+    }
 }

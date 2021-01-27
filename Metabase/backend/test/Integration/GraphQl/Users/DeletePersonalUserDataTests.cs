@@ -1,9 +1,9 @@
-using FluentAssertions;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Snapshooter.Xunit;
 using Xunit;
-using System.Collections.Generic;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {

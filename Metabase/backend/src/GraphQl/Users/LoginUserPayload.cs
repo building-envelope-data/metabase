@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Users
 {
-  public sealed class LoginUserPayload
-    : UserPayload<LoginUserError>
+    public sealed class LoginUserPayload
+      : UserPayload<LoginUserError>
     {
         // TODO Use proper type like https://docs.microsoft.com/en-us/dotnet/api/system.identitymodel.tokens.jwt.jwtsecuritytoken?view=azure-dotnet
         public string? JwtAccessToken { get; }

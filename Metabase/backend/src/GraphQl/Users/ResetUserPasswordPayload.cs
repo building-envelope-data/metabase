@@ -2,25 +2,25 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Users
 {
-  public sealed class ResetUserPasswordPayload
+    public sealed class ResetUserPasswordPayload
     {
-      public IReadOnlyCollection<ResetUserPasswordError>? Errors { get; }
+        public IReadOnlyCollection<ResetUserPasswordError>? Errors { get; }
 
-      public ResetUserPasswordPayload()
+        public ResetUserPasswordPayload()
         {
         }
 
-      public ResetUserPasswordPayload(
-          IReadOnlyCollection<ResetUserPasswordError> errors
-          )
+        public ResetUserPasswordPayload(
+            IReadOnlyCollection<ResetUserPasswordError> errors
+            )
         {
-          Errors = errors;
+            Errors = errors;
         }
 
         public ResetUserPasswordPayload(
             ResetUserPasswordError error
             )
-          : this(new [] { error })
+          : this(new[] { error })
         {
         }
     }

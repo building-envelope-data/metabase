@@ -1,15 +1,15 @@
+using System.Collections.Generic;
 using System.Linq;
-using Array = System.Array;
-using System.Text;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using HotChocolate;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
-using HotChocolate.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.WebUtilities;
+using Array = System.Array;
 
 namespace Metabase.GraphQl.Users
 {

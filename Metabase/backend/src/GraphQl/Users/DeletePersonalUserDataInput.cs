@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.Users
 {
-  public record DeletePersonalUserDataInput(
-        string? Password
-      );
+    public record DeletePersonalUserDataInput(
+          string? Password
+        );
 }

@@ -13,7 +13,7 @@ namespace Metabase.GraphQl.Users
             MemberInfo member
             )
         {
-          descriptor.UseUserManager();
+            descriptor.UseUserManager();
         }
     }
 }

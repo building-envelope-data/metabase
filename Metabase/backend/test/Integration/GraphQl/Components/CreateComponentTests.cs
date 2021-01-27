@@ -1,11 +1,11 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Metabase.GraphQl.Components;
+using Snapshooter;
 using Snapshooter.Xunit;
 using Xunit;
-using Metabase.GraphQl.Components;
-using FluentAssertions;
-using Snapshooter;
-using System;
 
 namespace Metabase.Tests.Integration.GraphQl.Components
 {
