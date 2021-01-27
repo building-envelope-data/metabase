@@ -11,7 +11,12 @@ namespace Metabase.GraphQl.Components
             )
         {
             base.Configure(descriptor);
-            // TODO Can we use paging with custom edges with additional fields?
+            // TODO Can we use paging with custom edges with additional fields? Could we use extensions, for example,
+            // [ExtendObjectType(Name = "FooEdge")]
+            // public class FooEdgeExtension
+            // {
+            //     public int X() => ....
+            // }
             descriptor
                 .Field(t => t.Manufacturers)
                 .ResolveWith<ComponentResolvers>(t => t.GetManufacturersAsync(default!, default!, default!, default))
