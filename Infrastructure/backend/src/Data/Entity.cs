@@ -4,6 +4,7 @@ using Guid = System.Guid;
 namespace Infrastructure.Data
 {
     public abstract class Entity
+      : IEntity
     {
         public Guid Id { get; private set; }
 

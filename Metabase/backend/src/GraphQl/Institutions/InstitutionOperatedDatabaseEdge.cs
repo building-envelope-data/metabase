@@ -1,26 +1,14 @@
-using System;
-using System.Threading.Tasks;
-using GreenDonut;
-using HotChocolate;
-using Metabase.GraphQl.Databases;
-
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionOperatedDatabaseEdge
-        : Edge<Data.Database>
     {
-        public InstitutionOperatedDatabaseEdge(
-            Guid nodeId
-        )
-            : base(nodeId)
-        {
-        }
+        public Data.Database Node { get; }
 
-        public Task<Data.Database> GetNode(
-            [DataLoader] DatabaseByIdDataLoader databaseById
-            )
+        public InstitutionOperatedDatabaseEdge(
+            Data.Database node
+        )
         {
-            return databaseById.LoadAsync(NodeId)!;
+            Node = node;
         }
     }
 }

@@ -42,6 +42,7 @@ namespace Metabase.Configuration
                     .AddDataLoader<GraphQlX.Components.ComponentByIdDataLoader>()
                     .AddDataLoader<GraphQlX.Databases.DatabaseByIdDataLoader>()
                     .AddDataLoader<GraphQlX.Institutions.InstitutionByIdDataLoader>()
+                    .AddDataLoader<GraphQlX.Institutions.InstitutionRepresentativesByInstitutionIdDataLoader>()
                     .AddDataLoader<GraphQlX.Methods.MethodByIdDataLoader>()
                     .AddDataLoader<GraphQlX.Persons.PersonByIdDataLoader>()
                     // Filtering

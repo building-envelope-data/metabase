@@ -6,7 +6,7 @@ using Metabase.GraphQl.Institutions;
 namespace Metabase.GraphQl.Users
 {
     public sealed class RepresentedInstitutionEdge
-        : Edge<Data.Institution>
+        : Edge<Data.Institution, InstitutionByIdDataLoader>
     {
         public Enumerations.InstitutionRepresentativeRole Role { get; }
 
@@ -16,13 +16,6 @@ namespace Metabase.GraphQl.Users
             : base(institutionRepresentative.UserId)
         {
             Role = institutionRepresentative.Role;
-        }
-
-        public Task<Data.Institution> GetNode(
-            [DataLoader] InstitutionByIdDataLoader institutionById
-            )
-        {
-            return institutionById.LoadAsync(NodeId)!;
         }
     }
 }
