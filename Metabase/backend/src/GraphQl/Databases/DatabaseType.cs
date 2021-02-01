@@ -12,7 +12,11 @@ namespace Metabase.GraphQl.Databases
             base.Configure(descriptor);
             descriptor
                 .Field(t => t.Operator)
-                .ResolveWith<DatabaseResolvers>(t => t.GetOperatorAsync(default!, default!, default));
+                .Resolve(context =>
+                    new DatabaseOperatorEdge(
+                        context.Parent<Data.Database>()
+                        )
+                    );
             descriptor
                 .Field(t => t.OperatorId).Ignore();
         }

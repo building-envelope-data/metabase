@@ -1,23 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using HotChocolate.Types.Pagination;
-
 namespace Metabase.GraphQl.Components
 {
     public sealed class ComponentManufacturerConnection
-        : Connection
+        : Connection<Data.Component, Data.ComponentManufacturer, ComponentManufacturersByComponentIdDataLoader, ComponentManufacturerEdge>
     {
         public ComponentManufacturerConnection(
-            IReadOnlyCollection<ComponentManufacturerEdge> edges,
-            ConnectionPageInfo info,
-            Func<CancellationToken, ValueTask<int>> getTotalCount)
-            : base(edges, info, getTotalCount)
+            Data.Component subject
+        )
+            : base(
+                subject,
+                x => new ComponentManufacturerEdge(x)
+                )
         {
-            Edges = edges;
         }
-
-        public new IReadOnlyCollection<ComponentManufacturerEdge> Edges { get; }
     }
 }

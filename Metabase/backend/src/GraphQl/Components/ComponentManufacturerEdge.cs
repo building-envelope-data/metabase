@@ -1,13 +1,14 @@
+using Metabase.GraphQl.Institutions;
+
 namespace Metabase.GraphQl.Components
 {
     public sealed class ComponentManufacturerEdge
-        : HotChocolate.Types.Pagination.Edge<Data.Institution>
+        : Edge<Data.Institution, InstitutionByIdDataLoader>
     {
         public ComponentManufacturerEdge(
-            Data.Institution node,
-            string cursor
-            )
-            : base(node, cursor)
+            Data.ComponentManufacturer association
+        )
+            : base(association.InstitutionId)
         {
         }
     }

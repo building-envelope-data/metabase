@@ -1,5 +1,4 @@
 using HotChocolate.Types;
-using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.Components
 {
@@ -11,17 +10,13 @@ namespace Metabase.GraphQl.Components
             )
         {
             base.Configure(descriptor);
-            // TODO Can we use paging with custom edges with additional fields? Could we use extensions, for example,
-            // [ExtendObjectType(Name = "FooEdge")]
-            // public class FooEdgeExtension
-            // {
-            //     public int X() => ....
-            // }
             descriptor
                 .Field(t => t.Manufacturers)
-                .ResolveWith<ComponentResolvers>(t => t.GetManufacturersAsync(default!, default!, default!, default))
-                .UseDbContext<Data.ApplicationDbContext>()
-                .UsePaging<InstitutionType>();
+                .Resolve(context =>
+                    new ComponentManufacturerConnection(
+                        context.Parent<Data.Component>()
+                        )
+                    );
             descriptor
                 .Field(t => t.ManufacturerEdges).Ignore();
         }

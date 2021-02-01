@@ -25,8 +25,7 @@ namespace Metabase.GraphQl.Institutions
                     new InstitutionManufacturedComponentConnection(
                         context.Parent<Data.Institution>()
                         )
-                    )
-                .UseDbContext<Data.ApplicationDbContext>();
+                    );
             descriptor
                 .Field(t => t.ManufacturedComponentEdges)
                 .Ignore();
@@ -36,16 +35,14 @@ namespace Metabase.GraphQl.Institutions
                     new InstitutionOperatedDatabaseConnection(
                         context.Parent<Data.Institution>()
                         )
-                    )
-                .UseDbContext<Data.ApplicationDbContext>();
+                    );
             descriptor
                 .Field(t => t.Representatives)
                 .Resolve(context =>
                     new InstitutionRepresentativeConnection(
                         context.Parent<Data.Institution>()
                         )
-                    )
-                .UseDbContext<Data.ApplicationDbContext>();
+                    );
             descriptor
                 .Field(t => t.RepresentativeEdges)
                 .Ignore();
