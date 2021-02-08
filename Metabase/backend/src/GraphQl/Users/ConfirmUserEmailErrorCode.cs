@@ -3,7 +3,7 @@ namespace Metabase.GraphQl.Users
     public enum ConfirmUserEmailErrorCode
     {
         UNKNOWN,
-        USER_NOT_FOUND,
+        UNKNOWN_USER,
         INVALID_CONFIRMATION_CODE
     }
 }

@@ -40,7 +40,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new PersonalUserDataPayload(
                     new PersonalUserDataError(
-                      PersonalUserDataErrorCode.USER_NOT_FOUND,
+                      PersonalUserDataErrorCode.UNKNOWN_USER,
                       $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )

@@ -833,14 +833,14 @@ enum ApplyPolicy {
 
 enum ChangeUserEmailErrorCode {
   UNKNOWN
-  USER_NOT_FOUND
+  UNKNOWN_USER
   UNCHANGED_EMAIL
   INVALID_EMAIL
 }
 
 enum ChangeUserPasswordErrorCode {
   UNKNOWN
-  USER_NOT_FOUND
+  UNKNOWN_USER
   NO_PASSWORD
   PASSWORD_CONFIRMATION_MISMATCH
   PASSWORD_REQUIRES_DIGIT
@@ -860,12 +860,12 @@ enum ConfirmUserEmailChangeErrorCode {
   UNKNOWN
   DUPLICATE_EMAIL
   INVALID_CONFIRMATION_CODE
-  USER_NOT_FOUND
+  UNKNOWN_USER
 }
 
 enum ConfirmUserEmailErrorCode {
   UNKNOWN
-  USER_NOT_FOUND
+  UNKNOWN_USER
   INVALID_CONFIRMATION_CODE
 }
 
@@ -888,14 +888,14 @@ enum CreateMethodErrorCode {
 
 enum DeletePersonalUserDataErrorCode {
   UNKNOWN
-  USER_NOT_FOUND
+  UNKNOWN_USER
   MISSING_PASSWORD
   INCORRECT_PASSWORD
 }
 
 enum GenerateUserTwoFactorRecoveryCodesErrorCode {
   UNKNOWN
-  USER_NOT_FOUND
+  UNKNOWN_USER
   TWO_FACTOR_AUTHENTICATION_DISABLED
 }
 
@@ -924,7 +924,7 @@ enum MethodCategory {
 
 enum PersonalUserDataErrorCode {
   UNKNOWN
-  USER_NOT_FOUND
+  UNKNOWN_USER
 }
 
 enum RegisterUserErrorCode {
@@ -950,7 +950,7 @@ enum ResendUserEmailConfirmationErrorCode {
 
 enum ResendUserEmailVerificationErrorCode {
   UNKNOWN
-  USER_NOT_FOUND
+  UNKNOWN_USER
 }
 
 enum ResetUserPasswordErrorCode {
@@ -966,7 +966,7 @@ enum ResetUserPasswordErrorCode {
 
 enum SetUserPasswordErrorCode {
   UNKNOWN
-  USER_NOT_FOUND
+  UNKNOWN_USER
   EXISTING_PASSWORD
   PASSWORD_CONFIRMATION_MISMATCH
   PASSWORD_REQUIRES_DIGIT
@@ -978,7 +978,7 @@ enum SetUserPasswordErrorCode {
 
 enum SetUserPhoneNumberErrorCode {
   UNKNOWN
-  USER_NOT_FOUND
+  UNKNOWN_USER
   UNCHANGED_PHONE_NUMBER
 }
 

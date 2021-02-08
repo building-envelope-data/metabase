@@ -3,7 +3,7 @@ namespace Metabase.GraphQl.Users
     public enum SetUserPhoneNumberErrorCode
     {
         UNKNOWN,
-        USER_NOT_FOUND,
+        UNKNOWN_USER,
         UNCHANGED_PHONE_NUMBER
     }
 }

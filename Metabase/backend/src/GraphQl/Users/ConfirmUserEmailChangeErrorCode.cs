@@ -5,6 +5,6 @@ namespace Metabase.GraphQl.Users
         UNKNOWN,
         DUPLICATE_EMAIL,
         INVALID_CONFIRMATION_CODE,
-        USER_NOT_FOUND
+        UNKNOWN_USER
     }
 }

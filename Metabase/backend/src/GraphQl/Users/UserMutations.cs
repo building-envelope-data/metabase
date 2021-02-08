@@ -37,7 +37,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new ConfirmUserEmailPayload(
                     new ConfirmUserEmailError(
-                      ConfirmUserEmailErrorCode.USER_NOT_FOUND,
+                      ConfirmUserEmailErrorCode.UNKNOWN_USER,
                       $"Unable to load user with email address {input.Email}.",
                       new[] { "input", "email" }
                       )
@@ -90,7 +90,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new ConfirmUserEmailChangePayload(
                     new ConfirmUserEmailChangeError(
-                      ConfirmUserEmailChangeErrorCode.USER_NOT_FOUND,
+                      ConfirmUserEmailChangeErrorCode.UNKNOWN_USER,
                       $"Unable to load user with email address {input.CurrentEmail}.",
                       new[] { "input", "currentEmail" }
                       )
@@ -233,7 +233,7 @@ namespace Metabase.GraphQl.Users
         /*     { */
         /*       return new LoginUserWithTwoFactorPayload( */
         /*           new LoginUserWithTwoFactorError( */
-        /*             LoginUserWithTwoFactorErrorCode.USER_NOT_FOUND, */
+        /*             LoginUserWithTwoFactorErrorCode.UNKNOWN_USER, */
         /*             $"Unable to load two-factor authentication user with email address {input.CurrentEmail}.", */
         /*             new [] { "input", "currentEmail" } */
         /*             ) */
@@ -545,7 +545,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new ChangeUserPasswordPayload(
                     new ChangeUserPasswordError(
-                      ChangeUserPasswordErrorCode.USER_NOT_FOUND,
+                      ChangeUserPasswordErrorCode.UNKNOWN_USER,
                       $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
@@ -645,7 +645,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new DeletePersonalUserDataPayload(
                     new DeletePersonalUserDataError(
-                      DeletePersonalUserDataErrorCode.USER_NOT_FOUND,
+                      DeletePersonalUserDataErrorCode.UNKNOWN_USER,
                       $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
@@ -719,7 +719,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new ChangeUserEmailPayload(
                     new ChangeUserEmailError(
-                      ChangeUserEmailErrorCode.USER_NOT_FOUND,
+                      ChangeUserEmailErrorCode.UNKNOWN_USER,
                       $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
@@ -761,7 +761,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new ResendUserEmailVerificationPayload(
                     new ResendUserEmailVerificationError(
-                      ResendUserEmailVerificationErrorCode.USER_NOT_FOUND,
+                      ResendUserEmailVerificationErrorCode.UNKNOWN_USER,
                       $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
@@ -789,7 +789,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new GenerateUserTwoFactorRecoveryCodesPayload(
                     new GenerateUserTwoFactorRecoveryCodesError(
-                      GenerateUserTwoFactorRecoveryCodesErrorCode.USER_NOT_FOUND,
+                      GenerateUserTwoFactorRecoveryCodesErrorCode.UNKNOWN_USER,
                       $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
@@ -828,7 +828,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new SetUserPhoneNumberPayload(
                     new SetUserPhoneNumberError(
-                      SetUserPhoneNumberErrorCode.USER_NOT_FOUND,
+                      SetUserPhoneNumberErrorCode.UNKNOWN_USER,
                       $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
@@ -888,7 +888,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new SetUserPasswordPayload(
                     new SetUserPasswordError(
-                      SetUserPasswordErrorCode.USER_NOT_FOUND,
+                      SetUserPasswordErrorCode.UNKNOWN_USER,
                       $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )

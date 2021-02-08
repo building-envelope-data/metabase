@@ -3,7 +3,7 @@ namespace Metabase.GraphQl.Users
     public enum ChangeUserEmailErrorCode
     {
         UNKNOWN,
-        USER_NOT_FOUND,
+        UNKNOWN_USER,
         UNCHANGED_EMAIL,
         INVALID_EMAIL
     }

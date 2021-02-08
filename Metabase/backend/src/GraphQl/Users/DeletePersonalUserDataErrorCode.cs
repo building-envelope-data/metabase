@@ -3,7 +3,7 @@ namespace Metabase.GraphQl.Users
     public enum DeletePersonalUserDataErrorCode
     {
         UNKNOWN,
-        USER_NOT_FOUND,
+        UNKNOWN_USER,
         MISSING_PASSWORD,
         INCORRECT_PASSWORD
     }

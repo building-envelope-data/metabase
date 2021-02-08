@@ -3,7 +3,7 @@ namespace Metabase.GraphQl.Users
     public enum ChangeUserPasswordErrorCode
     {
         UNKNOWN,
-        USER_NOT_FOUND,
+        UNKNOWN_USER,
         NO_PASSWORD,
         PASSWORD_CONFIRMATION_MISMATCH,
         PASSWORD_REQUIRES_DIGIT,
