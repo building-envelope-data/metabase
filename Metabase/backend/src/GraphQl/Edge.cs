@@ -18,12 +18,12 @@ namespace Metabase.GraphQl
             _nodeId = nodeId;
         }
 
-        public Task<TNode> GetNode(
-            [DataLoader] TNodeByIdDataLoader nodeById,
+        public async Task<TNode> GetNodeAsync(
+            [DataLoader] TNodeByIdDataLoader byId,
             CancellationToken cancellationToken
             )
         {
-            return nodeById.LoadAsync(_nodeId, cancellationToken)!;
+            return (await byId.LoadAsync(_nodeId, cancellationToken).ConfigureAwait(false))!;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Metabase.GraphQl
             _createEdge = createEdge;
         }
 
-        public async Task<IEnumerable<TEdge>> GetEdges(
+        public async Task<IEnumerable<TEdge>> GetEdgesAsync(
             [DataLoader] TAssociationsByAssociateIdDataLoader dataLoader,
             CancellationToken cancellationToken
             )
