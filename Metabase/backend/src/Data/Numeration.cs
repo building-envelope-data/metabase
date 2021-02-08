@@ -9,6 +9,7 @@ namespace Metabase.Data
         [MinLength(1)]
         public string? Prefix { get; private set; }
 
+        [Required]
         [MinLength(1)]
         public string MainNumber { get; private set; }
 
@@ -16,9 +17,9 @@ namespace Metabase.Data
         public string? Suffix { get; private set; }
 
         public Numeration(
-            string prefix,
+            string? prefix,
             string mainNumber,
-            string suffix
+            string? suffix
             )
         {
             Prefix = prefix;

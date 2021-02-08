@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Metabase.Data
 {
@@ -10,6 +11,7 @@ namespace Metabase.Data
         public Guid UserId { get; set; }
         public User User { get; set; } = default!;
 
+        [Required]
         public Enumerations.InstitutionRepresentativeRole Role { get; set; }
     }
 }

@@ -9,23 +9,23 @@ namespace Metabase.Data
     {
         [Required]
         [MinLength(1)]
-        public string? Name { get; set; }
+        public string Name { get; private set; }
 
         [MinLength(1)]
-        public string? Abbreviation { get; set; }
+        public string? Abbreviation { get; private set; }
 
         [Required]
         [MinLength(1)]
-        public string? Description { get; set; }
+        public string Description { get; private set; }
 
         [Url]
-        public string? WebsiteLocator { get; set; }
+        public string? WebsiteLocator { get; private set; }
 
         [MinLength(1)]
-        public string? PublicKey { get; set; }
+        public string? PublicKey { get; private set; }
 
         [Required]
-        public Enumerations.InstitutionState? State { get; set; }
+        public Enumerations.InstitutionState State { get; private set; }
 
         public ICollection<PersonAffiliation> AffiliatedPersonEdges { get; } = new List<PersonAffiliation>();
         public ICollection<Person> AffiliatedPersons { get; } = new List<Person>();
@@ -42,10 +42,12 @@ namespace Metabase.Data
         public ICollection<InstitutionRepresentative> RepresentativeEdges { get; } = new List<InstitutionRepresentative>();
         public ICollection<User> Representatives { get; } = new List<User>();
 
+#nullable disable
         public Institution()
         {
             // Parameterless constructor is needed by HotChocolate's `UseProjection`
         }
+#nullable enable
 
         public Institution(
             string name,

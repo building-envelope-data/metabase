@@ -9,9 +9,11 @@ namespace Metabase.Data
     public sealed class Method
       : Infrastructure.Data.Entity
     {
+        [Required]
         [MinLength(1)]
         public string Name { get; private set; }
 
+        [Required]
         [MinLength(1)]
         public string Description { get; private set; }
 
@@ -25,6 +27,7 @@ namespace Metabase.Data
         [Url]
         public string? CodeLocator { get; private set; }
 
+        [Required]
         public Enumerations.MethodCategory[] Categories { get; private set; }
 
         public ICollection<InstitutionMethodDeveloper> InstitutionDeveloperEdges { get; } = new List<InstitutionMethodDeveloper>();
@@ -41,10 +44,12 @@ namespace Metabase.Data
                 );
         }
 
+#nullable disable
         public Method()
         {
             // Parameterless constructor is needed by HotChocolate's `UseProjection`
         }
+#nullable enable
 
         public Method(
             string name,

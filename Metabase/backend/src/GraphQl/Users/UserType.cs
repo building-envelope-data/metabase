@@ -22,8 +22,8 @@ namespace Metabase.GraphQl.Users
                 .IdField(t => t.Id)
                 .ResolveNode((context, id) =>
                     context
-                    .DataLoader<GraphQl.Users.UserByIdDataLoader>()
-                    .LoadAsync(id, context.RequestAborted)
+                    .DataLoader<UserByIdDataLoader>()
+                    .LoadAsync(id, context.RequestAborted)!
                     );
 
             descriptor

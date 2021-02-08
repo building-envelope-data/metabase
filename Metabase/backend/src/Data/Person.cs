@@ -6,9 +6,11 @@ namespace Metabase.Data
     public sealed class Person
       : Stakeholder
     {
+        [Required]
         [MinLength(1)]
         public string Name { get; private set; }
 
+        [Required]
         public ContactInformation ContactInformation { get; set; } = default!;
 
         public ICollection<PersonAffiliation> AffiliatedInstitutionEdges { get; } = new List<PersonAffiliation>();
@@ -17,10 +19,12 @@ namespace Metabase.Data
         public ICollection<PersonMethodDeveloper> DevelopedMethodEdges { get; } = new List<PersonMethodDeveloper>();
         public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
 
+#nullable disable
         public Person()
         {
             // Parameterless constructor is needed by HotChocolate's `UseProjection`
         }
+#nullable enable
 
         public Person(
             string name

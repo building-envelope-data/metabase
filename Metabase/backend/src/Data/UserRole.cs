@@ -6,7 +6,7 @@ namespace Metabase.Data
 {
     public sealed class UserRole : IdentityUserRole<Guid>
     {
-        public User User { get; set; } = null!;
-        public Role Role { get; set; } = null!;
+        public User User { get; set; } = default!;
+        public Role Role { get; set; } = default!;
     }
 }

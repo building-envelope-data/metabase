@@ -1,6 +1,3 @@
-using System.Threading.Tasks;
-using GreenDonut;
-using HotChocolate;
 using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.Users
