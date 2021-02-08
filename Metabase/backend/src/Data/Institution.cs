@@ -7,22 +7,25 @@ namespace Metabase.Data
     public sealed class Institution
       : Stakeholder
     {
+        [Required]
         [MinLength(1)]
-        public string Name { get; private set; }
+        public string? Name { get; set; }
 
         [MinLength(1)]
-        public string? Abbreviation { get; private set; }
+        public string? Abbreviation { get; set; }
 
+        [Required]
         [MinLength(1)]
-        public string? Description { get; private set; }
+        public string? Description { get; set; }
 
         [Url]
-        public string? WebsiteLocator { get; private set; }
+        public string? WebsiteLocator { get; set; }
 
         [MinLength(1)]
-        public string? PublicKey { get; private set; }
+        public string? PublicKey { get; set; }
 
-        public Enumerations.InstitutionState State { get; private set; }
+        [Required]
+        public Enumerations.InstitutionState? State { get; set; }
 
         public ICollection<PersonAffiliation> AffiliatedPersonEdges { get; } = new List<PersonAffiliation>();
         public ICollection<Person> AffiliatedPersons { get; } = new List<Person>();
@@ -47,11 +50,28 @@ namespace Metabase.Data
         public Institution(
             string name,
             string? abbreviation,
-            string? description,
+            string description,
             string? websiteLocator,
             string? publicKey,
             Enumerations.InstitutionState state
             )
+        {
+            Name = name;
+            Abbreviation = abbreviation;
+            Description = description;
+            WebsiteLocator = websiteLocator;
+            PublicKey = publicKey;
+            State = state;
+        }
+
+        public void Update(
+            string name,
+            string? abbreviation,
+            string description,
+            string? websiteLocator,
+            string? publicKey,
+            Enumerations.InstitutionState state
+        )
         {
             Name = name;
             Abbreviation = abbreviation;

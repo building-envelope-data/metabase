@@ -81,6 +81,109 @@ namespace Metabase.GraphQl.Institutions
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize]
+        public async Task<UpdateInstitutionPayload> UpdateInstitutionAsync(
+            UpdateInstitutionInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await InstitutionAuthorization.IsAuthorizedToUpdateInstitution(
+                 claimsPrincipal,
+                 input.InstitutionId,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+               )
+            {
+                return new UpdateInstitutionPayload(
+                    new UpdateInstitutionError(
+                      UpdateInstitutionErrorCode.UNAUTHORIZED,
+                      "You are not authorized to update the institution.",
+                      Array.Empty<string>()
+                      )
+                      );
+            }
+            var institution =
+                await context.Institutions
+                .Where(i => i.Id == input.InstitutionId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+            if (institution is null)
+            {
+                return new UpdateInstitutionPayload(
+                    new UpdateInstitutionError(
+                      UpdateInstitutionErrorCode.UNKNOWN_INSTITUTION,
+                      "Unknown institution.",
+                      new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                      )
+                      );
+            }
+            institution.Update(
+                name: input.Name,
+                abbreviation: input.Abbreviation,
+                description: input.Description,
+                websiteLocator: input.WebsiteLocator,
+                publicKey: input.PublicKey,
+                state: input.State
+            );
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return new UpdateInstitutionPayload(institution);
+        }
+
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        [Authorize]
+        public async Task<DeleteInstitutionPayload> DeleteInstitutionAsync(
+            DeleteInstitutionInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await InstitutionAuthorization.IsAuthorizedToDeleteInstitution(
+                 claimsPrincipal,
+                 input.InstitutionId,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+               )
+            {
+                return new DeleteInstitutionPayload(
+                    new DeleteInstitutionError(
+                      DeleteInstitutionErrorCode.UNAUTHORIZED,
+                      "You are not authorized to delete the institution.",
+                      Array.Empty<string>()
+                      )
+                      );
+            }
+            var institution =
+                await context.Institutions
+                .Where(i => i.Id == input.InstitutionId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+            if (institution is null)
+            {
+                return new DeleteInstitutionPayload(
+                    new DeleteInstitutionError(
+                      DeleteInstitutionErrorCode.UNKNOWN_INSTITUTION,
+                      "Unknown institution.",
+                      new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                      )
+                      );
+            }
+            context.Institutions.Remove(institution);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return new DeleteInstitutionPayload();
+        }
+
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        [Authorize]
         public async Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentativeAsync(
             AddInstitutionRepresentativeInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
