@@ -17,6 +17,7 @@ namespace Infrastructure
         }
 
         public JsonWebTokenSettings JsonWebToken { get; set; }
+        = new JsonWebTokenSettings();
 
         public sealed class JsonWebTokenSettings
         {

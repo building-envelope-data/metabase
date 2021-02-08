@@ -1,6 +1,5 @@
 using HotChocolate.Language;
 using HotChocolate.Types;
-using HotChocolate.Properties;
 using Convert = System.Convert;
 using HotChocolate;
 
@@ -11,8 +10,8 @@ namespace Infrastructure.GraphQl.Common
     public sealed class UIntType
         : IntegerTypeBase<uint>
     {
-        private static readonly string ScalarName = "UInt";
-        private static readonly string ScalarDescription = "The `UInt` scalar represents a 32-bit unsigned integer type.";
+        private const string ScalarName = "UInt";
+        private const string ScalarDescription = "The `UInt` scalar represents a 32-bit unsigned integer type.";
 
         public UIntType()
             : this(uint.MinValue, uint.MaxValue)

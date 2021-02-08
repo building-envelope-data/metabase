@@ -6,9 +6,9 @@ namespace Metabase.Data
       : Infrastructure.Data.Entity
     {
         public Guid MethodId { get; set; }
-        public Method Method { get; set; } = default;
+        public Method? Method { get; set; } = default;
 
         public Guid InstitutionId { get; set; }
-        public Institution Institution { get; set; } = default;
+        public Institution? Institution { get; set; } = default;
     }
 }
