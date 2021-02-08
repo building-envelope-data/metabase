@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
 using HotChocolate;
@@ -14,14 +15,15 @@ namespace Metabase.GraphQl
             Guid nodeId
             )
         {
-            _nodeId =  nodeId;
+            _nodeId = nodeId;
         }
 
         public Task<TNode> GetNode(
-            [DataLoader] TNodeByIdDataLoader nodeById
+            [DataLoader] TNodeByIdDataLoader nodeById,
+            CancellationToken cancellationToken
             )
         {
-            return nodeById.LoadAsync(_nodeId)!;
+            return nodeById.LoadAsync(_nodeId, cancellationToken)!;
         }
     }
 }

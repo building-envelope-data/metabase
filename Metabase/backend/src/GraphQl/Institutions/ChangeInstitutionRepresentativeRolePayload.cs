@@ -4,13 +4,13 @@ using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Institutions
 {
-    public sealed class AddInstitutionRepresentativePayload
+    public sealed class ChangeInstitutionRepresentativeRolePayload
     {
         public RepresentedInstitutionEdge? RepresentedInstitutionEdge { get; }
         public InstitutionRepresentativeEdge? InstitutionRepresentativeEdge { get; }
-        public IReadOnlyCollection<AddInstitutionRepresentativeError>? Errors { get; }
+        public IReadOnlyCollection<ChangeInstitutionRepresentativeRoleError>? Errors { get; }
 
-        public AddInstitutionRepresentativePayload(
+        public ChangeInstitutionRepresentativeRolePayload(
             Data.InstitutionRepresentative institutionRepresentative
             )
         {
@@ -18,15 +18,15 @@ namespace Metabase.GraphQl.Institutions
             InstitutionRepresentativeEdge = new InstitutionRepresentativeEdge(institutionRepresentative);
         }
 
-        public AddInstitutionRepresentativePayload(
-            IReadOnlyCollection<AddInstitutionRepresentativeError> errors
+        public ChangeInstitutionRepresentativeRolePayload(
+            IReadOnlyCollection<ChangeInstitutionRepresentativeRoleError> errors
             )
         {
             Errors = errors;
         }
 
-        public AddInstitutionRepresentativePayload(
-            AddInstitutionRepresentativeError error
+        public ChangeInstitutionRepresentativeRolePayload(
+            ChangeInstitutionRepresentativeRoleError error
             )
             : this(new[] { error })
         {
