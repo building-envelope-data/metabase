@@ -1,5 +1,5 @@
 # Inspired by https://mherman.org/blog/dockerizing-a-react-app/
-FROM node:14.15.0-alpine3.12
+FROM node:14.15.4-alpine3.12
 
 ARG GROUP_ID
 ARG USER_ID
@@ -32,8 +32,8 @@ ENV PATH=/app/${PROJECT_NAME}/frontend/node_modules/.bin:$PATH
 COPY \
   --chown=node:node \
   ./${PROJECT_NAME}/frontend/package.json ./
-RUN npm install
+RUN yarn install
 
 EXPOSE 3000
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["npm", "run", "start"]
+CMD ["yarn", "start"]
