@@ -67,22 +67,23 @@ namespace Metabase.Controllers
                 // return an error indicating that the user is not logged in.
                 if (request.HasPrompt(Prompts.None))
                 {
-                    return Forbid(
+                    Forbid(
                         properties: new AuthenticationProperties(new Dictionary<string, string?>
                         {
                             [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.LoginRequired,
                             [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user is not logged in."
                         }),
-                        authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                        authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+                        );
                 }
-
                 return Challenge(
                     properties: new AuthenticationProperties
                     {
                         RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
                             Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList())
                     },
-                    authenticationSchemes: IdentityConstants.ApplicationScheme);
+                    authenticationSchemes: IdentityConstants.ApplicationScheme
+                    );
             }
 
             // If prompt=login was specified by the client application,
@@ -137,13 +138,21 @@ namespace Metabase.Controllers
                 throw new InvalidOperationException("The user details cannot be retrieved.");
 
             // Retrieve the application details from the database.
-            var application = await _applicationManager.FindByClientIdAsync(request.ClientId).ConfigureAwait(false) ??
-                throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
+            var application = (
+                request.ClientId is null
+                ? null
+                : await _applicationManager.FindByClientIdAsync(request.ClientId).ConfigureAwait(false)
+                )
+                ?? throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
+            // TODO Can't we not just use `request.ClientId`?
+            var applicationId =
+                await _applicationManager.GetIdAsync(application).ConfigureAwait(false)
+                ?? throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
 
             // Retrieve the permanent authorizations associated with the user and the calling client application.
             var authorizations = await _authorizationManager.FindAsync(
                 subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
-                client: await _applicationManager.GetIdAsync(application).ConfigureAwait(false),
+                client: applicationId,
                 status: Statuses.Valid,
                 type: AuthorizationTypes.Permanent,
                 scopes: request.GetScopes()).ToListAsync().ConfigureAwait(false);
@@ -183,7 +192,7 @@ namespace Metabase.Controllers
                         authorization = await _authorizationManager.CreateAsync(
                             principal: principal,
                             subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
-                            client: await _applicationManager.GetIdAsync(application).ConfigureAwait(false),
+                            client: applicationId,
                             type: AuthorizationTypes.Permanent,
                             scopes: principal.GetScopes()).ConfigureAwait(false);
                     }
@@ -232,13 +241,21 @@ namespace Metabase.Controllers
                 throw new InvalidOperationException("The user details cannot be retrieved.");
 
             // Retrieve the application details from the database.
-            var application = await _applicationManager.FindByClientIdAsync(request.ClientId).ConfigureAwait(false) ??
-                throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
+            var application = (
+                request.ClientId is null
+                ? null
+                : await _applicationManager.FindByClientIdAsync(request.ClientId).ConfigureAwait(false)
+                )
+                ?? throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
+            // TODO Can't we just use `request.ClientId`?
+            var applicationId =
+                await _applicationManager.GetIdAsync(application).ConfigureAwait(false)
+                ?? throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
 
             // Retrieve the permanent authorizations associated with the user and the calling client application.
             var authorizations = await _authorizationManager.FindAsync(
                 subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
-                client: await _applicationManager.GetIdAsync(application).ConfigureAwait(false),
+                client: applicationId,
                 status: Statuses.Valid,
                 type: AuthorizationTypes.Permanent,
                 scopes: request.GetScopes()).ToListAsync().ConfigureAwait(false);
@@ -274,7 +291,7 @@ namespace Metabase.Controllers
                 authorization = await _authorizationManager.CreateAsync(
                     principal: principal,
                     subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
-                    client: await _applicationManager.GetIdAsync(application).ConfigureAwait(false),
+                    client: applicationId,
                     type: AuthorizationTypes.Permanent,
                     scopes: principal.GetScopes()).ConfigureAwait(false);
             }
@@ -316,17 +333,22 @@ namespace Metabase.Controllers
             var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
             if (result.Succeeded)
             {
-                // Retrieve the application details from the database using the client_id stored in the principal.
-                var application = await _applicationManager.FindByClientIdAsync(result.Principal.GetClaim(Claims.ClientId)).ConfigureAwait(false) ??
-                    throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
-
-                // Render a form asking the user to confirm the authorization demand.
-                return View(new VerifyViewModel
+                var clientId = result.Principal?.GetClaim(Claims.ClientId);
+                var scopes = result.Principal?.GetScopes();
+                if (clientId is not null && scopes is not null)
                 {
-                    ApplicationName = await _applicationManager.GetLocalizedDisplayNameAsync(application).ConfigureAwait(false),
-                    Scope = string.Join(" ", result.Principal.GetScopes()),
-                    UserCode = request.UserCode
-                });
+                    // Retrieve the application details from the database using the client_id stored in the principal.
+                    var application = await _applicationManager.FindByClientIdAsync(clientId).ConfigureAwait(false) ??
+                        throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
+
+                    // Render a form asking the user to confirm the authorization demand.
+                    return View(new VerifyViewModel
+                    {
+                        ApplicationName = await _applicationManager.GetLocalizedDisplayNameAsync(application).ConfigureAwait(false),
+                        Scope = string.Join(" ", scopes),
+                        UserCode = request.UserCode
+                    });
+                }
             }
 
             // Redisplay the form when the user code is not valid.
@@ -354,7 +376,7 @@ namespace Metabase.Controllers
                 // Note: in this sample, the granted scopes match the requested scope
                 // but you may want to allow the user to uncheck specific scopes.
                 // For that, simply restrict the list of scopes before calling SetScopes.
-                principal.SetScopes(result.Principal.GetScopes());
+                principal.SetScopes(result.Principal?.GetScopes() ?? throw new InvalidOperationException("The scopes cannot be retrieved."));
                 principal.SetResources(await _scopeManager.ListResourcesAsync(principal.GetScopes()).ToListAsync().ConfigureAwait(false));
 
                 foreach (var claim in principal.Claims)
@@ -477,7 +499,16 @@ namespace Metabase.Controllers
             {
                 // Retrieve the claims principal stored in the authorization code/device code/refresh token.
                 var principal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false)).Principal;
-
+                if (principal is null)
+                {
+                    return Forbid(
+                        properties: new AuthenticationProperties(new Dictionary<string, string?>
+                        {
+                            [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
+                            [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The token is no longer valid."
+                        }),
+                        authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                }
                 // Retrieve the user profile corresponding to the authorization code/refresh token.
                 // Note: if you want to automatically invalidate the authorization code/refresh token
                 // when the user password/roles change, use the following line instead:
@@ -619,31 +650,31 @@ namespace Metabase.Controllers
         }
     }
 
-    public sealed class VerifyViewModel
+    public record VerifyViewModel
     {
         [Display(Name = "Application")]
-        public string ApplicationName { get; set; }
+        public string? ApplicationName { get; init; }
 
         [BindNever, Display(Name = "Error")]
-        public string Error { get; set; }
+        public string? Error { get; init; }
 
         [BindNever, Display(Name = "Error description")]
-        public string ErrorDescription { get; set; }
+        public string? ErrorDescription { get; init; }
 
         [Display(Name = "Scope")]
-        public string Scope { get; set; }
+        public string? Scope { get; init; }
 
         [FromQuery(Name = OpenIddictConstants.Parameters.UserCode)]
         [Display(Name = "User code")]
-        public string UserCode { get; set; }
+        public string? UserCode { get; init; }
     }
 
-    public sealed class AuthorizeViewModel
+    public record AuthorizeViewModel
     {
         [Display(Name = "Application")]
-        public string ApplicationName { get; set; }
+        public string? ApplicationName { get; init; }
 
         [Display(Name = "Scope")]
-        public string Scope { get; set; }
+        public string? Scope { get; init; }
     }
 }
