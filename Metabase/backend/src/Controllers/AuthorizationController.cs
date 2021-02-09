@@ -1,4 +1,4 @@
-// Inspired by https://github.com/openiddict/openiddict-core/blob/dev/samples/Mvc.Server/Controllers/AuthorizationController.cs
+// Inspired by https://github.com/openiddict/openiddict-core/blob/11d3a2eb8d30c0307c1f9098b8bcdeeeb88fd2e9/samples/Mvc.Server/Controllers/AuthorizationController.cs
 // TODO Adapt to our needs!
 
 using System;
