@@ -1,7 +1,7 @@
+using HotChocolate;
 using HotChocolate.Language;
 using HotChocolate.Types;
 using Convert = System.Convert;
-using HotChocolate;
 
 namespace Infrastructure.GraphQl.Common
 {

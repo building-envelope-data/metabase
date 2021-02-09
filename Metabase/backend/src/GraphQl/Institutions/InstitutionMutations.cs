@@ -1,18 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading;
-using Metabase.Authorization;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
-using Metabase.GraphQl.Users;
-using System;
+using Metabase.Authorization;
 using Metabase.Extensions;
+using Metabase.GraphQl.Users;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Institutions
 {

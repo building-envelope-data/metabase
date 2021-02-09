@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
 using HotChocolate;
-using System.Linq;
 
 namespace Metabase.GraphQl
 {

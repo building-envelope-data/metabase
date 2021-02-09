@@ -11,7 +11,7 @@ namespace Metabase.GraphQl
         public string Message { get; }
         public IReadOnlyList<string> Path { get; }
 
-        public UserErrorBase(
+        protected UserErrorBase(
             TUserErrorCode code,
             string message,
             IReadOnlyList<string> path

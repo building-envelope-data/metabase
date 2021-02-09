@@ -27,7 +27,7 @@ namespace Metabase.GraphQl.Users
             )
         {
             // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
-            string userManagerServiceName = GetServiceName<UserManager<Data.User>>();
+            var userManagerServiceName = GetServiceName<UserManager<Data.User>>();
             return descriptor.Use(next => async context =>
             {
                 var services = context.Service<IServiceProvider>();
@@ -68,7 +68,7 @@ namespace Metabase.GraphQl.Users
             )
         {
             // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
-            string signInManagerServiceName = GetServiceName<SignInManager<Data.User>>();
+            var signInManagerServiceName = GetServiceName<SignInManager<Data.User>>();
             return descriptor.Use(next => async context =>
             {
                 var services = context.Service<IServiceProvider>();

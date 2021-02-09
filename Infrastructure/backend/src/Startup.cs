@@ -1,10 +1,10 @@
+using System;
+using System.Reflection;
 using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
-using System;
 /* using AutoMapper; */
 
 namespace Infrastructure
