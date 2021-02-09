@@ -2,6 +2,7 @@
 
 **/.*
 **/*.md
+**/*.bak
 Dockerfile*
 diagrams/
 docker-compose*
