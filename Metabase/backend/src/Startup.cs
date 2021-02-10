@@ -42,8 +42,15 @@ namespace Metabase
             Configuration.Database.ConfigureServices(services, _appSettings.Database);
             services.AddControllers();
             // services.AddDatabaseDeveloperPageExceptionFilter();
+            // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order
             services.Configure<ForwardedHeadersOptions>(_ =>
-                _.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            {
+                // TODO _.AllowedHosts = ...
+                _.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forward-the-scheme-for-linux-and-non-iis-reverse-proxies
+                _.KnownNetworks.Clear();
+                _.KnownProxies.Clear();
+            }
             );
         }
 
@@ -96,6 +103,7 @@ namespace Metabase
                 options.SetDefaultCulture("en-US");
             });
             app.UseCors();
+            // app.UseCertificateForwarding(); // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-5.0#other-web-proxies
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseSession();
