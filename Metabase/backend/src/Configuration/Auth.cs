@@ -99,7 +99,7 @@ namespace Metabase.Configuration
               .AddJwtBearer(_ =>
                   {
                       _.Audience = ServerName;
-                      _.RequireHttpsMetadata = false;
+                      _.RequireHttpsMetadata = !environment.IsEnvironment("test");
                       _.IncludeErrorDetails = true;
                       _.SaveToken = true;
                       _.TokenValidationParameters = new TokenValidationParameters()
@@ -228,14 +228,18 @@ namespace Metabase.Configuration
                     // Force client applications to use Proof Key for Code Exchange (PKCE).
                     _.RequireProofKeyForCodeExchange();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
-                    _.UseAspNetCore()
+                    var aspNetCoreBuilder =
+                        _.UseAspNetCore()
                                .EnableStatusCodePagesIntegration()
                                .EnableAuthorizationEndpointPassthrough()
                                .EnableLogoutEndpointPassthrough()
                                .EnableTokenEndpointPassthrough()
                                .EnableUserinfoEndpointPassthrough()
-                               .EnableVerificationEndpointPassthrough()
-                               .DisableTransportSecurityRequirement();
+                               .EnableVerificationEndpointPassthrough();
+                    if (environment.IsEnvironment("test"))
+                    {
+                        aspNetCoreBuilder.DisableTransportSecurityRequirement();
+                    }
                     // Note: if you don't want to specify a client_id when sending
                     // a token or revocation request, uncomment the following line:
                     // _.AcceptAnonymousClients();
