@@ -5,6 +5,10 @@ ARG GROUP_ID
 ARG USER_ID
 ARG PROJECT_NAME
 
+# TODO directory node_modules is created on host machine when container is run
+# and does not belong to current user. Avoid it being created at all or at
+# least make it belong to the current user
+
 #############
 # As `root` #
 #############
