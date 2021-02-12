@@ -99,7 +99,7 @@ namespace Metabase.Configuration
               .AddJwtBearer(_ =>
                   {
                       _.Audience = ServerName;
-                      _.RequireHttpsMetadata = !environment.IsEnvironment("test");
+                      _.RequireHttpsMetadata = false; // TODO `!environment.IsEnvironment("test");` ... but what about server-side requests from next.js?
                       _.IncludeErrorDetails = true;
                       _.SaveToken = true;
                       _.TokenValidationParameters = new TokenValidationParameters()
@@ -236,7 +236,7 @@ namespace Metabase.Configuration
                                .EnableTokenEndpointPassthrough()
                                .EnableUserinfoEndpointPassthrough()
                                .EnableVerificationEndpointPassthrough();
-                    if (environment.IsEnvironment("test"))
+                    if (true) // TODO `environment.IsEnvironment("test")` but what about server-side requests from next.js?
                     {
                         aspNetCoreBuilder.DisableTransportSecurityRequirement();
                     }

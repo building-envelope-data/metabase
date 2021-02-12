@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Metabase.ViewModels.Authorization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using OpenIddict.Abstractions;
@@ -648,33 +647,5 @@ namespace Metabase.Controllers
 
             return !string.IsNullOrEmpty(routeContext.HttpContext.Request.Form[_name]);
         }
-    }
-
-    public record VerifyViewModel
-    {
-        [Display(Name = "Application")]
-        public string? ApplicationName { get; init; }
-
-        [BindNever, Display(Name = "Error")]
-        public string? Error { get; init; }
-
-        [BindNever, Display(Name = "Error description")]
-        public string? ErrorDescription { get; init; }
-
-        [Display(Name = "Scope")]
-        public string? Scope { get; init; }
-
-        [FromQuery(Name = OpenIddictConstants.Parameters.UserCode)]
-        [Display(Name = "User code")]
-        public string? UserCode { get; init; }
-    }
-
-    public record AuthorizeViewModel
-    {
-        [Display(Name = "Application")]
-        public string? ApplicationName { get; init; }
-
-        [Display(Name = "Scope")]
-        public string? Scope { get; init; }
     }
 }

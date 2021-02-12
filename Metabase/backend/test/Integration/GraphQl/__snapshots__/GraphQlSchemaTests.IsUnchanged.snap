@@ -20,6 +20,18 @@ type AddInstitutionRepresentativePayload {
   representedInstitutionEdge: RepresentedInstitutionEdge
 }
 
+type ChangeInstitutionRepresentativeRoleError {
+  code: ChangeInstitutionRepresentativeRoleErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ChangeInstitutionRepresentativeRolePayload {
+  errors: [ChangeInstitutionRepresentativeRoleError!]
+  institutionRepresentativeEdge: InstitutionRepresentativeEdge
+  representedInstitutionEdge: RepresentedInstitutionEdge
+}
+
 type ChangeUserEmailError {
   code: ChangeUserEmailErrorCode!
   message: String!
@@ -52,7 +64,7 @@ type Component implements Node {
   generalizationEdges: [ComponentConcretizationAndGeneralization!]!
   generalizations: [Component!]!
   id: ID!
-  manufacturers(after: String before: String first: Int last: Int): InstitutionConnection
+  manufacturers: ComponentManufacturerConnection
   name: String!
   uuid: Uuid!
 }
@@ -82,6 +94,14 @@ type ComponentEdge {
   cursor: String!
   "The item at the end of the edge."
   node: Component!
+}
+
+type ComponentManufacturerConnection {
+  edges: [ComponentManufacturerEdge!]!
+}
+
+type ComponentManufacturerEdge {
+  node: Institution!
 }
 
 type ConfirmUserEmailChangeError {
@@ -162,7 +182,7 @@ type Database implements Node {
   id: ID!
   locator: String!
   name: String!
-  operator: Institution
+  operator: DatabaseOperatorEdge
   uuid: Uuid!
 }
 
@@ -182,6 +202,20 @@ type DatabaseEdge {
   cursor: String!
   "The item at the end of the edge."
   node: Database!
+}
+
+type DatabaseOperatorEdge {
+  node: Institution!
+}
+
+type DeleteInstitutionError {
+  code: DeleteInstitutionErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type DeleteInstitutionPayload {
+  errors: [DeleteInstitutionError!]
 }
 
 type DeletePersonalUserDataError {
@@ -211,7 +245,7 @@ type Institution implements Node {
   abbreviation: String
   affiliatedPersonEdges: [PersonAffiliation!]!
   affiliatedPersons: [Person!]!
-  description: String
+  description: String!
   developedMethods: [Method!]!
   id: ID!
   manufacturedComponents: InstitutionManufacturedComponentConnection
@@ -326,6 +360,7 @@ type MethodEdge {
 
 type Mutation {
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER)
+  changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(apply: BEFORE_RESOLVER)
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(apply: BEFORE_RESOLVER)
   changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
   confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
@@ -334,16 +369,19 @@ type Mutation {
   createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload! @authorize(apply: BEFORE_RESOLVER)
   createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER)
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(apply: BEFORE_RESOLVER)
+  deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(apply: BEFORE_RESOLVER)
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER)
   loginUser(input: LoginUserInput!): LoginUserPayload!
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
+  removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER)
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
   resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
   resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(apply: BEFORE_RESOLVER)
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload!
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER)
+  updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER)
 }
 
 type Numeration {
@@ -412,6 +450,7 @@ type PersonalUserDataPayload {
 type Query {
   component(uuid: Uuid!): Component
   components(after: String before: String first: Int last: Int order: [ComponentSortInput!] where: ComponentFilterInput): ComponentConnection
+  currentUser: User
   database(uuid: Uuid!): Database
   databases(after: String before: String first: Int last: Int order: [DatabaseSortInput!] where: DatabaseFilterInput): DatabaseConnection
   institution(uuid: Uuid!): Institution
@@ -432,6 +471,18 @@ type RegisterUserError {
 type RegisterUserPayload {
   errors: [RegisterUserError!]
   user: User
+}
+
+type RemoveInstitutionRepresentativeError {
+  code: RemoveInstitutionRepresentativeErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveInstitutionRepresentativePayload {
+  errors: [RemoveInstitutionRepresentativeError!]
+  institution: Institution!
+  user: User!
 }
 
 type RepresentedInstitutionEdge {
@@ -519,6 +570,17 @@ type Standard {
   year: Int!
 }
 
+type UpdateInstitutionError {
+  code: UpdateInstitutionErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateInstitutionPayload {
+  errors: [UpdateInstitutionError!]
+  institution: Institution
+}
+
 type User implements Node {
   email: String
   id: ID!
@@ -545,6 +607,12 @@ type UserEdge {
 input AddInstitutionRepresentativeInput {
   institutionId: Uuid!
   role: InstitutionRepresentativeRole!
+  userId: Uuid!
+}
+
+input ChangeInstitutionRepresentativeRoleInput {
+  institutionId: Uuid!
+  newRole: InstitutionRepresentativeRole!
   userId: Uuid!
 }
 
@@ -661,6 +729,10 @@ input DatabaseSortInput {
   xmin: SortEnumType
 }
 
+input DeleteInstitutionInput {
+  institutionId: Uuid!
+}
+
 input DeletePersonalUserDataInput {
   password: String
 }
@@ -751,6 +823,11 @@ input RegisterUserInput {
   passwordConfirmation: String!
 }
 
+input RemoveInstitutionRepresentativeInput {
+  institutionId: Uuid!
+  userId: Uuid!
+}
+
 input RequestUserPasswordResetInput {
   email: String!
 }
@@ -801,6 +878,16 @@ input StringOperationFilterInput {
   startsWith: String
 }
 
+input UpdateInstitutionInput {
+  abbreviation: String
+  description: String!
+  institutionId: Uuid!
+  name: String!
+  publicKey: String
+  state: InstitutionState!
+  websiteLocator: String
+}
+
 input UserSortInput {
   accessFailedCount: SortEnumType
   concurrencyStamp: SortEnumType
@@ -817,6 +904,7 @@ input UserSortInput {
   securityStamp: SortEnumType
   twoFactorEnabled: SortEnumType
   userName: SortEnumType
+  xmin: SortEnumType
 }
 
 enum AddInstitutionRepresentativeErrorCode {
@@ -824,11 +912,21 @@ enum AddInstitutionRepresentativeErrorCode {
   UNKNOWN_INSTITUTION
   UNKNOWN_USER
   DUPLICATE
+  UNAUTHORIZED
 }
 
 enum ApplyPolicy {
   BEFORE_RESOLVER
   AFTER_RESOLVER
+}
+
+enum ChangeInstitutionRepresentativeRoleErrorCode {
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+  UNKNOWN_USER
+  UNAUTHORIZED
+  UNKNOWN_REPRESENTATIVE
+  LAST_OWNER
 }
 
 enum ChangeUserEmailErrorCode {
@@ -880,10 +978,17 @@ enum CreateDatabaseErrorCode {
 enum CreateInstitutionErrorCode {
   UNKNOWN
   NO_OWNER
+  UNKNOWN_OWNERS
 }
 
 enum CreateMethodErrorCode {
   UNKNOWN
+}
+
+enum DeleteInstitutionErrorCode {
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
 }
 
 enum DeletePersonalUserDataErrorCode {
@@ -938,6 +1043,15 @@ enum RegisterUserErrorCode {
   PASSWORD_REQUIRES_UPPER
   PASSWORD_TOO_SHORT
   NULL_OR_EMPTY_EMAIL
+}
+
+enum RemoveInstitutionRepresentativeErrorCode {
+  UNKNOWN
+  LAST_OWNER
+  UNAUTHORIZED
+  UNKNOWN_INSTITUTION
+  UNKNOWN_REPRESENTATIVE
+  UNKNOWN_USER
 }
 
 enum RequestUserPasswordResetErrorCode {
@@ -1012,6 +1126,12 @@ enum Standardizer {
   VDI
   VFF
   WELL
+}
+
+enum UpdateInstitutionErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_INSTITUTION
 }
 
 directive @authorize("Defines when when the resolver shall be executed.By default the resolver is executed after the policy has determined that the current user is allowed to access the field." apply: ApplyPolicy! = BEFORE_RESOLVER "The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!]) repeatable on SCHEMA | OBJECT | FIELD_DEFINITION

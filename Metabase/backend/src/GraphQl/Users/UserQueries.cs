@@ -14,6 +14,16 @@ namespace Metabase.GraphQl.Users
     public sealed class UserQueries
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<Data.User?> GetCurrentUserAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager
+            )
+        {
+            return await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        }
+
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UsePaging]
         /* TODO [UseProjection] // fails without an explicit error message in the logs */
         /* TODO [UseFiltering(typeof(UserFilterType))] // wait for https://github.com/ChilliCream/hotchocolate/issues/2672 and https://github.com/ChilliCream/hotchocolate/issues/2666 */
