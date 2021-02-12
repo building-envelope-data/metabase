@@ -32,8 +32,11 @@ ENV PATH=/app/${PROJECT_NAME}/frontend/node_modules/.bin:$PATH
 COPY \
   --chown=node:node \
   ./${PROJECT_NAME}/frontend/package.json ./
+COPY \
+  --chown=node:node \
+  ./${PROJECT_NAME}/frontend/yarn.lock ./
 RUN yarn install
 
 EXPOSE 3000
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["yarn", "start"]
+CMD ["yarn", "dev"]
