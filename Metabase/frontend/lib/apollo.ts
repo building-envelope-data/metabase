@@ -16,11 +16,13 @@ export type ResolverContext = {
 
 function createIsomorphLink(context: ResolverContext = {}) {
   return createHttpLink({
-    uri: 'http://backend:8080/graphql/',
-    useGETForQueries: 'true',
+    uri: typeof window === 'undefined'
+      ? 'http://backend:8080/graphql/'
+      : 'https://localhost:4041/graphql/', // TODO Use proper URL
+    useGETForQueries: true,
     credentials: 'same-origin',
     headers: {
-      // cookie: context.req.header('Cookie'),
+      cookie: context.req ? context.req.headers.cookie : null,
     },
   })
 }

@@ -10,30 +10,22 @@ import { initializeApollo } from '../lib/apollo'
 const Index = () => {
   const { currentUser } = useCurrentUserQuery().data!
   const [newEmail, setNewEmail] = useState('')
-  const [changeUserEmailMutation] = useChangeUserEmailMutation()
-
-  const onChangeEmail = () => {
+  const [changeUserEmailMutation] = useChangeUserEmailMutation({
+    update(store, { data }) {
+        // Read the data from our cache for this query.
+        /* const { currentUser } = store.readQuery({ query: CurrentUserDocument }) */
+        /* const newCurrentUser = { ...currentUser } */
+        // Add our comment from the mutation to the end.
+        /* newCurrentUser.email = data.changeUserEmail.user.email */
+        // Write our data back to the cache.
+        if (data && data.changeUserEmail && data.changeUserEmail.user)
+          store.writeQuery({ query: CurrentUserDocument, data: { currentUser: data.changeUserEmail.user } })
+    }
+  })
+  const onChangeUserEmail = () => {
     changeUserEmailMutation({
       variables: {
         newEmail: newEmail,
-      },
-      //Follow apollo suggestion to update cache
-      //https://www.apollographql.com/docs/angular/features/cache-updates/#update
-      update: (
-        store,
-        {
-          data: {
-            updateEmail: { email },
-          },
-        }
-      ) => {
-        // Read the data from our cache for this query.
-        const { currentUser } = store.readQuery({ query: CurrentUserDocument })
-        const newCurrentUser = { ...currentUser }
-        // Add our comment from the mutation to the end.
-        newCurrentUser.email = email
-        // Write our data back to the cache.
-        store.writeQuery({ query: CurrentUserDocument, data: { currentUser: newCurrentUser } })
       },
     })
   }
@@ -53,7 +45,7 @@ const Index = () => {
               placeholder="your new email..."
               onChange={(e) => setNewEmail(e.target.value)}
             />
-            <input type="button" value="change" onClick={onChangeEmail} />
+            <input type="button" value="change" onClick={onChangeUserEmail} />
           </div>
         </div>
       )
