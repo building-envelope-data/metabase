@@ -1,6 +1,8 @@
 using HotChocolate;
 using HotChocolate.Data.Filters;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 using GraphQlX = Metabase.GraphQl;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
 
@@ -17,6 +19,12 @@ namespace Metabase.Configuration
                 services,
                 executorBuilder =>
                     executorBuilder
+                    .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
+                    {
+                        var authenticateResult = await httpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme).ConfigureAwait(false);
+                        if (authenticateResult.Succeeded && authenticateResult.Principal is not null)
+                            httpContext.User = authenticateResult.Principal;
+                    })
                     .AddQueryType(d => d.Name(nameof(GraphQlX.Query)))
                         .AddType<GraphQlX.Users.UserQueries>()
                         .AddType<GraphQlX.Components.ComponentQueries>()
