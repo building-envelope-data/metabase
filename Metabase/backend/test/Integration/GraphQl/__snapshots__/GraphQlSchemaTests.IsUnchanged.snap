@@ -318,8 +318,18 @@ type LoginUserError {
 
 type LoginUserPayload {
   errors: [LoginUserError!]
-  jwtAccessToken: String
   requiresTwoFactor: Boolean
+  user: User
+}
+
+type LogoutUserError {
+  code: LogoutUserErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type LogoutUserPayload {
+  errors: [LogoutUserError!]
   user: User
 }
 
@@ -373,6 +383,7 @@ type Mutation {
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER)
   loginUser(input: LoginUserInput!): LoginUserPayload!
+  logoutUser: LogoutUserPayload!
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER)
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
@@ -1020,6 +1031,11 @@ enum LoginUserErrorCode {
   INVALID
   LOCKED_OUT
   NOT_ALLOWED
+  UNKNOWN
+}
+
+enum LogoutUserErrorCode {
+  UNKNOWN
 }
 
 enum MethodCategory {

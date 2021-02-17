@@ -4,6 +4,7 @@ namespace Metabase.GraphQl.Users
     {
         INVALID,
         LOCKED_OUT,
-        NOT_ALLOWED
+        NOT_ALLOWED,
+        UNKNOWN
     }
 }

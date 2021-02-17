@@ -6,6 +6,63 @@ query CurrentUser {
   }
 }
 
+mutation LoginUser(
+    $email: String!,
+    $password: String!
+    ) {
+  loginUser(
+      input: {
+           email: $email,
+           password: $password
+           }
+      ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation LogoutUser {
+  logoutUser {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RegisterUser(
+  $email: String!,
+  $password: String!,
+  $passwordConfirmation: String!
+) {
+  registerUser(
+    input: {
+      email: $email,
+      password: $password,
+      passwordConfirmation: $passwordConfirmation
+    }
+  ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 mutation ChangeUserEmail($newEmail: String!) {
   changeUserEmail(input: { newEmail: $newEmail }) {
     user {

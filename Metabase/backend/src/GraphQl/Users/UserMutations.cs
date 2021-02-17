@@ -173,7 +173,7 @@ namespace Metabase.GraphQl.Users
             var signInResult = await signInManager.PasswordSignInAsync(
                 input.Email,
                 input.Password,
-                isPersistent: false,
+                isPersistent: false, // TODO Use `input.RememberMe`?
                 lockoutOnFailure: true
                 ).ConfigureAwait(false);
             // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinresult?view=aspnetcore-5.0
@@ -211,9 +211,9 @@ namespace Metabase.GraphQl.Users
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
             if (signInResult.RequiresTwoFactor)
             {
-                return new LoginUserPayload(user);
+                return new LoginUserPayload(user, requiresTwoFactor: true);
             }
-            return new LoginUserPayload("TODO Generate JWT Access Token", user);
+            return new LoginUserPayload(user, requiresTwoFactor: false);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWith2fa.cs.cshtml
@@ -264,17 +264,15 @@ namespace Metabase.GraphQl.Users
         /* } */
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Logout.cs.cshtml
-        /* [UseDbContext(typeof(Data.ApplicationDbContext))] */
-        /* [UseUserManager] */
-        /* [UseSignInManager] */
-        /* public async Task<LogOutUserPayload> LogoutUserAsync( */
-        /*     LogoutUserInput input, */
-        /*     [ScopedService] UserManager<Data.User> userManager, */
-        /*     [ScopedService] SignInManager<Data.User> signInManager */
-        /*     ) */
-        /* { */
-        /*   // TODO Invalidate JWT token? */
-        /* } */
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseSignInManager]
+        public async Task<LogoutUserPayload> LogoutUserAsync(
+            [ScopedService] SignInManager<Data.User> signInManager
+            )
+        {
+            await signInManager.SignOutAsync().ConfigureAwait(false);
+            return new LogoutUserPayload();
+        }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Register.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]

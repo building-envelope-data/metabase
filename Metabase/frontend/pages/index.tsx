@@ -1,25 +1,37 @@
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState } from 'react' // useEffect
+// import { useRouter } from 'next/router'
 import {
   useCurrentUserQuery,
   useChangeUserEmailMutation,
   CurrentUserDocument,
 } from '../lib/currentUser.graphql'
 import { initializeApollo } from '../lib/apollo'
+import Layout from '../components/Layout'
 
 const Index = () => {
-  const { currentUser } = useCurrentUserQuery().data!
+  // const router = useRouter()
+  const { data, error } = useCurrentUserQuery() // loading
+  const currentUser = data?.currentUser
+  // const shouldRedirect = !(loading || error || currentUser)
   const [newEmail, setNewEmail] = useState('')
   const [changeUserEmailMutation] = useChangeUserEmailMutation({
-    update(store, { data }) {
-        // Read the data from our cache for this query.
-        /* const { currentUser } = store.readQuery({ query: CurrentUserDocument }) */
-        /* const newCurrentUser = { ...currentUser } */
-        // Add our comment from the mutation to the end.
-        /* newCurrentUser.email = data.changeUserEmail.user.email */
-        // Write our data back to the cache.
-        if (data && data.changeUserEmail && data.changeUserEmail.user)
-          store.writeQuery({ query: CurrentUserDocument, data: { currentUser: data.changeUserEmail.user } })
+    update(cache, { data }) {
+      // Read the data from our cache for this query.
+      /* const { currentUser } = cache.readQuery({ query: CurrentUserDocument }) */
+      /* const newCurrentUser = { ...currentUser } */
+      // Add our comment from the mutation to the end.
+      /* newCurrentUser.email = data.changeUserEmail.user.email */
+      // Write our data back to the cache.
+      if (data?.changeUserEmail?.user)
+        cache.writeQuery(
+          {
+            query: CurrentUserDocument,
+            data: {
+              currentUser: data.changeUserEmail.user
+            }
+          }
+        )
     }
   })
   const onChangeUserEmail = () => {
@@ -30,9 +42,20 @@ const Index = () => {
     })
   }
 
-  if (currentUser)
-    {
-      return (
+  // useEffect(() => {
+  //   if (shouldRedirect) {
+  //     router.push('/login')
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [shouldRedirect])
+
+  if (error) {
+    return <p>{error.message}</p>
+  }
+
+  if (currentUser) {
+    return (
+      <Layout>
         <div>
           You're signed in as {currentUser.email} and you're {currentUser.id}. Go to the{' '}
           <Link href="/about">
@@ -48,14 +71,16 @@ const Index = () => {
             <input type="button" value="change" onClick={onChangeUserEmail} />
           </div>
         </div>
-      )
-    }
-    else
-      {
-        return (
-          <div>You're not signed in.</div>
-        )
-      }
+      </Layout>
+    )
+  }
+  else {
+    return (
+      <Layout>
+        <p>Loading ...</p>
+      </Layout>
+    )
+  }
 }
 
 export async function getStaticProps() {

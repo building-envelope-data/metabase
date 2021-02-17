@@ -1,31 +1,16 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Users
 {
     public sealed class UserType
-      : ObjectType<Data.User>
+      : EntityType<Data.User, UserByIdDataLoader>
     {
         protected override void Configure(
             IObjectTypeDescriptor<Data.User> descriptor
             )
         {
             descriptor.BindFieldsExplicitly();
-            descriptor
-                .ImplementsNode()
-                .IdField(t => t.Id)
-                .ResolveNode((context, id) =>
-                    context
-                    .DataLoader<UserByIdDataLoader>()
-                    .LoadAsync(id, context.RequestAborted)!
-                    );
-
+            base.Configure(descriptor);
             descriptor
               .Field(t => t.Email);
 
