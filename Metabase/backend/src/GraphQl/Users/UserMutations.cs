@@ -265,6 +265,7 @@ namespace Metabase.GraphQl.Users
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Logout.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
         [UseSignInManager]
         public async Task<LogoutUserPayload> LogoutUserAsync(
             [ScopedService] SignInManager<Data.User> signInManager
