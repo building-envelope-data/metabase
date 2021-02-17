@@ -17,6 +17,8 @@ namespace Metabase.Configuration
 {
     public abstract class Auth
     {
+        public const string CookieAuthenticatedPolicy = "CookieAuthenticated";
+
         public static string ApiScope { get; } = "api";
         public static string ServerName { get; } = "metabase";
 
@@ -119,7 +121,14 @@ namespace Metabase.Configuration
                           IssuerSigningKey = signingKey
                       };
                   });
-            services.AddAuthorization();
+            services.AddAuthorization(_ =>
+                _.AddPolicy(CookieAuthenticatedPolicy, policy =>
+                {
+                    policy.AuthenticationSchemes = new[] { IdentityConstants.ApplicationScheme };
+                    policy.RequireAuthenticatedUser();
+                }
+                )
+            );
         }
 
         private static void ConfigureTaskScheduling(
