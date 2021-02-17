@@ -1,11 +1,8 @@
 import Head from "next/head"
 import * as React from "react"
-import Header from "./Header"
 import Footer from "./Footer"
 import NavBar from "./NavBar"
-import * as Ant from "antd"
-
-import 'antd/dist/antd.css';
+import { Layout as AntLayout } from "antd"
 
 const navItems = [
     {
@@ -15,6 +12,10 @@ const navItems = [
     {
         path: `/about`,
         label: `About`,
+    },
+    {
+        path: `/user/change-email`,
+        label: `Change Email`
     }
 ]
 
@@ -22,23 +23,22 @@ const Layout: React.FunctionComponent = ({ children }) => {
     const appTitle = `Building Envelope Data`;
 
     return (
-        <Ant.Layout>
+        <AntLayout>
             <Head>
                 <title>{appTitle}</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <meta charSet="utf-8" />
             </Head>
-            <Ant.Layout.Header>
-                <Header appTitle={appTitle} />
+            <AntLayout.Header>
                 <NavBar items={navItems} />
-            </Ant.Layout.Header>
-            <Ant.Layout.Content>
+            </AntLayout.Header>
+            <AntLayout.Content>
                 {children}
-            </Ant.Layout.Content>
-            <Ant.Layout.Footer>
+            </AntLayout.Content>
+            <AntLayout.Footer>
                 <Footer />
-            </Ant.Layout.Footer>
-        </Ant.Layout>
+            </AntLayout.Footer>
+        </AntLayout>
     );
 };
 

@@ -16,8 +16,9 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
     const router = useRouter()
     return (
         <Menu
-            selectedKeys={[router.pathname]}
             mode="horizontal"
+            selectedKeys={[router.pathname]}
+            theme="dark"
         >
             {items.map(({ path, label }) => (
                 <Menu.Item key={path}>
@@ -26,13 +27,13 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
                     </Link>
                 </Menu.Item>
             ))}
-            <Menu.Item key="/login">
-                <Link href="/login">
+            <Menu.Item key="/user/login">
+                <Link href="/user/login">
                     Login
                 </Link>
             </Menu.Item>
-            <Menu.Item key="/register">
-                <Link href="/register">
+            <Menu.Item key="/user/register">
+                <Link href="/user/register">
                     Register
                 </Link>
             </Menu.Item>

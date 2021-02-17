@@ -63,8 +63,35 @@ mutation RegisterUser(
   }
 }
 
-mutation ChangeUserEmail($newEmail: String!) {
-  changeUserEmail(input: { newEmail: $newEmail }) {
+mutation ConfirmUserEmail(
+  $email: String!,
+  $confirmationCode: String!
+) {
+  confirmUserEmail(
+    input: {
+      email: $email,
+      confirmationCode: $confirmationCode
+    }
+  ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ChangeUserEmail(
+  $newEmail: String!
+  ) {
+  changeUserEmail(
+    input: {
+       newEmail: $newEmail
+       }
+       ) {
     user {
       ...UserPartial
     }

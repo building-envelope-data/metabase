@@ -2,9 +2,9 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import {
     useLogoutUserMutation,
-} from '../lib/currentUser.graphql'
-import { initializeApollo } from '../lib/apollo'
-import Layout from '../components/Layout'
+} from '../../lib/currentUser.graphql'
+import { initializeApollo } from '../../lib/apollo'
+import Layout from '../../components/Layout'
 
 function Logout() {
     const router = useRouter()

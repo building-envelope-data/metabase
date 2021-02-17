@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router'
-import { initializeApollo } from '../lib/apollo'
-import { useRegisterUserMutation } from '../lib/currentUser.graphql'
-import { Form, Input, Button } from "antd"
-import Layout from '../components/Layout'
+import { initializeApollo } from '../../lib/apollo'
+import { useLoginUserMutation } from '../../lib/currentUser.graphql'
+import { Form, Input, Button, Checkbox } from "antd"
+import Layout from '../../components/Layout'
 
 const layout = {
     labelCol: { span: 8 },
@@ -12,37 +12,36 @@ const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
 };
 
-function Register() {
+function Login() {
     const router = useRouter()
     const apolloClient = initializeApollo()
-    const [registerUserMutation] = useRegisterUserMutation()
+    const [loginUserMutation] = useLoginUserMutation()
 
-    const onFinish = ({ email, password, passwordConfirmation }: any) => { // TODO `rememberMe`
-        const register = async () => {
+    const onFinish = ({ email, password }: any) => { // TODO `rememberMe`
+        const login = async () => {
             try {
                 // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
                 await apolloClient.resetStore()
-                const { data, errors } = await registerUserMutation({
+                const { data, errors } = await loginUserMutation({
                     variables: {
                         email: email,
                         password: password,
-                        passwordConfirmation: passwordConfirmation,
                     },
                 })
                 if (errors) {
                     console.log('Failed:', errors)
                 }
-                if (data?.registerUser?.errors) {
-                    console.log('Failed:', data?.registerUser?.errors)
+                if (data?.loginUser?.errors) {
+                    console.log('Failed:', data?.loginUser?.errors)
                 }
-                if (data?.registerUser?.user) {
+                if (data?.loginUser?.user) {
                     await router.push('/')
                 }
             } catch (error) {
                 console.log('Failed:', error)
             }
         }
-        register()
+        login()
     };
 
     const onFinishFailed = (errorInfo: any) => {
@@ -54,6 +53,7 @@ function Register() {
             <Form
                 {...layout}
                 name="basic"
+                initialValues={{ remember: true }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
             >
@@ -83,25 +83,11 @@ function Register() {
                 </Form.Item>
 
                 <Form.Item
-                    label="Confirm Password"
-                    name="passwordConfirmation"
-                    dependencies={['password']}
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input your password!'
-                        },
-                        ({ getFieldValue }) => ({
-                            validator(_, value) {
-                                if (!value || getFieldValue('password') === value) {
-                                    return Promise.resolve();
-                                }
-                                return Promise.reject('Password and confirmation do not match!');
-                            },
-                        }),
-                    ]}
+                    {...tailLayout}
+                    name="rememberMe"
+                    valuePropName="checked"
                 >
-                    <Input.Password />
+                    <Checkbox>Remember me</Checkbox>
                 </Form.Item>
 
                 <Form.Item {...tailLayout}>
@@ -114,4 +100,4 @@ function Register() {
     );
 }
 
-export default Register
+export default Login

@@ -6,7 +6,7 @@ import {
   useChangeUserEmailMutation,
   CurrentUserDocument,
 } from '../lib/currentUser.graphql'
-import { initializeApollo } from '../lib/apollo'
+// import { initializeApollo } from '../lib/apollo'
 import Layout from '../components/Layout'
 
 const Index = () => {
@@ -83,18 +83,18 @@ const Index = () => {
   }
 }
 
-export async function getStaticProps() {
-  const apolloClient = initializeApollo()
+// export async function getStaticProps() {
+//   const apolloClient = initializeApollo()
 
-  await apolloClient.query({
-    query: CurrentUserDocument,
-  })
+//   await apolloClient.query({
+//     query: CurrentUserDocument,
+//   })
 
-  return {
-    props: {
-      initialApolloState: apolloClient.cache.extract(),
-    },
-  }
-}
+//   return {
+//     props: {
+//       initialApolloState: apolloClient.cache.extract(),
+//     },
+//   }
+// }
 
 export default Index
