@@ -77,6 +77,14 @@ namespace Metabase.Configuration
                 })
               .AddEntityFrameworkStores<Data.ApplicationDbContext>()
               .AddDefaultTokenProviders();
+            services.ConfigureApplicationCookie(_ =>
+            {
+                _.AccessDeniedPath = "/unauthorized";
+                _.LoginPath = "/user/login";
+                _.LogoutPath = "/user/logout";
+                _.ReturnUrlParameter = "return-to";
+            }
+            );
         }
 
         private static void ConfigureAuthenticiationAndAuthorizationServices(
