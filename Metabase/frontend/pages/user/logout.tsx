@@ -12,13 +12,16 @@ function Logout() {
     const [logoutUserMutation] = useLogoutUserMutation()
 
     useEffect(() => {
-        logoutUserMutation().then(() => {
-            // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-            apolloClient.resetStore().then(() => {
-                router.push('/login')
-            })
-        })
-    }, [router, logoutUserMutation])
+        const logout = async () => {
+            if (router.isReady) {
+                await logoutUserMutation()
+                // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
+                await apolloClient.resetStore()
+                await router.push('/user/login')
+            }
+        }
+        logout()
+    }, [router])
 
     return (
         <Layout>

@@ -35,7 +35,12 @@ function Login() {
                     console.log('Failed:', data?.loginUser?.errors)
                 }
                 if (data?.loginUser?.user) {
-                    await router.push('/')
+                    if (router.query?.returnTo && typeof router.query.returnTo === "string") {
+                        await router.push(router.query.returnTo)
+                    }
+                    else {
+                        await router.push('/')
+                    }
                 }
             } catch (error) {
                 console.log('Failed:', error)

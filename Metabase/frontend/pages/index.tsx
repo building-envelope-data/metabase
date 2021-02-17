@@ -11,7 +11,7 @@ import Layout from '../components/Layout'
 
 const Index = () => {
   // const router = useRouter()
-  const { data, error } = useCurrentUserQuery() // loading
+  const { loading, error, data } = useCurrentUserQuery()
   const currentUser = data?.currentUser
   // const shouldRedirect = !(loading || error || currentUser)
   const [newEmail, setNewEmail] = useState('')
@@ -49,8 +49,20 @@ const Index = () => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [shouldRedirect])
 
+  if (loading) {
+    return (
+      <Layout>
+        <p>Loading ...</p>
+      </Layout>
+    )
+  }
+
   if (error) {
-    return <p>{error.message}</p>
+    return (
+      <Layout>
+        <p>{error.message}</p>
+      </Layout>
+    )
   }
 
   if (currentUser) {
@@ -74,13 +86,10 @@ const Index = () => {
       </Layout>
     )
   }
-  else {
-    return (
-      <Layout>
-        <p>Loading ...</p>
-      </Layout>
-    )
-  }
+
+  return (
+    <Layout>Something went wrong ...</Layout>
+  )
 }
 
 // export async function getStaticProps() {
