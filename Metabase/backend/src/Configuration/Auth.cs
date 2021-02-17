@@ -82,7 +82,7 @@ namespace Metabase.Configuration
                 _.AccessDeniedPath = "/unauthorized";
                 _.LoginPath = "/user/login";
                 _.LogoutPath = "/user/logout";
-                _.ReturnUrlParameter = "return-to";
+                _.ReturnUrlParameter = "returnTo";
             }
             );
         }
