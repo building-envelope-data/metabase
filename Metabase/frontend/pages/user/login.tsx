@@ -1,107 +1,161 @@
 import { useRouter } from 'next/router'
 import { initializeApollo } from '../../lib/apollo'
 import { useLoginUserMutation } from '../../lib/currentUser.graphql'
-import { Form, Input, Button, Checkbox } from "antd"
+import { Alert, Form, Input, Button, Checkbox, Row, Col, Card } from "antd"
 import Layout from '../../components/Layout'
-
-const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
-};
-const tailLayout = {
-    wrapperCol: { offset: 8, span: 16 },
-};
+import Link from 'next/link'
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import paths from "../../paths"
+import { useState } from 'react'
+import { handleFormErrors } from '../../lib/form'
 
 function Login() {
     const router = useRouter()
+    const returnTo = router.query.returnTo
     const apolloClient = initializeApollo()
     const [loginUserMutation] = useLoginUserMutation()
+    const [globalErrorMessages, setGlobalErrorMessages] = useState(new Array<string>())
+    const [form] = Form.useForm()
+    const [loggingIn, setLoggingIn] = useState(false)
 
-    const onFinish = ({ email, password }: any) => { // TODO `rememberMe`
+    const onFinish = ({ email, password }: { email: string, password: string }) => { // TODO `rememberMe`
         const login = async () => {
             try {
+                setLoggingIn(true)
                 // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-                await apolloClient.resetStore()
-                const { data, errors } = await loginUserMutation({
-                    variables: {
-                        email: email,
-                        password: password,
-                    },
-                })
-                if (errors) {
-                    console.log('Failed:', errors)
+                const { errors, data } =
+                    await loginUserMutation({
+                        variables: {
+                            email: email,
+                            password: password,
+                        },
+                    })
+                handleFormErrors(
+                    errors,
+                    data?.loginUser?.errors?.map(x => {
+                        return { code: x.code, message: x.message, path: x.path }
+                    }),
+                    setGlobalErrorMessages,
+                    form,
+                )
+                if (!errors && !data?.loginUser?.errors && data?.loginUser?.user) {
+                    await apolloClient.resetStore()
+                    await router.push(
+                        typeof returnTo === "string"
+                            ? returnTo
+                            : paths.home
+                    )
                 }
-                if (data?.loginUser?.errors) {
-                    console.log('Failed:', data?.loginUser?.errors)
-                }
-                if (data?.loginUser?.user) {
-                    if (router.query?.returnTo && typeof router.query.returnTo === "string") {
-                        await router.push(router.query.returnTo)
-                    }
-                    else {
-                        await router.push('/')
-                    }
-                }
-            } catch (error) {
+            }
+            catch (error) {
+                // TODO Handle properly.
                 console.log('Failed:', error)
+            }
+            finally {
+                setLoggingIn(false)
             }
         }
         login()
     };
 
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo)
+    const onFinishFailed = () => {
+        setGlobalErrorMessages(["Fix the errors below."])
     };
 
     return (
         <Layout>
-            <Form
-                {...layout}
-                name="basic"
-                initialValues={{ remember: true }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
+            <Row
+                justify="center"
             >
-                <Form.Item
-                    label="Email"
-                    name="email"
-                    rules={[
-                        {
-                            type: 'email',
-                            message: 'Invalid email!',
-                        },
-                        {
-                            required: true,
-                            message: 'Please input your email!'
-                        }
-                    ]}
-                >
-                    <Input />
-                </Form.Item>
+                <Col>
+                    <Card title="Login">
+                        {/* Display error messages in a list? */}
+                        {globalErrorMessages.length > 0 ? <Alert type="error" message={globalErrorMessages.join(' ')} /> : <></>}
+                        <Form
+                            form={form}
+                            name="basic"
+                            initialValues={{ remember: true }}
+                            onFinish={onFinish}
+                            onFinishFailed={onFinishFailed}
+                        >
+                            <Form.Item
+                                name="email"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please input your email!'
+                                    },
+                                    {
+                                        type: 'email',
+                                        message: 'Invalid email!',
+                                    }
+                                ]}
+                            >
+                                <Input
+                                    prefix={<UserOutlined />}
+                                    placeholder="Email"
+                                />
+                            </Form.Item>
 
-                <Form.Item
-                    label="Password"
-                    name="password"
-                    rules={[{ required: true, message: 'Please input your password!' }]}
-                >
-                    <Input.Password />
-                </Form.Item>
+                            <Form.Item
+                                name="password"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please input your password!'
+                                    }
+                                ]}
+                            >
+                                <Input.Password
+                                    prefix={<LockOutlined />}
+                                    placeholder="Password"
+                                />
+                            </Form.Item>
 
-                <Form.Item
-                    {...tailLayout}
-                    name="rememberMe"
-                    valuePropName="checked"
-                >
-                    <Checkbox>Remember me</Checkbox>
-                </Form.Item>
+                            <Form.Item>
+                                <Form.Item
+                                    name="rememberMe"
+                                    valuePropName="checked"
+                                    noStyle
+                                >
+                                    <Checkbox>Remember me</Checkbox>
+                                </Form.Item>
 
-                <Form.Item {...tailLayout}>
-                    <Button type="primary" htmlType="submit">
-                        Submit
-                </Button>
-                </Form.Item>
-            </Form>
-        </Layout>
+                                <Link
+                                    href={{
+                                        pathname: paths.userForgotPassword,
+                                        query: returnTo ? { returnTo: returnTo } : null,
+                                    }}
+                                    passHref
+                                >
+                                    <a style={{ float: 'right' }}>
+                                        Forgot password
+                    </a>
+                                </Link>
+                            </Form.Item>
+
+                            <Form.Item>
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    loading={loggingIn}
+                                >
+                                    Login
+                    </Button>
+                    Or <Link
+                                    href={{
+                                        pathname: paths.userRegister,
+                                        query: returnTo ? { returnTo: returnTo } : null,
+                                    }}
+                                >
+                                    Register now!
+                    </Link>
+                            </Form.Item>
+                        </Form>
+                    </Card>
+                </Col>
+            </Row>
+        </Layout >
     );
 }
 

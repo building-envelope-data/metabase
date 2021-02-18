@@ -1,10 +1,14 @@
 import * as React from 'react'
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Menu } from "antd"
+import { Menu, Button, message } from "antd"
 import {
     useCurrentUserQuery,
+    useLogoutUserMutation,
 } from '../lib/currentUser.graphql'
+import paths from "../paths"
+import { initializeApollo } from '../lib/apollo'
+import { useState } from 'react'
 
 type NavItemProps = {
     path: string,
@@ -18,6 +22,32 @@ export type NavBarProps = {
 export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
     const router = useRouter()
     const currentUser = useCurrentUserQuery()?.data?.currentUser
+    const apolloClient = initializeApollo()
+    const [logoutUserMutation] = useLogoutUserMutation()
+    const [loggingOut, setLoggingOut] = useState(false)
+
+    const logout = async () => {
+        try {
+            setLoggingOut(true)
+            const { errors, data } = await logoutUserMutation()
+            if (errors) {
+                console.log(errors) // TODO What to do?
+            }
+            else if (data?.logoutUser?.errors) {
+                // TODO Is this how we want to display errors?
+                message.error(data?.logoutUser?.errors.map(error => error.message).join(' '))
+            }
+            else {
+                // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
+                await apolloClient.resetStore()
+                await router.push('/user/login')
+            }
+        }
+        finally {
+            setLoggingOut(false)
+        }
+    }
+
     return (
         <Menu
             mode="horizontal"
@@ -31,24 +61,28 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
                     </Link>
                 </Menu.Item>
             ))}
+            {/* I would like the following to be on the right but that is not possible at the moment, see issue https://github.com/ant-design/ant-design/issues/10749 */}
             {currentUser ?
                 (
-                    <Menu.Item key="/user/logout">
-                        <Link href="/user/logout">
+                    <Menu.Item>
+                        <Button
+                            onClick={logout}
+                            loading={loggingOut}
+                        >
                             Logout
-                        </Link>
+                        </Button>
                     </Menu.Item>
                 )
                 :
                 (
                     <>
-                        <Menu.Item key="/user/login">
-                            <Link href="/user/login">
+                        <Menu.Item key={paths.userLogin}>
+                            <Link href={paths.userLogin}>
                                 Login
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="/user/register">
-                            <Link href="/user/register">
+                        <Menu.Item key={paths.userRegister}>
+                            <Link href={paths.userRegister}>
                                 Register
                             </Link>
                         </Menu.Item>

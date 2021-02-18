@@ -88,7 +88,7 @@ const Index = () => {
   }
 
   return (
-    <Layout>Something went wrong ...</Layout>
+    <Layout>You're not sigend in.</Layout>
   )
 }
 

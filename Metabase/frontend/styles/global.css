@@ -1,4 +1,4 @@
-*,
+/* *,
 *:before,
 *:after {
   box-sizing: inherit;
@@ -190,4 +190,4 @@ body {
 
 .text-disabled {
   color: var(--textColorSecondary) !important;
-}
+} */

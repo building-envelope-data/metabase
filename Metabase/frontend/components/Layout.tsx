@@ -3,18 +3,15 @@ import * as React from "react"
 import Footer from "./Footer"
 import NavBar from "./NavBar"
 import { Layout as AntLayout } from "antd"
+import paths from "../paths"
 
 const navItems = [
     {
-        path: `/`,
+        path: paths.home,
         label: `Home`,
     },
     {
-        path: `/about`,
-        label: `About`,
-    },
-    {
-        path: `/user/change-email`,
+        path: paths.userChangeEmail,
         label: `Change Email`
     }
 ]
@@ -32,7 +29,9 @@ const Layout: React.FunctionComponent = ({ children }) => {
             <AntLayout.Header>
                 <NavBar items={navItems} />
             </AntLayout.Header>
-            <AntLayout.Content>
+            <AntLayout.Content
+                style={{ padding: '50px' }}
+            >
                 {children}
             </AntLayout.Content>
             <AntLayout.Footer>

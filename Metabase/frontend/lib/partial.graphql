@@ -1,4 +1,0 @@
-fragment UserPartial on User {
-  id
-  email
-}

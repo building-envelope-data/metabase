@@ -5,6 +5,7 @@ import {
 } from '../../lib/currentUser.graphql'
 import { initializeApollo } from '../../lib/apollo'
 import Layout from '../../components/Layout'
+import paths from '../../paths'
 
 function ConfirmUserEmail() {
     const router = useRouter()
@@ -13,19 +14,24 @@ function ConfirmUserEmail() {
     const [confirmUserEmailMutation] = useConfirmUserEmailMutation()
 
     useEffect(() => {
-        if (router.isReady) {
-            confirmUserEmailMutation({
-                variables: {
-                    email: email,
-                    confirmationCode: confirmationCode,
+        const confirmUserEmail = async () => {
+            if (router.isReady) {
+                if (typeof email === "string" &&
+                    typeof confirmationCode === "string"
+                ) {
+                    await confirmUserEmailMutation({
+                        variables: {
+                            email: email,
+                            confirmationCode: confirmationCode,
+                        }
+                    })
+                    // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-confirmUserEmail
+                    await apolloClient.resetStore()
+                    await router.push(paths.home)
                 }
-            }).then(() => {
-                // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-confirmUserEmail
-                apolloClient.resetStore().then(() => {
-                    router.push('/')
-                })
-            })
+            }
         }
+        confirmUserEmail()
     }, [email, confirmationCode])
 
     return (

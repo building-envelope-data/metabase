@@ -1,4 +1,7 @@
-# import UserPartial from './partial.graphql'
+fragment UserPartial on User {
+  id
+  email
+}
 
 query CurrentUser {
   currentUser {
@@ -29,9 +32,6 @@ mutation LoginUser(
 
 mutation LogoutUser {
   logoutUser {
-    user {
-      ...UserPartial
-    }
     errors {
       code
       message
