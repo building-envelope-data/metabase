@@ -19,15 +19,19 @@ export function handleFormErrors(
         const errorPathToMessage =
             userErrors.reduce(
                 (a, x) => {
-                    if (!a.has(x.path)) {
-                        a.set(x.path, [])
+                    // We use strings as keys instead of path arrays because the
+                    // latter are compared by reference.
+                    const pathAsString = x.path.join('.');
+                    if (!a.has(pathAsString)) {
+                        a.set(pathAsString, [x.path, []])
                     }
-                    a.get(x.path)?.push(x.message)
+                    a.get(pathAsString)?.[1]?.push(x.message)
                     return a
                 },
-                new Map<string[], string[]>()
+                new Map<string, [string[], string[]]>()
             )
-        for (let [path, messages] of errorPathToMessage) {
+        console.log(errorPathToMessage)
+        for (let [, [path, messages]] of errorPathToMessage) {
             if (path.length === 1) {
                 globalErrorMessages.push(...messages)
             }
