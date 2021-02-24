@@ -11,6 +11,10 @@ const navItems = [
         label: `Home`,
     },
     {
+        path: paths.institutions,
+        label: `Institutions`
+    },
+    {
         path: paths.userChangeEmail,
         label: `Change Email`
     }

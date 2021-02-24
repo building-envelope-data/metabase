@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { initializeApollo } from '../../lib/apollo'
-import { useLoginUserMutation } from '../../lib/currentUser.graphql'
+import { useLoginUserMutation } from '../../queries/currentUser.graphql'
 import { Alert, Form, Input, Button, Checkbox, Row, Col, Card } from "antd"
 import Layout from '../../components/Layout'
 import Link from 'next/link'
@@ -38,13 +38,21 @@ function Login() {
                     setGlobalErrorMessages,
                     form,
                 )
-                if (!errors && !data?.loginUser?.errors && data?.loginUser?.user) {
-                    await apolloClient.resetStore()
-                    await router.push(
-                        typeof returnTo === "string"
-                            ? returnTo
-                            : paths.home
-                    )
+                if (!errors && !data?.loginUser?.errors) {
+                    if (data?.loginUser?.requiresTwoFactor) {
+                        await router.push({
+                            pathname: paths.userSendTwoFactorCode,
+                            query: returnTo ? { returnTo: returnTo } : null,
+                        })
+                    }
+                    if (data?.loginUser?.user) {
+                        await apolloClient.resetStore()
+                        await router.push(
+                            typeof returnTo === "string"
+                                ? returnTo
+                                : paths.home
+                        )
+                    }
                 }
             }
             catch (error) {
@@ -139,6 +147,7 @@ function Login() {
                                     type="primary"
                                     htmlType="submit"
                                     loading={loggingIn}
+                                    style={{ width: "100%" }}
                                 >
                                     Login
                     </Button>

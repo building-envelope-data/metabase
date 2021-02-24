@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { initializeApollo } from '../../lib/apollo'
-import { useRegisterUserMutation } from '../../lib/currentUser.graphql'
+import { useRegisterUserMutation } from '../../queries/currentUser.graphql'
 import { Alert, Form, Input, Button, Row, Col, Card } from "antd"
 import Layout from '../../components/Layout'
 import paths from '../../paths'
@@ -84,6 +84,10 @@ function Register() {
                                 label="Email"
                                 name="email"
                                 rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please input your email!'
+                                    }
                                 ]}
                             >
                                 <Input />
@@ -92,7 +96,12 @@ function Register() {
                             <Form.Item
                                 label="Password"
                                 name="password"
-                                rules={[{ required: true, message: 'Please input your password!' }]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please input your password!'
+                                    }
+                                ]}
                             >
                                 <Input.Password />
                             </Form.Item>
@@ -132,7 +141,7 @@ function Register() {
                     </Card>
                 </Col>
             </Row>
-        </Layout>
+        </Layout >
     );
 }
 

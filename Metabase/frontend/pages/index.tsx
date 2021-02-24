@@ -5,7 +5,7 @@ import {
   useCurrentUserQuery,
   useChangeUserEmailMutation,
   CurrentUserDocument,
-} from '../lib/currentUser.graphql'
+} from '../queries/currentUser.graphql'
 // import { initializeApollo } from '../lib/apollo'
 import Layout from '../components/Layout'
 

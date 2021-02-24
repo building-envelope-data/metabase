@@ -13,7 +13,7 @@ namespace Metabase.GraphQl.Institutions
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UsePaging(typeof(InstitutionType))]
-        [UseProjection]
+        // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
         [UseFiltering]
         [UseSorting]
         public IQueryable<Data.Institution> GetInstitutions(

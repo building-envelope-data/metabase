@@ -17,7 +17,7 @@ namespace Metabase.Data
 
         [Required]
         [Url]
-        public string Locator { get; private set; }
+        public Uri Locator { get; private set; }
 
         public Guid OperatorId { get; set; }
 
@@ -34,7 +34,7 @@ namespace Metabase.Data
         public Database(
             string name,
             string description,
-            string locator
+            Uri locator
             )
         {
             Name = name;

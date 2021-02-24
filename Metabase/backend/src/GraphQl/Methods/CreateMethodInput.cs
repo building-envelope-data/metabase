@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using NpgsqlTypes;
-using DateTime = System.DateTime;
+using System;
 
 namespace Metabase.GraphQl.Methods
 {
     public record CreateMethodInput(
           string Name,
           string Description,
-          string? PublicationLocator,
-          string? CodeLocator,
+          Uri? PublicationLocator,
+          Uri? CodeLocator,
           Enumerations.MethodCategory[] Categories
         );
 }

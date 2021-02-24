@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using GraphQlX = Metabase.GraphQl;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
+using HotChocolate.Types.Pagination;
 
 namespace Metabase.Configuration
 {
@@ -31,12 +32,14 @@ namespace Metabase.Configuration
                         .AddType<GraphQlX.Databases.DatabaseQueries>()
                         .AddType<GraphQlX.Institutions.InstitutionQueries>()
                         .AddType<GraphQlX.Methods.MethodQueries>()
+                        .AddType<GraphQlX.Standards.StandardQueries>()
                     .AddMutationType(d => d.Name(nameof(GraphQlX.Mutation)))
                         .AddType<GraphQlX.Users.UserMutations>()
                         .AddType<GraphQlX.Components.ComponentMutations>()
                         .AddType<GraphQlX.Databases.DatabaseMutations>()
                         .AddType<GraphQlX.Institutions.InstitutionMutations>()
                         .AddType<GraphQlX.Methods.MethodMutations>()
+                        .AddType<GraphQlX.Standards.StandardMutations>()
                     /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
                     /*     .AddType<ComponentSubscriptions>() */
                     // Object Types
@@ -46,6 +49,7 @@ namespace Metabase.Configuration
                     .AddType<GraphQlX.Institutions.InstitutionType>()
                     .AddType<GraphQlX.Methods.MethodType>()
                     .AddType<GraphQlX.Persons.PersonType>()
+                    .AddType<GraphQlX.Standards.StandardType>()
                     // Data Loaders
                     .AddDataLoader<GraphQlX.Components.ComponentByIdDataLoader>()
                     .AddDataLoader<GraphQlX.Databases.DatabaseByIdDataLoader>()
@@ -53,6 +57,7 @@ namespace Metabase.Configuration
                     .AddDataLoader<GraphQlX.Institutions.InstitutionRepresentativesByInstitutionIdDataLoader>()
                     .AddDataLoader<GraphQlX.Methods.MethodByIdDataLoader>()
                     .AddDataLoader<GraphQlX.Persons.PersonByIdDataLoader>()
+                    .AddDataLoader<GraphQlX.Standards.StandardByIdDataLoader>()
                     // Filtering
                     .AddConvention<IFilterConvention>(
                      new FilterConventionExtension(descriptor =>
@@ -61,9 +66,19 @@ namespace Metabase.Configuration
                            descriptor.BindRuntimeType<Data.Database, GraphQlX.Databases.DatabaseFilterType>();
                            descriptor.BindRuntimeType<Data.Institution, GraphQlX.Institutions.InstitutionFilterType>();
                            descriptor.BindRuntimeType<Data.Method, GraphQlX.Methods.MethodFilterType>();
+                           descriptor.BindRuntimeType<Data.Standard, GraphQlX.Standards.StandardFilterType>();
                        }
                        )
                      )
+                    // Paging
+                    .SetPagingOptions(
+                        new PagingOptions
+                        {
+                            // MaxPageSize = ...,
+                            // DefaultPageSize = ...,
+                            IncludeTotalCount = true
+                        }
+                    )
                 );
         }
     }

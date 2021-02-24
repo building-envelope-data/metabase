@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Metabase.Data
 {
@@ -16,13 +17,13 @@ namespace Metabase.Data
         public string? EmailAddress { get; private set; }
 
         [Url]
-        public string? WebsiteLocator { get; private set; }
+        public Uri? WebsiteLocator { get; private set; }
 
         public ContactInformation(
             string? phoneNumber,
             string? postalAddress,
             string? emailAddress,
-            string? websiteLocator
+            Uri? websiteLocator
             )
         {
             PhoneNumber = phoneNumber;

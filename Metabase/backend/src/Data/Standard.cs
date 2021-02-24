@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace Metabase.Data
 {
@@ -29,7 +30,7 @@ namespace Metabase.Data
 
         [Required]
         [Url]
-        public string Locator { get; private set; }
+        public Uri Locator { get; private set; }
 
 #nullable disable
         public Standard()
@@ -44,7 +45,7 @@ namespace Metabase.Data
             string section,
             int year,
             Enumerations.Standardizer[] standardizers,
-            string locator
+            Uri locator
             )
         {
             Title = title;

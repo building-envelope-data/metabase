@@ -1,0 +1,79 @@
+fragment InstitutionPartial on Institution {
+  id
+  uuid
+  name
+  abbreviation
+  description
+  websiteLocator
+  state
+}
+
+# query Institutions(
+#     $after: String
+#     $before: String
+#     $first: Int
+#     $last: Int
+# ) {
+#   institutions(
+#       after: $after,
+#       before: $before,
+#       first: $first,
+#       last: $last
+#   ) {
+#     nodes {
+#         ...InstitutionPartial
+#       }
+#     pageInfo {
+#         endCursor
+#         startCursor
+#     }
+#     totalCount
+#   }
+# }
+query Institutions {
+  institutions {
+    nodes {
+        ...InstitutionPartial
+      }
+    totalCount
+  }
+}
+
+mutation CreateInstitution(
+  $name: String!
+  $abbreviation: String
+  $description: String!
+  $ownerIds: [Uuid!]!
+  $websiteLocator: Url
+  $state: InstitutionState!
+) {
+  createInstitution(
+    input: {
+      name: $name,
+      abbreviation: $abbreviation,
+      description: $description,
+      ownerIds: $ownerIds,
+      websiteLocator: $websiteLocator,
+      state: $state
+    }
+  ) {
+    institution {
+      ...InstitutionPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+query Institution(
+  $uuid: Uuid!
+) {
+  institution(
+    uuid: $uuid
+  ) {
+    ...InstitutionPartial
+  }
+}

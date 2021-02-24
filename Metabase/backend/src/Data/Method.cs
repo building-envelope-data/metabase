@@ -22,10 +22,10 @@ namespace Metabase.Data
         public Standard? Standard { get; set; }
 
         [Url]
-        public string? PublicationLocator { get; private set; }
+        public Uri? PublicationLocator { get; private set; }
 
         [Url]
-        public string? CodeLocator { get; private set; }
+        public Uri? CodeLocator { get; private set; }
 
         [Required]
         public Enumerations.MethodCategory[] Categories { get; private set; }
@@ -54,8 +54,8 @@ namespace Metabase.Data
         public Method(
             string name,
             string description,
-            string? publicationLocator,
-            string? codeLocator,
+            Uri? publicationLocator,
+            Uri? codeLocator,
             Enumerations.MethodCategory[] categories
 
             )

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System;
 
 namespace Metabase.Data
 {
@@ -19,7 +20,7 @@ namespace Metabase.Data
         public string Description { get; private set; }
 
         [Url]
-        public string? WebsiteLocator { get; private set; }
+        public Uri? WebsiteLocator { get; private set; }
 
         [MinLength(1)]
         public string? PublicKey { get; private set; }
@@ -53,7 +54,7 @@ namespace Metabase.Data
             string name,
             string? abbreviation,
             string description,
-            string? websiteLocator,
+            Uri? websiteLocator,
             string? publicKey,
             Enumerations.InstitutionState state
             )
@@ -70,7 +71,7 @@ namespace Metabase.Data
             string name,
             string? abbreviation,
             string description,
-            string? websiteLocator,
+            Uri? websiteLocator,
             string? publicKey,
             Enumerations.InstitutionState state
         )

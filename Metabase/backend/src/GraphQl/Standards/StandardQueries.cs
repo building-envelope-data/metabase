@@ -6,30 +6,30 @@ using HotChocolate.Data;
 using HotChocolate.Types;
 using Guid = System.Guid;
 
-namespace Metabase.GraphQl.Databases
+namespace Metabase.GraphQl.Standards
 {
     [ExtendObjectType(Name = nameof(Query))]
-    public sealed class DatabaseQueries
+    public sealed class StandardQueries
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UsePaging]
         // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Data.Database> GetDatabases(
+        public IQueryable<Data.Standard> GetStandards(
             [ScopedService] Data.ApplicationDbContext context
             )
         {
-            return context.Databases;
+            return context.Standards;
         }
 
-        public Task<Data.Database?> GetDatabaseAsync(
+        public Task<Data.Standard?> GetStandardAsync(
             Guid uuid,
-            DatabaseByIdDataLoader databaseById,
+            StandardByIdDataLoader standardById,
             CancellationToken cancellationToken
             )
         {
-            return databaseById.LoadAsync(
+            return standardById.LoadAsync(
                 uuid,
                 cancellationToken
                 );

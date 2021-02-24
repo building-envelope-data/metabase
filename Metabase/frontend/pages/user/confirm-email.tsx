@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import {
     useConfirmUserEmailMutation,
-} from '../../lib/currentUser.graphql'
+} from '../../queries/currentUser.graphql'
 import { initializeApollo } from '../../lib/apollo'
 import Layout from '../../components/Layout'
 import paths from '../../paths'

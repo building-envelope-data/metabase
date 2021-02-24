@@ -86,6 +86,7 @@ type ComponentConnection {
   nodes: [Component!]
   "Information to aid in pagination."
   pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 "An edge in a connection."
@@ -130,7 +131,7 @@ type ContactInformation {
   emailAddress: String
   phoneNumber: String
   postalAddress: String
-  websiteLocator: String
+  websiteLocator: Url
 }
 
 type CreateComponentError {
@@ -177,10 +178,21 @@ type CreateMethodPayload {
   method: Method
 }
 
+type CreateStandardError {
+  code: CreateStandardErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type CreateStandardPayload {
+  errors: [CreateStandardError!]
+  standard: Standard
+}
+
 type Database implements Node {
   description: String!
   id: ID!
-  locator: String!
+  locator: Url!
   name: String!
   operator: DatabaseOperatorEdge
   uuid: Uuid!
@@ -194,6 +206,7 @@ type DatabaseConnection {
   nodes: [Database!]
   "Information to aid in pagination."
   pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 "An edge in a connection."
@@ -255,7 +268,7 @@ type Institution implements Node {
   representatives: InstitutionRepresentativeConnection
   state: InstitutionState!
   uuid: Uuid!
-  websiteLocator: String
+  websiteLocator: Url
 }
 
 "A connection to a list of items."
@@ -266,6 +279,7 @@ type InstitutionConnection {
   nodes: [Institution]
   "Information to aid in pagination."
   pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 "An edge in a connection."
@@ -335,7 +349,7 @@ type LogoutUserPayload {
 
 type Method implements Node {
   categories: [MethodCategory!]!
-  codeLocator: String
+  codeLocator: Url
   description: String!
   developers: [Stakeholder!]!
   id: ID!
@@ -344,7 +358,7 @@ type Method implements Node {
   name: String!
   personDeveloperEdges: [PersonMethodDeveloper!]!
   personDevelopers: [Person!]!
-  publicationLocator: String
+  publicationLocator: Url
   standard: Standard
   standardId: Uuid
   uuid: Uuid!
@@ -358,6 +372,7 @@ type MethodConnection {
   nodes: [Method!]
   "Information to aid in pagination."
   pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 "An edge in a connection."
@@ -379,6 +394,7 @@ type Mutation {
   createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload! @authorize(apply: BEFORE_RESOLVER)
   createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER)
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(apply: BEFORE_RESOLVER)
+  createStandard(input: CreateStandardInput!): CreateStandardPayload! @authorize(apply: BEFORE_RESOLVER)
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(apply: BEFORE_RESOLVER)
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER)
@@ -470,6 +486,8 @@ type Query {
   methods(after: String before: String first: Int last: Int order: [MethodSortInput!] where: MethodFilterInput): MethodConnection
   node(id: ID!): Node
   personalUserData: PersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
+  standard(uuid: Uuid!): Standard
+  standards(after: String before: String first: Int last: Int order: [StandardSortInput!] where: StandardFilterInput): StandardConnection
   users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
 }
 
@@ -569,16 +587,35 @@ type Stakeholder {
   xmin: UInt!
 }
 
-type Standard {
+type Standard implements Node {
   abstract: String!
-  id: Uuid!
-  locator: String!
+  id: ID!
+  locator: Url!
   numeration: Numeration!
   section: String!
   standardizers: [Standardizer!]!
   title: String!
-  xmin: UInt!
+  uuid: Uuid!
   year: Int!
+}
+
+"A connection to a list of items."
+type StandardConnection {
+  "A list of edges."
+  edges: [StandardEdge!]
+  "A flattened list of the nodes."
+  nodes: [Standard!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type StandardEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Standard!
 }
 
 type UpdateInstitutionError {
@@ -595,6 +632,7 @@ type UpdateInstitutionPayload {
 type User implements Node {
   email: String
   id: ID!
+  uuid: Uuid!
 }
 
 "A connection to a list of items."
@@ -605,6 +643,7 @@ type UserConnection {
   nodes: [User!]
   "Information to aid in pagination."
   pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 "An edge in a connection."
@@ -619,6 +658,11 @@ input AddInstitutionRepresentativeInput {
   institutionId: Uuid!
   role: InstitutionRepresentativeRole!
   userId: Uuid!
+}
+
+input BooleanOperationFilterInput {
+  eq: Boolean
+  neq: Boolean
 }
 
 input ChangeInstitutionRepresentativeRoleInput {
@@ -650,6 +694,21 @@ input ComparableGuidOperationFilterInput {
   nin: [Uuid!]
   nlt: Uuid
   nlte: Uuid
+}
+
+input ComparableInt32OperationFilterInput {
+  eq: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  neq: Int
+  ngt: Int
+  ngte: Int
+  nin: [Int!]
+  nlt: Int
+  nlte: Int
 }
 
 input ComponentCategoryOperationFilterInput {
@@ -699,7 +758,7 @@ input CreateComponentInput {
 
 input CreateDatabaseInput {
   description: String!
-  locator: String!
+  locator: Url!
   name: String!
 }
 
@@ -710,22 +769,31 @@ input CreateInstitutionInput {
   ownerIds: [Uuid!]!
   publicKey: String
   state: InstitutionState!
-  websiteLocator: String
+  websiteLocator: Url
 }
 
 input CreateMethodInput {
   categories: [MethodCategory!]!
-  codeLocator: String
+  codeLocator: Url
   description: String!
   name: String!
-  publicationLocator: String
+  publicationLocator: Url
+}
+
+input CreateStandardInput {
+  abstract: String!
+  locator: Url!
+  section: String!
+  standardizers: [Standardizer!]!
+  title: String!
+  year: Int!
 }
 
 input DatabaseFilterInput {
   and: [DatabaseFilterInput!]
   description: StringOperationFilterInput
   id: ComparableGuidOperationFilterInput
-  locator: StringOperationFilterInput
+  locator: UriFilterInput
   name: StringOperationFilterInput
   or: [DatabaseFilterInput!]
 }
@@ -733,7 +801,7 @@ input DatabaseFilterInput {
 input DatabaseSortInput {
   description: SortEnumType
   id: SortEnumType
-  locator: SortEnumType
+  locator: UriSortInput
   name: SortEnumType
   operator: InstitutionSortInput
   operatorId: SortEnumType
@@ -755,7 +823,7 @@ input InstitutionFilterInput {
   id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   or: [InstitutionFilterInput!]
-  websiteLocator: StringOperationFilterInput
+  websiteLocator: UriFilterInput
 }
 
 input InstitutionSortInput {
@@ -765,7 +833,7 @@ input InstitutionSortInput {
   name: SortEnumType
   publicKey: SortEnumType
   state: SortEnumType
-  websiteLocator: SortEnumType
+  websiteLocator: UriSortInput
   xmin: SortEnumType
 }
 
@@ -783,6 +851,13 @@ input ListMethodCategoryOperationFilterInput {
   some: MethodCategoryOperationFilterInput
 }
 
+input ListStringOperationFilterInput {
+  all: StringOperationFilterInput
+  any: Boolean
+  none: StringOperationFilterInput
+  some: StringOperationFilterInput
+}
+
 input LoginUserInput {
   email: String!
   password: String!
@@ -798,20 +873,20 @@ input MethodCategoryOperationFilterInput {
 input MethodFilterInput {
   and: [MethodFilterInput!]
   categories: ListMethodCategoryOperationFilterInput
-  codeLocator: StringOperationFilterInput
+  codeLocator: UriFilterInput
   description: StringOperationFilterInput
   id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   or: [MethodFilterInput!]
-  publicationLocator: StringOperationFilterInput
+  publicationLocator: UriFilterInput
 }
 
 input MethodSortInput {
-  codeLocator: SortEnumType
+  codeLocator: UriSortInput
   description: SortEnumType
   id: SortEnumType
   name: SortEnumType
-  publicationLocator: SortEnumType
+  publicationLocator: UriSortInput
   standard: StandardSortInput
   standardId: SortEnumType
   xmin: SortEnumType
@@ -863,10 +938,18 @@ input SetUserPhoneNumberInput {
   phoneNumber: String!
 }
 
+input StandardFilterInput {
+  abstract: StringOperationFilterInput
+  and: [StandardFilterInput!]
+  id: ComparableGuidOperationFilterInput
+  or: [StandardFilterInput!]
+  title: StringOperationFilterInput
+}
+
 input StandardSortInput {
   abstract: SortEnumType
   id: SortEnumType
-  locator: SortEnumType
+  locator: UriSortInput
   numeration: NumerationSortInput
   section: SortEnumType
   title: SortEnumType
@@ -896,7 +979,65 @@ input UpdateInstitutionInput {
   name: String!
   publicKey: String
   state: InstitutionState!
-  websiteLocator: String
+  websiteLocator: Url
+}
+
+input UriFilterInput {
+  absolutePath: StringOperationFilterInput
+  absoluteUri: StringOperationFilterInput
+  and: [UriFilterInput!]
+  authority: StringOperationFilterInput
+  dnsSafeHost: StringOperationFilterInput
+  fragment: StringOperationFilterInput
+  host: StringOperationFilterInput
+  hostNameType: UriHostNameTypeOperationFilterInput
+  idnHost: StringOperationFilterInput
+  isAbsoluteUri: BooleanOperationFilterInput
+  isDefaultPort: BooleanOperationFilterInput
+  isFile: BooleanOperationFilterInput
+  isLoopback: BooleanOperationFilterInput
+  isUnc: BooleanOperationFilterInput
+  localPath: StringOperationFilterInput
+  or: [UriFilterInput!]
+  originalString: StringOperationFilterInput
+  pathAndQuery: StringOperationFilterInput
+  port: ComparableInt32OperationFilterInput
+  query: StringOperationFilterInput
+  scheme: StringOperationFilterInput
+  segments: ListStringOperationFilterInput
+  userEscaped: BooleanOperationFilterInput
+  userInfo: StringOperationFilterInput
+}
+
+input UriHostNameTypeOperationFilterInput {
+  eq: UriHostNameType
+  in: [UriHostNameType!]
+  neq: UriHostNameType
+  nin: [UriHostNameType!]
+}
+
+input UriSortInput {
+  absolutePath: SortEnumType
+  absoluteUri: SortEnumType
+  authority: SortEnumType
+  dnsSafeHost: SortEnumType
+  fragment: SortEnumType
+  host: SortEnumType
+  hostNameType: SortEnumType
+  idnHost: SortEnumType
+  isAbsoluteUri: SortEnumType
+  isDefaultPort: SortEnumType
+  isFile: SortEnumType
+  isLoopback: SortEnumType
+  isUnc: SortEnumType
+  localPath: SortEnumType
+  originalString: SortEnumType
+  pathAndQuery: SortEnumType
+  port: SortEnumType
+  query: SortEnumType
+  scheme: SortEnumType
+  userEscaped: SortEnumType
+  userInfo: SortEnumType
 }
 
 input UserSortInput {
@@ -993,6 +1134,10 @@ enum CreateInstitutionErrorCode {
 }
 
 enum CreateMethodErrorCode {
+  UNKNOWN
+}
+
+enum CreateStandardErrorCode {
   UNKNOWN
 }
 
@@ -1150,6 +1295,14 @@ enum UpdateInstitutionErrorCode {
   UNKNOWN_INSTITUTION
 }
 
+enum UriHostNameType {
+  UNKNOWN
+  BASIC
+  DNS
+  I_PV4
+  I_PV6
+}
+
 directive @authorize("Defines when when the resolver shall be executed.By default the resolver is executed after the policy has determined that the current user is allowed to access the field." apply: ApplyPolicy! = BEFORE_RESOLVER "The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!]) repeatable on SCHEMA | OBJECT | FIELD_DEFINITION
 
 "The `@defer` directive may be provided for fragment spreads and inline fragments to inform the executor to delay the execution of the current fragment to indicate deprioritization of the current fragment. A query with `@defer` directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred is delivered in a subsequent response. `@include` and `@skip` take precedence over `@defer`."
@@ -1175,5 +1328,7 @@ scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time"
 
 "The `UInt` scalar represents a 32-bit unsigned integer type."
 scalar UInt
+
+scalar Url
 
 scalar Uuid

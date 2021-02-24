@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { initializeApollo } from '../../lib/apollo'
-import { useChangeUserEmailMutation } from '../../lib/currentUser.graphql'
+import { useChangeUserEmailMutation } from '../../queries/currentUser.graphql'
 import { Form, Input, Button } from "antd"
 import Layout from '../../components/Layout'
 

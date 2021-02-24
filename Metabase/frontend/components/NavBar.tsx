@@ -5,7 +5,7 @@ import { Menu, Button, message } from "antd"
 import {
     useCurrentUserQuery,
     useLogoutUserMutation,
-} from '../lib/currentUser.graphql'
+} from '../queries/currentUser.graphql'
 import paths from "../paths"
 import { initializeApollo } from '../lib/apollo'
 import { useState } from 'react'

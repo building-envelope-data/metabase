@@ -1,5 +1,6 @@
 fragment UserPartial on User {
   id
+  uuid
   email
 }
 
@@ -19,6 +20,7 @@ mutation LoginUser(
            password: $password
            }
       ) {
+    requiresTwoFactor
     user {
       ...UserPartial
     }
