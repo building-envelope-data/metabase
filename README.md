@@ -5,6 +5,8 @@ cd icon
 git submodule init
 git submodule update
 ```
+For an introduction to submodules see
+[Git submodules](https://www.atlassian.com/git/tutorials/git-submodule)
 
 The product identifier service should provide the following endpoints:
 * Obtain a new product identifier possibly associating internal meta information with it, like a custom string or a JSON blob
@@ -54,3 +56,6 @@ We may add some error detection and correction capabilities by, for example, gen
     and by
     [Type Safety Back and Forth](https://www.parsonsmatt.org/2017/10/11/type_safety_back_and_forth.html)
 - A hands-on introduction to regular expressions is [Everything you need to know about Regular Expressions](https://towardsdatascience.com/everything-you-need-to-know-about-regular-expressions-8f622fe10b03)
+- [Unit testing best practices](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices)
+  and
+  [Naming standards for unit tests](https://osherove.com/blog/2005/4/3/naming-standards-for-unit-tests.html)

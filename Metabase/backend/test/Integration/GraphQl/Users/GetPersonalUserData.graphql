@@ -1,0 +1,13 @@
+query {
+  personalUserData {
+    user {
+      id
+      email
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

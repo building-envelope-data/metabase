@@ -14,8 +14,8 @@ WORKDIR /app/${PROJECT_NAME}/frontend
 
 ENV PATH=/app/${PROJECT_NAME}/frontend/node_modules/.bin:$PATH
 
-RUN npm install
-RUN npm run build
+RUN yarn install
+RUN yarn build
 
 ###########
 # RUNTIME #

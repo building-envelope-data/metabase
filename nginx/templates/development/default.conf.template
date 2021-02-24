@@ -2,7 +2,7 @@
 # and https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#configure-nginx
 
 proxy_redirect          off;
-proxy_set_header        Host $host;
+proxy_set_header        Host $http_host; # Use the HTTP request header field HOST through the variable `$http_host` instead of the host name `$host` because the former includes the port whereas the latter does not. This header is then used by ASP.NET Core for make relative paths absolute, for example, in the OpenId Configuration `/.well-known/openid-configuration`. The NGINX variables `$http_` are described in http://nginx.org/en/docs/http/ngx_http_core_module.html#var_http_
 proxy_set_header        X-Real-IP $remote_addr;
 proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header        X-Forwarded-Proto $scheme;
@@ -56,7 +56,7 @@ server {
   ssl_stapling              on; #ensure your cert is capable
   ssl_stapling_verify       on; #ensure your cert is capable
 
-  add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+  add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload" always;
   add_header X-Frame-Options DENY;
   add_header X-Content-Type-Options nosniff; # Secure from MIME-type sniffing: https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#mime-type-sniffing
 
@@ -65,7 +65,16 @@ server {
     limit_req  zone=one burst=10 nodelay;
   }
 
-  #Redirects all traffic
+  location /connect {
+    proxy_pass http://backend;
+    limit_req  zone=one burst=10 nodelay;
+  }
+
+  location /.well-known {
+    proxy_pass http://backend;
+    limit_req  zone=one burst=10 nodelay;
+  }
+
   location / {
     proxy_pass http://frontend;
     limit_req  zone=one burst=10 nodelay;

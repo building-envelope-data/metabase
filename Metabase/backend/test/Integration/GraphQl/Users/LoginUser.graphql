@@ -1,0 +1,21 @@
+mutation loginUser(
+    $email: String!
+    $password: String!
+) {
+  loginUser(input: {
+    email: $email,
+    password: $password
+  }) {
+    jwtAccessToken
+    requiresTwoFactor
+    user {
+      id
+      email
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

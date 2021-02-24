@@ -8,7 +8,7 @@ namespace Infrastructure.Configuration
     {
         public static void ConfigureServices(IServiceCollection services)
         {
-            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-3.1#session-state
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
                 {
@@ -18,12 +18,6 @@ namespace Infrastructure.Configuration
                     // Make the session cookie essential
                     options.Cookie.IsEssential = true;
                 });
-        }
-
-        public static void Configure(IApplicationBuilder app)
-        {
-            app.UseCookiePolicy();
-            app.UseSession();
         }
     }
 }

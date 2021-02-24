@@ -1,36 +1,16 @@
 using System;
-using System.Reflection;
-using Infrastructure.Extensions;
-using Infrastructure.ValueObjects;
-using Metabase.Data;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 
-// TODO ? Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth?view=aspnetcore-3.0
-// TODO Use NodaTime (see commented code below; confer https://www.npgsql.org/efcore/mapping/nodatime.html).
-//      There are problems with the generated migrations of the identity server.
-//      Maybe https://github.com/etiennemtl/identity-npsql-nodatime helps.
-//      The error was `System.InvalidCastException: Can't write CLR type System.DateTime with handler type TimestampHandler`
-//      See also https://github.com/npgsql/Npgsql.EntityFrameworkCore.PostgreSQL/issues/568
-//      https://github.com/npgsql/Npgsql.EntityFrameworkCore.PostgreSQL/issues/648
-// TODO API versioning: https://github.com/RicoSuter/NSwag/issues/2118
-
-// OpenIddict is another implementation of OpenId Connect
-
-// IdentityServer4 Demo: https://demo.identityserver.io/
-//                       https://github.com/IdentityServer/IdentityServer4.Demo/blob/master/src/IdentityServer4Demo/Config.cs
-
-// TODO IdentityServer4 Admin UI. Available options are:
-//      https://github.com/skoruba/IdentityServer4.Admin
-//      https://github.com/brunohbrito/JPProject.IdentityServer4.AdminUI
-//      https://github.com/zarxor/IdentityServer4.OpenAdmin
-
-// TODO For client libraries use https://identitymodel.readthedocs.io/en/latest/
-
-// TODO Swagger UI for IdentityServer4 endpoints, follow `https://github.com/IdentityServer/IdentityServer4/issues/2286`
+// TODO Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth
 
 namespace Metabase
 {
@@ -51,23 +31,113 @@ namespace Metabase
         public override void ConfigureServices(IServiceCollection services)
         {
             base.ConfigureServices(services);
-            Infrastructure.Configuration.Session.ConfigureServices(services);
-            Infrastructure.Configuration.RequestResponse.ConfigureServices(services);
-            Configuration.Auth.ConfigureServices(services, _environment, _configuration, _appSettings, GetMigrationsAssembly());
+            services.AddHealthChecks();
+            // TODO Find better place for message senders?
+            services.AddTransient<Services.IEmailSender, Services.MessageSender>();
+            services.AddTransient<Services.ISmsSender, Services.MessageSender>();
+            services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+            ConfigureSessionServices(services);
+            Configuration.Auth.ConfigureServices(services, _environment, _appSettings);
             Configuration.GraphQl.ConfigureServices(services);
-            Configuration.EventStore.ConfigureServices(services, _environment, _appSettings.Database);
-            Configuration.QueryCommandAndEventBusses.ConfigureServices(services);
+            Configuration.Database.ConfigureServices(services, _appSettings.Database);
+            services.AddControllersWithViews();
+            // services.AddDatabaseDeveloperPageExceptionFilter();
+            // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order
+            services.Configure<ForwardedHeadersOptions>(_ =>
+            {
+                // TODO _.AllowedHosts = ...
+                _.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forward-the-scheme-for-linux-and-non-iis-reverse-proxies
+                _.KnownNetworks.Clear();
+                _.KnownProxies.Clear();
+            }
+            );
+        }
+
+        private static void ConfigureSessionServices(IServiceCollection services)
+        {
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+                {
+                    // Set a short timeout for easy testing.
+                    options.IdleTimeout = TimeSpan.FromSeconds(10);
+                    options.Cookie.HttpOnly = true;
+                    // Make the session cookie essential
+                    options.Cookie.IsEssential = true;
+                });
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            Infrastructure.Configuration.RequestResponse.ConfigureRouting(app, _environment);
-            Configuration.Auth.Configure(app);
-            Infrastructure.Configuration.Session.Configure(app);
-            Configuration.GraphQl.Configure(app, _environment);
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/
+            if (_environment.IsDevelopment() || _environment.IsEnvironment("test"))
+            {
+                app.UseDeveloperExceptionPage();
+                // app.UseMigrationsEndPoint();
+                // Forwarded Headers Middleware must run before other middleware except diagnostics and error handling middleware. In particular before HSTS middleware.
+                // See https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#other-proxy-server-and-load-balancer-scenarios
+                app.UseForwardedHeaders();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                // Forwarded Headers Middleware must run before other middleware except diagnostics and error handling middleware. In particular before HSTS middleware.
+                // See https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#other-proxy-server-and-load-balancer-scenarios
+                app.UseForwardedHeaders();
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                // ASP.NET advices to not use HSTS for APIs, see the warning on
+                // https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl
+                // app.UseHsts(); // Done by NGINX, see https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
+            }
+            // app.UseStatusCodePages();
+            // app.UseHttpsRedirection(); // Done by NGINX
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
+            app.UseRouting();
+            // TODO Do we really want this? See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0
+            app.UseRequestLocalization(options =>
+            {
+                options.AddSupportedCultures("en-US", "de-DE");
+                options.AddSupportedUICultures("en-US", "de-DE");
+                options.SetDefaultCulture("en-US");
+            });
+            app.UseCors();
+            // app.UseCertificateForwarding(); // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-5.0#other-web-proxies
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseSession();
+            // app.UseResponseCompression(); // Done by Nginx
+            // app.UseResponseCaching(); // Done by Nginx
+            app.UseHealthChecks(
+                "/health",
+                new HealthCheckOptions
+                {
+                    ResponseWriter = JsonResponseWriter
+                }
+                );
+            /* app.UseWebSockets(); */
+            app.UseEndpoints(_ =>
+            {
+                _.MapGraphQL();
+                _.MapControllers();
+            });
+        }
 
-            // TODO Shall we do migrations here or in Program.cs?
-            /* app.ApplicationServices.GetService<ClientsDbContext>().Database.Migrate(); */
+        private async Task JsonResponseWriter(HttpContext context, HealthReport report)
+        {
+            context.Response.ContentType = "application/json";
+            await JsonSerializer.SerializeAsync(
+                context.Response.Body,
+                new
+                {
+                    Status = report.Status.ToString()
+                },
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                }
+                ).ConfigureAwait(false);
         }
     }
 }

@@ -5,42 +5,39 @@ namespace Infrastructure
     public sealed class AppSettings
     {
         public string Host { get; set; }
-        = "https://icon.com";
+        = "";
 
         public LoggingSettings Logging { get; set; }
         = new LoggingSettings();
 
-        public class LoggingSettings
+        public sealed class LoggingSettings
         {
             public bool EnableSensitiveDataLogging { get; set; }
             = false;
         }
 
+        public JsonWebTokenSettings JsonWebToken { get; set; }
+        = new JsonWebTokenSettings();
+
+        public sealed class JsonWebTokenSettings
+        {
+            public string EncryptionKey { get; set; }
+            = "";
+
+            public string SigningKey { get; set; }
+            = "";
+        }
+
         public DatabaseSettings Database { get; set; }
         = new DatabaseSettings();
 
-        public class DatabaseSettings
+        public sealed class DatabaseSettings
         {
             public string ConnectionString { get; set; }
-            = "Host=database;Port=5432;Database=icon;";
+            = "";
 
-            public SchemaNameSettings SchemaName { get; set; }
-            = new SchemaNameSettings();
-
-            public class SchemaNameSettings
-            {
-                public string Application { get; set; }
-                = "application";
-
-                public string EventStore { get; set; }
-                = "event_store";
-
-                public string IdentityServerPersistedGrant { get; set; }
-                = "persisted_grant";
-
-                public string IdentityServerConfiguration { get; set; }
-                = "configuration";
-            }
+            public string SchemaName { get; set; }
+            = "";
         }
     }
 }

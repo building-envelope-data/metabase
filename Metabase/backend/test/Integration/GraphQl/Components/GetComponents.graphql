@@ -1,0 +1,18 @@
+query {
+  components {
+    edges {
+      node {
+        id
+        uuid
+        name
+        abbreviation
+        description
+        availability {
+            from
+            to
+        }
+        categories
+      }
+    }
+  }
+}

@@ -1,3 +1,0 @@
-[submodule "dotnet-certificate-tool"]
-	path = dotnet-certificate-tool
-	url = https://github.com/ise621/dotnet-certificate-tool.git

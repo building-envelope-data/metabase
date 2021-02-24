@@ -1,6 +1,7 @@
 using System;
-using Metabase.Data;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,23 +11,34 @@ namespace Metabase
 {
     public class Program
     {
-        public static void Main(string[] commandLineArguments)
+        public static async Task Main(string[] commandLineArguments)
         {
             var host = CreateHostBuilder(commandLineArguments).Build();
-            using (var scope = host.Services.CreateScope())
+            // TODO Shall we really seed here?
+            await CreateAndSeedDbIfNotExists(host).ConfigureAwait(false);
+            host.Run();
+        }
+
+        public static async Task CreateAndSeedDbIfNotExists(IHost host)
+        {
+            // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
+            using var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            try
             {
-                var services = scope.ServiceProvider;
-                try
+                using var dbContext =
+                 services.GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
+                 .CreateDbContext();
+                if (dbContext.Database.EnsureCreated())
                 {
-                    SeedData.Initialize(services);
-                }
-                catch (Exception exception)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(exception, "An error occurred seeding the database.");
+                    await Data.DbSeeder.DoAsync(services, testEnvironment: false).ConfigureAwait(false);
                 }
             }
-            host.Run();
+            catch (Exception exception)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(exception, "An error occurred creating and seeding the database.");
+            }
         }
 
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
@@ -35,9 +47,9 @@ namespace Metabase
             return Host.CreateDefaultBuilder(commandLineArguments)
               .ConfigureWebHostDefaults(webBuilder =>
                   webBuilder
-                  .UseKestrel() // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-3.1
+                  .UseKestrel() // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel
                   .UseContentRoot(Directory.GetCurrentDirectory())
-                  .UseStartup<Startup>(webHostBuilderContext =>
+                  .UseStartup(webHostBuilderContext =>
                     new Startup(
                       webHostBuilderContext.HostingEnvironment,
                       commandLineArguments

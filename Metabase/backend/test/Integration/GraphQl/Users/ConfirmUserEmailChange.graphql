@@ -1,0 +1,21 @@
+mutation confirmUserEmailChange(
+  $currentEmail: String!,
+  $newEmail: String!,
+  $confirmationCode: String!
+  ) {
+  confirmUserEmailChange(input: {
+    currentEmail: $currentEmail,
+    newEmail: $newEmail,
+    confirmationCode: $confirmationCode
+  }) {
+    user {
+      id
+      email
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
