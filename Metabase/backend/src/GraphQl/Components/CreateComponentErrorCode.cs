@@ -2,6 +2,8 @@ namespace Metabase.GraphQl.Components
 {
     public enum CreateComponentErrorCode
     {
-        UNKNOWN
+        UNKNOWN,
+        UNKNOWN_MANUFACTURER,
+        UNAUTHORIZED
     }
 }
