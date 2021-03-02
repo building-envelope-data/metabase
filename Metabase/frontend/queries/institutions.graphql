@@ -33,8 +33,8 @@ fragment InstitutionPartial on Institution {
 query Institutions {
   institutions {
     nodes {
-        ...InstitutionPartial
-      }
+      ...InstitutionPartial
+    }
     totalCount
   }
 }
@@ -49,11 +49,11 @@ mutation CreateInstitution(
 ) {
   createInstitution(
     input: {
-      name: $name,
-      abbreviation: $abbreviation,
-      description: $description,
-      ownerIds: $ownerIds,
-      websiteLocator: $websiteLocator,
+      name: $name
+      abbreviation: $abbreviation
+      description: $description
+      ownerIds: $ownerIds
+      websiteLocator: $websiteLocator
       state: $state
     }
   ) {
@@ -68,12 +68,67 @@ mutation CreateInstitution(
   }
 }
 
-query Institution(
-  $uuid: Uuid!
+mutation UpdateInstitution(
+  $institutionId: Uuid!
+  $name: String!
+  $abbreviation: String
+  $description: String!
+  $websiteLocator: Url
+  $state: InstitutionState!
 ) {
-  institution(
-    uuid: $uuid
+  updateInstitution(
+    input: {
+      institutionId: $institutionId
+      name: $name
+      abbreviation: $abbreviation
+      description: $description
+      websiteLocator: $websiteLocator
+      state: $state
+    }
   ) {
+    institution {
+      ...InstitutionPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+query Institution($uuid: Uuid!) {
+  institution(uuid: $uuid) {
     ...InstitutionPartial
+    manufacturedComponents {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+        }
+      }
+    }
+    operatedDatabases {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+          locator
+        }
+      }
+    }
+    representatives {
+      edges {
+        node {
+          id
+          uuid
+          email
+        }
+      }
+    }
   }
 }

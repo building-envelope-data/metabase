@@ -753,6 +753,7 @@ input CreateComponentInput {
   availability: OpenEndedDateTimeRangeInput
   categories: [ComponentCategory!]!
   description: String!
+  manufacturerId: Uuid!
   name: String!
 }
 
@@ -1121,6 +1122,7 @@ enum ConfirmUserEmailErrorCode {
 
 enum CreateComponentErrorCode {
   UNKNOWN
+  UNKNOWN_MANUFACTURER
 }
 
 enum CreateDatabaseErrorCode {
