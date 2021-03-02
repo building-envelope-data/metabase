@@ -16,7 +16,8 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                     Abbreviation: "C!A",
                     Description: "Best component ever!",
                     Availability: null,
-                    Categories: Array.Empty<Enumerations.ComponentCategory>()
+                    Categories: Array.Empty<Enumerations.ComponentCategory>(),
+                    ManufacturerId: Guid.Empty
                  );
 
         protected static CreateComponentInput FromAndToRestrictedAvailabilityComponentInput { get; } = new(
@@ -30,7 +31,8 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                     Categories: new[] {
                         Enumerations.ComponentCategory.MATERIAL,
                         Enumerations.ComponentCategory.UNIT,
-                        }
+                        },
+                    ManufacturerId: Guid.Empty
                  );
 
         protected static CreateComponentInput ToRestrictedAvailabilityComponentInput { get; } = new(
@@ -43,7 +45,8 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                       ),
                     Categories: new[] {
                         Enumerations.ComponentCategory.UNIT,
-                        }
+                        },
+                    ManufacturerId: Guid.Empty
                  );
 
         protected static CreateComponentInput FromRestrictedAvailabilityComponentInput { get; } = new(
@@ -58,7 +61,8 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                         Enumerations.ComponentCategory.LAYER,
                         Enumerations.ComponentCategory.MATERIAL,
                         Enumerations.ComponentCategory.UNIT,
-                        }
+                        },
+                    ManufacturerId: Guid.Empty
                  );
 
         protected static IEnumerable<CreateComponentInput> ComponentInputs
