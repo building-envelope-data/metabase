@@ -1,13 +1,11 @@
 import * as React from "react";
-import { DatePicker, Alert, Select, Form, Input, Button } from "antd";
+import { Alert, Form, Input, Button } from "antd";
 import {
-  useCreateComponentMutation,
-  ComponentCategory,
+  useCreateDatabaseMutation,
   Scalars,
-} from "../../queries/components.graphql";
+} from "../../queries/databases.graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import * as moment from "moment";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
 
 const layout = {
@@ -18,21 +16,21 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-export type CreateComponentProps = {
-  manufacturerId: Scalars["Uuid"];
+export type CreateDatabaseProps = {
+  operatorId: Scalars["Uuid"];
 };
 
-export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
-  manufacturerId,
+export const CreateDatabase: React.FunctionComponent<CreateDatabaseProps> = ({
+  operatorId,
 }) => {
-  const [createComponentMutation] = useCreateComponentMutation({
+  const [createDatabaseMutation] = useCreateDatabaseMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
       {
         query: InstitutionDocument,
         variables: {
-          uuid: manufacturerId,
+          uuid: operatorId,
         },
       },
     ],
@@ -45,35 +43,28 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
 
   const onFinish = ({
     name,
-    abbreviation,
     description,
-    availability,
-    categories,
+    locator,
   }: {
     name: string;
-    abbreviation: string;
     description: string;
-    availability: [moment.Moment | null, moment.Moment | null] | null;
-    categories: ComponentCategory[];
+    locator: Scalars["Url"];
   }) => {
     const create = async () => {
       try {
         setCreating(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createComponentMutation({
+        const { errors, data } = await createDatabaseMutation({
           variables: {
             name: name,
-            abbreviation: abbreviation,
             description: description,
-            availableFrom: availability?.[0],
-            availableTo: availability?.[1],
-            categories: categories || [],
-            manufacturerId: manufacturerId,
+            locator: locator,
+            operatorId: operatorId,
           },
         });
         handleFormErrors(
           errors,
-          data?.createComponent?.errors?.map((x) => {
+          data?.createDatabase?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
@@ -118,9 +109,6 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Abbreviation" name="abbreviation">
-          <Input />
-        </Form.Item>
         <Form.Item
           label="Description"
           name="description"
@@ -132,17 +120,19 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Availability" name="availability">
-          <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
-        </Form.Item>
-        <Form.Item label="Categories" name="categories">
-          <Select mode="multiple" placeholder="Please select">
-            <Select.Option value={ComponentCategory.Layer}>Layer</Select.Option>
-            <Select.Option value={ComponentCategory.Unit}>Unit</Select.Option>
-            <Select.Option value={ComponentCategory.Material}>
-              Material
-            </Select.Option>
-          </Select>
+        <Form.Item
+          label="Locator"
+          name="locator"
+          rules={[
+            {
+              required: true,
+            },
+            {
+              type: "url",
+            },
+          ]}
+        >
+          <Input />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>
@@ -154,4 +144,4 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
   );
 };
 
-export default CreateComponent;
+export default CreateDatabase;

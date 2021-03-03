@@ -2,6 +2,8 @@ namespace Metabase.GraphQl.Databases
 {
     public enum CreateDatabaseErrorCode
     {
-        UNKNOWN
+        UNKNOWN,
+        UNAUTHORIZED,
+        UNKNOWN_OPERATOR
     }
 }

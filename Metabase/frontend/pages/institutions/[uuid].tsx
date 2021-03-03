@@ -1,10 +1,21 @@
 import Layout from "../../components/Layout";
-import { Divider, List, Card, Typography, message, Skeleton } from "antd";
+import {
+  Divider,
+  List,
+  Card,
+  Typography,
+  message,
+  Skeleton,
+  Table,
+} from "antd";
 import { EditOutlined, MoreOutlined } from "@ant-design/icons";
 import { useInstitutionQuery } from "../../queries/institutions.graphql";
 import { useRouter } from "next/router";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
 import CreateComponent from "../../components/components/CreateComponent";
+import CreateDatabase from "../../components/databases/CreateDatabase";
+import Link from "next/link";
+import paths from "../../paths";
 
 function Show() {
   const router = useRouter();
@@ -78,8 +89,39 @@ function Show() {
       )}
       <Divider />
       <Typography.Title level={2}>Operated Databases</Typography.Title>
+      <Table
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+          },
+          {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+          },
+          {
+            title: "Locator",
+            dataIndex: "locator",
+            key: "locator",
+          },
+        ]}
+        dataSource={
+          institution.operatedDatabases?.edges?.map((x) => x.node) || []
+        }
+      />
+      {currentUser ? <CreateDatabase operatorId={institution.uuid} /> : <></>}
       <Divider />
       <Typography.Title level={2}>Representatives</Typography.Title>
+      <List
+        dataSource={
+          institution.representatives?.edges?.map((x) => x.node) || []
+        }
+        renderItem={(item) => (
+          <Link href={paths.user(item?.uuid)}>{item?.email}</Link>
+        )}
+      />
     </Layout>
   );
 }

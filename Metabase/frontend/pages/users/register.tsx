@@ -104,6 +104,10 @@ function Register() {
                     required: true,
                     message: "Please input your email!",
                   },
+                  {
+                    type: "email",
+                    message: "Invalid email!",
+                  },
                 ]}
               >
                 <Input />

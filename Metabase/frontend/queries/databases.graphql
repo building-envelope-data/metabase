@@ -1,0 +1,26 @@
+mutation CreateDatabase(
+  $name: String!
+  $description: String!
+  $locator: Url!
+  $operatorId: Uuid!
+) {
+  createDatabase(
+    input: {
+      name: $name
+      description: $description
+      locator: $locator
+      operatorId: $operatorId
+    }
+  ) {
+    database {
+      name
+      description
+      locator
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
