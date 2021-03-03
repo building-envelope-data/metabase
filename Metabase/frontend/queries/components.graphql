@@ -18,6 +18,8 @@ mutation CreateComponent(
     }
   ) {
     component {
+      id
+      uuid
       name
       abbreviation
       description

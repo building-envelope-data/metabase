@@ -60,28 +60,40 @@ function Show() {
       )}
       <Divider />
       <Typography.Title level={2}>Manufactured Components</Typography.Title>
-      <List
-        grid={{
-          gutter: 16,
-          xs: 1,
-          sm: 2,
-          md: 4,
-          lg: 4,
-          xl: 6,
-          xxl: 3,
-        }}
+      <Table
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+          },
+          {
+            title: "Abbreviation",
+            dataIndex: "abbreviation",
+            key: "abbreviation",
+          },
+          {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+          },
+          {
+            title: "Categories",
+            dataIndex: "categories",
+            key: "categories",
+            render: (categories) => categories.join(", "),
+          },
+          {
+            title: "Availability",
+            dataIndex: "availability",
+            key: "availability",
+            render: (availability) =>
+              `${availability.from} to ${availability.to}`,
+          },
+        ]}
         dataSource={
           institution?.manufacturedComponents?.edges?.map((x) => x.node) || []
         }
-        renderItem={(item) => (
-          <Card
-            actions={[<EditOutlined key="edit" />, <MoreOutlined key="more" />]}
-          >
-            <Skeleton loading={loading} active>
-              <Card.Meta title={item.name} description={item.description} />
-            </Skeleton>
-          </Card>
-        )}
       />
       {currentUser ? (
         <CreateComponent manufacturerId={institution.uuid} />
