@@ -980,7 +980,8 @@ namespace Metabase.GraphQl.Users
             await emailSender.SendEmailAsync(
                 email,
                 "Confirm your email",
-                $"Please confirm your email address with the confirmation code {confirmationCode}.").ConfigureAwait(false);
+                $"Please confirm your email address by clicking the link https://TODO/user/confirm-email?email={email}&confirmationCode={confirmationCode}.")
+                .ConfigureAwait(false);
         }
 
         private static string EncodeToken(string token)

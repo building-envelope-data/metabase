@@ -9,5 +9,12 @@ namespace Metabase.GraphQl.Components
               : base(component)
         {
         }
+
+        public CreateComponentPayload(
+          CreateComponentError error
+        )
+        : base(error)
+        {
+        }
     }
 }

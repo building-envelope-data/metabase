@@ -9,5 +9,12 @@ namespace Metabase.GraphQl.Databases
               : base(database)
         {
         }
+
+        public CreateDatabasePayload(
+            CreateDatabaseError error
+            )
+              : base(error)
+        {
+        }
     }
 }

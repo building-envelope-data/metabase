@@ -13,7 +13,7 @@ import { useInstitutionsQuery } from "../../queries/institutions.graphql"
 // }
 // }
 
-function Institutions() {
+function Index() {
     const pageSize = 100
     const { loading, error, data } = useInstitutionsQuery()
     // const [institutions, setInstitutions] = useState([])
@@ -40,7 +40,7 @@ function Institutions() {
                 }}
                 renderItem={item =>
                     <List.Item
-                        key={item?.name}
+                        key={item?.uuid}
                     >
                         <Skeleton
                             loading={item === null || loading}
@@ -66,4 +66,4 @@ function Institutions() {
     )
 }
 
-export default Institutions
+export default Index
