@@ -1,0 +1,9 @@
+query Users {
+  users {
+    nodes {
+      id
+      uuid
+      email
+    }
+  }
+}

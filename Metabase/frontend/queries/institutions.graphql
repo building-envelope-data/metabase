@@ -132,3 +132,27 @@ query Institution($uuid: Uuid!) {
     }
   }
 }
+
+mutation AddInstitutionRepresentative(
+  $institutionId: Uuid!
+  $userId: Uuid!
+  $role: InstitutionRepresentativeRole!
+) {
+  addInstitutionRepresentative(
+    input: { institutionId: $institutionId, userId: $userId, role: $role }
+  ) {
+    institutionRepresentativeEdge {
+      node {
+        id
+        uuid
+        email
+      }
+      role
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

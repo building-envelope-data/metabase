@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
 import CreateComponent from "../../components/components/CreateComponent";
 import CreateDatabase from "../../components/databases/CreateDatabase";
+import AddInstitutionRepresentative from "../../components/institutions/AddInstitutionRepresentative";
 import Link from "next/link";
 import paths from "../../paths";
 
@@ -122,6 +123,11 @@ function Show() {
           <Link href={paths.user(item?.uuid)}>{item?.email}</Link>
         )}
       />
+      {currentUser ? (
+        <AddInstitutionRepresentative institutionId={institution.uuid} />
+      ) : (
+        <></>
+      )}
     </Layout>
   );
 }
