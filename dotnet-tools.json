@@ -3,19 +3,19 @@
   "isRoot": true,
   "tools": {
     "dotnet-aspnet-codegenerator": {
-      "version": "5.0.0",
+      "version": "5.0.2",
       "commands": [
         "dotnet-aspnet-codegenerator"
       ]
     },
     "dotnet-counters": {
-      "version": "5.0.152202",
+      "version": "5.0.160202",
       "commands": [
         "dotnet-counters"
       ]
     },
     "dotnet-dump": {
-      "version": "5.0.152202",
+      "version": "5.0.160202",
       "commands": [
         "dotnet-dump"
       ]
