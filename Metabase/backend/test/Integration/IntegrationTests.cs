@@ -326,7 +326,7 @@ namespace Metabase.Tests.Integration
             {
                 throw new Exception(pathResult.Error);
             }
-            return pathResult.Matches.Single().Value.GetString()
+            return pathResult.Matches?.Single()?.Value.GetString()
             ?? throw new Exception("String is null");
         }
 
