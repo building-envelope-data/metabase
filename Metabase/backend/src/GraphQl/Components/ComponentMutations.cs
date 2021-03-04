@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.Components
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.WritePolicy)]
         public async Task<CreateComponentPayload> CreateComponentAsync(
             CreateComponentInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,

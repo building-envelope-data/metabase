@@ -13,7 +13,7 @@ namespace Metabase.GraphQl.Methods
     public sealed class MethodMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.WritePolicy)]
         public async Task<CreateMethodPayload> CreateMethodAsync(
             CreateMethodInput input,
             [ScopedService] Data.ApplicationDbContext context,

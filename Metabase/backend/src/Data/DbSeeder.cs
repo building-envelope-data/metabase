@@ -64,7 +64,8 @@ namespace Metabase.Data
                             OpenIddictConstants.Permissions.Scopes.Email,
                             OpenIddictConstants.Permissions.Scopes.Profile,
                             OpenIddictConstants.Permissions.Scopes.Roles,
-                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.Auth.ApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.Auth.ReadApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.Auth.WriteApiScope,
                         },
                         Requirements =
                         {
@@ -81,18 +82,37 @@ namespace Metabase.Data
             )
         {
             var manager = services.GetRequiredService<IOpenIddictScopeManager>();
-            if (await manager.FindByNameAsync(Configuration.Auth.ApiScope).ConfigureAwait(false) is null)
+            if (await manager.FindByNameAsync(Configuration.Auth.ReadApiScope).ConfigureAwait(false) is null)
             {
-                logger.LogDebug($"Creating scope '{Configuration.Auth.ApiScope}'");
+                logger.LogDebug($"Creating scope '{Configuration.Auth.ReadApiScope}'");
                 await manager.CreateAsync(
                     new OpenIddictScopeDescriptor
                     {
-                        DisplayName = "API access",
+                        DisplayName = "Read API access",
                         DisplayNames =
                         {
-                            [CultureInfo.GetCultureInfo("de-DE")] = "API Zugriff"
+                            [CultureInfo.GetCultureInfo("de-DE")] = "API Lesezugriff"
                         },
-                        Name = Configuration.Auth.ApiScope,
+                        Name = Configuration.Auth.ReadApiScope,
+                        Resources =
+                        {
+                            Configuration.Auth.ServerName
+                        }
+                    }
+                ).ConfigureAwait(false);
+            }
+            if (await manager.FindByNameAsync(Configuration.Auth.WriteApiScope).ConfigureAwait(false) is null)
+            {
+                logger.LogDebug($"Creating scope '{Configuration.Auth.WriteApiScope}'");
+                await manager.CreateAsync(
+                    new OpenIddictScopeDescriptor
+                    {
+                        DisplayName = "Write API access",
+                        DisplayNames =
+                        {
+                            [CultureInfo.GetCultureInfo("de-DE")] = "API Schreibzugriff"
+                        },
+                        Name = Configuration.Auth.WriteApiScope,
                         Resources =
                         {
                             Configuration.Auth.ServerName

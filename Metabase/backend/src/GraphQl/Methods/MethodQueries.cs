@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Data;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
 using Guid = System.Guid;
 
@@ -16,6 +17,7 @@ namespace Metabase.GraphQl.Methods
         // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
         [UseFiltering]
         [UseSorting]
+        [Authorize(Policy = Configuration.Auth.ReadPolicy)]
         public IQueryable<Data.Method> GetMethods(
             [ScopedService] Data.ApplicationDbContext context
             )

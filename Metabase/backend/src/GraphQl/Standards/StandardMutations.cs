@@ -11,7 +11,7 @@ namespace Metabase.GraphQl.Standards
     public sealed class StandardMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.WritePolicy)]
         public async Task<CreateStandardPayload> CreateStandardAsync(
             CreateStandardInput input,
             [ScopedService] Data.ApplicationDbContext context,
