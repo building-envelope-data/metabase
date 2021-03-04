@@ -21,13 +21,13 @@
       ]
     },
     "dotnet-ef": {
-      "version": "5.0.0",
+      "version": "5.0.3",
       "commands": [
         "dotnet-ef"
       ]
     },
     "dotnet-format": {
-      "version": "4.1.131201",
+      "version": "5.0.211103",
       "commands": [
         "dotnet-format"
       ]
@@ -39,37 +39,37 @@
       ]
     },
     "dotnet-trace": {
-      "version": "5.0.152202",
+      "version": "5.0.160202",
       "commands": [
         "dotnet-trace"
       ]
     },
     "dotnet-gcdump": {
-      "version": "5.0.152202",
+      "version": "5.0.160202",
       "commands": [
         "dotnet-gcdump"
       ]
     },
     "dotnet-sos": {
-      "version": "5.0.152202",
+      "version": "5.0.160202",
       "commands": [
         "dotnet-sos"
       ]
     },
     "roslynator.dotnet.cli": {
-      "version": "0.1.0",
+      "version": "0.1.1",
       "commands": [
         "roslynator"
       ]
     },
     "jetbrains.resharper.globaltools": {
-      "version": "2020.3.0-eap07",
+      "version": "2020.3.3",
       "commands": [
         "jb"
       ]
     },
     "dotnet-certificate-tool": {
-      "version": "2.0.2",
+      "version": "2.0.4",
       "commands": [
         "certificate-tool"
       ]
