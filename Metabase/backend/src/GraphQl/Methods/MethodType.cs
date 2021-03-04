@@ -17,6 +17,8 @@ namespace Metabase.GraphQl.Methods
             descriptor
             .Field(t => t.Publication)
             .Ignore();
+            // TODO Fetch `Reference` efficiently. Is it always pre-loaded automatically because it is owned or do we need a data loader?
+            // TODO Use connections for relations.
         }
     }
 }

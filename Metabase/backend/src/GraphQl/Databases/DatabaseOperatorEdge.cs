@@ -1,3 +1,4 @@
+using HotChocolate.Types;
 using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.Databases
@@ -11,5 +12,10 @@ namespace Metabase.GraphQl.Databases
             : base(association.OperatorId)
         {
         }
+    }
+
+    public sealed class DatabaseOperatorEdgeType
+      : ObjectType<DatabaseOperatorEdge>
+    {
     }
 }

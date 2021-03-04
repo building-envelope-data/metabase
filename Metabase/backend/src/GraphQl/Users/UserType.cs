@@ -19,6 +19,8 @@ namespace Metabase.GraphQl.Users
               .Field(t => t.PhoneNumber);
             descriptor
               .Field(t => t.WebsiteLocator);
+            // TODO DevelopedMethods
+            // TODO RepresentedInstitutions
         }
     }
 }

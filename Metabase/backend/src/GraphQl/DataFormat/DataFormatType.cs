@@ -16,6 +16,17 @@ namespace Metabase.GraphQl.DataFormats
             descriptor
             .Field(t => t.Publication)
             .Ignore();
+            // TODO Fetch `Reference` efficiently. Is it always pre-loaded automatically because it is owned or do we need a data loader?
+            descriptor
+                .Field(t => t.Manager)
+                .Type<NonNullType<DataFormatManagerEdgeType>>()
+                .Resolve(context =>
+                    new DataFormatManagerEdge(
+                        context.Parent<Data.DataFormat>()
+                        )
+                    );
+            descriptor
+                .Field(t => t.ManagerId).Ignore();
         }
     }
 }
