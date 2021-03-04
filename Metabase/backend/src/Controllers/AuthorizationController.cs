@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using Metabase.ViewModels.Authorization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Metabase.ViewModels.Authorization;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;

@@ -1,11 +1,11 @@
 using HotChocolate;
 using HotChocolate.Data.Filters;
+using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using GraphQlX = Metabase.GraphQl;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
-using HotChocolate.Types.Pagination;
 
 namespace Metabase.Configuration
 {

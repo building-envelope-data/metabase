@@ -7,13 +7,13 @@ using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 using DateTime = System.DateTime;
-using Metabase.Authorization;
 
 namespace Metabase.GraphQl.Components
 {

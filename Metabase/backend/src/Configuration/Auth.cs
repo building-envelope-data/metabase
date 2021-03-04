@@ -142,47 +142,47 @@ namespace Metabase.Configuration
                     policy.RequireAuthenticatedUser();
                 }
                 );
-                foreach (var (policyName, scope) in new [] {
+                foreach (var (policyName, scope) in new[] {
                      (ReadPolicy, ReadApiScope),
                       (WritePolicy, WriteApiScope)
                       }
                       )
                 {
-                _.AddPolicy(policyName, policy =>
-                {
-                    policy.AuthenticationSchemes = new[] {
+                    _.AddPolicy(policyName, policy =>
+                    {
+                        policy.AuthenticationSchemes = new[] {
                         IdentityConstants.ApplicationScheme, // TODO Remove once we use OpenId Connect in the frontend.
                         JwtBearerDefaults.AuthenticationScheme
-                        };
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireAssertion(context =>
-                    {
-                        // TODO Remove the `if` but keep the last return once we use OpenId Connect in the frontend.
-                        // if (context.Resource is IResolverContext resolverContext)
-                        // {
-                        //     if (resolverContext.ContextData.ContainsKey(nameof(HttpContext)))
-                        //     {
-                        //         if (resolverContext.ContextData[nameof(HttpContext)] is HttpContext httpContext)
-                        //         {
-                        //             if (httpContext.Request.Headers.ContainsKey("Sec-Fetch-Site") &&
-                        //                 httpContext.Request.Headers.ContainsKey("Origin")
-                        //                 )
-                        //             {
-                        //                 // TODO CORS cannot serve as a security mechanism. Secure access from the frontend by some other means.
-                        //                 return httpContext.Request.Headers["Sec-Fetch-Site"] == "same-origin" &&
-                        //                     httpContext.Request.Host == httpContext.Request.Headers["Origin"]; // TODO Comparison does not work because one includes the protocol HTTPS while the other does not.
-                        //             }
-                        //         }
+                            };
+                        policy.RequireAuthenticatedUser();
+                        policy.RequireAssertion(context =>
+                        {
+                            // TODO Remove the `if` but keep the last return once we use OpenId Connect in the frontend.
+                            // if (context.Resource is IResolverContext resolverContext)
+                            // {
+                            //     if (resolverContext.ContextData.ContainsKey(nameof(HttpContext)))
+                            //     {
+                            //         if (resolverContext.ContextData[nameof(HttpContext)] is HttpContext httpContext)
+                            //         {
+                            //             if (httpContext.Request.Headers.ContainsKey("Sec-Fetch-Site") &&
+                            //                 httpContext.Request.Headers.ContainsKey("Origin")
+                            //                 )
+                            //             {
+                            //                 // TODO CORS cannot serve as a security mechanism. Secure access from the frontend by some other means.
+                            //                 return httpContext.Request.Headers["Sec-Fetch-Site"] == "same-origin" &&
+                            //                     httpContext.Request.Host == httpContext.Request.Headers["Origin"]; // TODO Comparison does not work because one includes the protocol HTTPS while the other does not.
+                            //             }
+                            //         }
 
-                        //     }
-                        // }
-                        // return context.User.HasScope(scope);
-                        return true;
+                            //     }
+                            // }
+                            // return context.User.HasScope(scope);
+                            return true;
+                        }
+                        );
                     }
                     );
                 }
-                );
-            }
             }
             );
         }
