@@ -8,11 +8,11 @@ export default {
   user(uuid: string) {
     return `/users/${encodeURIComponent(uuid)}`;
   },
-  userLogin: "/users/login",
+  userLogin: "/user/login",
   userRegister: "/users/register",
   userChangeEmail: "/user/change-email",
-  userConfirmEmail: "/user/confirm-email",
-  userForgotPassword: "/user/forgot-password",
-  userSendTwoFactorCode: "/user/send-two-factor-code",
-  userVerifyTwoFactorCode: "/user/verify-two-factor-code",
+  userConfirmEmail: "/users/confirm-email",
+  userForgotPassword: "/users/forgot-password",
+  userSendTwoFactorCode: "/users/send-two-factor-code",
+  userVerifyTwoFactorCode: "/users/verify-two-factor-code",
 };

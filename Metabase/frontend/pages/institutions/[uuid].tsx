@@ -1,14 +1,5 @@
 import Layout from "../../components/Layout";
-import {
-  Divider,
-  List,
-  Card,
-  Typography,
-  message,
-  Skeleton,
-  Table,
-} from "antd";
-import { EditOutlined, MoreOutlined } from "@ant-design/icons";
+import { Divider, List, Typography, message, Skeleton, Table } from "antd";
 import { useInstitutionQuery } from "../../queries/institutions.graphql";
 import { useRouter } from "next/router";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";

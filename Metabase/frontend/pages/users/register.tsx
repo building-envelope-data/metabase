@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
-import { useRegisterUserMutation } from "../../queries/currentUser.graphql";
+import { useRegisterUserMutation } from "../../queries/users.graphql";
 import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
@@ -27,10 +27,12 @@ function Register() {
   const [registering, setRegistering] = useState(false);
 
   const onFinish = ({
+    name,
     email,
     password,
     passwordConfirmation,
   }: {
+    name: string;
     email: string;
     password: string;
     passwordConfirmation: string;
@@ -42,6 +44,7 @@ function Register() {
         await apolloClient.resetStore();
         const { errors, data } = await registerUserMutation({
           variables: {
+            name: name,
             email: email,
             password: password,
             passwordConfirmation: passwordConfirmation,
@@ -96,6 +99,18 @@ function Register() {
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
             >
+              <Form.Item
+                label="Name"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
               <Form.Item
                 label="Email"
                 name="email"

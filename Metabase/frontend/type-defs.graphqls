@@ -8,6 +8,16 @@ interface Node {
   id: ID!
 }
 
+interface Reference {
+  abstract: String
+  section: String
+  title: String
+}
+
+interface Stakeholder {
+  name: String!
+}
+
 type AddInstitutionRepresentativeError {
   code: AddInstitutionRepresentativeErrorCode!
   message: String!
@@ -127,13 +137,6 @@ type ConfirmUserEmailPayload {
   user: User
 }
 
-type ContactInformation {
-  emailAddress: String
-  phoneNumber: String
-  postalAddress: String
-  websiteLocator: Url
-}
-
 type CreateComponentError {
   code: CreateComponentErrorCode!
   message: String!
@@ -143,6 +146,17 @@ type CreateComponentError {
 type CreateComponentPayload {
   component: Component
   errors: [CreateComponentError!]
+}
+
+type CreateDataFormatError {
+  code: CreateDataFormatErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type CreateDataFormatPayload {
+  dataFormat: DataFormat
+  errors: [CreateDataFormatError!]
 }
 
 type CreateDatabaseError {
@@ -178,15 +192,36 @@ type CreateMethodPayload {
   method: Method
 }
 
-type CreateStandardError {
-  code: CreateStandardErrorCode!
-  message: String!
-  path: [String!]!
+type DataFormat implements Node {
+  description: String!
+  extension: String
+  id: ID!
+  manager: Institution
+  managerId: Uuid!
+  mediaType: String!
+  name: String!
+  reference: Reference
+  schemaLocator: Url
+  uuid: Uuid!
 }
 
-type CreateStandardPayload {
-  errors: [CreateStandardError!]
-  standard: Standard
+"A connection to a list of items."
+type DataFormatConnection {
+  "A list of edges."
+  edges: [DataFormatEdge!]
+  "A flattened list of the nodes."
+  nodes: [DataFormat!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type DataFormatEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: DataFormat!
 }
 
 type Database implements Node {
@@ -254,13 +289,12 @@ type GenerateUserTwoFactorRecoveryCodesPayload {
   user: User
 }
 
-type Institution implements Node {
+type Institution implements Node & Stakeholder {
   abbreviation: String
-  affiliatedPersonEdges: [PersonAffiliation!]!
-  affiliatedPersons: [Person!]!
   description: String!
   developedMethods: [Method!]!
   id: ID!
+  managedDataFormats: [DataFormat!]!
   manufacturedComponents: InstitutionManufacturedComponentConnection
   name: String!
   operatedDatabases: InstitutionOperatedDatabaseConnection
@@ -348,20 +382,20 @@ type LogoutUserPayload {
 }
 
 type Method implements Node {
+  availability: OpenEndedDateTimeRange
+  calculationLocator: Url
   categories: [MethodCategory!]!
-  codeLocator: Url
   description: String!
   developers: [Stakeholder!]!
   id: ID!
   institutionDeveloperEdges: [InstitutionMethodDeveloper!]!
   institutionDevelopers: [Institution!]!
   name: String!
-  personDeveloperEdges: [PersonMethodDeveloper!]!
-  personDevelopers: [Person!]!
-  publicationLocator: Url
-  standard: Standard
-  standardId: Uuid
+  reference: Reference
+  userDeveloperEdges: [UserMethodDeveloper!]!
+  userDevelopers: [User!]!
   uuid: Uuid!
+  validity: OpenEndedDateTimeRange
 }
 
 "A connection to a list of items."
@@ -384,31 +418,31 @@ type MethodEdge {
 }
 
 type Mutation {
-  addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER)
-  changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(apply: BEFORE_RESOLVER)
+  addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(apply: BEFORE_RESOLVER)
   changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
   confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
   confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload!
-  createComponent(input: CreateComponentInput!): CreateComponentPayload! @authorize(apply: BEFORE_RESOLVER)
-  createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload! @authorize(apply: BEFORE_RESOLVER)
-  createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER)
-  createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(apply: BEFORE_RESOLVER)
-  createStandard(input: CreateStandardInput!): CreateStandardPayload! @authorize(apply: BEFORE_RESOLVER)
-  deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(apply: BEFORE_RESOLVER)
+  createComponent(input: CreateComponentInput!): CreateComponentPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  createDataFormat(input: CreateDataFormatInput!): CreateDataFormatPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER)
   loginUser(input: LoginUserInput!): LoginUserPayload!
   logoutUser: LogoutUserPayload!
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
-  removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER)
+  removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
   resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
   resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(apply: BEFORE_RESOLVER)
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload!
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER)
-  updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER)
+  updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
 }
 
 type Numeration {
@@ -434,35 +468,6 @@ type PageInfo {
   startCursor: String
 }
 
-type Person implements Node {
-  affiliatedInstitutionEdges: [PersonAffiliation!]!
-  affiliatedInstitutions: [Institution!]!
-  contactInformation: ContactInformation!
-  developedMethodEdges: [PersonMethodDeveloper!]!
-  developedMethods: [Method!]!
-  id: ID!
-  name: String!
-  uuid: Uuid!
-}
-
-type PersonAffiliation {
-  id: Uuid!
-  institution: Institution!
-  institutionId: Uuid!
-  person: Person!
-  personId: Uuid!
-  xmin: UInt!
-}
-
-type PersonMethodDeveloper {
-  id: Uuid!
-  method: Method!
-  methodId: Uuid!
-  person: Person!
-  personId: Uuid!
-  xmin: UInt!
-}
-
 type PersonalUserDataError {
   code: PersonalUserDataErrorCode!
   message: String!
@@ -474,21 +479,37 @@ type PersonalUserDataPayload {
   user: User
 }
 
+type Publication implements Reference {
+  abstract: String
+  "arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
+  arXiv: String
+  authors: [String!]
+  "The Digital Object Identifier (DOI) is a very important persistent identifier for publications. It MUST be defined here if it is available for a publication."
+  doi: String
+  "Referenced section"
+  section: String
+  title: String
+  "A Uniform Resource Name (URN) can be used to define a publication. TODO: Improve the regex pattern to further restrict the string."
+  urn: String
+  "If a persistent identifiert like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long."
+  webAddress: Url
+}
+
 type Query {
   component(uuid: Uuid!): Component
-  components(after: String before: String first: Int last: Int order: [ComponentSortInput!] where: ComponentFilterInput): ComponentConnection
+  components(after: String before: String first: Int last: Int order: [ComponentSortInput!] where: ComponentFilterInput): ComponentConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
   currentUser: User
   database(uuid: Uuid!): Database
-  databases(after: String before: String first: Int last: Int order: [DatabaseSortInput!] where: DatabaseFilterInput): DatabaseConnection
+  databases(after: String before: String first: Int last: Int order: [DatabaseSortInput!] where: DatabaseFilterInput): DatabaseConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
+  dataFormat(uuid: Uuid!): DataFormat
+  dataFormats(after: String before: String first: Int last: Int order: [DataFormatSortInput!] where: DataFormatFilterInput): DataFormatConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
   institution(uuid: Uuid!): Institution
-  institutions(after: String before: String first: Int last: Int order: [InstitutionSortInput!] where: InstitutionFilterInput): InstitutionConnection
+  institutions(after: String before: String first: Int last: Int order: [InstitutionSortInput!] where: InstitutionFilterInput): InstitutionConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
   method(uuid: Uuid!): Method
-  methods(after: String before: String first: Int last: Int order: [MethodSortInput!] where: MethodFilterInput): MethodConnection
+  methods(after: String before: String first: Int last: Int order: [MethodSortInput!] where: MethodFilterInput): MethodConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
   node(id: ID!): Node
   personalUserData: PersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
-  standard(uuid: Uuid!): Standard
-  standards(after: String before: String first: Int last: Int order: [StandardSortInput!] where: StandardFilterInput): StandardConnection
-  users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
+  users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
 }
 
 type RegisterUserError {
@@ -582,40 +603,17 @@ type SetUserPhoneNumberPayload {
   user: User
 }
 
-type Stakeholder {
-  id: Uuid!
-  xmin: UInt!
-}
-
-type Standard implements Node {
-  abstract: String!
-  id: ID!
-  locator: Url!
+"`ISO 52022` is an example of the abbreviation of a standardizer and the main number of the identifier."
+type Standard implements Reference {
+  abstract: String
+  locator: Url
   numeration: Numeration!
-  section: String!
+  "The section of the standard to which the reference refers to."
+  section: String
   standardizers: [Standardizer!]!
   title: String!
-  uuid: Uuid!
-  year: Int!
-}
-
-"A connection to a list of items."
-type StandardConnection {
-  "A list of edges."
-  edges: [StandardEdge!]
-  "A flattened list of the nodes."
-  nodes: [Standard!]
-  "Information to aid in pagination."
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-"An edge in a connection."
-type StandardEdge {
-  "A cursor for use in pagination."
-  cursor: String!
-  "The item at the end of the edge."
-  node: Standard!
+  "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
+  year: Int
 }
 
 type UpdateInstitutionError {
@@ -629,10 +627,14 @@ type UpdateInstitutionPayload {
   institution: Institution
 }
 
-type User implements Node {
+type User implements Node & Stakeholder {
   email: String
   id: ID!
+  "Full name"
+  name: String!
+  phoneNumber: String
   uuid: Uuid!
+  websiteLocator: Url
 }
 
 "A connection to a list of items."
@@ -652,6 +654,15 @@ type UserEdge {
   cursor: String!
   "The item at the end of the edge."
   node: User!
+}
+
+type UserMethodDeveloper {
+  id: Uuid!
+  method: Method!
+  methodId: Uuid!
+  user: User!
+  userId: Uuid!
+  xmin: UInt!
 }
 
 input AddInstitutionRepresentativeInput {
@@ -757,6 +768,16 @@ input CreateComponentInput {
   name: String!
 }
 
+input CreateDataFormatInput {
+  description: String!
+  extension: String
+  mediaType: String!
+  name: String!
+  publication: CreatePublicationInput
+  schemaLocator: Url
+  standard: CreateStandardInput
+}
+
 input CreateDatabaseInput {
   description: String!
   locator: Url!
@@ -775,20 +796,65 @@ input CreateInstitutionInput {
 }
 
 input CreateMethodInput {
+  availability: OpenEndedDateTimeRangeInput
+  calculationLocator: Url
   categories: [MethodCategory!]!
-  codeLocator: Url
   description: String!
   name: String!
-  publicationLocator: Url
+  publication: CreatePublicationInput
+  standard: CreateStandardInput
+  validity: OpenEndedDateTimeRangeInput
+}
+
+input CreateNumerationInput {
+  mainNumber: String!
+  prefix: String
+  suffix: String
+}
+
+input CreatePublicationInput {
+  abstract: String
+  arXiv: String
+  authors: [String!]
+  doi: String
+  section: String
+  title: String
+  urn: String
+  webAddress: Url
 }
 
 input CreateStandardInput {
-  abstract: String!
-  locator: Url!
-  section: String!
+  abstract: String
+  locator: Url
+  numeration: CreateNumerationInput!
+  section: String
   standardizers: [Standardizer!]!
-  title: String!
-  year: Int!
+  title: String
+  year: Int
+}
+
+input DataFormatFilterInput {
+  and: [DataFormatFilterInput!]
+  description: StringOperationFilterInput
+  id: ComparableGuidOperationFilterInput
+  mediaType: StringOperationFilterInput
+  name: StringOperationFilterInput
+  or: [DataFormatFilterInput!]
+}
+
+input DataFormatSortInput {
+  description: SortEnumType
+  extension: SortEnumType
+  id: SortEnumType
+  manager: InstitutionSortInput
+  managerId: SortEnumType
+  mediaType: SortEnumType
+  name: SortEnumType
+  publication: PublicationSortInput
+  reference: IReferenceSortInput
+  schemaLocator: UriSortInput
+  standard: StandardSortInput
+  xmin: SortEnumType
 }
 
 input DatabaseFilterInput {
@@ -816,6 +882,12 @@ input DeleteInstitutionInput {
 
 input DeletePersonalUserDataInput {
   password: String
+}
+
+input IReferenceSortInput {
+  abstract: SortEnumType
+  section: SortEnumType
+  title: SortEnumType
 }
 
 input InstitutionFilterInput {
@@ -875,22 +947,22 @@ input MethodCategoryOperationFilterInput {
 input MethodFilterInput {
   and: [MethodFilterInput!]
   categories: ListMethodCategoryOperationFilterInput
-  codeLocator: UriFilterInput
   description: StringOperationFilterInput
   id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   or: [MethodFilterInput!]
-  publicationLocator: UriFilterInput
 }
 
 input MethodSortInput {
-  codeLocator: UriSortInput
+  availability: SortEnumType
+  calculationLocator: UriSortInput
   description: SortEnumType
   id: SortEnumType
   name: SortEnumType
-  publicationLocator: UriSortInput
+  publication: PublicationSortInput
+  reference: IReferenceSortInput
   standard: StandardSortInput
-  standardId: SortEnumType
+  validity: SortEnumType
   xmin: SortEnumType
 }
 
@@ -905,8 +977,24 @@ input OpenEndedDateTimeRangeInput {
   to: DateTime
 }
 
+input PublicationSortInput {
+  abstract: SortEnumType
+  "arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
+  arXiv: SortEnumType
+  "The Digital Object Identifier (DOI) is a very important persistent identifier for publications. It MUST be defined here if it is available for a publication."
+  doi: SortEnumType
+  "Referenced section"
+  section: SortEnumType
+  title: SortEnumType
+  "A Uniform Resource Name (URN) can be used to define a publication. TODO: Improve the regex pattern to further restrict the string."
+  urn: SortEnumType
+  "If a persistent identifiert like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long."
+  webAddress: UriSortInput
+}
+
 input RegisterUserInput {
   email: String!
+  name: String!
   password: String!
   passwordConfirmation: String!
 }
@@ -940,22 +1028,15 @@ input SetUserPhoneNumberInput {
   phoneNumber: String!
 }
 
-input StandardFilterInput {
-  abstract: StringOperationFilterInput
-  and: [StandardFilterInput!]
-  id: ComparableGuidOperationFilterInput
-  or: [StandardFilterInput!]
-  title: StringOperationFilterInput
-}
-
+"`ISO 52022` is an example of the abbreviation of a standardizer and the main number of the identifier."
 input StandardSortInput {
   abstract: SortEnumType
-  id: SortEnumType
   locator: UriSortInput
   numeration: NumerationSortInput
+  "The section of the standard to which the reference refers to."
   section: SortEnumType
   title: SortEnumType
-  xmin: SortEnumType
+  "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
   year: SortEnumType
 }
 
@@ -1050,14 +1131,18 @@ input UserSortInput {
   id: SortEnumType
   lockoutEnabled: SortEnumType
   lockoutEnd: SortEnumType
+  "Full name"
+  name: SortEnumType
   normalizedEmail: SortEnumType
   normalizedUserName: SortEnumType
   passwordHash: SortEnumType
   phoneNumber: SortEnumType
   phoneNumberConfirmed: SortEnumType
+  postalAddress: SortEnumType
   securityStamp: SortEnumType
   twoFactorEnabled: SortEnumType
   userName: SortEnumType
+  websiteLocator: UriSortInput
   xmin: SortEnumType
 }
 
@@ -1127,6 +1212,11 @@ enum CreateComponentErrorCode {
   UNAUTHORIZED
 }
 
+enum CreateDataFormatErrorCode {
+  UNKNOWN
+  TWO_REFERENCES
+}
+
 enum CreateDatabaseErrorCode {
   UNKNOWN
   UNAUTHORIZED
@@ -1141,10 +1231,7 @@ enum CreateInstitutionErrorCode {
 
 enum CreateMethodErrorCode {
   UNKNOWN
-}
-
-enum CreateStandardErrorCode {
-  UNKNOWN
+  TWO_REFERENCES
 }
 
 enum DeleteInstitutionErrorCode {
