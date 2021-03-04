@@ -26,6 +26,12 @@ trace : ## Trace the dotnet process `Metabase`
 			--providers Microsoft-Windows-DotNETRuntime
 .PHONY : trace
 
+update-schema : ## Update GraphQl schema
+	-dotnet test --filter "FullyQualifiedName~GraphQlSchemaTests"
+	cp test/Integration/GraphQl/__snapshots__/__mismatch__/GraphQlSchemaTests.IsUnchanged.snap test/Integration/GraphQl/__snapshots__/
+	cp test/Integration/GraphQl/__snapshots__/__mismatch__/GraphQlSchemaTests.IsUnchanged.snap ../frontend/type-defs.graphqls
+.PHONY : update-schema
+
 # https://github.com/JosefPihrt/Roslynator/blob/master/docs/cli/README.md
 analyze : ## Analyze with Roslynator
 	dotnet tool run roslynator analyze
