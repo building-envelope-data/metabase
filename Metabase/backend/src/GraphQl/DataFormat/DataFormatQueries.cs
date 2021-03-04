@@ -7,10 +7,10 @@ using HotChocolate.Data;
 using HotChocolate.Types;
 using Guid = System.Guid;
 
-namespace Metabase.GraphQl.Standards
+namespace Metabase.GraphQl.DataFormats
 {
     [ExtendObjectType(Name = nameof(Query))]
-    public sealed class StandardQueries
+    public sealed class DataFormatQueries
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UsePaging]
@@ -18,20 +18,20 @@ namespace Metabase.GraphQl.Standards
         [UseFiltering]
         [UseSorting]
         [Authorize(Policy = Configuration.Auth.ReadPolicy)]
-        public IQueryable<Data.Standard> GetStandards(
+        public IQueryable<Data.DataFormat> GetDataFormats(
             [ScopedService] Data.ApplicationDbContext context
             )
         {
-            return context.Standards;
+            return context.DataFormats;
         }
 
-        public Task<Data.Standard?> GetStandardAsync(
+        public Task<Data.DataFormat?> GetDataFormatAsync(
             Guid uuid,
-            StandardByIdDataLoader standardById,
+            DataFormatByIdDataLoader dataFormatById,
             CancellationToken cancellationToken
             )
         {
-            return standardById.LoadAsync(
+            return dataFormatById.LoadAsync(
                 uuid,
                 cancellationToken
                 );

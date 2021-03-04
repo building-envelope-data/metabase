@@ -154,43 +154,23 @@ namespace Metabase.Data
               );
         }
 
-        private static void ConfigurePersonAffiliation(ModelBuilder builder)
-        {
-            builder.Entity<Person>()
-              .HasMany(p => p.AffiliatedInstitutions)
-              .WithMany(i => i.AffiliatedPersons)
-              .UsingEntity<PersonAffiliation>(
-                j => j
-                .HasOne(e => e.Institution)
-                .WithMany(i => i.AffiliatedPersonEdges)
-                .HasForeignKey(e => e.InstitutionId),
-                j => j
-                .HasOne(e => e.Person)
-                .WithMany(p => p.AffiliatedInstitutionEdges)
-                .HasForeignKey(e => e.PersonId),
-                j => j
-                .ToTable("person_affiliation")
-                .HasKey(a => new { a.PersonId, a.InstitutionId })
-              );
-        }
-
-        private static void ConfigurePersonMethodDeveloper(ModelBuilder builder)
+        private static void ConfigureUserMethodDeveloper(ModelBuilder builder)
         {
             builder.Entity<Method>()
-              .HasMany(m => m.PersonDevelopers)
+              .HasMany(m => m.UserDevelopers)
               .WithMany(i => i.DevelopedMethods)
-              .UsingEntity<PersonMethodDeveloper>(
+              .UsingEntity<UserMethodDeveloper>(
                 j => j
-                .HasOne(e => e.Person)
+                .HasOne(e => e.User)
                 .WithMany(i => i.DevelopedMethodEdges)
-                .HasForeignKey(e => e.PersonId),
+                .HasForeignKey(e => e.UserId),
                 j => j
                 .HasOne(e => e.Method)
-                .WithMany(m => m.PersonDeveloperEdges)
+                .WithMany(m => m.UserDeveloperEdges)
                 .HasForeignKey(e => e.MethodId),
                 j => j
-                .ToTable("person_method_developer")
-                .HasKey(a => new { a.PersonId, a.MethodId })
+                .ToTable("user_method_developer")
+                .HasKey(a => new { a.UserId, a.MethodId })
               );
         }
 
@@ -201,12 +181,10 @@ namespace Metabase.Data
         public DbSet<ComponentConcretizationAndGeneralization> ComponentConcretizationAndGeneralizations { get; private set; } = default!;
         public DbSet<ComponentManufacturer> ComponentManufacturers { get; private set; } = default!;
         public DbSet<Database> Databases { get; private set; } = default!;
+        public DbSet<DataFormat> DataFormats { get; private set; } = default!;
         public DbSet<Institution> Institutions { get; private set; } = default!;
         public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
         public DbSet<Method> Methods { get; private set; } = default!;
-        public DbSet<Person> Persons { get; private set; } = default!;
-        public DbSet<PersonAffiliation> PersonAffiliations { get; private set; } = default!;
-        public DbSet<Standard> Standards { get; private set; } = default!;
 
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options
@@ -244,16 +222,7 @@ namespace Metabase.Data
                 builder.Entity<Method>()
                 )
               .ToTable("method");
-            ConfigureEntity(
-                builder.Entity<Person>()
-                )
-              .ToTable("person");
-            ConfigurePersonAffiliation(builder);
-            ConfigurePersonMethodDeveloper(builder);
-            ConfigureEntity(
-                builder.Entity<Standard>()
-                )
-              .ToTable("standard");
+            ConfigureUserMethodDeveloper(builder);
         }
     }
 }

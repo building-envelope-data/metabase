@@ -5,18 +5,16 @@ using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Metabase.Extensions;
-using NpgsqlTypes;
-using DateTime = System.DateTime;
 
-namespace Metabase.GraphQl.Methods
+namespace Metabase.GraphQl.DataFormats
 {
     [ExtendObjectType(Name = nameof(Mutation))]
-    public sealed class MethodMutations
+    public sealed class DataFormatMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [Authorize(Policy = Configuration.Auth.WritePolicy)]
-        public async Task<CreateMethodPayload> CreateMethodAsync(
-            CreateMethodInput input,
+        public async Task<CreateDataFormatPayload> CreateDataFormatAsync(
+            CreateDataFormatInput input,
             [ScopedService] Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
@@ -25,35 +23,22 @@ namespace Metabase.GraphQl.Methods
                 input.Publication is not null
                 )
             {
-                return new CreateMethodPayload(
-                    new CreateMethodError(
-                        CreateMethodErrorCode.TWO_REFERENCES,
+                return new CreateDataFormatPayload(
+                    new CreateDataFormatError(
+                        CreateDataFormatErrorCode.TWO_REFERENCES,
                         "Specify either a standard or a publication as reference.",
                       new[] { nameof(input), nameof(input.Publication).FirstCharToLower() }
                     )
                 );
             }
-            var method = new Data.Method(
+            var dataFormat = new Data.DataFormat(
                 name: input.Name,
+                extension: input.Extension,
                 description: input.Description,
-                validity: // TODO Put into helper method!
-                 input.Validity is not null
-                 ? new NpgsqlRange<DateTime>(
-                   input.Validity.From.GetValueOrDefault(), true, input.Validity.From is null,
-                   input.Validity.To.GetValueOrDefault(), true, input.Validity.To is null
-                   )
-                 : null,
-                availability:
-                 input.Availability is not null
-                 ? new NpgsqlRange<DateTime>(
-                   input.Availability.From.GetValueOrDefault(), true, input.Availability.From is null,
-                   input.Availability.To.GetValueOrDefault(), true, input.Availability.To is null
-                   )
-                 : null,
-                calculationLocator: input.CalculationLocator,
-                categories: input.Categories
+                mediaType: input.MediaType,
+                schemaLocator: input.SchemaLocator
             )
-            { // TODO The below is also used in `DataFormatMutations`. Put into helper!
+            {
                 Standard =
                 input.Standard is null
                  ? null
@@ -86,10 +71,9 @@ input.Publication is null
             webAddress: input.Publication.WebAddress
                 )
             };
-            ;
-            context.Methods.Add(method);
+            context.DataFormats.Add(dataFormat);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            return new CreateMethodPayload(method);
+            return new CreateDataFormatPayload(dataFormat);
         }
     }
 }

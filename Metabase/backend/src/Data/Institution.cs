@@ -6,7 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Metabase.Data
 {
     public sealed class Institution
-      : Stakeholder
+      : Infrastructure.Data.Entity,
+        IStakeholder
     {
         [Required]
         [MinLength(1)]
@@ -28,11 +29,11 @@ namespace Metabase.Data
         [Required]
         public Enumerations.InstitutionState State { get; private set; }
 
-        public ICollection<PersonAffiliation> AffiliatedPersonEdges { get; } = new List<PersonAffiliation>();
-        public ICollection<Person> AffiliatedPersons { get; } = new List<Person>();
-
         public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } = new List<InstitutionMethodDeveloper>();
         public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
+
+        [InverseProperty(nameof(DataFormat.Manager))]
+        public ICollection<DataFormat> ManagedDataFormats { get; } = new List<DataFormat>();
 
         public ICollection<ComponentManufacturer> ManufacturedComponentEdges { get; } = new List<ComponentManufacturer>();
         public ICollection<Component> ManufacturedComponents { get; } = new List<Component>();

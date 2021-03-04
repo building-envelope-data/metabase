@@ -284,11 +284,12 @@ namespace Metabase.GraphQl.Users
             [Service] Services.IEmailSender emailSender
             )
         {
-            var user = new Data.User
-            {
-                UserName = input.Email,
-                Email = input.Email
-            };
+            var user = new Data.User(
+                name: input.Name,
+                email: input.Email,
+                postalAddress: null,
+                websiteLocator: null
+            );
             if (input.Password != input.PasswordConfirmation)
             {
                 return new RegisterUserPayload(

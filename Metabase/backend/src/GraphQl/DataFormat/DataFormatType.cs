@@ -1,13 +1,12 @@
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
 
-namespace Metabase.GraphQl.Methods
+namespace Metabase.GraphQl.DataFormats
 {
-    public sealed class MethodType
-      : EntityType<Data.Method, MethodByIdDataLoader>
+    public sealed class DataFormatType
+      : EntityType<Data.DataFormat, DataFormatByIdDataLoader>
     {
         protected override void Configure(
-            IObjectTypeDescriptor<Data.Method> descriptor
+            IObjectTypeDescriptor<Data.DataFormat> descriptor
             )
         {
             base.Configure(descriptor);

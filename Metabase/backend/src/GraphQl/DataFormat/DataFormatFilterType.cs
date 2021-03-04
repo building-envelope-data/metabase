@@ -1,19 +1,19 @@
 using HotChocolate.Data.Filters;
 
-namespace Metabase.GraphQl.Methods
+namespace Metabase.GraphQl.DataFormats
 {
-    public sealed class MethodFilterType
-      : FilterInputType<Data.Method>
+    public sealed class DataFormatFilterType
+      : FilterInputType<Data.DataFormat>
     {
         protected override void Configure(
-          IFilterInputTypeDescriptor<Data.Method> descriptor
+          IFilterInputTypeDescriptor<Data.DataFormat> descriptor
           )
         {
             descriptor.BindFieldsExplicitly();
             descriptor.Field(x => x.Id);
             descriptor.Field(x => x.Name);
             descriptor.Field(x => x.Description);
-            descriptor.Field(x => x.Categories);
+            descriptor.Field(x => x.MediaType);
         }
     }
 }
