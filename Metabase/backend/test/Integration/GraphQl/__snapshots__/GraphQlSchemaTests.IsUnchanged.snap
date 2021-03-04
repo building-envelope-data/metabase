@@ -292,9 +292,9 @@ type GenerateUserTwoFactorRecoveryCodesPayload {
 type Institution implements Node & Stakeholder {
   abbreviation: String
   description: String!
-  developedMethods: [Method!]!
+  developedMethods: InstitutionDevelopedMethodConnection
   id: ID!
-  managedDataFormats: [DataFormat!]!
+  managedDataFormats: InstitutionManagedDataFormatConnection
   manufacturedComponents: InstitutionManufacturedComponentConnection
   name: String!
   operatedDatabases: InstitutionOperatedDatabaseConnection
@@ -316,12 +316,28 @@ type InstitutionConnection {
   totalCount: Int!
 }
 
+type InstitutionDevelopedMethodConnection {
+  edges: [InstitutionDevelopedMethodEdge!]!
+}
+
+type InstitutionDevelopedMethodEdge {
+  node: Method!
+}
+
 "An edge in a connection."
 type InstitutionEdge {
   "A cursor for use in pagination."
   cursor: String!
   "The item at the end of the edge."
   node: Institution
+}
+
+type InstitutionManagedDataFormatConnection {
+  edges: [InstitutionManagedDataFormatEdge!]!
+}
+
+type InstitutionManagedDataFormatEdge {
+  node: DataFormat!
 }
 
 type InstitutionManufacturedComponentConnection {

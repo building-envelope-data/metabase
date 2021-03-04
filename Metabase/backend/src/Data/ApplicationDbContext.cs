@@ -180,11 +180,13 @@ namespace Metabase.Data
         public DbSet<Component> Components { get; private set; } = default!;
         public DbSet<ComponentConcretizationAndGeneralization> ComponentConcretizationAndGeneralizations { get; private set; } = default!;
         public DbSet<ComponentManufacturer> ComponentManufacturers { get; private set; } = default!;
-        public DbSet<Database> Databases { get; private set; } = default!;
         public DbSet<DataFormat> DataFormats { get; private set; } = default!;
+        public DbSet<Database> Databases { get; private set; } = default!;
         public DbSet<Institution> Institutions { get; private set; } = default!;
+        public DbSet<InstitutionMethodDeveloper> InstitutionMethodDevelopers { get; private set; } = default!;
         public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
         public DbSet<Method> Methods { get; private set; } = default!;
+        public DbSet<UserMethodDeveloper> UserMethodDeveloper { get; private set; } = default!;
 
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options

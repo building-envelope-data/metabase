@@ -1,4 +1,3 @@
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
 
 namespace Metabase.GraphQl.Institutions
@@ -11,11 +10,17 @@ namespace Metabase.GraphQl.Institutions
             )
         {
             base.Configure(descriptor);
-            // TODO AffiliatedPersons
             // descriptor
             //     .Field(t => t.DevelopedMethods)
             //     .ResolveWith<InstitutionResolvers>(t => t.GetDevelopedMethodsAsync(default!, default!, default!, default))
             //     .UseDbContext<Data.ApplicationDbContext>();
+            descriptor
+                .Field(t => t.DevelopedMethods)
+                .Resolve(context =>
+                    new InstitutionDevelopedMethodConnection(
+                        context.Parent<Data.Institution>()
+                    )
+                );
             descriptor
                 .Field(t => t.DevelopedMethodEdges)
                 .Ignore();
@@ -29,6 +34,13 @@ namespace Metabase.GraphQl.Institutions
             descriptor
                 .Field(t => t.ManufacturedComponentEdges)
                 .Ignore();
+            descriptor
+                .Field(t => t.ManagedDataFormats)
+                .Resolve(context =>
+                    new InstitutionManagedDataFormatConnection(
+                        context.Parent<Data.Institution>()
+                        )
+                );
             descriptor
                 .Field(t => t.OperatedDatabases)
                 .Resolve(context =>

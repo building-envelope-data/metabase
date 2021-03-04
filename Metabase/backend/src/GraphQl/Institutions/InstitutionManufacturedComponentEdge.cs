@@ -1,4 +1,3 @@
-using System;
 using Metabase.GraphQl.Components;
 
 namespace Metabase.GraphQl.Institutions
