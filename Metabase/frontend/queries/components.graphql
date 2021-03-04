@@ -1,3 +1,14 @@
+query Components {
+  components {
+    nodes {
+      id
+      uuid
+      name
+      description
+    }
+  }
+}
+
 mutation CreateComponent(
   $name: String!
   $abbreviation: String
