@@ -22,18 +22,18 @@
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.9" />
     <PackageReference Include="HotChocolate.Data" Version="11.0.9" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="11.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
     <!-- <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="5.0.0" /> -->
     <!-- <PackageReference Include="StyleCop.Analyzers" Version="1.1.118"> -->
     <!--   <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets> -->
     <!--   <PrivateAssets>all</PrivateAssets> -->
     <!-- </PackageReference> -->
-    <PackageReference Include="OpenIddict.AspNetCore" Version="3.0.0" />
-    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.0.0" />
-    <PackageReference Include="OpenIddict.Quartz" Version="3.0.0" />
+    <PackageReference Include="OpenIddict.AspNetCore" Version="3.0.1" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.0.1" />
+    <PackageReference Include="OpenIddict.Quartz" Version="3.0.1" />
     <PackageReference Include="Quartz" Version="3.2.4" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.2.4" />
   </ItemGroup>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using NpgsqlTypes;
 
 namespace Metabase.Data
 {
@@ -17,15 +18,29 @@ namespace Metabase.Data
         [MinLength(1)]
         public string Description { get; private set; }
 
-        public Guid? StandardId { get; set; }
-
+        // Standard, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
         public Standard? Standard { get; set; }
 
-        [Url]
-        public Uri? PublicationLocator { get; private set; }
+        // Publication, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
+        public Publication? Publication { get; set; }
+
+        // TODO Make sure that either `Standard` or `Publication` is set but never both!
+        [NotMapped]
+        public IReference? Reference
+        {
+            get => Standard is not null ? Standard : Publication;
+        }
+
+        // TODO additionalReferences (that is, standards or publications)
+        // TODO service
+        // TODO Description of named parameters and sources?
+
+        public NpgsqlRange<DateTime>? Validity { get; private set; } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
+
+        public NpgsqlRange<DateTime>? Availability { get; private set; } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
 
         [Url]
-        public Uri? CodeLocator { get; private set; }
+        public Uri? CalculationLocator { get; private set; }
 
         [Required]
         public Enumerations.MethodCategory[] Categories { get; private set; }
@@ -33,14 +48,14 @@ namespace Metabase.Data
         public ICollection<InstitutionMethodDeveloper> InstitutionDeveloperEdges { get; } = new List<InstitutionMethodDeveloper>();
         public ICollection<Institution> InstitutionDevelopers { get; } = new List<Institution>();
 
-        public ICollection<PersonMethodDeveloper> PersonDeveloperEdges { get; } = new List<PersonMethodDeveloper>();
-        public ICollection<Person> PersonDevelopers { get; } = new List<Person>();
+        public ICollection<UserMethodDeveloper> UserDeveloperEdges { get; } = new List<UserMethodDeveloper>();
+        public ICollection<User> UserDevelopers { get; } = new List<User>();
 
         [NotMapped]
-        public IEnumerable<Stakeholder> Developers
+        public IEnumerable<IStakeholder> Developers
         {
-            get => InstitutionDevelopers.Cast<Stakeholder>().Concat(
-                PersonDevelopers.Cast<Stakeholder>()
+            get => InstitutionDevelopers.Cast<IStakeholder>().Concat(
+                UserDevelopers.Cast<IStakeholder>()
                 );
         }
 
@@ -54,18 +69,19 @@ namespace Metabase.Data
         public Method(
             string name,
             string description,
-            Uri? publicationLocator,
-            Uri? codeLocator,
+            NpgsqlRange<DateTime>? validity,
+            NpgsqlRange<DateTime>? availability,
+            Uri? calculationLocator,
             Enumerations.MethodCategory[] categories
 
             )
         {
             Name = name;
             Description = description;
-            PublicationLocator = publicationLocator;
-            CodeLocator = codeLocator;
+            Validity = validity;
+            Availability = availability;
+            CalculationLocator = calculationLocator;
             Categories = categories;
-
         }
     }
 }

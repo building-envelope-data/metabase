@@ -1,14 +1,5 @@
 import Layout from "../../components/Layout";
-import {
-  Divider,
-  List,
-  Card,
-  Typography,
-  message,
-  Skeleton,
-  Table,
-} from "antd";
-import { EditOutlined, MoreOutlined } from "@ant-design/icons";
+import { Divider, List, Typography, message, Skeleton, Table } from "antd";
 import { useInstitutionQuery } from "../../queries/institutions.graphql";
 import { useRouter } from "next/router";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
@@ -125,6 +116,49 @@ function Show() {
         }
       />
       {currentUser ? <CreateDatabase operatorId={institution.uuid} /> : <></>}
+      <Divider />
+      <Typography.Title level={2}>Managed Data Formats</Typography.Title>
+      <Table
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+          },
+          {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+          },
+          {
+            title: "Media Type",
+            dataIndex: "mediaType",
+            key: "mediaType",
+          },
+        ]}
+        dataSource={
+          institution.managedDataFormats?.edges?.map((x) => x.node) || []
+        }
+      />
+      <Divider />
+      <Typography.Title level={2}>Developed Methods</Typography.Title>
+      <Table
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+          },
+          {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+          },
+        ]}
+        dataSource={
+          institution.developedMethods?.edges?.map((x) => x.node) || []
+        }
+      />
       <Divider />
       <Typography.Title level={2}>Representatives</Typography.Title>
       <List

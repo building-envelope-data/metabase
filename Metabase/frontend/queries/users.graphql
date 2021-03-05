@@ -1,9 +1,54 @@
+fragment UserPartial on User {
+  id
+  uuid
+  name
+  email
+}
+
 query Users {
   users {
     nodes {
-      id
-      uuid
-      email
+      ...UserPartial
+    }
+  }
+}
+
+mutation RegisterUser(
+  $name: String!
+  $email: String!
+  $password: String!
+  $passwordConfirmation: String!
+) {
+  registerUser(
+    input: {
+      name: $name
+      email: $email
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+    }
+  ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ConfirmUserEmail($email: String!, $confirmationCode: String!) {
+  confirmUserEmail(
+    input: { email: $email, confirmationCode: $confirmationCode }
+  ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
     }
   }
 }

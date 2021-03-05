@@ -12,13 +12,27 @@ namespace Metabase.GraphQl.Components
             base.Configure(descriptor);
             descriptor
                 .Field(t => t.Manufacturers)
+                .Type<NonNullType<ObjectType<ComponentManufacturerConnection>>>()
                 .Resolve(context =>
                     new ComponentManufacturerConnection(
                         context.Parent<Data.Component>()
                         )
                     );
+            // TODO Use connections for concretization and generalization as is done above for manufacturers.
             descriptor
                 .Field(t => t.ManufacturerEdges).Ignore();
+            descriptor
+                .Field(t => t.Generalizations)
+                .Ignore();
+            descriptor
+                .Field(t => t.GeneralizationEdges)
+                .Ignore();
+            descriptor
+                .Field(t => t.Concretizations)
+                .Ignore();
+            descriptor
+                .Field(t => t.ConcretizationEdges)
+                .Ignore();
         }
     }
 }

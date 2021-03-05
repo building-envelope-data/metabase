@@ -5,14 +5,27 @@ export default {
     return `/institutions/${encodeURIComponent(uuid)}`;
   },
   institutionCreate: "/institutions/create",
+  users: "/users",
   user(uuid: string) {
     return `/users/${encodeURIComponent(uuid)}`;
   },
-  userLogin: "/users/login",
+  userLogin: "/user/login",
   userRegister: "/users/register",
   userChangeEmail: "/user/change-email",
-  userConfirmEmail: "/user/confirm-email",
-  userForgotPassword: "/user/forgot-password",
-  userSendTwoFactorCode: "/user/send-two-factor-code",
-  userVerifyTwoFactorCode: "/user/verify-two-factor-code",
+  userConfirmEmail: "/users/confirm-email",
+  userForgotPassword: "/users/forgot-password",
+  userSendTwoFactorCode: "/users/send-two-factor-code",
+  userVerifyTwoFactorCode: "/users/verify-two-factor-code",
+  dataFormats: "/data-formats",
+  dataFormat(uuid: string) {
+    return `/data-formats/${encodeURIComponent(uuid)}`;
+  },
+  methods: "/methods",
+  method(uuid: string) {
+    return `/methods/${encodeURIComponent(uuid)}`;
+  },
+  components: "/components",
+  component(uuid: string) {
+    return `/components/${encodeURIComponent(uuid)}`;
+  },
 };

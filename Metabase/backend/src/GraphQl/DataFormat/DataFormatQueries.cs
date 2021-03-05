@@ -2,34 +2,36 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Guid = System.Guid;
 
-namespace Metabase.GraphQl.Standards
+namespace Metabase.GraphQl.DataFormats
 {
     [ExtendObjectType(Name = nameof(Query))]
-    public sealed class StandardQueries
+    public sealed class DataFormatQueries
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UsePaging]
         // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Data.Standard> GetStandards(
+        [Authorize(Policy = Configuration.Auth.ReadPolicy)]
+        public IQueryable<Data.DataFormat> GetDataFormats(
             [ScopedService] Data.ApplicationDbContext context
             )
         {
-            return context.Standards;
+            return context.DataFormats;
         }
 
-        public Task<Data.Standard?> GetStandardAsync(
+        public Task<Data.DataFormat?> GetDataFormatAsync(
             Guid uuid,
-            StandardByIdDataLoader standardById,
+            DataFormatByIdDataLoader dataFormatById,
             CancellationToken cancellationToken
             )
         {
-            return standardById.LoadAsync(
+            return dataFormatById.LoadAsync(
                 uuid,
                 cancellationToken
                 );

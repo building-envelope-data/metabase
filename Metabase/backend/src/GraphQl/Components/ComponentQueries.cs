@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Guid = System.Guid;
@@ -16,6 +17,7 @@ namespace Metabase.GraphQl.Components
         // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
         [UseFiltering]
         [UseSorting]
+        [Authorize(Policy = Configuration.Auth.ReadPolicy)]
         public IQueryable<Data.Component> GetComponents(
             [ScopedService] Data.ApplicationDbContext context
             )

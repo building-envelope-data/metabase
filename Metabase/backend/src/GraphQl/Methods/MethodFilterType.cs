@@ -13,8 +13,6 @@ namespace Metabase.GraphQl.Methods
             descriptor.Field(x => x.Id);
             descriptor.Field(x => x.Name);
             descriptor.Field(x => x.Description);
-            descriptor.Field(x => x.PublicationLocator);
-            descriptor.Field(x => x.CodeLocator);
             descriptor.Field(x => x.Categories);
         }
     }

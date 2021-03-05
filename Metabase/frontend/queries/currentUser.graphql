@@ -1,6 +1,7 @@
 fragment UserPartial on User {
   id
   uuid
+  name
   email
 }
 
@@ -10,16 +11,8 @@ query CurrentUser {
   }
 }
 
-mutation LoginUser(
-    $email: String!,
-    $password: String!
-    ) {
-  loginUser(
-      input: {
-           email: $email,
-           password: $password
-           }
-      ) {
+mutation LoginUser($email: String!, $password: String!) {
+  loginUser(input: { email: $email, password: $password }) {
     requiresTwoFactor
     user {
       ...UserPartial
@@ -42,58 +35,8 @@ mutation LogoutUser {
   }
 }
 
-mutation RegisterUser(
-  $email: String!,
-  $password: String!,
-  $passwordConfirmation: String!
-) {
-  registerUser(
-    input: {
-      email: $email,
-      password: $password,
-      passwordConfirmation: $passwordConfirmation
-    }
-  ) {
-    user {
-      ...UserPartial
-    }
-    errors {
-      code
-      message
-      path
-    }
-  }
-}
-
-mutation ConfirmUserEmail(
-  $email: String!,
-  $confirmationCode: String!
-) {
-  confirmUserEmail(
-    input: {
-      email: $email,
-      confirmationCode: $confirmationCode
-    }
-  ) {
-    user {
-      ...UserPartial
-    }
-    errors {
-      code
-      message
-      path
-    }
-  }
-}
-
-mutation ChangeUserEmail(
-  $newEmail: String!
-  ) {
-  changeUserEmail(
-    input: {
-       newEmail: $newEmail
-       }
-       ) {
+mutation ChangeUserEmail($newEmail: String!) {
+  changeUserEmail(input: { newEmail: $newEmail }) {
     user {
       ...UserPartial
     }

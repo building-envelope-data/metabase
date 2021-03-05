@@ -96,11 +96,11 @@ namespace Metabase
             app.UseCookiePolicy();
             app.UseRouting();
             // TODO Do we really want this? See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0
-            app.UseRequestLocalization(options =>
+            app.UseRequestLocalization(_ =>
             {
-                options.AddSupportedCultures("en-US", "de-DE");
-                options.AddSupportedUICultures("en-US", "de-DE");
-                options.SetDefaultCulture("en-US");
+                _.AddSupportedCultures("en-US", "de-DE");
+                _.AddSupportedUICultures("en-US", "de-DE");
+                _.SetDefaultCulture("en-US");
             });
             app.UseCors();
             // app.UseCertificateForwarding(); // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-5.0#other-web-proxies

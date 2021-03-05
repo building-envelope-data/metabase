@@ -28,6 +28,7 @@ namespace Metabase.GraphQl.Users
         /* TODO [UseProjection] // fails without an explicit error message in the logs */
         /* TODO [UseFiltering(typeof(UserFilterType))] // wait for https://github.com/ChilliCream/hotchocolate/issues/2672 and https://github.com/ChilliCream/hotchocolate/issues/2666 */
         [UseSorting]
+        [Authorize(Policy = Configuration.Auth.ReadPolicy)]
         public IQueryable<Data.User> GetUsers(
             [ScopedService] Data.ApplicationDbContext context
             )

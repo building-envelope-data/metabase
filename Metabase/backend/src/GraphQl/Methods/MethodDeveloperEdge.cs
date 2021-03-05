@@ -1,0 +1,46 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
+using Metabase.GraphQl.Institutions;
+using Metabase.GraphQl.Users;
+
+namespace Metabase.GraphQl.Methods
+{
+    public sealed class MethodDeveloperEdge
+    {
+        private readonly InstitutionMethodDeveloperEdge? _institutionMethodDeveloperEdge;
+        private readonly UserMethodDeveloperEdge? _userMethodDeveloperEdge;
+
+        public MethodDeveloperEdge(
+            InstitutionMethodDeveloperEdge edge
+        )
+        {
+            _institutionMethodDeveloperEdge = edge;
+        }
+
+        public MethodDeveloperEdge(
+            UserMethodDeveloperEdge edge
+        )
+        {
+            _userMethodDeveloperEdge = edge;
+        }
+
+        public async Task<Data.IStakeholder> GetNodeAsync(
+            [DataLoader] InstitutionByIdDataLoader institutionById,
+            [DataLoader] UserByIdDataLoader userById,
+            CancellationToken cancellationToken
+            )
+        {
+            if (_institutionMethodDeveloperEdge is not null)
+            {
+                return await _institutionMethodDeveloperEdge.GetNodeAsync(institutionById, cancellationToken).ConfigureAwait(false);
+            }
+            if (_userMethodDeveloperEdge is not null)
+            {
+                return await _userMethodDeveloperEdge.GetNodeAsync(userById, cancellationToken).ConfigureAwait(false);
+            }
+            throw new Exception("Impossible!");
+        }
+    }
+}

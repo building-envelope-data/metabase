@@ -1,51 +1,47 @@
-using System.ComponentModel.DataAnnotations;
 using System;
+using System.ComponentModel.DataAnnotations;
+using HotChocolate;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Data
 {
+    [Owned]
+    [GraphQLDescription("`ISO 52022` is an example of the abbreviation of a standardizer and the main number of the identifier.")]
     public sealed class Standard
-      : Infrastructure.Data.Entity
+    : IReference
     {
         [Required]
         [MinLength(1)]
-        public string Title { get; private set; }
+        public string? Title { get; private set; }
 
-        [Required]
         [MinLength(1)]
-        public string Abstract { get; private set; }
+        public string? Abstract { get; private set; }
 
-        [Required]
         [MinLength(1)]
-        public string Section { get; private set; }
+        [GraphQLDescription("The section of the standard to which the reference refers to.")]
+        public string? Section { get; private set; }
 
-        [Required]
         [Range(0, 3000)]
-        public int Year { get; private set; }
+        [GraphQLDescription("It is important to define the year in which the standard was issued because there can be relevant updates of one standard.")]
+        public int? Year { get; private set; }
 
+        // Numeration, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
         [Required]
         public Numeration Numeration { get; set; } = default!;
 
         [Required]
         public Enumerations.Standardizer[] Standardizers { get; private set; }
 
-        [Required]
         [Url]
-        public Uri Locator { get; private set; }
-
-#nullable disable
-        public Standard()
-        {
-            // Parameterless constructor is needed by HotChocolate's `UseProjection`
-        }
-#nullable enable
+        public Uri? Locator { get; private set; }
 
         public Standard(
-            string title,
-            string @abstract,
-            string section,
-            int year,
+            string? title,
+            string? @abstract,
+            string? section,
+            int? year,
             Enumerations.Standardizer[] standardizers,
-            Uri locator
+            Uri? locator
             )
         {
             Title = title;

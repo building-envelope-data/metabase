@@ -9,5 +9,12 @@ namespace Metabase.GraphQl.Methods
               : base(method)
         {
         }
+
+        public CreateMethodPayload(
+            CreateMethodError error
+            )
+              : base(error)
+        {
+        }
     }
 }

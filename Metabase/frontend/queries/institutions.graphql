@@ -136,6 +136,27 @@ query Institution($uuid: Uuid!) {
         }
       }
     }
+    managedDataFormats {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+          mediaType
+        }
+      }
+    }
+    developedMethods {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+        }
+      }
+    }
   }
 }
 

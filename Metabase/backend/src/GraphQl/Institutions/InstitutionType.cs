@@ -1,4 +1,3 @@
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
 
 namespace Metabase.GraphQl.Institutions
@@ -11,16 +10,20 @@ namespace Metabase.GraphQl.Institutions
             )
         {
             base.Configure(descriptor);
-            // TODO AffiliatedPersons
-            // descriptor
-            //     .Field(t => t.DevelopedMethods)
-            //     .ResolveWith<InstitutionResolvers>(t => t.GetDevelopedMethodsAsync(default!, default!, default!, default))
-            //     .UseDbContext<Data.ApplicationDbContext>();
+            descriptor
+                .Field(t => t.DevelopedMethods)
+                .Type<NonNullType<ObjectType<InstitutionDevelopedMethodConnection>>>()
+                .Resolve(context =>
+                    new InstitutionDevelopedMethodConnection(
+                        context.Parent<Data.Institution>()
+                    )
+                );
             descriptor
                 .Field(t => t.DevelopedMethodEdges)
                 .Ignore();
             descriptor
                 .Field(t => t.ManufacturedComponents)
+                .Type<NonNullType<ObjectType<InstitutionManufacturedComponentConnection>>>()
                 .Resolve(context =>
                     new InstitutionManufacturedComponentConnection(
                         context.Parent<Data.Institution>()
@@ -30,7 +33,16 @@ namespace Metabase.GraphQl.Institutions
                 .Field(t => t.ManufacturedComponentEdges)
                 .Ignore();
             descriptor
+                .Field(t => t.ManagedDataFormats)
+                .Type<NonNullType<ObjectType<InstitutionManagedDataFormatConnection>>>()
+                .Resolve(context =>
+                    new InstitutionManagedDataFormatConnection(
+                        context.Parent<Data.Institution>()
+                        )
+                );
+            descriptor
                 .Field(t => t.OperatedDatabases)
+                .Type<NonNullType<ObjectType<InstitutionOperatedDatabaseConnection>>>()
                 .Resolve(context =>
                     new InstitutionOperatedDatabaseConnection(
                         context.Parent<Data.Institution>()
@@ -38,6 +50,7 @@ namespace Metabase.GraphQl.Institutions
                     );
             descriptor
                 .Field(t => t.Representatives)
+                .Type<NonNullType<ObjectType<InstitutionRepresentativeConnection>>>()
                 .Resolve(context =>
                     new InstitutionRepresentativeConnection(
                         context.Parent<Data.Institution>()

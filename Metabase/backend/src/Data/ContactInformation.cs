@@ -1,7 +1,8 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
-using System;
 
+// TODO Use it somewhere or remove it! :)
 namespace Metabase.Data
 {
     [Owned]

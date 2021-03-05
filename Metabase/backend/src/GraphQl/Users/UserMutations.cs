@@ -284,11 +284,12 @@ namespace Metabase.GraphQl.Users
             [Service] Services.IEmailSender emailSender
             )
         {
-            var user = new Data.User
-            {
-                UserName = input.Email,
-                Email = input.Email
-            };
+            var user = new Data.User(
+                name: input.Name,
+                email: input.Email,
+                postalAddress: null,
+                websiteLocator: null
+            );
             if (input.Password != input.PasswordConfirmation)
             {
                 return new RegisterUserPayload(
@@ -980,7 +981,7 @@ namespace Metabase.GraphQl.Users
             await emailSender.SendEmailAsync(
                 email,
                 "Confirm your email",
-                $"Please confirm your email address by clicking the link https://TODO/user/confirm-email?email={email}&confirmationCode={confirmationCode}.")
+                $"Please confirm your email address by clicking the link https://TODO/users/confirm-email?email={email}&confirmationCode={confirmationCode}.")
                 .ConfigureAwait(false);
         }
 
