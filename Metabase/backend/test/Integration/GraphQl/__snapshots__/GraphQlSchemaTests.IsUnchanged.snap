@@ -673,6 +673,7 @@ type UserRepresentedInstitutionConnection {
 
 type UserRepresentedInstitutionEdge {
   node: Institution!
+  role: InstitutionRepresentativeRole!
 }
 
 input AddInstitutionRepresentativeInput {
