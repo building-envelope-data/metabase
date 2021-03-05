@@ -147,14 +147,16 @@ namespace Metabase.Controllers
             var applicationId =
                 await _applicationManager.GetIdAsync(application).ConfigureAwait(false)
                 ?? throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
-
             // Retrieve the permanent authorizations associated with the user and the calling client application.
             var authorizations = await _authorizationManager.FindAsync(
                 subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
                 client: applicationId,
                 status: Statuses.Valid,
                 type: AuthorizationTypes.Permanent,
-                scopes: request.GetScopes()).ToListAsync().ConfigureAwait(false);
+                scopes: request.GetScopes()
+                )
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             switch (await _applicationManager.GetConsentTypeAsync(application).ConfigureAwait(false))
             {
@@ -193,7 +195,9 @@ namespace Metabase.Controllers
                             subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
                             client: applicationId,
                             type: AuthorizationTypes.Permanent,
-                            scopes: principal.GetScopes()).ConfigureAwait(false);
+                            scopes: principal.GetScopes()
+                            )
+                            .ConfigureAwait(false);
                     }
 
                     principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false));
@@ -257,7 +261,10 @@ namespace Metabase.Controllers
                 client: applicationId,
                 status: Statuses.Valid,
                 type: AuthorizationTypes.Permanent,
-                scopes: request.GetScopes()).ToListAsync().ConfigureAwait(false);
+                scopes: request.GetScopes()
+                )
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             // Note: the same check is already made in the other action but is repeated
             // here to ensure a malicious user can't abuse this POST-only endpoint and

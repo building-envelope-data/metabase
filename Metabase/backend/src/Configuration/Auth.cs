@@ -1,13 +1,10 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using HotChocolate.Resolvers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -238,6 +235,9 @@ namespace Metabase.Configuration
                                .SetDeviceEndpointUris("/connect/device")
                                .SetLogoutEndpointUris("/connect/logout")
                                .SetIntrospectionEndpointUris("/connect/introspect")
+                                // .SetRevocationEndpointUris("")
+                                // .SetCryptographyEndpointUris("")
+                                // .SetConfigurationEndpointUris("")
                                .SetTokenEndpointUris("/connect/token")
                                .SetUserinfoEndpointUris("/connect/userinfo")
                                .SetVerificationEndpointUris("/connect/verify");
