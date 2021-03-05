@@ -56,7 +56,7 @@ namespace Metabase.GraphQl.Databases
                 return new CreateDatabasePayload(
                     new CreateDatabaseError(
                         CreateDatabaseErrorCode.UNKNOWN_OPERATOR,
-                        "Unknown manufacturer",
+                        "Unknown operator",
                       new[] { nameof(input), nameof(input.OperatorId).FirstCharToLower() }
                     )
                 );

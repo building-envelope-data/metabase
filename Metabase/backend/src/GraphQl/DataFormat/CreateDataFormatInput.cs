@@ -11,6 +11,7 @@ namespace Metabase.GraphQl.DataFormats
             string MediaType,
             Uri? SchemaLocator,
             CreateStandardInput? Standard,
-            CreatePublicationInput? Publication
+            CreatePublicationInput? Publication,
+            Guid ManagerId
         );
 }

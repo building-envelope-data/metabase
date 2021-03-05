@@ -782,6 +782,7 @@ input CreateComponentInput {
 input CreateDataFormatInput {
   description: String!
   extension: String
+  managerId: Uuid!
   mediaType: String!
   name: String!
   publication: CreatePublicationInput
@@ -811,9 +812,11 @@ input CreateMethodInput {
   calculationLocator: Url
   categories: [MethodCategory!]!
   description: String!
+  institutionDeveloperIds: [Uuid!]!
   name: String!
   publication: CreatePublicationInput
   standard: CreateStandardInput
+  userDeveloperIds: [Uuid!]!
   validity: OpenEndedDateTimeRangeInput
 }
 
@@ -1226,6 +1229,8 @@ enum CreateComponentErrorCode {
 enum CreateDataFormatErrorCode {
   UNKNOWN
   TWO_REFERENCES
+  UNKNOWN_MANAGER
+  UNAUTHORIZED
 }
 
 enum CreateDatabaseErrorCode {
@@ -1243,6 +1248,8 @@ enum CreateInstitutionErrorCode {
 enum CreateMethodErrorCode {
   UNKNOWN
   TWO_REFERENCES
+  UNKNOWN_INSTITUTION_DEVELOPERS
+  UNKNOWN_USER_DEVELOPERS
 }
 
 enum DeleteInstitutionErrorCode {
