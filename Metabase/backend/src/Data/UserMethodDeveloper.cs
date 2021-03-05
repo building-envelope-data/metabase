@@ -3,7 +3,8 @@ using System;
 namespace Metabase.Data
 {
     public sealed class UserMethodDeveloper
-      : Infrastructure.Data.Entity
+      : Infrastructure.Data.Entity,
+        IMethodDeveloper
     {
         public Guid MethodId { get; set; }
         public Method Method { get; set; } = default!;

@@ -19,8 +19,24 @@ namespace Metabase.GraphQl.Users
               .Field(t => t.PhoneNumber);
             descriptor
               .Field(t => t.WebsiteLocator);
-            // TODO DevelopedMethods
-            // TODO RepresentedInstitutions
+            descriptor
+              .Field(t => t.DevelopedMethods);
+            descriptor
+                .Field(t => t.DevelopedMethods)
+                .Type<NonNullType<ObjectType<UserDevelopedMethodConnection>>>()
+                .Resolve(context =>
+                    new UserDevelopedMethodConnection(
+                        context.Parent<Data.User>()
+                    )
+                );
+            descriptor
+                .Field(t => t.RepresentedInstitutions)
+                .Type<NonNullType<ObjectType<UserRepresentedInstitutionConnection>>>()
+                .Resolve(context =>
+                    new UserRepresentedInstitutionConnection(
+                        context.Parent<Data.User>()
+                    )
+                );
         }
     }
 }

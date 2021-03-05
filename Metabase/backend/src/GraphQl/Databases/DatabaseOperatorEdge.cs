@@ -13,9 +13,4 @@ namespace Metabase.GraphQl.Databases
         {
         }
     }
-
-    public sealed class DatabaseOperatorEdgeType
-      : ObjectType<DatabaseOperatorEdge>
-    {
-    }
 }

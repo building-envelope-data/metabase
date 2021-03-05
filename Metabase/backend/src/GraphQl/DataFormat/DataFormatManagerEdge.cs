@@ -13,9 +13,4 @@ namespace Metabase.GraphQl.DataFormats
         {
         }
     }
-
-    public sealed class DataFormatManagerEdgeType
-      : ObjectType<DataFormatManagerEdge>
-    {
-    }
 }

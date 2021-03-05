@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.Databases
             base.Configure(descriptor);
             descriptor
                 .Field(t => t.Operator)
-                .Type<NonNullType<DatabaseOperatorEdgeType>>()
+                .Type<NonNullType<ObjectType<DatabaseOperatorEdge>>>()
                 .Resolve(context =>
                     new DatabaseOperatorEdge(
                         context.Parent<Data.Database>()

@@ -12,6 +12,7 @@ namespace Metabase.GraphQl.Components
             base.Configure(descriptor);
             descriptor
                 .Field(t => t.Manufacturers)
+                .Type<NonNullType<ObjectType<ComponentManufacturerConnection>>>()
                 .Resolve(context =>
                     new ComponentManufacturerConnection(
                         context.Parent<Data.Component>()

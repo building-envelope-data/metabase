@@ -68,24 +68,11 @@ type Component implements Node {
   abbreviation: String
   availability: OpenEndedDateTimeRange
   categories: [ComponentCategory!]!
-  concretizationEdges: [ComponentConcretizationAndGeneralization!]!
-  concretizations: [Component!]!
   description: String!
-  generalizationEdges: [ComponentConcretizationAndGeneralization!]!
-  generalizations: [Component!]!
   id: ID!
-  manufacturers: ComponentManufacturerConnection
+  manufacturers: ComponentManufacturerConnection!
   name: String!
   uuid: Uuid!
-}
-
-type ComponentConcretizationAndGeneralization {
-  concreteComponent: Component!
-  concreteComponentId: Uuid!
-  generalComponent: Component!
-  generalComponentId: Uuid!
-  id: Uuid!
-  xmin: UInt!
 }
 
 "A connection to a list of items."
@@ -196,8 +183,7 @@ type DataFormat implements Node {
   description: String!
   extension: String
   id: ID!
-  manager: Institution
-  managerId: Uuid!
+  manager: DataFormatManagerEdge!
   mediaType: String!
   name: String!
   reference: Reference
@@ -224,12 +210,16 @@ type DataFormatEdge {
   node: DataFormat!
 }
 
+type DataFormatManagerEdge {
+  node: Institution!
+}
+
 type Database implements Node {
   description: String!
   id: ID!
   locator: Url!
   name: String!
-  operator: DatabaseOperatorEdge
+  operator: DatabaseOperatorEdge!
   uuid: Uuid!
 }
 
@@ -292,14 +282,14 @@ type GenerateUserTwoFactorRecoveryCodesPayload {
 type Institution implements Node & Stakeholder {
   abbreviation: String
   description: String!
-  developedMethods: InstitutionDevelopedMethodConnection
+  developedMethods: InstitutionDevelopedMethodConnection!
   id: ID!
-  managedDataFormats: InstitutionManagedDataFormatConnection
-  manufacturedComponents: InstitutionManufacturedComponentConnection
+  managedDataFormats: InstitutionManagedDataFormatConnection!
+  manufacturedComponents: InstitutionManufacturedComponentConnection!
   name: String!
-  operatedDatabases: InstitutionOperatedDatabaseConnection
+  operatedDatabases: InstitutionOperatedDatabaseConnection!
   publicKey: String
-  representatives: InstitutionRepresentativeConnection
+  representatives: InstitutionRepresentativeConnection!
   state: InstitutionState!
   uuid: Uuid!
   websiteLocator: Url
@@ -348,15 +338,6 @@ type InstitutionManufacturedComponentEdge {
   node: Component!
 }
 
-type InstitutionMethodDeveloper {
-  id: Uuid!
-  institution: Institution!
-  institutionId: Uuid!
-  method: Method!
-  methodId: Uuid!
-  xmin: UInt!
-}
-
 type InstitutionOperatedDatabaseConnection {
   edges: [InstitutionOperatedDatabaseEdge!]!
 }
@@ -402,14 +383,10 @@ type Method implements Node {
   calculationLocator: Url
   categories: [MethodCategory!]!
   description: String!
-  developers: [Stakeholder!]!
+  developers: MethodDeveloperConnection!
   id: ID!
-  institutionDeveloperEdges: [InstitutionMethodDeveloper!]!
-  institutionDevelopers: [Institution!]!
   name: String!
   reference: Reference
-  userDeveloperEdges: [UserMethodDeveloper!]!
-  userDevelopers: [User!]!
   uuid: Uuid!
   validity: OpenEndedDateTimeRange
 }
@@ -423,6 +400,14 @@ type MethodConnection {
   "Information to aid in pagination."
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+type MethodDeveloperConnection {
+  edges: [MethodDeveloperEdge!]!
+}
+
+type MethodDeveloperEdge {
+  node: Stakeholder!
 }
 
 "An edge in a connection."
@@ -644,11 +629,13 @@ type UpdateInstitutionPayload {
 }
 
 type User implements Node & Stakeholder {
+  developedMethods: UserDevelopedMethodConnection!
   email: String
   id: ID!
   "Full name"
   name: String!
   phoneNumber: String
+  representedInstitutions: UserRepresentedInstitutionConnection!
   uuid: Uuid!
   websiteLocator: Url
 }
@@ -664,6 +651,14 @@ type UserConnection {
   totalCount: Int!
 }
 
+type UserDevelopedMethodConnection {
+  edges: [UserDevelopedMethodEdge!]!
+}
+
+type UserDevelopedMethodEdge {
+  node: Method!
+}
+
 "An edge in a connection."
 type UserEdge {
   "A cursor for use in pagination."
@@ -672,13 +667,12 @@ type UserEdge {
   node: User!
 }
 
-type UserMethodDeveloper {
-  id: Uuid!
-  method: Method!
-  methodId: Uuid!
-  user: User!
-  userId: Uuid!
-  xmin: UInt!
+type UserRepresentedInstitutionConnection {
+  edges: [UserRepresentedInstitutionEdge!]!
+}
+
+type UserRepresentedInstitutionEdge {
+  node: Institution!
 }
 
 input AddInstitutionRepresentativeInput {

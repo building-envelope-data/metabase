@@ -25,6 +25,7 @@ namespace Metabase.Data
         [GraphQLDescription("It is important to define the year in which the standard was issued because there can be relevant updates of one standard.")]
         public int? Year { get; private set; }
 
+        // Numeration, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
         [Required]
         public Numeration Numeration { get; set; } = default!;
 

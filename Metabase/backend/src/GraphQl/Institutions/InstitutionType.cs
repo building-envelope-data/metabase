@@ -10,12 +10,9 @@ namespace Metabase.GraphQl.Institutions
             )
         {
             base.Configure(descriptor);
-            // descriptor
-            //     .Field(t => t.DevelopedMethods)
-            //     .ResolveWith<InstitutionResolvers>(t => t.GetDevelopedMethodsAsync(default!, default!, default!, default))
-            //     .UseDbContext<Data.ApplicationDbContext>();
             descriptor
                 .Field(t => t.DevelopedMethods)
+                .Type<NonNullType<ObjectType<InstitutionDevelopedMethodConnection>>>()
                 .Resolve(context =>
                     new InstitutionDevelopedMethodConnection(
                         context.Parent<Data.Institution>()
@@ -26,6 +23,7 @@ namespace Metabase.GraphQl.Institutions
                 .Ignore();
             descriptor
                 .Field(t => t.ManufacturedComponents)
+                .Type<NonNullType<ObjectType<InstitutionManufacturedComponentConnection>>>()
                 .Resolve(context =>
                     new InstitutionManufacturedComponentConnection(
                         context.Parent<Data.Institution>()
@@ -36,6 +34,7 @@ namespace Metabase.GraphQl.Institutions
                 .Ignore();
             descriptor
                 .Field(t => t.ManagedDataFormats)
+                .Type<NonNullType<ObjectType<InstitutionManagedDataFormatConnection>>>()
                 .Resolve(context =>
                     new InstitutionManagedDataFormatConnection(
                         context.Parent<Data.Institution>()
@@ -43,6 +42,7 @@ namespace Metabase.GraphQl.Institutions
                 );
             descriptor
                 .Field(t => t.OperatedDatabases)
+                .Type<NonNullType<ObjectType<InstitutionOperatedDatabaseConnection>>>()
                 .Resolve(context =>
                     new InstitutionOperatedDatabaseConnection(
                         context.Parent<Data.Institution>()
@@ -50,6 +50,7 @@ namespace Metabase.GraphQl.Institutions
                     );
             descriptor
                 .Field(t => t.Representatives)
+                .Type<NonNullType<ObjectType<InstitutionRepresentativeConnection>>>()
                 .Resolve(context =>
                     new InstitutionRepresentativeConnection(
                         context.Parent<Data.Institution>()

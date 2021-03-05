@@ -186,7 +186,7 @@ namespace Metabase.Data
         public DbSet<InstitutionMethodDeveloper> InstitutionMethodDevelopers { get; private set; } = default!;
         public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
         public DbSet<Method> Methods { get; private set; } = default!;
-        public DbSet<UserMethodDeveloper> UserMethodDeveloper { get; private set; } = default!;
+        public DbSet<UserMethodDeveloper> UserMethodDevelopers { get; private set; } = default!;
 
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options
