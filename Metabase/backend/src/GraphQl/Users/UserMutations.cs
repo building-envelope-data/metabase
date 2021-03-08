@@ -263,18 +263,6 @@ namespace Metabase.GraphQl.Users
         /*     } */
         /* } */
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Logout.cs.cshtml
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
-        [UseUserManager]
-        [UseSignInManager]
-        public async Task<LogoutUserPayload> LogoutUserAsync(
-            [ScopedService] SignInManager<Data.User> signInManager
-            )
-        {
-            await signInManager.SignOutAsync().ConfigureAwait(false);
-            return new LogoutUserPayload();
-        }
-
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Register.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -528,8 +516,21 @@ namespace Metabase.GraphQl.Users
         // LOGGED-IN USER //
         ////////////////////
 
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Logout.cs.cshtml
+        [Authorize(Policy = Configuration.Auth.ManageUserPolicy)]
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        [UseSignInManager]
+        public async Task<LogoutUserPayload> LogoutUserAsync(
+            [ScopedService] SignInManager<Data.User> signInManager
+            )
+        {
+            await signInManager.SignOutAsync().ConfigureAwait(false);
+            return new LogoutUserPayload();
+        }
+
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.ChangePassword.cs.cshtml
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [UseSignInManager]
@@ -629,7 +630,7 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.DeletePersonalData.cs.cshtml
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [UseSignInManager]
@@ -704,7 +705,7 @@ namespace Metabase.GraphQl.Users
         // TODO Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Disable2fa.cs.cshtml
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<ChangeUserEmailPayload> ChangeUserEmailAsync(
@@ -747,7 +748,7 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<ResendUserEmailVerificationPayload> ResendUserEmailVerificationAsync(
@@ -776,7 +777,7 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.GenerateRecoveryCodes.cs.cshtml
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<GenerateUserTwoFactorRecoveryCodesPayload> GenerateUserTwoFactorRecoveryCodesAsync(
@@ -813,7 +814,7 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Index.cs.cshtml
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<SetUserPhoneNumberPayload> SetUserPhoneNumberAsync(
@@ -872,7 +873,7 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.SetPassword.cs.cshtml
-        [Authorize]
+        [Authorize(Policy = Configuration.Auth.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [UseSignInManager]

@@ -1,8 +1,10 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using Quartz;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 using AppSettings = Infrastructure.AppSettings;
 
 namespace Metabase.Configuration
@@ -20,8 +23,10 @@ namespace Metabase.Configuration
         public const string CookieAuthenticatedPolicy = "CookieAuthenticated";
         public const string ReadPolicy = "Read";
         public const string WritePolicy = "Write";
+        public const string ManageUserPolicy = "ManageUser";
         public static string ReadApiScope { get; } = "api:read";
         public static string WriteApiScope { get; } = "api:write";
+        public static string ManageUserApiScope { get; } = "api:user:manage";
         public static string ServerName { get; } = "metabase";
 
         public static void ConfigureServices(
@@ -85,7 +90,34 @@ namespace Metabase.Configuration
                 _.LoginPath = "/user/login";
                 _.LogoutPath = "/user/logout";
                 _.ReturnUrlParameter = "returnTo";
-            }
+                _.Events.OnValidatePrincipal = context =>
+                        // TODO Is there any security risk associated with adding scopes as is done below?
+                    {
+                        // The metabase frontend uses application cookies for
+                        // user authentication and is allowed to read data,
+                        // write data, and manage users. The corresponding
+                        // policies use scopes, so we need to add them.
+                        var identity = new ClaimsIdentity();
+                        foreach (
+                            var claim in
+                                new[] {
+                                ReadApiScope,
+                                WriteApiScope,
+                                ManageUserApiScope
+                                }
+                        )
+                        {
+                            identity.AddClaim(
+                                new Claim(
+                                    Claims.Private.Scope,
+                                    claim
+                                    )
+                                );
+                        }
+                        context?.Principal?.AddIdentity(identity);
+                        return Task.CompletedTask;
+                    };
+                }
             );
         }
 
@@ -141,20 +173,21 @@ namespace Metabase.Configuration
                 );
                 foreach (var (policyName, scope) in new[] {
                      (ReadPolicy, ReadApiScope),
-                      (WritePolicy, WriteApiScope)
-                      }
-                      )
+                     (WritePolicy, WriteApiScope),
+                     (ManageUserPolicy, ManageUserApiScope)
+                     }
+                   )
                 {
                     _.AddPolicy(policyName, policy =>
                     {
                         policy.AuthenticationSchemes = new[] {
-                        IdentityConstants.ApplicationScheme, // TODO Remove once we use OpenId Connect in the frontend.
+                        IdentityConstants.ApplicationScheme,
                         JwtBearerDefaults.AuthenticationScheme
                             };
                         policy.RequireAuthenticatedUser();
                         policy.RequireAssertion(context =>
                         {
-                            // TODO Remove the `if` but keep the last return once we use OpenId Connect in the frontend.
+                            // How the `HttpContext` can be accessed when the policies are used in GraphQL queries or mutations.
                             // if (context.Resource is IResolverContext resolverContext)
                             // {
                             //     if (resolverContext.ContextData.ContainsKey(nameof(HttpContext)))
@@ -173,8 +206,7 @@ namespace Metabase.Configuration
 
                             //     }
                             // }
-                            // return context.User.HasScope(scope);
-                            return true;
+                            return context.User.HasScope(scope);
                         }
                         );
                     }
