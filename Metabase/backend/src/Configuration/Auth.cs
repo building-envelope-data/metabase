@@ -13,7 +13,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using Quartz;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 using AppSettings = Infrastructure.AppSettings;
 
 namespace Metabase.Configuration
@@ -109,7 +108,7 @@ namespace Metabase.Configuration
                         {
                             identity.AddClaim(
                                 new Claim(
-                                    Claims.Private.Scope,
+                                    OpenIddictConstants.Claims.Private.Scope,
                                     claim
                                     )
                                 );

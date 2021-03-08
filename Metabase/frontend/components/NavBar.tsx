@@ -9,7 +9,6 @@ import {
 import paths from "../paths";
 import { initializeApollo } from "../lib/apollo";
 import { useState } from "react";
-import { signIn, signOut, useSession } from "next-auth/client";
 
 type NavItemProps = {
   path: string;
@@ -21,7 +20,6 @@ export type NavBarProps = {
 };
 
 export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
-  const [session, loading] = useSession();
   const router = useRouter();
   const currentUser = useCurrentUserQuery()?.data?.currentUser;
   const apolloClient = initializeApollo();
@@ -72,18 +70,6 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
             <Link href={paths.userRegister}>Register</Link>
           </Menu.Item>
         </>
-      )}
-      {!session && (
-        <Menu.Item>
-          Not signed in <br />
-          <button onClick={() => signIn()}>Sign in</button>
-        </Menu.Item>
-      )}
-      {session && (
-        <Menu.Item>
-          Signed in as {session.user.email} <br />
-          <button onClick={() => signOut()}>Sign out</button>
-        </Menu.Item>
       )}
     </Menu>
   );

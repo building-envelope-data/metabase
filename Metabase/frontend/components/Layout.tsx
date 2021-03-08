@@ -34,6 +34,10 @@ const navItems = [
     path: paths.userChangeEmail,
     label: `Change Email`,
   },
+  {
+    path: paths.openIdConnectClient,
+    label: `OpenId Connect Client`,
+  },
 ];
 
 const Layout: React.FunctionComponent = ({ children }) => {
