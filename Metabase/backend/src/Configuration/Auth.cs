@@ -86,8 +86,8 @@ namespace Metabase.Configuration
             services.ConfigureApplicationCookie(_ =>
             {
                 _.AccessDeniedPath = "/unauthorized";
-                _.LoginPath = "/user/login";
-                _.LogoutPath = "/user/logout";
+                _.LoginPath = "/me/login";
+                _.LogoutPath = "/me/logout";
                 _.ReturnUrlParameter = "returnTo";
                 _.Events.OnValidatePrincipal = context =>
                         // TODO Is there any security risk associated with adding scopes as is done below?
