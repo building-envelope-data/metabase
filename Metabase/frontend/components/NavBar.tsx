@@ -40,7 +40,7 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
       } else {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         await apolloClient.resetStore();
-        await router.push("/user/login");
+        await router.push(paths.userLogin);
       }
     } finally {
       setLoggingOut(false);
