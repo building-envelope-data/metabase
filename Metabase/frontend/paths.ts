@@ -9,7 +9,7 @@ export default {
   user(uuid: string) {
     return `/users/${encodeURIComponent(uuid)}`;
   },
-  userLogin: "/me/login",
+  userLogin: "/users/login",
   userRegister: "/users/register",
   userChangeEmail: "/me/change-email",
   userConfirmEmail: "/users/confirm-email",
