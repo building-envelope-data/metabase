@@ -18,22 +18,22 @@ const options = {
       scope: "openid email profile roles api:read api:write offline_access",
       params: { grant_type: "authorization_code" },
       authorizationParams: {},
-      accessTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/token`,
-      requestTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/token`,
+      accessTokenUrl: `http://backend:8080/connect/token`,
+      requestTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/authorize`,
       authorizationUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/authorize?response_type=code`,
       profileUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/userinfo`,
       protection: "pkce", // https://security.stackexchange.com/questions/214980/does-pkce-replace-state-in-the-authorization-code-oauth-flow/215027#215027
       idToken: true,
       headers: {},
       async profile(
-        profile: { id: string; name: string; email: string }
+        profile: { sub: string; name: string; email: string }
         // tokens: { access_token: string, id_token: string, refresh_token: string }
       ) {
         // You can use the tokens, in case you want to fetch more profile information
         // For example several OAuth provider does not return e-mail by default.
         // Depending on your provider, will have tokens like `access_token`, `id_token` and or `refresh_token`
         return {
-          id: profile.id,
+          id: profile.sub,
           name: profile.name,
           email: profile.email,
         };
