@@ -86,7 +86,7 @@ namespace Metabase.Configuration
             services.ConfigureApplicationCookie(_ =>
             {
                 _.AccessDeniedPath = "/unauthorized";
-                _.LoginPath = "/me/login";
+                _.LoginPath = "/users/login";
                 _.LogoutPath = "/me/logout";
                 _.ReturnUrlParameter = "returnTo";
                 _.Events.OnValidatePrincipal = context =>
@@ -277,7 +277,8 @@ namespace Metabase.Configuration
                         OpenIddictConstants.Scopes.Profile,
                         OpenIddictConstants.Scopes.Roles,
                         ReadApiScope,
-                        WriteApiScope
+                        WriteApiScope,
+                        ManageUserApiScope
                         );
                     _.AllowAuthorizationCodeFlow()
                       .AllowDeviceCodeFlow()
