@@ -1,13 +1,17 @@
 mutation registerUser(
-    $email: String!,
-    $password: String!,
-    $passwordConfirmation: String!
+  $name: String!
+  $email: String!
+  $password: String!
+  $passwordConfirmation: String!
 ) {
-  registerUser(input: {
-    email: $email,
-    password: $password,
-    passwordConfirmation: $passwordConfirmation
-  }) {
+  registerUser(
+    input: {
+      name: $name
+      email: $email
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+    }
+  ) {
     user {
       id
       email

@@ -23,6 +23,7 @@ namespace Metabase.Tests.Integration
         protected CollectingEmailSender EmailSender { get => Factory.EmailSender; }
         protected CollectingSmsSender SmsSender { get => Factory.SmsSender; }
         protected HttpClient HttpClient { get; }
+        public const string DefaultName = "John Doe";
         public const string DefaultEmail = "john.doe@ise.fraunhofer.de";
         public const string DefaultPassword = "aaaAAA123$!@";
 
@@ -57,7 +58,7 @@ namespace Metabase.Tests.Integration
                     Address = "http://localhost/connect/token",
                     ClientId = "metabase",
                     ClientSecret = "secret",
-                    Scope = "api",
+                    Scope = "api:read api:write api:user:manage",
                     UserName = emailAddress,
                     Password = password,
                 }
@@ -90,6 +91,7 @@ namespace Metabase.Tests.Integration
         }
 
         protected async Task<string> RegisterUser(
+            string name = DefaultName,
             string email = DefaultEmail,
             string password = DefaultPassword,
             string? passwordConfirmation = null
@@ -99,6 +101,7 @@ namespace Metabase.Tests.Integration
                 File.ReadAllText("Integration/GraphQl/Users/RegisterUser.graphql"),
                 variables: new Dictionary<string, object?>
                 {
+                    ["name"] = name,
                     ["email"] = email,
                     ["password"] = password,
                     ["passwordConfirmation"] = passwordConfirmation ?? password
@@ -110,7 +113,7 @@ namespace Metabase.Tests.Integration
         {
             return Regex.Match(
                 EmailSender.Emails.Single().Message,
-                @"confirmation code (?<confirmationCode>\w+)"
+                @"confirmationCode=(?<confirmationCode>\w+)"
                 )
                 .Groups["confirmationCode"]
                 .Captures
