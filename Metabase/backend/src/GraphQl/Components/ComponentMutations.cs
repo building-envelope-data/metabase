@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +42,7 @@ namespace Metabase.GraphQl.Components
                     new CreateComponentError(
                       CreateComponentErrorCode.UNAUTHORIZED,
                       "You are not authorized to create components for the institution.",
-                      Array.Empty<string>()
+                      new[] { nameof(input), nameof(input.ManufacturerId).FirstCharToLower() }
                     )
                 );
             }

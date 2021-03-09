@@ -41,7 +41,7 @@ namespace Metabase.GraphQl.Databases
                     new CreateDatabaseError(
                       CreateDatabaseErrorCode.UNAUTHORIZED,
                       "You are not authorized to create components for the institution.",
-                      Array.Empty<string>()
+                      new[] { nameof(input), nameof(input.OperatorId).FirstCharToLower() }
                     )
                 );
             }

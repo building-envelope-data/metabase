@@ -307,6 +307,7 @@ type InstitutionConnection {
 }
 
 type InstitutionDevelopedMethodConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [InstitutionDevelopedMethodEdge!]!
 }
 
@@ -323,6 +324,7 @@ type InstitutionEdge {
 }
 
 type InstitutionManagedDataFormatConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [InstitutionManagedDataFormatEdge!]!
 }
 
@@ -331,6 +333,7 @@ type InstitutionManagedDataFormatEdge {
 }
 
 type InstitutionManufacturedComponentConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [InstitutionManufacturedComponentEdge!]!
 }
 
@@ -339,6 +342,7 @@ type InstitutionManufacturedComponentEdge {
 }
 
 type InstitutionOperatedDatabaseConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [InstitutionOperatedDatabaseEdge!]!
 }
 
@@ -347,6 +351,7 @@ type InstitutionOperatedDatabaseEdge {
 }
 
 type InstitutionRepresentativeConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [InstitutionRepresentativeEdge!]!
 }
 
@@ -421,8 +426,8 @@ type MethodEdge {
 type Mutation {
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
-  changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(apply: BEFORE_RESOLVER)
-  changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
+  changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
   confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload!
   createComponent(input: CreateComponentInput!): CreateComponentPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
@@ -431,18 +436,18 @@ type Mutation {
   createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
-  deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
-  generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER)
+  deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   loginUser(input: LoginUserInput!): LoginUserPayload!
-  logoutUser: LogoutUserPayload!
+  logoutUser: LogoutUserPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
   resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
-  resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(apply: BEFORE_RESOLVER)
+  resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload!
-  setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER)
-  setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER)
+  setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
 }
 
@@ -1250,6 +1255,7 @@ enum CreateMethodErrorCode {
   TWO_REFERENCES
   UNKNOWN_INSTITUTION_DEVELOPERS
   UNKNOWN_USER_DEVELOPERS
+  UNAUTHORIZED
 }
 
 enum DeleteInstitutionErrorCode {

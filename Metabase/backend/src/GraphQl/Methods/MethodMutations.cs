@@ -1,11 +1,15 @@
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Extensions;
+using Metabase.GraphQl.Users;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 using DateTime = System.DateTime;
@@ -16,15 +20,35 @@ namespace Metabase.GraphQl.Methods
     public sealed class MethodMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
         [Authorize(Policy = Configuration.Auth.WritePolicy)]
         public async Task<CreateMethodPayload> CreateMethodAsync(
             CreateMethodInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
             [ScopedService] Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
             // TODO Authorization! In particular, which developers am I allowed to add?
             // TODO What if there are no developers (for example because they are not registered). Do we need a manager as for data formats?
+            // if (!await MethodAuthorization.IsAuthorizedToCreateMethodForInstitution(
+            //      claimsPrincipal,
+            //      input.ManagerId,
+            //      userManager,
+            //      context,
+            //      cancellationToken
+            //      ).ConfigureAwait(false)
+            // )
+            // {
+            //     return new CreateMethodPayload(
+            //         new CreateMethodError(
+            //           CreateMethodErrorCode.UNAUTHORIZED,
+            //           "You are not authorized to create components for the institution.",
+            //           new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
+            //         )
+            //     );
+            // }
             var unknownInstitutionDeveloperIds =
                 input.InstitutionDeveloperIds.Except(
                     await context.Users

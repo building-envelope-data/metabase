@@ -115,6 +115,7 @@ query Institution($uuid: Uuid!) {
           }
         }
       }
+      canCurrentUserAddEdge
     }
     operatedDatabases {
       edges {
@@ -126,6 +127,7 @@ query Institution($uuid: Uuid!) {
           locator
         }
       }
+      canCurrentUserAddEdge
     }
     representatives {
       edges {
@@ -135,6 +137,7 @@ query Institution($uuid: Uuid!) {
           email
         }
       }
+      canCurrentUserAddEdge
     }
     managedDataFormats {
       edges {
@@ -146,6 +149,7 @@ query Institution($uuid: Uuid!) {
           mediaType
         }
       }
+      canCurrentUserAddEdge
     }
     developedMethods {
       edges {
@@ -156,6 +160,7 @@ query Institution($uuid: Uuid!) {
           description
         }
       }
+      canCurrentUserAddEdge
     }
   }
 }
