@@ -66,6 +66,7 @@ namespace Metabase.Data
                             OpenIddictConstants.Permissions.Scopes.Roles,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.Auth.ReadApiScope,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.Auth.WriteApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.Auth.ManageUserApiScope,
                         },
                         Requirements =
                         {
