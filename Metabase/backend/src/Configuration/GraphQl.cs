@@ -22,6 +22,7 @@ namespace Metabase.Configuration
                     executorBuilder
                     .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
                     {
+                        // TODO Remove when we do not use cookies in the web frontend anymore (except for the OIDC login)
                         var authenticateResult = await httpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme).ConfigureAwait(false);
                         if (authenticateResult.Succeeded && authenticateResult.Principal is not null)
                             httpContext.User = authenticateResult.Principal;
@@ -32,6 +33,7 @@ namespace Metabase.Configuration
                         .AddType<GraphQlX.Databases.DatabaseQueries>()
                         .AddType<GraphQlX.Institutions.InstitutionQueries>()
                         .AddType<GraphQlX.Methods.MethodQueries>()
+                        .AddType<GraphQlX.OpenIdConnect.OpendIdConnectQueries>()
                         .AddType<GraphQlX.Users.UserQueries>()
                     .AddMutationType(d => d.Name(nameof(GraphQlX.Mutation)))
                         .AddType<GraphQlX.Components.ComponentMutations>()
@@ -49,6 +51,10 @@ namespace Metabase.Configuration
                     .AddType<GraphQlX.Institutions.InstitutionType>()
                     .AddType<GraphQlX.Methods.MethodType>()
                     .AddType<GraphQlX.Numerations.NumerationType>()
+                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectApplicationType>()
+                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectAuthorizationType>()
+                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectScopeType>()
+                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectTokenType>()
                     .AddType<GraphQlX.Publications.PublicationType>()
                     .AddType<GraphQlX.References.ReferenceType>()
                     .AddType<GraphQlX.Stakeholders.StakeholderType>()

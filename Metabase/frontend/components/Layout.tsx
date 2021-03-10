@@ -38,6 +38,10 @@ const navItems = [
     path: paths.openIdConnectClient,
     label: `OpenId Connect Client`,
   },
+  {
+    path: paths.openIdConnect,
+    label: `OpenId Connect`,
+  },
 ];
 
 const Layout: React.FunctionComponent = ({ children }) => {

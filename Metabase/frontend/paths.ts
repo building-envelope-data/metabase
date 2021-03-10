@@ -29,4 +29,5 @@ export default {
     return `/components/${encodeURIComponent(uuid)}`;
   },
   openIdConnectClient: "/openIdConnectClient",
+  openIdConnect: "/openIdConnect",
 };

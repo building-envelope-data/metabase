@@ -1,0 +1,94 @@
+fragment OpenIdConnectApplicationPartial on OpenIdConnectApplication {
+  clientId
+  clientSecret
+  concurrencyToken
+  consentType
+  displayName
+  displayNames
+  id
+  permissions
+  postLogoutRedirectUris
+  properties
+  redirectUris
+  requirements
+  type
+}
+
+fragment OpenIdConnectAuthorizationPartial on OpenIdConnectAuthorization {
+  concurrencyToken
+  creationDate
+  id
+  properties
+  scopes
+  status
+  subject
+  type
+}
+
+fragment OpenIdConnectTokenPartial on OpenIdConnectToken {
+  concurrencyToken
+  creationDate
+  expirationDate
+  id
+  payload
+  properties
+  redemptionDate
+  referenceId
+  status
+  subject
+  type
+}
+
+fragment OpenIdConnectScopePartial on OpenIdConnectScope {
+  concurrencyToken
+  description
+  descriptions
+  displayName
+  displayNames
+  id
+  name
+  properties
+  resources
+}
+
+query OpenIdConnect {
+  openIdConnectApplications {
+    ...OpenIdConnectApplicationPartial
+    # tokens {
+    #   ...OpenIdConnectTokenPartial
+    #   application {
+    #     ...
+    #   }
+    #   authorization {
+    #     ...
+    #   }
+    # }
+    # authorizations {
+    #   ...OpenIdConnectAuthorizationPartial
+    #   tokens {
+    #     ...OpenIdConnectTokenPartial
+    #   }
+    # }
+  }
+  openIdConnectTokens {
+    ...OpenIdConnectTokenPartial
+    application {
+      id
+    }
+    authorization {
+      id
+    }
+  }
+  openIdConnectAuthorizations {
+    ...OpenIdConnectAuthorizationPartial
+    application {
+      id
+    }
+    tokens {
+      ...OpenIdConnectTokenPartial
+    }
+  }
+  openIdConnectScopes {
+    ...OpenIdConnectScopePartial
+  }
+}
