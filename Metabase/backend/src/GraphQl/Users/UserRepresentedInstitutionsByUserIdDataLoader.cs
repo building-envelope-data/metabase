@@ -16,7 +16,7 @@ namespace Metabase.GraphQl.Users
                 batchScheduler,
                 dbContextFactory,
                 (dbContext, ids) =>
-                    dbContext.InstitutionRepresentatives.Where(x =>
+                    dbContext.InstitutionRepresentatives.AsQueryable().Where(x =>
                         ids.Contains(x.UserId)
                     ),
                 x => x.UserId

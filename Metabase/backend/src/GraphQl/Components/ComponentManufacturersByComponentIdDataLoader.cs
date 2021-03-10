@@ -16,7 +16,7 @@ namespace Metabase.GraphQl.Components
                 batchScheduler,
                 dbContextFactory,
                 (dbContext, ids) =>
-                    dbContext.ComponentManufacturers.Where(x =>
+                    dbContext.ComponentManufacturers.AsQueryable().Where(x =>
                         ids.Contains(x.ComponentId)
                     ),
                 x => x.ComponentId

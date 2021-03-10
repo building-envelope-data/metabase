@@ -51,7 +51,7 @@ namespace Metabase.GraphQl.Methods
             // }
             var unknownInstitutionDeveloperIds =
                 input.InstitutionDeveloperIds.Except(
-                    await context.Users
+                    await context.Users.AsQueryable()
                     .Where(x => input.InstitutionDeveloperIds.Contains(x.Id))
                     .Select(x => x.Id)
                     .ToListAsync(cancellationToken)
@@ -69,7 +69,7 @@ namespace Metabase.GraphQl.Methods
             }
             var unknownUserDeveloperIds =
                 input.UserDeveloperIds.Except(
-                    await context.Users
+                    await context.Users.AsQueryable()
                     .Where(u => input.UserDeveloperIds.Contains(u.Id))
                     .Select(u => u.Id)
                     .ToListAsync(cancellationToken)

@@ -35,7 +35,7 @@ namespace Metabase.GraphQl.Entitys
         {
             await using var dbContext =
                 _dbContextFactory.CreateDbContext();
-            return await _getQueryable(dbContext)
+            return await _getQueryable(dbContext).AsQueryable()
                 .Where(entity => ids.Contains(entity.Id))
                 .ToDictionaryAsync(
                     entity => entity.Id,
