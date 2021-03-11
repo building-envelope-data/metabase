@@ -353,6 +353,32 @@ namespace Metabase.Configuration
                     // Note: when issuing access tokens used by third-party APIs
                     // you don't own, you can disable access token encryption:
                     // _.DisableAccessTokenEncryption();
+                    // Note: To decrypt a JWT token, like an application code or an access token, you can execute
+                    // ```
+                    // var jwt = "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiYXQrand0In0.tn0jqCR5-01c_SDRwex6sPBNl1Vl1KSRA5Zs2UoXri9F4tG4v9B6qbLmxzsfkd0rLe55BozRV8VCChsZAt_mCZfoVGOYewwP.ogGZQ5Q2p7Yue7D6zPJlSQ.uNX1Qs9R30vZxAPj-LuJSwWnisoKHQ5qNC_K9WvA0JDSCS_orw6TsboSVCe5b_aUg3JvrkJX_Ir0c-bFMf0HVhOVNy1UJwxo9zegJOsm7MybPzK58H4ubt_PRnrSueLgnQX8aDcjbM38Imy3RN6a3r3aKawdWGcyA23sIH8XnVmGk0lDB_PqFrFE7x2MmG4fyVJINoki441UI-7x0sLFUi4o98Z-2vTFuCd9cLRY5LAeb0ZIuWwOI7dv2Q54w7uV765kHS3VIPtupzSSXgQmfPBJOzDeV_-sCZGwUuC0jL8x1vJw573fejPwpPmXj3EKgzXgbGfAHmjoIzkNvcfr--Dy7O8WxLjSERoBgW45Tq0xcCLL9Vx4JGWehOw1jY-KaKIzfjUW9CTSwLgWdhqonetAULZFRJAYOEJ8PtP49jXlvkdjmavRXaX2UD8FD5TUx30TkGQ_xyuo6HvokURQqIYILZiL6R_kVqh7kwUnj4dgBqni-56M1GYFuX2UzynagL6c6t4OlO7RhQJpgz1pzmGNdEb5nvZplXru8KVEt_e9bQOy54EWudAemEVAyX-4P6FdWWazU5vMaRnDg53Y8gy4rt6LCwXK9WHNRbhkdAmTNNsfiuUd588lzMJVSVPeqzbl70yW8IH7hbwfscLjSf2-gP9evwDKoLMKjqyBtbsqGx-qtBE47y_-LKyP3TOJug0SBtiHIMb3xzN2rJaykAMRRz4kMaMF4_TZRV8kqZQqzF_xBoMJQD3nLYaN-G0qJYIse1JhVu4yHuH7vSvXdHA0x5dnBwwq4P3g35W5zv-cw4-b1cXnLq7TYUvHNVe6DcMAJogxW5ovA7wtEjF4yKxSbvlRaO065Jed5siLrIL17RahoHqew34kMzqXL0OUHvxId0A7myvLFy0YqhLnKg.1jfT6-IVamiQbS84hfX4lLtmoTiAmf0Ea0rpLPgYEek";
+                    // var handler = new JwtSecurityTokenHandler();
+                    // var claimsPrincipal = handler.ValidateToken(
+                    //     jwt,
+                    //     new TokenValidationParameters
+                    //     {
+                    //         IssuerSigningKey = signingKey,
+                    //         TokenDecryptionKey = encryptionKey,
+                    //         // ValidIssuer = "https://metabase.org:4041/",
+                    //         ValidateActor = false,
+                    //         ValidateAudience = false,
+                    //         ValidateIssuer = false,
+                    //         ValidateIssuerSigningKey = false,
+                    //         ValidateLifetime = false,
+                    //         ValidateTokenReplay = false,
+                    //     },
+                    //     out var validatedToken
+                    // );
+                    // Console.WriteLine(validatedToken.ToString());
+                    // ```
+                    // which as of this writing outputs
+                    // ```
+                    // {"alg":"A256KW","enc":"A256CBC-HS512","typ":"at+jwt"}.{"sub":"075561fa-98c0-40db-ad3d-9dc8abf240fd","name":"sw@ise.de","http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress":"sw@ise.de","oi_prst":"metabase","iss":"https://localhost:4041/","oi_au_id":"5dc00347-30fa-4ddb-91c1-471c505e7842","client_id":"metabase","oi_tkn_id":"e7430a26-4e13-4c21-8e6d-0f07dca66ff6","aud":"metabase","scope":"openid email profile roles api:read api:write offline_access","exp":1615405869,"iat":1615402269}
+                    // ```
                 }
             )
               // Register the OpenIddict validation components.
