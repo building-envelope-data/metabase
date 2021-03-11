@@ -29,6 +29,7 @@ const options = {
       accessTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/token`, // ,
       requestTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/authorize`,
       authorizationUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/authorize?response_type=code`,
+
       profileUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/userinfo`,
       protection: "pkce", // https://security.stackexchange.com/questions/214980/does-pkce-replace-state-in-the-authorization-code-oauth-flow/215027#215027
       idToken: true,
@@ -78,46 +79,40 @@ const options = {
     // async encode({ secret, token, maxAge }) {},
     // async decode({ secret, token, maxAge }) {},
   },
-  pages: {
-    // signIn: '/auth/signin',
-    // signOut: '/auth/signout',
-    // error: '/auth/error', // Error code passed in query string as ?error=
-    // verifyRequest: '/auth/verify-request', // (used for check email message)
-    // newUser: null // If set, new users will be directed here on first sign in
-  },
-  callbacks: {
-    // async signIn(user, account, profile) {
-    //   return true
-    // },
-    // async redirect(url, baseUrl) {
-    //   return baseUrl
-    // },
-    // async session(session, user) {
-    //   return session
-    // },
-    // async jwt(token, user, account, profile, isNewUser) {
-    //   return token
-    // }
-  },
-  events: {
-    // async signIn(message) { /* on successful sign in */ },
-    // async signOut(message) { /* on signout */ },
-    // async createUser(message) { /* user created */ },
-    // async linkAccount(message) { /* account linked to a user */ },
-    // async session(message) { /* session is active */ },
-    // async error(message) { /* error in authentication flow */ }
-  },
   debug: process.env.NODE_ENV !== "production",
-  logger: {
-    // error(code, ...message) {
-    //   log.error(code, message)
-    // },
-    // warn(code, ...message) {
-    //   log.warn(code, message)
-    // },
-    // debug(code, ...message) {
-    //   log.debug(code, message)
-    // }
-  },
   theme: "auto",
+  // pages: {
+  //   signIn: '/auth/signin',
+  //   signOut: '/auth/signout',
+  //   error: '/auth/error', // Error code passed in query string as ?error=
+  //   verifyRequest: '/auth/verify-request', // (used for check email message)
+  //   newUser: null // If set, new users will be directed here on first sign in
+  // },
+  // callbacks: {
+  //   async signIn(user, account, profile) {
+  //     return true
+  //   },
+  //   async redirect(url, baseUrl) {
+  //     return baseUrl
+  //   },
+  //   async session(session, user) {
+  //     return session
+  //   },
+  //   async jwt(token, user, account, profile, isNewUser) {
+  //     return token
+  //   }
+  // },
+  // events: {
+  //   async signIn(message) { /* on successful sign in */ },
+  //   async signOut(message) { /* on signout */ },
+  //   async createUser(message) { /* user created */ },
+  //   async linkAccount(message) { /* account linked to a user */ },
+  //   async session(message) { /* session is active */ },
+  //   async error(message) { /* error in authentication flow */ },
+  // },
+  // logger: {
+  //   error(code, ...message) { log.error(code, message) },
+  //   warn(code, ...message) { log.warn(code, message) },
+  //   debug(code, ...message) { log.debug(code, message) },
+  // },
 };
