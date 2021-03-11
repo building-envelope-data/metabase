@@ -34,7 +34,7 @@ const options = {
       idToken: true,
       headers: {},
       async profile(
-        profile: { sub: string; name: string; email: string }
+        profile: { sub: string; email: string }
         // tokens: { access_token: string, id_token: string, refresh_token: string }
       ) {
         // You can use the tokens, in case you want to fetch more profile information
@@ -42,7 +42,7 @@ const options = {
         // Depending on your provider, will have tokens like `access_token`, `id_token` and or `refresh_token`
         return {
           id: profile.sub,
-          name: profile.name,
+          name: profile.email, // TODO Include `name` in token?
           email: profile.email,
         };
       },
