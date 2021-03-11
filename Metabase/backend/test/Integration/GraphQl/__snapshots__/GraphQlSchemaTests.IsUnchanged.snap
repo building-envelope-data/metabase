@@ -462,6 +462,65 @@ type OpenEndedDateTimeRange {
   to: DateTime
 }
 
+type OpenIdConnectApplication {
+  authorizations: [OpenIdConnectAuthorization!]!
+  clientId: String
+  clientSecret: String
+  concurrencyToken: String
+  consentType: String
+  displayName: String
+  displayNames: String
+  id: String
+  permissions: String
+  postLogoutRedirectUris: String
+  properties: String
+  redirectUris: String
+  requirements: String
+  tokens: [OpenIdConnectToken!]!
+  type: String
+}
+
+type OpenIdConnectAuthorization {
+  application: OpenIdConnectApplication
+  concurrencyToken: String
+  creationDate: DateTime
+  id: String
+  properties: String
+  scopes: String
+  status: String
+  subject: String
+  tokens: [OpenIdConnectToken!]!
+  type: String
+}
+
+type OpenIdConnectScope {
+  concurrencyToken: String
+  description: String
+  descriptions: String
+  displayName: String
+  displayNames: String
+  id: String
+  name: String
+  properties: String
+  resources: String
+}
+
+type OpenIdConnectToken {
+  application: OpenIdConnectApplication
+  authorization: OpenIdConnectAuthorization
+  concurrencyToken: String
+  creationDate: DateTime
+  expirationDate: DateTime
+  id: String
+  payload: String
+  properties: String
+  redemptionDate: DateTime
+  referenceId: String
+  status: String
+  subject: String
+  type: String
+}
+
 "Information about pagination in a connection."
 type PageInfo {
   "When paginating forwards, the cursor to continue."
@@ -514,6 +573,10 @@ type Query {
   method(uuid: Uuid!): Method
   methods(after: String before: String first: Int last: Int order: [MethodSortInput!] where: MethodFilterInput): MethodConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
   node(id: ID!): Node
+  openIdConnectApplications: [OpenIdConnectApplication!]!
+  openIdConnectAuthorizations: [OpenIdConnectAuthorization!]!
+  openIdConnectScopes: [OpenIdConnectScope!]!
+  openIdConnectTokens: [OpenIdConnectToken!]!
   personalUserData: PersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
   users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
 }
