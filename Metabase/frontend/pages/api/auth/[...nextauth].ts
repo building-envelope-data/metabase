@@ -18,7 +18,15 @@ const options = {
       scope: "openid email profile roles api:read api:write offline_access",
       params: { grant_type: "authorization_code" },
       authorizationParams: {},
-      accessTokenUrl: `http://backend:8080/connect/token`,
+
+      // Note that the host of `authorizationUrl`, `accessTokenUrl`, and
+      // `requestTokenUrl` must be the same (supposedly for security). And that
+      // `authorizationUrl` must be a valid URL outside of the Docker network
+      // (as it is requested within the web browser). That is why we cannot use
+      // http://backend:8080/connect/token as `accessTokenUrl` (although it is
+      // the correct URL within the Docker network and only used within that
+      // network from the `frontend` service).
+      accessTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/token`, // ,
       requestTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/authorize`,
       authorizationUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/authorize?response_type=code`,
       profileUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/userinfo`,
