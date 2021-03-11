@@ -50,6 +50,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile-frontend-${ENVIRONMENT}
+      args:
+        - CERTIFICATE_AUTHORITY_BASE_FILE_NAME=${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}
     # user: 1000:1000
     command: [
       "yarn", "dev"
