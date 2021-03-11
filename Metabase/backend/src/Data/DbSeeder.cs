@@ -43,11 +43,11 @@ namespace Metabase.Data
                         },
                         PostLogoutRedirectUris =
                         {
-                            new Uri(testEnvironment ? "urn:test" : "https://localhost:4041/logout-callback") // TODO Use correct URI
+                            new Uri(testEnvironment ? "urn:test" : "https://metabase.org:4041/logout-callback") // TODO Use correct URI
                         },
                         RedirectUris =
                         {
-                            new Uri(testEnvironment ? "urn:test" : "https://localhost:4041/api/auth/callback/metabase") // TODO Use correct URI
+                            new Uri(testEnvironment ? "urn:test" : "https://metabase.org:4041/api/auth/callback/metabase") // TODO Use correct URI
                         },
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
