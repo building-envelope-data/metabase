@@ -4,6 +4,84 @@ import NextAuth from "next-auth";
 const authHandler: NextApiHandler = (req, res) => NextAuth(req, res, options);
 export default authHandler;
 
+interface Token {
+  refreshToken: string;
+  accessToken: string;
+  accessTokenExpires: number;
+  error: string | null;
+  user: User;
+}
+
+interface Session {
+  user: User;
+  accessToken: string;
+  error: string | null;
+}
+
+interface ProviderAccount {
+  accessToken: string;
+  expires_in: number;
+  refresh_token: string;
+}
+
+interface ProviderProfile {
+  sub: string;
+  email: string;
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+/**
+ * Takes a token, and returns a new token with updated
+ * `accessToken` and `accessTokenExpires`. If an error occurs,
+ * returns the old token and an error property
+ *
+ * See https://next-auth.js.org/tutorials/refresh-token-rotation
+ */
+async function refreshAccessToken(token: Token): Promise<Token> {
+  try {
+    const url =
+      `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/token` +
+      new URLSearchParams({
+        client_id: process.env.AUTH_CLIENT_ID || "", // TODO Throw an error if environment variable is missing!
+        client_secret: process.env.AUTH_CLIENT_SECRET || "", // TODO Throw an error if environment variable is missing!
+        grant_type: "refresh_token",
+        refresh_token: token.refreshToken,
+      });
+
+    const response = await fetch(url, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      method: "POST",
+    });
+
+    const refreshedTokens = await response.json();
+
+    if (!response.ok) {
+      throw refreshedTokens;
+    }
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.access_token,
+      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+    };
+  } catch (error) {
+    console.log(error);
+
+    return {
+      ...token,
+      error: "RefreshAccessTokenError", // TODO Use global constant instead of string!
+    };
+  }
+}
+
 // https://next-auth.js.org/configuration/options
 const options = {
   providers: [
@@ -26,7 +104,7 @@ const options = {
       // http://backend:8080/connect/token as `accessTokenUrl` (although it is
       // the correct URL within the Docker network and only used within that
       // network from the `frontend` service).
-      accessTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/token`, // ,
+      accessTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/token`,
       requestTokenUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/authorize`,
       authorizationUrl: `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/authorize?response_type=code`,
 
@@ -35,9 +113,9 @@ const options = {
       idToken: true,
       headers: {},
       async profile(
-        profile: { sub: string; email: string }
+        profile: ProviderProfile
         // tokens: { access_token: string, id_token: string, refresh_token: string }
-      ) {
+      ): Promise<User> {
         // You can use the tokens, in case you want to fetch more profile information
         // For example several OAuth provider does not return e-mail by default.
         // Depending on your provider, will have tokens like `access_token`, `id_token` and or `refresh_token`
@@ -81,26 +159,79 @@ const options = {
   },
   debug: process.env.NODE_ENV !== "production",
   theme: "auto",
+  callbacks: {
+    // See https://next-auth.js.org/tutorials/refresh-token-rotation
+    /**
+     * This JSON Web Token callback is called whenever a JSON Web Token is
+     * created (i.e. at sign in) or updated (i.e whenever a session is accessed
+     * in the client).
+     *
+     * @param  {object}  token     Decrypted JSON Web Token
+     * @param  {object}  user      User object      (only available on sign in)
+     * @param  {object}  account   Provider account (only available on sign in)
+     * @param  {object}  profile   Provider profile (only available on sign in)
+     * @param  {boolean} isNewUser True if new user (only available on sign in)
+     * @return {object}            JSON Web Token that will be saved
+     */
+    async jwt(
+      token: Token,
+      user: User | undefined,
+      account: ProviderAccount | undefined,
+      _profile: ProviderProfile | undefined,
+      _isNewUser: boolean | undefined
+    ): Promise<Token> {
+      // Initial sign in
+      if (user && account) {
+        return {
+          accessToken: account.accessToken,
+          accessTokenExpires: Date.now() + account.expires_in * 1000,
+          refreshToken: account.refresh_token,
+          error: null,
+          user,
+        };
+      }
+      // Return previous token if the access token has not expired yet
+      if (Date.now() < token.accessTokenExpires) {
+        return token;
+      }
+      // Access token has expired, try to update it
+      return refreshAccessToken(token);
+    },
+
+    /**
+     * The session callback is called whenever a session is checked. By
+     * default, only a subset of the token is returned for increased security.
+     * If you want to make something available you added to the token through
+     * the jwt() callback, you have to explicitely forward it here to make it
+     * available to the client.
+     *
+     * @param  {object} session      Session object
+     * @param  {object} token        User object    (if using database sessions)
+     *                               JSON Web Token (if not using database sessions)
+     * @return {object}              Session that will be returned to the client
+     */
+    async session(session: Session, token: Token | undefined) {
+      if (token) {
+        session.user = token.user;
+        session.accessToken = token.accessToken;
+        session.error = token.error;
+      }
+      return session;
+    },
+
+    // async signIn(user, account, profile) {
+    //   return true
+    // },
+    // async redirect(url, baseUrl) {
+    //   return baseUrl
+    // },
+  },
   // pages: {
   //   signIn: '/auth/signin',
   //   signOut: '/auth/signout',
   //   error: '/auth/error', // Error code passed in query string as ?error=
   //   verifyRequest: '/auth/verify-request', // (used for check email message)
   //   newUser: null // If set, new users will be directed here on first sign in
-  // },
-  // callbacks: {
-  //   async signIn(user, account, profile) {
-  //     return true
-  //   },
-  //   async redirect(url, baseUrl) {
-  //     return baseUrl
-  //   },
-  //   async session(session, user) {
-  //     return session
-  //   },
-  //   async jwt(token, user, account, profile, isNewUser) {
-  //     return token
-  //   }
   // },
   // events: {
   //   async signIn(message) { /* on successful sign in */ },
