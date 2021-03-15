@@ -1,38 +1,72 @@
 import { NextApiHandler } from "next";
 import NextAuth from "next-auth";
 
+// @ts-ignore: TODO Ask `@types/next-auth` to extend their types? For example, to allow the callback `session` getting a `token` instead of a `user` as second parameter. See https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/next-auth
 const authHandler: NextApiHandler = (req, res) => NextAuth(req, res, options);
 export default authHandler;
 
-interface Token {
+interface ProviderJsonWebToken {
+  name: string;
+  email: string;
+  picture: number | null;
+  sub: string;
+}
+
+interface StoredJsonWebToken {
   refreshToken: string;
   accessToken: string;
   accessTokenExpires: number;
-  error: string | null;
+  error?: string;
   user: User;
 }
 
+interface SessionJsonWebToken extends StoredJsonWebToken {
+  iat: number;
+  exp: number;
+}
+
+// extends `SessionBase` from `@types/next-auth`, see https://github.com/DefinitelyTyped/DefinitelyTyped/blob/461c4b4dd7783684c16dbf1e9ef28b33a5455026/types/next-auth/_utils.d.ts#L26
 interface Session {
-  user: User;
-  accessToken: string;
-  error: string | null;
+  user?: User;
+  accessToken?: string;
+  expires?: number;
+  error?: string;
 }
 
 interface ProviderAccount {
+  provider: string;
+  type: string;
+  id: string;
   accessToken: string;
+  accessTokenExpires: number | null;
+  refreshToken: string;
+  idToken: string;
+  access_token: string;
+  token_type: "Bearer";
   expires_in: number;
+  scope: string;
+  id_token: string;
   refresh_token: string;
 }
 
 interface ProviderProfile {
   sub: string;
-  email: string;
+  name: string;
+  oi_au_id: string;
+  azp: string;
+  at_hash: string;
+  oi_tkn_id: string;
+  aud: string;
+  exp: number;
+  iss: string;
+  iat: number;
 }
 
 interface User {
   id: string;
   name: string;
   email: string;
+  image: string | null;
 }
 
 /**
@@ -42,30 +76,28 @@ interface User {
  *
  * See https://next-auth.js.org/tutorials/refresh-token-rotation
  */
-async function refreshAccessToken(token: Token): Promise<Token> {
+async function refreshAccessToken(
+  token: StoredJsonWebToken
+): Promise<StoredJsonWebToken> {
   try {
     const url =
-      `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/token` +
+      `${process.env.NEXT_PUBLIC_METABASE_URL}/connect/token?` +
       new URLSearchParams({
         client_id: process.env.AUTH_CLIENT_ID || "", // TODO Throw an error if environment variable is missing!
         client_secret: process.env.AUTH_CLIENT_SECRET || "", // TODO Throw an error if environment variable is missing!
         grant_type: "refresh_token",
         refresh_token: token.refreshToken,
       });
-
     const response = await fetch(url, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       method: "POST",
     });
-
     const refreshedTokens = await response.json();
-
     if (!response.ok) {
       throw refreshedTokens;
     }
-
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
@@ -74,7 +106,6 @@ async function refreshAccessToken(token: Token): Promise<Token> {
     };
   } catch (error) {
     console.log(error);
-
     return {
       ...token,
       error: "RefreshAccessTokenError", // TODO Use global constant instead of string!
@@ -84,6 +115,25 @@ async function refreshAccessToken(token: Token): Promise<Token> {
 
 // https://next-auth.js.org/configuration/options
 const options = {
+  // database: {
+  //   type: "sqlite",
+  //   database: ":memory:",
+  //   synchronize: true,
+  // },
+  // database: {
+  //   type: "postgres",
+  //   host: "database",
+  //   port: 5432,
+  //   username: "postgres",
+  //   password: "postgres",
+  //   database: "xbase_development",
+  //   entityPrefix: "nextauth_",
+  //   synchronize: process.env.NODE_ENV !== "production",
+  //   // uri:
+  //   //   process.env.NODE_ENV === "production"
+  //   //     ? "Host=database; Port=5432; Database=xbase; User Id=postgres; Passfile=/run/secrets/pgpass;"
+  //   //     : "Host=database; Port=5432; Database=xbase_development; User Id=postgres; Password=postgres;",
+  // },
   providers: [
     {
       // https://next-auth.js.org/configuration/providers#using-a-custom-provider
@@ -112,17 +162,15 @@ const options = {
       protection: "pkce", // https://security.stackexchange.com/questions/214980/does-pkce-replace-state-in-the-authorization-code-oauth-flow/215027#215027
       idToken: true,
       headers: {},
-      async profile(
-        profile: ProviderProfile
-        // tokens: { access_token: string, id_token: string, refresh_token: string }
-      ): Promise<User> {
+      async profile(profile: ProviderProfile): Promise<User> {
         // You can use the tokens, in case you want to fetch more profile information
         // For example several OAuth provider does not return e-mail by default.
         // Depending on your provider, will have tokens like `access_token`, `id_token` and or `refresh_token`
         return {
           id: profile.sub,
-          name: profile.email, // TODO Include `name` in token?
-          email: profile.email,
+          name: profile.name, // TODO Include `name` in token?
+          email: profile.name,
+          image: null, // TODO Include `image` in token?
         };
       },
       clientId: process.env.AUTH_CLIENT_ID,
@@ -174,28 +222,31 @@ const options = {
      * @return {object}            JSON Web Token that will be saved
      */
     async jwt(
-      token: Token,
+      token: ProviderJsonWebToken | StoredJsonWebToken,
       user: User | undefined,
       account: ProviderAccount | undefined,
       _profile: ProviderProfile | undefined,
       _isNewUser: boolean | undefined
-    ): Promise<Token> {
+    ): Promise<StoredJsonWebToken> {
       // Initial sign in
       if (user && account) {
         return {
           accessToken: account.accessToken,
           accessTokenExpires: Date.now() + account.expires_in * 1000,
-          refreshToken: account.refresh_token,
-          error: null,
+          refreshToken: "", // account.refreshToken, // TODO When `accessToken` and `refreshToken` are set, then signing in does not work, there just is no session after signing in. Why? I first thought that it is a problem with the cookie size but it's not because the problem persists when I switch to a database for session storage.
           user,
         };
       }
-      // Return previous token if the access token has not expired yet
-      if (Date.now() < token.accessTokenExpires) {
-        return token;
+      // Type Guard: https://basarat.gitbook.io/typescript/type-system/typeguard#in
+      if ("accessToken" in token) {
+        if (Date.now() < token.accessTokenExpires) {
+          // Return previous token if the access token has not expired yet
+          return token;
+        }
+        // Access token has expired, try to update it
+        return refreshAccessToken(token);
       }
-      // Access token has expired, try to update it
-      return refreshAccessToken(token);
+      throw new Error("Impossible!");
     },
 
     /**
@@ -210,20 +261,61 @@ const options = {
      *                               JSON Web Token (if not using database sessions)
      * @return {object}              Session that will be returned to the client
      */
-    async session(session: Session, token: Token | undefined) {
+    async session(
+      _session: {
+        user: { name?: string; email?: string; image?: string };
+        accessToken?: string;
+        expires: number;
+      },
+      token: SessionJsonWebToken
+    ): Promise<Session> {
       if (token) {
-        session.user = token.user;
-        session.accessToken = token.accessToken;
-        session.error = token.error;
+        return {
+          user: token.user,
+          accessToken: token.accessToken,
+          expires: token.accessTokenExpires,
+          error: token.error,
+        };
       }
-      return session;
+      return {};
     },
 
-    // async signIn(user, account, profile) {
-    //   return true
+    /**
+     * Use the signIn() callback to control if a user is allowed to sign in.
+     *
+     * @param  {object} user     User object
+     * @param  {object} account  Provider account
+     * @param  {object} profile  Provider profile
+     * @return {boolean|string}  Return `true` to allow sign in
+     *                           Return `false` to deny access
+     *                           Return `string` to redirect to (eg.: "/unauthorized")
+     */
+    // async signIn(
+    //   user: User,
+    //   account: ProviderAccount,
+    //   profile: ProviderProfile
+    // ): Promise<boolean> {
+    //   const isAllowedToSignIn = true;
+    //   if (isAllowedToSignIn) {
+    //     return true;
+    //   } else {
+    //     // Return false to display a default error message
+    //     return false;
+    //     // Or you can return a URL to redirect to:
+    //     // return '/unauthorized'
+    //   }
     // },
-    // async redirect(url, baseUrl) {
-    //   return baseUrl
+
+    /**
+     * The redirect callback is called anytime the user is redirected to a callback URL (e.g. on signin or signout).
+     *
+     * By default only URLs on the same URL as the site are allowed, you can use the redirect callback to customise that behaviour.
+     * @param  {string} url      URL provided as callback URL by the client
+     * @param  {string} baseUrl  Default base URL of site (can be used as fallback)
+     * @return {string}          URL the client will be redirect to
+     */
+    // async redirect(url: string, baseUrl: string) {
+    //   return url.startsWith(baseUrl) ? url : baseUrl;
     // },
   },
   // pages: {

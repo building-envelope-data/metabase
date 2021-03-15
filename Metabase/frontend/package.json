@@ -20,7 +20,7 @@
     "next-auth": "^3.0",
     "react": "^17.0",
     "react-dom": "^17.0",
-    "react-google-recaptcha-v3": "^1.8.0"
+    "react-google-recaptcha-v3": "^1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0",
@@ -33,7 +33,7 @@
     "@graphql-tools/load-files": "^6.0",
     "@graphql-tools/merge": "^6.0",
     "@graphql-tools/schema": "^7.0",
-    "@types/next-auth": "^3.7.1",
+    "@types/next-auth": "^3.0",
     "@types/node": "^14.0",
     "@types/react": "^17.0",
     "@types/react-dom": "^17.0",

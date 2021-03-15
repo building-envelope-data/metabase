@@ -1428,7 +1428,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/next-auth@^3.7.1":
+"@types/next-auth@^3.0":
   version "3.7.1"
   resolved "https://registry.yarnpkg.com/@types/next-auth/-/next-auth-3.7.1.tgz#9f3d7d79e2dd06fc0ddbce2ab732ee8ec12b6be9"
   integrity sha512-HV3i87HLwt/nO6wSy6ainAYyzBxeEITOwaq8TZevaFG2Ix7eleAgL0ae7gAEa4SW4Ms+2rxv7eIZtk/CIpMapg==
@@ -6603,7 +6603,7 @@ react-dom@^17.0:
     object-assign "^4.1.1"
     scheduler "^0.20.1"
 
-react-google-recaptcha-v3@^1.8.0:
+react-google-recaptcha-v3@^1.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/react-google-recaptcha-v3/-/react-google-recaptcha-v3-1.8.0.tgz#962cefc223e05a39a32b7fd67eaa1f45ae72d159"
   integrity sha512-dZxuZFjP3vVhb84yOjxwmyshbJGqNDaJPBGp8hyXaMkyD0cDxrICW2WmqcYeQaHPl0jsoVR4gwTTY1p6nr4zhQ==
