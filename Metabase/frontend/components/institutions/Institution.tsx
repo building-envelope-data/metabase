@@ -8,6 +8,7 @@ import CreateDatabase from "../databases/CreateDatabase";
 import AddInstitutionRepresentative from "./AddInstitutionRepresentative";
 import Link from "next/link";
 import paths from "../../paths";
+import { useEffect } from "react";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -23,10 +24,11 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
   });
   const institution = data?.institution;
 
-  if (error) {
-    // TODO Why can't we display error messages like this? It results in a `Objects are not valid as a React` child error.
-    // message.error(error);
-  }
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+    }
+  }, [error]);
 
   if (loading || !institution) {
     return <Skeleton active avatar title />;
