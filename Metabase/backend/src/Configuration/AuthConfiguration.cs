@@ -133,7 +133,7 @@ namespace Metabase.Configuration
               .AddJwtBearer(_ =>
                   {
                       _.Audience = ServerName;
-                      _.RequireHttpsMetadata = false; // TODO `!environment.IsEnvironment("test");` ... but what about server-side requests from next.js?
+                      _.RequireHttpsMetadata = false; // TODO `!environment.IsEnvironment("test");` ... but what about server-side requests from next.js? Make those requests go through the WWW using the public URL! Replace the `http://backend/...` URL in `apollo.ts`!
                       _.IncludeErrorDetails = true;
                       _.SaveToken = true;
                       _.TokenValidationParameters = new TokenValidationParameters()
