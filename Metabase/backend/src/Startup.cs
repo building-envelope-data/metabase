@@ -1,11 +1,13 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Metabase.Data.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -40,18 +42,19 @@ namespace Metabase
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(_appSettings);
-            services.AddHealthChecks();
-            // TODO Find better place for message senders?
-            services.AddTransient<Services.IEmailSender, Services.MessageSender>();
-            services.AddTransient<Services.ISmsSender, Services.MessageSender>();
-            services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
-            ConfigureSessionServices(services);
             Configuration.AuthConfiguration.ConfigureServices(services, _environment, _appSettings);
             Configuration.GraphQlConfiguration.ConfigureServices(services, _environment);
-            Configuration.DatabaseConfiguration.ConfigureServices(services, _environment, _appSettings.Database);
-            services.AddControllersWithViews();
+            ConfigureDatabaseServices(services);
+            ConfigureMessageSenderServices(services);
+            ConfigureRequestResponseServices(services);
+            ConfigureSessionServices(services);
+            services.AddHealthChecks();
+            services.AddSingleton(_appSettings);
             // services.AddDatabaseDeveloperPageExceptionFilter();
+        }
+
+        private static void ConfigureRequestResponseServices(IServiceCollection services)
+        {
             // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order
             services.Configure<ForwardedHeadersOptions>(_ =>
             {
@@ -62,6 +65,21 @@ namespace Metabase
                 _.KnownProxies.Clear();
             }
             );
+            services.AddCors(_ =>
+                _.AddDefaultPolicy(policy =>
+                    policy
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    )
+                );
+            services.AddControllersWithViews();
+        }
+
+        private static void ConfigureMessageSenderServices(IServiceCollection services)
+        {
+            services.AddTransient<Services.IEmailSender, Services.MessageSender>();
+            services.AddTransient<Services.ISmsSender, Services.MessageSender>();
         }
 
         private static void ConfigureSessionServices(IServiceCollection services)
@@ -76,6 +94,41 @@ namespace Metabase
                     // Make the session cookie essential
                     options.Cookie.IsEssential = true;
                 });
+        }
+
+        private void ConfigureDatabaseServices(IServiceCollection services)
+        {
+            services.AddPooledDbContextFactory<Data.ApplicationDbContext>(options =>
+                {
+                    options
+                    .UseNpgsql(_appSettings.Database.ConnectionString)
+                    .UseSchemaName(_appSettings.Database.SchemaName)
+                    .UseOpenIddict();
+                    /* .UseNodaTime() */ // https://www.npgsql.org/efcore/mapping/nodatime.html
+                    if (!_environment.IsProduction())
+                    {
+                        options
+                        .EnableSensitiveDataLogging()
+                        .EnableDetailedErrors();
+                    }
+                }
+                );
+            // Database context as services are used by `Identity` and `OpenIddict`.
+            services.AddDbContext<Data.ApplicationDbContext>(
+                (services, options) =>
+                {
+                    if (!_environment.IsProduction())
+                    {
+                        options
+                        .EnableSensitiveDataLogging()
+                        .EnableDetailedErrors();
+                    }
+                    services
+                    .GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
+                    .CreateDbContext();
+                },
+                ServiceLifetime.Transient
+                );
         }
 
         public void Configure(IApplicationBuilder app)
