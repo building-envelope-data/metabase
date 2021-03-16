@@ -1017,6 +1017,7 @@ input ListStringOperationFilterInput {
 input LoginUserInput {
   email: String!
   password: String!
+  rememberMe: Boolean!
 }
 
 input MethodCategoryOperationFilterInput {
