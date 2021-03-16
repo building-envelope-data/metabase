@@ -31,6 +31,7 @@ function UseSession(appProps: AppProps) {
   // could add an endpoint `/api/graphql` that redirects to the backend GraphQL
   // endpoint as remarked on https://github.com/nextauthjs/next-auth/issues/643
   // (see also https://next-auth.js.org/tutorials/securing-pages-and-api-routes)
+  // TODO Do what is suggested above?
   if (loading) {
     return null;
   }
