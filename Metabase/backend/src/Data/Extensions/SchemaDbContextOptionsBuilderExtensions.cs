@@ -1,11 +1,8 @@
-using System;
-using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 // Inspired by https://github.com/npgsql/efcore.pg/blob/main/src/EFCore.PG/Extensions/NpgsqlDbContextOptionsBuilderExtensions.cs
-namespace Infrastructure.Data
+namespace Metabase.Data.Extensions
 {
     public static class SchemaNameDbContextOptionsBuilderExtensions
     {

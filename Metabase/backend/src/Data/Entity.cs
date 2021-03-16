@@ -1,7 +1,7 @@
 using Guid = System.Guid;
 // using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Infrastructure.Data
+namespace Metabase.Data
 {
     public abstract class Entity
       : IEntity

@@ -8,7 +8,7 @@ using NpgsqlTypes;
 namespace Metabase.Data
 {
     public sealed class Method
-      : Infrastructure.Data.Entity
+      : Data.Entity
     {
         [Required]
         [MinLength(1)]

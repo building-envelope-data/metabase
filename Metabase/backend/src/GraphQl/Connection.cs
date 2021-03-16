@@ -9,7 +9,7 @@ using HotChocolate;
 namespace Metabase.GraphQl
 {
     public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>
-        where TSubject : Infrastructure.Data.IEntity
+        where TSubject : Data.IEntity
         where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
     {
         protected TSubject Subject { get; }

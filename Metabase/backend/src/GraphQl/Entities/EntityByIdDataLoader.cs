@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.Entitys
 {
     public abstract class EntityByIdDataLoader<TEntity>
       : BatchDataLoader<Guid, TEntity?>
-      where TEntity : class, Infrastructure.Data.IEntity
+      where TEntity : class, Data.IEntity
     {
         private readonly IDbContextFactory<Data.ApplicationDbContext> _dbContextFactory;
         private readonly Func<Data.ApplicationDbContext, DbSet<TEntity>> _getQueryable;

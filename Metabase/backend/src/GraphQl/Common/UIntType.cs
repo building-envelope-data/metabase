@@ -3,7 +3,7 @@ using HotChocolate.Language;
 using HotChocolate.Types;
 using Convert = System.Convert;
 
-namespace Infrastructure.GraphQl.Common
+namespace Metabase.GraphQl.Common
 {
     // TODO Just map C# `uint` (or `uint`) to GraphQl `Int`
     // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Scalars/LongType.cs

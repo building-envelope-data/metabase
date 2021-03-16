@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Npgsql;
-using SchemaNameOptionsExtension = Infrastructure.Data.SchemaNameOptionsExtension;
+using SchemaNameOptionsExtension = Metabase.Data.Extensions.SchemaNameOptionsExtension;
 
 namespace Metabase.Data
 {
@@ -44,7 +44,7 @@ namespace Metabase.Data
           ConfigureEntity<TEntity>(
             EntityTypeBuilder<TEntity> builder
             )
-          where TEntity : Infrastructure.Data.Entity
+          where TEntity : Data.Entity
         {
             // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
             builder

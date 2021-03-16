@@ -7,7 +7,7 @@ namespace Metabase.GraphQl
 {
     public abstract class EntityType<TEntity, TEntityByIdDataLoader>
       : ObjectType<TEntity>
-      where TEntity : Infrastructure.Data.IEntity
+      where TEntity : Data.IEntity
       where TEntityByIdDataLoader : IDataLoader<Guid, TEntity?>
     {
         protected override void Configure(

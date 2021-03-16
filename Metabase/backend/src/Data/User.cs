@@ -10,7 +10,7 @@ namespace Metabase.Data
 {
     public sealed class User
         : IdentityUser<Guid>,
-          Infrastructure.Data.IEntity,
+          Data.IEntity,
           IStakeholder
     {
         [GraphQLDescription("Full name")]

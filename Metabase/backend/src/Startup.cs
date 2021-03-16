@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -14,23 +15,32 @@ using Microsoft.Extensions.Hosting;
 
 namespace Metabase
 {
-    public class Startup
-                : Infrastructure.Startup
+    public sealed class Startup
     {
+        private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
+        private readonly AppSettings _appSettings;
+
         public Startup(
             IWebHostEnvironment environment,
             string[] commandLineArguments
             )
-          : base(
-              environment,
-              commandLineArguments
-              )
         {
+            _environment = environment;
+            _configuration = new ConfigurationBuilder()
+                .SetBasePath(environment.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false, reloadOnChange: false)
+                .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
+                .AddCommandLine(commandLineArguments)
+              .Build();
+            _appSettings = _configuration.Get<AppSettings>();
+
         }
 
-        public override void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-            base.ConfigureServices(services);
+            services.AddSingleton(_appSettings);
             services.AddHealthChecks();
             // TODO Find better place for message senders?
             services.AddTransient<Services.IEmailSender, Services.MessageSender>();
@@ -38,7 +48,7 @@ namespace Metabase
             services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
             ConfigureSessionServices(services);
             Configuration.Auth.ConfigureServices(services, _environment, _appSettings);
-            Configuration.GraphQl.ConfigureServices(services);
+            Configuration.GraphQl.ConfigureServices(services, _environment);
             Configuration.Database.ConfigureServices(services, _environment, _appSettings.Database);
             services.AddControllersWithViews();
             // services.AddDatabaseDeveloperPageExceptionFilter();

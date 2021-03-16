@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Metabase.Data
 {
     public sealed class Database
-      : Infrastructure.Data.Entity
+      : Data.Entity
     {
         [Required]
         [MinLength(1)]

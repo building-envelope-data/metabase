@@ -6,7 +6,7 @@ using DateTime = System.DateTime;
 namespace Metabase.Data
 {
     public sealed class Component
-      : Infrastructure.Data.Entity
+      : Data.Entity
     {
         // Entity Framework Core Read-Only Properties https://docs.microsoft.com/en-us/ef/core/modeling/constructors#read-only-properties
         // Data Annotations https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations

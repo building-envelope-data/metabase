@@ -1,6 +1,6 @@
 using Guid = System.Guid;
 
-namespace Infrastructure.Data
+namespace Metabase.Data
 {
     public interface IEntity
     {

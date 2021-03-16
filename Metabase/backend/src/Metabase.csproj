@@ -46,8 +46,4 @@
   <ItemGroup>
     <EmbeddedResource Include="./jwt-encryption-certificate.pfx" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="../../../Infrastructure/backend/src/Infrastructure.csproj" />
-  </ItemGroup>
 </Project>

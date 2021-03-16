@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 // Inspired by https://github.com/npgsql/efcore.pg/blob/main/src/EFCore.PG/Infrastructure/Internal/NpgsqlOptionsExtension.cs
-namespace Infrastructure.Data
+namespace Metabase.Data.Extensions
 {
     public sealed class SchemaNameOptionsExtension
       : IDbContextOptionsExtension

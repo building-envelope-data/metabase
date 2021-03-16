@@ -1,15 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 using DateTime = System.DateTime;
 
-namespace Infrastructure.GraphQl.Common
+namespace Metabase.GraphQl.Common
 {
     public sealed class OpenEndedDateTimeRangeType
       : ObjectType<NpgsqlRange<DateTime>>
@@ -20,7 +13,8 @@ namespace Infrastructure.GraphQl.Common
         {
             descriptor.BindFieldsExplicitly();
 
-            descriptor.Name("OpenEndedDateTimeRange");
+            var suffixedName = nameof(OpenEndedDateTimeRangeType);
+            descriptor.Name(suffixedName.Remove(suffixedName.Length - "Type".Length));
 
             descriptor
               .Field("from")

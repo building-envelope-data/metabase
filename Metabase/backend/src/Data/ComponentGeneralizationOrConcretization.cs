@@ -3,7 +3,7 @@ using System;
 namespace Metabase.Data
 {
     public sealed class ComponentConcretizationAndGeneralization
-      : Infrastructure.Data.Entity
+      : Data.Entity
     {
         public Guid GeneralComponentId { get; set; }
         public Component GeneralComponent { get; set; } = default!;

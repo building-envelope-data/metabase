@@ -1,6 +1,6 @@
 // Inspired by https://weblog.west-wind.com/posts/2017/dec/12/easy-configuration-binding-in-aspnet-core-revisited
 
-namespace Infrastructure
+namespace Metabase
 {
     public sealed class AppSettings
     {

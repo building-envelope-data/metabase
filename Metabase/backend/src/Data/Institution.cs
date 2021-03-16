@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Metabase.Data
 {
     public sealed class Institution
-      : Infrastructure.Data.Entity,
+      : Data.Entity,
         IStakeholder
     {
         [Required]

@@ -1,8 +1,7 @@
 using System;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration
+namespace Metabase.Configuration
 {
     public static class Session
     {

@@ -1,4 +1,4 @@
-using Infrastructure.Data;
+using Metabase.Data.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +11,7 @@ namespace Metabase.Configuration
         public static void ConfigureServices(
             IServiceCollection services,
             IWebHostEnvironment environment,
-            Infrastructure.AppSettings.DatabaseSettings databaseSettings
+            AppSettings.DatabaseSettings databaseSettings
             )
         {
             services.AddPooledDbContextFactory<Data.ApplicationDbContext>(options =>
