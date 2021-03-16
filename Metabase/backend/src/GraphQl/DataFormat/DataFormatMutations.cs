@@ -19,7 +19,7 @@ namespace Metabase.GraphQl.DataFormats
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        [Authorize(Policy = Configuration.Auth.WritePolicy)]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateDataFormatPayload> CreateDataFormatAsync(
             CreateDataFormatInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,

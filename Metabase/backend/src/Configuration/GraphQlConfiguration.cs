@@ -11,7 +11,7 @@ using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceColl
 
 namespace Metabase.Configuration
 {
-    public static class GraphQl
+    public static class GraphQlConfiguration
     {
         public static void ConfigureServices(
             IServiceCollection services,

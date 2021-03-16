@@ -20,7 +20,7 @@ namespace Metabase.GraphQl.Institutions
     public sealed class InstitutionMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
-        [Authorize(Policy = Configuration.Auth.WritePolicy)]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateInstitutionPayload> CreateInstitutionAsync(
             CreateInstitutionInput input,
             [ScopedService] Data.ApplicationDbContext context,
@@ -80,7 +80,7 @@ namespace Metabase.GraphQl.Institutions
 
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        [Authorize(Policy = Configuration.Auth.WritePolicy)]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<UpdateInstitutionPayload> UpdateInstitutionAsync(
             UpdateInstitutionInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
@@ -135,7 +135,7 @@ namespace Metabase.GraphQl.Institutions
 
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        [Authorize(Policy = Configuration.Auth.WritePolicy)]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<DeleteInstitutionPayload> DeleteInstitutionAsync(
             DeleteInstitutionInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
@@ -183,7 +183,7 @@ namespace Metabase.GraphQl.Institutions
 
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        [Authorize(Policy = Configuration.Auth.WritePolicy)]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentativeAsync(
             AddInstitutionRepresentativeInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
@@ -272,7 +272,7 @@ namespace Metabase.GraphQl.Institutions
 
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        [Authorize(Policy = Configuration.Auth.WritePolicy)]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<RemoveInstitutionRepresentativePayload> RemoveInstitutionRepresentativeAsync(
             RemoveInstitutionRepresentativeInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
@@ -373,7 +373,7 @@ namespace Metabase.GraphQl.Institutions
 
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        [Authorize(Policy = Configuration.Auth.WritePolicy)]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<ChangeInstitutionRepresentativeRolePayload> ChangeInstitutionRepresentativeRoleAsync(
             ChangeInstitutionRepresentativeRoleInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,

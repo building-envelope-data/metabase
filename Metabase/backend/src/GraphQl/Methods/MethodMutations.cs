@@ -21,7 +21,7 @@ namespace Metabase.GraphQl.Methods
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        [Authorize(Policy = Configuration.Auth.WritePolicy)]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateMethodPayload> CreateMethodAsync(
             CreateMethodInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,

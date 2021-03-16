@@ -47,9 +47,9 @@ namespace Metabase
             services.AddTransient<Services.ISmsSender, Services.MessageSender>();
             services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
             ConfigureSessionServices(services);
-            Configuration.Auth.ConfigureServices(services, _environment, _appSettings);
-            Configuration.GraphQl.ConfigureServices(services, _environment);
-            Configuration.Database.ConfigureServices(services, _environment, _appSettings.Database);
+            Configuration.AuthConfiguration.ConfigureServices(services, _environment, _appSettings);
+            Configuration.GraphQlConfiguration.ConfigureServices(services, _environment);
+            Configuration.DatabaseConfiguration.ConfigureServices(services, _environment, _appSettings.Database);
             services.AddControllersWithViews();
             // services.AddDatabaseDeveloperPageExceptionFilter();
             // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order

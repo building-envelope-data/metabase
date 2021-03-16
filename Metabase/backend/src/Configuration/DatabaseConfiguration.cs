@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Metabase.Configuration
 {
-    public sealed class Database
+    public sealed class DatabaseConfiguration
     {
         public static void ConfigureServices(
             IServiceCollection services,

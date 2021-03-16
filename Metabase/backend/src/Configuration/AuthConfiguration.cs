@@ -14,7 +14,7 @@ using Quartz;
 
 namespace Metabase.Configuration
 {
-    public abstract class Auth
+    public abstract class AuthConfiguration
     {
         // public const string JwtBearerAuthenticatedPolicy = "JwtBearerAuthenticated";
         public const string ReadPolicy = "Read";

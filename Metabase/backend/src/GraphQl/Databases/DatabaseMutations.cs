@@ -19,7 +19,7 @@ namespace Metabase.GraphQl.Databases
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        [Authorize(Policy = Configuration.Auth.WritePolicy)]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateDatabasePayload> CreateDatabaseAsync(
             CreateDatabaseInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
