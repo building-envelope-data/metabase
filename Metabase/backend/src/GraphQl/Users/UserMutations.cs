@@ -173,7 +173,7 @@ namespace Metabase.GraphQl.Users
             var signInResult = await signInManager.PasswordSignInAsync(
                 input.Email,
                 input.Password,
-                isPersistent: false, // TODO Use `input.RememberMe`?
+                isPersistent: input.RememberMe,
                 lockoutOnFailure: true
                 ).ConfigureAwait(false);
             // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinresult?view=aspnetcore-5.0

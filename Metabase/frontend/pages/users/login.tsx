@@ -23,9 +23,11 @@ function Login() {
   const onFinish = ({
     email,
     password,
+    rememberMe,
   }: {
     email: string;
     password: string;
+    rememberMe: boolean;
   }) => {
     // TODO `rememberMe`
     const login = async () => {
@@ -36,6 +38,7 @@ function Login() {
           variables: {
             email: email,
             password: password,
+            rememberMe: rememberMe,
           },
         });
         handleFormErrors(
