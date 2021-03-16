@@ -143,7 +143,8 @@ const options = {
       name: "Metabase",
       type: "oauth",
       version: "2.0",
-      scope: "openid email profile roles api:read api:write offline_access",
+      scope:
+        "openid email profile roles api:read api:write api:user:manage offline_access",
       params: { grant_type: "authorization_code" },
       authorizationParams: {},
 
