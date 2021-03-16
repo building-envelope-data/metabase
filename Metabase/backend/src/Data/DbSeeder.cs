@@ -34,7 +34,7 @@ namespace Metabase.Data
                     new OpenIddictApplicationDescriptor
                     {
                         ClientId = "metabase",
-                        ClientSecret = "secret", // TODO Do not hardcode secret here. It is also needed in tests, see `IntegrationTests#RequestAuthToken`
+                        ClientSecret = "secret", // TODO Do not hardcode secret here. It is also needed in tests, see `IntegrationTests#RequestAuthToken`. See also frontend `.env.*` `AUTH_CLIENT_SECRET`
                         ConsentType = testEnvironment ? OpenIddictConstants.ConsentTypes.Systematic : OpenIddictConstants.ConsentTypes.Explicit,
                         DisplayName = "Metabase client application",
                         DisplayNames =
@@ -43,12 +43,12 @@ namespace Metabase.Data
                         },
                         PostLogoutRedirectUris =
                         {
-                            new Uri(testEnvironment ? "urn:test" : "https://localhost:4041/logout-callback") // TODO Use correct URI
-                    },
+                            new Uri(testEnvironment ? "urn:test" : "https://metabase.org:4041/logout-callback") // TODO Use correct URI
+                        },
                         RedirectUris =
                         {
-                            new Uri(testEnvironment ? "urn:test" : "https://localhost:4041/login") // TODO Use correct URI
-                    },
+                            new Uri(testEnvironment ? "urn:test" : "https://metabase.org:4041/api/auth/callback/metabase") // TODO Use correct URI
+                        },
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
                             // OpenIddictConstants.Permissions.Endpoints.Device,
@@ -66,6 +66,7 @@ namespace Metabase.Data
                             OpenIddictConstants.Permissions.Scopes.Roles,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.Auth.ReadApiScope,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.Auth.WriteApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.Auth.ManageUserApiScope,
                         },
                         Requirements =
                         {

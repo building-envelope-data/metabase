@@ -16,7 +16,7 @@ namespace Metabase.GraphQl.Institutions
                 batchScheduler,
                 dbContextFactory,
                 (dbContext, ids) =>
-                    dbContext.InstitutionMethodDevelopers.Where(x =>
+                    dbContext.InstitutionMethodDevelopers.AsQueryable().Where(x =>
                         ids.Contains(x.InstitutionId)
                     ),
                 x => x.InstitutionId

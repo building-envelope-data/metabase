@@ -4,6 +4,8 @@ import Footer from "./Footer";
 import NavBar from "./NavBar";
 import { Layout as AntLayout } from "antd";
 import paths from "../paths";
+import { signIn, useSession } from "next-auth/client";
+import { useEffect } from "react";
 
 const navItems = [
   {
@@ -34,10 +36,25 @@ const navItems = [
     path: paths.userChangeEmail,
     label: `Change Email`,
   },
+  {
+    path: paths.openIdConnectClient,
+    label: `OpenId Connect Client`,
+  },
+  {
+    path: paths.openIdConnect,
+    label: `OpenId Connect`,
+  },
 ];
 
 const Layout: React.FunctionComponent = ({ children }) => {
+  const [session] = useSession();
   const appTitle = `Building Envelope Data`;
+
+  useEffect(() => {
+    if (session?.error === "RefreshAccessTokenError") {
+      signIn(); // Force sign in to hopefully resolve error
+    }
+  }, [session]);
 
   return (
     <AntLayout>

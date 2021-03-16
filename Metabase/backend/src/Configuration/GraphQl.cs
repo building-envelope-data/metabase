@@ -4,6 +4,7 @@ using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using OpenIddict.Validation.AspNetCore;
 using GraphQlX = Metabase.GraphQl;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
 
@@ -22,9 +23,18 @@ namespace Metabase.Configuration
                     executorBuilder
                     .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
                     {
-                        var authenticateResult = await httpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme).ConfigureAwait(false);
+                        // HotChocolate uses the default cookie authentication
+                        // scheme `IdentityConstants.ApplicationScheme` by
+                        // default. We want it to use the JavaScript Web Token
+                        // (JWT), aka, Access Token, provided as `Authorization`
+                        // HTTP header with the prefix `Bearer` as issued by
+                        // OpenIddict though. This Access Token includes Scopes
+                        // and Claims.
+                        var authenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
                         if (authenticateResult.Succeeded && authenticateResult.Principal is not null)
+                        {
                             httpContext.User = authenticateResult.Principal;
+                        }
                     })
                     .AddQueryType(d => d.Name(nameof(GraphQlX.Query)))
                         .AddType<GraphQlX.Components.ComponentQueries>()
@@ -32,6 +42,7 @@ namespace Metabase.Configuration
                         .AddType<GraphQlX.Databases.DatabaseQueries>()
                         .AddType<GraphQlX.Institutions.InstitutionQueries>()
                         .AddType<GraphQlX.Methods.MethodQueries>()
+                        .AddType<GraphQlX.OpenIdConnect.OpendIdConnectQueries>()
                         .AddType<GraphQlX.Users.UserQueries>()
                     .AddMutationType(d => d.Name(nameof(GraphQlX.Mutation)))
                         .AddType<GraphQlX.Components.ComponentMutations>()
@@ -49,6 +60,10 @@ namespace Metabase.Configuration
                     .AddType<GraphQlX.Institutions.InstitutionType>()
                     .AddType<GraphQlX.Methods.MethodType>()
                     .AddType<GraphQlX.Numerations.NumerationType>()
+                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectApplicationType>()
+                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectAuthorizationType>()
+                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectScopeType>()
+                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectTokenType>()
                     .AddType<GraphQlX.Publications.PublicationType>()
                     .AddType<GraphQlX.References.ReferenceType>()
                     .AddType<GraphQlX.Stakeholders.StakeholderType>()

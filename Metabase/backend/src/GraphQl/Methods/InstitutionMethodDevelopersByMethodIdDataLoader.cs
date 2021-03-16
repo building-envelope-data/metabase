@@ -16,7 +16,7 @@ namespace Metabase.GraphQl.Methods
                 batchScheduler,
                 dbContextFactory,
                 (dbContext, ids) =>
-                    dbContext.InstitutionMethodDevelopers.Where(x =>
+                    dbContext.InstitutionMethodDevelopers.AsQueryable().Where(x =>
                         ids.Contains(x.MethodId)
                     ),
                 x => x.MethodId

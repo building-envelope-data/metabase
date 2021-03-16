@@ -39,7 +39,7 @@ namespace Metabase.GraphQl.Institutions
             }
             var unknownOwnerIds =
                 input.OwnerIds.Except(
-                    await context.Users
+                    await context.Users.AsQueryable()
                     .Where(u => input.OwnerIds.Contains(u.Id))
                     .Select(u => u.Id)
                     .ToListAsync(cancellationToken)
@@ -107,7 +107,7 @@ namespace Metabase.GraphQl.Institutions
                       );
             }
             var institution =
-                await context.Institutions
+                await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
@@ -162,7 +162,7 @@ namespace Metabase.GraphQl.Institutions
                       );
             }
             var institution =
-                await context.Institutions
+                await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
@@ -210,7 +210,7 @@ namespace Metabase.GraphQl.Institutions
                       );
             }
             var errors = new List<AddInstitutionRepresentativeError>();
-            if (!await context.Institutions
+            if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
                 .ConfigureAwait(false)
@@ -224,7 +224,7 @@ namespace Metabase.GraphQl.Institutions
                       )
                 );
             }
-            if (!await context.Users
+            if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
                 .ConfigureAwait(false)
@@ -242,7 +242,7 @@ namespace Metabase.GraphQl.Institutions
             {
                 return new AddInstitutionRepresentativePayload(errors.AsReadOnly());
             }
-            if (await context.InstitutionRepresentatives
+            if (await context.InstitutionRepresentatives.AsQueryable()
                 .Where(r =>
                        r.InstitutionId == input.InstitutionId
                     && r.UserId == input.UserId
@@ -299,7 +299,7 @@ namespace Metabase.GraphQl.Institutions
                       );
             }
             var errors = new List<RemoveInstitutionRepresentativeError>();
-            if (!await context.Institutions
+            if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
                 .ConfigureAwait(false)
@@ -313,7 +313,7 @@ namespace Metabase.GraphQl.Institutions
                       )
                 );
             }
-            if (!await context.Users
+            if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
                 .ConfigureAwait(false)
@@ -332,7 +332,7 @@ namespace Metabase.GraphQl.Institutions
                 return new RemoveInstitutionRepresentativePayload(errors.AsReadOnly());
             }
             var institutionRepresentative =
-                await context.InstitutionRepresentatives
+                await context.InstitutionRepresentatives.AsQueryable()
                 .Where(r =>
                        r.InstitutionId == input.InstitutionId
                     && r.UserId == input.UserId
@@ -400,7 +400,7 @@ namespace Metabase.GraphQl.Institutions
                       );
             }
             var errors = new List<ChangeInstitutionRepresentativeRoleError>();
-            if (!await context.Institutions
+            if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
                 .ConfigureAwait(false)
@@ -414,7 +414,7 @@ namespace Metabase.GraphQl.Institutions
                       )
                 );
             }
-            if (!await context.Users
+            if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
                 .ConfigureAwait(false)
@@ -433,7 +433,7 @@ namespace Metabase.GraphQl.Institutions
                 return new ChangeInstitutionRepresentativeRolePayload(errors.AsReadOnly());
             }
             var institutionRepresentative =
-                await context.InstitutionRepresentatives
+                await context.InstitutionRepresentatives.AsQueryable()
                 .Where(r =>
                        r.InstitutionId == input.InstitutionId
                     && r.UserId == input.UserId
@@ -480,7 +480,7 @@ namespace Metabase.GraphQl.Institutions
             CancellationToken cancellationToken
         )
         {
-            return await context.InstitutionRepresentatives
+            return await context.InstitutionRepresentatives.AsQueryable()
                 .Where(r =>
                     r.InstitutionId == institutionId
                     && r.UserId != userId

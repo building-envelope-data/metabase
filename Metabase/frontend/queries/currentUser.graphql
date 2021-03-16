@@ -11,8 +11,10 @@ query CurrentUser {
   }
 }
 
-mutation LoginUser($email: String!, $password: String!) {
-  loginUser(input: { email: $email, password: $password }) {
+mutation LoginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
+  loginUser(
+    input: { email: $email, password: $password, rememberMe: $rememberMe }
+  ) {
     requiresTwoFactor
     user {
       ...UserPartial

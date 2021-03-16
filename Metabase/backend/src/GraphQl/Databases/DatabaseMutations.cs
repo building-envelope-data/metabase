@@ -41,7 +41,7 @@ namespace Metabase.GraphQl.Databases
                     new CreateDatabaseError(
                       CreateDatabaseErrorCode.UNAUTHORIZED,
                       "You are not authorized to create components for the institution.",
-                      Array.Empty<string>()
+                      new[] { nameof(input), nameof(input.OperatorId).FirstCharToLower() }
                     )
                 );
             }
@@ -56,7 +56,7 @@ namespace Metabase.GraphQl.Databases
                 return new CreateDatabasePayload(
                     new CreateDatabaseError(
                         CreateDatabaseErrorCode.UNKNOWN_OPERATOR,
-                        "Unknown manufacturer",
+                        "Unknown operator",
                       new[] { nameof(input), nameof(input.OperatorId).FirstCharToLower() }
                     )
                 );

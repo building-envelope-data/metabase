@@ -147,14 +147,16 @@ namespace Metabase.Controllers
             var applicationId =
                 await _applicationManager.GetIdAsync(application).ConfigureAwait(false)
                 ?? throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
-
             // Retrieve the permanent authorizations associated with the user and the calling client application.
             var authorizations = await _authorizationManager.FindAsync(
                 subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
                 client: applicationId,
                 status: Statuses.Valid,
                 type: AuthorizationTypes.Permanent,
-                scopes: request.GetScopes()).ToListAsync().ConfigureAwait(false);
+                scopes: request.GetScopes()
+                )
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             switch (await _applicationManager.GetConsentTypeAsync(application).ConfigureAwait(false))
             {
@@ -193,7 +195,9 @@ namespace Metabase.Controllers
                             subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
                             client: applicationId,
                             type: AuthorizationTypes.Permanent,
-                            scopes: principal.GetScopes()).ConfigureAwait(false);
+                            scopes: principal.GetScopes()
+                            )
+                            .ConfigureAwait(false);
                     }
 
                     principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false));
@@ -228,8 +232,8 @@ namespace Metabase.Controllers
             }
         }
 
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), FormValueRequired("submit.Accept")]
-        [HttpPost("~/connect/authorize"), ValidateAntiForgeryToken]
+        [Authorize, FormValueRequired("submit.Accept")]
+        [HttpPost("~/connect/authorize")] // TODO Add attribute `ValidateAntiForgeryToken`
         public async Task<IActionResult> Accept()
         {
             var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -257,7 +261,10 @@ namespace Metabase.Controllers
                 client: applicationId,
                 status: Statuses.Valid,
                 type: AuthorizationTypes.Permanent,
-                scopes: request.GetScopes()).ToListAsync().ConfigureAwait(false);
+                scopes: request.GetScopes()
+                )
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             // Note: the same check is already made in the other action but is repeated
             // here to ensure a malicious user can't abuse this POST-only endpoint and
@@ -306,8 +313,8 @@ namespace Metabase.Controllers
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), FormValueRequired("submit.Deny")]
-        [HttpPost("~/connect/authorize"), ValidateAntiForgeryToken]
+        [Authorize, FormValueRequired("submit.Deny")]
+        [HttpPost("~/connect/authorize")] // TODO Add attribute `ValidateAntiForgeryToken`
         // Notify OpenIddict that the authorization grant has been denied by the resource owner
         // to redirect the user agent to the client application using the appropriate response_mode.
         public IActionResult Deny() => Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -315,7 +322,7 @@ namespace Metabase.Controllers
 
         #region Device flow
         // Note: to support the device flow, you must provide your own verification endpoint action:
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), HttpGet("~/connect/verify")]
+        [Authorize, HttpGet("~/connect/verify")]
         public async Task<IActionResult> Verify()
         {
             var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -358,7 +365,7 @@ namespace Metabase.Controllers
             });
         }
 
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), FormValueRequired("submit.Accept")]
+        [Authorize, FormValueRequired("submit.Accept")]
         [HttpPost("~/connect/verify"), ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyAccept()
         {
@@ -401,7 +408,7 @@ namespace Metabase.Controllers
             });
         }
 
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), FormValueRequired("submit.Deny")]
+        [Authorize, FormValueRequired("submit.Deny")]
         [HttpPost("~/connect/verify"), ValidateAntiForgeryToken]
         // Notify OpenIddict that the authorization grant has been denied by the resource owner.
         public IActionResult VerifyDeny() => Forbid(

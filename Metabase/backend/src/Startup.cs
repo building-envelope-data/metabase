@@ -39,7 +39,7 @@ namespace Metabase
             ConfigureSessionServices(services);
             Configuration.Auth.ConfigureServices(services, _environment, _appSettings);
             Configuration.GraphQl.ConfigureServices(services);
-            Configuration.Database.ConfigureServices(services, _appSettings.Database);
+            Configuration.Database.ConfigureServices(services, _environment, _appSettings.Database);
             services.AddControllersWithViews();
             // services.AddDatabaseDeveloperPageExceptionFilter();
             // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order

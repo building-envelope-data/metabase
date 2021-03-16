@@ -63,7 +63,7 @@ namespace Metabase.Authorization
                 return null;
             }
             var wrappedRole =
-                await context.InstitutionRepresentatives
+                await context.InstitutionRepresentatives.AsQueryable()
                 .Where(x =>
                     x.InstitutionId == institutionId &&
                     x.UserId == user.Id

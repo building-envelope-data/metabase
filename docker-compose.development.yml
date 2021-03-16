@@ -50,6 +50,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile-frontend-${ENVIRONMENT}
+      args:
+        - CERTIFICATE_AUTHORITY_BASE_FILE_NAME=${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}
     # user: 1000:1000
     command: [
       "yarn", "dev"
@@ -57,6 +59,8 @@ services:
     volumes:
       - .:/app
       - frontend_node_modules:/app/node_modules
+    extra_hosts:
+      - ${METABASE_HOST}:${DOCKER_IP}
     environment:
       - NODE_ENV=${ENVIRONMENT}
       - CHOKIDAR_USEPOLLING=true

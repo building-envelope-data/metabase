@@ -4,6 +4,7 @@ FROM node:14.15.4-alpine3.12
 ARG GROUP_ID
 ARG USER_ID
 ARG PROJECT_NAME
+ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
 
 # TODO directory node_modules is created on host machine when container is run
 # and does not belong to current user. Avoid it being created at all or at
@@ -13,10 +14,20 @@ ARG PROJECT_NAME
 # As `root` #
 #############
 
+# `ca-certificates` is needed to run `update-ca-certificates`
+# `openssl` is needed to debug SSL certificates
 RUN \
   apk add --no-cache \
+    ca-certificates \
     dumb-init \
-    make
+    make \
+    openssl
+
+COPY \
+  ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.crt \
+  /usr/local/share/ca-certificates
+RUN \
+  update-ca-certificates
 
 ENV HOME=/home/node
 RUN \

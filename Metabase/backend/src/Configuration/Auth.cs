@@ -1,18 +1,18 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using HotChocolate.Resolvers;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
+using OpenIddict.Validation.AspNetCore;
 using Quartz;
 using AppSettings = Infrastructure.AppSettings;
 
@@ -20,11 +20,13 @@ namespace Metabase.Configuration
 {
     public abstract class Auth
     {
-        public const string CookieAuthenticatedPolicy = "CookieAuthenticated";
+        // public const string JwtBearerAuthenticatedPolicy = "JwtBearerAuthenticated";
         public const string ReadPolicy = "Read";
         public const string WritePolicy = "Write";
+        public const string ManageUserPolicy = "ManageUser";
         public static string ReadApiScope { get; } = "api:read";
         public static string WriteApiScope { get; } = "api:write";
+        public static string ManageUserApiScope { get; } = "api:user:manage";
         public static string ServerName { get; } = "metabase";
 
         public static void ConfigureServices(
@@ -85,10 +87,37 @@ namespace Metabase.Configuration
             services.ConfigureApplicationCookie(_ =>
             {
                 _.AccessDeniedPath = "/unauthorized";
-                _.LoginPath = "/user/login";
-                _.LogoutPath = "/user/logout";
+                _.LoginPath = "/users/login";
+                _.LogoutPath = "/me/logout";
                 _.ReturnUrlParameter = "returnTo";
-            }
+                // _.Events.OnValidatePrincipal = context =>
+                //         // Is there any security risk associated with adding scopes as is done below?
+                //     {
+                //         // The metabase frontend uses application cookies for
+                //         // user authentication and is allowed to read data,
+                //         // write data, and manage users. The corresponding
+                //         // policies use scopes, so we need to add them.
+                //         var identity = new ClaimsIdentity();
+                //         foreach (
+                //             var claim in
+                //                 new[] {
+                //                 ReadApiScope,
+                //                 WriteApiScope,
+                //                 ManageUserApiScope
+                //                 }
+                //         )
+                //         {
+                //             identity.AddClaim(
+                //                 new Claim(
+                //                     OpenIddictConstants.Claims.Private.Scope,
+                //                     claim
+                //                     )
+                //                 );
+                //         }
+                //         context?.Principal?.AddIdentity(identity);
+                //         return Task.CompletedTask;
+                //     };
+                }
             );
         }
 
@@ -104,13 +133,7 @@ namespace Metabase.Configuration
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
             // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/
-            services.AddAuthentication(_ =>
-             {
-                 _.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                 _.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                 _.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-             }
-             )
+            services.AddAuthentication()
               .AddJwtBearer(_ =>
                   {
                       _.Audience = ServerName;
@@ -133,31 +156,32 @@ namespace Metabase.Configuration
                           TokenDecryptionKey = encryptionKey,
                           IssuerSigningKey = signingKey
                       };
+                      // _.Events.OnAuthenticationFailed = _ =>
                   });
             services.AddAuthorization(_ =>
             {
-                _.AddPolicy(CookieAuthenticatedPolicy, policy =>
-                {
-                    policy.AuthenticationSchemes = new[] { IdentityConstants.ApplicationScheme };
-                    policy.RequireAuthenticatedUser();
-                }
-                );
+                // _.AddPolicy(JwtBearerAuthenticatedPolicy, policy =>
+                // {
+                //     policy.AuthenticationSchemes = new[] { JwtBearerDefaults.AuthenticationScheme }; // For cookies it would be `IdentityConstants.ApplicationScheme`
+                //     policy.RequireAuthenticatedUser();
+                // }
+                // );
                 foreach (var (policyName, scope) in new[] {
                      (ReadPolicy, ReadApiScope),
-                      (WritePolicy, WriteApiScope)
-                      }
-                      )
+                     (WritePolicy, WriteApiScope),
+                     (ManageUserPolicy, ManageUserApiScope)
+                     }
+                   )
                 {
                     _.AddPolicy(policyName, policy =>
                     {
                         policy.AuthenticationSchemes = new[] {
-                        IdentityConstants.ApplicationScheme, // TODO Remove once we use OpenId Connect in the frontend.
-                        JwtBearerDefaults.AuthenticationScheme
+                            OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme
                             };
                         policy.RequireAuthenticatedUser();
                         policy.RequireAssertion(context =>
                         {
-                            // TODO Remove the `if` but keep the last return once we use OpenId Connect in the frontend.
+                            // How the `HttpContext` can be accessed when the policies are used in GraphQL queries or mutations.
                             // if (context.Resource is IResolverContext resolverContext)
                             // {
                             //     if (resolverContext.ContextData.ContainsKey(nameof(HttpContext)))
@@ -168,16 +192,15 @@ namespace Metabase.Configuration
                             //                 httpContext.Request.Headers.ContainsKey("Origin")
                             //                 )
                             //             {
-                            //                 // TODO CORS cannot serve as a security mechanism. Secure access from the frontend by some other means.
+                            //                 // Note that CORS cannot serve as a security mechanism. Secure access from the frontend by some other means.
                             //                 return httpContext.Request.Headers["Sec-Fetch-Site"] == "same-origin" &&
-                            //                     httpContext.Request.Host == httpContext.Request.Headers["Origin"]; // TODO Comparison does not work because one includes the protocol HTTPS while the other does not.
+                            //                     httpContext.Request.Host == httpContext.Request.Headers["Origin"]; // Comparison does not work because one includes the protocol HTTPS while the other does not.
                             //             }
                             //         }
 
                             //     }
                             // }
-                            // return context.User.HasScope(scope);
-                            return true;
+                            return context.User.HasScope(scope);
                         }
                         );
                     }
@@ -238,6 +261,9 @@ namespace Metabase.Configuration
                                .SetDeviceEndpointUris("/connect/device")
                                .SetLogoutEndpointUris("/connect/logout")
                                .SetIntrospectionEndpointUris("/connect/introspect")
+                                // .SetRevocationEndpointUris("")
+                                // .SetCryptographyEndpointUris("")
+                                // .SetConfigurationEndpointUris("")
                                .SetTokenEndpointUris("/connect/token")
                                .SetUserinfoEndpointUris("/connect/userinfo")
                                .SetVerificationEndpointUris("/connect/verify");
@@ -246,7 +272,8 @@ namespace Metabase.Configuration
                         OpenIddictConstants.Scopes.Profile,
                         OpenIddictConstants.Scopes.Roles,
                         ReadApiScope,
-                        WriteApiScope
+                        WriteApiScope,
+                        ManageUserApiScope
                         );
                     _.AllowAuthorizationCodeFlow()
                       .AllowDeviceCodeFlow()
@@ -321,6 +348,32 @@ namespace Metabase.Configuration
                     // Note: when issuing access tokens used by third-party APIs
                     // you don't own, you can disable access token encryption:
                     // _.DisableAccessTokenEncryption();
+                    // Note: To decrypt a JWT token, like an application code or an access token, you can execute
+                    // ```
+                    // var jwt = "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiYXQrand0In0.tn0jqCR5-01c_SDRwex6sPBNl1Vl1KSRA5Zs2UoXri9F4tG4v9B6qbLmxzsfkd0rLe55BozRV8VCChsZAt_mCZfoVGOYewwP.ogGZQ5Q2p7Yue7D6zPJlSQ.uNX1Qs9R30vZxAPj-LuJSwWnisoKHQ5qNC_K9WvA0JDSCS_orw6TsboSVCe5b_aUg3JvrkJX_Ir0c-bFMf0HVhOVNy1UJwxo9zegJOsm7MybPzK58H4ubt_PRnrSueLgnQX8aDcjbM38Imy3RN6a3r3aKawdWGcyA23sIH8XnVmGk0lDB_PqFrFE7x2MmG4fyVJINoki441UI-7x0sLFUi4o98Z-2vTFuCd9cLRY5LAeb0ZIuWwOI7dv2Q54w7uV765kHS3VIPtupzSSXgQmfPBJOzDeV_-sCZGwUuC0jL8x1vJw573fejPwpPmXj3EKgzXgbGfAHmjoIzkNvcfr--Dy7O8WxLjSERoBgW45Tq0xcCLL9Vx4JGWehOw1jY-KaKIzfjUW9CTSwLgWdhqonetAULZFRJAYOEJ8PtP49jXlvkdjmavRXaX2UD8FD5TUx30TkGQ_xyuo6HvokURQqIYILZiL6R_kVqh7kwUnj4dgBqni-56M1GYFuX2UzynagL6c6t4OlO7RhQJpgz1pzmGNdEb5nvZplXru8KVEt_e9bQOy54EWudAemEVAyX-4P6FdWWazU5vMaRnDg53Y8gy4rt6LCwXK9WHNRbhkdAmTNNsfiuUd588lzMJVSVPeqzbl70yW8IH7hbwfscLjSf2-gP9evwDKoLMKjqyBtbsqGx-qtBE47y_-LKyP3TOJug0SBtiHIMb3xzN2rJaykAMRRz4kMaMF4_TZRV8kqZQqzF_xBoMJQD3nLYaN-G0qJYIse1JhVu4yHuH7vSvXdHA0x5dnBwwq4P3g35W5zv-cw4-b1cXnLq7TYUvHNVe6DcMAJogxW5ovA7wtEjF4yKxSbvlRaO065Jed5siLrIL17RahoHqew34kMzqXL0OUHvxId0A7myvLFy0YqhLnKg.1jfT6-IVamiQbS84hfX4lLtmoTiAmf0Ea0rpLPgYEek";
+                    // var handler = new JwtSecurityTokenHandler();
+                    // var claimsPrincipal = handler.ValidateToken(
+                    //     jwt,
+                    //     new TokenValidationParameters
+                    //     {
+                    //         IssuerSigningKey = signingKey,
+                    //         TokenDecryptionKey = encryptionKey,
+                    //         // ValidIssuer = "https://metabase.org:4041/",
+                    //         ValidateActor = false,
+                    //         ValidateAudience = false,
+                    //         ValidateIssuer = false,
+                    //         ValidateIssuerSigningKey = false,
+                    //         ValidateLifetime = false,
+                    //         ValidateTokenReplay = false,
+                    //     },
+                    //     out var validatedToken
+                    // );
+                    // Console.WriteLine(validatedToken.ToString());
+                    // ```
+                    // which as of this writing outputs
+                    // ```
+                    // {"alg":"A256KW","enc":"A256CBC-HS512","typ":"at+jwt"}.{"sub":"075561fa-98c0-40db-ad3d-9dc8abf240fd","name":"sw@ise.de","http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress":"sw@ise.de","oi_prst":"metabase","iss":"https://localhost:4041/","oi_au_id":"5dc00347-30fa-4ddb-91c1-471c505e7842","client_id":"metabase","oi_tkn_id":"e7430a26-4e13-4c21-8e6d-0f07dca66ff6","aud":"metabase","scope":"openid email profile roles api:read api:write offline_access","exp":1615405869,"iat":1615402269}
+                    // ```
                 }
             )
               // Register the OpenIddict validation components.

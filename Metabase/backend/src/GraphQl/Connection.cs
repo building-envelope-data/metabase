@@ -12,7 +12,7 @@ namespace Metabase.GraphQl
         where TSubject : Infrastructure.Data.IEntity
         where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
     {
-        private readonly TSubject _subject;
+        protected TSubject Subject { get; }
         private readonly Func<TAssociation, TEdge> _createEdge;
 
         protected Connection(
@@ -20,7 +20,7 @@ namespace Metabase.GraphQl
             Func<TAssociation, TEdge> createEdge
             )
         {
-            _subject = subject;
+            Subject = subject;
             _createEdge = createEdge;
         }
 
@@ -30,7 +30,7 @@ namespace Metabase.GraphQl
             )
         {
             return (
-                await dataLoader.LoadAsync(_subject.Id, cancellationToken)
+                await dataLoader.LoadAsync(Subject.Id, cancellationToken)
                 .ConfigureAwait(false)
                 )
                 .Select(_createEdge);

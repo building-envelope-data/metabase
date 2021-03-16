@@ -13,6 +13,8 @@ namespace Metabase.GraphQl.Methods
           CreateStandardInput? Standard,
           CreatePublicationInput? Publication,
           Uri? CalculationLocator,
-          Enumerations.MethodCategory[] Categories
+          Enumerations.MethodCategory[] Categories,
+          Guid[] InstitutionDeveloperIds,
+          Guid[] UserDeveloperIds
         );
 }
