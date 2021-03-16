@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Metabase.Configuration;
 using Metabase.Data.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -42,8 +43,8 @@ namespace Metabase
 
         public void ConfigureServices(IServiceCollection services)
         {
-            Configuration.AuthConfiguration.ConfigureServices(services, _environment, _appSettings);
-            Configuration.GraphQlConfiguration.ConfigureServices(services, _environment);
+            AuthConfiguration.ConfigureServices(services, _environment, _appSettings);
+            GraphQlConfiguration.ConfigureServices(services, _environment);
             ConfigureDatabaseServices(services);
             ConfigureMessageSenderServices(services);
             ConfigureRequestResponseServices(services);
