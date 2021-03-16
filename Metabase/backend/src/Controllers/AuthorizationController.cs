@@ -232,8 +232,8 @@ namespace Metabase.Controllers
             }
         }
 
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), FormValueRequired("submit.Accept")]
-        [HttpPost("~/connect/authorize"), ValidateAntiForgeryToken]
+        [Authorize, FormValueRequired("submit.Accept")]
+        [HttpPost("~/connect/authorize")] // TODO Add attribute `ValidateAntiForgeryToken`
         public async Task<IActionResult> Accept()
         {
             var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -313,8 +313,8 @@ namespace Metabase.Controllers
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), FormValueRequired("submit.Deny")]
-        [HttpPost("~/connect/authorize"), ValidateAntiForgeryToken]
+        [Authorize, FormValueRequired("submit.Deny")]
+        [HttpPost("~/connect/authorize")] // TODO Add attribute `ValidateAntiForgeryToken`
         // Notify OpenIddict that the authorization grant has been denied by the resource owner
         // to redirect the user agent to the client application using the appropriate response_mode.
         public IActionResult Deny() => Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -322,7 +322,7 @@ namespace Metabase.Controllers
 
         #region Device flow
         // Note: to support the device flow, you must provide your own verification endpoint action:
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), HttpGet("~/connect/verify")]
+        [Authorize, HttpGet("~/connect/verify")]
         public async Task<IActionResult> Verify()
         {
             var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -365,7 +365,7 @@ namespace Metabase.Controllers
             });
         }
 
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), FormValueRequired("submit.Accept")]
+        [Authorize, FormValueRequired("submit.Accept")]
         [HttpPost("~/connect/verify"), ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyAccept()
         {
@@ -408,7 +408,7 @@ namespace Metabase.Controllers
             });
         }
 
-        [Authorize(Policy = Configuration.Auth.CookieAuthenticatedPolicy), FormValueRequired("submit.Deny")]
+        [Authorize, FormValueRequired("submit.Deny")]
         [HttpPost("~/connect/verify"), ValidateAntiForgeryToken]
         // Notify OpenIddict that the authorization grant has been denied by the resource owner.
         public IActionResult VerifyDeny() => Forbid(

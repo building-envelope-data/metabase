@@ -4,6 +4,7 @@ using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using OpenIddict.Validation.AspNetCore;
 using GraphQlX = Metabase.GraphQl;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
 
@@ -22,10 +23,18 @@ namespace Metabase.Configuration
                     executorBuilder
                     .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
                     {
-                        // TODO Remove when we do not use cookies in the web frontend anymore (except for the OIDC login)
-                        var authenticateResult = await httpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme).ConfigureAwait(false);
+                        // HotChocolate uses the default cookie authentication
+                        // scheme `IdentityConstants.ApplicationScheme` by
+                        // default. We want it to use the JavaScript Web Token
+                        // (JWT), aka, Access Token, provided as `Authorization`
+                        // HTTP header with the prefix `Bearer` as issued by
+                        // OpenIddict though. This Access Token includes Scopes
+                        // and Claims.
+                        var authenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
                         if (authenticateResult.Succeeded && authenticateResult.Principal is not null)
+                        {
                             httpContext.User = authenticateResult.Principal;
+                        }
                     })
                     .AddQueryType(d => d.Name(nameof(GraphQlX.Query)))
                         .AddType<GraphQlX.Components.ComponentQueries>()

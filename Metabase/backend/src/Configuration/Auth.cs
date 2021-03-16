@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
+using OpenIddict.Validation.AspNetCore;
 using Quartz;
 using AppSettings = Infrastructure.AppSettings;
 
@@ -19,7 +20,7 @@ namespace Metabase.Configuration
 {
     public abstract class Auth
     {
-        public const string CookieAuthenticatedPolicy = "CookieAuthenticated";
+        // public const string JwtBearerAuthenticatedPolicy = "JwtBearerAuthenticated";
         public const string ReadPolicy = "Read";
         public const string WritePolicy = "Write";
         public const string ManageUserPolicy = "ManageUser";
@@ -132,13 +133,7 @@ namespace Metabase.Configuration
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
             // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/
-            services.AddAuthentication(_ =>
-             {
-                 _.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                 _.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                 _.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-             }
-             )
+            services.AddAuthentication()
               .AddJwtBearer(_ =>
                   {
                       _.Audience = ServerName;
@@ -161,15 +156,16 @@ namespace Metabase.Configuration
                           TokenDecryptionKey = encryptionKey,
                           IssuerSigningKey = signingKey
                       };
+                      // _.Events.OnAuthenticationFailed = _ =>
                   });
             services.AddAuthorization(_ =>
             {
-                _.AddPolicy(CookieAuthenticatedPolicy, policy =>
-                {
-                    policy.AuthenticationSchemes = new[] { IdentityConstants.ApplicationScheme };
-                    policy.RequireAuthenticatedUser();
-                }
-                );
+                // _.AddPolicy(JwtBearerAuthenticatedPolicy, policy =>
+                // {
+                //     policy.AuthenticationSchemes = new[] { JwtBearerDefaults.AuthenticationScheme }; // For cookies it would be `IdentityConstants.ApplicationScheme`
+                //     policy.RequireAuthenticatedUser();
+                // }
+                // );
                 foreach (var (policyName, scope) in new[] {
                      (ReadPolicy, ReadApiScope),
                      (WritePolicy, WriteApiScope),
@@ -180,8 +176,7 @@ namespace Metabase.Configuration
                     _.AddPolicy(policyName, policy =>
                     {
                         policy.AuthenticationSchemes = new[] {
-                        IdentityConstants.ApplicationScheme,
-                        JwtBearerDefaults.AuthenticationScheme
+                            OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme
                             };
                         policy.RequireAuthenticatedUser();
                         policy.RequireAssertion(context =>
@@ -197,9 +192,9 @@ namespace Metabase.Configuration
                             //                 httpContext.Request.Headers.ContainsKey("Origin")
                             //                 )
                             //             {
-                            //                 // TODO CORS cannot serve as a security mechanism. Secure access from the frontend by some other means.
+                            //                 // Note that CORS cannot serve as a security mechanism. Secure access from the frontend by some other means.
                             //                 return httpContext.Request.Headers["Sec-Fetch-Site"] == "same-origin" &&
-                            //                     httpContext.Request.Host == httpContext.Request.Headers["Origin"]; // TODO Comparison does not work because one includes the protocol HTTPS while the other does not.
+                            //                     httpContext.Request.Host == httpContext.Request.Headers["Origin"]; // Comparison does not work because one includes the protocol HTTPS while the other does not.
                             //             }
                             //         }
 
