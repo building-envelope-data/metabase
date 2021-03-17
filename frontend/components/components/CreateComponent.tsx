@@ -4,6 +4,7 @@ import {
   useCreateComponentMutation,
   ComponentCategory,
   Scalars,
+  ComponentsDocument,
 } from "../../queries/components.graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
@@ -34,6 +35,9 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
         variables: {
           uuid: manufacturerId,
         },
+      },
+      {
+        query: ComponentsDocument,
       },
     ],
   });
