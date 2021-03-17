@@ -122,7 +122,6 @@ traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for examp
 				"
 .PHONY : traceb
 
-psql : docker_compose = ${docker_compose}
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} exec \
@@ -132,7 +131,6 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname xbase
 .PHONY : psql
 
-shelld : docker_compose = ${docker_compose}
 shelld : ## Enter shell in a fresh `database` container
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} run \
