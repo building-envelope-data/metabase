@@ -3,7 +3,6 @@ FROM node:14.15.4-alpine3.12
 
 ARG GROUP_ID
 ARG USER_ID
-ARG PROJECT_NAME
 ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
 
 # TODO directory node_modules is created on host machine when container is run
@@ -31,27 +30,26 @@ RUN \
 
 ENV HOME=/home/node
 RUN \
-  mkdir --parents ${HOME}/app/${PROJECT_NAME}/frontend && \
-  chown node:node ${HOME}/app && \
-  chown node:node ${HOME}/app/${PROJECT_NAME} && \
-  chown node:node ${HOME}/app/${PROJECT_NAME}/frontend && \
+  mkdir --parents ${HOME}/app && \
+  chown \
+    node:node \
+    ${HOME}/app && \
   ln -s ${HOME}/app /app
 
 #############
 # As `node` #
 #############
 USER node
-WORKDIR /app/${PROJECT_NAME}/frontend
+WORKDIR /app
 
-ENV PATH=/app/${PROJECT_NAME}/frontend/node_modules/.bin:$PATH
+ENV PATH=/app/node_modules/.bin:$PATH
 COPY \
   --chown=node:node \
-  ./${PROJECT_NAME}/frontend/package.json ./
+  ./package.json ./
 COPY \
   --chown=node:node \
-  ./${PROJECT_NAME}/frontend/yarn.lock ./
+  ./yarn.lock ./
 RUN yarn install
 
 EXPOSE 3000
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["yarn", "dev"]

@@ -4,6 +4,9 @@
 /trace.*
 /.secrets
 
+/secrets
+/ssl
+
 /test/**/__snapshots__/__mismatch__
 
 # Created by https://www.gitignore.io/api/csharp

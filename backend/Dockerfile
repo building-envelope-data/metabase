@@ -4,7 +4,6 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0.100-alpine3.12-amd64
 
 ARG GROUP_ID
 ARG USER_ID
-ARG PROJECT_NAME
 ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
 ARG CERTIFICATE_AUTHORITY_PASSWORD
 
@@ -59,19 +58,17 @@ RUN \
 
 ENV HOME=/home/me
 RUN \
-  mkdir -p ${HOME}/app/${PROJECT_NAME}/backend && \
+  mkdir --parents ${HOME}/app && \
   chown \
     me:us \
-    ${HOME}/app \
-    ${HOME}/app/${PROJECT_NAME} \
-    ${HOME}/app/${PROJECT_NAME}/backend && \
+    ${HOME}/app && \
   ln -s ${HOME}/app /app
 
 ###########
 # As `me` #
 ###########
 USER me
-WORKDIR /app/${PROJECT_NAME}/backend
+WORKDIR /app
 
 # Install the tools specified in the manifest file `dotnet-tools.json`.
 # For a comprehensive list of tools see https://github.com/natemcmaster/dotnet-tools
@@ -92,25 +89,15 @@ RUN \
 
 RUN \
   mkdir ./src && \
-  mkdir ./test && \
-  mkdir -p /app/Infrastructure/backend/src && \
-  mkdir -p /app/Infrastructure/backend/test
+  mkdir ./test
 COPY \
   --chown=me:us \
-  ./${PROJECT_NAME}/backend/src/${PROJECT_NAME}.csproj \
+  ./src/Metabase.csproj \
   ./src/
 COPY \
   --chown=me:us \
-  ./${PROJECT_NAME}/backend/test/${PROJECT_NAME}.Tests.csproj \
+  ./test/Metabase.Tests.csproj \
   ./test/
-COPY \
-  --chown=me:us \
-  ./Infrastructure/backend/src/Infrastructure.csproj \
-  /app/Infrastructure/backend/src
-COPY \
-  --chown=me:us \
-  ./Infrastructure/backend/test/Infrastructure.Tests.csproj \
-  /app/Infrastructure/backend/test
 
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/aspnetapp/Dockerfile.alpine-x64
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/run-aspnetcore-https-development.md
@@ -124,12 +111,12 @@ COPY \
 RUN \
   # dotnet dev-certs https --export-path ./.secrets/https/icon.pfx --password crypticpassword && \
   # dotnet user-secrets --project ./src/Metabase.csproj set "Kestrel:Certificates:Development:Password" "crypticpassword" && \
-  dotnet user-secrets --project ./src/${PROJECT_NAME}.csproj set SendGridUser myuser && \
-  dotnet user-secrets --project ./src/${PROJECT_NAME}.csproj set SendGridKey mykey
+  dotnet user-secrets --project ./src/Metabase.csproj set SendGridUser myuser && \
+  dotnet user-secrets --project ./src/Metabase.csproj set SendGridKey mykey
 
 COPY \
   --chown=me:us \
-  ./${PROJECT_NAME}/backend/${PROJECT_NAME}.sln \
+  ./Metabase.sln \
   ./
 RUN \
   dotnet clean && \
@@ -277,10 +264,6 @@ RUN \
   mkdir -p ./src/bin && \
   mkdir -p ./src/obj && \
   mkdir -p ./test/bin && \
-  mkdir -p ./test/obj && \
-  mkdir -p /app/Infrastructure/backend/src/bin && \
-  mkdir -p /app/Infrastructure/backend/src/obj && \
-  mkdir -p /app/Infrastructure/backend/test/bin && \
-  mkdir -p /app/Infrastructure/backend/test/obj
+  mkdir -p ./test/obj
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
