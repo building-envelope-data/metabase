@@ -27,6 +27,9 @@
 7. Generate and trust a self-signed certificate authority and SSL certificates
    by running `make ssl`.
 8. Start all services and follow their logs by running `make up logs`.
+9. To see the web frontend navigate to `https://metabase.org:4041` in your
+   web browser and to see the GraphQL API navigate to
+   `https://metabase.org:4041/graphql/`.
 
 In another shell
 1. Drop into `ash` with the working directory `/app`, which is mounted to the
