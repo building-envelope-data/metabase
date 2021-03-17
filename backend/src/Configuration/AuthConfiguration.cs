@@ -1,8 +1,10 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,33 +88,33 @@ namespace Metabase.Configuration
                 _.LoginPath = "/users/login";
                 _.LogoutPath = "/me/logout";
                 _.ReturnUrlParameter = "returnTo";
-                // _.Events.OnValidatePrincipal = context =>
-                //         // Is there any security risk associated with adding scopes as is done below?
-                //     {
-                //         // The metabase frontend uses application cookies for
-                //         // user authentication and is allowed to read data,
-                //         // write data, and manage users. The corresponding
-                //         // policies use scopes, so we need to add them.
-                //         var identity = new ClaimsIdentity();
-                //         foreach (
-                //             var claim in
-                //                 new[] {
-                //                 ReadApiScope,
-                //                 WriteApiScope,
-                //                 ManageUserApiScope
-                //                 }
-                //         )
-                //         {
-                //             identity.AddClaim(
-                //                 new Claim(
-                //                     OpenIddictConstants.Claims.Private.Scope,
-                //                     claim
-                //                     )
-                //                 );
-                //         }
-                //         context?.Principal?.AddIdentity(identity);
-                //         return Task.CompletedTask;
-                //     };
+                _.Events.OnValidatePrincipal = context =>
+                        // TODO Is there any security risk associated with adding scopes as is done below?
+                    {
+                        // The metabase frontend uses application cookies for
+                        // user authentication and is allowed to read data,
+                        // write data, and manage users. The corresponding
+                        // policies use scopes, so we need to add them.
+                        var identity = new ClaimsIdentity();
+                        foreach (
+                            var claim in
+                                new[] {
+                                ReadApiScope,
+                                WriteApiScope,
+                                ManageUserApiScope
+                                }
+                        )
+                        {
+                            identity.AddClaim(
+                                new Claim(
+                                    OpenIddictConstants.Claims.Private.Scope,
+                                    claim
+                                    )
+                                );
+                        }
+                        context?.Principal?.AddIdentity(identity);
+                        return Task.CompletedTask;
+                    };
                 }
             );
         }
