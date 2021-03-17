@@ -128,7 +128,7 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		database \
 		psql \
 		--username postgres \
-		--dbname xbase
+		--dbname xbase_development
 .PHONY : psql
 
 shelld : ## Enter shell in a fresh `database` container
@@ -144,7 +144,7 @@ createdb : ## Create databases
 		database \
 		bash -c " \
 			createdb --username postgres xbase_test ; \
-			createdb --username postgres xbase \
+			createdb --username postgres xbase_development ; \
 		"
 .PHONY : createdb
 
