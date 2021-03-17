@@ -47,14 +47,14 @@ const navItems = [
 ];
 
 const Layout: React.FunctionComponent = ({ children }) => {
-  const [session] = useSession();
+  // const [session] = useSession();
   const appTitle = `Building Envelope Data`;
 
-  useEffect(() => {
-    if (session?.error === "RefreshAccessTokenError") {
-      signIn(); // Force sign in to hopefully resolve error
-    }
-  }, [session]);
+  // useEffect(() => {
+  //   if (session?.error === "RefreshAccessTokenError") {
+  //     signIn(); // Force sign in to hopefully resolve error
+  //   }
+  // }, [session]);
 
   return (
     <AntLayout>

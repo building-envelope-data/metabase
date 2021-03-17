@@ -7,9 +7,9 @@ import {
   useLogoutUserMutation,
 } from "../queries/currentUser.graphql";
 import paths from "../paths";
-// import { initializeApollo } from "../lib/apollo";
+import { initializeApollo } from "../lib/apollo";
 import { useState } from "react";
-import { signIn, signOut } from "next-auth/client";
+// import { signIn, signOut } from "next-auth/client";
 
 type NavItemProps = {
   path: string;
@@ -23,7 +23,7 @@ export type NavBarProps = {
 export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
   const router = useRouter();
   const currentUser = useCurrentUserQuery()?.data?.currentUser;
-  // const apolloClient = initializeApollo();
+  const apolloClient = initializeApollo();
   const [logoutUserMutation] = useLogoutUserMutation();
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -40,9 +40,9 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
         );
       } else {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        // await apolloClient.resetStore();
-        signOut();
-        // await router.push(paths.userLogin);
+        await apolloClient.resetStore();
+        await router.push(paths.userLogin);
+        // signOut();
       }
     } finally {
       setLoggingOut(false);
@@ -66,10 +66,12 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
       ) : (
         <>
           <Menu.Item>
-            {/* TODO Instead of the provider id `metabase` use a global constant. It must match the one set in `[...nextauth].ts` */}
-            <Button type="link" onClick={() => signIn("metabase")}>
+            {/* Instead of the provider id `metabase` use a global constant. It must match the one set in `[...nextauth].ts` */}
+            {/* <Button type="link" onClick={() => signIn("metabase")}>
               Login
-            </Button>
+            </Button> */}
+            {/* Instead of the provider id `metabase` use a global constant. It must match the one set in `[...nextauth].ts` */}
+            <Link href={paths.userLogin}>Login</Link>
           </Menu.Item>
           <Menu.Item key={paths.userRegister}>
             <Link href={paths.userRegister}>Register</Link>

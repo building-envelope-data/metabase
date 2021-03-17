@@ -18,7 +18,8 @@ const OpenIdConnectClient = () => {
       {!session && (
         <>
           Not signed in <br />
-          <button onClick={() => signIn()}>Sign in</button>
+          {/* TODO Instead of the provider id `metabase` use a global constant. It must match the one set in `[...nextauth].ts` */}
+          <button onClick={() => signIn("metabase")}>Sign in</button>
         </>
       )}
       {session && (
