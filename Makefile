@@ -483,6 +483,9 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 				exit 0 \
 			) || echo \"PFX file is invalid\" \
 			"
+	mkdir --parents ./backend/ssl
+	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx ./backend/src/jwt-encryption-certificate.pfx
+	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx ./backend/src/jwt-signing-certificate.pfx
 .PHONY : generate-ssl-certificate
 
 fetch-ssl-certificate : ## Fetch the SSL certificate of the server
