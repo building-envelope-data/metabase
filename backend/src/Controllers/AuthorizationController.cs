@@ -46,8 +46,6 @@ namespace Metabase.Controllers
         }
 
         #region Authorization code, implicit and hybrid flows
-        // Note: to support interactive flows like the code flow,
-        // you must provide your own authorization endpoint action:
 
         [HttpGet("~/connect/authorize")]
         [HttpPost("~/connect/authorize")]
@@ -321,7 +319,7 @@ namespace Metabase.Controllers
         #endregion
 
         #region Device flow
-        // Note: to support the device flow, you must provide your own verification endpoint action:
+
         [Authorize, HttpGet("~/connect/verify")]
         public async Task<IActionResult> Verify()
         {
@@ -422,8 +420,6 @@ namespace Metabase.Controllers
         #endregion
 
         #region Logout support for interactive flows like code and implicit
-        // Note: the logout action is only useful when implementing interactive
-        // flows like the authorization code flow or the implicit flow.
 
         [HttpGet("~/connect/logout")]
         public IActionResult Logout() => View();
@@ -449,8 +445,6 @@ namespace Metabase.Controllers
         #endregion
 
         #region Password, authorization code, device and refresh token flows
-        // Note: to support non-interactive flows like password,
-        // you must provide your own token endpoint action:
 
         [HttpPost("~/connect/token"), Produces("application/json")]
         public async Task<IActionResult> Exchange()
