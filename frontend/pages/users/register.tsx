@@ -63,8 +63,9 @@ function Register() {
           !data?.registerUser?.errors &&
           data?.registerUser?.user
         ) {
+          // TODO return to does not work like this because user is not automatically logged-in after registering. Return-to would need to be in the confirmation link sent via email ...
           await router.push(
-            typeof returnTo === "string" ? returnTo : paths.home
+            typeof returnTo === "string" ? returnTo : paths.userCheckYourInbox
           );
         }
       } catch (error) {

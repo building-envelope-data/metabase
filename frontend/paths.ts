@@ -16,6 +16,7 @@ export default {
   userForgotPassword: "/users/forgot-password",
   userSendTwoFactorCode: "/users/send-two-factor-code",
   userVerifyTwoFactorCode: "/users/verify-two-factor-code",
+  userCheckYourInbox: "/users/check-your-inbox",
   dataFormats: "/data-formats",
   dataFormat(uuid: string) {
     return `/data-formats/${encodeURIComponent(uuid)}`;
