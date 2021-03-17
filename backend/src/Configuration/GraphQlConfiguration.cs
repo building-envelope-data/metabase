@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
-using GraphQlX = Metabase.GraphQl;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
 
 namespace Metabase.Configuration
@@ -20,9 +19,9 @@ namespace Metabase.Configuration
         {
               services.AddGraphQLServer()
               // Scalars
-              .BindRuntimeType<uint, GraphQlX.Common.UIntType>()
+              .BindRuntimeType<uint, GraphQl.Common.UIntType>()
               // Types
-              .AddType<GraphQlX.Common.OpenEndedDateTimeRangeType>()
+              .AddType<GraphQl.Common.OpenEndedDateTimeRangeType>()
               // Extensions
               .AddProjections()
               .AddFiltering()
@@ -56,7 +55,7 @@ namespace Metabase.Configuration
                 // TODO Persisted queries
                 /* .AddFileSystemQueryStorage("./persisted_queries") */
                 /* .UsePersistedQueryPipeline(); */
-                /* TODO services.AddDiagnosticObserver<GraphQlX.DiagnosticObserver>(); */
+                /* TODO services.AddDiagnosticObserver<GraphQl.DiagnosticObserver>(); */
                     .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
                     {
                         // HotChocolate uses the default cookie authentication
@@ -72,55 +71,55 @@ namespace Metabase.Configuration
                             httpContext.User = authenticateResult.Principal;
                         }
                     })
-                    .AddQueryType(d => d.Name(nameof(GraphQlX.Query)))
-                        .AddType<GraphQlX.Components.ComponentQueries>()
-                        .AddType<GraphQlX.DataFormats.DataFormatQueries>()
-                        .AddType<GraphQlX.Databases.DatabaseQueries>()
-                        .AddType<GraphQlX.Institutions.InstitutionQueries>()
-                        .AddType<GraphQlX.Methods.MethodQueries>()
-                        .AddType<GraphQlX.OpenIdConnect.OpendIdConnectQueries>()
-                        .AddType<GraphQlX.Users.UserQueries>()
-                    .AddMutationType(d => d.Name(nameof(GraphQlX.Mutation)))
-                        .AddType<GraphQlX.Components.ComponentMutations>()
-                        .AddType<GraphQlX.DataFormats.DataFormatMutations>()
-                        .AddType<GraphQlX.Databases.DatabaseMutations>()
-                        .AddType<GraphQlX.Institutions.InstitutionMutations>()
-                        .AddType<GraphQlX.Methods.MethodMutations>()
-                        .AddType<GraphQlX.Users.UserMutations>()
+                    .AddQueryType(d => d.Name(nameof(GraphQl.Query)))
+                        .AddType<GraphQl.Components.ComponentQueries>()
+                        .AddType<GraphQl.DataFormats.DataFormatQueries>()
+                        .AddType<GraphQl.Databases.DatabaseQueries>()
+                        .AddType<GraphQl.Institutions.InstitutionQueries>()
+                        .AddType<GraphQl.Methods.MethodQueries>()
+                        .AddType<GraphQl.OpenIdConnect.OpendIdConnectQueries>()
+                        .AddType<GraphQl.Users.UserQueries>()
+                    .AddMutationType(d => d.Name(nameof(GraphQl.Mutation)))
+                        .AddType<GraphQl.Components.ComponentMutations>()
+                        .AddType<GraphQl.DataFormats.DataFormatMutations>()
+                        .AddType<GraphQl.Databases.DatabaseMutations>()
+                        .AddType<GraphQl.Institutions.InstitutionMutations>()
+                        .AddType<GraphQl.Methods.MethodMutations>()
+                        .AddType<GraphQl.Users.UserMutations>()
                     /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
                     /*     .AddType<ComponentSubscriptions>() */
                     // Object Types
-                    .AddType<GraphQlX.Components.ComponentType>()
-                    .AddType<GraphQlX.DataFormats.DataFormatType>()
-                    .AddType<GraphQlX.Databases.DatabaseType>()
-                    .AddType<GraphQlX.Institutions.InstitutionType>()
-                    .AddType<GraphQlX.Methods.MethodType>()
-                    .AddType<GraphQlX.Numerations.NumerationType>()
-                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectApplicationType>()
-                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectAuthorizationType>()
-                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectScopeType>()
-                    .AddType<GraphQlX.OpenIdConnect.OpenIdConnectTokenType>()
-                    .AddType<GraphQlX.Publications.PublicationType>()
-                    .AddType<GraphQlX.References.ReferenceType>()
-                    .AddType<GraphQlX.Stakeholders.StakeholderType>()
-                    .AddType<GraphQlX.Standards.StandardType>()
-                    .AddType<GraphQlX.Users.UserType>()
+                    .AddType<GraphQl.Components.ComponentType>()
+                    .AddType<GraphQl.DataFormats.DataFormatType>()
+                    .AddType<GraphQl.Databases.DatabaseType>()
+                    .AddType<GraphQl.Institutions.InstitutionType>()
+                    .AddType<GraphQl.Methods.MethodType>()
+                    .AddType<GraphQl.Numerations.NumerationType>()
+                    .AddType<GraphQl.OpenIdConnect.OpenIdConnectApplicationType>()
+                    .AddType<GraphQl.OpenIdConnect.OpenIdConnectAuthorizationType>()
+                    .AddType<GraphQl.OpenIdConnect.OpenIdConnectScopeType>()
+                    .AddType<GraphQl.OpenIdConnect.OpenIdConnectTokenType>()
+                    .AddType<GraphQl.Publications.PublicationType>()
+                    .AddType<GraphQl.References.ReferenceType>()
+                    .AddType<GraphQl.Stakeholders.StakeholderType>()
+                    .AddType<GraphQl.Standards.StandardType>()
+                    .AddType<GraphQl.Users.UserType>()
                     // Data Loaders
-                    .AddDataLoader<GraphQlX.Components.ComponentByIdDataLoader>()
-                    .AddDataLoader<GraphQlX.DataFormats.DataFormatByIdDataLoader>()
-                    .AddDataLoader<GraphQlX.Databases.DatabaseByIdDataLoader>()
-                    .AddDataLoader<GraphQlX.Institutions.InstitutionByIdDataLoader>()
-                    .AddDataLoader<GraphQlX.Institutions.InstitutionRepresentativesByInstitutionIdDataLoader>()
-                    .AddDataLoader<GraphQlX.Methods.MethodByIdDataLoader>()
+                    .AddDataLoader<GraphQl.Components.ComponentByIdDataLoader>()
+                    .AddDataLoader<GraphQl.DataFormats.DataFormatByIdDataLoader>()
+                    .AddDataLoader<GraphQl.Databases.DatabaseByIdDataLoader>()
+                    .AddDataLoader<GraphQl.Institutions.InstitutionByIdDataLoader>()
+                    .AddDataLoader<GraphQl.Institutions.InstitutionRepresentativesByInstitutionIdDataLoader>()
+                    .AddDataLoader<GraphQl.Methods.MethodByIdDataLoader>()
                     // Filtering
                     .AddConvention<IFilterConvention>(
                      new FilterConventionExtension(descriptor =>
                        {
-                           descriptor.BindRuntimeType<Data.Component, GraphQlX.Components.ComponentFilterType>();
-                           descriptor.BindRuntimeType<Data.DataFormat, GraphQlX.DataFormats.DataFormatFilterType>();
-                           descriptor.BindRuntimeType<Data.Database, GraphQlX.Databases.DatabaseFilterType>();
-                           descriptor.BindRuntimeType<Data.Institution, GraphQlX.Institutions.InstitutionFilterType>();
-                           descriptor.BindRuntimeType<Data.Method, GraphQlX.Methods.MethodFilterType>();
+                           descriptor.BindRuntimeType<Data.Component, GraphQl.Components.ComponentFilterType>();
+                           descriptor.BindRuntimeType<Data.DataFormat, GraphQl.DataFormats.DataFormatFilterType>();
+                           descriptor.BindRuntimeType<Data.Database, GraphQl.Databases.DatabaseFilterType>();
+                           descriptor.BindRuntimeType<Data.Institution, GraphQl.Institutions.InstitutionFilterType>();
+                           descriptor.BindRuntimeType<Data.Method, GraphQl.Methods.MethodFilterType>();
                        }
                        )
                      )
