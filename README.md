@@ -1,13 +1,3 @@
-Clone the project and initialize submodules by running
-```shell
-git clone git@gitlab.cc-asp.fraunhofer.de:ise621/icon.git
-cd icon
-git submodule init
-git submodule update
-```
-For an introduction to submodules see
-[Git submodules](https://www.atlassian.com/git/tutorials/git-submodule)
-
 The product identifier service should provide the following endpoints:
 * Obtain a new product identifier possibly associating internal meta information with it, like a custom string or a JSON blob
 * Update the meta information of one of your product identifiers
