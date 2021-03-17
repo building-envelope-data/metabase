@@ -40,8 +40,6 @@ services:
       # Create anonymous volumes for dotnet tools
       - /home/me/.nuget
       - /home/me/.dotnet
-    ports:
-      - 5000:8080
     environment:
       # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
       # - XBASE_DATABASE__CONNECTION_STRING="Host=database;Port=5432;Database=xbase_development;User Id=postgres;Password=postgres;"
