@@ -38,7 +38,7 @@ function Login() {
           variables: {
             email: email,
             password: password,
-            rememberMe: rememberMe,
+            rememberMe: rememberMe ?? false,
           },
         });
         handleFormErrors(
