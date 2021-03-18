@@ -14,7 +14,6 @@ namespace Metabase
         public static async Task Main(string[] commandLineArguments)
         {
             var host = CreateHostBuilder(commandLineArguments).Build();
-            // TODO Shall we really seed here?
             await CreateAndSeedDbIfNotExists(host).ConfigureAwait(false);
             host.Run();
         }

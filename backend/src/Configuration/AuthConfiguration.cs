@@ -356,7 +356,7 @@ namespace Metabase.Configuration
                     //     {
                     //         IssuerSigningKey = signingKey,
                     //         TokenDecryptionKey = encryptionKey,
-                    //         // ValidIssuer = "https://metabase.org:4041/",
+                    //         // ValidIssuer = environment.IsEnvironment("test") ? "http://localhost/" : appSettings.Host,
                     //         ValidateActor = false,
                     //         ValidateAudience = false,
                     //         ValidateIssuer = false,

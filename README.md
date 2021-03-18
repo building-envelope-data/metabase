@@ -20,16 +20,17 @@
    `git clone git@github.com:ise621/metabase.git` and navigate
    into the new directory `metabase` by running `cd metabase`.
 4. Prepare your environment by running `cp .env.sample .env` and adding the
-   line `127.0.0.1 metabase.org` to your `/etc/hosts` file.
+   line `127.0.0.1 local.buildingenvelopedata.org` to your `/etc/hosts` file.
 5. Install [Docker Desktop](https://www.docker.com/products/docker-desktop), and
    [GNU Make](https://www.gnu.org/software/make/).
 6. List all GNU Make targets by running `make help`.
 7. Generate and trust a self-signed certificate authority and SSL certificates
    by running `make ssl`.
 8. Start all services and follow their logs by running `make up logs`.
-9. To see the web frontend navigate to `https://metabase.org:4041` in your
-   web browser and to see the GraphQL API navigate to
-   `https://metabase.org:4041/graphql/`.
+9. To see the web frontend navigate to
+   `https://local.buildingenvelopedata.org:4041` in your web browser and to see
+   the GraphQL API navigate to
+   `https://local.buildingenvelopedata.org:4041/graphql/`.
 
 In another shell
 1. Drop into `ash` with the working directory `/app`, which is mounted to the

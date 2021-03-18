@@ -30,6 +30,7 @@ namespace Metabase.Data
             if (await manager.FindByClientIdAsync("metabase").ConfigureAwait(false) is null)
             {
                 logger.LogDebug("Creating application client 'metabase'");
+                var appSettings = services.GetRequiredService<AppSettings>();
                 await manager.CreateAsync(
                     new OpenIddictApplicationDescriptor
                     {
@@ -43,11 +44,11 @@ namespace Metabase.Data
                         },
                         PostLogoutRedirectUris =
                         {
-                            new Uri(testEnvironment ? "urn:test" : "https://metabase.org:4041/logout-callback") // TODO Use correct URI
+                            new Uri(testEnvironment ? "urn:test" : $"{appSettings.Host}/users/login")
                         },
                         RedirectUris =
                         {
-                            new Uri(testEnvironment ? "urn:test" : "https://metabase.org:4041/api/auth/callback/metabase") // TODO Use correct URI
+                            new Uri(testEnvironment ? "urn:test" : $"{appSettings.Host}/api/auth/callback/metabase")
                         },
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,

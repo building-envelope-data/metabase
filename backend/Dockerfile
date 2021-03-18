@@ -176,7 +176,7 @@ RUN \
 # var response =
 #    await client
 #    .PostAsync(
-#    "https://metabase.org:4041/graphql/",
+#    "https://local.buildingenvelopedata.org:4041/graphql/",
 #    content
 #    );
 # ```
