@@ -156,7 +156,7 @@ namespace Metabase.GraphQl.Users
                 }
                 return new ConfirmUserEmailChangePayload(errors);
             }
-            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO Refresh access token?
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new ConfirmUserEmailChangePayload(user);
         }
 
@@ -625,7 +625,7 @@ namespace Metabase.GraphQl.Users
                 }
                 return new ChangeUserPasswordPayload(user, errors);
             }
-            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO What exactly does this do? Refresh the cookie? Then it is unnecessary for us! https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinmanager-1.refreshsigninasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Identity_SignInManager_1_RefreshSignInAsync__0_
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new ChangeUserPasswordPayload(user);
         }
 
@@ -698,7 +698,7 @@ namespace Metabase.GraphQl.Users
                 }
                 return new DeletePersonalUserDataPayload(user, errors);
             }
-            await signInManager.SignOutAsync().ConfigureAwait(false); // TODO Invalidate access tokens here!
+            await signInManager.SignOutAsync().ConfigureAwait(false);
             return new DeletePersonalUserDataPayload(user);
         }
 
@@ -868,7 +868,7 @@ namespace Metabase.GraphQl.Users
                 }
                 return new SetUserPhoneNumberPayload(user, errors);
             }
-            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO Refresh access token?
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new SetUserPhoneNumberPayload(user);
         }
 
@@ -968,7 +968,7 @@ namespace Metabase.GraphQl.Users
                 }
                 return new SetUserPasswordPayload(user, errors);
             }
-            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false); // TODO What exactly does this do? Refresh the cookie? Then it is unnecessary for us! https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinmanager-1.refreshsigninasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Identity_SignInManager_1_RefreshSignInAsync__0_
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new SetUserPasswordPayload(user);
         }
 
