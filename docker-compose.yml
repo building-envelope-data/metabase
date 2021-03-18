@@ -19,10 +19,12 @@ services:
         - CERTIFICATE_AUTHORITY_PASSWORD=${CERTIFICATE_AUTHORITY_PASSWORD}
     # user: 1000:1000
     command: [
-      "dotnet", "run",
+      "dotnet", "watch",
+      "--project", "./src/Metabase.csproj",
+      "--",
+      "run",
       "--no-launch-profile",
-      "--runtime", "linux-musl-x64",
-      "--project", "./src/Metabase.csproj"
+      "--runtime", "linux-musl-x64"
       ]
       # "--no-restore",
       # ["dotnet", "watch", "run", "--no-restore"]
@@ -48,6 +50,7 @@ services:
       - XBASE_HOST=https://${HOST}:${HTTPS_PORT}
       - XBASE_JsonWebToken__EncryptionKey=${JSON_WEB_TOKEN_ENCRYPTION_KEY}
       - XBASE_JsonWebToken__SigningKey=${JSON_WEB_TOKEN_SIGNING_KEY}
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       # - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_CERTIFICATE_PASSWORD}
       # - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
