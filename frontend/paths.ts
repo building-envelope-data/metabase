@@ -29,6 +29,5 @@ export default {
   component(uuid: string) {
     return `/components/${encodeURIComponent(uuid)}`;
   },
-  openIdConnectClient: "/openIdConnectClient",
   openIdConnect: "/openIdConnect",
 };

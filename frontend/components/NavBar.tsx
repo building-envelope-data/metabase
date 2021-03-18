@@ -9,7 +9,6 @@ import {
 import paths from "../paths";
 import { initializeApollo } from "../lib/apollo";
 import { useState } from "react";
-// import { signIn, signOut } from "next-auth/client";
 
 type NavItemProps = {
   path: string;

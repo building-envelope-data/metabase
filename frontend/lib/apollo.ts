@@ -15,10 +15,7 @@ export type ResolverContext = {
   res?: ServerResponse;
 };
 
-function createIsomorphLink(
-  context: ResolverContext = {},
-  accessToken?: string
-) {
+function createIsomorphLink(context: ResolverContext = {}) {
   return createHttpLink({
     uri:
       // In the case `typeof window === "undefined"`, that is on the server
@@ -35,29 +32,26 @@ function createIsomorphLink(
     useGETForQueries: true,
     credentials: "same-origin",
     headers: {
-      authorization: accessToken ? `Bearer ${accessToken}` : "",
       cookie: context.req ? context.req.headers.cookie : null,
     },
   });
 }
 
-function createApolloClient(context?: ResolverContext, accessToken?: string) {
+function createApolloClient(context?: ResolverContext) {
   return new ApolloClient({
     ssrMode: typeof window === "undefined",
-    link: createIsomorphLink(context, accessToken),
+    link: createIsomorphLink(context),
     cache: new InMemoryCache(),
   });
 }
 
 export function initializeApollo(
   initialState: any = null,
-  accessToken?: string,
   // Pages with Next.js data fetching methods, like `getStaticProps`, can send
   // a custom context which will be used by `SchemaLink` to server render pages
   context?: ResolverContext
 ) {
-  const _apolloClient =
-    apolloClient ?? createApolloClient(context, accessToken);
+  const _apolloClient = apolloClient ?? createApolloClient(context);
 
   // If your page has Next.js data fetching methods that use Apollo Client, the initial state
   // get hydrated here
@@ -77,10 +71,7 @@ export function initializeApollo(
   return _apolloClient;
 }
 
-export function useApollo(initialState: any, accessToken?: string) {
-  const store = useMemo(() => initializeApollo(initialState, accessToken), [
-    initialState,
-    accessToken,
-  ]);
+export function useApollo(initialState: any) {
+  const store = useMemo(() => initializeApollo(initialState), [initialState]);
   return store;
 }
