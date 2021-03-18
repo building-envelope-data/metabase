@@ -47,9 +47,10 @@ services:
       # - XBASE_DATABASE__CONNECTION_STRING="Host=database;Port=5432;Database=xbase_development;User Id=postgres;Password=postgres;"
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=development
-      - XBASE_HOST=https://${HOST}:${HTTPS_PORT}
+      - XBASE_Host=https://${HOST}:${HTTPS_PORT}
       - XBASE_JsonWebToken__EncryptionKey=${JSON_WEB_TOKEN_ENCRYPTION_KEY}
       - XBASE_JsonWebToken__SigningKey=${JSON_WEB_TOKEN_SIGNING_KEY}
+      - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       # - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_CERTIFICATE_PASSWORD}

@@ -33,11 +33,13 @@ namespace Metabase.Data
             {
                 logger.LogDebug("Creating application client 'testlab-solar-facades'");
                 var host = environment.IsProduction() ? "testlab-solar-facades.de" : "local.testlab-solar-facades.de:5051";
+                var appSettings = services.GetRequiredService<AppSettings>();
                 await manager.CreateAsync(
                     new OpenIddictApplicationDescriptor
                     {
                         ClientId = "testlab-solar-facades",
-                        ClientSecret = "secret", // TODO Do not hardcode secret here. It is also needed in tests, see `IntegrationTests#RequestAuthToken`. See also frontend `.env.*` `AUTH_CLIENT_SECRET`
+                        // The secret is used in tests, see `IntegrationTests#RequestAuthToken` and in the database frontned, see `AUTH_CLIENT_SECRET` in `/frontend/.env.*`.
+                        ClientSecret = appSettings.TestlabSolarFacadesOpenIdConnectClientSecret,
                         ConsentType = environment.IsEnvironment("test") ? OpenIddictConstants.ConsentTypes.Systematic : OpenIddictConstants.ConsentTypes.Explicit,
                         DisplayName = "Testlab-Solar-Facades client application",
                         DisplayNames =
@@ -69,7 +71,10 @@ namespace Metabase.Data
                             OpenIddictConstants.Permissions.Scopes.Roles,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ReadApiScope,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.WriteApiScope,
-                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ManageUserApiScope, // TODO Only add this scope in test environment.
+                            // Is there a better way to optionally add a value to a hash set inline?
+                            environment.IsEnvironment("test")
+                            ? OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ManageUserApiScope
+                            : OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ReadApiScope,
                         },
                         Requirements =
                         {

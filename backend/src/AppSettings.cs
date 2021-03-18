@@ -28,6 +28,9 @@ namespace Metabase
             = "";
         }
 
+        public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }
+        = "";
+
         public DatabaseSettings Database { get; set; }
         = new DatabaseSettings();
 
