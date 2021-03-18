@@ -21,8 +21,16 @@ function createIsomorphLink(
 ) {
   return createHttpLink({
     uri:
+      // In the case `typeof window === "undefined"`, that is on the server
+      // side, because we require HTTPS for the JWT bearer token, we cannot use
+      // "http://backend:8080/graphql/" to make local requests. When the reverse
+      // proxy NGINX serves the certificate like in development we could use
+      // "https://nginx:443/graphql/" to make local requests, which this does
+      // however not work in production. Thus, on the server side we also use
+      // `${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/` as on the client
+      // side.
       typeof window === "undefined"
-        ? "http://backend:8080/graphql/"
+        ? `${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`
         : `${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`,
     useGETForQueries: true,
     credentials: "same-origin",
