@@ -135,7 +135,7 @@ namespace Metabase.GraphQl.Methods
                             mainNumber: input.Standard.Numeration.MainNumber,
                             suffix: input.Standard.Numeration.Suffix
                        )
-                 },
+                     },
                 Publication =
                     input.Publication is null
                     ? null
