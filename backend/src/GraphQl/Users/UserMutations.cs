@@ -269,7 +269,8 @@ namespace Metabase.GraphQl.Users
         public async Task<RegisterUserPayload> RegisterUserAsync(
             RegisterUserInput input,
             [ScopedService] UserManager<Data.User> userManager,
-            [Service] Services.IEmailSender emailSender
+            [Service] Services.IEmailSender emailSender,
+            [Service] AppSettings appSettings
             )
         {
             var user = new Data.User(
@@ -370,7 +371,8 @@ namespace Metabase.GraphQl.Users
             await SendUserEmailConfirmation(
                 input.Email,
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
-                emailSender
+                emailSender,
+                appSettings.Host
                 ).ConfigureAwait(false);
             return new RegisterUserPayload(user);
         }
@@ -381,7 +383,8 @@ namespace Metabase.GraphQl.Users
         public async Task<ResendUserEmailConfirmationPayload> ResendUserEmailConfirmationAsync(
             ResendUserEmailConfirmationInput input,
             [ScopedService] UserManager<Data.User> userManager,
-            [Service] Services.IEmailSender emailSender
+            [Service] Services.IEmailSender emailSender,
+            [Service] AppSettings appSettings
             )
         {
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -391,7 +394,8 @@ namespace Metabase.GraphQl.Users
                 await SendUserEmailConfirmation(
                     input.Email,
                     await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
-                    emailSender
+                    emailSender,
+                    appSettings.Host
                     ).ConfigureAwait(false);
             }
             return new ResendUserEmailConfirmationPayload();
@@ -712,7 +716,8 @@ namespace Metabase.GraphQl.Users
             ChangeUserEmailInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [ScopedService] UserManager<Data.User> userManager,
-            [Service] Services.IEmailSender emailSender
+            [Service] Services.IEmailSender emailSender,
+            [Service] AppSettings appSettings
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -742,7 +747,8 @@ namespace Metabase.GraphQl.Users
             await SendUserEmailConfirmation(
                 input.NewEmail,
                 await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),
-                emailSender
+                emailSender,
+                appSettings.Host
                 ).ConfigureAwait(false);
             return new ChangeUserEmailPayload(user);
         }
@@ -754,7 +760,8 @@ namespace Metabase.GraphQl.Users
         public async Task<ResendUserEmailVerificationPayload> ResendUserEmailVerificationAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [ScopedService] UserManager<Data.User> userManager,
-            [Service] Services.IEmailSender emailSender
+            [Service] Services.IEmailSender emailSender,
+            [Service] AppSettings appSettings
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -771,7 +778,8 @@ namespace Metabase.GraphQl.Users
             await SendUserEmailConfirmation(
                 await userManager.GetEmailAsync(user).ConfigureAwait(false),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
-                emailSender
+                emailSender,
+                appSettings.Host
                 ).ConfigureAwait(false);
             return new ResendUserEmailVerificationPayload(user);
         }
@@ -975,14 +983,15 @@ namespace Metabase.GraphQl.Users
         private static async Task SendUserEmailConfirmation(
             string email,
             string confirmationToken,
-            Services.IEmailSender emailSender
+            Services.IEmailSender emailSender,
+            string host
             )
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendEmailAsync(
                 email,
                 "Confirm your email",
-                $"Please confirm your email address by clicking the link https://TODO/users/confirm-email?email={email}&confirmationCode={confirmationCode}.")
+                $"Please confirm your email address by clicking the link {host}/users/confirm-email?email={email}&confirmationCode={confirmationCode}.")
                 .ConfigureAwait(false);
         }
 
