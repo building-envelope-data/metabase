@@ -30,7 +30,7 @@ namespace Metabase
                  .CreateDbContext();
                 if (dbContext.Database.EnsureCreated())
                 {
-                    await Data.DbSeeder.DoAsync(services, testEnvironment: false).ConfigureAwait(false);
+                    await Data.DbSeeder.DoAsync(services).ConfigureAwait(false);
                 }
             }
             catch (Exception exception)

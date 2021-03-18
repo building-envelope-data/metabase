@@ -38,7 +38,6 @@ namespace Metabase
                 .AddCommandLine(commandLineArguments)
               .Build();
             _appSettings = _configuration.Get<AppSettings>();
-
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -51,6 +50,7 @@ namespace Metabase
             ConfigureSessionServices(services);
             services.AddHealthChecks();
             services.AddSingleton(_appSettings);
+            services.AddSingleton(_environment);
             // services.AddDatabaseDeveloperPageExceptionFilter();
         }
 

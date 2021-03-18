@@ -65,12 +65,7 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
         </Menu.Item>
       ) : (
         <>
-          <Menu.Item>
-            {/* Instead of the provider id `metabase` use a global constant. It must match the one set in `[...nextauth].ts` */}
-            {/* <Button type="link" onClick={() => signIn("metabase")}>
-              Login
-            </Button> */}
-            {/* Instead of the provider id `metabase` use a global constant. It must match the one set in `[...nextauth].ts` */}
+          <Menu.Item key={paths.userLogin}>
             <Link href={paths.userLogin}>Login</Link>
           </Menu.Item>
           <Menu.Item key={paths.userRegister}>

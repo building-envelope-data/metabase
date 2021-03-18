@@ -1,54 +1,56 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
+using Microsoft.Extensions.Hosting;
 
 namespace Metabase.Data
 {
     public sealed class DbSeeder
     {
         public static async Task DoAsync(
-            IServiceProvider services,
-            bool testEnvironment
+            IServiceProvider services
             )
         {
             var logger = services.GetRequiredService<ILogger<DbSeeder>>();
             logger.LogDebug("Seeding the database");
-            await RegisterApplicationsAsync(services, logger, testEnvironment).ConfigureAwait(false);
+            var environment = services.GetRequiredService<IWebHostEnvironment>();
+            await RegisterApplicationsAsync(services, logger, environment).ConfigureAwait(false);
             await RegisterScopesAsync(services, logger).ConfigureAwait(false);
         }
 
         private static async Task RegisterApplicationsAsync(
             IServiceProvider services,
             ILogger<DbSeeder> logger,
-            bool testEnvironment
+            IWebHostEnvironment environment
             )
         {
             var manager = services.GetRequiredService<IOpenIddictApplicationManager>();
-            if (await manager.FindByClientIdAsync("metabase").ConfigureAwait(false) is null)
+            if (await manager.FindByClientIdAsync("testlab-solar-facades").ConfigureAwait(false) is null)
             {
-                logger.LogDebug("Creating application client 'metabase'");
-                var appSettings = services.GetRequiredService<AppSettings>();
+                logger.LogDebug("Creating application client 'testlab-solar-facades'");
+                var host = environment.IsProduction() ? "testlab-solar-facades.de" : "local.testlab-solar-facades.de:5051";
                 await manager.CreateAsync(
                     new OpenIddictApplicationDescriptor
                     {
-                        ClientId = "metabase",
+                        ClientId = "testlab-solar-facades",
                         ClientSecret = "secret", // TODO Do not hardcode secret here. It is also needed in tests, see `IntegrationTests#RequestAuthToken`. See also frontend `.env.*` `AUTH_CLIENT_SECRET`
-                        ConsentType = testEnvironment ? OpenIddictConstants.ConsentTypes.Systematic : OpenIddictConstants.ConsentTypes.Explicit,
-                        DisplayName = "Metabase client application",
+                        ConsentType = environment.IsEnvironment("test") ? OpenIddictConstants.ConsentTypes.Systematic : OpenIddictConstants.ConsentTypes.Explicit,
+                        DisplayName = "Testlab-Solar-Facades client application",
                         DisplayNames =
                         {
-                            [CultureInfo.GetCultureInfo("de-DE")] = "Metabase-Klient-Anwendung"
+                            [CultureInfo.GetCultureInfo("de-DE")] = "Testlab-Solar-Facades-Klient-Anwendung"
                         },
                         PostLogoutRedirectUris =
                         {
-                            new Uri(testEnvironment ? "urn:test" : $"{appSettings.Host}/users/login")
+                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"https://{host}/users/login")
                         },
                         RedirectUris =
                         {
-                            new Uri(testEnvironment ? "urn:test" : $"{appSettings.Host}/api/auth/callback/metabase")
+                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"https://{host}/api/auth/callback/metabase")
                         },
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
@@ -57,17 +59,17 @@ namespace Metabase.Data
                             OpenIddictConstants.Permissions.Endpoints.Logout,
                             // OpenIddictConstants.Permissions.Endpoints.Revocation,
                             OpenIddictConstants.Permissions.Endpoints.Token,
-                            testEnvironment ? OpenIddictConstants.Permissions.GrantTypes.Password : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                            environment.IsEnvironment("test") ? OpenIddictConstants.Permissions.GrantTypes.Password : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                             // OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
                             // OpenIddictConstants.Permissions.GrantTypes.DeviceCode,
                             OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                            testEnvironment ? OpenIddictConstants.Permissions.ResponseTypes.Token : OpenIddictConstants.Permissions.ResponseTypes.Code,
+                            environment.IsEnvironment("test") ? OpenIddictConstants.Permissions.ResponseTypes.Token : OpenIddictConstants.Permissions.ResponseTypes.Code,
                             OpenIddictConstants.Permissions.Scopes.Email,
                             OpenIddictConstants.Permissions.Scopes.Profile,
                             OpenIddictConstants.Permissions.Scopes.Roles,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ReadApiScope,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.WriteApiScope,
-                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ManageUserApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ManageUserApiScope, // TODO Only add this scope in test environment.
                         },
                         Requirements =
                         {
