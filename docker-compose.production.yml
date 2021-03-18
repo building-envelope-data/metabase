@@ -20,16 +20,16 @@ services:
     image: registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon/metabase-backend-production:v0.0.0-482-g8c3c73a
     ports:
       - 8002:80
-    environment:
-      - XBASE_HOST=TODO
-      - XBASE_JsonWebToken__EncryptionKey=${JSON_WEB_TOKEN_ENCRYPTION_KEY}
-      - XBASE_JsonWebToken__SigningKey=${JSON_WEB_TOKEN_SIGNING_KEY}
     restart: always
     # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#command-line
     # command: ["dotnet", "App.dll", "/Logging:LogLevel:Default=Debug", "/Logging:LogLevel:Microsoft=Debug", "/Logging:LogLevel:Microsoft:Hosting:Lifetime=Debug"]
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - ASPNETCORE_ENVIRONMENT=production
+      - XBASE_Host=https://${HOST}:${HTTPS_PORT}
+      - XBASE_JsonWebToken__EncryptionKey=${JSON_WEB_TOKEN_ENCRYPTION_KEY}
+      - XBASE_JsonWebToken__SigningKey=${JSON_WEB_TOKEN_SIGNING_KEY}
+      - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
     volumes:
       - ./secrets:/run/secrets:ro
     depends_on:
@@ -40,6 +40,8 @@ services:
     ports:
       - 8001:80
     restart: always
+    environment:
+      - NODE_ENV=production
     depends_on:
       - backend
 
