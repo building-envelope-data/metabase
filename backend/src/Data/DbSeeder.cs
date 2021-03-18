@@ -32,7 +32,7 @@ namespace Metabase.Data
             if (await manager.FindByClientIdAsync("testlab-solar-facades").ConfigureAwait(false) is null)
             {
                 logger.LogDebug("Creating application client 'testlab-solar-facades'");
-                var host = environment.IsProduction() ? "testlab-solar-facades.de" : "local.testlab-solar-facades.de:5051";
+                var host = environment.IsProduction() ? "https://testlab-solar-facades.de" : "https://local.testlab-solar-facades.de:5051";
                 var appSettings = services.GetRequiredService<AppSettings>();
                 await manager.CreateAsync(
                     new OpenIddictApplicationDescriptor
@@ -48,11 +48,11 @@ namespace Metabase.Data
                         },
                         PostLogoutRedirectUris =
                         {
-                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"https://{host}/users/login")
+                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"{host}/users/login")
                         },
                         RedirectUris =
                         {
-                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"https://{host}/api/auth/callback/metabase")
+                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"{host}/api/auth/callback/metabase")
                         },
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
