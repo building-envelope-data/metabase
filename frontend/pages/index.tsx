@@ -1,46 +1,11 @@
-import Link from 'next/link'
-import { useState } from 'react' // useEffect
-// import { useRouter } from 'next/router'
-import {
-  useCurrentUserQuery,
-  useChangeUserEmailMutation,
-  CurrentUserDocument,
-} from '../queries/currentUser.graphql'
-// import { initializeApollo } from '../lib/apollo'
-import Layout from '../components/Layout'
+import { useCurrentUserQuery } from "../queries/currentUser.graphql";
+import Layout from "../components/Layout";
+import { Skeleton, Typography } from "antd";
 
 const Index = () => {
-  // const router = useRouter()
-  const { loading, error, data } = useCurrentUserQuery()
-  const currentUser = data?.currentUser
+  const { loading, error, data } = useCurrentUserQuery();
+  const currentUser = data?.currentUser;
   // const shouldRedirect = !(loading || error || currentUser)
-  const [newEmail, setNewEmail] = useState('')
-  const [changeUserEmailMutation] = useChangeUserEmailMutation({
-    update(cache, { data }) {
-      // Read the data from our cache for this query.
-      /* const { currentUser } = cache.readQuery({ query: CurrentUserDocument }) */
-      /* const newCurrentUser = { ...currentUser } */
-      // Add our comment from the mutation to the end.
-      /* newCurrentUser.email = data.changeUserEmail.user.email */
-      // Write our data back to the cache.
-      if (data?.changeUserEmail?.user)
-        cache.writeQuery(
-          {
-            query: CurrentUserDocument,
-            data: {
-              currentUser: data.changeUserEmail.user
-            }
-          }
-        )
-    }
-  })
-  const onChangeUserEmail = () => {
-    changeUserEmailMutation({
-      variables: {
-        newEmail: newEmail,
-      },
-    })
-  }
 
   // useEffect(() => {
   //   if (shouldRedirect) {
@@ -52,9 +17,9 @@ const Index = () => {
   if (loading) {
     return (
       <Layout>
-        <p>Loading ...</p>
+        <Skeleton />
       </Layout>
-    )
+    );
   }
 
   if (error) {
@@ -62,35 +27,22 @@ const Index = () => {
       <Layout>
         <p>{error.message}</p>
       </Layout>
-    )
+    );
   }
 
   if (currentUser) {
     return (
       <Layout>
-        <div>
-          You're signed in as {currentUser.email} and you're {currentUser.id}. Go to the{' '}
-          <Link href="/about">
-            <a>about</a>
-          </Link>{' '}
-          page.
-          <div>
-            <input
-              type="text"
-              placeholder="your new email..."
-              onChange={(e) => setNewEmail(e.target.value)}
-            />
-            <input type="button" value="change" onClick={onChangeUserEmail} />
-          </div>
-        </div>
+        <Typography.Paragraph>
+          You're signed in as {currentUser.name}, your email address it{" "}
+          {currentUser.email}, and your UUID is {currentUser.uuid}.
+        </Typography.Paragraph>
       </Layout>
-    )
+    );
   }
 
-  return (
-    <Layout>You're not sigend in.</Layout>
-  )
-}
+  return <Layout>You're not sigend in.</Layout>;
+};
 
 // export async function getStaticProps() {
 //   const apolloClient = initializeApollo()
@@ -106,4 +58,4 @@ const Index = () => {
 //   }
 // }
 
-export default Index
+export default Index;
