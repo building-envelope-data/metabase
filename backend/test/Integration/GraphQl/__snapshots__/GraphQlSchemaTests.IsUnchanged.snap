@@ -267,6 +267,17 @@ type DeletePersonalUserDataPayload {
   user: User
 }
 
+type DisableUserTwoFactorAuthenticationError {
+  code: DisableUserTwoFactorAuthenticationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type DisableUserTwoFactorAuthenticationPayload {
+  errors: [DisableUserTwoFactorAuthenticationError!]
+  user: User
+}
+
 type GenerateUserTwoFactorRecoveryCodesError {
   code: GenerateUserTwoFactorRecoveryCodesErrorCode!
   message: String!
@@ -459,6 +470,7 @@ type Mutation {
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   loginUser(input: LoginUserInput!): LoginUserPayload!
   loginUserWithRecoveryCode(input: LoginUserWithRecoveryCodeInput!): LoginUserWithRecoveryCodePayload!
@@ -1367,6 +1379,11 @@ enum DeletePersonalUserDataErrorCode {
   UNKNOWN_USER
   MISSING_PASSWORD
   INCORRECT_PASSWORD
+}
+
+enum DisableUserTwoFactorAuthenticationErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
 }
 
 enum GenerateUserTwoFactorRecoveryCodesErrorCode {
