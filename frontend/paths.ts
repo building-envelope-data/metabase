@@ -9,13 +9,14 @@ export default {
   user(uuid: string) {
     return `/users/${encodeURIComponent(uuid)}`;
   },
+  userCurrent: "me",
   userLogin: "/users/login",
   userRegister: "/users/register",
   userChangeEmail: "/me/change-email",
   userConfirmEmail: "/users/confirm-email",
   userForgotPassword: "/users/forgot-password",
-  userSendTwoFactorCode: "/users/send-two-factor-code",
-  userVerifyTwoFactorCode: "/users/verify-two-factor-code",
+  userLoginWithTwoFactorCode: "/users/login-with-two-factor-code",
+  userLoginWithRecoveryCode: "/users/login-with-recovery-code",
   userCheckYourInbox: "/users/check-your-inbox",
   dataFormats: "/data-formats",
   dataFormat(uuid: string) {

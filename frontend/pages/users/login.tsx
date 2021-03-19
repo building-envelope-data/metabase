@@ -29,11 +29,9 @@ function Login() {
     password: string;
     rememberMe: boolean;
   }) => {
-    // TODO `rememberMe`
     const login = async () => {
       try {
         setLoggingIn(true);
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const { errors, data } = await loginUserMutation({
           variables: {
             email: email,
@@ -52,8 +50,10 @@ function Login() {
         if (!errors && !data?.loginUser?.errors) {
           if (data?.loginUser?.requiresTwoFactor) {
             await router.push({
-              pathname: paths.userSendTwoFactorCode,
-              query: returnTo ? { returnTo: returnTo } : null,
+              pathname: paths.userLoginWithTwoFactorCode,
+              query: returnTo
+                ? { returnTo: returnTo, rememberMe: rememberMe }
+                : { rememberMe: rememberMe },
             });
           }
           if (data?.loginUser?.user) {
@@ -91,7 +91,7 @@ function Login() {
             <Form
               form={form}
               name="basic"
-              initialValues={{ remember: true }}
+              initialValues={{ rememberMe: true }}
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
             >

@@ -27,6 +27,42 @@ mutation LoginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
   }
 }
 
+mutation LoginUserWithTwoFactorCode(
+  $authenticatorCode: String!
+  $rememberMe: Boolean!
+  $rememberMachine: Boolean!
+) {
+  loginUserWithTwoFactorCode(
+    input: {
+      authenticatorCode: $authenticatorCode
+      rememberMe: $rememberMe
+      rememberMachine: $rememberMachine
+    }
+  ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation LoginUserWithRecoveryCode($recoveryCode: String!) {
+  loginUserWithRecoveryCode(input: { recoveryCode: $recoveryCode }) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 mutation LogoutUser {
   logoutUser {
     errors {

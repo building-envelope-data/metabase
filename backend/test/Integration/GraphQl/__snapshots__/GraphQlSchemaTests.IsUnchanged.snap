@@ -372,6 +372,28 @@ type LoginUserPayload {
   user: User
 }
 
+type LoginUserWithRecoveryCodeError {
+  code: LoginUserWithRecoveryCodeErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type LoginUserWithRecoveryCodePayload {
+  errors: [LoginUserWithRecoveryCodeError!]
+  user: User
+}
+
+type LoginUserWithTwoFactorCodeError {
+  code: LoginUserWithTwoFactorCodeErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type LoginUserWithTwoFactorCodePayload {
+  errors: [LoginUserWithTwoFactorCodeError!]
+  user: User
+}
+
 type LogoutUserError {
   code: LogoutUserErrorCode!
   message: String!
@@ -439,6 +461,8 @@ type Mutation {
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   loginUser(input: LoginUserInput!): LoginUserPayload!
+  loginUserWithRecoveryCode(input: LoginUserWithRecoveryCodeInput!): LoginUserWithRecoveryCodePayload!
+  loginUserWithTwoFactorCode(input: LoginUserWithTwoFactorCodeInput!): LoginUserWithTwoFactorCodePayload!
   logoutUser: LogoutUserPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
@@ -562,23 +586,23 @@ type Publication implements Reference {
 
 type Query {
   component(uuid: Uuid!): Component
-  components(after: String before: String first: Int last: Int order: [ComponentSortInput!] where: ComponentFilterInput): ComponentConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
+  components(after: String before: String first: Int last: Int order: [ComponentSortInput!] where: ComponentFilterInput): ComponentConnection
   currentUser: User
   database(uuid: Uuid!): Database
-  databases(after: String before: String first: Int last: Int order: [DatabaseSortInput!] where: DatabaseFilterInput): DatabaseConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
+  databases(after: String before: String first: Int last: Int order: [DatabaseSortInput!] where: DatabaseFilterInput): DatabaseConnection
   dataFormat(uuid: Uuid!): DataFormat
-  dataFormats(after: String before: String first: Int last: Int order: [DataFormatSortInput!] where: DataFormatFilterInput): DataFormatConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
+  dataFormats(after: String before: String first: Int last: Int order: [DataFormatSortInput!] where: DataFormatFilterInput): DataFormatConnection
   institution(uuid: Uuid!): Institution
-  institutions(after: String before: String first: Int last: Int order: [InstitutionSortInput!] where: InstitutionFilterInput): InstitutionConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
+  institutions(after: String before: String first: Int last: Int order: [InstitutionSortInput!] where: InstitutionFilterInput): InstitutionConnection
   method(uuid: Uuid!): Method
-  methods(after: String before: String first: Int last: Int order: [MethodSortInput!] where: MethodFilterInput): MethodConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
+  methods(after: String before: String first: Int last: Int order: [MethodSortInput!] where: MethodFilterInput): MethodConnection
   node(id: ID!): Node
   openIdConnectApplications: [OpenIdConnectApplication!]!
   openIdConnectAuthorizations: [OpenIdConnectAuthorization!]!
   openIdConnectScopes: [OpenIdConnectScope!]!
   openIdConnectTokens: [OpenIdConnectToken!]!
   personalUserData: PersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
-  users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection @authorize(apply: BEFORE_RESOLVER, policy: "Read")
+  users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
 }
 
 type RegisterUserError {
@@ -1020,6 +1044,16 @@ input LoginUserInput {
   rememberMe: Boolean!
 }
 
+input LoginUserWithRecoveryCodeInput {
+  recoveryCode: String!
+}
+
+input LoginUserWithTwoFactorCodeInput {
+  authenticatorCode: String!
+  rememberMachine: Boolean!
+  rememberMe: Boolean!
+}
+
 input MethodCategoryOperationFilterInput {
   eq: MethodCategory
   in: [MethodCategory!]
@@ -1358,6 +1392,22 @@ enum LoginUserErrorCode {
   LOCKED_OUT
   NOT_ALLOWED
   UNKNOWN
+}
+
+enum LoginUserWithRecoveryCodeErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+  NOT_ALLOWED
+  LOCKED_OUT
+  INVALID_RECOVERY_CODE
+}
+
+enum LoginUserWithTwoFactorCodeErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+  NOT_ALLOWED
+  LOCKED_OUT
+  INVALID_AUTHENTICATOR_CODE
 }
 
 enum LogoutUserErrorCode {

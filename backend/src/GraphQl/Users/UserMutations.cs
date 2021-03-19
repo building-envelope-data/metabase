@@ -216,52 +216,128 @@ namespace Metabase.GraphQl.Users
             return new LoginUserPayload(user, requiresTwoFactor: false);
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWith2fa.cs.cshtml
-        // TODO Using `SignInManager`'s two-factor authentication methods does not work because they rely on cookies, see https://github.com/aspnet/Identity/issues/1421 . We have to do manually what is done in https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L504
-        // TODO https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWithRecoveryCode.cs.cshtml
-        /* [UseDbContext(typeof(Data.ApplicationDbContext))] */
-        /* [UseUserManager] */
-        /* [UseSignInManager] */
-        /* public async Task<LoginUserWithTwoFactorPayload> LoginUserWithTwoFactorAsync( */
-        /*     LoginUserWithTwoFactorInput input, */
-        /*     [ScopedService] UserManager<Data.User> userManager, */
-        /*     [ScopedService] SignInManager<Data.User> signInManager */
-        /*     ) */
-        /* { */
-        /*     var user = await signInManager.GetTwoFactorAuthenticationUserAsync(); */
-        /*     if (user is null) */
-        /*     { */
-        /*       return new LoginUserWithTwoFactorPayload( */
-        /*           new LoginUserWithTwoFactorError( */
-        /*             LoginUserWithTwoFactorErrorCode.UNKNOWN_USER, */
-        /*             $"Unable to load two-factor authentication user with email address {input.CurrentEmail}.", */
-        /*             new [] { "input", "currentEmail" } */
-        /*             ) */
-        /*           ); */
-        /*     } */
-        /*     if (user == null) */
-        /*     { */
-        /*         throw new InvalidOperationException($"Unable to load two-factor authentication user."); */
-        /*     } */
-        /*     var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty); */
-        /*     var result = await signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine); */
-        /*     if (result.Succeeded) */
-        /*     { */
-        /*         _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id); */
-        /*         return LocalRedirect(returnUrl); */
-        /*     } */
-        /*     else if (result.IsLockedOut) */
-        /*     { */
-        /*         _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id); */
-        /*         return RedirectToPage("./Lockout"); */
-        /*     } */
-        /*     else */
-        /*     { */
-        /*         _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", user.Id); */
-        /*         ModelState.AddModelError(string.Empty, "Invalid authenticator code."); */
-        /*         return Page(); */
-        /*     } */
-        /* } */
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWith2fa.cs.cshtml
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        [UseSignInManager]
+        public async Task<LoginUserWithTwoFactorCodePayload> LoginUserWithTwoFactorCodeAsync(
+            LoginUserWithTwoFactorCodeInput input,
+            [ScopedService] SignInManager<Data.User> signInManager
+            )
+        {
+            var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
+            if (user is null)
+            {
+              return new LoginUserWithTwoFactorCodePayload(
+                  new LoginUserWithTwoFactorCodeError(
+                    LoginUserWithTwoFactorCodeErrorCode.UNKNOWN_USER,
+                    "Unable to load two-factor authentication user.",
+                    Array.Empty<string>()
+                    )
+                  );
+            }
+            var authenticatorCode =
+                input.AuthenticatorCode
+                .Replace(" ", string.Empty)
+                .Replace("-", string.Empty);
+            var signInResult =
+                await signInManager.TwoFactorAuthenticatorSignInAsync(
+                    authenticatorCode,
+                    isPersistent: input.RememberMe,
+                    rememberClient: input.RememberMachine
+                ).ConfigureAwait(false);
+            if (signInResult.IsLockedOut)
+            {
+                return new LoginUserWithTwoFactorCodePayload(
+                    new LoginUserWithTwoFactorCodeError(
+                      LoginUserWithTwoFactorCodeErrorCode.LOCKED_OUT,
+                      "User is locked out.",
+                      new[] { nameof(input) }
+                      )
+                    );
+            }
+            if (signInResult.IsNotAllowed)
+            {
+                return new LoginUserWithTwoFactorCodePayload(
+                    new LoginUserWithTwoFactorCodeError(
+                      LoginUserWithTwoFactorCodeErrorCode.NOT_ALLOWED,
+                      "User is not allowed to login.",
+                      new[] { nameof(input) }
+                      )
+                    );
+            }
+            if (!signInResult.Succeeded)
+            {
+                return new LoginUserWithTwoFactorCodePayload(
+                    new LoginUserWithTwoFactorCodeError(
+                      LoginUserWithTwoFactorCodeErrorCode.INVALID_AUTHENTICATOR_CODE,
+                      "Invalid authenticator code.",
+                      new[] { nameof(input), nameof(input.AuthenticatorCode).FirstCharToLower() }
+                      )
+                    );
+            }
+            return new LoginUserWithTwoFactorCodePayload(user);
+        }
+
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWithRecoveryCode.cs.cshtml
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        [UseSignInManager]
+        public async Task<LoginUserWithRecoveryCodePayload> LoginUserWithRecoveryCodeAsync(
+            LoginUserWithRecoveryCodeInput input,
+            [ScopedService] SignInManager<Data.User> signInManager
+            )
+        {
+            var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
+            if (user is null)
+            {
+              return new LoginUserWithRecoveryCodePayload(
+                  new LoginUserWithRecoveryCodeError(
+                    LoginUserWithRecoveryCodeErrorCode.UNKNOWN_USER,
+                    "Unable to load two-factor authentication user.",
+                    Array.Empty<string>()
+                    )
+                  );
+            }
+            var recoveryCode =
+                input.RecoveryCode
+                .Replace(" ", string.Empty);
+            var signInResult =
+                await signInManager.TwoFactorRecoveryCodeSignInAsync(
+                    recoveryCode
+                ).ConfigureAwait(false);
+            if (signInResult.IsLockedOut)
+            {
+                return new LoginUserWithRecoveryCodePayload(
+                    new LoginUserWithRecoveryCodeError(
+                      LoginUserWithRecoveryCodeErrorCode.LOCKED_OUT,
+                      "User is locked out.",
+                      new[] { nameof(input) }
+                      )
+                    );
+            }
+            if (signInResult.IsNotAllowed)
+            {
+                return new LoginUserWithRecoveryCodePayload(
+                    new LoginUserWithRecoveryCodeError(
+                      LoginUserWithRecoveryCodeErrorCode.NOT_ALLOWED,
+                      "User is not allowed to login.",
+                      new[] { nameof(input) }
+                      )
+                    );
+            }
+            if (!signInResult.Succeeded)
+            {
+                return new LoginUserWithRecoveryCodePayload(
+                    new LoginUserWithRecoveryCodeError(
+                      LoginUserWithRecoveryCodeErrorCode.INVALID_RECOVERY_CODE,
+                      "Invalid recovery code.",
+                      new[] { nameof(input), nameof(input.RecoveryCode).FirstCharToLower() }
+                      )
+                    );
+            }
+            return new LoginUserWithRecoveryCodePayload(user);
+        }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Register.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]
