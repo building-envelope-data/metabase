@@ -41,7 +41,7 @@ namespace Metabase.GraphQl.Users
                     new ConfirmUserEmailError(
                       ConfirmUserEmailErrorCode.UNKNOWN_USER,
                       $"Unable to load user with email address {input.Email}.",
-                      new[] { nameof(input), "email" }
+                      new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
                       )
                     );
             }
@@ -60,7 +60,7 @@ namespace Metabase.GraphQl.Users
                         new ConfirmUserEmailError(
                             ConfirmUserEmailErrorCode.INVALID_CONFIRMATION_CODE,
                             error.Description,
-                            new[] { nameof(input), "confirmationCode" }
+                            new[] { nameof(input), nameof(input.ConfirmationCode).FirstCharToLower() }
                             ),
                             _ =>
                         new ConfirmUserEmailError(
@@ -94,7 +94,7 @@ namespace Metabase.GraphQl.Users
                     new ConfirmUserEmailChangeError(
                       ConfirmUserEmailChangeErrorCode.UNKNOWN_USER,
                       $"Unable to load user with email address {input.CurrentEmail}.",
-                      new[] { nameof(input), "currentEmail" }
+                      new[] { nameof(input), nameof(input.CurrentEmail).FirstCharToLower() }
                       )
                     );
             }
@@ -120,13 +120,13 @@ namespace Metabase.GraphQl.Users
                         new ConfirmUserEmailChangeError(
                             ConfirmUserEmailChangeErrorCode.DUPLICATE_EMAIL,
                             error.Description,
-                            new[] { nameof(input), "newEmail" }
+                            new[] { nameof(input), nameof(input.NewEmail).FirstCharToLower() }
                             ),
                             "InvalidToken" =>
                         new ConfirmUserEmailChangeError(
                             ConfirmUserEmailChangeErrorCode.INVALID_CONFIRMATION_CODE,
                             error.Description,
-                            new[] { nameof(input), "confirmationCode" }
+                            new[] { nameof(input), nameof(input.ConfirmationCode).FirstCharToLower() }
                             ),
                             _ =>
                         new ConfirmUserEmailChangeError(
@@ -363,7 +363,7 @@ namespace Metabase.GraphQl.Users
                     new RegisterUserError(
                       RegisterUserErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
-                      new[] { nameof(input), "passwordConfirmation" }
+                      new[] { nameof(input), nameof(input.PasswordConfirmation).FirstCharToLower() }
                       )
                     );
             }
@@ -389,49 +389,49 @@ namespace Metabase.GraphQl.Users
                         new RegisterUserError(
                             RegisterUserErrorCode.DUPLICATE_EMAIL,
                             error.Description,
-                            new[] { nameof(input), "email" }
+                            new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
                             ),
                                 "InvalidEmail" =>
                         new RegisterUserError(
                             RegisterUserErrorCode.INVALID_EMAIL,
                             error.Description,
-                            new[] { nameof(input), "email" }
+                            new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
                             ),
                                 "PasswordRequiresDigit" =>
                         new RegisterUserError(
                             RegisterUserErrorCode.PASSWORD_REQUIRES_DIGIT,
                             error.Description,
-                            new[] { nameof(input), "password" }
+                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                             ),
                                 "PasswordRequiresLower" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.PASSWORD_REQUIRES_LOWER,
                               error.Description,
-                              new[] { nameof(input), "password" }
+                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                               ),
                                 "PasswordRequiresNonAlphanumeric" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
                               error.Description,
-                              new[] { nameof(input), "password" }
+                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                               ),
                                 "PasswordRequiresUpper" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.PASSWORD_REQUIRES_UPPER,
                               error.Description,
-                              new[] { nameof(input), "password" }
+                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                               ),
                                 "PasswordTooShort" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.PASSWORD_TOO_SHORT,
                               error.Description,
-                              new[] { nameof(input), "password" }
+                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                               ),
                                 "PropertyTooShort" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.NULL_OR_EMPTY_EMAIL,
                               error.Description,
-                              new[] { nameof(input), "email" }
+                              new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
                               ),
                                 _ =>
                           new RegisterUserError(
@@ -521,7 +521,7 @@ namespace Metabase.GraphQl.Users
                     new ResetUserPasswordError(
                       ResetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
-                      new[] { nameof(input), "passwordConfirmation" }
+                      new[] { nameof(input), nameof(input.PasswordConfirmation).FirstCharToLower() }
                       )
                     );
             }
@@ -547,37 +547,37 @@ namespace Metabase.GraphQl.Users
                             new ResetUserPasswordError(
                                 ResetUserPasswordErrorCode.INVALID_RESET_CODE,
                                 error.Description,
-                                new[] { nameof(input), "resetCode" }
+                                new[] { nameof(input), nameof(input.ResetCode).FirstCharToLower() }
                                 ),
                                 "PasswordRequiresDigit" =>
                         new ResetUserPasswordError(
                             ResetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
                             error.Description,
-                            new[] { nameof(input), "password" }
+                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                             ),
                                 "PasswordRequiresLower" =>
                           new ResetUserPasswordError(
                               ResetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
                               error.Description,
-                              new[] { nameof(input), "password" }
+                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                               ),
                                 "PasswordRequiresNonAlphanumeric" =>
                           new ResetUserPasswordError(
                               ResetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
                               error.Description,
-                              new[] { nameof(input), "password" }
+                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                               ),
                                 "PasswordRequiresUpper" =>
                           new ResetUserPasswordError(
                               ResetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
                               error.Description,
-                              new[] { nameof(input), "password" }
+                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                               ),
                                 "PasswordTooShort" =>
                           new ResetUserPasswordError(
                               ResetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
                               error.Description,
-                              new[] { nameof(input), "password" }
+                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                               ),
                                 _ =>
                           new ResetUserPasswordError(
@@ -652,7 +652,7 @@ namespace Metabase.GraphQl.Users
                     new ChangeUserPasswordError(
                       ChangeUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
-                      new[] { nameof(input), "passwordConfirmation" }
+                      new[] { nameof(input), nameof(input.NewPasswordConfirmation).FirstCharToLower() }
                       )
                     );
             }
@@ -670,31 +670,31 @@ namespace Metabase.GraphQl.Users
                       new ChangeUserPasswordError(
                           ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
                           error.Description,
-                          new[] { nameof(input), "password" }
+                          new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
                           ),
                             "PasswordRequiresLower" =>
                       new ChangeUserPasswordError(
                           ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
                           error.Description,
-                          new[] { nameof(input), "password" }
+                          new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
                           ),
                             "PasswordRequiresNonAlphanumeric" =>
                       new ChangeUserPasswordError(
                           ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
                           error.Description,
-                          new[] { nameof(input), "password" }
+                          new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
                           ),
                             "PasswordRequiresUpper" =>
                         new ChangeUserPasswordError(
                             ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
                             error.Description,
-                            new[] { nameof(input), "password" }
+                            new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
                             ),
                             "PasswordTooShort" =>
                         new ChangeUserPasswordError(
                             ChangeUserPasswordErrorCode.PASSWORD_TOO_SHORT,
                             error.Description,
-                            new[] { nameof(input), "password" }
+                            new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
                             ),
                             _ =>
                         new ChangeUserPasswordError(
@@ -743,7 +743,7 @@ namespace Metabase.GraphQl.Users
                         new DeletePersonalUserDataError(
                           DeletePersonalUserDataErrorCode.MISSING_PASSWORD,
                           "Missing password.",
-                          new[] { nameof(input), "password" }
+                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                           )
                         );
                 }
@@ -754,7 +754,7 @@ namespace Metabase.GraphQl.Users
                         new DeletePersonalUserDataError(
                           DeletePersonalUserDataErrorCode.INCORRECT_PASSWORD,
                           "Incorrect password.",
-                          new[] { nameof(input), "password" }
+                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                           )
                         );
                 }
@@ -999,7 +999,7 @@ namespace Metabase.GraphQl.Users
                     new SetUserPasswordError(
                       SetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
-                      new[] { nameof(input), "passwordConfirmation" }
+                      new[] { nameof(input), nameof(input.PasswordConfirmation).FirstCharToLower() }
                       )
                     );
             }
@@ -1017,31 +1017,31 @@ namespace Metabase.GraphQl.Users
                       new SetUserPasswordError(
                           SetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
                           error.Description,
-                          new[] { nameof(input), "password" }
+                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                           ),
                             "PasswordRequiresLower" =>
                       new SetUserPasswordError(
                           SetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
                           error.Description,
-                          new[] { nameof(input), "password" }
+                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                           ),
                             "PasswordRequiresNonAlphanumeric" =>
                       new SetUserPasswordError(
                           SetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
                           error.Description,
-                          new[] { nameof(input), "password" }
+                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                           ),
                             "PasswordRequiresUpper" =>
                         new SetUserPasswordError(
                             SetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
                             error.Description,
-                            new[] { nameof(input), "password" }
+                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                             ),
                             "PasswordTooShort" =>
                         new SetUserPasswordError(
                             SetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
                             error.Description,
-                            new[] { nameof(input), "password" }
+                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
                             ),
                             _ =>
                         new SetUserPasswordError(
