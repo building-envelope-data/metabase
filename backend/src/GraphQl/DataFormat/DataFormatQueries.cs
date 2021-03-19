@@ -17,7 +17,6 @@ namespace Metabase.GraphQl.DataFormats
         // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
         [UseFiltering]
         [UseSorting]
-        [Authorize(Policy = Configuration.AuthConfiguration.ReadPolicy)]
         public IQueryable<Data.DataFormat> GetDataFormats(
             [ScopedService] Data.ApplicationDbContext context
             )

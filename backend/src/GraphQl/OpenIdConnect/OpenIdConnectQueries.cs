@@ -17,7 +17,6 @@ namespace Metabase.GraphQl.OpenIdConnect
         // [UseProjection]
         // [UseFiltering]
         // [UseSorting]
-        // [Authorize(Policy = Configuration.Auth.ReadPolicy)]
         public async Task<List<OpenIddictEntityFrameworkCoreApplication>> GetOpenIdConnectApplications(
             [Service] OpenIddictApplicationManager<OpenIddictEntityFrameworkCoreApplication> manager,
             // [ScopedService] Data.ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
