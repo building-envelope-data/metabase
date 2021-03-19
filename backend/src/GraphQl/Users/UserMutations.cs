@@ -15,8 +15,6 @@ using Array = System.Array;
 // Note that `SignInManager` relies on cookies, see https://github.com/aspnet/Identity/issues/1421. For its source code see https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/SignInManager.cs
 namespace Metabase.GraphQl.Users
 {
-    // TODO Mutations in https://github.com/dotnet/Scaffolding/tree/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account
-
     [ExtendObjectType(Name = nameof(GraphQl.Mutation))]
     public sealed class UserMutations
     {
@@ -785,6 +783,38 @@ namespace Metabase.GraphQl.Users
         }
 
         // TODO Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Disable2fa.cs.cshtml
+        [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<DisableUserTwoFactorAuthenticationPayload> DisableUserTwoFactorAuthenticationAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager
+            )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new DisableUserTwoFactorAuthenticationPayload(
+                    new DisableUserTwoFactorAuthenticationError(
+                      DisableUserTwoFactorAuthenticationErrorCode.UNKNOWN_USER,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            var disable2faResult = await userManager.SetTwoFactorEnabledAsync(user, false);
+            if (!disable2faResult.Succeeded)
+            {
+                return new DisableUserTwoFactorAuthenticationPayload(
+                    new DisableUserTwoFactorAuthenticationError(
+                      DisableUserTwoFactorAuthenticationErrorCode.UNKNOWN,
+                      "Unknown error.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            return new DisableUserTwoFactorAuthenticationPayload(user);
+        }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
