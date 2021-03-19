@@ -782,7 +782,7 @@ namespace Metabase.GraphQl.Users
             return new DeletePersonalUserDataPayload(user);
         }
 
-        // TODO Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Disable2fa.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Disable2fa.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
