@@ -116,7 +116,7 @@ namespace Metabase.Tests.Integration
         {
             await DoAsync(
                 async services =>
-                 await Data.DbSeeder.DoAsync(services, testEnvironment: true).ConfigureAwait(false)
+                 await Data.DbSeeder.DoAsync(services).ConfigureAwait(false)
             ).ConfigureAwait(false);
         }
 
