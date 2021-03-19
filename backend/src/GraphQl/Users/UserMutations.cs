@@ -7,13 +7,15 @@ using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using Metabase.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Array = System.Array;
 
+// Note that `SignInManager` relies on cookies, see https://github.com/aspnet/Identity/issues/1421. For its source code see https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/SignInManager.cs
 namespace Metabase.GraphQl.Users
 {
-    // TODO Mutations in https://github.com/dotnet/Scaffolding/tree/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account
+    // TODO Mutations in https://github.com/dotnet/Scaffolding/tree/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account
 
     [ExtendObjectType(Name = nameof(GraphQl.Mutation))]
     public sealed class UserMutations
@@ -22,8 +24,8 @@ namespace Metabase.GraphQl.Users
         // LOGGED-OUT USER //
         /////////////////////
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ConfirmEmail.cs.cshtml
-        // and https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.RegisterConfirmation.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ConfirmEmail.cs.cshtml
+        // and https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.RegisterConfirmation.cs.cshtml
         // Despite its name, it is also used to confirm registrations. TODO Should we add another mutation for that?
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -39,7 +41,7 @@ namespace Metabase.GraphQl.Users
                     new ConfirmUserEmailError(
                       ConfirmUserEmailErrorCode.UNKNOWN_USER,
                       $"Unable to load user with email address {input.Email}.",
-                      new[] { "input", "email" }
+                      new[] { nameof(input), "email" }
                       )
                     );
             }
@@ -51,20 +53,20 @@ namespace Metabase.GraphQl.Users
                 foreach (var error in identityResult.Errors)
                 {
                     errors.Add(
-                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
+                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/main/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
                         error.Code switch
                         {
                             "InvalidToken" =>
                         new ConfirmUserEmailError(
                             ConfirmUserEmailErrorCode.INVALID_CONFIRMATION_CODE,
                             error.Description,
-                            new[] { "input", "confirmationCode" }
+                            new[] { nameof(input), "confirmationCode" }
                             ),
                             _ =>
                         new ConfirmUserEmailError(
                             ConfirmUserEmailErrorCode.UNKNOWN,
                             error.Description,
-                            new[] { "input" }
+                            new[] { nameof(input) }
                             )
                         }
                         );
@@ -74,7 +76,7 @@ namespace Metabase.GraphQl.Users
             return new ConfirmUserEmailPayload(user);
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ConfirmEmailChange.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ConfirmEmailChange.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [UseSignInManager]
@@ -92,7 +94,7 @@ namespace Metabase.GraphQl.Users
                     new ConfirmUserEmailChangeError(
                       ConfirmUserEmailChangeErrorCode.UNKNOWN_USER,
                       $"Unable to load user with email address {input.CurrentEmail}.",
-                      new[] { "input", "currentEmail" }
+                      new[] { nameof(input), "currentEmail" }
                       )
                     );
             }
@@ -111,26 +113,26 @@ namespace Metabase.GraphQl.Users
                 foreach (var error in changeEmailIdentityResult.Errors)
                 {
                     errors.Add(
-                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
+                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/main/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
                         error.Code switch
                         {
                             "DuplicateEmail" =>
                         new ConfirmUserEmailChangeError(
                             ConfirmUserEmailChangeErrorCode.DUPLICATE_EMAIL,
                             error.Description,
-                            new[] { "input", "newEmail" }
+                            new[] { nameof(input), "newEmail" }
                             ),
                             "InvalidToken" =>
                         new ConfirmUserEmailChangeError(
                             ConfirmUserEmailChangeErrorCode.INVALID_CONFIRMATION_CODE,
                             error.Description,
-                            new[] { "input", "confirmationCode" }
+                            new[] { nameof(input), "confirmationCode" }
                             ),
                             _ =>
                         new ConfirmUserEmailChangeError(
                             ConfirmUserEmailChangeErrorCode.UNKNOWN,
                             error.Description,
-                            new[] { "input" }
+                            new[] { nameof(input) }
                             )
                         }
                         );
@@ -141,14 +143,14 @@ namespace Metabase.GraphQl.Users
                     if (error.Code != "DuplicateUserName")
                     {
                         errors.Add(
-                            // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
+                            // List of codes from https://github.com/aspnet/AspNetIdentity/blob/main/src/Microsoft.AspNet.Identity.Core/Resources.resx#L140
                             error.Code switch
                             {
                                 _ =>
                           new ConfirmUserEmailChangeError(
                               ConfirmUserEmailChangeErrorCode.UNKNOWN,
                               error.Description,
-                              new[] { "input" }
+                              new[] { nameof(input) }
                               )
                             }
                             );
@@ -160,7 +162,7 @@ namespace Metabase.GraphQl.Users
             return new ConfirmUserEmailChangePayload(user);
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Login.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Login.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [UseSignInManager]
@@ -183,7 +185,7 @@ namespace Metabase.GraphQl.Users
                     new LoginUserError(
                       LoginUserErrorCode.LOCKED_OUT,
                       "User is locked out.",
-                      new[] { "input" }
+                      new[] { nameof(input) }
                       )
                     );
             }
@@ -193,7 +195,7 @@ namespace Metabase.GraphQl.Users
                     new LoginUserError(
                       LoginUserErrorCode.NOT_ALLOWED,
                       "User is not allowed to login.",
-                      new[] { "input" }
+                      new[] { nameof(input) }
                       )
                     );
             }
@@ -203,7 +205,7 @@ namespace Metabase.GraphQl.Users
                     new LoginUserError(
                       LoginUserErrorCode.INVALID,
                       "Invalid login attempt.",
-                      new[] { "input" }
+                      new[] { nameof(input) }
                       )
                     );
             }
@@ -339,7 +341,7 @@ namespace Metabase.GraphQl.Users
             return new LoginUserWithRecoveryCodePayload(user);
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Register.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Register.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<RegisterUserPayload> RegisterUserAsync(
@@ -361,7 +363,7 @@ namespace Metabase.GraphQl.Users
                     new RegisterUserError(
                       RegisterUserErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
-                      new[] { "input", "passwordConfirmation" }
+                      new[] { nameof(input), "passwordConfirmation" }
                       )
                     );
             }
@@ -380,62 +382,62 @@ namespace Metabase.GraphQl.Users
                         && error.Code != "InvalidUserName")
                     {
                         errors.Add(
-                            // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
+                            // List of codes from https://github.com/aspnet/AspNetIdentity/blob/main/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
                             error.Code switch
                             {
                                 "DuplicateEmail" =>
                         new RegisterUserError(
                             RegisterUserErrorCode.DUPLICATE_EMAIL,
                             error.Description,
-                            new[] { "input", "email" }
+                            new[] { nameof(input), "email" }
                             ),
                                 "InvalidEmail" =>
                         new RegisterUserError(
                             RegisterUserErrorCode.INVALID_EMAIL,
                             error.Description,
-                            new[] { "input", "email" }
+                            new[] { nameof(input), "email" }
                             ),
                                 "PasswordRequiresDigit" =>
                         new RegisterUserError(
                             RegisterUserErrorCode.PASSWORD_REQUIRES_DIGIT,
                             error.Description,
-                            new[] { "input", "password" }
+                            new[] { nameof(input), "password" }
                             ),
                                 "PasswordRequiresLower" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.PASSWORD_REQUIRES_LOWER,
                               error.Description,
-                              new[] { "input", "password" }
+                              new[] { nameof(input), "password" }
                               ),
                                 "PasswordRequiresNonAlphanumeric" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
                               error.Description,
-                              new[] { "input", "password" }
+                              new[] { nameof(input), "password" }
                               ),
                                 "PasswordRequiresUpper" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.PASSWORD_REQUIRES_UPPER,
                               error.Description,
-                              new[] { "input", "password" }
+                              new[] { nameof(input), "password" }
                               ),
                                 "PasswordTooShort" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.PASSWORD_TOO_SHORT,
                               error.Description,
-                              new[] { "input", "password" }
+                              new[] { nameof(input), "password" }
                               ),
                                 "PropertyTooShort" =>
                           new RegisterUserError(
                               RegisterUserErrorCode.NULL_OR_EMPTY_EMAIL,
                               error.Description,
-                              new[] { "input", "email" }
+                              new[] { nameof(input), "email" }
                               ),
                                 _ =>
                           new RegisterUserError(
                               RegisterUserErrorCode.UNKNOWN,
                               $"{error.Description} (error code `{error.Code}`)",
-                              new[] { "input" }
+                              new[] { nameof(input) }
                               )
                             }
                         );
@@ -453,7 +455,7 @@ namespace Metabase.GraphQl.Users
             return new RegisterUserPayload(user);
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResendEmailConfirmation.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResendEmailConfirmation.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<ResendUserEmailConfirmationPayload> ResendUserEmailConfirmationAsync(
@@ -477,7 +479,7 @@ namespace Metabase.GraphQl.Users
             return new ResendUserEmailConfirmationPayload();
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ForgotPassword.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ForgotPassword.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<RequestUserPasswordResetPayload> RequestUserPasswordResetAsync(
@@ -504,7 +506,7 @@ namespace Metabase.GraphQl.Users
             return new RequestUserPasswordResetPayload();
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResetPassword.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResetPassword.cs.cshtml
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<ResetUserPasswordPayload> ResetUserPasswordAsync(
@@ -519,7 +521,7 @@ namespace Metabase.GraphQl.Users
                     new ResetUserPasswordError(
                       ResetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
-                      new[] { "input", "passwordConfirmation" }
+                      new[] { nameof(input), "passwordConfirmation" }
                       )
                     );
             }
@@ -538,50 +540,50 @@ namespace Metabase.GraphQl.Users
                     foreach (var error in identityResult.Errors)
                     {
                         errors.Add(
-                            // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
+                            // List of codes from https://github.com/aspnet/AspNetIdentity/blob/main/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
                             error.Code switch
                             {
                                 "InvalidToken" =>
                             new ResetUserPasswordError(
                                 ResetUserPasswordErrorCode.INVALID_RESET_CODE,
                                 error.Description,
-                                new[] { "input", "resetCode" }
+                                new[] { nameof(input), "resetCode" }
                                 ),
                                 "PasswordRequiresDigit" =>
                         new ResetUserPasswordError(
                             ResetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
                             error.Description,
-                            new[] { "input", "password" }
+                            new[] { nameof(input), "password" }
                             ),
                                 "PasswordRequiresLower" =>
                           new ResetUserPasswordError(
                               ResetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
                               error.Description,
-                              new[] { "input", "password" }
+                              new[] { nameof(input), "password" }
                               ),
                                 "PasswordRequiresNonAlphanumeric" =>
                           new ResetUserPasswordError(
                               ResetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
                               error.Description,
-                              new[] { "input", "password" }
+                              new[] { nameof(input), "password" }
                               ),
                                 "PasswordRequiresUpper" =>
                           new ResetUserPasswordError(
                               ResetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
                               error.Description,
-                              new[] { "input", "password" }
+                              new[] { nameof(input), "password" }
                               ),
                                 "PasswordTooShort" =>
                           new ResetUserPasswordError(
                               ResetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
                               error.Description,
-                              new[] { "input", "password" }
+                              new[] { nameof(input), "password" }
                               ),
                                 _ =>
                           new ResetUserPasswordError(
                               ResetUserPasswordErrorCode.UNKNOWN,
                               $"{error.Description} (error code `{error.Code}`)",
-                              new[] { "input" }
+                              new[] { nameof(input) }
                               )
                             }
                         );
@@ -596,7 +598,7 @@ namespace Metabase.GraphQl.Users
         // LOGGED-IN USER //
         ////////////////////
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Logout.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Logout.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -609,7 +611,7 @@ namespace Metabase.GraphQl.Users
             return new LogoutUserPayload();
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.ChangePassword.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.ChangePassword.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -650,7 +652,7 @@ namespace Metabase.GraphQl.Users
                     new ChangeUserPasswordError(
                       ChangeUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
-                      new[] { "input", "passwordConfirmation" }
+                      new[] { nameof(input), "passwordConfirmation" }
                       )
                     );
             }
@@ -661,44 +663,44 @@ namespace Metabase.GraphQl.Users
                 foreach (var error in identityResult.Errors)
                 {
                     errors.Add(
-                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
+                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/main/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
                         error.Code switch
                         {
                             "PasswordRequiresDigit" =>
                       new ChangeUserPasswordError(
                           ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
                           error.Description,
-                          new[] { "input", "password" }
+                          new[] { nameof(input), "password" }
                           ),
                             "PasswordRequiresLower" =>
                       new ChangeUserPasswordError(
                           ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
                           error.Description,
-                          new[] { "input", "password" }
+                          new[] { nameof(input), "password" }
                           ),
                             "PasswordRequiresNonAlphanumeric" =>
                       new ChangeUserPasswordError(
                           ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
                           error.Description,
-                          new[] { "input", "password" }
+                          new[] { nameof(input), "password" }
                           ),
                             "PasswordRequiresUpper" =>
                         new ChangeUserPasswordError(
                             ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
                             error.Description,
-                            new[] { "input", "password" }
+                            new[] { nameof(input), "password" }
                             ),
                             "PasswordTooShort" =>
                         new ChangeUserPasswordError(
                             ChangeUserPasswordErrorCode.PASSWORD_TOO_SHORT,
                             error.Description,
-                            new[] { "input", "password" }
+                            new[] { nameof(input), "password" }
                             ),
                             _ =>
                         new ChangeUserPasswordError(
                             ChangeUserPasswordErrorCode.UNKNOWN,
                             $"{error.Description} (error code `{error.Code}`)",
-                            new[] { "input" }
+                            new[] { nameof(input) }
                             )
                         }
                     );
@@ -709,7 +711,7 @@ namespace Metabase.GraphQl.Users
             return new ChangeUserPasswordPayload(user);
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.DeletePersonalData.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.DeletePersonalData.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -741,7 +743,7 @@ namespace Metabase.GraphQl.Users
                         new DeletePersonalUserDataError(
                           DeletePersonalUserDataErrorCode.MISSING_PASSWORD,
                           "Missing password.",
-                          new[] { "input", "password" }
+                          new[] { nameof(input), "password" }
                           )
                         );
                 }
@@ -752,7 +754,7 @@ namespace Metabase.GraphQl.Users
                         new DeletePersonalUserDataError(
                           DeletePersonalUserDataErrorCode.INCORRECT_PASSWORD,
                           "Incorrect password.",
-                          new[] { "input", "password" }
+                          new[] { nameof(input), "password" }
                           )
                         );
                 }
@@ -771,7 +773,7 @@ namespace Metabase.GraphQl.Users
                         new DeletePersonalUserDataError(
                             DeletePersonalUserDataErrorCode.UNKNOWN,
                             $"{error.Description} (error code `{error.Code}`)",
-                            new[] { "input" }
+                            new[] { nameof(input) }
                             )
                         }
                     );
@@ -782,9 +784,9 @@ namespace Metabase.GraphQl.Users
             return new DeletePersonalUserDataPayload(user);
         }
 
-        // TODO Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Disable2fa.cs.cshtml
+        // TODO Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Disable2fa.cs.cshtml
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -815,7 +817,7 @@ namespace Metabase.GraphQl.Users
                     new ChangeUserEmailError(
                       ChangeUserEmailErrorCode.UNCHANGED_EMAIL,
                       "Your email is unchanged.",
-                      new string[] { "input", "newEmail" }
+                      new string[] { nameof(input), "newEmail" }
                       )
                     );
             }
@@ -829,7 +831,7 @@ namespace Metabase.GraphQl.Users
             return new ChangeUserEmailPayload(user);
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -860,7 +862,7 @@ namespace Metabase.GraphQl.Users
             return new ResendUserEmailVerificationPayload(user);
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.GenerateRecoveryCodes.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.GenerateRecoveryCodes.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -897,7 +899,7 @@ namespace Metabase.GraphQl.Users
                 );
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Index.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Index.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -927,7 +929,7 @@ namespace Metabase.GraphQl.Users
                     new SetUserPhoneNumberError(
                       SetUserPhoneNumberErrorCode.UNCHANGED_PHONE_NUMBER,
                       "Your phone number is unchanged.",
-                      new string[] { "input", "phoneNumber" }
+                      new string[] { nameof(input), "phoneNumber" }
                       )
                     );
             }
@@ -945,7 +947,7 @@ namespace Metabase.GraphQl.Users
                         new SetUserPhoneNumberError(
                             SetUserPhoneNumberErrorCode.UNKNOWN,
                             $"{error.Description} (error code `{error.Code}`)",
-                            new[] { "input" }
+                            new[] { nameof(input) }
                             )
                         }
                     );
@@ -956,7 +958,7 @@ namespace Metabase.GraphQl.Users
             return new SetUserPhoneNumberPayload(user);
         }
 
-        // Inspired by https://github.com/dotnet/Scaffolding/blob/master/src/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.SetPassword.cs.cshtml
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.SetPassword.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
@@ -997,7 +999,7 @@ namespace Metabase.GraphQl.Users
                     new SetUserPasswordError(
                       SetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
                       "Password and confirmation password do not match.",
-                      new[] { "input", "passwordConfirmation" }
+                      new[] { nameof(input), "passwordConfirmation" }
                       )
                     );
             }
@@ -1008,44 +1010,44 @@ namespace Metabase.GraphQl.Users
                 foreach (var error in identityResult.Errors)
                 {
                     errors.Add(
-                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/master/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
+                        // List of codes from https://github.com/aspnet/AspNetIdentity/blob/main/src/Microsoft.AspNet.Identity.Core/Resources.resx#L120
                         error.Code switch
                         {
                             "PasswordRequiresDigit" =>
                       new SetUserPasswordError(
                           SetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
                           error.Description,
-                          new[] { "input", "password" }
+                          new[] { nameof(input), "password" }
                           ),
                             "PasswordRequiresLower" =>
                       new SetUserPasswordError(
                           SetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
                           error.Description,
-                          new[] { "input", "password" }
+                          new[] { nameof(input), "password" }
                           ),
                             "PasswordRequiresNonAlphanumeric" =>
                       new SetUserPasswordError(
                           SetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
                           error.Description,
-                          new[] { "input", "password" }
+                          new[] { nameof(input), "password" }
                           ),
                             "PasswordRequiresUpper" =>
                         new SetUserPasswordError(
                             SetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
                             error.Description,
-                            new[] { "input", "password" }
+                            new[] { nameof(input), "password" }
                             ),
                             "PasswordTooShort" =>
                         new SetUserPasswordError(
                             SetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
                             error.Description,
-                            new[] { "input", "password" }
+                            new[] { nameof(input), "password" }
                             ),
                             _ =>
                         new SetUserPasswordError(
                             SetUserPasswordErrorCode.UNKNOWN,
                             $"{error.Description} (error code `{error.Code}`)",
-                            new[] { "input" }
+                            new[] { nameof(input) }
                             )
                         }
                     );
