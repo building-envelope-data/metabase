@@ -85,3 +85,82 @@ mutation ChangeUserEmail($newEmail: String!) {
     }
   }
 }
+
+query TwoFactorAuthentication {
+  currentUser {
+    twoFactorAuthentication {
+      hasAuthenticator
+      isEnabled
+      isMachineRemembered
+      recoveryCodesLeftCount
+    }
+  }
+}
+
+mutation GenerateUserTwoFactorRecoveryCodes {
+  generateUserTwoFactorRecoveryCodes {
+    twoFactorRecoveryCodes
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DisableUserTwoFactorAuthentication {
+  disableUserTwoFactorAuthentication {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ForgetUserTwoFactorAuthenticationClient {
+  forgetUserTwoFactorAuthenticationClient {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ResetUserTwoFactorAuthenticator {
+  resetUserTwoFactorAuthenticator {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri {
+  generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri {
+    sharedKey
+    authenticatorUri
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation EnableUserTwoFactorAuthenticator($verificationCode: String!) {
+  enableUserTwoFactorAuthenticator(
+    input: { verificationCode: $verificationCode }
+  ) {
+    twoFactorRecoveryCodes
+    sharedKey
+    authenticatorUri
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

@@ -22,10 +22,10 @@ namespace Metabase.Data
         [Url]
         public Uri? WebsiteLocator { get; private set; }
 
-        public ICollection<UserClaim> Claims { get; } = new List<UserClaim>();
-        public ICollection<UserLogin> Logins { get; } = new List<UserLogin>();
-        public ICollection<UserToken> Tokens { get; } = new List<UserToken>();
-        public ICollection<UserRole> Roles { get; } = new List<UserRole>();
+        // public ICollection<UserClaim> Claims { get; } = new List<UserClaim>();
+        // public ICollection<UserLogin> Logins { get; } = new List<UserLogin>();
+        // public ICollection<UserToken> Tokens { get; } = new List<UserToken>();
+        // public ICollection<UserRole> Roles { get; } = new List<UserRole>();
 
         public ICollection<UserMethodDeveloper> DevelopedMethodEdges { get; } = new List<UserMethodDeveloper>();
         public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
