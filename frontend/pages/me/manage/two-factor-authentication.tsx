@@ -266,6 +266,11 @@ function Page() {
           >
             Disable two-factor authentication
           </Button>
+          <Alert
+            message="Resetting recovery codes does not change the keys used in authenticator apps. If you wish to change the key
+        used in an authenticator app you should reset your authenticator keys below."
+            type="info"
+          />
           <Button
             onClick={generateUserTwoFactorRecoveryCodes}
             loading={generatingUserTwoFactorRecoveryCodes}

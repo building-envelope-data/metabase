@@ -164,3 +164,23 @@ mutation EnableUserTwoFactorAuthenticator($verificationCode: String!) {
     }
   }
 }
+
+mutation ChangeUserPassword(
+  $currentPassword: String!
+  $newPassword: String!
+  $newPasswordConfirmation: String!
+) {
+  changeUserPassword(
+    input: {
+      currentPassword: $currentPassword
+      newPassword: $newPassword
+      newPasswordConfirmation: $newPasswordConfirmation
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
