@@ -19,6 +19,7 @@ namespace Metabase.GraphQl.Users
     [ExtendObjectType(Name = nameof(GraphQl.Mutation))]
     public sealed class UserMutations
     {
+        // Key Uri Format https://github.com/google/google-authenticator/wiki/Key-Uri-Format
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
         /////////////////////
@@ -980,9 +981,9 @@ namespace Metabase.GraphQl.Users
         {
             return string.Format(
                 AuthenticatorUriFormat,
-                urlEncoder.Encode("metabase"), // TODO Is this what we want?
-                urlEncoder.Encode(email),
-                unformattedKey
+                urlEncoder.Encode("buildingenvelopedata.org"), // issuer
+                urlEncoder.Encode(email), // account name
+                unformattedKey // secret
                 );
         }
 
