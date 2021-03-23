@@ -55,8 +55,7 @@ function Login() {
                 ? { returnTo: returnTo, rememberMe: rememberMe }
                 : { rememberMe: rememberMe },
             });
-          }
-          if (data?.loginUser?.user) {
+          } else if (data?.loginUser?.user) {
             await apolloClient.resetStore();
             await router.push(
               typeof returnTo === "string" ? returnTo : paths.home

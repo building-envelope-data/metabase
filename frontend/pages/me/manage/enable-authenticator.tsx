@@ -12,13 +12,13 @@ import {
 import {
   useGenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation,
   useEnableUserTwoFactorAuthenticatorMutation,
-  GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriDocument,
 } from "../../../queries/currentUser.graphql";
 import { useRouter } from "next/router";
 import paths from "../../../paths";
 import { handleFormErrors } from "../../../lib/form";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode.react";
+import recoveryCodesModal from "../../../lib/recoveryCodesModal";
 
 const layout = {
   labelCol: { span: 8 },
@@ -35,22 +35,7 @@ function Page() {
   ] = useGenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
   const [
     enableUserTwoFactorAuthenticatorMutation,
-  ] = useEnableUserTwoFactorAuthenticatorMutation({
-    update(cache, { data }) {
-      if (
-        data?.enableUserTwoFactorAuthenticator?.sharedKey &&
-        data?.enableUserTwoFactorAuthenticator?.authenticatorUri
-      )
-        cache.writeQuery({
-          query: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriDocument,
-          data: {
-            sharedKey: data.enableUserTwoFactorAuthenticator.sharedKey,
-            authenticatorUri:
-              data.enableUserTwoFactorAuthenticator.authenticatorUri,
-          },
-        });
-    },
-  });
+  ] = useEnableUserTwoFactorAuthenticatorMutation();
   const [sharedKey, setSharedKey] = useState<string | null | undefined>(
     undefined
   );
@@ -84,8 +69,23 @@ function Page() {
           setGlobalErrorMessages,
           form
         );
-        message.success("Your authenticator app has been verified.");
-        router.push(paths.me.manage.twoFactorAuthentication);
+        if (data?.enableUserTwoFactorAuthenticator?.sharedKey) {
+          setSharedKey(data.enableUserTwoFactorAuthenticator.sharedKey);
+        }
+        if (data?.enableUserTwoFactorAuthenticator?.authenticatorUri) {
+          setAuthenticatorUri(
+            data.enableUserTwoFactorAuthenticator.authenticatorUri
+          );
+        }
+        if (data?.enableUserTwoFactorAuthenticator?.twoFactorRecoveryCodes) {
+          recoveryCodesModal(
+            data.enableUserTwoFactorAuthenticator.twoFactorRecoveryCodes
+          );
+        }
+        if (!errors && !data?.enableUserTwoFactorAuthenticator?.errors) {
+          message.success("Your authenticator app has been verified.");
+          router.push(paths.me.manage.twoFactorAuthentication);
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);

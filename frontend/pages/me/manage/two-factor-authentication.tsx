@@ -7,18 +7,11 @@ import {
   useForgetUserTwoFactorAuthenticationClientMutation,
   TwoFactorAuthenticationDocument,
 } from "../../../queries/currentUser.graphql";
-import {
-  List,
-  Button,
-  Alert,
-  message,
-  Skeleton,
-  Typography,
-  Modal,
-} from "antd";
+import { Button, Alert, message, Skeleton, Typography } from "antd";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import paths from "../../../paths";
+import recoveryCodesModal from "../../../lib/recoveryCodesModal";
 
 function Page() {
   const { error, data } = useTwoFactorAuthenticationQuery();
@@ -176,28 +169,9 @@ function Page() {
             .join(" ")
         );
       } else {
-        Modal.success({
-          title: "New Recovery Codes",
-          content: (
-            <div>
-              <Typography.Paragraph strong>
-                Put these codes in a safe place.
-              </Typography.Paragraph>
-              <Typography.Paragraph>
-                If you lose your device and don't have the recovery codes you
-                will lose access to your account.
-              </Typography.Paragraph>
-              <List>
-                {(
-                  data?.generateUserTwoFactorRecoveryCodes
-                    ?.twoFactorRecoveryCodes || []
-                ).map((code) => (
-                  <List.Item>{code}</List.Item>
-                ))}
-              </List>
-            </div>
-          ),
-        });
+        recoveryCodesModal(
+          data?.generateUserTwoFactorRecoveryCodes?.twoFactorRecoveryCodes || []
+        );
       }
     } finally {
       setGeneratingUserTwoFactorRecoveryCodes(false);
