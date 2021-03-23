@@ -48,6 +48,11 @@ namespace Metabase.GraphQl.Users
               .UseDbContext<Data.ApplicationDbContext>()
               .UseUserManager()
               .UseSignInManager();
+            descriptor
+              .Field("hasPassword")
+              .ResolveWith<UserResolvers>(t => t.GetHasPasswordAsync(default!, default!, default!))
+              .UseDbContext<Data.ApplicationDbContext>()
+              .UseUserManager();
         }
 
         private sealed class UserResolvers
@@ -74,6 +79,23 @@ namespace Metabase.GraphQl.Users
                   isMachineRemembered: await signInManager.IsTwoFactorClientRememberedAsync(user).ConfigureAwait(false),
                   recoveryCodesLeftCount: await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false)
                   );
+            }
+
+            public async Task<bool?> GetHasPasswordAsync(
+              Data.User user,
+              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              [ScopedService] UserManager<Data.User> userManager
+            )
+            {
+              if (!await UserAuthorization.IsAuthorizedToManageUser(
+                claimsPrincipal,
+                user.Id,
+                userManager
+              ).ConfigureAwait(false))
+              {
+                return null;
+              }
+              return await userManager.HasPasswordAsync(user).ConfigureAwait(false);
             }
         }
     }

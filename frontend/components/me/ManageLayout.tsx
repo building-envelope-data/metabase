@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
-import { Layout as AntLayout, Menu } from "antd";
+import { Skeleton, Layout as AntLayout, Menu } from "antd";
 import Layout from "../Layout";
 import paths from "../../paths";
 
@@ -14,10 +14,6 @@ const navItems = [
   {
     path: paths.me.manage.email,
     label: "Email",
-  },
-  {
-    path: paths.me.manage.password,
-    label: "Password",
   },
   {
     path: paths.me.manage.twoFactorAuthentication,
@@ -37,13 +33,21 @@ const ManageLayout: React.FunctionComponent = ({ children }) => {
   const shouldRedirect = !(loading || error || currentUser);
 
   useEffect(() => {
-    if (shouldRedirect) {
+    if (router.isReady && shouldRedirect) {
       router.push({
         pathname: paths.userLogin,
         query: { returnTo: paths.userCurrent },
       });
     }
   }, [shouldRedirect]);
+
+  if (!currentUser) {
+    return (
+      <Layout>
+        <Skeleton />
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -59,6 +63,17 @@ const ManageLayout: React.FunctionComponent = ({ children }) => {
                 <Link href={path}>{label}</Link>
               </Menu.Item>
             ))}
+            {currentUser.hasPassword ? (
+              <Menu.Item key={paths.me.manage.changePassword}>
+                <Link href={paths.me.manage.changePassword}>
+                  Change Password
+                </Link>
+              </Menu.Item>
+            ) : (
+              <Menu.Item key={paths.me.manage.setPassword}>
+                <Link href={paths.me.manage.setPassword}>Set Password</Link>
+              </Menu.Item>
+            )}
           </Menu>
         </AntLayout.Sider>
         <AntLayout.Content style={{ padding: "0 24px", minHeight: 280 }}>

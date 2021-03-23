@@ -14,7 +14,8 @@ export default {
     manage: {
       profile: "/me/manage/profile",
       email: "/me/manage/email",
-      password: "/me/manage/password",
+      changePassword: "/me/manage/change-password",
+      setPassword: "/me/manage/set-password",
       twoFactorAuthentication: "/me/manage/two-factor-authentication",
       enableAuthenticator: "/me/manage/enable-authenticator",
       personalData: "/me/manage/personal-data",

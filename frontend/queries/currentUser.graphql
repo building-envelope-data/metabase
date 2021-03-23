@@ -1,13 +1,14 @@
-fragment UserPartial on User {
+fragment CurrentUserPartial on User {
   id
   uuid
   name
   email
+  hasPassword
 }
 
 query CurrentUser {
   currentUser {
-    ...UserPartial
+    ...CurrentUserPartial
   }
 }
 
@@ -17,7 +18,7 @@ mutation LoginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
   ) {
     requiresTwoFactor
     user {
-      ...UserPartial
+      ...CurrentUserPartial
     }
     errors {
       code
@@ -40,7 +41,7 @@ mutation LoginUserWithTwoFactorCode(
     }
   ) {
     user {
-      ...UserPartial
+      ...CurrentUserPartial
     }
     errors {
       code
@@ -53,7 +54,7 @@ mutation LoginUserWithTwoFactorCode(
 mutation LoginUserWithRecoveryCode($recoveryCode: String!) {
   loginUserWithRecoveryCode(input: { recoveryCode: $recoveryCode }) {
     user {
-      ...UserPartial
+      ...CurrentUserPartial
     }
     errors {
       code
@@ -76,7 +77,7 @@ mutation LogoutUser {
 mutation ChangeUserEmail($newEmail: String!) {
   changeUserEmail(input: { newEmail: $newEmail }) {
     user {
-      ...UserPartial
+      ...CurrentUserPartial
     }
     errors {
       code
@@ -176,6 +177,18 @@ mutation ChangeUserPassword(
       newPassword: $newPassword
       newPasswordConfirmation: $newPasswordConfirmation
     }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation SetUserPassword($password: String!, $passwordConfirmation: String!) {
+  setUserPassword(
+    input: { password: $password, passwordConfirmation: $passwordConfirmation }
   ) {
     errors {
       code
