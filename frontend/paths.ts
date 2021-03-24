@@ -12,6 +12,7 @@ export default {
   userCurrent: "me",
   me: {
     manage: {
+      index: "/me/manage",
       profile: "/me/manage/profile",
       email: "/me/manage/email",
       changePassword: "/me/manage/change-password",
@@ -24,7 +25,6 @@ export default {
   personalUserData: "/personal-user-data",
   userLogin: "/users/login",
   userRegister: "/users/register",
-  userChangeEmail: "/me/change-email",
   userConfirmEmail: "/users/confirm-email",
   userForgotPassword: "/users/forgot-password",
   userLoginWithTwoFactorCode: "/users/login-with-two-factor-code",

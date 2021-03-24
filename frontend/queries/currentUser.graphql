@@ -4,6 +4,7 @@ fragment CurrentUserPartial on User {
   name
   email
   hasPassword
+  emailConfirmed
 }
 
 query CurrentUser {
@@ -200,6 +201,16 @@ mutation SetUserPassword($password: String!, $passwordConfirmation: String!) {
 
 mutation DeletePersonalUserData($password: String) {
   deletePersonalUserData(input: { password: $password }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ResendUserEmailVerification {
+  resendUserEmailVerification {
     errors {
       code
       message

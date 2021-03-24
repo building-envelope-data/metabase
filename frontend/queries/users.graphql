@@ -52,3 +52,26 @@ mutation ConfirmUserEmail($email: String!, $confirmationCode: String!) {
     }
   }
 }
+
+mutation ConfirmUserEmailChange(
+  $currentEmail: String!
+  $newEmail: String!
+  $confirmationCode: String!
+) {
+  confirmUserEmailChange(
+    input: {
+      currentEmail: $currentEmail
+      newEmail: $newEmail
+      confirmationCode: $confirmationCode
+    }
+  ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

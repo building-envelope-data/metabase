@@ -15,9 +15,12 @@ namespace Metabase.GraphQl.Users
             )
         {
             descriptor.BindFieldsExplicitly();
+            // TODO Protect fields like `Email` and `PhoneNumber` from being publicly available!
             base.Configure(descriptor);
             descriptor
               .Field(t => t.Email);
+            descriptor
+              .Field(t => t.EmailConfirmed);
             descriptor
               .Field(t => t.Name);
             descriptor

@@ -1071,7 +1071,8 @@ namespace Metabase.GraphQl.Users
                     );
             }
             // TODO Check validity of `input.NewEmail` (use error code `INVALID_EMAIL`)
-            await SendUserEmailConfirmation(
+            await SendChangeUserEmailConfirmation(
+                currentEmail,
                 input.NewEmail,
                 await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),
                 emailSender,
@@ -1319,6 +1320,22 @@ namespace Metabase.GraphQl.Users
                 email,
                 "Confirm your email",
                 $"Please confirm your email address by clicking the link {host}/users/confirm-email?email={email}&confirmationCode={confirmationCode}.")
+                .ConfigureAwait(false);
+        }
+
+        private static async Task SendChangeUserEmailConfirmation(
+            string currentEmail,
+            string newEmail,
+            string confirmationToken,
+            Services.IEmailSender emailSender,
+            string host
+        )
+        {
+            var confirmationCode = EncodeToken(confirmationToken);
+            await emailSender.SendEmailAsync(
+                newEmail,
+                "Confirm your email change",
+                $"Please confirm your email address change by clicking the link {host}/users/confirm-email-change?currentEmail={currentEmail}&newEmail={newEmail}&confirmationCode={confirmationCode}.")
                 .ConfigureAwait(false);
         }
 
