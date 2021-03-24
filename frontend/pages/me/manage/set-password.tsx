@@ -13,7 +13,7 @@ const tailLayout = {
 };
 
 function Page() {
-  const [changeUserPasswordMutation] = useSetUserPasswordMutation();
+  const [setUserPasswordMutation] = useSetUserPasswordMutation();
 
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
@@ -32,7 +32,7 @@ function Page() {
       try {
         setSetting(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await changeUserPasswordMutation({
+        const { errors, data } = await setUserPasswordMutation({
           variables: {
             password: password,
             passwordConfirmation: passwordConfirmation,
@@ -40,13 +40,13 @@ function Page() {
         });
         handleFormErrors(
           errors,
-          data?.changeUserPassword?.errors?.map((x) => {
+          data?.setUserPassword?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.changeUserPassword?.errors) {
+        if (!errors && !data?.setUserPassword?.errors) {
           message.success("Your password has been set.");
           form.resetFields();
         }
