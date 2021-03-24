@@ -75,3 +75,35 @@ mutation ConfirmUserEmailChange(
     }
   }
 }
+
+mutation RequestUserPasswordReset($email: String!) {
+  requestUserPasswordReset(input: { email: $email }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ResetUserPassword(
+  $email: String!
+  $password: String!
+  $passwordConfirmation: String!
+  $resetCode: String!
+) {
+  resetUserPassword(
+    input: {
+      email: $email
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+      resetCode: $resetCode
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

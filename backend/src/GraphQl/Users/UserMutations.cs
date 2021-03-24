@@ -487,7 +487,8 @@ namespace Metabase.GraphQl.Users
         public async Task<RequestUserPasswordResetPayload> RequestUserPasswordResetAsync(
             RequestUserPasswordResetInput input,
             [ScopedService] UserManager<Data.User> userManager,
-            [Service] Services.IEmailSender emailSender
+            [Service] Services.IEmailSender emailSender,
+            [Service] AppSettings appSettings
             )
         {
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -502,7 +503,7 @@ namespace Metabase.GraphQl.Users
                 await emailSender.SendEmailAsync(
                     input.Email,
                     "Reset password",
-                    $"Please reset your password with the reset code {resetCode}."
+                    $"Please reset your password by clicking the link {appSettings.Host}/users/reset-password?resetCode={resetCode}."
                     ).ConfigureAwait(false);
             }
             return new RequestUserPasswordResetPayload();
