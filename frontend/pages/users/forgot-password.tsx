@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import { useRequestUserPasswordResetMutation } from "../../queries/users.graphql";
 import { Alert, Form, Input, Button, Row, Col, Card, message } from "antd";
 import Layout from "../../components/Layout";
@@ -7,7 +6,6 @@ import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 
 function Page() {
-  const router = useRouter();
   const [
     requestUserPasswordResetMutation,
   ] = useRequestUserPasswordResetMutation();
