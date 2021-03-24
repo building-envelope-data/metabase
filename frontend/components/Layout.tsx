@@ -35,7 +35,7 @@ const navItems = [
     label: `OpenId Connect`,
   },
   {
-    path: paths.me.manage.index,
+    path: paths.me.manage.profile,
     label: `Account`,
   },
 ];

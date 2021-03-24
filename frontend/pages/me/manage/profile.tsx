@@ -97,6 +97,7 @@ function Page() {
   return (
     <ManageLayout>
       <Typography.Paragraph>Hello {currentUser.name}!</Typography.Paragraph>
+      {/* TODO Change name, postal address, and website locator */}
       {globalErrorMessages.length > 0 && (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
       )}
