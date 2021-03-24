@@ -25,6 +25,8 @@ namespace Metabase.GraphQl.Users
               .Field(t => t.Name);
             descriptor
               .Field(t => t.PhoneNumber);
+            // descriptor
+            //   .Field(t => t.PhoneNumberConfirmed);
             descriptor
               .Field(t => t.WebsiteLocator);
             descriptor

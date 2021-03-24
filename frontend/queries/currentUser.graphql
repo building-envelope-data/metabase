@@ -5,6 +5,7 @@ fragment CurrentUserPartial on User {
   email
   hasPassword
   emailConfirmed
+  phoneNumber
 }
 
 query CurrentUser {
@@ -211,6 +212,19 @@ mutation DeletePersonalUserData($password: String) {
 
 mutation ResendUserEmailVerification {
   resendUserEmailVerification {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation SetUserPhoneNumber($phoneNumber: String!) {
+  setUserPhoneNumber(input: { phoneNumber: $phoneNumber }) {
+    user {
+      ...CurrentUserPartial
+    }
     errors {
       code
       message

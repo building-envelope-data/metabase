@@ -1066,7 +1066,7 @@ namespace Metabase.GraphQl.Users
                     new ChangeUserEmailError(
                       ChangeUserEmailErrorCode.UNCHANGED_EMAIL,
                       "Your email is unchanged.",
-                      new string[] { nameof(input), "newEmail" }
+                      new string[] { nameof(input), nameof(input.NewEmail).FirstCharToLower() }
                       )
                     );
             }
@@ -1153,6 +1153,7 @@ namespace Metabase.GraphQl.Users
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
+        [UseSignInManager]
         public async Task<SetUserPhoneNumberPayload> SetUserPhoneNumberAsync(
             SetUserPhoneNumberInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
@@ -1179,7 +1180,7 @@ namespace Metabase.GraphQl.Users
                     new SetUserPhoneNumberError(
                       SetUserPhoneNumberErrorCode.UNCHANGED_PHONE_NUMBER,
                       "Your phone number is unchanged.",
-                      new string[] { nameof(input), "phoneNumber" }
+                      new string[] { nameof(input), nameof(input.PhoneNumber).FirstCharToLower() }
                       )
                     );
             }

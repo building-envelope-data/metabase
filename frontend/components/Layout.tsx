@@ -31,12 +31,12 @@ const navItems = [
     label: `Users`,
   },
   {
-    path: paths.me.manage.index,
-    label: `Account`,
-  },
-  {
     path: paths.openIdConnect,
     label: `OpenId Connect`,
+  },
+  {
+    path: paths.me.manage.index,
+    label: `Account`,
   },
 ];
 
