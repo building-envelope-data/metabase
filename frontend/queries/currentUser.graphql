@@ -197,3 +197,13 @@ mutation SetUserPassword($password: String!, $passwordConfirmation: String!) {
     }
   }
 }
+
+mutation DeletePersonalUserData($password: String) {
+  deletePersonalUserData(input: { password: $password }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

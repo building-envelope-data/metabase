@@ -21,6 +21,7 @@ export default {
       personalData: "/me/manage/personal-data",
     },
   },
+  personalUserData: "/personal-user-data",
   userLogin: "/users/login",
   userRegister: "/users/register",
   userChangeEmail: "/me/change-email",

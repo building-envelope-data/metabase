@@ -84,7 +84,7 @@ function Page() {
         }
         if (!errors && !data?.enableUserTwoFactorAuthenticator?.errors) {
           message.success("Your authenticator app has been verified.");
-          router.push(paths.me.manage.twoFactorAuthentication);
+          await router.push(paths.me.manage.twoFactorAuthentication);
         }
       } catch (error) {
         // TODO Handle properly.

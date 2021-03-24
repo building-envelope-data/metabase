@@ -59,6 +59,11 @@ server {
     limit_req  zone=one burst=10 nodelay;
   }
 
+  location /personal-user-data {
+    proxy_pass http://backend;
+    limit_req  zone=one burst=10 nodelay;
+  }
+
   location / {
     proxy_pass http://frontend;
     limit_req  zone=one burst=10 nodelay;
