@@ -278,6 +278,44 @@ type DisableUserTwoFactorAuthenticationPayload {
   user: User
 }
 
+type EnableUserTwoFactorAuthenticatorError {
+  code: EnableUserTwoFactorAuthenticatorErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type EnableUserTwoFactorAuthenticatorPayload {
+  authenticatorUri: String
+  errors: [EnableUserTwoFactorAuthenticatorError!]
+  sharedKey: String
+  twoFactorRecoveryCodes: [String!]
+  user: User
+}
+
+type ForgetUserTwoFactorAuthenticationClientError {
+  code: ForgetUserTwoFactorAuthenticationClientErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ForgetUserTwoFactorAuthenticationClientPayload {
+  errors: [ForgetUserTwoFactorAuthenticationClientError!]
+  user: User
+}
+
+type GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError {
+  code: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload {
+  authenticatorUri: String
+  errors: [GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError!]
+  sharedKey: String
+  user: User
+}
+
 type GenerateUserTwoFactorRecoveryCodesError {
   code: GenerateUserTwoFactorRecoveryCodesErrorCode!
   message: String!
@@ -471,6 +509,9 @@ type Mutation {
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  enableUserTwoFactorAuthenticator(input: EnableUserTwoFactorAuthenticatorInput!): EnableUserTwoFactorAuthenticatorPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   loginUser(input: LoginUserInput!): LoginUserPayload!
   loginUserWithRecoveryCode(input: LoginUserWithRecoveryCodeInput!): LoginUserWithRecoveryCodePayload!
@@ -482,6 +523,7 @@ type Mutation {
   resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
   resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload!
+  resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
@@ -569,17 +611,6 @@ type PageInfo {
   startCursor: String
 }
 
-type PersonalUserDataError {
-  code: PersonalUserDataErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type PersonalUserDataPayload {
-  errors: [PersonalUserDataError!]
-  user: User
-}
-
 type Publication implements Reference {
   abstract: String
   "arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
@@ -613,7 +644,6 @@ type Query {
   openIdConnectAuthorizations: [OpenIdConnectAuthorization!]!
   openIdConnectScopes: [OpenIdConnectScope!]!
   openIdConnectTokens: [OpenIdConnectToken!]!
-  personalUserData: PersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER)
   users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
 }
 
@@ -686,6 +716,17 @@ type ResetUserPasswordPayload {
   errors: [ResetUserPasswordError!]
 }
 
+type ResetUserTwoFactorAuthenticatorError {
+  code: ResetUserTwoFactorAuthenticatorErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ResetUserTwoFactorAuthenticatorPayload {
+  errors: [ResetUserTwoFactorAuthenticatorError!]
+  user: User
+}
+
 type SetUserPasswordError {
   code: SetUserPasswordErrorCode!
   message: String!
@@ -721,6 +762,13 @@ type Standard implements Reference {
   year: Int
 }
 
+type TwoFactorAuthentication {
+  hasAuthenticator: Boolean!
+  isEnabled: Boolean!
+  isMachineRemembered: Boolean!
+  recoveryCodesLeftCount: Int!
+}
+
 type UpdateInstitutionError {
   code: UpdateInstitutionErrorCode!
   message: String!
@@ -735,11 +783,14 @@ type UpdateInstitutionPayload {
 type User implements Node & Stakeholder {
   developedMethods: UserDevelopedMethodConnection!
   email: String
+  emailConfirmed: Boolean!
+  hasPassword: Boolean
   id: ID!
   "Full name"
   name: String!
   phoneNumber: String
   representedInstitutions: UserRepresentedInstitutionConnection!
+  twoFactorAuthentication: TwoFactorAuthentication
   uuid: Uuid!
   websiteLocator: Url
 }
@@ -1000,6 +1051,10 @@ input DeleteInstitutionInput {
 
 input DeletePersonalUserDataInput {
   password: String
+}
+
+input EnableUserTwoFactorAuthenticatorInput {
+  verificationCode: String!
 }
 
 input IReferenceSortInput {
@@ -1386,6 +1441,23 @@ enum DisableUserTwoFactorAuthenticationErrorCode {
   UNKNOWN_USER
 }
 
+enum EnableUserTwoFactorAuthenticatorErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+  ENABLING_FAILED
+  INVALID_VERIFICATION_CODE
+}
+
+enum ForgetUserTwoFactorAuthenticationClientErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+}
+
+enum GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+}
+
 enum GenerateUserTwoFactorRecoveryCodesErrorCode {
   UNKNOWN
   UNKNOWN_USER
@@ -1436,11 +1508,6 @@ enum MethodCategory {
   CALCULATION
 }
 
-enum PersonalUserDataErrorCode {
-  UNKNOWN
-  UNKNOWN_USER
-}
-
 enum RegisterUserErrorCode {
   UNKNOWN
   PASSWORD_CONFIRMATION_MISMATCH
@@ -1485,6 +1552,13 @@ enum ResetUserPasswordErrorCode {
   PASSWORD_REQUIRES_NON_ALPHANUMERIC
   PASSWORD_REQUIRES_UPPER
   PASSWORD_TOO_SHORT
+}
+
+enum ResetUserTwoFactorAuthenticatorErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+  DISABLING_FAILED
+  RESETTING_FAILED
 }
 
 enum SetUserPasswordErrorCode {

@@ -23,7 +23,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Metabase.Controllers
 {
-    public class AuthorizationController : Controller
+    public sealed class AuthorizationController : Controller
     {
         private readonly IOpenIddictApplicationManager _applicationManager;
         private readonly IOpenIddictAuthorizationManager _authorizationManager;

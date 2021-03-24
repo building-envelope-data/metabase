@@ -37,7 +37,7 @@ function LoginWithTwoFactorCode() {
     rememberMachine,
   }: {
     authenticatorCode: string;
-    rememberMachine: string;
+    rememberMachine: boolean;
   }) => {
     const loginWithTwoFactorCode = async () => {
       try {

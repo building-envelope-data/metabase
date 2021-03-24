@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
@@ -18,6 +19,9 @@ namespace Metabase.GraphQl.Users
     [ExtendObjectType(Name = nameof(GraphQl.Mutation))]
     public sealed class UserMutations
     {
+        // Key Uri Format https://github.com/google/google-authenticator/wiki/Key-Uri-Format
+        private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
+
         /////////////////////
         // LOGGED-OUT USER //
         /////////////////////
@@ -483,7 +487,8 @@ namespace Metabase.GraphQl.Users
         public async Task<RequestUserPasswordResetPayload> RequestUserPasswordResetAsync(
             RequestUserPasswordResetInput input,
             [ScopedService] UserManager<Data.User> userManager,
-            [Service] Services.IEmailSender emailSender
+            [Service] Services.IEmailSender emailSender,
+            [Service] AppSettings appSettings
             )
         {
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -498,7 +503,7 @@ namespace Metabase.GraphQl.Users
                 await emailSender.SendEmailAsync(
                     input.Email,
                     "Reset password",
-                    $"Please reset your password with the reset code {resetCode}."
+                    $"Please reset your password by clicking the link {appSettings.Host}/users/reset-password?resetCode={resetCode}."
                     ).ConfigureAwait(false);
             }
             return new RequestUserPasswordResetPayload();
@@ -802,8 +807,8 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
-            var disable2faResult = await userManager.SetTwoFactorEnabledAsync(user, false);
-            if (!disable2faResult.Succeeded)
+            var disableResult = await userManager.SetTwoFactorEnabledAsync(user, false).ConfigureAwait(false);
+            if (!disableResult.Succeeded)
             {
                 return new DisableUserTwoFactorAuthenticationPayload(
                     new DisableUserTwoFactorAuthenticationError(
@@ -814,6 +819,221 @@ namespace Metabase.GraphQl.Users
                     );
             }
             return new DisableUserTwoFactorAuthenticationPayload(user);
+        }
+
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
+        [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        [UseSignInManager]
+        public async Task<ForgetUserTwoFactorAuthenticationClientPayload> ForgetUserTwoFactorAuthenticationClientAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] SignInManager<Data.User> signInManager
+            )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new ForgetUserTwoFactorAuthenticationClientPayload(
+                    new ForgetUserTwoFactorAuthenticationClientError(
+                      ForgetUserTwoFactorAuthenticationClientErrorCode.UNKNOWN_USER,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            await signInManager.ForgetTwoFactorClientAsync().ConfigureAwait(false);
+            return new ForgetUserTwoFactorAuthenticationClientPayload(user);
+        }
+
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.EnableAuthenticator.cs.cshtml
+        [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload> GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [Service] UrlEncoder urlEncoder
+            )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
+                    new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
+                      GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.UNKNOWN_USER,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+                var (sharedKey, authenticatorUri) = await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false);
+                return new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
+                    user,
+                    sharedKey,
+                    authenticatorUri
+                    );
+            }
+
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.EnableAuthenticator.cs.cshtml
+        [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<EnableUserTwoFactorAuthenticatorPayload> EnableUserTwoFactorAuthenticatorAsync(
+            EnableUserTwoFactorAuthenticatorInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [Service] UrlEncoder urlEncoder
+            )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new EnableUserTwoFactorAuthenticatorPayload(
+                    new EnableUserTwoFactorAuthenticatorError(
+                      EnableUserTwoFactorAuthenticatorErrorCode.UNKNOWN_USER,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            var verificationToken =
+                input.VerificationCode
+                .Replace(" ", string.Empty)
+                .Replace("-", string.Empty);
+            var isTokenValid =
+                await userManager.VerifyTwoFactorTokenAsync(
+                    user,
+                    userManager.Options.Tokens.AuthenticatorTokenProvider,
+                    verificationToken
+                    )
+                    .ConfigureAwait(false);
+            if (!isTokenValid)
+            {
+                var (sharedKey, authenticatorUri) = await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false);
+                return new EnableUserTwoFactorAuthenticatorPayload(
+                    new EnableUserTwoFactorAuthenticatorError(
+                      EnableUserTwoFactorAuthenticatorErrorCode.INVALID_VERIFICATION_CODE,
+                      "Verification code is invalid.",
+                      new[] { nameof(input), nameof(input.VerificationCode).FirstCharToLower() }
+                      ),
+                    sharedKey,
+                    authenticatorUri
+                    );
+            }
+            var enableResult = await userManager.SetTwoFactorEnabledAsync(user, true).ConfigureAwait(false);
+            if (!enableResult.Succeeded)
+            {
+                var (sharedKey, authenticatorUri) = await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false);
+                return new EnableUserTwoFactorAuthenticatorPayload(
+                    new EnableUserTwoFactorAuthenticatorError(
+                      EnableUserTwoFactorAuthenticatorErrorCode.ENABLING_FAILED,
+                      "Unknown error enabling.",
+                      Array.Empty<string>()
+                      ),
+                    sharedKey,
+                    authenticatorUri
+                    );
+            }
+            if (await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false) == 0)
+            {
+                var recoveryCodes = await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
+                return new EnableUserTwoFactorAuthenticatorPayload(user, recoveryCodes.ToList().AsReadOnly());
+            }
+            else
+            {
+                return new EnableUserTwoFactorAuthenticatorPayload(user);
+            }
+        }
+
+        private static async Task<(string sharedKey, string authenticatorUri)> LoadSharedKeyAndQrCodeUriAsync(UserManager<Data.User> userManager, UrlEncoder urlEncoder, Data.User user)
+        {
+            // Load the authenticator key & QR code URI to display on the form
+            var unformattedKey = await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(unformattedKey))
+            {
+                await userManager.ResetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+                unformattedKey = await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+            }
+            var sharedKey = FormatKey(unformattedKey);
+            var email = await userManager.GetEmailAsync(user).ConfigureAwait(false);
+            var authenticatorUri = GenerateQrCodeUri(urlEncoder, email, unformattedKey);
+            return (sharedKey, authenticatorUri);
+        }
+
+        private static string FormatKey(string unformattedKey)
+        {
+            var result = new StringBuilder();
+            var currentPosition = 0;
+            while (currentPosition + 4 < unformattedKey.Length)
+            {
+                result.Append(unformattedKey, currentPosition, 4).Append(' ');
+                currentPosition += 4;
+            }
+            if (currentPosition < unformattedKey.Length)
+            {
+                result.Append(unformattedKey, currentPosition, unformattedKey.Length - currentPosition);
+            }
+            return result.ToString().ToLowerInvariant();
+        }
+
+        private static string GenerateQrCodeUri(UrlEncoder urlEncoder, string email, string unformattedKey)
+        {
+            return string.Format(
+                AuthenticatorUriFormat,
+                urlEncoder.Encode("buildingenvelopedata.org"), // issuer
+                urlEncoder.Encode(email), // account name
+                unformattedKey // secret
+                );
+        }
+
+        // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.ResetAuthenticator.cs.cshtml
+        [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        [UseSignInManager]
+        public async Task<ResetUserTwoFactorAuthenticatorPayload> ResetUserTwoFactorAuthenticatorAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] SignInManager<Data.User> signInManager
+            )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new ResetUserTwoFactorAuthenticatorPayload(
+                    new ResetUserTwoFactorAuthenticatorError(
+                      ResetUserTwoFactorAuthenticatorErrorCode.UNKNOWN_USER,
+                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            var disableResult = await userManager.SetTwoFactorEnabledAsync(user, false).ConfigureAwait(false);
+            if (!disableResult.Succeeded)
+            {
+                return new ResetUserTwoFactorAuthenticatorPayload(
+                    new ResetUserTwoFactorAuthenticatorError(
+                      ResetUserTwoFactorAuthenticatorErrorCode.DISABLING_FAILED,
+                      "Unknown error disabling.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            var resetResult = await userManager.ResetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+            if (!resetResult.Succeeded)
+            {
+                return new ResetUserTwoFactorAuthenticatorPayload(
+                    new ResetUserTwoFactorAuthenticatorError(
+                      ResetUserTwoFactorAuthenticatorErrorCode.RESETTING_FAILED,
+                      "Unknown error resetting.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
+            return new ResetUserTwoFactorAuthenticatorPayload(user);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
@@ -847,12 +1067,13 @@ namespace Metabase.GraphQl.Users
                     new ChangeUserEmailError(
                       ChangeUserEmailErrorCode.UNCHANGED_EMAIL,
                       "Your email is unchanged.",
-                      new string[] { nameof(input), "newEmail" }
+                      new string[] { nameof(input), nameof(input.NewEmail).FirstCharToLower() }
                       )
                     );
             }
             // TODO Check validity of `input.NewEmail` (use error code `INVALID_EMAIL`)
-            await SendUserEmailConfirmation(
+            await SendChangeUserEmailConfirmation(
+                currentEmail,
                 input.NewEmail,
                 await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),
                 emailSender,
@@ -933,6 +1154,7 @@ namespace Metabase.GraphQl.Users
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
+        [UseSignInManager]
         public async Task<SetUserPhoneNumberPayload> SetUserPhoneNumberAsync(
             SetUserPhoneNumberInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
@@ -959,7 +1181,7 @@ namespace Metabase.GraphQl.Users
                     new SetUserPhoneNumberError(
                       SetUserPhoneNumberErrorCode.UNCHANGED_PHONE_NUMBER,
                       "Your phone number is unchanged.",
-                      new string[] { nameof(input), "phoneNumber" }
+                      new string[] { nameof(input), nameof(input.PhoneNumber).FirstCharToLower() }
                       )
                     );
             }
@@ -1100,6 +1322,22 @@ namespace Metabase.GraphQl.Users
                 email,
                 "Confirm your email",
                 $"Please confirm your email address by clicking the link {host}/users/confirm-email?email={email}&confirmationCode={confirmationCode}.")
+                .ConfigureAwait(false);
+        }
+
+        private static async Task SendChangeUserEmailConfirmation(
+            string currentEmail,
+            string newEmail,
+            string confirmationToken,
+            Services.IEmailSender emailSender,
+            string host
+        )
+        {
+            var confirmationCode = EncodeToken(confirmationToken);
+            await emailSender.SendEmailAsync(
+                newEmail,
+                "Confirm your email change",
+                $"Please confirm your email address change by clicking the link {host}/users/confirm-email-change?currentEmail={currentEmail}&newEmail={newEmail}&confirmationCode={confirmationCode}.")
                 .ConfigureAwait(false);
         }
 

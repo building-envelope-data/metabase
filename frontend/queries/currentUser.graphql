@@ -1,13 +1,16 @@
-fragment UserPartial on User {
+fragment CurrentUserPartial on User {
   id
   uuid
   name
   email
+  hasPassword
+  emailConfirmed
+  phoneNumber
 }
 
 query CurrentUser {
   currentUser {
-    ...UserPartial
+    ...CurrentUserPartial
   }
 }
 
@@ -17,7 +20,7 @@ mutation LoginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
   ) {
     requiresTwoFactor
     user {
-      ...UserPartial
+      ...CurrentUserPartial
     }
     errors {
       code
@@ -40,7 +43,7 @@ mutation LoginUserWithTwoFactorCode(
     }
   ) {
     user {
-      ...UserPartial
+      ...CurrentUserPartial
     }
     errors {
       code
@@ -53,7 +56,7 @@ mutation LoginUserWithTwoFactorCode(
 mutation LoginUserWithRecoveryCode($recoveryCode: String!) {
   loginUserWithRecoveryCode(input: { recoveryCode: $recoveryCode }) {
     user {
-      ...UserPartial
+      ...CurrentUserPartial
     }
     errors {
       code
@@ -76,7 +79,151 @@ mutation LogoutUser {
 mutation ChangeUserEmail($newEmail: String!) {
   changeUserEmail(input: { newEmail: $newEmail }) {
     user {
-      ...UserPartial
+      ...CurrentUserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+query TwoFactorAuthentication {
+  currentUser {
+    twoFactorAuthentication {
+      hasAuthenticator
+      isEnabled
+      isMachineRemembered
+      recoveryCodesLeftCount
+    }
+  }
+}
+
+mutation GenerateUserTwoFactorRecoveryCodes {
+  generateUserTwoFactorRecoveryCodes {
+    twoFactorRecoveryCodes
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DisableUserTwoFactorAuthentication {
+  disableUserTwoFactorAuthentication {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ForgetUserTwoFactorAuthenticationClient {
+  forgetUserTwoFactorAuthenticationClient {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ResetUserTwoFactorAuthenticator {
+  resetUserTwoFactorAuthenticator {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri {
+  generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri {
+    sharedKey
+    authenticatorUri
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation EnableUserTwoFactorAuthenticator($verificationCode: String!) {
+  enableUserTwoFactorAuthenticator(
+    input: { verificationCode: $verificationCode }
+  ) {
+    twoFactorRecoveryCodes
+    sharedKey
+    authenticatorUri
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ChangeUserPassword(
+  $currentPassword: String!
+  $newPassword: String!
+  $newPasswordConfirmation: String!
+) {
+  changeUserPassword(
+    input: {
+      currentPassword: $currentPassword
+      newPassword: $newPassword
+      newPasswordConfirmation: $newPasswordConfirmation
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation SetUserPassword($password: String!, $passwordConfirmation: String!) {
+  setUserPassword(
+    input: { password: $password, passwordConfirmation: $passwordConfirmation }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DeletePersonalUserData($password: String) {
+  deletePersonalUserData(input: { password: $password }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ResendUserEmailVerification {
+  resendUserEmailVerification {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation SetUserPhoneNumber($phoneNumber: String!) {
+  setUserPhoneNumber(input: { phoneNumber: $phoneNumber }) {
+    user {
+      ...CurrentUserPartial
     }
     errors {
       code

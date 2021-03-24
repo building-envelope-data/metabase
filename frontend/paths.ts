@@ -10,9 +10,20 @@ export default {
     return `/users/${encodeURIComponent(uuid)}`;
   },
   userCurrent: "me",
+  me: {
+    manage: {
+      profile: "/me/manage/profile",
+      email: "/me/manage/email",
+      changePassword: "/me/manage/change-password",
+      setPassword: "/me/manage/set-password",
+      twoFactorAuthentication: "/me/manage/two-factor-authentication",
+      enableAuthenticator: "/me/manage/enable-authenticator",
+      personalData: "/me/manage/personal-data",
+    },
+  },
+  personalUserData: "/personal-user-data",
   userLogin: "/users/login",
   userRegister: "/users/register",
-  userChangeEmail: "/me/change-email",
   userConfirmEmail: "/users/confirm-email",
   userForgotPassword: "/users/forgot-password",
   userLoginWithTwoFactorCode: "/users/login-with-two-factor-code",

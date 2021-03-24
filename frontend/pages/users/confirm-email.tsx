@@ -14,7 +14,7 @@ function ConfirmUserEmail() {
     const confirmUserEmail = async () => {
       if (router.isReady) {
         if (typeof email === "string" && typeof confirmationCode === "string") {
-          const { errors } = await confirmUserEmailMutation({
+          const { errors, data } = await confirmUserEmailMutation({
             variables: {
               email: email,
               confirmationCode: confirmationCode,
@@ -22,10 +22,18 @@ function ConfirmUserEmail() {
           });
           if (errors) {
             // TODO Report errors properly.
-            message.error("Something went wrong!");
+            console.log(errors);
+          } else if (data?.confirmUserEmail?.errors) {
+            // TODO Is this how we want to display errors?
+            message.error(
+              data?.confirmUserEmail?.errors
+                .map((error) => error.message)
+                .join(" ")
+            );
+          } else {
+            message.success("Email address confirmed!");
+            await router.push(paths.userLogin);
           }
-          message.success("Email address confirmed!");
-          await router.push(paths.userLogin);
         }
       }
     };

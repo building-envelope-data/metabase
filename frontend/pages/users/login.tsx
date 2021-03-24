@@ -1,7 +1,17 @@
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
 import { useLoginUserMutation } from "../../queries/currentUser.graphql";
-import { Alert, Form, Input, Button, Checkbox, Row, Col, Card } from "antd";
+import {
+  Alert,
+  Form,
+  Input,
+  Button,
+  Checkbox,
+  Row,
+  Col,
+  Card,
+  Typography,
+} from "antd";
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -55,8 +65,7 @@ function Login() {
                 ? { returnTo: returnTo, rememberMe: rememberMe }
                 : { rememberMe: rememberMe },
             });
-          }
-          if (data?.loginUser?.user) {
+          } else if (data?.loginUser?.user) {
             await apolloClient.resetStore();
             await router.push(
               typeof returnTo === "string" ? returnTo : paths.home
@@ -138,7 +147,9 @@ function Login() {
                   }}
                   passHref
                 >
-                  <a style={{ float: "right" }}>Forgot password</a>
+                  <Typography.Link href={paths.userForgotPassword}>
+                    Forgot password
+                  </Typography.Link>
                 </Link>
               </Form.Item>
 
