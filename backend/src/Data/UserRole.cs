@@ -6,8 +6,6 @@ namespace Metabase.Data
 {
     public sealed class UserRole : IdentityUserRole<Guid>
     {
-        public const string Administrator = "Administrator";
-
         public User User { get; set; } = default!;
         public Role Role { get; set; } = default!;
     }
