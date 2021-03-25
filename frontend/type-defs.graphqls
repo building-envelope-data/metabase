@@ -783,9 +783,10 @@ type UpdateInstitutionPayload {
 type User implements Node & Stakeholder {
   developedMethods: UserDevelopedMethodConnection!
   email: String
-  emailConfirmed: Boolean!
   hasPassword: Boolean
   id: ID!
+  isEmailConfirmed: Boolean!
+  isPhoneNumberConfirmed: Boolean!
   "Full name"
   name: String!
   phoneNumber: String

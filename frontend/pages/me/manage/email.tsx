@@ -126,7 +126,7 @@ function Page() {
     <ManageLayout>
       <Typography.Paragraph>
         Your current email address is {currentUser.email}.
-        {!currentUser.emailConfirmed && (
+        {!currentUser.isEmailConfirmed && (
           <>
             Please confirm it by clicking the confirmation link in the
             confirmation email you received. If you didn't receive a

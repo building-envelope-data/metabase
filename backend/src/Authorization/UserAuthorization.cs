@@ -15,6 +15,10 @@ namespace Metabase.Authorization
             )
         {
             var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (loggedInUser is null)
+            {
+                return false;
+            }
             if (loggedInUser.Id == userId)
             {
                 return true;
