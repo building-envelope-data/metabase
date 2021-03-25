@@ -57,11 +57,22 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
       ))}
       {/* I would like the following to be on the right but that is not possible at the moment, see issue https://github.com/ant-design/ant-design/issues/10749 */}
       {currentUser ? (
-        <Menu.Item>
-          <Button type="link" onClick={logout} loading={loggingOut}>
-            Logout
-          </Button>
-        </Menu.Item>
+        <>
+          {/* TODO Make role name `Administrator` a constant. */}
+          {currentUser?.roles?.includes("Administrator") && (
+            <Menu.Item key={paths.openIdConnect}>
+              <Link href={paths.openIdConnect}>OpenId Connect</Link>
+            </Menu.Item>
+          )}
+          <Menu.Item key={paths.me.manage.profile}>
+            <Link href={paths.me.manage.profile}>Account</Link>
+          </Menu.Item>
+          <Menu.Item>
+            <Button type="link" onClick={logout} loading={loggingOut}>
+              Logout
+            </Button>
+          </Menu.Item>
+        </>
       ) : (
         <>
           <Menu.Item key={paths.userLogin}>

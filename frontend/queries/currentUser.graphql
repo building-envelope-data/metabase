@@ -6,6 +6,7 @@ fragment CurrentUserPartial on User {
   hasPassword
   isEmailConfirmed
   phoneNumber
+  roles
 }
 
 query CurrentUser {

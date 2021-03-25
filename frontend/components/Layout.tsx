@@ -30,14 +30,6 @@ const navItems = [
     path: paths.users,
     label: `Users`,
   },
-  {
-    path: paths.openIdConnect,
-    label: `OpenId Connect`,
-  },
-  {
-    path: paths.me.manage.profile,
-    label: `Account`,
-  },
 ];
 
 const Layout: React.FunctionComponent = ({ children }) => {
