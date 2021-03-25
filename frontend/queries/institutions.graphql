@@ -134,7 +134,7 @@ query Institution($uuid: Uuid!) {
         node {
           id
           uuid
-          email
+          name
         }
       }
       canCurrentUserAddEdge
@@ -177,7 +177,7 @@ mutation AddInstitutionRepresentative(
       node {
         id
         uuid
-        email
+        name
       }
       role
     }

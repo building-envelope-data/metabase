@@ -157,7 +157,7 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
       <List
         dataSource={institution.representatives.edges.map((x) => x.node)}
         renderItem={(item) => (
-          <Link href={paths.user(item?.uuid)}>{item?.email}</Link>
+          <Link href={paths.user(item?.uuid)}>{item?.name}</Link>
         )}
       />
       {institution.representatives.canCurrentUserAddEdge ? (
