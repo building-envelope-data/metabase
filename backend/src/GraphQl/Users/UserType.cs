@@ -17,7 +17,11 @@ namespace Metabase.GraphQl.Users
             return typeof(TService).FullName ?? typeof(TService).Name;
         }
 
-        private static async Task<T?> Authorize<T>(IResolverContext context, Func<Data.User, T?> getField)
+        private static async Task<T?> Authorize<T>(
+          IResolverContext context,
+          Func<Data.User, T?> getValue
+          )
+          where T : class
         {
               var user = context.Parent<Data.User>();
               var claimsPrincipal =
@@ -32,10 +36,81 @@ namespace Metabase.GraphQl.Users
                 userManager
               ).ConfigureAwait(false))
               {
-                return default;
+                return null;
               }
-              return getField(user);
+              return getValue(user);
+        }
 
+        private static async Task<T?> Authorize<T>(
+          IResolverContext context,
+          Func<Data.User, T?> getValue
+          )
+          where T : struct
+        {
+              var user = context.Parent<Data.User>();
+              var claimsPrincipal =
+                context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
+                ?? throw new Exception("Claims principal must not be null.");
+              var userManager =
+                context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+                ?? throw new Exception("User manager must not be null.");
+              if (!await UserAuthorization.IsAuthorizedToManageUser(
+                claimsPrincipal,
+                user.Id,
+                userManager
+              ).ConfigureAwait(false))
+              {
+                return null;
+              }
+              return getValue(user);
+        }
+
+        private static async Task<T?> AuthorizeAsync<T>(
+          IResolverContext context,
+          Func<Data.User, UserManager<Data.User>, Task<T?>> getValue
+          )
+          where T : class
+        {
+              var user = context.Parent<Data.User>();
+              var claimsPrincipal =
+                context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
+                ?? throw new Exception("Claims principal must not be null.");
+              var userManager =
+                context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+                ?? throw new Exception("User manager must not be null.");
+              if (!await UserAuthorization.IsAuthorizedToManageUser(
+                claimsPrincipal,
+                user.Id,
+                userManager
+              ).ConfigureAwait(false))
+              {
+                return null;
+              }
+              return await getValue(user, userManager).ConfigureAwait(false);
+        }
+
+        private static async Task<T?> AuthorizeAsync<T>(
+          IResolverContext context,
+          Func<Data.User, UserManager<Data.User>, Task<T?>> getValue
+          )
+          where T : struct
+        {
+              var user = context.Parent<Data.User>();
+              var claimsPrincipal =
+                context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
+                ?? throw new Exception("Claims principal must not be null.");
+              var userManager =
+                context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+                ?? throw new Exception("User manager must not be null.");
+              if (!await UserAuthorization.IsAuthorizedToManageUser(
+                claimsPrincipal,
+                user.Id,
+                userManager
+              ).ConfigureAwait(false))
+              {
+                return null;
+              }
+              return await getValue(user, userManager).ConfigureAwait(false);
         }
 
         protected override void Configure(
@@ -56,8 +131,9 @@ namespace Metabase.GraphQl.Users
             descriptor
               .Field(t => t.EmailConfirmed)
               .Name("isEmailConfirmed")
+              .Type<BooleanType>()
               .Resolve(context =>
-                Authorize(context, user => user.EmailConfirmed)
+                Authorize<bool>(context, user => user.EmailConfirmed)
               )
               .UseDbContext<Data.ApplicationDbContext>()
               .UseUserManager();
@@ -71,8 +147,9 @@ namespace Metabase.GraphQl.Users
             descriptor
               .Field(t => t.PhoneNumberConfirmed)
               .Name("isPhoneNumberConfirmed")
+              .Type<BooleanType>()
               .Resolve(context =>
-                Authorize(context, user => user.PhoneNumberConfirmed)
+                Authorize<bool>(context, user => user.PhoneNumberConfirmed)
               )
               .UseDbContext<Data.ApplicationDbContext>()
               .UseUserManager();
@@ -86,7 +163,21 @@ namespace Metabase.GraphQl.Users
               .UseSignInManager();
             descriptor
               .Field("hasPassword")
-              .ResolveWith<UserResolvers>(t => t.GetHasPasswordAsync(default!, default!, default!))
+              .Type<BooleanType>()
+              .Resolve(context =>
+                AuthorizeAsync<bool>(context, async (user, userManager) =>
+                  await userManager.HasPasswordAsync(user).ConfigureAwait(false)
+                  )
+              )
+              .UseDbContext<Data.ApplicationDbContext>()
+              .UseUserManager();
+            descriptor
+              .Field("roles")
+              .Resolve(context =>
+                AuthorizeAsync(context, async (user, userManager) =>
+                  await userManager.GetRolesAsync(user).ConfigureAwait(false)
+                  )
+              )
               .UseDbContext<Data.ApplicationDbContext>()
               .UseUserManager();
             descriptor
@@ -133,23 +224,6 @@ namespace Metabase.GraphQl.Users
                   isMachineRemembered: await signInManager.IsTwoFactorClientRememberedAsync(user).ConfigureAwait(false),
                   recoveryCodesLeftCount: await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false)
                   );
-            }
-
-            public async Task<bool?> GetHasPasswordAsync(
-              Data.User user,
-              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-              [ScopedService] UserManager<Data.User> userManager
-            )
-            {
-              if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-              ).ConfigureAwait(false))
-              {
-                return null;
-              }
-              return await userManager.HasPasswordAsync(user).ConfigureAwait(false);
             }
         }
     }

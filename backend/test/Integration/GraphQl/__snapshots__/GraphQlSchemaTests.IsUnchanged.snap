@@ -640,10 +640,10 @@ type Query {
   method(uuid: Uuid!): Method
   methods(after: String before: String first: Int last: Int order: [MethodSortInput!] where: MethodFilterInput): MethodConnection
   node(id: ID!): Node
-  openIdConnectApplications: [OpenIdConnectApplication!]!
-  openIdConnectAuthorizations: [OpenIdConnectAuthorization!]!
-  openIdConnectScopes: [OpenIdConnectScope!]!
-  openIdConnectTokens: [OpenIdConnectToken!]!
+  openIdConnectApplications: [OpenIdConnectApplication!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
+  openIdConnectAuthorizations: [OpenIdConnectAuthorization!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
+  openIdConnectScopes: [OpenIdConnectScope!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
+  openIdConnectTokens: [OpenIdConnectToken!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
   users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
 }
 
@@ -785,12 +785,13 @@ type User implements Node & Stakeholder {
   email: String
   hasPassword: Boolean
   id: ID!
-  isEmailConfirmed: Boolean!
-  isPhoneNumberConfirmed: Boolean!
+  isEmailConfirmed: Boolean
+  isPhoneNumberConfirmed: Boolean
   "Full name"
   name: String!
   phoneNumber: String
   representedInstitutions: UserRepresentedInstitutionConnection!
+  roles: [String]
   twoFactorAuthentication: TwoFactorAuthentication
   uuid: Uuid!
   websiteLocator: Url
