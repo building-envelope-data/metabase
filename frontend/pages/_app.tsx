@@ -1,6 +1,7 @@
 import { AppProps } from "next/app";
 import { ApolloProvider } from "@apollo/client";
 import { useApollo } from "../lib/apollo";
+import { CookiesProvider } from "react-cookie";
 
 import "antd/dist/antd.css";
 import "../styles/vars.css";
@@ -11,7 +12,9 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <Component {...pageProps} />
+      <CookiesProvider>
+        <Component {...pageProps} />
+      </CookiesProvider>
     </ApolloProvider>
   );
 }

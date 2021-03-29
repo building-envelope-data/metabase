@@ -1,9 +1,11 @@
 import Head from "next/head";
-import * as React from "react";
+import { FunctionComponent, useEffect } from "react";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
-import { Layout as AntLayout } from "antd";
+import { Modal, Layout as AntLayout, Typography } from "antd";
 import paths from "../paths";
+import Cookies from "js-cookie";
+import { useCookies } from "react-cookie";
 
 const navItems = [
   {
@@ -32,8 +34,31 @@ const navItems = [
   },
 ];
 
-const Layout: React.FunctionComponent = ({ children }) => {
+const Layout: FunctionComponent = ({ children }) => {
   const appTitle = `Building Envelope Data`;
+  const cookieConsentName = "consent";
+  const cookieConsentValue = "yes";
+
+  const [cookies, setCookie] = useCookies([cookieConsentName]);
+
+  useEffect(() => {
+    if (cookies[cookieConsentName] != cookieConsentValue) {
+      Modal.info({
+        title: "Cookie Consent",
+        content: (
+          <Typography.Paragraph>
+            This website employs cookies to make it work securely. As these
+            cookies are essential you need to agree to their usage to use this
+            website.
+          </Typography.Paragraph>
+        ),
+        okText: "I agree",
+        onOk: () => {
+          setCookie(cookieConsentName, cookieConsentValue);
+        },
+      });
+    }
+  }, []);
 
   return (
     <AntLayout>
