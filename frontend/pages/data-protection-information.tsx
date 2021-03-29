@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 
 const url =
   "https://dsi.informationssicherheit.fraunhofer.de/en/dsi/metabase.buildingenvelopedata.org";
-const errorMessage = "Legal notice could not be fetched.";
+const errorMessage = "Data protection information could not be fetched.";
 
 function Page() {
   // Inspired by https://www.robinwieruch.de/react-hooks-fetch-data
@@ -43,7 +43,7 @@ function Page() {
   if (!data) {
     return (
       <Layout>
-        You can view the legal notice under{" "}
+        You can view the data protection information under{" "}
         <Typography.Link href={url}>{url}</Typography.Link>
       </Layout>
     );
