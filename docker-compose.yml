@@ -51,6 +51,7 @@ services:
       - XBASE_JsonWebToken__EncryptionKey=${JSON_WEB_TOKEN_ENCRYPTION_KEY}
       - XBASE_JsonWebToken__SigningKey=${JSON_WEB_TOKEN_SIGNING_KEY}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
+      - XBASE_ElasticsearchUri=http://localhost:9200
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       # - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_CERTIFICATE_PASSWORD}
@@ -105,7 +106,97 @@ services:
       - frontend
       - backend
 
+  # TODO https://www.elastic.co/guide/en/elasticsearch/reference/current/secure-cluster.html
+  # https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-docker.html#get-started-docker
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    environment:
+      - xpack.watcher.enabled=false
+      - xpack.security.enabled=true
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/enable-audit-logging.html
+      - xpack.security.audit.enabled=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - bootstrap.memory_lock=true
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+
+  # https://www.elastic.co/guide/en/beats/heartbeat/current/running-on-docker.html
+  # https://www.docker.elastic.co/r/beats
+  # heartbeat:
+  #   image: docker.elastic.co/beats/heartbeat:7.12.0
+  #   environment:
+  #     - setup.kibana.host=http://kibana:5601
+  #     - output.elasticsearch.hosts=["http://elasticsearch:9200"]
+  #   networks:
+  #     - elastic
+
+  # TODO https://www.elastic.co/guide/en/logstash/current/docker.html
+  # TODO https://www.elastic.co/guide/en/logstash/current/config-examples.html
+  # logstash:
+  #   image: docker.elastic.co/logstash/logstash:7.12.0
+  #   environment:
+  #     - setup.kibana.host=http://kibana:5601
+  #     - monitoring.elasticsearch.hosts=http://elasticsearch:9200
+  #     - output.elasticsearch.hosts=["http://elasticsearch:9200"]
+  #   networks:
+  #     - elastic
+
+  # TODO https://www.elastic.co/guide/en/beats/metricbeat/7.12/running-on-docker.html
+  # metricbeat:
+  #   image: docker.elastic.co/beats/metricbeat:7.12.0
+  #   volumes:
+  #     - ./metricbeat.docker.yml:/usr/share/metricbeat/metricbeat.yml:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+  #     - /proc:/hostfs/proc:ro
+  #     - /:/hostfs:ro
+  #   environment:
+  #     - setup.kibana.host=http://kibana:5601
+  #     - output.elasticsearch.hosts=["http://elasticsearch:9200"]
+  #   networks:
+  #     - elastic
+
+  # https://www.elastic.co/guide/en/kibana/current/docker.html
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.12.0
+    ports:
+      - 5601:5601
+    # volumes:
+    #   - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    environment:
+      - SERVER_NAME=kibana
+      - SERVER_HOST=0.0.0.0
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=["http://elasticsearch:9200"]
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
+      - XPACK_SECURITY_ENABLED=true
+      - XPACK_SECURITY_ENCRYPTIONKEY=${XPACK_SECURITY_ENCRYPTIONKEY}
+      - MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED=true
+      - MONITORING_CLUSTERALERTS_EMAILNOTIFICATIONS_EMAILADDRESS=${NOTIFICATION_EMAIL_ADDRESS}
+      - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
+    networks:
+      - elastic
+    depends_on:
+      - elasticsearch
+
 volumes:
   data:
   # backend_node_modules:
   frontend_node_modules:
+  elasticsearch:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge

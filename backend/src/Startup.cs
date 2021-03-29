@@ -9,10 +9,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Serilog;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 
 // TODO Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth
 
@@ -21,23 +22,15 @@ namespace Metabase
     public sealed class Startup
     {
         private readonly IWebHostEnvironment _environment;
-        private readonly IConfiguration _configuration;
         private readonly AppSettings _appSettings;
 
         public Startup(
             IWebHostEnvironment environment,
-            string[] commandLineArguments
+            IConfiguration configuration
             )
         {
             _environment = environment;
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(environment.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false, reloadOnChange: false)
-                .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
-                .AddCommandLine(commandLineArguments)
-              .Build();
-            _appSettings = _configuration.Get<AppSettings>();
+            _appSettings = configuration.Get<AppSettings>();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -156,6 +149,7 @@ namespace Metabase
             }
             // app.UseStatusCodePages();
             // app.UseHttpsRedirection(); // Done by NGINX
+            app.UseSerilogRequestLogging();
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseRouting();
