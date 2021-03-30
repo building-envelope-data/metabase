@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Metabase.GraphQl.Common;
@@ -11,16 +12,16 @@ namespace Metabase.Tests.Integration.GraphQl.Components
     public abstract class ComponentIntegrationTests
       : IntegrationTests
     {
-        protected static CreateComponentInput MinimalComponentInput { get; } = new(
+        internal static CreateComponentInput MinimalComponentInput { get; } = new(
                     Name: "Component A",
                     Abbreviation: "C!A",
                     Description: "Best component ever!",
                     Availability: null,
                     Categories: Array.Empty<Enumerations.ComponentCategory>(),
-                    ManufacturerId: Guid.NewGuid()
+                    ManufacturerId: Guid.Empty
                  );
 
-        protected static CreateComponentInput FromAndToRestrictedAvailabilityComponentInput { get; } = new(
+        internal static CreateComponentInput FromAndToRestrictedAvailabilityComponentInput { get; } = new(
                     Name: "Component B",
                     Abbreviation: "C!B",
                     Description: "Another component!",
@@ -32,10 +33,10 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                         Enumerations.ComponentCategory.MATERIAL,
                         Enumerations.ComponentCategory.UNIT,
                         },
-                    ManufacturerId: Guid.NewGuid()
+                    ManufacturerId: Guid.Empty
                  );
 
-        protected static CreateComponentInput ToRestrictedAvailabilityComponentInput { get; } = new(
+        internal static CreateComponentInput ToRestrictedAvailabilityComponentInput { get; } = new(
                     Name: "Component C",
                     Abbreviation: "C!C",
                     Description: "Yet another component!",
@@ -46,10 +47,10 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                     Categories: new[] {
                         Enumerations.ComponentCategory.UNIT,
                         },
-                    ManufacturerId: Guid.NewGuid()
+                    ManufacturerId: Guid.Empty
                  );
 
-        protected static CreateComponentInput FromRestrictedAvailabilityComponentInput { get; } = new(
+        internal static CreateComponentInput FromRestrictedAvailabilityComponentInput { get; } = new(
                     Name: "Component D",
                     Abbreviation: "C!D",
                     Description: "Whatever component!",
@@ -62,10 +63,10 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                         Enumerations.ComponentCategory.MATERIAL,
                         Enumerations.ComponentCategory.UNIT,
                         },
-                    ManufacturerId: Guid.NewGuid()
+                    ManufacturerId: Guid.Empty
                  );
 
-        protected static IEnumerable<CreateComponentInput> ComponentInputs
+        internal static IEnumerable<CreateComponentInput> ComponentInputs
         {
             get
             {
@@ -76,7 +77,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             }
         }
 
-        protected static IEnumerable<object[]> EnumerateComponentInputs()
+        internal static IEnumerable<object[]> EnumerateComponentInputs()
         {
             yield return new object[] { nameof(MinimalComponentInput), MinimalComponentInput };
             yield return new object[] { nameof(FromAndToRestrictedAvailabilityComponentInput), FromAndToRestrictedAvailabilityComponentInput };
@@ -86,14 +87,33 @@ namespace Metabase.Tests.Integration.GraphQl.Components
 
         protected Task<string> GetComponents()
         {
+            return GetComponents(HttpClient);
+        }
+
+        internal static Task<string> GetComponents(
+            HttpClient httpClient
+        )
+        {
             return SuccessfullyQueryGraphQlContentAsString(
+                httpClient,
                 File.ReadAllText("Integration/GraphQl/Components/GetComponents.graphql")
                 );
         }
 
-        protected Task<string> GetComponent(string uuid)
+        protected Task<string> GetComponent(
+            string uuid
+            )
+        {
+            return GetComponent(HttpClient, uuid);
+        }
+
+        internal static Task<string> GetComponent(
+            HttpClient httpClient,
+            string uuid
+            )
         {
             return SuccessfullyQueryGraphQlContentAsString(
+                httpClient,
                 File.ReadAllText("Integration/GraphQl/Components/GetComponent.graphql"),
                 variables: new Dictionary<string, object?>
                 {
@@ -106,7 +126,16 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             CreateComponentInput input
             )
         {
+            return CreateComponent(HttpClient, input);
+        }
+
+        internal static Task<string> CreateComponent(
+            HttpClient httpClient,
+            CreateComponentInput input
+            )
+        {
             return SuccessfullyQueryGraphQlContentAsString(
+                httpClient,
                 File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
                 variables: input
                 );
@@ -117,6 +146,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             )
         {
             return SuccessfullyQueryGraphQlContentAsJson(
+                HttpClient,
                 File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
                 variables: input
                 );

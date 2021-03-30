@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Metabase.GraphQl.Components;
+using Metabase.Tests.Integration.GraphQl.Institutions;
 using Snapshooter;
 using Snapshooter.Xunit;
 using Xunit;
@@ -18,9 +19,9 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         {
             // Act
             var response =
-             await UnsuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
-                variables: MinimalComponentInput
+                await UnsuccessfullyQueryGraphQlContentAsString(
+                    File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
+                    variables: MinimalComponentInput
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -47,9 +48,19 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         )
         {
             // Arrange
-            await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+            var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+            var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
+                HttpClient,
+                InstitutionIntegrationTests.OperativeInstitutionInput with {
+                    OwnerIds = new[] { userId }
+                }
+                ).ConfigureAwait(false);
             // Act
-            var response = await CreateComponent(input).ConfigureAwait(false);
+            var response = await CreateComponent(
+                input with {
+                    ManufacturerId = institutionId
+                }
+                ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
@@ -72,9 +83,19 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         )
         {
             // Arrange
-            await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+            var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+            var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
+                HttpClient,
+                InstitutionIntegrationTests.OperativeInstitutionInput with {
+                    OwnerIds = new[] { userId }
+                }
+                ).ConfigureAwait(false);
             // Act
-            var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(input).ConfigureAwait(false);
+            var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(
+                input with {
+                    ManufacturerId = institutionId
+                }
+                ).ConfigureAwait(false);
             var response = await GetComponents().ConfigureAwait(false);
             // Assert
             Snapshot.Match(

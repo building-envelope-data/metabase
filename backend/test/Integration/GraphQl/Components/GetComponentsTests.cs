@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Metabase.Tests.Integration.GraphQl.Institutions;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -25,8 +26,18 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         public async Task SingleComponent_IsReturned()
         {
             // Arrange
-            await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(MinimalComponentInput).ConfigureAwait(false);
+            var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+            var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
+                HttpClient,
+                InstitutionIntegrationTests.OperativeInstitutionInput with {
+                    OwnerIds = new[] { userId }
+                }
+                ).ConfigureAwait(false);
+            var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(
+                MinimalComponentInput with {
+                    ManufacturerId = institutionId
+                }
+                ).ConfigureAwait(false);
             LogoutUser();
             // Act
             var response = await GetComponents().ConfigureAwait(false);
@@ -47,12 +58,22 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         public async Task MultipleComponents_AreReturned()
         {
             // Arrange
-            await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+            var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+            var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
+                HttpClient,
+                InstitutionIntegrationTests.OperativeInstitutionInput with {
+                    OwnerIds = new[] { userId }
+                }
+                ).ConfigureAwait(false);
             var componentIdsAndUuids = new List<(string, string)>();
             foreach (var input in ComponentInputs)
             {
                 componentIdsAndUuids.Add(
-                    await CreateComponentReturningIdAndUuid(input).ConfigureAwait(false)
+                    await CreateComponentReturningIdAndUuid(
+                        input with {
+                            ManufacturerId = institutionId
+                        }
+                        ).ConfigureAwait(false)
                     );
             }
             LogoutUser();
