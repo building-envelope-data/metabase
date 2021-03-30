@@ -60,7 +60,7 @@ remove-data : ## Remove data volumes
 .PHONY : remove-data
 
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
-up : build ## (Re)create and start containers
+up : build ## (Re)create, and start containers (after building images if necessary)
 	DOCKER_IP=${docker_ip} \
 		${docker_compose} up \
 		--remove-orphans \
@@ -83,32 +83,32 @@ logs : ## Follow logs
 		--follow
 .PHONY : logs
 
-run : build ## Run the one-time command `${COMMAND}` against a fresh `${CONTAINER}` container
+exec : up ## Execute the one-time command `${COMMAND}` against an existing `${CONTAINER}` container (after starting all containers if necessary)
 	DOCKER_IP=${docker_ip} \
-		${docker_compose} run \
+		${docker_compose} exec \
 		--user $(shell id --user):$(shell id --group) \
 		${CONTAINER} \
 		${COMMAND}
-.PHONY : run
+.PHONY : exec
 
-runf : CONTAINER = frontend
-runf : run ## Run the one-time command `${COMMAND}` against a fresh `frontend` container
-.PHONY : runf
+execf : CONTAINER = frontend
+execf : exec ## Execute the one-time command `${COMMAND}` against an existing `frontend` container (after starting all containers if necessary)
+.PHONY : execf
 
-runb : CONTAINER = backend
-runb : run ## Run the one-time command `${COMMAND}` against a fresh `backend` container
-.PHONY : runb
+execb : CONTAINER = backend
+execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
+.PHONY : execb
 
 shellf : COMMAND = ash
-shellf : runf ## Enter shell in a fresh `frontend` container
+shellf : execf ## Enter shell in an existing `frontend` container (after starting all containers if necessary)
 .PHONY : shellf
 
 shellb : COMMAND = ash
-shellb : runb ## Enter shell in a fresh `backend` container
+shellb : execb ## Enter shell in an existing `backend` container (after starting all containers if necessary)
 .PHONY : shellb
 
 shellb-examples : COMMAND = bash -c "cd ./examples && bash"
-shellb-examples : runb-metabase ## Enter Bourne-again shell, aka, bash, in a fresh metabase container
+shellb-examples : execb-metabase ## Enter Bourne-again shell, aka, bash, in an existing `backend` container (after starting all containers if necessary)
 .PHONY : shellb-examples
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
@@ -131,9 +131,9 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname xbase_development
 .PHONY : psql
 
-shelld : ## Enter shell in a fresh `database` container
+shelld : up ## Enter shell in an existing `database` container (after starting all containers if necessary)
 	DOCKER_IP=${docker_ip} \
-		${docker_compose} run \
+		${docker_compose} exec \
 		database \
 		ash
 .PHONY : shelld
