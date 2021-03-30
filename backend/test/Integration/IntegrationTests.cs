@@ -150,7 +150,7 @@ namespace Metabase.Tests.Integration
         {
             return Regex.Match(
                 EmailSender.Emails.Single().Message,
-                @"reset code (?<resetCode>\w+)"
+                @"resetCode=(?<resetCode>\w+)"
                 )
                 .Groups["resetCode"]
                 .Captures
