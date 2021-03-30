@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Snapshooter.Xunit;
@@ -22,14 +23,18 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             Snapshot.Match(
                 response,
                 // matchOptions => matchOptions.IgnoreField("data.registerUser.user.id")
-                matchOptions => matchOptions.Assert(fieldOptions =>
-                  fieldOptions.Field<string>("data.registerUser.user.id").Should().NotBeNullOrWhiteSpace()
-                  )
+                matchOptions => matchOptions
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<string>("data.registerUser.user.id").Should().NotBeNullOrWhiteSpace()
+                    )
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<Guid>("data.registerUser.user.uuid").Should().NotBe(Guid.Empty)
+                    )
                 );
             EmailsShouldContainSingle(
                 address: email,
                 subject: "Confirm your email",
-                messageRegEx: @"^Please confirm your email address with the confirmation code \w+\.$"
+                messageRegEx: @"^Please confirm your email address by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+\.$"
                 );
         }
 

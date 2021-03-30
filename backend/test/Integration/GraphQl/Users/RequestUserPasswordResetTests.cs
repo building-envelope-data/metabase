@@ -25,7 +25,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailsShouldContainSingle(
                 address: email,
                 subject: "Reset password",
-                messageRegEx: @"^Please reset your password with the reset code \w+\.$"
+                messageRegEx: @"^Please reset your password by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
                 );
         }
 

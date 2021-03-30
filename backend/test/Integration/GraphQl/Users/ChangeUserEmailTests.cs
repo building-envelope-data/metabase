@@ -40,8 +40,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
             EmailsShouldContainSingle(
                 address: newEmail,
-                subject: "Confirm your email",
-                messageRegEx: @"^Please confirm your email address with the confirmation code \w+\.$"
+                subject: "Confirm your email change",
+                messageRegEx: @"^Please confirm your email address change by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email-change\?currentEmail=john\.doe@ise\.fraunhofer\.de&newEmail=new.john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+\.$"
                 );
         }
 
