@@ -29,12 +29,14 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationTests.OperativeInstitutionInput with {
+                InstitutionIntegrationTests.OperativeInstitutionInput with
+                {
                     OwnerIds = new[] { userId }
                 }
                 ).ConfigureAwait(false);
             var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(
-                MinimalComponentInput with {
+                MinimalComponentInput with
+                {
                     ManufacturerId = institutionId
                 }
                 ).ConfigureAwait(false);
@@ -61,7 +63,8 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationTests.OperativeInstitutionInput with {
+                InstitutionIntegrationTests.OperativeInstitutionInput with
+                {
                     OwnerIds = new[] { userId }
                 }
                 ).ConfigureAwait(false);
@@ -70,7 +73,8 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             {
                 componentIdsAndUuids.Add(
                     await CreateComponentReturningIdAndUuid(
-                        input with {
+                        input with
+                        {
                             ManufacturerId = institutionId
                         }
                         ).ConfigureAwait(false)

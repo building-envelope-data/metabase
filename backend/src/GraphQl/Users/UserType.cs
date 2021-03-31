@@ -23,22 +23,22 @@ namespace Metabase.GraphQl.Users
           )
           where T : class
         {
-              var user = context.Parent<Data.User>();
-              var claimsPrincipal =
-                context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
-                ?? throw new Exception("Claims principal must not be null.");
-              var userManager =
-                context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                ?? throw new Exception("User manager must not be null.");
-              if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-              ).ConfigureAwait(false))
-              {
+            var user = context.Parent<Data.User>();
+            var claimsPrincipal =
+              context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
+              ?? throw new Exception("Claims principal must not be null.");
+            var userManager =
+              context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+              ?? throw new Exception("User manager must not be null.");
+            if (!await UserAuthorization.IsAuthorizedToManageUser(
+              claimsPrincipal,
+              user.Id,
+              userManager
+            ).ConfigureAwait(false))
+            {
                 return null;
-              }
-              return getValue(user);
+            }
+            return getValue(user);
         }
 
         private static async Task<T?> Authorize<T>(
@@ -47,22 +47,22 @@ namespace Metabase.GraphQl.Users
           )
           where T : struct
         {
-              var user = context.Parent<Data.User>();
-              var claimsPrincipal =
-                context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
-                ?? throw new Exception("Claims principal must not be null.");
-              var userManager =
-                context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                ?? throw new Exception("User manager must not be null.");
-              if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-              ).ConfigureAwait(false))
-              {
+            var user = context.Parent<Data.User>();
+            var claimsPrincipal =
+              context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
+              ?? throw new Exception("Claims principal must not be null.");
+            var userManager =
+              context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+              ?? throw new Exception("User manager must not be null.");
+            if (!await UserAuthorization.IsAuthorizedToManageUser(
+              claimsPrincipal,
+              user.Id,
+              userManager
+            ).ConfigureAwait(false))
+            {
                 return null;
-              }
-              return getValue(user);
+            }
+            return getValue(user);
         }
 
         private static async Task<T?> AuthorizeAsync<T>(
@@ -71,22 +71,22 @@ namespace Metabase.GraphQl.Users
           )
           where T : class
         {
-              var user = context.Parent<Data.User>();
-              var claimsPrincipal =
-                context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
-                ?? throw new Exception("Claims principal must not be null.");
-              var userManager =
-                context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                ?? throw new Exception("User manager must not be null.");
-              if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-              ).ConfigureAwait(false))
-              {
+            var user = context.Parent<Data.User>();
+            var claimsPrincipal =
+              context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
+              ?? throw new Exception("Claims principal must not be null.");
+            var userManager =
+              context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+              ?? throw new Exception("User manager must not be null.");
+            if (!await UserAuthorization.IsAuthorizedToManageUser(
+              claimsPrincipal,
+              user.Id,
+              userManager
+            ).ConfigureAwait(false))
+            {
                 return null;
-              }
-              return await getValue(user, userManager).ConfigureAwait(false);
+            }
+            return await getValue(user, userManager).ConfigureAwait(false);
         }
 
         private static async Task<T?> AuthorizeAsync<T>(
@@ -95,22 +95,22 @@ namespace Metabase.GraphQl.Users
           )
           where T : struct
         {
-              var user = context.Parent<Data.User>();
-              var claimsPrincipal =
-                context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
-                ?? throw new Exception("Claims principal must not be null.");
-              var userManager =
-                context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                ?? throw new Exception("User manager must not be null.");
-              if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-              ).ConfigureAwait(false))
-              {
+            var user = context.Parent<Data.User>();
+            var claimsPrincipal =
+              context.GetGlobalValue<ClaimsPrincipal>(nameof(ClaimsPrincipal))
+              ?? throw new Exception("Claims principal must not be null.");
+            var userManager =
+              context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+              ?? throw new Exception("User manager must not be null.");
+            if (!await UserAuthorization.IsAuthorizedToManageUser(
+              claimsPrincipal,
+              user.Id,
+              userManager
+            ).ConfigureAwait(false))
+            {
                 return null;
-              }
-              return await getValue(user, userManager).ConfigureAwait(false);
+            }
+            return await getValue(user, userManager).ConfigureAwait(false);
         }
 
         protected override void Configure(
@@ -210,20 +210,20 @@ namespace Metabase.GraphQl.Users
               [ScopedService] SignInManager<Data.User> signInManager
             )
             {
-              if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-              ).ConfigureAwait(false))
-              {
-                return null;
-              }
-              return new TwoFactorAuthentication(
-                  hasAuthenticator: await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false) != null,
-                  isEnabled: await userManager.GetTwoFactorEnabledAsync(user).ConfigureAwait(false),
-                  isMachineRemembered: await signInManager.IsTwoFactorClientRememberedAsync(user).ConfigureAwait(false),
-                  recoveryCodesLeftCount: await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false)
-                  );
+                if (!await UserAuthorization.IsAuthorizedToManageUser(
+                  claimsPrincipal,
+                  user.Id,
+                  userManager
+                ).ConfigureAwait(false))
+                {
+                    return null;
+                }
+                return new TwoFactorAuthentication(
+                    hasAuthenticator: await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false) != null,
+                    isEnabled: await userManager.GetTwoFactorEnabledAsync(user).ConfigureAwait(false),
+                    isMachineRemembered: await signInManager.IsTwoFactorClientRememberedAsync(user).ConfigureAwait(false),
+                    recoveryCodesLeftCount: await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false)
+                    );
             }
         }
     }

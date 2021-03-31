@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.OpenIdConnect
         // [UseProjection]
         // [UseFiltering]
         // [UseSorting]
-        [Authorize(Roles = new[] {Data.Role.Administrator})]
+        [Authorize(Roles = new[] { Data.Role.Administrator })]
         public async Task<List<OpenIddictEntityFrameworkCoreApplication>> GetOpenIdConnectApplications(
             [Service] OpenIddictApplicationManager<OpenIddictEntityFrameworkCoreApplication> manager,
             // [ScopedService] Data.ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
@@ -29,7 +29,7 @@ namespace Metabase.GraphQl.OpenIdConnect
             return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken);
         }
 
-        [Authorize(Roles = new[] {Data.Role.Administrator})]
+        [Authorize(Roles = new[] { Data.Role.Administrator })]
         public async Task<List<OpenIddictEntityFrameworkCoreScope>> GetOpenIdConnectScopes(
             [Service] OpenIddictScopeManager<OpenIddictEntityFrameworkCoreScope> manager,
             // [ScopedService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
@@ -39,7 +39,7 @@ namespace Metabase.GraphQl.OpenIdConnect
             return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken);
         }
 
-        [Authorize(Roles = new[] {Data.Role.Administrator})]
+        [Authorize(Roles = new[] { Data.Role.Administrator })]
         public async Task<List<OpenIddictEntityFrameworkCoreToken>> GetOpenIdConnectTokens(
             [Service] OpenIddictTokenManager<OpenIddictEntityFrameworkCoreToken> manager,
             // [TokendService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
@@ -49,7 +49,7 @@ namespace Metabase.GraphQl.OpenIdConnect
             return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken);
         }
 
-        [Authorize(Roles = new[] {Data.Role.Administrator})]
+        [Authorize(Roles = new[] { Data.Role.Administrator })]
         public async Task<List<OpenIddictEntityFrameworkCoreAuthorization>> GetOpenIdConnectAuthorizations(
             [Service] OpenIddictAuthorizationManager<OpenIddictEntityFrameworkCoreAuthorization> manager,
             // [AuthorizationdService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.

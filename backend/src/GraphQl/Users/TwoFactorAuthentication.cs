@@ -14,10 +14,10 @@ namespace Metabase.GraphQl.Users
                 int recoveryCodesLeftCount
             )
         {
-          HasAuthenticator = hasAuthenticator;
-          IsEnabled = isEnabled;
-          IsMachineRemembered = isMachineRemembered;
-          RecoveryCodesLeftCount = recoveryCodesLeftCount;
+            HasAuthenticator = hasAuthenticator;
+            IsEnabled = isEnabled;
+            IsMachineRemembered = isMachineRemembered;
+            RecoveryCodesLeftCount = recoveryCodesLeftCount;
         }
     }
 }

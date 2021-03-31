@@ -50,7 +50,8 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
             var response = await CreateInstitution(
-                input with {
+                input with
+                {
                     OwnerIds = new[] { userId }
                 }
                 ).ConfigureAwait(false);
@@ -79,7 +80,8 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
             var (institutionId, institutionUuid) = await CreateInstitutionReturningIdAndUuid(
-                input with {
+                input with
+                {
                     OwnerIds = new[] { userId }
                 }
                 ).ConfigureAwait(false);

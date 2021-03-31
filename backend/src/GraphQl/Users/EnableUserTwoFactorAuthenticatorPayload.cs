@@ -32,8 +32,8 @@ namespace Metabase.GraphQl.Users
             )
           : base(error)
         {
-          SharedKey = sharedKey;
-          AuthenticatorUri = authenticatorUri;
+            SharedKey = sharedKey;
+            AuthenticatorUri = authenticatorUri;
         }
 
         public EnableUserTwoFactorAuthenticatorPayload(

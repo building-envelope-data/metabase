@@ -232,13 +232,13 @@ namespace Metabase.GraphQl.Users
             var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
             if (user is null)
             {
-              return new LoginUserWithTwoFactorCodePayload(
-                  new LoginUserWithTwoFactorCodeError(
-                    LoginUserWithTwoFactorCodeErrorCode.UNKNOWN_USER,
-                    "Unable to load two-factor authentication user.",
-                    Array.Empty<string>()
-                    )
-                  );
+                return new LoginUserWithTwoFactorCodePayload(
+                    new LoginUserWithTwoFactorCodeError(
+                      LoginUserWithTwoFactorCodeErrorCode.UNKNOWN_USER,
+                      "Unable to load two-factor authentication user.",
+                      Array.Empty<string>()
+                      )
+                    );
             }
             var authenticatorCode =
                 input.AuthenticatorCode
@@ -295,13 +295,13 @@ namespace Metabase.GraphQl.Users
             var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
             if (user is null)
             {
-              return new LoginUserWithRecoveryCodePayload(
-                  new LoginUserWithRecoveryCodeError(
-                    LoginUserWithRecoveryCodeErrorCode.UNKNOWN_USER,
-                    "Unable to load two-factor authentication user.",
-                    Array.Empty<string>()
-                    )
-                  );
+                return new LoginUserWithRecoveryCodePayload(
+                    new LoginUserWithRecoveryCodeError(
+                      LoginUserWithRecoveryCodeErrorCode.UNKNOWN_USER,
+                      "Unable to load two-factor authentication user.",
+                      Array.Empty<string>()
+                      )
+                    );
             }
             var recoveryCode =
                 input.RecoveryCode
@@ -868,13 +868,13 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
-                var (sharedKey, authenticatorUri) = await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false);
-                return new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
-                    user,
-                    sharedKey,
-                    authenticatorUri
-                    );
-            }
+            var (sharedKey, authenticatorUri) = await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false);
+            return new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
+                user,
+                sharedKey,
+                authenticatorUri
+                );
+        }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.EnableAuthenticator.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
