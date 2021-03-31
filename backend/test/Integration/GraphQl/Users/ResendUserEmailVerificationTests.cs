@@ -33,7 +33,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailsShouldContainSingle(
                 address: email,
                 subject: "Confirm your email",
-                messageRegEx: @"^Please confirm your email address with the confirmation code \w+\.$"
+                messageRegEx: @"^Please confirm your email address by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+\.$"
                 );
         }
 
