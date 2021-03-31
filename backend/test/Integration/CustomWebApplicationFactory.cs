@@ -124,9 +124,12 @@ namespace Metabase.Tests.Integration
         {
             Do(
                 services =>
-                  services.GetRequiredService<Data.ApplicationDbContext>()
-                  .Database.GetService<IRelationalDatabaseCreator>()
-                  .EnsureDeleted()
+                    {
+                        services
+                        .GetRequiredService<Data.ApplicationDbContext>()
+                        .Database
+                        .EnsureDeleted();
+                    }
             );
             base.Dispose();
         }
