@@ -10,8 +10,6 @@ using System.IO;
 using Serilog;
 using Serilog.Events;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
-using Microsoft.AspNetCore.HostFiltering;
-using Microsoft.Extensions.Options;
 
 namespace Metabase
 {
