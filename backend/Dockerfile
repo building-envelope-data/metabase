@@ -108,11 +108,8 @@ COPY \
 #
 # `dotnet dev-certs` does not generate certificates that work in Linux
 # distributions
-RUN \
+# RUN \
   # dotnet dev-certs https --export-path ./.secrets/https/icon.pfx --password crypticpassword && \
-  # dotnet user-secrets --project ./src/Metabase.csproj set "Kestrel:Certificates:Development:Password" "crypticpassword" && \
-  dotnet user-secrets --project ./src/Metabase.csproj set SendGridUser myuser && \
-  dotnet user-secrets --project ./src/Metabase.csproj set SendGridKey mykey
 
 COPY \
   --chown=me:us \
