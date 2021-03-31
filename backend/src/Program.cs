@@ -6,20 +6,75 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Directory = System.IO.Directory;
+using System.IO;
+using Serilog;
+using Serilog.Events;
 
 namespace Metabase
 {
     public class Program
     {
-        public static async Task Main(string[] commandLineArguments)
+        public static async Task<int> Main(
+            string[] commandLineArguments
+            )
         {
-            var host = CreateHostBuilder(commandLineArguments).Build();
-            await CreateAndSeedDbIfNotExists(host).ConfigureAwait(false);
-            host.Run();
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? throw new Exception("Unknown enrivornment.");
+            ConfigureBootstrapLogging(environment);
+            try
+            {
+                Log.Information("Starting web host");
+                var host = CreateHostBuilder(commandLineArguments).Build();
+                await CreateAndSeedDbIfNotExists(host).ConfigureAwait(false);
+                host.Run();
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+                return 1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
-        public static async Task CreateAndSeedDbIfNotExists(IHost host)
+        private static void ConfigureBootstrapLogging(
+            string environment
+        )
+        {
+            var configuration = new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information);
+            ConfigureLogging(configuration, environment);
+            Log.Logger = configuration.CreateBootstrapLogger();
+        }
+
+        private static void ConfigureLogging(
+            LoggerConfiguration configuration,
+            string environment
+        )
+        {
+            configuration
+                .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .Enrich.WithProperty("Environment", environment)
+                .WriteTo.Console()
+                .WriteTo.File(
+                    "seri.log",
+                    fileSizeLimitBytes: 1073741824, // 1 GB
+                    retainedFileCountLimit: 31,
+                    rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true
+                    );
+            if (environment != "production")
+            {
+                configuration.WriteTo.Debug();
+            }
+        }
+
+        public static async Task CreateAndSeedDbIfNotExists(
+            IHost host
+            )
         {
             // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
             using var scope = host.Services.CreateScope();
@@ -42,7 +97,9 @@ namespace Metabase
         }
 
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
-        public static IHostBuilder CreateHostBuilder(string[] commandLineArguments)
+        public static IHostBuilder CreateHostBuilder(
+            string[] commandLineArguments
+            )
         {
             return Host.CreateDefaultBuilder(commandLineArguments)
                 // .ConfigureHostConfiguration(_ =>
@@ -60,6 +117,16 @@ namespace Metabase
                 // .ConfigureLogging(_ =>
                 //     _.ClearProviders()
                 // )
+                .UseSerilog((webHostBuilderContext, loggerConfiguration) =>
+                    {
+                        ConfigureLogging(
+                            loggerConfiguration,
+                            webHostBuilderContext.HostingEnvironment.EnvironmentName
+                            );
+                        loggerConfiguration
+                            .ReadFrom.Configuration(webHostBuilderContext.Configuration);
+                    }
+                )
                 // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
                 .ConfigureWebHostDefaults(webBuilder =>
                     webBuilder

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 // TODO Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth
 
@@ -148,6 +149,7 @@ namespace Metabase
             }
             // app.UseStatusCodePages();
             // app.UseHttpsRedirection(); // Done by NGINX
+            app.UseSerilogRequestLogging();
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseRouting();
