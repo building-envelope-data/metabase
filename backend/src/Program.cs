@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -44,17 +45,34 @@ namespace Metabase
         public static IHostBuilder CreateHostBuilder(string[] commandLineArguments)
         {
             return Host.CreateDefaultBuilder(commandLineArguments)
+              .ConfigureAppConfiguration((webHostBuilderContext, configurationBuilder) =>
+                ConfigureAppConfiguration(
+                    configurationBuilder,
+                    webHostBuilderContext.HostingEnvironment,
+                    commandLineArguments
+                    )
+              )
               .ConfigureWebHostDefaults(webBuilder =>
                   webBuilder
                   .UseKestrel() // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel
                   .UseContentRoot(Directory.GetCurrentDirectory())
-                  .UseStartup(webHostBuilderContext =>
-                    new Startup(
-                      webHostBuilderContext.HostingEnvironment,
-                      commandLineArguments
-                      )
-                    )
+                  .UseStartup<Startup>()
                   );
+        }
+
+        public static void ConfigureAppConfiguration(
+            IConfigurationBuilder configuration,
+            IHostEnvironment environment,
+            string[] commandLineArguments
+            )
+        {
+            configuration.Sources.Clear();
+            configuration
+                .SetBasePath(environment.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: !environment.IsEnvironment("test"))
+                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false, reloadOnChange: !environment.IsEnvironment("test"))
+                .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
+                .AddCommandLine(commandLineArguments);
         }
     }
 }

@@ -21,23 +21,15 @@ namespace Metabase
     public sealed class Startup
     {
         private readonly IWebHostEnvironment _environment;
-        private readonly IConfiguration _configuration;
         private readonly AppSettings _appSettings;
 
         public Startup(
             IWebHostEnvironment environment,
-            string[] commandLineArguments
+            IConfiguration configuration
             )
         {
             _environment = environment;
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(environment.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false, reloadOnChange: false)
-                .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
-                .AddCommandLine(commandLineArguments)
-              .Build();
-            _appSettings = _configuration.Get<AppSettings>();
+            _appSettings = configuration.Get<AppSettings>();
         }
 
         public void ConfigureServices(IServiceCollection services)
