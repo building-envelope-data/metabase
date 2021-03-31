@@ -10,7 +10,6 @@ function Page() {
   // Inspired by https://www.robinwieruch.de/react-hooks-fetch-data
   const [data, setData] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
