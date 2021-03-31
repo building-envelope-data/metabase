@@ -1,12 +1,7 @@
-mutation loginUser(
-    $email: String!
-    $password: String!
-) {
-  loginUser(input: {
-    email: $email,
-    password: $password
-  }) {
-    jwtAccessToken
+mutation loginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
+  loginUser(
+    input: { email: $email, password: $password, rememberMe: $rememberMe }
+  ) {
     requiresTwoFactor
     user {
       id

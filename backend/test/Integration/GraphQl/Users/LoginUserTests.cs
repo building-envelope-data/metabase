@@ -24,10 +24,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 variables: new Dictionary<string, object?>
                 {
                     ["email"] = email,
-                    ["password"] = password
+                    ["password"] = password,
+                    ["rememberMe"] = false
                 }
                 ).ConfigureAwait(false);
             // Assert
+            // TODO assert that cookie was set!
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
