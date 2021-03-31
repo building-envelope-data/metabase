@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 using System.IO;
 using Serilog;
 using Serilog.Events;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
+using Microsoft.AspNetCore.HostFiltering;
+using Microsoft.Extensions.Options;
 
 namespace Metabase
 {
@@ -101,39 +104,90 @@ namespace Metabase
             string[] commandLineArguments
             )
         {
-            return Host.CreateDefaultBuilder(commandLineArguments)
-                // .ConfigureHostConfiguration(_ =>
-                //     ...
-                // )
-                // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/
-                .ConfigureAppConfiguration((webHostBuilderContext, configurationBuilder) =>
-                    ConfigureAppConfiguration(
-                        configurationBuilder,
-                        webHostBuilderContext.HostingEnvironment,
-                        commandLineArguments
-                        )
+            return new HostBuilder()
+            .UseContentRoot(
+                Directory.GetCurrentDirectory()
                 )
-                // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/
-                // .ConfigureLogging(_ =>
-                //     _.ClearProviders()
-                // )
-                .UseSerilog((webHostBuilderContext, loggerConfiguration) =>
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host#host-configuration
+            .ConfigureHostConfiguration(configuration =>
+                {
+                    configuration.AddEnvironmentVariables(prefix: "DOTNET_");
+                    configuration.AddCommandLine(commandLineArguments);
+                }
+            )
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/
+            .ConfigureAppConfiguration((hostingContext, configuration) =>
+                ConfigureAppConfiguration(
+                    configuration,
+                    hostingContext.HostingEnvironment,
+                    commandLineArguments
+                    )
+                )
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/
+            .ConfigureLogging((_, loggingBuilder) =>
+            {
+                loggingBuilder.Configure(options =>
+                {
+                    options.ActivityTrackingOptions = ActivityTrackingOptions.SpanId
+                                                        | ActivityTrackingOptions.TraceId
+                                                        | ActivityTrackingOptions.ParentId;
+                });
+            })
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection
+            .UseDefaultServiceProvider((context, options) =>
+            {
+                var isDevelopment = context.HostingEnvironment.IsDevelopment();
+                options.ValidateScopes = isDevelopment;
+                options.ValidateOnBuild = isDevelopment;
+            })
+            .UseSerilog((webHostBuilderContext, loggerConfiguration) =>
+                {
+                    ConfigureLogging(
+                        loggerConfiguration,
+                        webHostBuilderContext.HostingEnvironment.EnvironmentName
+                        );
+                    loggerConfiguration
+                        .ReadFrom.Configuration(webHostBuilderContext.Configuration);
+                }
+            )
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
+            // https://github.com/dotnet/aspnetcore/blob/main/src/DefaultBuilder/src/WebHost.cs#L215
+            .ConfigureWebHost(_ =>
+                _
+                .ConfigureAppConfiguration((context, _) =>
+                {
+                    if (context.HostingEnvironment.IsDevelopment())
                     {
-                        ConfigureLogging(
-                            loggerConfiguration,
-                            webHostBuilderContext.HostingEnvironment.EnvironmentName
-                            );
-                        loggerConfiguration
-                            .ReadFrom.Configuration(webHostBuilderContext.Configuration);
+                        StaticWebAssetsLoader.UseStaticWebAssets(context.HostingEnvironment, context.Configuration);
                     }
-                )
-                // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
-                .ConfigureWebHostDefaults(webBuilder =>
-                    webBuilder
-                    .UseKestrel() // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel
-                    .UseContentRoot(Directory.GetCurrentDirectory())
-                    .UseStartup<Startup>()
-                    );
+                })
+                // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel
+                .UseKestrel((context, options) =>
+                    options.Configure(context.Configuration.GetSection("Kestrel"), reloadOnChange: true)
+                    )
+                .ConfigureServices((context, services) =>
+                    {
+                        // Fallback
+                        // services.PostConfigure<HostFilteringOptions>(options =>
+                        // {
+                        //     if (options.AllowedHosts == null || options.AllowedHosts.Count == 0)
+                        //     {
+                        //         // "AllowedHosts": "localhost;127.0.0.1;[::1]"
+                        //         var hosts = context.Configuration["AllowedHosts"]?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        //         // Fall back to "*" to disable.
+                        //         options.AllowedHosts = (hosts?.Length > 0 ? hosts : new[] { "*" });
+                        //     }
+                        // });
+                        // Change notification
+                        // services.AddSingleton<IOptionsChangeTokenSource<HostFilteringOptions>>(
+                        //     new ConfigurationChangeTokenSource<HostFilteringOptions>(context.Configuration));
+                        // services.AddTransient<IStartupFilter, HostFilteringStartupFilter>();
+                        services.AddRouting();
+                    })
+                // .UseIIS()
+                // .UseIISIntegration()
+                .UseStartup<Startup>()
+            );
         }
 
         public static void ConfigureAppConfiguration(
@@ -142,11 +196,19 @@ namespace Metabase
             string[] commandLineArguments
             )
         {
-            configuration.Sources.Clear();
             configuration
                 .SetBasePath(environment.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: !environment.IsEnvironment("test"))
-                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: false, reloadOnChange: !environment.IsEnvironment("test"))
+                .AddJsonFile(
+                    "appsettings.json",
+                    optional: false,
+                    reloadOnChange: !environment.IsEnvironment("test")
+                    )
+                .AddJsonFile(
+                    $"appsettings.{environment.EnvironmentName}.json",
+                    optional: false,
+                    reloadOnChange: !environment.IsEnvironment("test")
+                    )
+                .AddEnvironmentVariables()
                 .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
                 .AddCommandLine(commandLineArguments);
         }
