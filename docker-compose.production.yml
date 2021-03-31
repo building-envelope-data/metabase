@@ -4,6 +4,13 @@ services:
   database:
     restart: always
     image: postgres:11.5-alpine
+    # For possible command-line arguments see
+    # https://www.postgresql.org/docs/current/app-postgres.html
+    # and for possible configuration parameters like `max_connections` see
+    # https://www.postgresql.org/docs/current/runtime-config.html
+    command: [
+      "-c", "max_connections=100"
+    ]
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
