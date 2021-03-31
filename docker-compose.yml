@@ -2,9 +2,16 @@ version: '3.3'
 
 services:
   database:
-    image: postgres:11.5-alpine
+    image: postgres:13.2-alpine
     # ports:
     #   - 5432:5432
+    # For possible command-line arguments see
+    # https://www.postgresql.org/docs/current/app-postgres.html
+    # and for possible configuration parameters like `max_connections` see
+    # https://www.postgresql.org/docs/current/runtime-config.html
+    command: [
+      "-c" "max_connections=100"
+    ]
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
