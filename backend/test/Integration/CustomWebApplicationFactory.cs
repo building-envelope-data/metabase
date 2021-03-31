@@ -10,9 +10,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
-using IRelationalDatabaseCreator = Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator;
-using IsolationLevel = System.Data.IsolationLevel;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Hosting;
 
 namespace Metabase.Tests.Integration
 {
@@ -98,14 +97,8 @@ namespace Metabase.Tests.Integration
         {
             // https://docs.microsoft.com/en-us/ef/core/managing-schemas/ensure-created#multiple-dbcontext-classes
             var databaseCreator = dbContext.Database.GetService<IRelationalDatabaseCreator>();
-            if (databaseCreator.Exists())
-            {
-                DropDatabaseSchema(dbContext);
-            }
-            else
-            {
-                databaseCreator.Create();
-            }
+            databaseCreator.EnsureDeleted();
+            databaseCreator.Create();
             databaseCreator.CreateTables();
             Task.Run(async () =>
                 await SeedDatabase().ConfigureAwait(false)
@@ -124,29 +117,11 @@ namespace Metabase.Tests.Integration
         {
             Do(
                 services =>
-                DropDatabaseSchema(
                   services.GetRequiredService<Data.ApplicationDbContext>()
-                  )
+                  .Database.GetService<IRelationalDatabaseCreator>()
+                  .EnsureDeleted()
             );
             base.Dispose();
-        }
-
-        private void DropDatabaseSchema(DbContext dbContext)
-        {
-            DropDatabaseSchema(
-                dbContext.Model.GetDefaultSchema()
-                );
-        }
-
-        private void DropDatabaseSchema(string schemaName)
-        {
-            using var connection = new NpgsqlConnection(AppSettings.Database.ConnectionString);
-            connection.Open();
-            using var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
-            var command = connection.CreateCommand();
-            command.CommandText = $"DROP SCHEMA IF EXISTS {schemaName} CASCADE;";
-            command.ExecuteNonQuery();
-            transaction.Commit();
         }
     }
 }
