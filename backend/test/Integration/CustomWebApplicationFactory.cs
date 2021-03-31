@@ -64,12 +64,15 @@ namespace Metabase.Tests.Integration
         {
             builder.UseEnvironment("test");
             builder.ConfigureAppConfiguration((webHostBuilderContext, configurationBuilder) =>
-                Program.ConfigureAppConfiguration(
-                    configurationBuilder,
-                    webHostBuilderContext.HostingEnvironment,
-                    Array.Empty<string>()
-                    )
-                );
+                {
+                    configurationBuilder.Sources.Clear();
+                    Program.ConfigureAppConfiguration(
+                        configurationBuilder,
+                        webHostBuilderContext.HostingEnvironment,
+                        Array.Empty<string>()
+                        );
+                }
+            );
             builder.ConfigureServices(serviceCollection =>
                 {
                     using var scope = serviceCollection.BuildServiceProvider().CreateScope();
