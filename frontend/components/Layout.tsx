@@ -4,7 +4,6 @@ import Footer from "./Footer";
 import NavBar from "./NavBar";
 import { Modal, Layout as AntLayout, Typography } from "antd";
 import paths from "../paths";
-import Cookies from "js-cookie";
 import { useCookies } from "react-cookie";
 
 const navItems = [
@@ -27,6 +26,10 @@ const navItems = [
   {
     path: paths.components,
     label: `Components`,
+  },
+  {
+    path: paths.databases,
+    label: `Databases`,
   },
   {
     path: paths.users,

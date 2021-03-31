@@ -1,3 +1,21 @@
+query Databases {
+  databases {
+    nodes {
+      id
+      uuid
+      name
+      description
+      locator
+      operator {
+        node {
+          uuid
+          name
+        }
+      }
+    }
+  }
+}
+
 mutation CreateDatabase(
   $name: String!
   $description: String!

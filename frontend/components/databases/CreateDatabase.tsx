@@ -3,6 +3,7 @@ import { Alert, Form, Input, Button } from "antd";
 import {
   useCreateDatabaseMutation,
   Scalars,
+  DatabasesDocument,
 } from "../../queries/databases.graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
@@ -32,6 +33,9 @@ export const CreateDatabase: React.FunctionComponent<CreateDatabaseProps> = ({
         variables: {
           uuid: operatorId,
         },
+      },
+      {
+        query: DatabasesDocument,
       },
     ],
   });

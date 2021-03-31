@@ -2,6 +2,7 @@ export default {
   home: "/",
   legalNotice: "/legal-notice",
   dataProtectionInformation: "/data-protection-information",
+  databases: "/databases",
   institutions: "/institutions",
   institution(uuid: string) {
     return `/institutions/${encodeURIComponent(uuid)}`;
