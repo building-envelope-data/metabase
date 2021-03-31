@@ -45,19 +45,28 @@ namespace Metabase
         public static IHostBuilder CreateHostBuilder(string[] commandLineArguments)
         {
             return Host.CreateDefaultBuilder(commandLineArguments)
-              .ConfigureAppConfiguration((webHostBuilderContext, configurationBuilder) =>
-                ConfigureAppConfiguration(
-                    configurationBuilder,
-                    webHostBuilderContext.HostingEnvironment,
-                    commandLineArguments
-                    )
-              )
-              .ConfigureWebHostDefaults(webBuilder =>
-                  webBuilder
-                  .UseKestrel() // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel
-                  .UseContentRoot(Directory.GetCurrentDirectory())
-                  .UseStartup<Startup>()
-                  );
+                // .ConfigureHostConfiguration(_ =>
+                //     ...
+                // )
+                // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/
+                .ConfigureAppConfiguration((webHostBuilderContext, configurationBuilder) =>
+                    ConfigureAppConfiguration(
+                        configurationBuilder,
+                        webHostBuilderContext.HostingEnvironment,
+                        commandLineArguments
+                        )
+                )
+                // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/
+                // .ConfigureLogging(_ =>
+                //     _.ClearProviders()
+                // )
+                // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
+                .ConfigureWebHostDefaults(webBuilder =>
+                    webBuilder
+                    .UseKestrel() // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseStartup<Startup>()
+                    );
         }
 
         public static void ConfigureAppConfiguration(
