@@ -19,6 +19,28 @@ services:
     volumes:
       - data:/var/lib/postgresql/data
 
+  pgbouncer:
+    build:
+      context: ./pgbouncer
+      dockerfile: ./Dockerfile
+    # ports:
+    #   - 6432:6432
+    environment:
+      - DB_HOST=database
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      # Set maximum user connections regardless of database to 100 such that
+      # the maximum number PostgreSQL clients is not exceeded when running
+      # tests in parallel, which before using `pgbouncer` with that setting
+      # resulted in the exception `Npgsql.PostgresException` with the message
+      # `08P01: sorry, too many clients already`.
+      # see https://www.pgbouncer.org/config.html#max_user_connections
+      - MAX_USER_CONNECTIONS=100
+    # volumes:
+    #   - ./pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
+    depends_on:
+      - database
+
   backend:
     build:
       context: ./backend

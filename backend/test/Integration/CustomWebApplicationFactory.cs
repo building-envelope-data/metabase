@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
 using IRelationalDatabaseCreator = Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator;
-using IsolationLevel = System.Data.IsolationLevel;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace Metabase.Tests.Integration
 {
@@ -69,7 +69,7 @@ namespace Metabase.Tests.Integration
                     using var scope = serviceCollection.BuildServiceProvider().CreateScope();
                     var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
                     // appSettings.Database.SchemaName += Guid.NewGuid().ToString().Replace("-", ""); // does not work because enumeration types in public schema cannot be created when they already exist. We therefore create a whole new database for each test instead of just a new schema.
-                    appSettings.Database.ConnectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;";
+                    appSettings.Database.ConnectionString = $"Host=pgbouncer; Port=6432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;";
                     // Configure `IEmailSender`
                     var emailSenderServiceDescriptor =
                     serviceCollection.SingleOrDefault(d =>
@@ -98,14 +98,16 @@ namespace Metabase.Tests.Integration
         {
             // https://docs.microsoft.com/en-us/ef/core/managing-schemas/ensure-created#multiple-dbcontext-classes
             var databaseCreator = dbContext.Database.GetService<IRelationalDatabaseCreator>();
-            if (databaseCreator.Exists())
-            {
-                DropDatabaseSchema(dbContext);
-            }
-            else
-            {
-                databaseCreator.Create();
-            }
+            // Calling `databaseCreator.Exists` makes `pgbouncer` fail when the
+            // database does not exist resulting in an
+            // `Npgsql.PostgresException`. Because it is veeeery unlikely that
+            // the database does already exist, we omit this check (and the
+            // ensuing possible deletion).
+            // if (databaseCreator.Exists())
+            // {
+            //     databaseCreator.Delete();
+            // }
+            databaseCreator.Create();
             databaseCreator.CreateTables();
             Task.Run(async () =>
                 await SeedDatabase().ConfigureAwait(false)
@@ -124,29 +126,11 @@ namespace Metabase.Tests.Integration
         {
             Do(
                 services =>
-                DropDatabaseSchema(
                   services.GetRequiredService<Data.ApplicationDbContext>()
-                  )
+                  .Database.GetService<IRelationalDatabaseCreator>()
+                  .EnsureDeleted()
             );
             base.Dispose();
-        }
-
-        private void DropDatabaseSchema(DbContext dbContext)
-        {
-            DropDatabaseSchema(
-                dbContext.Model.GetDefaultSchema()
-                );
-        }
-
-        private void DropDatabaseSchema(string schemaName)
-        {
-            using var connection = new NpgsqlConnection(AppSettings.Database.ConnectionString);
-            connection.Open();
-            using var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
-            var command = connection.CreateCommand();
-            command.CommandText = $"DROP SCHEMA IF EXISTS {schemaName} CASCADE;";
-            command.ExecuteNonQuery();
-            transaction.Commit();
         }
     }
 }
