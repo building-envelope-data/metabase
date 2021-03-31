@@ -17,6 +17,21 @@ help : ## Print this help
 # https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet
 # TODO Shortcuts for `dotnet aspnet-codegenerator`?
 
+# See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
+test : ## Run tests
+	@echo "--------------------------------------------------"
+	@echo "Test list"
+	@echo "--------------------------------------------------"
+	dotnet test \
+		--list-tests
+	@echo "--------------------------------------------------"
+	@echo "Test runs"
+	@echo "--------------------------------------------------"
+	dotnet test \
+		--collect:"XPlat Code Coverage" \
+		--verbosity minimal
+.PHONY : test
+
 assets : ## Build assets
 	npm run all
 .PHONY : assets
