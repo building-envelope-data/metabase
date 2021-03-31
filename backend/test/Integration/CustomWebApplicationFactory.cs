@@ -69,7 +69,7 @@ namespace Metabase.Tests.Integration
                     using var scope = serviceCollection.BuildServiceProvider().CreateScope();
                     var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
                     // appSettings.Database.SchemaName += Guid.NewGuid().ToString().Replace("-", ""); // does not work because enumeration types in public schema cannot be created when they already exist. We therefore create a whole new database for each test instead of just a new schema.
-                    appSettings.Database.ConnectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Max Pool Size=90;";
+                    appSettings.Database.ConnectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;";
                     // Configure `IEmailSender`
                     var emailSenderServiceDescriptor =
                     serviceCollection.SingleOrDefault(d =>
