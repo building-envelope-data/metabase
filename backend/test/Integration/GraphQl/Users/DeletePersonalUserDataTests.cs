@@ -40,20 +40,18 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Arrange
             var email = "john.doe@ise.fraunhofer.de";
             var password = "aaaAAA123$!@";
-            await RegisterAndConfirmAndLoginUser(
-                email: email,
-                password: password
-            ).ConfigureAwait(false);
+            var userId =
+                await RegisterAndConfirmAndLoginUser(
+                    email: email,
+                    password: password
+                ).ConfigureAwait(false);
             // Act
             await DeletePersonalUserData(
                 password: password
                 ).ConfigureAwait(false);
-            var response = await GetPersonalUserData().ConfigureAwait(false);
+            var response = await GetUser(userId).ConfigureAwait(false);
             // Assert
-            Snapshot.Match(
-                response,
-                matchOptions => matchOptions.IgnoreField("data.personalUserData.errors[*].message")
-                );
+            Snapshot.Match(response);
         }
 
         [Fact]
@@ -84,10 +82,11 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Arrange
             var email = "john.doe@ise.fraunhofer.de";
             var password = "aaaAAA123$!@";
-            await RegisterAndConfirmUser(
-                email: email,
-                password: password
-            ).ConfigureAwait(false);
+            var userId =
+                await RegisterAndConfirmUser(
+                    email: email,
+                    password: password
+                ).ConfigureAwait(false);
             // Act
             await UnsuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Users/DeletePersonalUserData.graphql"),
@@ -100,12 +99,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 email: email,
                 password: password
             ).ConfigureAwait(false);
-            var response = await GetPersonalUserData().ConfigureAwait(false);
+            var response = await GetUser(userId).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.personalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                 fieldOptions.Field<string>("data.user.id").Should().NotBeNullOrWhiteSpace()
                  )
                 );
         }
@@ -139,20 +138,21 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Arrange
             var email = "john.doe@ise.fraunhofer.de";
             var password = "aaaAAA123$!@";
-            await RegisterAndConfirmAndLoginUser(
-                email: email,
-                password: password
-            ).ConfigureAwait(false);
+            var userId =
+                await RegisterAndConfirmAndLoginUser(
+                    email: email,
+                    password: password
+                ).ConfigureAwait(false);
             // Act
             await DeletePersonalUserData(
                 null
                 ).ConfigureAwait(false);
-            var response = await GetPersonalUserData().ConfigureAwait(false);
+            var response = await GetUser(userId).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.personalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                 fieldOptions.Field<string>("data.user.id").Should().NotBeNullOrWhiteSpace()
                  )
                 );
         }
@@ -186,20 +186,21 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Arrange
             var email = "john.doe@ise.fraunhofer.de";
             var password = "aaaAAA123$!@";
-            await RegisterAndConfirmAndLoginUser(
-                email: email,
-                password: password
-            ).ConfigureAwait(false);
+            var userId =
+                await RegisterAndConfirmAndLoginUser(
+                    email: email,
+                    password: password
+                ).ConfigureAwait(false);
             // Act
             await DeletePersonalUserData(
                 "incorrect" + password
                 ).ConfigureAwait(false);
-            var response = await GetPersonalUserData().ConfigureAwait(false);
+            var response = await GetUser(userId).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.personalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                 fieldOptions.Field<string>("data.user.id").Should().NotBeNullOrWhiteSpace()
                  )
                 );
         }

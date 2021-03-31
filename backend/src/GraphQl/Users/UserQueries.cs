@@ -1,5 +1,7 @@
+using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Data;
@@ -31,6 +33,18 @@ namespace Metabase.GraphQl.Users
             )
         {
             return context.Users;
+        }
+
+        public Task<Data.User?> GetUserAsync(
+            Guid uuid,
+            UserByIdDataLoader userById,
+            CancellationToken cancellationToken
+            )
+        {
+            return userById.LoadAsync(
+                uuid,
+                cancellationToken
+                );
         }
     }
 }

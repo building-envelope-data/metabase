@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,10 +8,14 @@ namespace Metabase.Tests.Integration.GraphQl.Users
     public abstract class UserIntegrationTests
       : IntegrationTests
     {
-        protected Task<string> GetPersonalUserData()
+        protected Task<string> GetUser(Guid uuid)
         {
             return SuccessfullyQueryGraphQlContentAsString(
-                File.ReadAllText("Integration/GraphQl/Users/GetPersonalUserData.graphql")
+                File.ReadAllText("Integration/GraphQl/Users/GetUser.graphql"),
+                variables: new Dictionary<string, object?>
+                {
+                    ["uuid"] = uuid
+                }
                 );
         }
 
