@@ -644,6 +644,7 @@ type Query {
   openIdConnectAuthorizations: [OpenIdConnectAuthorization!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
   openIdConnectScopes: [OpenIdConnectScope!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
   openIdConnectTokens: [OpenIdConnectToken!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
+  user(uuid: Uuid!): User
   users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
 }
 
