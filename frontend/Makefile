@@ -13,3 +13,8 @@ help : ## Print this help
 # Tasks to run, for example, in a Docker container #
 # ------------------------------------------------ #
 
+update-schema : ## Update GraphQl schema
+	wget \
+		--output-document ./type-defs.graphqls \
+		http://backend:8080/graphql?sdl
+.PHONY : update-schema
