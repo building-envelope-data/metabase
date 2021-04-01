@@ -63,8 +63,9 @@ trace : ## Trace the dotnet process `Metabase`
 .PHONY : trace
 
 update-schema : ## Update GraphQl schema
-	-dotnet test --filter "FullyQualifiedName~GraphQlSchemaTests"
-	cp test/Integration/GraphQl/__snapshots__/__mismatch__/GraphQlSchemaTests.IsUnchanged.snap test/Integration/GraphQl/__snapshots__/
+	wget \
+		--output-document ./test/Integration/GraphQl/__snapshots__/GraphQlSchemaTests.IsUnchanged.snap \
+		http://backend:8080/graphql?sdl
 .PHONY : update-schema
 
 # https://github.com/JosefPihrt/Roslynator/blob/master/docs/cli/README.md
