@@ -9,7 +9,7 @@ using Guid = System.Guid;
 
 namespace Metabase.GraphQl.Institutions
 {
-    [ExtendObjectType(Name = nameof(Query))]
+    [ExtendObjectType(nameof(Query))]
     public sealed class InstitutionQueries
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]

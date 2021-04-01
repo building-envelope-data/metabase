@@ -16,7 +16,7 @@ using Array = System.Array;
 // Note that `SignInManager` relies on cookies, see https://github.com/aspnet/Identity/issues/1421. For its source code see https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/SignInManager.cs
 namespace Metabase.GraphQl.Users
 {
-    [ExtendObjectType(Name = nameof(GraphQl.Mutation))]
+    [ExtendObjectType(nameof(GraphQl.Mutation))]
     public sealed class UserMutations
     {
         // Key Uri Format https://github.com/google/google-authenticator/wiki/Key-Uri-Format

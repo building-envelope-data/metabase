@@ -9,7 +9,7 @@ using Guid = System.Guid;
 
 namespace Metabase.GraphQl.Components
 {
-    [ExtendObjectType(Name = nameof(Query))]
+    [ExtendObjectType(nameof(Query))]
     public sealed class ComponentQueries
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]

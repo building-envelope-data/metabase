@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.DataFormats
 {
-    [ExtendObjectType(Name = nameof(Mutation))]
+    [ExtendObjectType(nameof(Mutation))]
     public sealed class DataFormatMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]

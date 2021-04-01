@@ -16,7 +16,7 @@ using DateTime = System.DateTime;
 
 namespace Metabase.GraphQl.Methods
 {
-    [ExtendObjectType(Name = nameof(Mutation))]
+    [ExtendObjectType(nameof(Mutation))]
     public sealed class MethodMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]

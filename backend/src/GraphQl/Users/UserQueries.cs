@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Users
 {
-    [ExtendObjectType(Name = nameof(Query))]
+    [ExtendObjectType(nameof(Query))]
     public sealed class UserQueries
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]

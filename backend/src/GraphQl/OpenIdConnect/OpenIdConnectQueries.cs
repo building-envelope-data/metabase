@@ -10,7 +10,7 @@ using HotChocolate.AspNetCore.Authorization;
 
 namespace Metabase.GraphQl.OpenIdConnect
 {
-    [ExtendObjectType(Name = nameof(Query))]
+    [ExtendObjectType(nameof(Query))]
     public sealed class OpendIdConnectQueries
     {
         // [UseDbContext(typeof(Data.ApplicationDbContext))]

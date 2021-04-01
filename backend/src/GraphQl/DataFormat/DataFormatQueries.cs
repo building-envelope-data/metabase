@@ -9,7 +9,7 @@ using Guid = System.Guid;
 
 namespace Metabase.GraphQl.DataFormats
 {
-    [ExtendObjectType(Name = nameof(Query))]
+    [ExtendObjectType(nameof(Query))]
     public sealed class DataFormatQueries
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]

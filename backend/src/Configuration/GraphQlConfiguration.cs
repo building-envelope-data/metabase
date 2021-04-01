@@ -27,6 +27,9 @@ namespace Metabase.Configuration
             .AddFiltering()
             .AddSorting()
             .AddAuthorization()
+            .AddApolloTracing(
+                HotChocolate.Execution.Options.TracingPreference.OnDemand
+            ) // TODO Do we want or need this?
             .EnableRelaySupport()
             .ModifyOptions(options =>
               {
@@ -45,7 +48,6 @@ namespace Metabase.Configuration
                     /* options.ExecutionTimeout = ...; */
                     options.IncludeExceptionDetails = environment.IsDevelopment(); // Default is `Debugger.IsAttached`.
                     /* options.QueryCacheSize = ...; */
-                    options.TracingPreference = HotChocolate.Execution.Options.TracingPreference.Always; // TODO Should we use `Never` (the default) or `OnDemand`?
                     /* options.UseComplexityMultipliers = ...; */
                 }
                 )

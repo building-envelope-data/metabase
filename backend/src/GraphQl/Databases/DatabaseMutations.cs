@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Databases
 {
-    [ExtendObjectType(Name = nameof(Mutation))]
+    [ExtendObjectType(nameof(Mutation))]
     public sealed class DatabaseMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
