@@ -13,6 +13,14 @@ help : ## Print this help
 # Tasks to run, for example, in a Docker container #
 # ------------------------------------------------ #
 
+install : ## Install packages (without touching the lockfile)
+	yarn install --frozen-lockfile
+.PHONY : install
+
+upgrade : ## Upgrade packages
+	yarn upgrade
+.PHONY : upgrade
+
 update-schema : ## Update GraphQl schema
 	wget \
 		--output-document ./type-defs.graphqls \

@@ -99,7 +99,7 @@ execb : CONTAINER = backend
 execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
 .PHONY : execb
 
-shellf : COMMAND = ash -c "yarn install --frozen-lockfile && exec ash"
+shellf : COMMAND = ash -c "make install && exec ash"
 shellf : execf ## Enter shell in an existing `frontend` container (after starting all containers if necessary)
 .PHONY : shellf
 
