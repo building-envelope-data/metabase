@@ -9,13 +9,13 @@
       ]
     },
     "dotnet-counters": {
-      "version": "5.0.160202",
+      "version": "5.0.217401",
       "commands": [
         "dotnet-counters"
       ]
     },
     "dotnet-dump": {
-      "version": "5.0.160202",
+      "version": "5.0.217401",
       "commands": [
         "dotnet-dump"
       ]
@@ -39,25 +39,25 @@
       ]
     },
     "dotnet-trace": {
-      "version": "5.0.160202",
+      "version": "5.0.217401",
       "commands": [
         "dotnet-trace"
       ]
     },
     "dotnet-gcdump": {
-      "version": "5.0.160202",
+      "version": "5.0.217401",
       "commands": [
         "dotnet-gcdump"
       ]
     },
     "dotnet-sos": {
-      "version": "5.0.160202",
+      "version": "5.0.217401",
       "commands": [
         "dotnet-sos"
       ]
     },
     "roslynator.dotnet.cli": {
-      "version": "0.1.1",
+      "version": "0.1.2",
       "commands": [
         "roslynator"
       ]
