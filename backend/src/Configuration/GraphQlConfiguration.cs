@@ -18,8 +18,6 @@ namespace Metabase.Configuration
             )
         {
             services.AddGraphQLServer()
-            // Scalars
-            .BindRuntimeType<uint, GraphQl.Common.UIntType>()
             // Types
             .AddType<GraphQl.Common.OpenEndedDateTimeRangeType>()
             // Extensions
