@@ -18,14 +18,16 @@ namespace Metabase.Data
             var logger = services.GetRequiredService<ILogger<DbSeeder>>();
             logger.LogDebug("Seeding the database");
             var environment = services.GetRequiredService<IWebHostEnvironment>();
-            await RegisterApplicationsAsync(services, logger, environment).ConfigureAwait(false);
-            await RegisterScopesAsync(services, logger).ConfigureAwait(false);
+            var appSettings = services.GetRequiredService<AppSettings>();
+            await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
+            await RegisterScopesAsync(services, logger, appSettings).ConfigureAwait(false);
         }
 
         private static async Task RegisterApplicationsAsync(
             IServiceProvider services,
             ILogger<DbSeeder> logger,
-            IWebHostEnvironment environment
+            IWebHostEnvironment environment,
+            AppSettings appSettings
             )
         {
             var manager = services.GetRequiredService<IOpenIddictApplicationManager>();
@@ -33,7 +35,6 @@ namespace Metabase.Data
             {
                 logger.LogDebug("Creating application client 'testlab-solar-facades'");
                 var host = environment.IsProduction() ? "https://testlab-solar-facades.de" : "https://local.testlab-solar-facades.de:5051";
-                var appSettings = services.GetRequiredService<AppSettings>();
                 await manager.CreateAsync(
                     new OpenIddictApplicationDescriptor
                     {
@@ -87,7 +88,8 @@ namespace Metabase.Data
 
         private static async Task RegisterScopesAsync(
             IServiceProvider services,
-            ILogger<DbSeeder> logger
+            ILogger<DbSeeder> logger,
+            AppSettings appSettings
             )
         {
             var manager = services.GetRequiredService<IOpenIddictScopeManager>();
@@ -105,7 +107,7 @@ namespace Metabase.Data
                         Name = Configuration.AuthConfiguration.ReadApiScope,
                         Resources =
                         {
-                            Configuration.AuthConfiguration.ServerName
+                            appSettings.Host
                         }
                     }
                 ).ConfigureAwait(false);
@@ -124,7 +126,7 @@ namespace Metabase.Data
                         Name = Configuration.AuthConfiguration.WriteApiScope,
                         Resources =
                         {
-                            Configuration.AuthConfiguration.ServerName
+                            appSettings.Host
                         }
                     }
                 ).ConfigureAwait(false);

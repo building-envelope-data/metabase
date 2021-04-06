@@ -25,7 +25,6 @@ namespace Metabase.Configuration
         public static string ReadApiScope { get; } = "api:read";
         public static string WriteApiScope { get; } = "api:write";
         public static string ManageUserApiScope { get; } = "api:user:manage";
-        public static string ServerName { get; } = "metabase";
 
         public static void ConfigureServices(
             IServiceCollection services,
@@ -48,7 +47,7 @@ namespace Metabase.Configuration
             ConfigureIdentityServices(services);
             ConfigureAuthenticiationAndAuthorizationServices(services, environment, appSettings, encryptionKey, signingKey);
             ConfigureTaskScheduling(services, environment);
-            ConfigureOpenIddictServices(services, environment, encryptionKey, signingKey);
+            ConfigureOpenIddictServices(services, environment, appSettings, encryptionKey, signingKey);
         }
 
         private static void ConfigureIdentityServices(
@@ -134,7 +133,7 @@ namespace Metabase.Configuration
             services.AddAuthentication()
               .AddJwtBearer(_ =>
                   {
-                      _.Audience = ServerName;
+                      _.Audience = appSettings.Host;
                       _.RequireHttpsMetadata = !environment.IsEnvironment("test");
                       _.IncludeErrorDetails = true;
                       _.SaveToken = true;
@@ -146,7 +145,7 @@ namespace Metabase.Configuration
                           ValidIssuer = environment.IsEnvironment("test") ? "http://localhost/" : appSettings.Host,
                           RequireAudience = true,
                           ValidateAudience = true,
-                          ValidAudience = ServerName,
+                          ValidAudience = appSettings.Host,
                           RequireExpirationTime = true,
                           ValidateLifetime = true,
                           ValidateIssuerSigningKey = true,
@@ -236,6 +235,7 @@ namespace Metabase.Configuration
         private static void ConfigureOpenIddictServices(
             IServiceCollection services,
             IWebHostEnvironment environment,
+            AppSettings appSettings,
             SymmetricSecurityKey encryptionKey,
             SymmetricSecurityKey signingKey
             )
@@ -378,7 +378,7 @@ namespace Metabase.Configuration
               .AddValidation(_ =>
                  {
                      // Configure the audience accepted by this resource server.
-                     _.AddAudiences(ServerName);
+                     _.AddAudiences(appSettings.Host);
                      // Import the configuration from the local OpenIddict server instance.
                      _.UseLocalServer();
                      // Register the ASP.NET Core host.
