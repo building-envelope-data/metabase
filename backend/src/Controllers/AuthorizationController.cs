@@ -77,6 +77,9 @@ namespace Metabase.Controllers
             {
                 await extend(principal).ConfigureAwait(false);
             }
+            // Set claim destinations when the respective scopes are granted.
+            // For details see
+            // https://documentation.openiddict.com/configuration/claim-destinations.html
             foreach (var claim in principal.Claims)
             {
                 claim.SetDestinations(
