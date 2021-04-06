@@ -61,6 +61,10 @@ namespace Metabase.Controllers
         )
         {
             var principal = await _signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
+            // Use `user.Name` instead of the default value `user.UserName` for
+            // the claim `Claims.Name`.
+            principal.SetClaim(Claims.Name, user.Name);
+            principal.SetClaim(Claims.Email, user.Email);
             principal.SetScopes(scopes);
             principal.SetResources(
                 await _scopeManager.ListResourcesAsync(
