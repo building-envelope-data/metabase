@@ -66,6 +66,9 @@ namespace Metabase.Controllers
             principal.SetClaim(Claims.Name, user.Name);
             principal.SetClaim(Claims.Email, user.Email);
             principal.SetScopes(scopes);
+            // Resources are used as audiences of issued access tokens. The
+            // audience of the identity token though is always the client (and
+            // not the resource server).
             principal.SetResources(
                 await _scopeManager.ListResourcesAsync(
                     principal.GetScopes()
