@@ -214,12 +214,18 @@ namespace Metabase.Configuration
         {
             // OpenIddict offers native integration with Quartz.NET to perform scheduled tasks
             // (like pruning orphaned authorizations/tokens from the database) at regular intervals.
+            // For configuring Quartz see
+            // https://www.quartz-scheduler.net/documentation/quartz-3.x/packages/hosted-services-integration.html
             services.AddQuartz(_ =>
             {
-                // TODO Configure properly. See https://github.com/quartznet/quartznet/blob/master/src/Quartz.Extensions.DependencyInjection/IServiceCollectionQuartzConfigurator.cs
+                _.SchedulerId = "metabase";
+                _.SchedulerName = "Metabase";
                 _.UseMicrosoftDependencyInjectionJobFactory();
                 _.UseSimpleTypeLoader();
-                _.UseInMemoryStore(); // TODO `UsePersistentStore`?
+                _.UseInMemoryStore();
+                _.UseDefaultThreadPool(_ =>
+                    _.MaxConcurrency = 10
+                );
                 if (environment.IsEnvironment("test"))
                 {
                     // See https://gitter.im/MassTransit/MassTransit?at=5db2d058f6db7f4f856fb404
@@ -227,8 +233,8 @@ namespace Metabase.Configuration
                 }
             });
             // Register the Quartz.NET service and configure it to block shutdown until jobs are complete.
-            services.AddQuartzHostedService(options =>
-                options.WaitForJobsToComplete = true
+            services.AddQuartzHostedService(_ =>
+                _.WaitForJobsToComplete = true
                 );
         }
 
