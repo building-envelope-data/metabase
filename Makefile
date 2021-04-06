@@ -143,7 +143,6 @@ createdb : ## Create databases
 		${docker_compose} exec \
 		database \
 		bash -c " \
-			createdb --username postgres xbase_test ; \
 			createdb --username postgres xbase_development ; \
 		"
 .PHONY : createdb
