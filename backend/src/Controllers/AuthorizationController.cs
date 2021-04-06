@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -43,6 +44,68 @@ namespace Metabase.Controllers
             _scopeManager = scopeManager;
             _signInManager = signInManager;
             _userManager = userManager;
+        }
+
+        private Task<ClaimsPrincipal> CreateUserPrincipalAsync(
+            Data.User user,
+            ImmutableArray<string> scopes
+        )
+        {
+            return CreateUserPrincipalAsync(user, scopes, null);
+        }
+
+        private async Task<ClaimsPrincipal> CreateUserPrincipalAsync(
+            Data.User user,
+            ImmutableArray<string> scopes,
+            Func<ClaimsPrincipal, Task>? extend
+        )
+        {
+            var principal = await _signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
+            principal.SetScopes(scopes);
+            principal.SetResources(
+                await _scopeManager.ListResourcesAsync(
+                    principal.GetScopes()
+                )
+                .ToListAsync()
+                .ConfigureAwait(false)
+            );
+            if (extend is not null)
+            {
+                await extend(principal).ConfigureAwait(false);
+            }
+            foreach (var claim in principal.Claims)
+            {
+                claim.SetDestinations(
+                    GetDestinations(claim, principal)
+                );
+            }
+            return principal;
+        }
+
+        private async Task CreatePermanentAuthorization(
+            ClaimsPrincipal principal,
+            Data.User user,
+            List<object> authorizations,
+            string applicationId
+        )
+        {
+            // Automatically create a permanent authorization to avoid requiring explicit consent
+            // for future authorization or token requests containing the same scopes.
+            var authorization = authorizations.LastOrDefault();
+            if (authorization is null)
+            {
+                authorization = await _authorizationManager.CreateAsync(
+                    principal: principal,
+                    subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
+                    client: applicationId,
+                    type: AuthorizationTypes.Permanent,
+                    scopes: principal.GetScopes()
+                    )
+                    .ConfigureAwait(false);
+            }
+            principal.SetAuthorizationId(
+                await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false)
+            );
         }
 
         #region Authorization code, implicit and hybrid flows
@@ -175,36 +238,22 @@ namespace Metabase.Controllers
                 case ConsentTypes.Implicit:
                 case ConsentTypes.External when authorizations.Count > 0:
                 case ConsentTypes.Explicit when authorizations.Count > 0 && !request.HasPrompt(Prompts.Consent):
-                    var principal = await _signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
-
                     // Note: in this sample, the granted scopes match the requested scope
                     // but you may want to allow the user to uncheck specific scopes.
-                    // For that, simply restrict the list of scopes before calling SetScopes.
-                    principal.SetScopes(request.GetScopes());
-                    principal.SetResources(await _scopeManager.ListResourcesAsync(principal.GetScopes()).ToListAsync().ConfigureAwait(false));
-
-                    // Automatically create a permanent authorization to avoid requiring explicit consent
-                    // for future authorization or token requests containing the same scopes.
-                    var authorization = authorizations.LastOrDefault();
-                    if (authorization is null)
-                    {
-                        authorization = await _authorizationManager.CreateAsync(
-                            principal: principal,
-                            subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
-                            client: applicationId,
-                            type: AuthorizationTypes.Permanent,
-                            scopes: principal.GetScopes()
+                    // For that, simply restrict the list of scopes.
+                    var principal = await CreateUserPrincipalAsync(
+                        user,
+                        request.GetScopes(),
+                        async principal =>
+                            await CreatePermanentAuthorization(
+                                principal,
+                                user,
+                                authorizations,
+                                applicationId
                             )
-                            .ConfigureAwait(false);
-                    }
-
-                    principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false));
-
-                    foreach (var claim in principal.Claims)
-                    {
-                        claim.SetDestinations(GetDestinations(claim, principal));
-                    }
-
+                            .ConfigureAwait(false)
+                        )
+                        .ConfigureAwait(false);
                     return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
                 // At this point, no authorization was found in the database and an error must be returned
@@ -279,33 +328,22 @@ namespace Metabase.Controllers
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
 
-            var principal = await _signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
-
             // Note: in this sample, the granted scopes match the requested scope
             // but you may want to allow the user to uncheck specific scopes.
-            // For that, simply restrict the list of scopes before calling SetScopes.
-            principal.SetScopes(request.GetScopes());
-            principal.SetResources(await _scopeManager.ListResourcesAsync(principal.GetScopes()).ToListAsync().ConfigureAwait(false));
-
-            // Automatically create a permanent authorization to avoid requiring explicit consent
-            // for future authorization or token requests containing the same scopes.
-            var authorization = authorizations.LastOrDefault();
-            if (authorization is null)
-            {
-                authorization = await _authorizationManager.CreateAsync(
-                    principal: principal,
-                    subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
-                    client: applicationId,
-                    type: AuthorizationTypes.Permanent,
-                    scopes: principal.GetScopes()).ConfigureAwait(false);
-            }
-
-            principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false));
-
-            foreach (var claim in principal.Claims)
-            {
-                claim.SetDestinations(GetDestinations(claim, principal));
-            }
+            // For that, simply restrict the list of scopes.
+            var principal = await CreateUserPrincipalAsync(
+                user,
+                request.GetScopes(),
+                async principal =>
+                    await CreatePermanentAuthorization(
+                        principal,
+                        user,
+                        authorizations,
+                        applicationId
+                    )
+                    .ConfigureAwait(false)
+                )
+                .ConfigureAwait(false);
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -375,26 +413,19 @@ namespace Metabase.Controllers
             var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
             if (result.Succeeded)
             {
-                var principal = await _signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
-
                 // Note: in this sample, the granted scopes match the requested scope
                 // but you may want to allow the user to uncheck specific scopes.
-                // For that, simply restrict the list of scopes before calling SetScopes.
-                principal.SetScopes(result.Principal?.GetScopes() ?? throw new InvalidOperationException("The scopes cannot be retrieved."));
-                principal.SetResources(await _scopeManager.ListResourcesAsync(principal.GetScopes()).ToListAsync().ConfigureAwait(false));
-
-                foreach (var claim in principal.Claims)
-                {
-                    claim.SetDestinations(GetDestinations(claim, principal));
-                }
-
+                // For that, simply restrict the list of scopes.
+                var principal = await CreateUserPrincipalAsync(
+                    user,
+                    result.Principal?.GetScopes() ?? throw new InvalidOperationException("The scopes cannot be retrieved.")
+                    ).ConfigureAwait(false);
                 var properties = new AuthenticationProperties
                 {
                     // This property points to the address OpenIddict will automatically
                     // redirect the user to after validating the authorization demand.
                     RedirectUri = "/"
                 };
-
                 return SignIn(principal, properties, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
 
@@ -479,18 +510,13 @@ namespace Metabase.Controllers
                         authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
                 }
 
-                var principal = await _signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
-
                 // Note: in this sample, the granted scopes match the requested scope
                 // but you may want to allow the user to uncheck specific scopes.
-                // For that, simply restrict the list of scopes before calling SetScopes.
-                principal.SetScopes(request.GetScopes());
-                principal.SetResources(await _scopeManager.ListResourcesAsync(principal.GetScopes()).ToListAsync().ConfigureAwait(false));
-
-                foreach (var claim in principal.Claims)
-                {
-                    claim.SetDestinations(GetDestinations(claim, principal));
-                }
+                // For that, simply restrict the list of scopes.
+                var principal = await CreateUserPrincipalAsync(
+                    user,
+                    request.GetScopes()
+                    ).ConfigureAwait(false);
 
                 // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
                 return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
