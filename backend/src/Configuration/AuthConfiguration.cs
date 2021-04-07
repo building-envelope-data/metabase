@@ -3,7 +3,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
+using System.Linq;
+using System.Security.Cryptography;
 
 namespace Metabase.Configuration
 {
@@ -32,22 +33,78 @@ namespace Metabase.Configuration
             AppSettings appSettings
             )
         {
-            // https://fullstackmark.com/post/21/user-authentication-and-identity-with-angular-aspnet-core-and-identityserver
-            // https://www.scottbrady91.com/Identity-Server/ASPNET-Core-Swagger-UI-Authorization-using-IdentityServer4
-            var encryptionKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    appSettings.JsonWebToken.EncryptionKey
-                    )
-                );
-            var signingKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    appSettings.JsonWebToken.SigningKey
-                    )
-                );
+            var (encryptionCertificate, signingCertificate) = CreateCertificatesIfNecessary(environment, appSettings);
             ConfigureIdentityServices(services);
-            ConfigureAuthenticiationAndAuthorizationServices(services, environment, appSettings, encryptionKey, signingKey);
+            ConfigureAuthenticiationAndAuthorizationServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
             ConfigureTaskScheduling(services, environment);
-            ConfigureOpenIddictServices(services, environment, appSettings, encryptionKey, signingKey);
+            ConfigureOpenIddictServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
+        }
+
+        private static (X509Certificate2, X509Certificate2) CreateCertificatesIfNecessary(
+            IWebHostEnvironment environment,
+            AppSettings appSettings
+        )
+        {
+            // TODO Is there a better way to manage these keys? Is there gonna be a problem in two-years time when the keys become invalid?
+            // Inspired by https://github.com/openiddict/openiddict-core/blob/78901e3e7e3ee47cf7846a71f758dc9ca110b1a2/src/OpenIddict.Server/OpenIddictServerBuilder.cs#L661-L679
+            // and https://github.com/openiddict/openiddict-core/blob/78901e3e7e3ee47cf7846a71f758dc9ca110b1a2/src/OpenIddict.Server/OpenIddictServerBuilder.cs#L661-L679
+            return (
+                CreateCertificateIfNecessary("Encryption",
+                                             X509KeyUsageFlags.KeyEncipherment,
+                                             appSettings.JsonWebToken.EncryptionCertificatePassword,
+                                             environment
+                                             ),
+                CreateCertificateIfNecessary("Signing",
+                                             X509KeyUsageFlags.DigitalSignature,
+                                             appSettings.JsonWebToken.SigningCertificatePassword,
+                                             environment
+                                             )
+            );
+        }
+
+        private static X509Certificate2 CreateCertificateIfNecessary(
+            string name,
+            X509KeyUsageFlags flags,
+            string password,
+            IWebHostEnvironment environment
+        )
+        {
+            var subject = new X500DistinguishedName(
+                environment.IsEnvironment("test")
+                ? $"CN=OpenId Connect Server {name} Certificate"
+                : $"CN=OpenId Connect Server {name} Certificate {Guid.NewGuid()}"
+                );
+            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadWrite);
+            // Try to retrieve the existing certificates from the specified store.
+            // If no valid existing certificate was found, create a new encryption certificate.
+            var certificates = store.Certificates.Find(X509FindType.FindBySubjectDistinguishedName, subject.Name, validOnly: false)
+                .OfType<X509Certificate2>()
+                .ToList();
+            var certificate = certificates.LastOrDefault(certificate => certificate.NotBefore < DateTime.Now && certificate.NotAfter > DateTime.Now);
+            if (certificate is null)
+            {
+                // TODO Is RSA sufficiently secure? Or should we use ECDSA?
+                using var algorithm = RSA.Create(keySizeInBits: 2048);
+                var request = new CertificateRequest(subject, algorithm, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+                request.CertificateExtensions.Add(new X509KeyUsageExtension(flags, critical: true));
+                certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddYears(2));
+                // Note: CertificateRequest.CreateSelfSigned() doesn't mark the key set associated with the certificate
+                // as "persisted", which eventually prevents X509Store.Add() from correctly storing the private key.
+                // To work around this issue, the certificate payload is manually exported and imported back
+                // into a new X509Certificate2 instance specifying the X509KeyStorageFlags.PersistKeySet flag.
+                var data = certificate.Export(X509ContentType.Pfx, password);
+                try
+                {
+                    certificates.Insert(0, certificate = new X509Certificate2(data, password, X509KeyStorageFlags.PersistKeySet));
+                }
+                finally
+                {
+                    Array.Clear(data, 0, data.Length);
+                }
+                store.Add(certificate);
+            }
+            return certificate;
         }
 
         private static void ConfigureIdentityServices(
@@ -122,8 +179,8 @@ namespace Metabase.Configuration
             IServiceCollection services,
             IWebHostEnvironment environment,
             AppSettings appSettings,
-            SymmetricSecurityKey encryptionKey,
-            SymmetricSecurityKey signingKey
+            X509Certificate2 encryptionCertificate,
+            X509Certificate2 signingCertificate
             )
         {
             // https://openiddict.github.io/openiddict-documentation/configuration/token-setup-and-validation.html#jwt-validation
@@ -150,8 +207,8 @@ namespace Metabase.Configuration
                           ValidateLifetime = true,
                           ValidateIssuerSigningKey = true,
                           RequireSignedTokens = true,
-                          TokenDecryptionKey = encryptionKey,
-                          IssuerSigningKey = signingKey
+                          TokenDecryptionKey = new X509SecurityKey(encryptionCertificate),
+                          IssuerSigningKey = new X509SecurityKey(signingCertificate)
                       };
                       // _.Events.OnAuthenticationFailed = _ =>
                   });
@@ -242,8 +299,8 @@ namespace Metabase.Configuration
             IServiceCollection services,
             IWebHostEnvironment environment,
             AppSettings appSettings,
-            SymmetricSecurityKey encryptionKey,
-            SymmetricSecurityKey signingKey
+            X509Certificate2 encryptionCertificate,
+            X509Certificate2 signingCertificate
             )
         {
             services.AddOpenIddict()
@@ -288,40 +345,9 @@ namespace Metabase.Configuration
                         _.AllowPasswordFlow();
                     }
                     // Register the signing and encryption credentials.
-                    // TODO Use certificate (public-private key pair) instead of symmetric keys. OpenIddict requires at least one certificate anyway.
-                    _.AddEncryptionKey(encryptionKey)
-                    .AddSigningKey(signingKey);
-                    if (environment.IsDevelopment())
-                    {
-                        _.AddDevelopmentEncryptionCertificate()
-                         .AddDevelopmentSigningCertificate();
-                        // _.AddEphemeralEncryptionKey()
-                        // .AddEphemeralSigningKey();
-                    }
-                    else if (environment.IsEnvironment("test"))
-                    {
-                        _.AddDevelopmentEncryptionCertificate(new X500DistinguishedName($"CN=OpenIddict Server Encryption Certificate {Guid.NewGuid()}"))
-                         .AddDevelopmentSigningCertificate(new X500DistinguishedName($"CN=OpenIddict Server Signing Certificate {Guid.NewGuid()}"));
-                    }
-                    else
-                    {
-                        // JWTs must be signed by a self-signing certificate or
-                        // a symmetric key. Here a certificate is used. The
-                        // certificate is an embedded resource, see the csproj
-                        // file. The certificate must contain public and private
-                        // keys.
-                        // TODO Manage the certificate and its password properly in production. Also use the same approach in development to match the production environment as closely as possible.
-                        _.AddEncryptionCertificate(
-                        assembly: typeof(Startup).GetTypeInfo().Assembly,
-                        resource: "Metabase.jwt-encryption-certificate.pfx",
-                        password: "password"
-                        )
-                        .AddSigningCertificate(
-                        assembly: typeof(Startup).GetTypeInfo().Assembly,
-                        resource: "Metabase.jwt-signing-certificate.pfx",
-                        password: "password"
-                        );
-                    }
+                    // See https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
+                    _.AddEncryptionCertificate(encryptionCertificate)
+                    .AddSigningCertificate(signingCertificate);
                     // Force client applications to use Proof Key for Code Exchange (PKCE).
                     _.RequireProofKeyForCodeExchange();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.

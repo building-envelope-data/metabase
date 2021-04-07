@@ -59,8 +59,8 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=development
       - XBASE_Host=https://${HOST}:${HTTPS_PORT}
-      - XBASE_JsonWebToken__EncryptionKey=${JSON_WEB_TOKEN_ENCRYPTION_KEY}
-      - XBASE_JsonWebToken__SigningKey=${JSON_WEB_TOKEN_SIGNING_KEY}
+      - XBASE_JsonWebToken__EncryptionCertificatePassword=${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD}
+      - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose

@@ -42,12 +42,4 @@
     <PackageReference Include="Quartz" Version="3.2.4" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.2.4" />
   </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="./jwt-signing-certificate.pfx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="./jwt-encryption-certificate.pfx" />
-  </ItemGroup>
 </Project>

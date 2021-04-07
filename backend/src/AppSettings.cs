@@ -21,10 +21,10 @@ namespace Metabase
 
         public sealed class JsonWebTokenSettings
         {
-            public string EncryptionKey { get; set; }
+            public string EncryptionCertificatePassword { get; set; }
             = "";
 
-            public string SigningKey { get; set; }
+            public string SigningCertificatePassword { get; set; }
             = "";
         }
 
