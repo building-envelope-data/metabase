@@ -108,7 +108,7 @@ shellb : execb ## Enter shell in an existing `backend` container (after starting
 .PHONY : shellb
 
 shellb-examples : COMMAND = bash -c "cd ./examples && bash"
-shellb-examples : execb-metabase ## Enter Bourne-again shell, aka, bash, in an existing `backend` container (after starting all containers if necessary)
+shellb-examples : execb ## Enter Bourne-again shell, aka, bash, in an existing `backend` container (after starting all containers if necessary)
 .PHONY : shellb-examples
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
@@ -185,21 +185,16 @@ register : ## Build and register the production `${END}` image for project `${PR
 	docker push ${REGISTRY_URL}/${IMAGE}:${VERSION}
 .PHONY : register
 
-register-metabase-backend : END = backend
-register-metabase-backend : PROJECT_NAME = Metabase
-register-metabase-backend : register ## Build and register metabase backend image
-.PHONY : register-metabase-backend
+register-backend : END = backend
+register-backend : register ## Build and register backend image
+.PHONY : register-backend
 
-register-metabase-frontend : END = frontend
-register-metabase-frontend : PROJECT_NAME = Metabase
-register-metabase-frontend : register ## Build and register metabase frontend image
-.PHONY : register-metabase-frontend
+register-frontend : END = frontend
+register-frontend : register ## Build and register frontend image
+.PHONY : register-frontend
 
 deploy : upload down-and-up-server ## Deploy, for example, `make JUMP_USER=swacker deploy`
 .PHONY : deploy
-
-deploy-metabase : deploy ## Deploy metabase, for example, `make JUMP_USER=swacker deploy`
-.PHONY : deploy-metabase
 
 upload : upload-images upload-files ## Upload images and files
 .PHONY : upload
