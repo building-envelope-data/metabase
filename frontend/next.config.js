@@ -1,4 +1,8 @@
 module.exports = {
+  future: {
+    webpack5: true,
+  },
+
   webpack(config, options) {
     config.module.rules.push({
       test: /\.graphql$/,
