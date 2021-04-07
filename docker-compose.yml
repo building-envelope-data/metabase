@@ -1,8 +1,7 @@
 version: '3.3'
 
 services:
-  database:
-    # https://hub.docker.com/_/postgres
+  database: # https://hub.docker.com/_/postgres
     image: postgres:13.2-alpine
     # ports:
     #   - 5432:5432
