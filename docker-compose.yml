@@ -97,7 +97,7 @@ services:
       - backend
 
   nginx: # https://hub.docker.com/_/nginx
-    image: nginx:1.19.4-alpine
+    image: nginx:1.19.9-alpine
     command: [
       "nginx-debug",
       "-g", "daemon off;"

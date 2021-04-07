@@ -49,9 +49,10 @@ services:
     depends_on:
       - backend
 
-  nginx:
+  nginx: # https://hub.docker.com/_/nginx
     restart: always
-    image: nginx:1.19.4-alpine
+    # https://hub.docker.com/_/nginx
+    image: nginx:1.19.9-alpine
     command: [
       "nginx",
       "-g", "daemon off;"
