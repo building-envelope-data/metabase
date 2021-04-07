@@ -1,6 +1,7 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
-# See https://hub.docker.com/_/microsoft-dotnet-core-sdk
-FROM mcr.microsoft.com/dotnet/sdk:5.0.100-alpine3.12-amd64
+
+# https://hub.docker.com/_/microsoft-dotnet-sdk
+FROM mcr.microsoft.com/dotnet/sdk:5.0.202-alpine3.13-amd64
 
 ARG GROUP_ID
 ARG USER_ID

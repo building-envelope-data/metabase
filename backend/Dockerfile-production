@@ -8,7 +8,7 @@
 #########
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:5.0.100-alpine3.12-amd64 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0.202-alpine3.13-amd64 AS build
 
 ARG PROJECT_NAME
 
@@ -31,8 +31,8 @@ RUN \
 # RUNTIME #
 ###########
 
-# https://hub.docker.com/_/microsoft-dotnet-core-aspnet
-FROM mcr.microsoft.com/dotnet/aspnet:5.0.0-alpine3.12-amd64
+# https://hub.docker.com/_/microsoft-dotnet-aspnet
+FROM mcr.microsoft.com/dotnet/aspnet:5.0.5-alpine3.13-amd64
 
 ARG PROJECT_NAME
 
