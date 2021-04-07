@@ -22,7 +22,7 @@ RUN yarn build
 # RUNTIME #
 ###########
 
-FROM nginx:1.19.4-alpine
+FROM nginx:1.19.9-alpine
 
 ARG PROJECT_NAME
 
