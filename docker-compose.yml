@@ -3,7 +3,7 @@ version: '3.3'
 services:
   database:
     # https://hub.docker.com/_/postgres
-    image: postgres:11.5-alpine
+    image: postgres:13.2-alpine
     # ports:
     #   - 5432:5432
     # For possible command-line arguments see
