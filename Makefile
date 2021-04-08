@@ -292,7 +292,7 @@ generate-certificate-authority : ## Generate certificate authority ECDSA private
 		docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
-		nginx:1.19.0 \
+		nginx:1.19.9 \
 		bash -cx " \
 			echo \"# Generate the elliptic curve (EC) private key '/ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
@@ -400,7 +400,7 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 		docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
-		nginx:1.19.0 \
+		nginx:1.19.9 \
 		bash -cx " \
 			echo \"# Generate the elliptic curve (EC) private key '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
