@@ -2,6 +2,7 @@
 
 **/.*
 !.graphql-let.yml
+!.env.production
 **/*.md
 **/*.bak
 Dockerfile*
