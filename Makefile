@@ -43,10 +43,16 @@ build : ## Build images
 		--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
-show-build-context : ## Show the build context configured by `.dockerignore`
+show-backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
 	docker build \
 		--file Dockerfile-show-build-context \
-		.
+		./backend
+.PHONY : show-build-context
+
+show-frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
+	docker build \
+		--file Dockerfile-show-build-context \
+		./backend
 .PHONY : show-build-context
 
 remove : ## Remove stopped containers
