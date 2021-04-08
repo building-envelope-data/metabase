@@ -10,11 +10,9 @@
 # https://hub.docker.com/_/microsoft-dotnet-sdk
 FROM mcr.microsoft.com/dotnet/sdk:5.0.202-alpine3.13-amd64 AS build
 
-ARG PROJECT_NAME
-
 COPY ./ /app
 
-WORKDIR /app/${PROJECT_NAME}/backend
+WORKDIR /app
 
 RUN \
   dotnet restore \
@@ -34,17 +32,15 @@ RUN \
 # https://hub.docker.com/_/microsoft-dotnet-aspnet
 FROM mcr.microsoft.com/dotnet/aspnet:5.0.5-alpine3.13-amd64
 
-ARG PROJECT_NAME
-
 WORKDIR /app
 
 COPY \
   --from=build \
-  /app/${PROJECT_NAME}/backend/out \
+  /app/out \
   ./
 
 RUN \
-  ln -s ${PROJECT_NAME}.dll App.dll
+  ln -s Metabase.dll App.dll
 
 # See: https://github.com/dotnet/announcements/issues/20
 # Uncomment to enable globalization APIs
@@ -52,6 +48,3 @@ RUN \
 #RUN apk add --no-cache icu-libs
 ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
-
-EXPOSE 8080
-CMD ["dotnet", "App.dll"]
