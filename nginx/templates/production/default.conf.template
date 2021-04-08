@@ -21,7 +21,7 @@ proxy_busy_buffers_size 256k;
 
 add_header X-Frame-Options "SAMEORIGIN"; # Secure from clickjacking: https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#secure-nginx-from-clickjacking
 
-limit_req_zone $binary_remote_addr zone=one:10m rate=5r/s;
+limit_req_zone $binary_remote_addr zone=one:10m rate=30r/s;
 server_tokens  off;
 
 sendfile              on;
@@ -31,11 +31,11 @@ client_header_timeout 10;
 send_timeout          10;
 
 upstream backend {
-  server backend:80;
+  server backend:8080;
 }
 
 upstream frontend {
-  server frontend:80;
+  server frontend:8080;
 }
 
 server {
@@ -56,16 +56,16 @@ server {
 
   location /.well-known {
     proxy_pass http://backend;
-    limit_req  zone=one burst=10 nodelay;
+    limit_req  zone=one burst=1 nodelay;
   }
 
   location /personal-user-data {
     proxy_pass http://backend;
-    limit_req  zone=one burst=10 nodelay;
+    limit_req  zone=one burst=1 nodelay;
   }
 
   location / {
     proxy_pass http://frontend;
-    limit_req  zone=one burst=10 nodelay;
+    limit_req  zone=one burst=30 nodelay;
   }
 }
