@@ -26,8 +26,10 @@
 6. List all GNU Make targets by running `make help`.
 7. Generate and trust a self-signed certificate authority and SSL certificates
    by running `make ssl`.
-8. Start all services and follow their logs by running `make up logs`.
-9. To see the web frontend navigate to
+8. Generate JSON Web Token (JWT) encryption and signing certificates by running
+   `make jwt-certificates`.
+9. Start all services and follow their logs by running `make up logs`.
+10. To see the web frontend navigate to
    `https://local.buildingenvelopedata.org:4041` in your web browser and to see
    the GraphQL API navigate to
    `https://local.buildingenvelopedata.org:4041/graphql/`.

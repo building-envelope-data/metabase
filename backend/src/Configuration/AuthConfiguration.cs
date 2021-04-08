@@ -1,6 +1,5 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -14,6 +13,9 @@ using OpenIddict.Validation.AspNetCore;
 using Quartz;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Reflection;
+using System.Security;
+using System.IO;
 
 namespace Metabase.Configuration
 {
@@ -33,78 +35,34 @@ namespace Metabase.Configuration
             AppSettings appSettings
             )
         {
-            var (encryptionCertificate, signingCertificate) = CreateCertificatesIfNecessary(environment, appSettings);
+            // TODO How can we use `SecureString` for passwords set via environment variables?
+            var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx", appSettings.JsonWebToken.EncryptionCertificatePassword);
+            var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
             ConfigureIdentityServices(services);
             ConfigureAuthenticiationAndAuthorizationServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
             ConfigureTaskScheduling(services, environment);
             ConfigureOpenIddictServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
         }
 
-        private static (X509Certificate2, X509Certificate2) CreateCertificatesIfNecessary(
-            IWebHostEnvironment environment,
-            AppSettings appSettings
+        private static X509Certificate2 LoadCertificate(
+            string fileName,
+            string password
         )
         {
-            // TODO Is there a better way to manage these keys? Is there gonna be a problem in two-years time when the keys become invalid?
-            // Inspired by https://github.com/openiddict/openiddict-core/blob/78901e3e7e3ee47cf7846a71f758dc9ca110b1a2/src/OpenIddict.Server/OpenIddictServerBuilder.cs#L661-L679
-            // and https://github.com/openiddict/openiddict-core/blob/78901e3e7e3ee47cf7846a71f758dc9ca110b1a2/src/OpenIddict.Server/OpenIddictServerBuilder.cs#L661-L679
-            return (
-                CreateCertificateIfNecessary("Encryption",
-                                             X509KeyUsageFlags.KeyEncipherment,
-                                             appSettings.JsonWebToken.EncryptionCertificatePassword,
-                                             environment
-                                             ),
-                CreateCertificateIfNecessary("Signing",
-                                             X509KeyUsageFlags.DigitalSignature,
-                                             appSettings.JsonWebToken.SigningCertificatePassword,
-                                             environment
-                                             )
-            );
-        }
-
-        private static X509Certificate2 CreateCertificateIfNecessary(
-            string name,
-            X509KeyUsageFlags flags,
-            string password,
-            IWebHostEnvironment environment
-        )
-        {
-            var subject = new X500DistinguishedName(
-                environment.IsEnvironment("test")
-                ? $"CN=OpenId Connect Server {name} Certificate"
-                : $"CN=OpenId Connect Server {name} Certificate {Guid.NewGuid()}"
-                );
-            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadWrite);
-            // Try to retrieve the existing certificates from the specified store.
-            // If no valid existing certificate was found, create a new encryption certificate.
-            var certificates = store.Certificates.Find(X509FindType.FindBySubjectDistinguishedName, subject.Name, validOnly: false)
-                .OfType<X509Certificate2>()
-                .ToList();
-            var certificate = certificates.LastOrDefault(certificate => certificate.NotBefore < DateTime.Now && certificate.NotAfter > DateTime.Now);
-            if (certificate is null)
+            if (string.IsNullOrEmpty(password))
             {
-                // TODO Is RSA sufficiently secure? Or should we use ECDSA?
-                using var algorithm = RSA.Create(keySizeInBits: 2048);
-                var request = new CertificateRequest(subject, algorithm, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-                request.CertificateExtensions.Add(new X509KeyUsageExtension(flags, critical: true));
-                certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddYears(2));
-                // Note: CertificateRequest.CreateSelfSigned() doesn't mark the key set associated with the certificate
-                // as "persisted", which eventually prevents X509Store.Add() from correctly storing the private key.
-                // To work around this issue, the certificate payload is manually exported and imported back
-                // into a new X509Certificate2 instance specifying the X509KeyStorageFlags.PersistKeySet flag.
-                var data = certificate.Export(X509ContentType.Pfx, password);
-                try
-                {
-                    certificates.Insert(0, certificate = new X509Certificate2(data, password, X509KeyStorageFlags.PersistKeySet));
-                }
-                finally
-                {
-                    Array.Clear(data, 0, data.Length);
-                }
-                store.Add(certificate);
+                throw new Exception($"Empty password for certificate {fileName}.");
             }
-            return certificate;
+            var stream =
+                Assembly.GetExecutingAssembly().GetManifestResourceStream($"Metabase.{fileName}")
+                ?? throw new Exception($"Missing certificate {fileName}.");
+            using var buffer = new MemoryStream();
+            stream.CopyTo(buffer);
+            return new X509Certificate2(
+                buffer.ToArray(),
+                password,
+                X509KeyStorageFlags.EphemeralKeySet
+            );
         }
 
         private static void ConfigureIdentityServices(

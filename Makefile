@@ -275,6 +275,27 @@ down-and-up-server : ## Down and up server (note that a restart would not reflec
 # Generate Certificates #
 # --------------------- #
 
+# TODO Pass passwords in a more secure way!
+jwt-certificates : ## Create JWT encryption and signing certificates if necessary
+	docker build \
+		--build-arg GROUP_ID=$(shell id --group) \
+		--build-arg USER_ID=$(shell id --user) \
+		--tag ${name}_bootstrap \
+		--file ./backend/Dockerfile-bootstrap \
+		./backend
+	docker run \
+		--user $(shell id --user):$(shell id --group) \
+		--mount type=bind,source="$(shell pwd)/backend",target=/app \
+		${name}_bootstrap \
+		ash -cx " \
+			dotnet-script \
+				create-certificates.csx \
+				-- \
+				${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD} \
+				${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD} \
+		"
+.PHONY : certificates
+
 # For an introduction to how HTTPS works see https://howhttps.works
 ssl : ## Generate and trust certificate authority, and generate SSL certificates
 	make generate-certificate-authority
