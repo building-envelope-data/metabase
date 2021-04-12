@@ -23,7 +23,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY --from=build /app/.env.production ./
+COPY --from=build /app/.env.local ./
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/next.config.js ./
 COPY --from=build /app/node_modules ./node_modules

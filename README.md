@@ -19,8 +19,9 @@
 3. Clone the source code by running
    `git clone git@github.com:ise621/metabase.git` and navigate
    into the new directory `metabase` by running `cd metabase`.
-4. Prepare your environment by running `cp .env.sample .env` and adding the
-   line `127.0.0.1 local.buildingenvelopedata.org` to your `/etc/hosts` file.
+4. Prepare your environment by running `cp .env.sample .env`,
+   `cp frontend/.env.local.sample frontend/.env.local`, and adding the line
+   `127.0.0.1 local.buildingenvelopedata.org` to your `/etc/hosts` file.
 5. Install [Docker Desktop](https://www.docker.com/products/docker-desktop), and
    [GNU Make](https://www.gnu.org/software/make/).
 6. List all GNU Make targets by running `make help`.
