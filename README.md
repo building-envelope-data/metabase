@@ -54,7 +54,7 @@ The same works for frontend containers by running `make shellf`.
 1. Do the set-up by running `ansible-playbook ./machine/local.yml`.
 1. Prepare the environment more or less as detailed above replacing dummy
    passwords by newly generated ones, for example, by running
-   `tr -dc A-Za-z0-9 < /dev/urandom | head -c 128 ; echo ''`.
+   `openssl rand -base64 32`.
 
 ## Original Idea
 
