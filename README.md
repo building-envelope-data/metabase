@@ -55,6 +55,14 @@ The same works for frontend containers by running `make shellf`.
 1. Prepare the environment more or less as detailed above replacing dummy
    passwords by newly generated ones, for example, by running
    `openssl rand -base64 32`.
+1. Prepare PostgreSQL by generating new password files by running
+   `make --file Makefile.production postgres_passwords`
+   and creating the database by running
+   `make --file Makefile.production createdb`.
+1. Start all services by running
+   `make --file Makefile.production up`.
+1. Restart changed services in a changed environment by running
+   `make --file Makefile.production down build up`.
 
 ## Original Idea
 
