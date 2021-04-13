@@ -1,6 +1,7 @@
 /examples/*.json
 /secrets
 /ssl
+/machine/*.retry
 
 .env
 .vscode
