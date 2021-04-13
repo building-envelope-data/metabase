@@ -45,7 +45,7 @@ shellb : ## Enter shell in a running `backend` container (to test database acces
 		ash
 .PHONY : shellb
 
-createdb : ## Create metabase database
+createdb : ## Create database
 	${docker_compose} run \
 		database \
 		bash -c "createdb --username postgres xbase"
