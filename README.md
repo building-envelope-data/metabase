@@ -46,7 +46,15 @@ In another shell
 
 The same works for frontend containers by running `make shellf`.
 
-# Original Idea
+## Setting up a Debian production machine
+1. Install [Ansible](https://www.ansible.com) as explained on
+   [Installing Ansible on Debian](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-debian).
+1. Clone the repository by running
+   `git clone git@github.com:ise621/metabase.git`.
+1. Do the set-up by running `ansible-playbook ./machine/local.yml`.
+1. Prepare the environment more or less as detailed above.
+
+## Original Idea
 
 The product identifier service should provide the following endpoints:
 * Obtain a new product identifier possibly associating internal meta information with it, like a custom string or a JSON blob
@@ -74,7 +82,7 @@ Randomness of identifiers ensures that
 
 We may add some error detection and correction capabilities by, for example, generating all but the last 4 bits randomly and using the last 4 bits as [some sort of checksum](https://en.wikipedia.org/wiki/Checksum).
 
-# ...
+## ...
 
 - [C# Coding Standards](https://www.dofactory.com/reference/csharp-coding-standards)
 - [Should You Use The Same Dockerfile For Dev, Staging And Production Builds?](https://vsupalov.com/same-dockerfile-dev-staging-production/)
