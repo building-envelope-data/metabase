@@ -44,16 +44,16 @@ build : ## Build images
 .PHONY : build
 
 show-backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
-	docker build \
+	docker build --no-cache \
 		--file Dockerfile-show-build-context \
 		./backend
-.PHONY : show-build-context
+.PHONY : show-backend-build-context
 
 show-frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
-	docker build \
+	docker build --no-cache \
 		--file Dockerfile-show-build-context \
-		./backend
-.PHONY : show-build-context
+		./frontend
+.PHONY : show-frontend-build-context
 
 remove : ## Remove stopped containers
 	DOCKER_IP=${docker_ip} \
