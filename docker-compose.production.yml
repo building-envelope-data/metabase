@@ -29,7 +29,7 @@ services:
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=production
-      - XBASE_Host=https://${HOST}:${HTTPS_PORT}
+      - XBASE_Host=https://${HOST}
       - XBASE_JsonWebToken__EncryptionCertificatePassword=${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD}
       - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
@@ -57,7 +57,7 @@ services:
       "-g", "daemon off;"
       ]
     ports:
-      - 8000:80
+      - ${HTTP_PORT}:80
     volumes:
       - ./nginx/templates/production:/etc/nginx/templates:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
