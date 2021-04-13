@@ -1,7 +1,7 @@
 # Concise introduction to GNU Make:
 # https://swcarpentry.github.io/make-novice/reference.html
 
-name = metabase
+name = metabase_production
 
 docker_compose = \
 	docker-compose \
