@@ -1,0 +1,61 @@
+- hosts: localhost
+  connection: local
+  become: true
+  become_user: root
+
+  pre_tasks:
+    - name: Update package information
+      become_user: root
+      apt:
+        update_cache: yes
+      changed_when: false
+    - name: Install access control list utilities (needed to escalate privileges, see https://github.com/ansible/ansible/issues/16052)
+      package:
+        name: acl
+        state: present
+
+  tasks:
+    - name: GNU Make
+      package:
+        name: make
+        state: present
+
+    - name: Docker and `docker-compose`
+      become_user: root
+      block:
+        - name: Add Docker dependencies
+          package:
+            name:
+              - apt-transport-https
+              - ca-certificates
+              - curl
+              - gnupg
+              - lsb-release
+            state: present
+
+        - name: Add Docker key
+          apt_key:
+            url: https://download.docker.com/linux/debian/gpg
+            id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+            state: present
+
+        - name: Docker Community Edition
+          block:
+            - name: Add Docker repository
+              apt_repository:
+                repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+                state: present
+            - name: Install Docker
+              package:
+                name:
+                  - docker-ce
+                  - docker-ce-cli
+                  - containerd.io
+                state: present
+
+        - name: Install `docker-compose`
+          get_url:
+            url: https://github.com/docker/compose/releases/download/1.29.0/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}
+            dest: /usr/local/bin/docker-compose
+            mode: 'u+x,g+x'
+            # checksum: sha256:TODO https://github.com/docker/compose/releases/tag/1.29.0
