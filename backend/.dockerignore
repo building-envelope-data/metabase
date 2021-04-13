@@ -6,6 +6,7 @@
 Dockerfile*
 
 **/core
+**/TestResult*/
 
 ### Csharp ###
 ## Ignore Visual Studio temporary files, build results, and
