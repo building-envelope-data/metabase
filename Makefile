@@ -153,6 +153,16 @@ createdb : ## Create databases
 		"
 .PHONY : createdb
 
+begin-maintenance : ## Begin maintenance
+	cp \
+		./nginx/html/maintenance.off.html \
+		./nginx/html/maintenance.html
+.PHONY : begin-maintenance
+
+end-maintenance : ## End maintenance
+	rm ./nginx/html/maintenance.html
+.PHONY : begin-maintenance
+
 # --------------------- #
 # Generate Certificates #
 # --------------------- #

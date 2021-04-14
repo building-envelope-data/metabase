@@ -80,3 +80,13 @@ postgres_passwords : postgres_password ## Generate PostgreSQL passwords file who
 	echo "*:*:*:*:$$(cat ./secrets/postgres_password)" \
 		> ./secrets/postgres_passwords
 .PHONY : postgres_passwords
+
+begin-maintenance : ## Begin maintenance
+	cp \
+		./nginx/html/maintenance.off.html \
+		./nginx/html/maintenance.html
+.PHONY : begin-maintenance
+
+end-maintenance : ## End maintenance
+	rm ./nginx/html/maintenance.html
+.PHONY : begin-maintenance
