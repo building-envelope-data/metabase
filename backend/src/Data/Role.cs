@@ -8,6 +8,6 @@ namespace Metabase.Data
     {
         public const string Administrator = "Administrator";
 
-        public ICollection<UserRole> UserRoles { get; } = new List<UserRole>();
+        // public ICollection<UserRole> UserRoles { get; } = new List<UserRole>();
     }
 }
