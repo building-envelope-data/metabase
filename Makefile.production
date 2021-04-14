@@ -27,7 +27,8 @@ up : ## (Re)create and start containers
 .PHONY : up
 
 down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
-	${docker_compose} down
+	${docker_compose} down \
+		--remove-orphans
 .PHONY : down
 
 restart : ## Restart all stopped and running containers

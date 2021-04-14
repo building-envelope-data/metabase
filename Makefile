@@ -75,7 +75,8 @@ up : build ## (Re)create, and start containers (after building images if necessa
 
 down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
 	DOCKER_IP=${docker_ip} \
-		${docker_compose} down
+		${docker_compose} down \
+		--remove-orphans
 .PHONY : down
 
 restart : ## Restart all stopped and running containers
