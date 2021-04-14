@@ -2,6 +2,7 @@
 /secrets
 /ssl
 /machine/*.retry
+/nginx/html/maintenance.html
 
 .env
 .vscode
