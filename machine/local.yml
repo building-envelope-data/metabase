@@ -15,6 +15,11 @@
         state: present
 
   tasks:
+    - name: Bash completion
+      package:
+        name: bash-completion
+        state: present
+
     - name: GNU Make
       package:
         name: make
