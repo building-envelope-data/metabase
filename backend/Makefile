@@ -154,3 +154,15 @@ diagrams : ## Draw images from textual UML diagrams
 schema : ## Fetch GraphQL schema using `hasura/graphqurl`
 	gq http://backend:8080/graphql/ --introspect > schema.graphql
 .PHONY : schema
+
+add-migration : ## Add migration with name `${NAME}`, for example, `make NAME=InitialCreate add-migration`
+	dotnet ef \
+		--project src/Metabase.csproj \
+		migrations \
+		add \
+		${NAME}
+.PHONY : add-migration
+
+migrate : ## Migrate database
+	dotnet ef database update
+.PHONY : migrate
