@@ -54,7 +54,9 @@ The same works for frontend containers by running `make shellf`.
 1. Do the set-up by running `ansible-playbook ./machine/local.yml`.
 1. Prepare the environment more or less as detailed above replacing dummy
    passwords by newly generated ones, for example, by running
-   `openssl rand -base64 32`.
+   `openssl rand -base64 32`,
+	 and adding the variable `NAME` with the value `metabase_production` (and
+	 `metabase_staging`).
 1. Prepare PostgreSQL by generating new password files by running
    `make --file Makefile.production postgres_passwords`
    and creating the database by running

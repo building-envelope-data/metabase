@@ -1,12 +1,12 @@
 # Concise introduction to GNU Make:
 # https://swcarpentry.github.io/make-novice/reference.html
 
-name = metabase_production
+include .env
 
 docker_compose = \
 	docker-compose \
 		--file docker-compose.production.yml \
-		--project-name ${name}
+		--project-name ${NAME}
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
@@ -17,7 +17,7 @@ help : ## Print this help
 .DEFAULT_GOAL := help
 
 name : ## Print value of variable `name`
-	@echo ${name}
+	@echo ${NAME}
 .PHONY : name
 
 build : ## Build images
