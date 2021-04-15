@@ -83,7 +83,7 @@ postgres_passwords : postgres_password ## Generate PostgreSQL passwords file who
 .PHONY : postgres_passwords
 
 # TODO Reboot when file `/var/run/reboot-required` exists
-# TODO Shall we use `apt` for system upgrades? See https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/
+# TODO Shall we use `apt` for system upgrades? See https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/ and https://www.redpill-linpro.com/sysadvent/2017/12/24/ansible-system-updates.html
 # TODO Shall we only run `apt-get upgrade` daily and only once in a while `apt-get dist-upgrade`?
 # TODO Run this command daily but __not__ within a cron job!
 upgrade-system : ## Upgrade system
