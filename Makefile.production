@@ -20,6 +20,10 @@ name : ## Print value of variable `name`
 	@echo ${name}
 .PHONY : name
 
+build : ## Build images
+	${docker_compose} build
+.PHONY : build
+
 up : ## (Re)create and start containers
 	${docker_compose} up \
 		--remove-orphans \
