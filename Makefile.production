@@ -82,6 +82,20 @@ postgres_passwords : postgres_password ## Generate PostgreSQL passwords file who
 		> ./secrets/postgres_passwords
 .PHONY : postgres_passwords
 
+# TODO Reboot when file `/var/run/reboot-required` exists
+# TODO Shall we use `apt` for system upgrades? See https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/
+# TODO Shall we only run `apt-get upgrade` daily and only once in a while `apt-get dist-upgrade`?
+# TODO Run this command daily but __not__ within a cron job!
+upgrade-system : ## Upgrade system
+	make --file Makefile.production begin-maintenance
+	sudo apt-get --assume-yes update
+	sudo apt-get --assume-yes dist-upgrade
+	sudo apt-get --assume-yes auto-remove
+	sudo apt-get --assume-yes clean
+	sudo apt-get --assume-yes auto-clean
+	make --file Makefile.production end-maintenance
+.PHONY : upgrade-system
+
 begin-maintenance : ## Begin maintenance
 	cp \
 		./nginx/html/maintenance.off.html \
