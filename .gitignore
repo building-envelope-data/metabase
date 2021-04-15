@@ -3,6 +3,7 @@
 /ssl
 /machine/*.retry
 /nginx/html/maintenance.html
+/commit
 
 .env
 .vscode

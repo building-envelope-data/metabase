@@ -40,10 +40,17 @@ logs : ## Follow logs
 		--follow
 .PHONY : logs
 
-shellb : ## Enter shell in a running `backend` container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
+exec : up ## Execute the one-time command `${COMMAND}` against an existing `${CONTAINER}` container (after starting all containers if necessary)
 	${docker_compose} exec \
-		backend \
-		ash
+		${CONTAINER} \
+		${COMMAND}
+.PHONY : exec
+
+execb : CONTAINER = backend
+execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
+
+shellb : COMMAND = ash
+shellb : execb ## Enter shell in a running `backend` container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
 .PHONY : shellb
 
 createdb : ## Create database
@@ -82,6 +89,16 @@ postgres_passwords : postgres_password ## Generate PostgreSQL passwords file who
 		> ./secrets/postgres_passwords
 .PHONY : postgres_passwords
 
+begin-maintenance : ## Begin maintenance
+	cp \
+		./nginx/html/maintenance.off.html \
+		./nginx/html/maintenance.html
+.PHONY : begin-maintenance
+
+end-maintenance : ## End maintenance
+	rm ./nginx/html/maintenance.html
+.PHONY : end-maintenance
+
 # TODO Reboot when file `/var/run/reboot-required` exists
 # TODO Shall we use `apt` for system upgrades? See https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/ and https://www.redpill-linpro.com/sysadvent/2017/12/24/ansible-system-updates.html
 # TODO Shall we only run `apt-get upgrade` daily and only once in a while `apt-get dist-upgrade`?
@@ -96,12 +113,53 @@ upgrade-system : ## Upgrade system
 	make --file Makefile.production end-maintenance
 .PHONY : upgrade-system
 
-begin-maintenance : ## Begin maintenance
-	cp \
-		./nginx/html/maintenance.off.html \
-		./nginx/html/maintenance.html
-.PHONY : begin-maintenance
+# TODO Use some well tested deployment tool, see https://developer.okta.com/blog/2019/07/02/aspnet-top-5-devops-automation-tools-dotnet-csharp-developers
+# TODO Rollback migrations! In particular, get name of current migration for rollback. Maybe `https://stackoverflow.com/questions/15857073/how-to-get-current-migration-name-via-code/15866090#15866090` works? I'd prefer it though if the tool `dotnet ef` (or some extension) supported getting the current migration.
+# TODO Run tests before deploying the services. The current test set-up needs running services though ...
+deploy : begin-maintenance store-commit fetch-all checkout-target migrate deploy-services run-tests end-maintenance ## Deploy tag, branch, or commit `${TARGET}`
+.PHONY : deploy
 
-end-maintenance : ## End maintenance
-	rm ./nginx/html/maintenance.html
-.PHONY : begin-maintenance
+# TODO Rollback migrations!
+rollback : TARGET = $(shell cat ./commit)
+rollback : begin-maintenance checkout-target deploy-services run-tests end-maintenance ## Rollback deployment attempt
+.PHONY : rollback
+
+store-commit : ## Store current commit
+	$(shell git rev-parse --verify HEAD > commit)
+.PHONY : store-commit
+
+fetch-all : ## Fetch all
+	git fetch --all
+.PHONY : fetch-all
+
+# Inspired by https://grimoire.ca/git/stop-using-git-pull-to-deploy/
+checkout-target : ## Fetch and checkout `${TARGET}`
+	git checkout --force "${TARGET}"
+.PHONY : checkout-target
+
+# TODO Using `dotnet ef database update` is *not* the adised method to do
+# database migrations. We should rather generate a SQL script
+# https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#sql-scripts
+# maybe even an idempotent one
+# https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#idempotent-sql-scripts
+# check and use those.
+# TODO Or we should pay for [Flybase](https://flywaydb.org) or [Liquibase](https://www.liquibase.org).
+migrate : ## Migrate database
+	dotnet ef --project src/Metabase.csproj database update
+.PHONY : migrate
+
+# Note that NGINX is because of its dependencies taken down and up last and in
+# one go so the maintenance page is only down very shortly.
+deploy-services : ## Deploy services
+	${docker_compose} pull
+	${docker_compose} up \
+		--build \
+		--force-recreate \
+		--renew-anon-volumes \
+		--remove-orphans \
+		--detach
+.PHONY : deploy-services
+
+run-tests : COMMAND = make test
+run-tests : execb ## Run tests
+.PHONY : run-tests
