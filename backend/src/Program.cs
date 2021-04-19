@@ -61,7 +61,7 @@ namespace Metabase
                 .Enrich.WithProperty("Environment", environment)
                 .WriteTo.Console()
                 .WriteTo.File(
-                    "seri.log",
+                    "./logs/seri.log",
                     fileSizeLimitBytes: 1073741824, // 1 GB
                     retainedFileCountLimit: 31,
                     rollingInterval: RollingInterval.Day,
