@@ -49,22 +49,29 @@ The same works for frontend containers by running `make shellf`.
 ## Setting up a Debian production machine
 1. Install [Ansible](https://www.ansible.com) as explained on
    [Installing Ansible on Debian](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-debian).
-1. Clone the repository by running
-   `git clone git@github.com:ise621/metabase.git`.
-1. Do the set-up by running `ansible-playbook ./machine/local.yml`.
-1. Prepare the environment more or less as detailed above replacing dummy
-   passwords by newly generated ones, for example, by running
-   `openssl rand -base64 32`,
-	 and adding the variable `NAME` with the value `metabase_production` (and
-	 `metabase_staging`).
-1. Prepare PostgreSQL by generating new password files by running
-   `make --file Makefile.production postgres_passwords`
-   and creating the database by running
-   `make --file Makefile.production createdb`.
-1. Start all services by running
-   `make --file Makefile.production up`.
-1. Restart changed services in a changed environment by running
-   `make --file Makefile.production down build up`.
+1. Change into the home directory by running `cd ~`.
+1. Clone the repository twice by running
+   ```
+   for environment in staging production ; do
+     git clone git@github.com:ise621/metabase.git ./${environment}
+   done
+   ```
+1. Change into one clone by running `cd ./staging`
+1. Set-up the machine by running `ansible-playbook ./machine/local.yml`.
+1. For each of the two environments
+   1. Prepare the environment in both clones more or less as detailed above
+      replacing dummy passwords by newly generated ones, for example, by running
+      `openssl rand -base64 32`,
+      and adding the variable `NAME` to `.env` with the value
+      `metabase_staging` or `metabase_production`.
+   1. Prepare PostgreSQL by generating new password files by running
+      `make --file Makefile.production postgres_passwords`
+      and creating the database by running
+      `make --file Makefile.production createdb`.
+   1. Start all services by running
+      `make --file Makefile.production up`.
+   1. Restart changed services in a changed environment by running
+      `make --file Makefile.production down build up`.
 
 ## Original Idea
 
