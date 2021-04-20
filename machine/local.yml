@@ -1,15 +1,14 @@
 - hosts: localhost
   connection: local
-  become: true
-  become_user: root
 
   pre_tasks:
     - name: Update package information
-      become_user: root
+      become: yes
       apt:
         update_cache: yes
       changed_when: false
     - name: Install access control list utilities (needed to escalate privileges, see https://github.com/ansible/ansible/issues/16052)
+      become: yes
       package:
         name: acl
         state: present
@@ -18,7 +17,7 @@
     - name: Bash completion
       block:
         - name: Install Bash completion
-          become_user: root
+          become: yes
           package:
             name: bash-completion
             state: present
@@ -37,13 +36,13 @@
             create: yes
 
     - name: Install GNU Make
-      become_user: root
+      become: yes
       package:
         name: make
         state: present
 
     - name: Docker and `docker-compose`
-      become_user: root
+      become: yes
       block:
         - name: Add Docker dependencies
           package:
