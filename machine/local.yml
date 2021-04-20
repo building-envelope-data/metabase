@@ -16,11 +16,28 @@
 
   tasks:
     - name: Bash completion
-      package:
-        name: bash-completion
-        state: present
+      block:
+        - name: Install Bash completion
+          become_user: root
+          package:
+            name: bash-completion
+            state: present
 
-    - name: GNU Make
+        # Inspired by https://stackoverflow.com/questions/40316836/update-bashrc-with-virtualenv-info-using-ansible/40317125#40317125
+        # The comment also mentions an alternative better solution that uses a `~/.bashrc.d` directory.
+        - name: Source Bash completion scripts in `~/.bashrc`
+          blockinfile:
+            dest: "{{ ansible_env.HOME }}/.bashrc"
+            block: |
+              for file in /etc/bash_completion.d/* ; do
+                  source "$file"
+              done
+            marker: '# {mark} ANSIBLE MANAGED BLOCK - bash-completion'
+            insertbefore: BOF
+            create: yes
+
+    - name: Install GNU Make
+      become_user: root
       package:
         name: make
         state: present
