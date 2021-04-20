@@ -41,6 +41,12 @@
         name: make
         state: present
 
+    - name: Install Small Computer System Interface (SCSI) tools (can be used to scan for additional data volumes with `sudo rescan-scsi-bus.sh` without restarting the virtual machine)
+      become: yes
+      package:
+        name: scsitools
+        state: present
+
     - name: Docker and `docker-compose`
       become: yes
       block:
