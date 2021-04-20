@@ -41,11 +41,20 @@
         name: make
         state: present
 
-    - name: Install Small Computer System Interface (SCSI) tools (can be used to scan for additional data volumes with `sudo rescan-scsi-bus.sh` without restarting the virtual machine)
-      become: yes
-      package:
-        name: scsitools
-        state: present
+    - name: Hard disk management
+      block:
+      - name: Install Small Computer System Interface (SCSI) tools (for example to scan for additional disks by running `sudo rescan-scsi-bus.sh` without restarting the virtual machine)
+        become: yes
+        package:
+          name: scsitools
+          state: present
+
+      # See https://opensource.com/article/18/11/partition-format-drive-linux
+      - name: Install parted to partition hard disks (for example by running `sudo parted --align=opt /dev/sdx mklabel gpt` and `sudo parted --align=opt /dev/sdx mkpart primary 2048s 50G` and then format the disk by running `sudo mkfs.ext4 -L data /dev/sdx1` and mount it temporarily by running `mkdir ~/data` and `sudo mount /dev/sdx1 ~/data` and permanently by adding `UUID=XXXX-XXXX-XXXX-XXXX-XXXX /home/cloud/data ext4 errors=remount-ro 0 1` to `/etc/fstab` and running `sudo mount --all` where the UUID is the one reported by `sudo blkid | grep /dev/sdx1` and to list block devices and whether and where they are mounted run `lsblk`)
+        become: yes
+        package:
+          name: parted
+          state: present
 
     - name: Docker and `docker-compose`
       become: yes
