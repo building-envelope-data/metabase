@@ -126,8 +126,8 @@
         - name: Enable Docker systemd service
           service:
             name: docker
-            started: yes
             enabled: yes
+            state: started
 
         - name: Prepare default daemon configuration
           # For a list of options see
