@@ -99,18 +99,18 @@
                   - containerd.io
                 state: present
 
-        - name: Enable Docker systemd service
-          service:
-            name: docker
-            enabled: yes
-            state: started
-
         - name: Prepare default daemon configuration
           # For a list of options see
           # https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
           copy:
             src: ./daemon.json
             dest: /etc/docker/daemon.json
+
+        - name: Enable Docker systemd service
+          service:
+            name: docker
+            enabled: yes
+            state: started
 
         - name: Set periodic docker container prune
           cron:
