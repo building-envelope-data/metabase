@@ -98,6 +98,15 @@ daemon-logs : ## View Docker daemon logs
 	sudo journalctl --unit docker.service
 .PHONY : daemon-logs
 
+reload-daemon : ## Reload Docker daemon
+	sudo systemctl reload docker
+.PHONY : reload-daemon
+
+# See https://docs.docker.com/config/containers/runmetrics/
+docker-stats : ## Show Docker run-time metrics
+	docker stats
+.PHONY : docker-stats
+
 begin-maintenance : ## Begin maintenance
 	cp \
 		./nginx/html/maintenance.off.html \
