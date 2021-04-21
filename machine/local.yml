@@ -112,12 +112,13 @@
             enabled: yes
             state: started
 
-        - name: Set periodic docker container prune
+        - name: Set periodic docker system prune
+          # See https://docs.docker.com/config/pruning/#prune-everything
           cron:
             name: docker-prune
             minute: 0
             hour: '*/2'
-            job: docker container prune -f
+            job: docker system prune --force --filter "until=24h"
 
         - name: Add users to docker group
           user:
