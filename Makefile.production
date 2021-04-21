@@ -93,6 +93,11 @@ postgres_passwords : postgres_password ## Generate PostgreSQL passwords file who
 		> ./secrets/postgres_passwords
 .PHONY : postgres_passwords
 
+# See https://docs.docker.com/config/daemon/#view-stack-traces
+daemon-logs : ## View Docker daemon logs
+	sudo journalctl --unit docker.service
+.PHONY : daemon-logs
+
 begin-maintenance : ## Begin maintenance
 	cp \
 		./nginx/html/maintenance.off.html \
