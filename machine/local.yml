@@ -116,7 +116,7 @@
           # See https://docs.docker.com/config/pruning/#prune-everything
           cron:
             name: docker-prune
-            minute: 0
+            minute: '0'
             hour: '*/2'
             job: docker system prune --force --filter "until=24h"
 
