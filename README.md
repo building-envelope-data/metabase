@@ -58,6 +58,30 @@ The same works for frontend containers by running `make shellf`.
    ```
 1. Change into one clone by running `cd ./staging`
 1. Set-up the machine by running `ansible-playbook ./machine/local.yml`.
+1. Format and mount hard disk for data to the directory `/data` as follows:
+   1. Figure out its name by running `lsblk` to figure out its name, for
+      example, `sdb` and use this name instead of `sdx` below.
+   1. Partition the hard disk `/dev/sdx` by running
+      `sudo parted --align=opt /dev/sdx mklabel gpt`
+      and
+      `sudo parted --align=opt /dev/sdx mkpart primary 0 50G`
+      or, if the command warns you that resulting partition is not properly
+      aligned for best performance: 1s % 2048s != 0s,
+      `sudo parted --align=opt /dev/sdx mkpart primary 2048s 50G`.
+      If the number of sectors, 2048 above, is not resported, consult
+      https://rainbow.chard.org/2013/01/30/how-to-align-partitions-for-best-performance-using-parted/
+      for details on how to compute that number.
+   1. Format the partition `/dev/sdx1` of hard disk `/dev/sdx` by running
+      `sudo mkfs.ext4 -L data /dev/sdx1`
+      and mount it permanently by adding
+      `UUID=XXXX-XXXX-XXXX-XXXX-XXXX /data ext4 errors=remount-ro 0 1`
+      to the file `/etc/fstab` and running
+      `sudo mount --all`,
+      where the UUID is the one reported by
+      `sudo blkid | grep /dev/sdx1`.
+      Note that to list block devices and whether and where they are
+      mounted run `lsblk` and you could mount partitions temporarily by running
+      `sudo mount /dev/sdx1 /data`.
 1. For each of the two environments
    1. Prepare the environment in both clones more or less as detailed above
       replacing dummy passwords by newly generated ones, for example, by running
