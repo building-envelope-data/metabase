@@ -1,4 +1,5 @@
 {
     "data-root": "/data/docker",
+    "live-restore": true,
     "storage-driver": "overlay2"
 }
