@@ -97,6 +97,10 @@ The same works for frontend containers by running `make shellf`.
    1. Restart changed services in a changed environment by running
       `make --file Makefile.production down build up`.
 
+For information on using Docker in production see
+[Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)
+and the pages following it.
+
 ## Original Idea
 
 The product identifier service should provide the following endpoints:
