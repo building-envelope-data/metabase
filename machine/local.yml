@@ -170,7 +170,7 @@
             state: absent
           when: >
             docker_compose_current_version.stdout is defined
-            and {{ docker_compose_version }} not in docker_compose_current_version.stdout
+            and docker_compose_version not in docker_compose_current_version.stdout
 
         - name: Install docker-compose
           get_url:
@@ -180,4 +180,4 @@
             # checksum: sha256:TODO https://github.com/docker/compose/releases/tag/1.29.0
           when: >
             docker_compose_current_version.stdout is defined
-            and {{ docker_compose_version }} not in docker_compose_current_version.stdout
+            and docker_compose_version not in docker_compose_current_version.stdout
