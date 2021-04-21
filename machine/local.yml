@@ -73,11 +73,11 @@
         # Format the partition `/dev/sdx1` of hard disk `/dev/sdx` by running
         # `sudo mkfs.ext4 -L data /dev/sdx1`
         # and mount it temporarily by running
-        # `mkdir ~/data`
+        # `sudo mkdir /data`
         # and
-        # `sudo mount /dev/sdx1 ~/data`
+        # `sudo mount /dev/sdx1 /data`
         # or permanently by adding
-        # `UUID=XXXX-XXXX-XXXX-XXXX-XXXX /home/cloud/data ext4 errors=remount-ro 0 1`
+        # `UUID=XXXX-XXXX-XXXX-XXXX-XXXX /data ext4 errors=remount-ro 0 1`
         # to the file `/etc/fstab` and running
         # `sudo mount --all`,
         # where the UUID is the one reported by
@@ -89,7 +89,8 @@
           name: e2fsprogs
           state: present
 
-    - name: Docker and `docker-compose`
+    - name: Docker
+      # Inspired by https://ops.tips/blog/docker-ansible-role/
       become: yes
       block:
         - name: Add Docker dependencies
@@ -122,9 +123,61 @@
                   - containerd.io
                 state: present
 
-        - name: Install `docker-compose`
+        - name: Enable Docker systemd service
+          service:
+            name: docker
+            started: yes
+            enabled: yes
+
+        - name: Prepare default daemon configuration
+          # For a list of options see
+          # https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
+          copy:
+            src: ./daemon.json
+            dest: /etc/docker/daemon.json
+
+        - name: Set periodic docker container prune
+          cron:
+            name: docker-prune
+            minute: 0
+            hour: '*/2'
+            job: docker container prune -f
+
+        - name: Add users to docker group
+          user:
+            name: {{ item }}
+            groups: docker
+            append: yes
+          with_items:
+            - cloud
+
+    - name: docker-compose
+      # Inspired by https://github.com/geerlingguy/ansible-role-docker/blob/master/tasks/docker-compose.yml
+      become: yes
+      vars:
+        docker_compose_path: /usr/local/bin/docker-compose
+        docker_compose_version: 1.29.0
+      block:
+        - name: Check current docker-compose version.
+          command: "{{ docker_compose_path }} --version"
+          register: docker_compose_current_version
+          changed_when: false
+          failed_when: false
+
+        - name: Delete existing docker-compose version if it's different.
+          file:
+            path: {{ docker_compose_path }}
+            state: absent
+          when: >
+            docker_compose_current_version.stdout is defined
+            and {{ docker_compose_version }} not in docker_compose_current_version.stdout
+
+        - name: Install docker-compose
           get_url:
-            url: https://github.com/docker/compose/releases/download/1.29.0/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}
-            dest: /usr/local/bin/docker-compose
+            url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}
+            dest: {{ docker_compose_path }}
             mode: 'u+x,g+x,o+x'
             # checksum: sha256:TODO https://github.com/docker/compose/releases/tag/1.29.0
+          when: >
+            docker_compose_current_version.stdout is defined
+            and {{ docker_compose_version }} not in docker_compose_current_version.stdout

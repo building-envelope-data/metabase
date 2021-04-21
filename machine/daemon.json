@@ -1,0 +1,4 @@
+{
+    "data-root": "/data",
+    "storage-driver": "overlay2"
+}

@@ -34,6 +34,7 @@ services:
       - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
     volumes:
+      - backend_logs:/app/logs
       - ./secrets:/run/secrets:ro
     depends_on:
       - database
@@ -68,3 +69,4 @@ services:
 
 volumes:
   data:
+  backend_logs:
