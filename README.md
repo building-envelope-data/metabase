@@ -49,15 +49,6 @@ The same works for frontend containers by running `make shellf`.
 ## Setting up a Debian production machine
 1. Install [Ansible](https://www.ansible.com) as explained on
    [Installing Ansible on Debian](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-debian).
-1. Change into the home directory by running `cd ~`.
-1. Clone the repository twice by running
-   ```
-   for environment in staging production ; do
-     git clone git@github.com:ise621/metabase.git ./${environment}
-   done
-   ```
-1. Change into one clone by running `cd ./staging`
-1. Set-up the machine by running `ansible-playbook ./machine/local.yml`.
 1. Format and mount hard disk for data to the directory `/data` as follows:
    1. Figure out its name by running `lsblk` to figure out its name, for
       example, `sdb` and use this name instead of `sdx` below.
@@ -82,6 +73,15 @@ The same works for frontend containers by running `make shellf`.
       Note that to list block devices and whether and where they are
       mounted run `lsblk` and you could mount partitions temporarily by running
       `sudo mount /dev/sdx1 /data`.
+1. Change into the home directory by running `cd ~`.
+1. Clone the repository twice by running
+   ```
+   for environment in staging production ; do
+     git clone git@github.com:ise621/metabase.git ./${environment}
+   done
+   ```
+1. Change into one clone by running `cd ./staging`
+1. Set-up the machine by running `ansible-playbook ./machine/local.yml`.
 1. For each of the two environments
    1. Prepare the environment in both clones more or less as detailed above
       replacing dummy passwords by newly generated ones, for example, by running
