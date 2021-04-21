@@ -103,7 +103,7 @@
           # For a list of options see
           # https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
           copy:
-            src: ./daemon.json
+            src: ./docker-daemon.json
             dest: /etc/docker/daemon.json
 
         - name: Enable Docker systemd service
