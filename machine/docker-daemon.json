@@ -1,5 +1,5 @@
 {
-    "data-root": "/data/docker",
+    "data-root": "/app/data/docker",
     "live-restore": true,
     "log-driver": "local",
     "storage-driver": "overlay2"

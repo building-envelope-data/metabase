@@ -49,7 +49,8 @@ The same works for frontend containers by running `make shellf`.
 ## Setting up a Debian production machine
 1. Install [Ansible](https://www.ansible.com) as explained on
    [Installing Ansible on Debian](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-debian).
-1. Format and mount hard disk for data to the directory `/data` as follows:
+1. Create a symbolic link from `/app` to `~` by running `sudo ln -s ~ /app`.
+1. Format and mount hard disk for data to the directory `/app/data` as follows:
    1. Figure out its name by running `lsblk` to figure out its name, for
       example, `sdb` and use this name instead of `sdx` below.
    1. Partition the hard disk `/dev/sdx` by running
@@ -65,15 +66,15 @@ The same works for frontend containers by running `make shellf`.
    1. Format the partition `/dev/sdx1` of hard disk `/dev/sdx` by running
       `sudo mkfs.ext4 -L data /dev/sdx1`
       and mount it permanently by adding
-      `UUID=XXXX-XXXX-XXXX-XXXX-XXXX /data ext4 errors=remount-ro 0 1`
+      `UUID=XXXX-XXXX-XXXX-XXXX-XXXX /app/data ext4 errors=remount-ro 0 1`
       to the file `/etc/fstab` and running
       `sudo mount --all`,
       where the UUID is the one reported by
       `sudo blkid | grep /dev/sdx1`.
       Note that to list block devices and whether and where they are
       mounted run `lsblk` and you could mount partitions temporarily by running
-      `sudo mount /dev/sdx1 /data`.
-1. Change into the home directory by running `cd ~`.
+      `sudo mount /dev/sdx1 /app/data`.
+1. Change into the app directory by running `cd /app`.
 1. Clone the repository twice by running
    ```
    for environment in staging production ; do
