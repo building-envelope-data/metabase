@@ -3,6 +3,7 @@
 
   handlers:
     - name: Restart Docker
+      become: yes
       service:
         name: docker
         state: restarted
