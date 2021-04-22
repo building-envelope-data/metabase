@@ -1,6 +1,12 @@
 - hosts: localhost
   connection: local
 
+  handlers:
+    - name: Restart Docker
+      service:
+        name: docker
+        state: restarted
+
   pre_tasks:
     - name: Update package information
       become: yes
@@ -105,6 +111,8 @@
           copy:
             src: ./docker-daemon.json
             dest: /etc/docker/daemon.json
+          notify:
+            - Restart Docker
 
         - name: Add users to docker group
           user:
@@ -128,13 +136,8 @@
             hour: '*/2'
             job: docker system prune --force --filter "until=24h"
 
-        - name: Add users to docker group
-          user:
-            name: '{{ item }}'
-            groups: docker
-            append: yes
-          with_items:
-            - cloud
+        - name: Flush handlers
+          meta: flush_handlers
 
     - name: docker-compose
       # Inspired by https://github.com/geerlingguy/ansible-role-docker/blob/master/tasks/docker-compose.yml
