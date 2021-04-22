@@ -106,6 +106,14 @@
             src: ./docker-daemon.json
             dest: /etc/docker/daemon.json
 
+        - name: Add users to docker group
+          user:
+            name: '{{ item }}'
+            groups: docker
+            append: yes
+          with_items:
+            - cloud
+
         - name: Enable Docker systemd service
           service:
             name: docker
