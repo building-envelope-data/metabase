@@ -71,6 +71,12 @@
           name: e2fsprogs
           state: present
 
+    - name: Backup database
+      cron:
+        name: database-backup
+        weekday: '0'
+        job: 'cd /app/production && make --file Makefile.production backup'
+
     - name: Docker
       # Inspired by https://ops.tips/blog/docker-ansible-role/
       become: yes
