@@ -76,7 +76,7 @@
       cron:
         name: database-backup
         weekday: '0'
-        job: 'cd /app/production && make --file Makefile.production backup'
+        job: 'cd /app/production && mkdir --parents /app/data/backups && make --file Makefile.production DUMP_FILE=/app/data/backups/dump_$(date +"%Y-%m-%d_%H_%M_%S").gz backup'
 
     - name: Docker
       # Inspired by https://ops.tips/blog/docker-ansible-role/
