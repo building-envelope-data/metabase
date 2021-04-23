@@ -163,7 +163,7 @@ deploy : begin-maintenance store-commit backup fetch-all checkout-target migrate
 # TODO Rollback migrations!
 rollback : TARGET = $(shell cat ./commit)
 rollback : DUMP_FILE = ./backup.gz
-rollback : begin-maintenance checkout-target restore deploy-services run-tests end-maintenance ## Rollback deployment attempt
+rollback : begin-maintenance checkout-target restore deploy-services run-tests end-maintenance ## Rollback deployment attempt (use commit hash stored in `./commit` and database backup stored in `./backup.gz`)
 .PHONY : rollback
 
 store-commit : ## Store current commit
