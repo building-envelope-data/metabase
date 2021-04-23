@@ -177,7 +177,7 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 	git checkout --force "${TARGET}"
 .PHONY : checkout-target
 
-# TODO Using `dotnet ef database update` is *not* the adised method to do
+# TODO Using `dotnet ef database update` is *not* the advised method to do
 # database migrations. We should rather generate a SQL script
 # https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#sql-scripts
 # maybe even an idempotent one
