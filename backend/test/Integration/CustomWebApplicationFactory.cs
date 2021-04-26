@@ -66,7 +66,7 @@ namespace Metabase.Tests.Integration
             builder.ConfigureAppConfiguration((webHostBuilderContext, configurationBuilder) =>
                 {
                     configurationBuilder.Sources.Clear();
-                    Program.ConfigureAppConfiguration(
+                    Metabase.Program.ConfigureAppConfiguration(
                         configurationBuilder,
                         webHostBuilderContext.HostingEnvironment,
                         Array.Empty<string>()
