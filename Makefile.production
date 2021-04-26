@@ -207,6 +207,6 @@ deploy-services : ## Deploy services
 		--detach
 .PHONY : deploy-services
 
-run-tests : COMMAND = true # TODO make test
+run-tests : COMMAND = true
 run-tests : execb ## Run tests
 .PHONY : run-tests
