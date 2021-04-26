@@ -153,7 +153,6 @@ upgrade-system : ## Upgrade system
 	make --file Makefile.production end-maintenance
 .PHONY : upgrade-system
 
-# TODO Use some well tested deployment tool, see https://developer.okta.com/blog/2019/07/02/aspnet-top-5-devops-automation-tools-dotnet-csharp-developers
 # TODO Rollback migrations! In particular, get name of current migration for rollback. Maybe `https://stackoverflow.com/questions/15857073/how-to-get-current-migration-name-via-code/15866090#15866090` works? I'd prefer it though if the tool `dotnet ef` (or some extension) supported getting the current migration.
 # TODO Run tests before deploying the services. The current test set-up needs running services though ...
 deploy : DUMP_FILE = ./backup.gz
