@@ -184,13 +184,6 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 # maybe even an idempotent one
 # https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#idempotent-sql-scripts
 # check and use those.
-# TODO We sould need to run migrations in an environment that has the dotnet tool `dotnet-ef` installed and to install it we need the SDK. Use SQL scripts instead!
-# ENV PATH=$PATH:/root/.dotnet/tools
-# RUN \
-#   dotnet tool install \
-#     --global \
-#     --no-cache \
-#     dotnet-ef
 migrate : ## Migrate database
 	# TODO dotnet ef --project ./src/Metabase.csproj database update
 .PHONY : migrate
