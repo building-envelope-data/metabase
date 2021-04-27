@@ -159,7 +159,6 @@ deploy : DUMP_FILE = ./backup.gz
 deploy : begin-maintenance store-commit backup fetch-all checkout-target migrate deploy-services run-tests end-maintenance ## Deploy tag, branch, or commit `${TARGET}`, for example, `make --file Makefile.production TARGET=v1.0.0 deploy`
 .PHONY : deploy
 
-# TODO Rollback migrations!
 rollback : TARGET = $(shell cat ./commit)
 rollback : DUMP_FILE = ./backup.gz
 rollback : begin-maintenance checkout-target restore deploy-services run-tests end-maintenance ## Rollback deployment attempt (use commit hash stored in `./commit` and database backup stored in `./backup.gz`)
@@ -178,14 +177,16 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 	git checkout --force "${TARGET}"
 .PHONY : checkout-target
 
-# TODO Using `dotnet ef database update` is *not* the advised method to do
-# database migrations. We should rather generate a SQL script
-# https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#sql-scripts
-# maybe even an idempotent one
-# https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#idempotent-sql-scripts
-# check and use those.
+migrate : FROM = $(file ./backend/src/Migrations/previous)
+migrate : TO = $(file ./backend/src/Migrations/current)
 migrate : ## Migrate database
-	# TODO dotnet ef --project ./src/Metabase.csproj database update
+	cat ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql \
+	| ${docker_compose} run \
+		-T \
+		database \
+		psql \
+			--username=postgres \
+			postgres
 .PHONY : migrate
 
 # Note that NGINX is because of its dependencies taken down and up last and in
