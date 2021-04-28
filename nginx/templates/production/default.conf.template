@@ -44,6 +44,21 @@ server {
   add_header X-Frame-Options DENY;
   add_header X-Content-Type-Options nosniff; # Secure from MIME-type sniffing: https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#mime-type-sniffing
 
+  location / {
+    set $maintenance 0;
+    if (-f $document_root/maintenance.html) {
+      set $maintenance 1;
+    }
+    if ($internal != 1) {
+      set $maintenance "${maintenance}1";
+    }
+    if ($maintenance = 11) {
+      return 503;
+    }
+    proxy_pass http://frontend;
+    limit_req  zone=one burst=30 nodelay;
+  }
+
   location /graphql {
     proxy_pass http://backend;
     limit_req  zone=one burst=10 nodelay;
@@ -64,8 +79,8 @@ server {
     limit_req  zone=one burst=1 nodelay;
   }
 
-  location / {
-    proxy_pass http://frontend;
-    limit_req  zone=one burst=30 nodelay;
+  error_page 503 @maintenance;
+  location @maintenance {
+    rewrite ^(.*)$ /maintenance.html break;
   }
 }

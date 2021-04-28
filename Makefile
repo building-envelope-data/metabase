@@ -44,16 +44,16 @@ build : ## Build images
 .PHONY : build
 
 show-backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
-	docker build \
+	docker build --no-cache \
 		--file Dockerfile-show-build-context \
 		./backend
-.PHONY : show-build-context
+.PHONY : show-backend-build-context
 
 show-frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
-	docker build \
+	docker build --no-cache \
 		--file Dockerfile-show-build-context \
-		./backend
-.PHONY : show-build-context
+		./frontend
+.PHONY : show-frontend-build-context
 
 remove : ## Remove stopped containers
 	DOCKER_IP=${docker_ip} \
@@ -75,7 +75,8 @@ up : build ## (Re)create, and start containers (after building images if necessa
 
 down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
 	DOCKER_IP=${docker_ip} \
-		${docker_compose} down
+		${docker_compose} down \
+		--remove-orphans
 .PHONY : down
 
 restart : ## Restart all stopped and running containers
@@ -153,123 +154,23 @@ createdb : ## Create databases
 		"
 .PHONY : createdb
 
-# ------ #
-# Deploy #
-# ------ #
-# 1. Run `make register-*` to build (and register) the images.
-# 2. Update the image names in `docker-compose.production.yml`.
-# 3. Run `make deploy` to upload the images, Makefile,
-#    docker-compose.production.yml files, and NGINX files to the server, and
-#    to restart the services with the new configuration.
+begin-maintenance : ## Begin maintenance
+	cp \
+		./nginx/html/maintenance.off.html \
+		./nginx/html/maintenance.html
+.PHONY : begin-maintenance
 
-jump_host = sg.ise.fhg.de
-remote_user="root"
-remote_host="sx14666"
+end-maintenance : ## End maintenance
+	rm ./nginx/html/maintenance.html
+.PHONY : begin-maintenance
 
-production_docker_compose = \
-	docker-compose \
-		--file docker-compose.production.yml \
-		--project-name ${name}
-
-# TODO Keep access token somewhere safe for example in an SSH vault.
-login : ## Login as `${USER_NAME}` to the Fraunhofer registry with the access token in the file with path `${ACCESS_TOKEN}`, for example, `make USER_NAME=sim69815 ACCESS_TOKEN=./registry-access-token.txt login`
-	cat ${ACCESS_TOKEN} | \
-		docker login registry.gitlab.cc-asp.fraunhofer.de:4567 \
-			--username ${USER_NAME} \
-			--password-stdin
-.PHONY : login
-
-register : VERSION = $(shell git describe --tags | head --lines=1)
-register : LOWER_PROJECT_NAME = $(shell echo ${PROJECT_NAME} | tr '[:upper:]' '[:lower:]')
-register : REGISTRY_URL = registry.gitlab.cc-asp.fraunhofer.de:4567/ise621/icon
-register : IMAGE = ${LOWER_PROJECT_NAME}-${END}-production
-register : ## Build and register the production `${END}` image for project `${PROJECT_NAME}`
-	docker build \
-		--build-arg PROJECT_NAME=${PROJECT_NAME} \
-		--tag ${REGISTRY_URL}/${IMAGE}:${VERSION} \
-		--file Dockerfile-${END}-production .
-	docker push ${REGISTRY_URL}/${IMAGE}:${VERSION}
-.PHONY : register
-
-register-backend : END = backend
-register-backend : register ## Build and register backend image
-.PHONY : register-backend
-
-register-frontend : END = frontend
-register-frontend : register ## Build and register frontend image
-.PHONY : register-frontend
-
-deploy : upload down-and-up-server ## Deploy, for example, `make JUMP_USER=swacker deploy`
-.PHONY : deploy
-
-upload : upload-images upload-files ## Upload images and files
-.PHONY : upload
-
-upload-images : ## Upload images
-	for image in $(shell make --silent images-production | tr '\n' ' '); do \
-		make \
-			IMAGE=$${image} \
-			JUMP_USER=${JUMP_USER} \
-			upload-image-if-needed ; \
-	done
-.PHONY : upload-images
-
-# Inspired by https://advancedweb.hu/deploying-docker-images-via-ssh/
-upload-image-if-needed : REMOTE_IMAGE_ID = $(shell ssh -J ${JUMP_USER}@${jump_host} ${remote_user}@${remote_host} "docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep ${IMAGE} | cut --delimiter ' ' --fields 2")
-upload-image-if-needed : LOCAL_IMAGE_ID = $(shell docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep ${IMAGE} | cut --delimiter ' ' --fields 2)
-upload-image-if-needed : ## Upload image if needed
-	if [ \
-		"${REMOTE_IMAGE_ID}" \
-		!= "${LOCAL_IMAGE_ID}" \
-		] ; \
-	then \
-		make \
-			IMAGE=${IMAGE} \
-			JUMP_USER=${JUMP_USER} \
-			upload-image ; \
-  else \
-		echo "Remote image ${IMAGE} is up-to-date" ; \
-	fi
-.PHONY : upload-image-if-needed
-
-upload-image : ## Upload image
-	docker save ${IMAGE} \
-		| bzip2 \
-		| pv \
-		| ssh \
-			-J ${JUMP_USER}@${jump_host} \
-			${remote_user}@${remote_host} \
-			'bunzip2 | docker load'
-.PHONY : upload-image
-
-images-production : ## Image names
-	${production_docker_compose} config \
-		| yq r - "services.*.image"
-.PHONY : images-production
-
-upload-files : ## Upload files
-	scp \
-		-r \
-		-o "ProxyJump ${JUMP_USER}@${jump_host}" \
-		./Makefile.production \
-		./docker-compose.production.yml \
-		./nginx \
-		${remote_user}@${remote_host}:'~/app'
-.PHONY : upload-files
-
-down-and-up-server : ## Down and up server (note that a restart would not reflect configuration changes)
-	ssh -t \
-		-J ${JUMP_USER}@${jump_host} \
-		${remote_user}@${remote_host} \
-		" \
-			cd ~/app && \
-			make \
-				--file Makefile.production \
-				down \
-				up && \
-			exit \
-		"
-.PHONY : down-and-up-server
+prepare-release : ## Prepare release
+	DOCKER_IP=${docker_ip} \
+		${docker_compose} run \
+		--user $(shell id --user):$(shell id --group) \
+		backend \
+		make prepare-release
+.PHONY : prepare-release
 
 # --------------------- #
 # Generate Certificates #

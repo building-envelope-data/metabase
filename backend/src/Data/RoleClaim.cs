@@ -5,6 +5,6 @@ namespace Metabase.Data
 {
     public sealed class RoleClaim : IdentityRoleClaim<Guid>
     {
-        public Role Role { get; set; } = default!;
+        // public Role Role { get; set; } = default!;
     }
 }

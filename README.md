@@ -19,8 +19,9 @@
 3. Clone the source code by running
    `git clone git@github.com:ise621/metabase.git` and navigate
    into the new directory `metabase` by running `cd metabase`.
-4. Prepare your environment by running `cp .env.sample .env` and adding the
-   line `127.0.0.1 local.buildingenvelopedata.org` to your `/etc/hosts` file.
+4. Prepare your environment by running `cp .env.sample .env`,
+   `cp frontend/.env.local.sample frontend/.env.local`, and adding the line
+   `127.0.0.1 local.buildingenvelopedata.org` to your `/etc/hosts` file.
 5. Install [Docker Desktop](https://www.docker.com/products/docker-desktop), and
    [GNU Make](https://www.gnu.org/software/make/).
 6. List all GNU Make targets by running `make help`.
@@ -45,7 +46,91 @@ In another shell
 
 The same works for frontend containers by running `make shellf`.
 
-# Original Idea
+## Deployment
+
+### Setting up a Debian production machine
+1. Install [Ansible](https://www.ansible.com) as explained on
+   [Installing Ansible on Debian](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-debian).
+1. Create a symbolic link from `/app` to `~` by running `sudo ln -s ~ /app`.
+1. Format and mount hard disk for data to the directory `/app/data` as follows:
+   1. Figure out its name by running `lsblk` to figure out its name, for
+      example, `sdb` and use this name instead of `sdx` below.
+   1. Partition the hard disk `/dev/sdx` by running
+      `sudo parted --align=opt /dev/sdx mklabel gpt`
+      and
+      `sudo parted --align=opt /dev/sdx mkpart primary 0 50G`
+      or, if the command warns you that resulting partition is not properly
+      aligned for best performance: 1s % 2048s != 0s,
+      `sudo parted --align=opt /dev/sdx mkpart primary 2048s 50G`.
+      If the number of sectors, 2048 above, is not resported, consult
+      https://rainbow.chard.org/2013/01/30/how-to-align-partitions-for-best-performance-using-parted/
+      for details on how to compute that number.
+   1. Format the partition `/dev/sdx1` of hard disk `/dev/sdx` by running
+      `sudo mkfs.ext4 -L data /dev/sdx1`
+      and mount it permanently by adding
+      `UUID=XXXX-XXXX-XXXX-XXXX-XXXX /app/data ext4 errors=remount-ro 0 1`
+      to the file `/etc/fstab` and running
+      `sudo mount --all`,
+      where the UUID is the one reported by
+      `sudo blkid | grep /dev/sdx1`.
+      Note that to list block devices and whether and where they are
+      mounted run `lsblk` and you could mount partitions temporarily by running
+      `sudo mount /dev/sdx1 /app/data`.
+1. Change into the app directory by running `cd /app`.
+1. Clone the repository twice by running
+   ```
+   for environment in staging production ; do
+     git clone git@github.com:ise621/metabase.git ./${environment}
+   done
+   ```
+1. Change into one clone by running `cd ./staging`
+1. Set-up the machine by running `ansible-playbook ./machine/local.yml`.
+1. For each of the two environments
+   1. Prepare the environment in both clones more or less as detailed above
+      replacing dummy passwords by newly generated ones, for example, by running
+      `openssl rand -base64 32`,
+      and adding the variable `NAME` to `.env` with the value
+      `metabase_staging` or `metabase_production`.
+   1. Prepare PostgreSQL by generating new password files by running
+      `make --file Makefile.production postgres_passwords`
+      and creating the database by running
+      `make --file Makefile.production createdb`.
+   1. Start all services by running
+      `make --file Makefile.production up`.
+   1. Restart changed services in a changed environment by running
+      `make --file Makefile.production down build up`.
+
+### Creating a release
+1. [Draft a new release](https://github.com/ise621/metabase/actions) with a new
+   version according to [Semantic Versioning](https://semver.org).
+1. Fetch the release branch by running `git fetch` and check it out by running
+   `git checkout release/v*.*.*`, where `*.*.*` is the version.
+1. Prepare the release by running `make prepare-release` in your shell, review,
+   add, and commit the changes. In particular, migration and rollback SQL files
+   are created in `./backend/src/Migrations/` which need to be reviewed --- see
+   [Migrations Overview](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli)
+   and following pages for details.
+1. [Publish the new release](https://github.com/ise621/metabase/actions).
+
+### Deploying a release
+1. Enter a shell on the production machine using `ssh`.
+1. Change to the staging envrionment by running `cd /app/staging`.
+1. Deploy the new release in the staging environment by running
+   `make --file Makefile.production deploy`.
+1. If it fails *after* the database backup was made, rollback to the previous
+   state by running
+   `make --file Makefile.production rollback`,
+   figure out what went wrong, apply the necessary fixes to the codebase,
+   create a new release, and try to deploy that release instead.
+1. If it succeeds, test whether everything works as expected and if that is
+   the case, repeat the same process in the directory `/app/production`
+   (instead of `/app/staging`).
+
+For information on using Docker in production see
+[Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)
+and the pages following it.
+
+## Original Idea
 
 The product identifier service should provide the following endpoints:
 * Obtain a new product identifier possibly associating internal meta information with it, like a custom string or a JSON blob
@@ -73,7 +158,7 @@ Randomness of identifiers ensures that
 
 We may add some error detection and correction capabilities by, for example, generating all but the last 4 bits randomly and using the last 4 bits as [some sort of checksum](https://en.wikipedia.org/wiki/Checksum).
 
-# ...
+## ...
 
 - [C# Coding Standards](https://www.dofactory.com/reference/csharp-coding-standards)
 - [Should You Use The Same Dockerfile For Dev, Staging And Production Builds?](https://vsupalov.com/same-dockerfile-dev-staging-production/)

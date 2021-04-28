@@ -1,6 +1,10 @@
 /examples/*.json
 /secrets
 /ssl
+/machine/*.retry
+/nginx/html/maintenance.html
+/commit
+/backup.gz
 
 .env
 .vscode

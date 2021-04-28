@@ -142,17 +142,14 @@ function Page() {
       <List>
         <List>
           <Typography.Paragraph>
-            Download a two-factor authenticator app like Microsoft Authenticator
-            for{" "}
-            <a href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a>{" "}
-            and <a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a>{" "}
-            or Google Authenticator for{" "}
-            <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">
-              Android
+            Download a two-factor authenticator app like{" "}
+            <a href="https://freeotp.github.io/">FreeOTP</a> or{" "}
+            <a href="https://www.microsoft.com/en-us/account/authenticator">
+              Microsoft Authenticator
             </a>{" "}
-            and{" "}
-            <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">
-              iOS
+            or{" "}
+            <a href="https://support.google.com/accounts/answer/1066447">
+              Google Authenticator
             </a>
             .
           </Typography.Paragraph>

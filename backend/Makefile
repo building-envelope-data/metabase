@@ -154,3 +154,57 @@ diagrams : ## Draw images from textual UML diagrams
 schema : ## Fetch GraphQL schema using `hasura/graphqurl`
 	gq http://backend:8080/graphql/ --introspect > schema.graphql
 .PHONY : schema
+
+add-migration : ## Add migration with name `${NAME}`, for example, `make NAME=InitialCreate add-migration`
+	dotnet ef \
+		--project src/Metabase.csproj \
+		migrations \
+		add \
+		${NAME}
+.PHONY : add-migration
+
+migrate : ## Migrate database
+	dotnet ef database update
+.PHONY : migrate
+
+prepare-release : find-latest-migration generate-migration-script switch-migrations ## Prepare release
+.PHONY : prepare-release
+
+find-latest-migration : ## Store name of latest migration in `./src/Migrations/new`
+	echo \
+		$(notdir \
+			$(basename \
+				$(lastword \
+					$(sort \
+						$(shell find ./src/Migrations/ -regex ".*/[^/.]*_[^/.]*\.cs") \
+					) \
+				) \
+			) \
+		) \
+	> ./src/Migrations/new
+.PHONY : find-latest-migration
+
+# https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#sql-scripts
+generate-migration-script : FROM = $(file < ./src/Migrations/current)
+generate-migration-script : TO = $(file < ./src/Migrations/new)
+generate-migration-script : ## Generate migration and rollback scripts for upcoming release from the migration named by `./src/Migrations/current` to the one named by `./src/Migrations/new`
+	dotnet ef \
+		--project ./src/Metabase.csproj \
+		migrations \
+		script \
+		${FROM} \
+		${TO} \
+		--output ./src/Migrations/migrate_from_${FROM}_to_${TO}.sql
+	dotnet ef \
+		--project ./src/Metabase.csproj \
+		migrations \
+		script \
+		${TO} \
+		${FROM} \
+		--output ./src/Migrations/rollback_from_${FROM}_to_${TO}.sql
+.PHONY : generate-migration-script
+
+switch-migrations : ## Turn current into previous and new into current
+	mv ./src/Migrations/current ./src/Migrations/previous
+	mv ./src/Migrations/new ./src/Migrations/current
+.PHONY : switch-migrations

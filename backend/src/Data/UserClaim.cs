@@ -5,6 +5,6 @@ namespace Metabase.Data
 {
     public sealed class UserClaim : IdentityUserClaim<Guid>
     {
-        public User User { get; set; } = default!;
+        // public User User { get; set; } = default!;
     }
 }
