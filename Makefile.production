@@ -154,7 +154,6 @@ upgrade-system : ## Upgrade system
 .PHONY : upgrade-system
 
 # TODO Rollback migrations! In particular, get name of current migration for rollback. Maybe `https://stackoverflow.com/questions/15857073/how-to-get-current-migration-name-via-code/15866090#15866090` works? I'd prefer it though if the tool `dotnet ef` (or some extension) supported getting the current migration.
-# TODO Run tests before deploying the services. The current test set-up needs running services though ...
 deploy : DUMP_FILE = ./backup.gz
 deploy : begin-maintenance store-commit backup fetch-all checkout-target migrate deploy-services run-tests end-maintenance ## Deploy tag, branch, or commit `${TARGET}`, for example, `make --file Makefile.production TARGET=v1.0.0 deploy`
 .PHONY : deploy
