@@ -46,7 +46,9 @@ In another shell
 
 The same works for frontend containers by running `make shellf`.
 
-## Setting up a Debian production machine
+## Deployment
+
+### Setting up a Debian production machine
 1. Install [Ansible](https://www.ansible.com) as explained on
    [Installing Ansible on Debian](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-debian).
 1. Create a symbolic link from `/app` to `~` by running `sudo ln -s ~ /app`.
@@ -97,6 +99,32 @@ The same works for frontend containers by running `make shellf`.
       `make --file Makefile.production up`.
    1. Restart changed services in a changed environment by running
       `make --file Makefile.production down build up`.
+
+### Creating a release
+1. [Draft a new release](https://github.com/ise621/metabase/actions) with a new
+   version according to [Semantic Versioning](https://semver.org).
+1. Fetch the release branch by running `git fetch` and check it out by running
+   `git checkout release/v*.*.*`, where `*.*.*` is the version.
+1. Prepare the release by running `make prepare-release` in your shell, review,
+   add, and commit the changes. In particular, migration and rollback SQL files
+   are created in `./backend/src/Migrations/` which need to be reviewed --- see
+   [Migrations Overview](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli)
+   and following pages for details.
+1. [Publish the new release](https://github.com/ise621/metabase/actions).
+
+### Deploying a release
+1. Enter a shell on the production machine using `ssh`.
+1. Change to the staging envrionment by running `cd /app/staging`.
+1. Deploy the new release in the staging environment by running
+   `make --file Makefile.production deploy`.
+1. If it fails *after* the database backup was made, rollback to the previous
+   state by running
+   `make --file Makefile.production rollback`,
+   figure out what went wrong, apply the necessary fixes to the codebase,
+   create a new release, and try to deploy that release instead.
+1. If it succeeds, test whether everything works as expected and if that is
+   the case, repeat the same process in the directory `/app/production`
+   (instead of `/app/staging`).
 
 For information on using Docker in production see
 [Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)

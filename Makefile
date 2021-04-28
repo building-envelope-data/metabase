@@ -164,6 +164,14 @@ end-maintenance : ## End maintenance
 	rm ./nginx/html/maintenance.html
 .PHONY : begin-maintenance
 
+prepare-release : ## Prepare release
+	DOCKER_IP=${docker_ip} \
+		${docker_compose} run \
+		--user $(shell id --user):$(shell id --group) \
+		backend \
+		make prepare-release
+.PHONY : prepare-release
+
 # --------------------- #
 # Generate Certificates #
 # --------------------- #
