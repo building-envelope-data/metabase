@@ -1,14 +1,14 @@
 server {
     server_name ${STAGING_HOST};
     location / {
-        proxy_pass http://localhost:${STAGING_HTTP_PORT};
+        proxy_pass http://host.docker.internal:${STAGING_HTTP_PORT};
     }
 }
 
 server {
     server_name ${PRODUCTION_HOST};
     location / {
-        proxy_pass http://localhost:${PRODUCTION_HTTP_PORT};
+        proxy_pass http://host.docker.internal:${PRODUCTION_HTTP_PORT};
     }
 }
 
