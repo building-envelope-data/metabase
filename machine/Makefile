@@ -23,6 +23,11 @@ deploy : ## Deploy services
 		--detach
 .PHONY : deploy
 
+logs : ## Follow logs
+	${docker_compose} logs \
+		--follow
+.PHONY : logs
+
 down : ## Stop containers and remove containers, networks, volumes, and images created by `deploy`
 	${docker_compose} down \
 		--remove-orphans
