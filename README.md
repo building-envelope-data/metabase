@@ -99,16 +99,17 @@ The same works for frontend containers by running `make shellf`.
       `make --file Makefile.production createdb`.
 
 ### Creating a release
-1. [Draft a new release](https://github.com/ise621/metabase/actions) with a new
-   version according to [Semantic Versioning](https://semver.org).
+1. [Draft a new release](https://github.com/ise621/metabase/actions/workflows/draft-new-release.yml)
+   with a new version according to [Semantic Versioning](https://semver.org).
 1. Fetch the release branch by running `git fetch` and check it out by running
    `git checkout release/v*.*.*`, where `*.*.*` is the version.
 1. Prepare the release by running `make prepare-release` in your shell, review,
-   add, and commit the changes. In particular, migration and rollback SQL files
-   are created in `./backend/src/Migrations/` which need to be reviewed --- see
+   add, commit, and push the changes. In particular, migration and rollback SQL
+   files are created in `./backend/src/Migrations/` which need to be reviewed
+   --- see
    [Migrations Overview](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli)
    and following pages for details.
-1. [Publish the new release](https://github.com/ise621/metabase/actions).
+1. [Publish the new release](https://github.com/ise621/metabase/actions/workflows/publish-new-release.yml).
 
 ### Deploying a release
 1. Enter a shell on the production machine using `ssh`.
