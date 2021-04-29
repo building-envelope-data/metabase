@@ -83,9 +83,11 @@ The same works for frontend containers by running `make shellf`.
      git clone git@github.com:ise621/metabase.git ./${environment}
    done
    ```
-1. Change into one clone by running `cd ./staging`
+1. Change into one clone by running `cd ./staging`.
 1. Set-up the machine by running `ansible-playbook ./machine/local.yml`.
-1. For each of the two environments
+1. Prepare the machine environment by running
+   `cp ./machine/.env.sample ./machine/.env`.
+1. For each of the two environments staging and production
    1. Prepare the environment in both clones more or less as detailed above
       replacing dummy passwords by newly generated ones, for example, by running
       `openssl rand -base64 32`,
@@ -95,10 +97,6 @@ The same works for frontend containers by running `make shellf`.
       `make --file Makefile.production postgres_passwords`
       and creating the database by running
       `make --file Makefile.production createdb`.
-   1. Start all services by running
-      `make --file Makefile.production up`.
-   1. Restart changed services in a changed environment by running
-      `make --file Makefile.production down build up`.
 
 ### Creating a release
 1. [Draft a new release](https://github.com/ise621/metabase/actions) with a new
@@ -122,9 +120,10 @@ The same works for frontend containers by running `make shellf`.
    `make --file Makefile.production rollback`,
    figure out what went wrong, apply the necessary fixes to the codebase,
    create a new release, and try to deploy that release instead.
-1. If it succeeds, test whether everything works as expected and if that is
-   the case, repeat the same process in the directory `/app/production`
-   (instead of `/app/staging`).
+1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
+	 running `cd ./machine && make deploy` and test whether everything works as
+	 expected and if that is the case, repeat all stages but this one in the
+	 directory `/app/production` (instead of `/app/staging`).
 
 For information on using Docker in production see
 [Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)
