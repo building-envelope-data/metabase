@@ -34,6 +34,7 @@ namespace Metabase.Data
             if (await manager.FindByClientIdAsync("testlab-solar-facades").ConfigureAwait(false) is null)
             {
                 logger.LogDebug("Creating application client 'testlab-solar-facades'");
+                // TODO Do not hardcode URL or at least port in development environment.
                 var host = environment.IsProduction() ? "https://testlab-solar-facades.de" : "https://local.testlab-solar-facades.de:5051";
                 await manager.CreateAsync(
                     new OpenIddictApplicationDescriptor
