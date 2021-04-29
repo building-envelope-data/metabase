@@ -1,0 +1,178 @@
+- hosts: localhost
+  connection: local
+
+  handlers:
+    - name: Restart Docker
+      become: yes
+      service:
+        name: docker
+        state: restarted
+
+  pre_tasks:
+    - name: Update package information
+      become: yes
+      apt:
+        update_cache: yes
+      changed_when: false
+    - name: Install access control list utilities (needed to escalate privileges, see https://github.com/ansible/ansible/issues/16052)
+      become: yes
+      package:
+        name: acl
+        state: present
+
+  tasks:
+    - name: Bash completion
+      block:
+        - name: Install Bash completion
+          become: yes
+          package:
+            name: bash-completion
+            state: present
+
+        # Inspired by https://stackoverflow.com/questions/40316836/update-bashrc-with-virtualenv-info-using-ansible/40317125#40317125
+        # The comment also mentions an alternative better solution that uses a `~/.bashrc.d` directory.
+        - name: Source Bash completion scripts in `~/.bashrc`
+          blockinfile:
+            dest: '{{ ansible_env.HOME }}/.bashrc'
+            block: |
+              for file in /etc/bash_completion.d/* ; do
+                  source "$file"
+              done
+            marker: '# {mark} ANSIBLE MANAGED BLOCK - bash-completion'
+            insertbefore: BOF
+            create: yes
+
+    - name: Install GNU Make
+      become: yes
+      package:
+        name: make
+        state: present
+
+    - name: Hard disk management
+      block:
+      - name: Install Small Computer System Interface (SCSI) tools
+        # For example, to scan for additional disks by running
+        # `sudo rescan-scsi-bus.sh`
+        # without restarting the virtual machine
+        become: yes
+        package:
+          name: scsitools
+          state: present
+
+      # See https://opensource.com/article/18/11/partition-format-drive-linux
+      - name: Install parted to partition hard disks
+        become: yes
+        package:
+          name: parted
+          state: present
+
+      - name: Install ext2/ext3/ext4 file system utilities to format hard disks
+        become: yes
+        package:
+          name: e2fsprogs
+          state: present
+
+    - name: Backup database
+      cron:
+        name: database-backup
+        weekday: '0'
+        job: 'cd /app/production && mkdir --parents /app/data/backups && make --file Makefile.production DUMP_FILE=/app/data/backups/dump_$(date +"%Y-%m-%d_%H_%M_%S").gz backup'
+
+    - name: Docker
+      # Inspired by https://ops.tips/blog/docker-ansible-role/
+      become: yes
+      block:
+        - name: Add Docker dependencies
+          package:
+            name:
+              - apt-transport-https
+              - ca-certificates
+              - curl
+              - gnupg
+              - lsb-release
+            state: present
+
+        - name: Add Docker key
+          apt_key:
+            url: https://download.docker.com/linux/debian/gpg
+            id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+            state: present
+
+        - name: Docker Community Edition
+          block:
+            - name: Add Docker repository
+              apt_repository:
+                repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+                state: present
+            - name: Install Docker
+              package:
+                name:
+                  - docker-ce
+                  - docker-ce-cli
+                  - containerd.io
+                state: present
+
+        - name: Prepare default daemon configuration
+          # For a list of options see
+          # https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
+          copy:
+            src: ./docker-daemon.json
+            dest: /etc/docker/daemon.json
+          notify:
+            - Restart Docker
+
+        - name: Add users to docker group
+          user:
+            name: '{{ item }}'
+            groups: docker
+            append: yes
+          with_items:
+            - cloud
+
+        - name: Enable Docker systemd service
+          service:
+            name: docker
+            enabled: yes
+            state: started
+
+        - name: Set periodic docker system prune
+          # See https://docs.docker.com/config/pruning/#prune-everything
+          cron:
+            name: docker-prune
+            minute: '0'
+            hour: '*/2'
+            job: docker system prune --force --filter "until=24h"
+
+        - name: Flush handlers
+          meta: flush_handlers
+
+    - name: docker-compose
+      # Inspired by https://github.com/geerlingguy/ansible-role-docker/blob/master/tasks/docker-compose.yml
+      become: yes
+      vars:
+        docker_compose_path: /usr/local/bin/docker-compose
+        docker_compose_version: 1.29.0
+      block:
+        - name: Check current docker-compose version.
+          command: '{{ docker_compose_path }} --version'
+          register: docker_compose_current_version
+          changed_when: false
+          failed_when: false
+
+        - name: Delete existing docker-compose version if it's different.
+          file:
+            path: '{{ docker_compose_path }}'
+            state: absent
+          when: >
+            docker_compose_current_version.stdout is defined
+            and docker_compose_version not in docker_compose_current_version.stdout
+
+        - name: Install docker-compose
+          get_url:
+            url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}
+            dest: '{{ docker_compose_path }}'
+            mode: 'u+x,g+x,o+x'
+            # checksum: sha256:TODO https://github.com/docker/compose/releases/tag/1.29.0
+          when: >
+            docker_compose_current_version.stdout is defined
+            and docker_compose_version not in docker_compose_current_version.stdout

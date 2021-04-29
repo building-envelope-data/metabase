@@ -1,0 +1,50 @@
+# Inspired by
+# https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
+# and
+# https://docs.docker.com/engine/examples/dotnetcore/
+
+#########
+# BUILD #
+#########
+
+# https://hub.docker.com/_/microsoft-dotnet-sdk
+FROM mcr.microsoft.com/dotnet/sdk:5.0.202-alpine3.13-amd64 AS build
+
+COPY ./ /app
+
+WORKDIR /app
+
+RUN \
+  dotnet restore \
+    --runtime linux-musl-x64
+RUN \
+  dotnet publish \
+    --runtime linux-musl-x64 \
+    --configuration release \
+    --output out \
+    --self-contained false \
+    --no-restore
+
+###########
+# RUNTIME #
+###########
+
+# https://hub.docker.com/_/microsoft-dotnet-aspnet
+FROM mcr.microsoft.com/dotnet/aspnet:5.0.5-alpine3.13-amd64
+
+WORKDIR /app
+
+COPY \
+  --from=build \
+  /app/out \
+  ./
+
+RUN \
+  ln -s Metabase.dll App.dll
+
+# See: https://github.com/dotnet/announcements/issues/20
+# Uncomment to enable globalization APIs
+#ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT false
+#RUN apk add --no-cache icu-libs
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8

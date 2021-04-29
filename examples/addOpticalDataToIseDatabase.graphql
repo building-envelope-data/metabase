@@ -1,0 +1,179 @@
+mutation addOpticalDataToIseDatabase(
+  $glazingComponentId: NonEmptyUuid!,
+  $shadingComponentId: NonEmptyUuid!,
+) {
+  glazingDataPoints: createOpticalData(input: {
+    componentId: $glazingComponentId,
+    data: {
+      schema: "https://www.buildingenvelopedata.org/schemas/optical.json",
+      dataPoints: [
+        {
+          incidence: {
+            direction: [
+              {
+                polar: 10,
+                azimuth: 45
+              }
+            ],
+            wavelengths: {
+              integral: true
+            },
+            range: {
+              spectrum: [
+                 "visible"
+              ]
+            }
+          },
+          emergence: {
+            direction: [
+              {
+                polar: 20,
+                azimuth: 60
+              }
+            ]
+          },
+          results: {
+            transmittance: {
+              uncertainValue: 0.1
+            }
+          }
+        },
+        {
+          incidence: {
+            direction: [
+              {
+                polar: 30,
+                azimuth: 15
+              }
+            ],
+            wavelengths: {
+              integral: true
+            },
+            range: {
+              spectrum: [
+                 "visible"
+              ]
+            }
+          },
+          emergence: {
+            direction: [
+              {
+                polar: 10,
+                azimuth: 70
+              }
+            ]
+          },
+          results: {
+            transmittance: {
+              uncertainValue: 0.05
+            }
+          }
+        }
+      ]
+    }
+  }) {
+    opticalData {
+      id
+    }
+  }
+
+  glazingFile: createOpticalData(input: {
+    componentId: $glazingComponentId,
+    data: {
+      schema: "https://www.buildingenvelopedata.org/schemas/optical.json",
+      file: {
+        name: "VX412005x_klems_full.xml",
+        webAddress: "https://oc.ise.fraunhofer.de/ceef5dc1-2501-4ea9-a994-a1ae41ea1f11",
+        formatting: {
+          name: "LBNL/Klems Full",
+          reference: {
+            publication: {
+              identifiers: {
+                doi: "z10.1016/j.solener.2017.05.065"
+              }
+            }
+          }
+        }
+      }
+    }
+  }) {
+    opticalData {
+      id
+    }
+  }
+
+  shadingDataPoints: createOpticalData(input: {
+    componentId: $shadingComponentId,
+    data: {
+      schema: "https://www.buildingenvelopedata.org/schemas/optical.json",
+      dataPoints: [
+        {
+          incidence: {
+            direction: [
+              {
+                polar: 10,
+                azimuth: 45
+              }
+            ],
+            wavelengths: {
+              integral: true
+            },
+            range: {
+              spectrum: [
+                 "visible"
+              ]
+            }
+          },
+          emergence: {
+            direction: [
+              {
+                polar: 20,
+                azimuth: 60
+              }
+            ]
+          },
+          results: {
+            transmittance: {
+              uncertainValue: 0.1
+            }
+          }
+        },
+        {
+          incidence: {
+            direction: [
+              {
+                polar: 30,
+                azimuth: 15
+              }
+            ],
+            wavelengths: {
+              integral: true
+            },
+            range: {
+              spectrum: [
+                 "visible"
+              ]
+            }
+          },
+          emergence: {
+            direction: [
+              {
+                polar: 10,
+                azimuth: 70
+              }
+            ]
+          },
+          results: {
+            transmittance: {
+              uncertainValue: 0.05
+            }
+          }
+        }
+      ]
+    }
+  }) {
+    opticalData {
+      id
+    }
+  }
+}

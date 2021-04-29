@@ -1,0 +1,10 @@
+query Methods {
+  methods {
+    nodes {
+      id
+      uuid
+      name
+      description
+    }
+  }
+}

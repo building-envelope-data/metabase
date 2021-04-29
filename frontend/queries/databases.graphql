@@ -1,0 +1,44 @@
+query Databases {
+  databases {
+    nodes {
+      id
+      uuid
+      name
+      description
+      locator
+      operator {
+        node {
+          uuid
+          name
+        }
+      }
+    }
+  }
+}
+
+mutation CreateDatabase(
+  $name: String!
+  $description: String!
+  $locator: Url!
+  $operatorId: Uuid!
+) {
+  createDatabase(
+    input: {
+      name: $name
+      description: $description
+      locator: $locator
+      operatorId: $operatorId
+    }
+  ) {
+    database {
+      name
+      description
+      locator
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

@@ -1,0 +1,34 @@
+mutation createInstitution(
+  $name: String!
+  $abbreviation: String
+  $description: String!
+  $ownerIds: [Uuid!]!
+  $websiteLocator: Url
+  $state: InstitutionState!
+) {
+  createInstitution(
+    input: {
+      name: $name
+      abbreviation: $abbreviation
+      description: $description
+      ownerIds: $ownerIds
+      websiteLocator: $websiteLocator
+      state: $state
+    }
+  ) {
+    institution {
+      id
+      uuid
+      name
+      abbreviation
+      description
+      websiteLocator
+      state
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

@@ -1,0 +1,18 @@
+query whoHasOpticalData(
+  $glazingComponentId: NonEmptyUuid!,
+  $shadingComponentId: NonEmptyUuid!,
+  $lbnlGlazingOpticalDataTimestamp: Timestamp!
+) {
+  whoHasOpticalDataForGlazingComponent: whoHasOpticalData(
+    componentId: $glazingComponentId,
+    timestamp: $lbnlGlazingOpticalDataTimestamp
+  ) {
+    locator
+  }
+  whoHasOpticalDataForShadingComponent: whoHasOpticalData(
+    componentId: $shadingComponentId,
+    timestamp: $lbnlGlazingOpticalDataTimestamp
+  ) {
+    locator
+  }
+}

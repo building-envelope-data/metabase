@@ -1,0 +1,30 @@
+/examples/*.json
+/secrets
+/ssl
+/machine/*.retry
+/nginx/html/maintenance.html
+/commit
+/backup.gz
+
+.env
+.vscode
+
+# Compiled output
+dist
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+lerna-debug.log*
+
+# Tests
+coverage
+.nyc_output
+
+# Backups
+*.bak
+
+# Image Diagrams
+/diagrams/*.png

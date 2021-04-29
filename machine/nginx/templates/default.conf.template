@@ -1,0 +1,20 @@
+server {
+    server_name ${STAGING_HOST};
+    location / {
+        proxy_pass http://host.docker.internal:${STAGING_HTTP_PORT};
+    }
+}
+
+server {
+    server_name ${PRODUCTION_HOST};
+    location / {
+        proxy_pass http://host.docker.internal:${PRODUCTION_HTTP_PORT};
+    }
+}
+
+# For the redirection from non-www to www see
+# http://nginx.org/en/docs/http/converting_rewrite_rules.html
+server {
+    server_name ${NON_WWW_PRODUCTION_HOST};
+    return 301 $scheme://${PRODUCTION_HOST}$request_uri;
+}

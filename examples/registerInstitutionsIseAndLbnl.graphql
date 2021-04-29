@@ -1,0 +1,23 @@
+mutation {
+  ise: createInstitution(input: {
+    name: "Fraunhofer Institute for Solar Energy Systems",
+    abbreviation: "ISE",
+    state: OPERATIVE,
+    websiteLocator: "https://www.ise.fraunhofer.de"
+  }) {
+    institution {
+      id
+    }
+  }
+
+  lbnl: createInstitution(input: {
+    name: "Lawrence Berkeley National Laboratory",
+    abbreviation: "LBNL",
+    state: OPERATIVE,
+    websiteLocator: "https://www.ise.fraunhofer.de"
+  }) {
+    institution {
+      id
+    }
+  }
+}

@@ -1,0 +1,49 @@
+query Components {
+  components {
+    nodes {
+      id
+      uuid
+      name
+      description
+    }
+  }
+}
+
+mutation CreateComponent(
+  $name: String!
+  $abbreviation: String
+  $description: String!
+  $categories: [ComponentCategory!]!
+  $availableFrom: DateTime
+  $availableTo: DateTime
+  $manufacturerId: Uuid!
+) {
+  createComponent(
+    input: {
+      name: $name
+      abbreviation: $abbreviation
+      description: $description
+      categories: $categories
+      availability: { from: $availableFrom, to: $availableTo }
+      manufacturerId: $manufacturerId
+    }
+  ) {
+    component {
+      id
+      uuid
+      name
+      abbreviation
+      description
+      categories
+      availability {
+        from
+        to
+      }
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

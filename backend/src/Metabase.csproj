@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <UserSecretsId>31666837686487542159</UserSecretsId>
+    <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
+    <Nullable>enable</Nullable>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <CodeAnalysisRuleSet>Metabase.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- <PackageReference Include="AutoMapper" Version="10.1.1" /> -->
+    <!-- <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" /> -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.1.3" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
+    <PackageReference Include="HotChocolate" Version="11.1.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.1.0" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.1.0" />
+    <PackageReference Include="HotChocolate.Data" Version="11.1.0" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="11.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.5" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
+    <!-- <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="5.0.0" /> -->
+    <!-- <PackageReference Include="StyleCop.Analyzers" Version="1.1.118"> -->
+    <!--   <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets> -->
+    <!--   <PrivateAssets>all</PrivateAssets> -->
+    <!-- </PackageReference> -->
+    <PackageReference Include="OpenIddict.AspNetCore" Version="3.0.3" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.0.3" />
+    <PackageReference Include="OpenIddict.Quartz" Version="3.0.3" />
+    <PackageReference Include="Quartz" Version="3.3.2" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="./jwt-encryption-certificate.pfx" />
+    <EmbeddedResource Include="./jwt-signing-certificate.pfx" />
+  </ItemGroup>
+</Project>

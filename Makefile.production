@@ -1,0 +1,204 @@
+# Concise introduction to GNU Make:
+# https://swcarpentry.github.io/make-novice/reference.html
+
+include .env
+
+docker_compose = \
+	docker-compose \
+		--file docker-compose.production.yml \
+		--project-name ${NAME}
+
+# Taken from https://www.client9.com/self-documenting-makefiles/
+help : ## Print this help
+	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
+		printf "\033[36m%-30s\033[0m %s\n", $$1, $$NF \
+	}' $(MAKEFILE_LIST)
+.PHONY : help
+.DEFAULT_GOAL := help
+
+name : ## Print value of variable `name`
+	@echo ${NAME}
+.PHONY : name
+
+build : ## Build images
+	${docker_compose} build
+.PHONY : build
+
+up : ## (Re)create and start containers
+	${docker_compose} up \
+		--remove-orphans \
+		--detach
+.PHONY : up
+
+down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
+	${docker_compose} down \
+		--remove-orphans
+.PHONY : down
+
+restart : ## Restart all stopped and running containers
+	${docker_compose} restart
+.PHONY : restart
+
+logs : ## Follow logs
+	${docker_compose} logs \
+		--follow
+.PHONY : logs
+
+exec : up ## Execute the one-time command `${COMMAND}` against an existing `${CONTAINER}` container (after starting all containers if necessary)
+	${docker_compose} exec \
+		${CONTAINER} \
+		${COMMAND}
+.PHONY : exec
+
+execb : CONTAINER = backend
+execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
+
+shellb : COMMAND = ash
+shellb : execb ## Enter shell in a running `backend` container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
+.PHONY : shellb
+
+createdb : ## Create database
+	${docker_compose} run \
+		database \
+		bash -c "createdb --username postgres xbase"
+.PHONY : createdb
+
+psql : ## Enter PostgreSQL interactive terminal in the running `database` service
+	${docker_compose} exec \
+		database \
+		psql \
+		--username postgres \
+		--dbname xbase
+.PHONY : psql
+
+# TODO The entrypoint file of the PostgreSQL image uses the file refered to by `POSTGRES_PASSWORD_FILE` and this file needs to be accessible by `other`. Why? We do not want all people to be able to read secrets!
+postgres_password : ## Generate PostgreSQL password file with nothing but one password in plain text (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
+	mkdir -p ./secrets
+	chmod 0755 ./secrets
+	touch ./secrets/postgres_password
+	chmod 0644 ./secrets/postgres_password
+	openssl rand -base64 32 \
+		> ./secrets/postgres_password
+.PHONY : postgres_password
+		# | openssl md5 \
+		# | awk '{print $$2}' \
+
+# https://www.postgresql.org/docs/current/libpq-pgpass.html
+postgres_passwords : postgres_password ## Generate PostgreSQL passwords file whose entries are of the form `hostname:port:database:username:password` (note that if the data volume already exists, then it either needs to be removed resulting in the loss of all data or the password of the PostgreSQL user needs to be changed manually by executing the SQL query `ALTER USER postgres with password '...'`)
+	mkdir -p ./secrets
+	chmod 0755 ./secrets
+	touch ./secrets/postgres_passwords
+	chmod 0600 ./secrets/postgres_passwords
+	echo "*:*:*:*:$$(cat ./secrets/postgres_password)" \
+		> ./secrets/postgres_passwords
+.PHONY : postgres_passwords
+
+# See https://docs.docker.com/config/daemon/#view-stack-traces
+daemon-logs : ## View Docker daemon logs
+	sudo journalctl --unit docker.service
+.PHONY : daemon-logs
+
+reload-daemon : ## Reload Docker daemon
+	sudo systemctl reload docker
+.PHONY : reload-daemon
+
+# See https://docs.docker.com/config/containers/runmetrics/
+docker-stats : ## Show Docker run-time metrics
+	docker stats
+.PHONY : docker-stats
+
+# Backup with `pg_dumpall`: https://www.postgresql.org/docs/13/backup-dump.html#BACKUP-DUMP-ALL
+# Command `pg_dumpall`: https://www.postgresql.org/docs/13/app-pg-dumpall.html
+backup : ## Backup databases to file with path `${DUMP_FILE}`, for example, `make --file Makefile.production DUMP_FILE=/app/data/backups/dump_$(date +"%Y-%m-%d_%H_%M_%S").gz backup`
+	${docker_compose} run \
+		database \
+		pg_dumpall \
+			--clean \
+			--username=postgres \
+	| gzip \
+	> ${DUMP_FILE}
+.PHONY : backup
+
+restore : ## Restore databases from file with path `${DUMP_FILE}`, for example, `make --file Makefile.production DUMP_FILE=/app/data/backups/dump_2021-04-22_15_43_35.gz restore`
+	gunzip --stdout ${DUMP_FILE} \
+	| ${docker_compose} run \
+		-T \
+		database \
+		psql \
+			--username=postgres \
+			postgres
+.PHONY : restore
+
+begin-maintenance : ## Begin maintenance
+	cp \
+		./nginx/html/maintenance.off.html \
+		./nginx/html/maintenance.html
+.PHONY : begin-maintenance
+
+end-maintenance : ## End maintenance
+	rm ./nginx/html/maintenance.html
+.PHONY : end-maintenance
+
+# TODO Reboot when file `/var/run/reboot-required` exists
+# TODO Shall we use `apt` for system upgrades? See https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/ and https://www.redpill-linpro.com/sysadvent/2017/12/24/ansible-system-updates.html
+# TODO Shall we only run `apt-get upgrade` daily and only once in a while `apt-get dist-upgrade`?
+# TODO Run this command daily but __not__ within a cron job!
+upgrade-system : ## Upgrade system
+	make --file Makefile.production begin-maintenance
+	sudo apt-get --assume-yes update
+	sudo apt-get --assume-yes dist-upgrade
+	sudo apt-get --assume-yes auto-remove
+	sudo apt-get --assume-yes clean
+	sudo apt-get --assume-yes auto-clean
+	make --file Makefile.production end-maintenance
+.PHONY : upgrade-system
+
+deploy : DUMP_FILE = ./backup.gz
+deploy : begin-maintenance store-commit backup fetch-all checkout-target migrate deploy-services run-tests end-maintenance ## Deploy tag, branch, or commit `${TARGET}`, for example, `make --file Makefile.production TARGET=v1.0.0 deploy`
+.PHONY : deploy
+
+rollback : TARGET = $(shell cat ./commit)
+rollback : DUMP_FILE = ./backup.gz
+rollback : begin-maintenance checkout-target restore deploy-services run-tests end-maintenance ## Rollback deployment attempt (use commit hash stored in `./commit` and database backup stored in `./backup.gz`)
+.PHONY : rollback
+
+store-commit : ## Store current commit
+	$(shell git rev-parse --verify HEAD > commit)
+.PHONY : store-commit
+
+fetch-all : ## Fetch all
+	git fetch --all
+.PHONY : fetch-all
+
+# Inspired by https://grimoire.ca/git/stop-using-git-pull-to-deploy/
+checkout-target : ## Fetch and checkout `${TARGET}`
+	git checkout --force "${TARGET}"
+.PHONY : checkout-target
+
+migrate : FROM = $(file ./backend/src/Migrations/previous)
+migrate : TO = $(file ./backend/src/Migrations/current)
+migrate : ## Migrate database
+	cat ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql \
+	| ${docker_compose} run \
+		-T \
+		database \
+		psql \
+			--username=postgres \
+			postgres
+.PHONY : migrate
+
+# Note that NGINX is because of its dependencies taken down and up last and in
+# one go so the maintenance page is only down very shortly.
+deploy-services : ## Deploy services
+	${docker_compose} pull
+	${docker_compose} up \
+		--build \
+		--force-recreate \
+		--renew-anon-volumes \
+		--remove-orphans \
+		--detach
+.PHONY : deploy-services
+
+run-tests : COMMAND = true
+run-tests : execb ## Run tests
+.PHONY : run-tests

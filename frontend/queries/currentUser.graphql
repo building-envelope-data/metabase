@@ -1,0 +1,235 @@
+fragment CurrentUserPartial on User {
+  id
+  uuid
+  name
+  email
+  hasPassword
+  isEmailConfirmed
+  phoneNumber
+  roles
+}
+
+query CurrentUser {
+  currentUser {
+    ...CurrentUserPartial
+  }
+}
+
+mutation LoginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
+  loginUser(
+    input: { email: $email, password: $password, rememberMe: $rememberMe }
+  ) {
+    requiresTwoFactor
+    user {
+      ...CurrentUserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation LoginUserWithTwoFactorCode(
+  $authenticatorCode: String!
+  $rememberMe: Boolean!
+  $rememberMachine: Boolean!
+) {
+  loginUserWithTwoFactorCode(
+    input: {
+      authenticatorCode: $authenticatorCode
+      rememberMe: $rememberMe
+      rememberMachine: $rememberMachine
+    }
+  ) {
+    user {
+      ...CurrentUserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation LoginUserWithRecoveryCode($recoveryCode: String!) {
+  loginUserWithRecoveryCode(input: { recoveryCode: $recoveryCode }) {
+    user {
+      ...CurrentUserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation LogoutUser {
+  logoutUser {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ChangeUserEmail($newEmail: String!) {
+  changeUserEmail(input: { newEmail: $newEmail }) {
+    user {
+      ...CurrentUserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+query TwoFactorAuthentication {
+  currentUser {
+    twoFactorAuthentication {
+      hasAuthenticator
+      isEnabled
+      isMachineRemembered
+      recoveryCodesLeftCount
+    }
+  }
+}
+
+mutation GenerateUserTwoFactorRecoveryCodes {
+  generateUserTwoFactorRecoveryCodes {
+    twoFactorRecoveryCodes
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DisableUserTwoFactorAuthentication {
+  disableUserTwoFactorAuthentication {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ForgetUserTwoFactorAuthenticationClient {
+  forgetUserTwoFactorAuthenticationClient {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ResetUserTwoFactorAuthenticator {
+  resetUserTwoFactorAuthenticator {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri {
+  generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri {
+    sharedKey
+    authenticatorUri
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation EnableUserTwoFactorAuthenticator($verificationCode: String!) {
+  enableUserTwoFactorAuthenticator(
+    input: { verificationCode: $verificationCode }
+  ) {
+    twoFactorRecoveryCodes
+    sharedKey
+    authenticatorUri
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ChangeUserPassword(
+  $currentPassword: String!
+  $newPassword: String!
+  $newPasswordConfirmation: String!
+) {
+  changeUserPassword(
+    input: {
+      currentPassword: $currentPassword
+      newPassword: $newPassword
+      newPasswordConfirmation: $newPasswordConfirmation
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation SetUserPassword($password: String!, $passwordConfirmation: String!) {
+  setUserPassword(
+    input: { password: $password, passwordConfirmation: $passwordConfirmation }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DeletePersonalUserData($password: String) {
+  deletePersonalUserData(input: { password: $password }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ResendUserEmailVerification {
+  resendUserEmailVerification {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation SetUserPhoneNumber($phoneNumber: String!) {
+  setUserPhoneNumber(input: { phoneNumber: $phoneNumber }) {
+    user {
+      ...CurrentUserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

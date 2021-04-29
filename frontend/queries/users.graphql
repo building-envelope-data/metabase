@@ -1,0 +1,109 @@
+fragment UserPartial on User {
+  id
+  uuid
+  name
+  email
+}
+
+query Users {
+  users {
+    nodes {
+      ...UserPartial
+    }
+  }
+}
+
+mutation RegisterUser(
+  $name: String!
+  $email: String!
+  $password: String!
+  $passwordConfirmation: String!
+) {
+  registerUser(
+    input: {
+      name: $name
+      email: $email
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+    }
+  ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ConfirmUserEmail($email: String!, $confirmationCode: String!) {
+  confirmUserEmail(
+    input: { email: $email, confirmationCode: $confirmationCode }
+  ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ConfirmUserEmailChange(
+  $currentEmail: String!
+  $newEmail: String!
+  $confirmationCode: String!
+) {
+  confirmUserEmailChange(
+    input: {
+      currentEmail: $currentEmail
+      newEmail: $newEmail
+      confirmationCode: $confirmationCode
+    }
+  ) {
+    user {
+      ...UserPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RequestUserPasswordReset($email: String!) {
+  requestUserPasswordReset(input: { email: $email }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation ResetUserPassword(
+  $email: String!
+  $password: String!
+  $passwordConfirmation: String!
+  $resetCode: String!
+) {
+  resetUserPassword(
+    input: {
+      email: $email
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+      resetCode: $resetCode
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

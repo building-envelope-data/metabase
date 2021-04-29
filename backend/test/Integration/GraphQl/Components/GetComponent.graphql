@@ -1,0 +1,16 @@
+query component(
+    $uuid: Uuid!
+) {
+    component(uuid: $uuid) {
+        id
+        uuid
+        name
+        abbreviation
+        description
+        availability {
+            from
+            to
+        }
+        categories
+    }
+}

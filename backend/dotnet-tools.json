@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-aspnet-codegenerator": {
+      "version": "5.0.2",
+      "commands": [
+        "dotnet-aspnet-codegenerator"
+      ]
+    },
+    "dotnet-counters": {
+      "version": "5.0.217401",
+      "commands": [
+        "dotnet-counters"
+      ]
+    },
+    "dotnet-dump": {
+      "version": "5.0.217401",
+      "commands": [
+        "dotnet-dump"
+      ]
+    },
+    "dotnet-ef": {
+      "version": "5.0.5",
+      "commands": [
+        "dotnet-ef"
+      ]
+    },
+    "dotnet-format": {
+      "version": "5.0.211103",
+      "commands": [
+        "dotnet-format"
+      ]
+    },
+    "dotnet-script": {
+      "version": "1.0.1",
+      "commands": [
+        "dotnet-script"
+      ]
+    },
+    "dotnet-trace": {
+      "version": "5.0.217401",
+      "commands": [
+        "dotnet-trace"
+      ]
+    },
+    "dotnet-gcdump": {
+      "version": "5.0.217401",
+      "commands": [
+        "dotnet-gcdump"
+      ]
+    },
+    "dotnet-sos": {
+      "version": "5.0.217401",
+      "commands": [
+        "dotnet-sos"
+      ]
+    },
+    "roslynator.dotnet.cli": {
+      "version": "0.1.2",
+      "commands": [
+        "roslynator"
+      ]
+    },
+    "jetbrains.resharper.globaltools": {
+      "version": "2021.1.1",
+      "commands": [
+        "jb"
+      ]
+    },
+    "dotnet-certificate-tool": {
+      "version": "2.0.6",
+      "commands": [
+        "certificate-tool"
+      ]
+    }
+  }
+}

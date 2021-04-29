@@ -1,0 +1,190 @@
+fragment InstitutionPartial on Institution {
+  id
+  uuid
+  name
+  abbreviation
+  description
+  websiteLocator
+  state
+}
+
+# query Institutions(
+#     $after: String
+#     $before: String
+#     $first: Int
+#     $last: Int
+# ) {
+#   institutions(
+#       after: $after,
+#       before: $before,
+#       first: $first,
+#       last: $last
+#   ) {
+#     nodes {
+#         ...InstitutionPartial
+#       }
+#     pageInfo {
+#         endCursor
+#         startCursor
+#     }
+#     totalCount
+#   }
+# }
+query Institutions {
+  institutions {
+    nodes {
+      ...InstitutionPartial
+    }
+    totalCount
+  }
+}
+
+mutation CreateInstitution(
+  $name: String!
+  $abbreviation: String
+  $description: String!
+  $ownerIds: [Uuid!]!
+  $websiteLocator: Url
+  $state: InstitutionState!
+) {
+  createInstitution(
+    input: {
+      name: $name
+      abbreviation: $abbreviation
+      description: $description
+      ownerIds: $ownerIds
+      websiteLocator: $websiteLocator
+      state: $state
+    }
+  ) {
+    institution {
+      ...InstitutionPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateInstitution(
+  $institutionId: Uuid!
+  $name: String!
+  $abbreviation: String
+  $description: String!
+  $websiteLocator: Url
+  $state: InstitutionState!
+) {
+  updateInstitution(
+    input: {
+      institutionId: $institutionId
+      name: $name
+      abbreviation: $abbreviation
+      description: $description
+      websiteLocator: $websiteLocator
+      state: $state
+    }
+  ) {
+    institution {
+      ...InstitutionPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+query Institution($uuid: Uuid!) {
+  institution(uuid: $uuid) {
+    ...InstitutionPartial
+    manufacturedComponents {
+      edges {
+        node {
+          id
+          uuid
+          name
+          abbreviation
+          description
+          categories
+          availability {
+            from
+            to
+          }
+        }
+      }
+      canCurrentUserAddEdge
+    }
+    operatedDatabases {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+          locator
+        }
+      }
+      canCurrentUserAddEdge
+    }
+    representatives {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+      canCurrentUserAddEdge
+    }
+    managedDataFormats {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+          mediaType
+        }
+      }
+      canCurrentUserAddEdge
+    }
+    developedMethods {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+        }
+      }
+      canCurrentUserAddEdge
+    }
+  }
+}
+
+mutation AddInstitutionRepresentative(
+  $institutionId: Uuid!
+  $userId: Uuid!
+  $role: InstitutionRepresentativeRole!
+) {
+  addInstitutionRepresentative(
+    input: { institutionId: $institutionId, userId: $userId, role: $role }
+  ) {
+    institutionRepresentativeEdge {
+      node {
+        id
+        uuid
+        name
+      }
+      role
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
