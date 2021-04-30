@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.0.2] - 2021-04-30
+
 ## [v0.0.1] - 2021-04-29
 
 ### Added
@@ -125,7 +127,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   Put source code under version control
 
-[Unreleased]: https://github.com/ise621/metabase/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/ise621/metabase/compare/v0.0.2...HEAD
+
+[v0.0.2]: https://github.com/ise621/metabase/compare/v0.0.1...v0.0.2
 
 [v0.0.1]: https://github.com/ise621/metabase/compare/0.0.0...v0.0.1
 
