@@ -197,14 +197,18 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 migrate : FROM = $(file < ./backend/src/Migrations/previous)
 migrate : TO = $(file < ./backend/src/Migrations/current)
 migrate : ## Migrate database
+	${docker_compose} run \
+		--name migrate_${NAME}_database \
+		--detach \
+		database
 	cat ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql \
-	| ${docker_compose} run \
-		--rm \
-		-T \
-		database \
+	| docker exec \
+		migrate_${NAME}_database \
 		psql \
 			--username=postgres \
 			postgres
+	docker container stop migrate_${NAME}_database
+	docker container rm migrate_${NAME}_database
 .PHONY : migrate
 
 # Note that NGINX is because of its dependencies taken down and up last and in
