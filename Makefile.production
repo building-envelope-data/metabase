@@ -175,8 +175,8 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 	git checkout --force "${TARGET}"
 .PHONY : checkout-target
 
-migrate : FROM = $(file ./backend/src/Migrations/previous)
-migrate : TO = $(file ./backend/src/Migrations/current)
+migrate : FROM = $(file < ./backend/src/Migrations/previous)
+migrate : TO = $(file < ./backend/src/Migrations/current)
 migrate : ## Migrate database
 	cat ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql \
 	| ${docker_compose} run \
