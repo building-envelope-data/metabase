@@ -75,8 +75,8 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` servic
 	${docker_compose} exec \
 		database \
 		psql \
-		--username postgres \
-		--dbname xbase
+		--username=postgres \
+		--dbname=xbase
 .PHONY : psql
 
 # TODO The entrypoint file of the PostgreSQL image uses the file refered to by `POSTGRES_PASSWORD_FILE` and this file needs to be accessible by `other`. Why? We do not want all people to be able to read secrets!
@@ -140,10 +140,13 @@ restore : ## Restore databases from file with path `${DUMP_FILE}`, for example, 
 		database
 	gunzip --stdout ${DUMP_FILE} \
 	| docker exec \
+		--interactive \
 		restore_${NAME}_database \
 		psql \
+			--echo-all \
+			--file=- \
 			--username=postgres \
-			postgres
+			--dbname=postgres
 	docker container stop restore_${NAME}_database
 	docker container rm restore_${NAME}_database
 .PHONY : restore
@@ -196,17 +199,20 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 
 migrate : FROM = $(file < ./backend/src/Migrations/previous)
 migrate : TO = $(file < ./backend/src/Migrations/current)
-migrate : ## Migrate database
+migrate : ## Migrate database (note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
 	${docker_compose} run \
 		--name migrate_${NAME}_database \
 		--detach \
 		database
 	cat ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql \
 	| docker exec \
+		--interactive \
 		migrate_${NAME}_database \
 		psql \
+			--echo-all \
+			--file=- \
 			--username=postgres \
-			postgres
+			--dbname=xbase
 	docker container stop migrate_${NAME}_database
 	docker container rm migrate_${NAME}_database
 .PHONY : migrate
