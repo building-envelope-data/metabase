@@ -62,6 +62,7 @@ createdb : ## Create database
 		--name create_${NAME}_database \
 		--detach \
 		database
+	while [ $$(docker inspect -f {{.State.Health.Status}} create_${NAME}_database) != "healthy" ]; do sleep 1; done
 	docker exec \
 		create_${NAME}_database \
 		createdb \
@@ -122,6 +123,7 @@ backup : ## Backup databases to file with path `${DUMP_FILE}`, for example, `mak
 		--name backup_${NAME}_database \
 		--detach \
 		database
+	while [ $$(docker inspect -f {{.State.Health.Status}} backup_${NAME}_database) != "healthy" ]; do sleep 1; done
 	docker exec \
 		backup_${NAME}_database \
 		pg_dumpall \
@@ -138,6 +140,7 @@ restore : ## Restore databases from file with path `${DUMP_FILE}`, for example, 
 		--name restore_${NAME}_database \
 		--detach \
 		database
+	while [ $$(docker inspect -f {{.State.Health.Status}} restore_${NAME}_database) != "healthy" ]; do sleep 1; done
 	gunzip --stdout ${DUMP_FILE} \
 	| docker exec \
 		--interactive \
@@ -204,6 +207,7 @@ migrate : ## Migrate database (note that other PostgreSQL instances using the sa
 		--name migrate_${NAME}_database \
 		--detach \
 		database
+	while [ $$(docker inspect -f {{.State.Health.Status}} migrate_${NAME}_database) != "healthy" ]; do sleep 1; done
 	cat ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql \
 	| docker exec \
 		--interactive \
