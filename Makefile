@@ -302,7 +302,7 @@ trust-certificate-authority : ## Trust the authority's SSL certificate
 # Note that extensions are not transferred to certificate requests and vice versa as said on https://www.openssl.org/docs/man1.1.0/man1/x509.html#BUGS
 generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate signed by our certificate authority
 	mkdir --parents ./ssl/
-		docker run \
+	docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
 		nginx:1.19.9 \
@@ -386,9 +386,6 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 				exit 0 \
 			) || echo \"PFX file is invalid\" \
 			"
-	mkdir --parents ./backend/ssl
-	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx ./backend/src/jwt-encryption-certificate.pfx
-	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx ./backend/src/jwt-signing-certificate.pfx
 .PHONY : generate-ssl-certificate
 
 fetch-ssl-certificate : ## Fetch the SSL certificate of the server
