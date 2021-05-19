@@ -23,9 +23,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Assert
             Snapshot.Match(response);
             EmailsShouldContainSingle(
-                address: email,
+                to: email,
                 subject: "Reset password",
-                messageRegEx: @"^Please reset your password by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
+                bodyRegEx: @"^Please reset your password by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
                 );
         }
 

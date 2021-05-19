@@ -70,10 +70,15 @@ namespace Metabase
             services.AddControllersWithViews();
         }
 
-        private static void ConfigureMessageSenderServices(IServiceCollection services)
+        private void ConfigureMessageSenderServices(IServiceCollection services)
         {
-            services.AddTransient<Services.IEmailSender, Services.MessageSender>();
-            services.AddTransient<Services.ISmsSender, Services.MessageSender>();
+            services.AddTransient<Services.IEmailSender>(serviceProvider =>
+                new Services.EmailSender(
+                    _appSettings.Email.SmtpHost,
+                    _appSettings.Email.SmtpPort,
+                    serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Services.EmailSender>>()
+                )
+            );
         }
 
         private static void ConfigureSessionServices(IServiceCollection services)

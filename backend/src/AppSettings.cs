@@ -28,6 +28,18 @@ namespace Metabase
             = "";
         }
 
+        public EmailSettings Email { get; set; }
+        = new EmailSettings();
+
+        public sealed class EmailSettings
+        {
+            public string SmtpHost { get; set; }
+            = "";
+
+            public int SmtpPort { get; set; }
+            = 0;
+        }
+
         public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }
         = "";
 

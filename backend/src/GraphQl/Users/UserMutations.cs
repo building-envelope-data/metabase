@@ -500,7 +500,7 @@ namespace Metabase.GraphQl.Users
                 var resetCode = EncodeToken(
                       await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
                       );
-                await emailSender.SendEmailAsync(
+                await emailSender.SendAsync(
                     input.Email,
                     "Reset password",
                     $"Please reset your password by clicking the link {appSettings.Host}/users/reset-password?resetCode={resetCode}."
@@ -1318,7 +1318,7 @@ namespace Metabase.GraphQl.Users
             )
         {
             var confirmationCode = EncodeToken(confirmationToken);
-            await emailSender.SendEmailAsync(
+            await emailSender.SendAsync(
                 email,
                 "Confirm your email",
                 $"Please confirm your email address by clicking the link {host}/users/confirm-email?email={email}&confirmationCode={confirmationCode}.")
@@ -1334,7 +1334,7 @@ namespace Metabase.GraphQl.Users
         )
         {
             var confirmationCode = EncodeToken(confirmationToken);
-            await emailSender.SendEmailAsync(
+            await emailSender.SendAsync(
                 newEmail,
                 "Confirm your email change",
                 $"Please confirm your email address change by clicking the link {host}/users/confirm-email-change?currentEmail={currentEmail}&newEmail={newEmail}&confirmationCode={confirmationCode}.")

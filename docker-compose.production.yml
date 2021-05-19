@@ -39,6 +39,8 @@ services:
       - XBASE_Host=https://${HOST}
       - XBASE_JsonWebToken__EncryptionCertificatePassword=${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD}
       - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
+      - XBASE_Email__SmtpHost=${SMTP_HOST}
+      - XBASE_Email__SmtpPort=${SMTP_PORT}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
     volumes:
       - backend_logs:/app/logs
