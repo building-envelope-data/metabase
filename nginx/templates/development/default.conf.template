@@ -68,7 +68,7 @@ server {
 
   location / {
     set $maintenance 0;
-    if (-f /maintenance.html) {
+    if (-f $document_root/maintenance.html) {
       set $maintenance 1;
     }
     if ($internal != 1) {
