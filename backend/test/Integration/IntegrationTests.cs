@@ -173,12 +173,14 @@ namespace Metabase.Tests.Integration
         }
 
         protected async Task<Guid> RegisterAndConfirmUser(
+            string name = DefaultName,
             string email = DefaultEmail,
             string password = DefaultPassword
         )
         {
             var uuid =
                 await RegisterUserReturningUuid(
+                    name: name,
                     email: email,
                     password: password
                     ).ConfigureAwait(false);
@@ -206,12 +208,14 @@ namespace Metabase.Tests.Integration
         // }
 
         protected async Task<Guid> RegisterAndConfirmAndLoginUser(
+            string name = DefaultName,
             string email = DefaultEmail,
             string password = DefaultPassword
         )
         {
             var uuid =
                 await RegisterAndConfirmUser(
+                    name: name,
                     email: email,
                     password: password
                     ).ConfigureAwait(false);
@@ -473,7 +477,7 @@ namespace Metabase.Tests.Integration
         }
 
         protected void EmailsShouldContainSingle(
-            string to,
+            (string name, string address) to,
             string subject,
             string bodyRegEx
         )

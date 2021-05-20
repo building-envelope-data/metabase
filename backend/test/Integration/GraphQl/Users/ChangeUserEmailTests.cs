@@ -15,9 +15,11 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidData_EmailsConfirmationCode()
         {
             // Arrange
+            var name = "John Doe";
             var email = "john.doe@ise.fraunhofer.de";
             var password = "aaaAAA123$!@";
             await RegisterAndConfirmAndLoginUser(
+                name: name,
                 email: email,
                 password: password
             ).ConfigureAwait(false);
@@ -39,7 +41,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 password: password
                 ).ConfigureAwait(false);
             EmailsShouldContainSingle(
-                to: newEmail,
+                to: (name, newEmail),
                 subject: "Confirm your email change",
                 bodyRegEx: @"^Please confirm your email address change by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email-change\?currentEmail=john\.doe@ise\.fraunhofer\.de&newEmail=new.john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+\.$"
                 );

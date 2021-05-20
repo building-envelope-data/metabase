@@ -14,6 +14,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidData_RegistersUser()
         {
             // Act
+            var name = "John Doe";
             var email = "john.doe@ise.fraunhofer.de";
             var response = await RegisterUser(
                 email: email,
@@ -32,7 +33,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                     )
                 );
             EmailsShouldContainSingle(
-                to: email,
+                to: (name, email),
                 subject: "Confirm your email",
                 bodyRegEx: @"^Please confirm your email address by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+\.$"
                 );

@@ -449,7 +449,7 @@ namespace Metabase.GraphQl.Users
             }
             // TODO The confirmation also confirms the registration/account. Should we use another email text then?
             await SendUserEmailConfirmation(
-                input.Email,
+                (user.Name, input.Email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender,
                 appSettings.Host
@@ -472,7 +472,7 @@ namespace Metabase.GraphQl.Users
             if (user is not null)
             {
                 await SendUserEmailConfirmation(
-                    input.Email,
+                    (user.Name, input.Email),
                     await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                     emailSender,
                     appSettings.Host
@@ -501,7 +501,7 @@ namespace Metabase.GraphQl.Users
                       await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
                       );
                 await emailSender.SendAsync(
-                    input.Email,
+                    (user.Name, input.Email),
                     "Reset password",
                     $"Please reset your password by clicking the link {appSettings.Host}/users/reset-password?resetCode={resetCode}."
                     ).ConfigureAwait(false);
@@ -1073,6 +1073,7 @@ namespace Metabase.GraphQl.Users
             }
             // TODO Check validity of `input.NewEmail` (use error code `INVALID_EMAIL`)
             await SendChangeUserEmailConfirmation(
+                user.Name,
                 currentEmail,
                 input.NewEmail,
                 await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),
@@ -1105,7 +1106,7 @@ namespace Metabase.GraphQl.Users
                     );
             }
             await SendUserEmailConfirmation(
-                await userManager.GetEmailAsync(user).ConfigureAwait(false),
+                (user.Name, await userManager.GetEmailAsync(user).ConfigureAwait(false)),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender,
                 appSettings.Host
@@ -1311,7 +1312,7 @@ namespace Metabase.GraphQl.Users
         }
 
         private static async Task SendUserEmailConfirmation(
-            string email,
+            (string name, string address) to,
             string confirmationToken,
             Services.IEmailSender emailSender,
             string host
@@ -1319,13 +1320,14 @@ namespace Metabase.GraphQl.Users
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendAsync(
-                email,
+                to,
                 "Confirm your email",
-                $"Please confirm your email address by clicking the link {host}/users/confirm-email?email={email}&confirmationCode={confirmationCode}.")
+                $"Please confirm your email address by clicking the link {host}/users/confirm-email?email={to.address}&confirmationCode={confirmationCode}.")
                 .ConfigureAwait(false);
         }
 
         private static async Task SendChangeUserEmailConfirmation(
+            string name,
             string currentEmail,
             string newEmail,
             string confirmationToken,
@@ -1335,7 +1337,7 @@ namespace Metabase.GraphQl.Users
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendAsync(
-                newEmail,
+                (name, newEmail),
                 "Confirm your email change",
                 $"Please confirm your email address change by clicking the link {host}/users/confirm-email-change?currentEmail={currentEmail}&newEmail={newEmail}&confirmationCode={confirmationCode}.")
                 .ConfigureAwait(false);

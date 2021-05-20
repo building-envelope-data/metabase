@@ -23,7 +23,11 @@ namespace Metabase.Tests.Integration
             _emails.Clear();
         }
 
-        public Task SendAsync(string to, string subject, string body)
+        public Task SendAsync(
+            (string name, string address) to,
+            string subject,
+            string body
+        )
         {
             _emails.Add(
                 new Email
@@ -37,7 +41,7 @@ namespace Metabase.Tests.Integration
         }
 
         public record Email(
-            string To,
+            (string name, string address) To,
             string Subject,
             string Body
         );

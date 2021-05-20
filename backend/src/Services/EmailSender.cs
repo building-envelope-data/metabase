@@ -24,7 +24,7 @@ namespace Metabase.Services
         }
 
         public Task SendAsync(
-            string to,
+            (string name, string address) to,
             string subject,
             string body
         )
@@ -32,7 +32,6 @@ namespace Metabase.Services
             _logger.LogDebug($"About to send email to `{to}` with subject `{subject}` and body `{body}`");
             var message = new MimeMessage();
             message.From.Add(
-                // TODO What shall we use here?
                 new MailboxAddress(
                     "Metabase",
                     "metabase@buildingenvelopedata.org"
@@ -40,8 +39,8 @@ namespace Metabase.Services
             );
             message.To.Add(
                 new MailboxAddress(
-                    "", // TODO Add name of recipient.
-                    to
+                    to.name,
+                    to.address
                 )
             );
             message.Subject = subject;
