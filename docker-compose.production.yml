@@ -31,7 +31,7 @@ services:
     # For all configuration options see
     # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
     volumes:
-      - email_data:/smtp4dev
+      - emails:/smtp4dev
     environment:
       - ServerOptions__BasePath=/email
       - ServerOptions__HostName=${HOST}
@@ -98,5 +98,5 @@ services:
 
 volumes:
   data:
-  email_data:
+  emails:
   backend_logs:

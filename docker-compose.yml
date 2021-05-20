@@ -37,7 +37,7 @@ services:
       # Imap server
       # - 143:143
     volumes:
-      - email_data:/smtp4dev
+      - emails:/smtp4dev
     environment:
       - ServerOptions__BasePath=/email
       - ServerOptions__HostName=${HOST}
@@ -153,6 +153,6 @@ services:
 
 volumes:
   data:
-  email_data:
+  emails:
   # backend_node_modules:
   frontend_node_modules:
