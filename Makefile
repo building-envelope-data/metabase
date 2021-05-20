@@ -3,12 +3,10 @@
 
 include .env
 
-name = metabase
-
 docker_compose = \
 	docker-compose \
 		--file docker-compose.yml \
-		--project-name ${name}
+		--project-name ${NAME}
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
@@ -18,8 +16,8 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name : ## Print value of variable `name`
-	@echo ${name}
+name : ## Print value of variable `${NAME}`
+	@echo ${NAME}
 .PHONY : name
 
 # ----------------------------- #
@@ -57,7 +55,7 @@ remove : ## Remove stopped containers
 
 remove-data : ## Remove data volumes
 	docker volume rm \
-		${name}_data
+		${NAME}_data
 .PHONY : remove-data
 
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
@@ -166,13 +164,13 @@ jwt-certificates : ## Create JWT encryption and signing certificates if necessar
 	docker build \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user) \
-		--tag ${name}_bootstrap \
+		--tag ${NAME}_bootstrap \
 		--file ./backend/Dockerfile-bootstrap \
 		./backend
 	docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/backend",target=/app \
-		${name}_bootstrap \
+		${NAME}_bootstrap \
 		ash -cx " \
 			dotnet-script \
 				create-certificates.csx \
