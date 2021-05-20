@@ -27,6 +27,7 @@ services:
       - ./secrets:/run/secrets:ro
 
   email: # https://hub.docker.com/r/rnwood/smtp4dev
+    restart: always
     image: rnwood/smtp4dev:v3.1
     # For all configuration options see
     # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
