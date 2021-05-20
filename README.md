@@ -9,31 +9,34 @@
    [Z shell, aka, `zsh`](https://www.zsh.org/),
    or shiny new
    [`fish`](https://fishshell.com/).
-2. Install [Git](https://git-scm.com/) by running
+1. Install [Git](https://git-scm.com/) by running
    `sudo apt install git-all` on [Debian](https://www.debian.org/)-based
    distributions like [Ubuntu](https://ubuntu.com/), or
    `sudo dnf install git` on [Fedora](https://getfedora.org/) and closely-related
    [RPM-Package-Manager](https://rpm.org/)-based distributions like
    [CentOS](https://www.centos.org/). For further information see
    [Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
-3. Clone the source code by running
+1. Clone the source code by running
    `git clone git@github.com:ise621/metabase.git` and navigate
    into the new directory `metabase` by running `cd metabase`.
-4. Prepare your environment by running `cp .env.sample .env`,
+1. Prepare your environment by running `cp .env.sample .env`,
    `cp frontend/.env.local.sample frontend/.env.local`, and adding the line
    `127.0.0.1 local.buildingenvelopedata.org` to your `/etc/hosts` file.
-5. Install [Docker Desktop](https://www.docker.com/products/docker-desktop), and
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop), and
    [GNU Make](https://www.gnu.org/software/make/).
-6. List all GNU Make targets by running `make help`.
-7. Generate and trust a self-signed certificate authority and SSL certificates
+1. List all GNU Make targets by running `make help`.
+1. Generate and trust a self-signed certificate authority and SSL certificates
    by running `make ssl`.
-8. Generate JSON Web Token (JWT) encryption and signing certificates by running
+1. Generate JSON Web Token (JWT) encryption and signing certificates by running
    `make jwt-certificates`.
-9. Start all services and follow their logs by running `make up logs`.
-10. To see the web frontend navigate to
-   `https://local.buildingenvelopedata.org:4041` in your web browser and to see
+1. Start all services and follow their logs by running `make up logs`.
+1. To see the web frontend navigate to
+   `https://local.buildingenvelopedata.org:4041` in your web browser, to see
    the GraphQL API navigate to
-   `https://local.buildingenvelopedata.org:4041/graphql/`.
+   `https://local.buildingenvelopedata.org:4041/graphql/`, and to see sent
+   emails navigate to
+   `https://local.buildingenvelopedata.org:4041/email/` (and in case this
+   address does not work use `http://localhost:4042`).
 
 In another shell
 1. Drop into `ash` with the working directory `/app`, which is mounted to the
@@ -59,12 +62,13 @@ The same works for frontend containers by running `make shellf`.
      git clone git@github.com:ise621/metabase.git ./${environment}
    done
    ```
-1. For each of the two environments staging and production
-   1. Prepare the environment in both clones more or less as detailed above
-      replacing dummy passwords by newly generated ones, for example, by running
-      `openssl rand -base64 32`,
-      and adding the variable `NAME` to `.env` with the value
-      `metabase_staging` or `metabase_production`.
+1. For each of the two environments staging and production referred to by
+   `${environment}` below:
+   1. Change into the clone `${environment}` by running `cd /app/${environment}`.
+   1. Prepare the environment by running `cp .env.${environment}.sample .env`,
+      `cp frontend/.env.local.sample frontend/.env.local`, and by replacing
+      dummy passwords in the copies by newly generated ones, where random
+      passwords may be generated running `openssl rand -base64 32`.
    1. Prepare PostgreSQL by generating new password files by running
       `make --file Makefile.production postgres_passwords`
       and creating the database by running
@@ -101,7 +105,12 @@ The same works for frontend containers by running `make shellf`.
 1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
    running `cd ./machine && make deploy && cd ..` and test whether everything
    works as expected and if that is the case, repeat all stages but this one in
-   the directory `/app/production` (instead of `/app/staging`).
+   the directory `/app/production` (instead of `/app/staging`). Note that in
+   the staging environment sent emails can be viewed in the web browser under
+   `https://staging.buildingenvelopedata.org/email/` and emails to addresses in
+   the variable `RELAY_ALLOWED_EMAILS` in the `.env` file are delivered to the
+   respective inboxes (the variable's value is a comma separated list of email
+   addresses).
 
 For information on using Docker in production see
 [Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)

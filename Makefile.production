@@ -16,7 +16,7 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name : ## Print value of variable `name`
+name : ## Print value of variable `${NAME}`
 	@echo ${NAME}
 .PHONY : name
 

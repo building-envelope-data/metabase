@@ -4,6 +4,10 @@ namespace Metabase.Services
 {
     public interface IEmailSender
     {
-        Task SendEmailAsync(string address, string subject, string message);
+        public Task SendAsync(
+            (string name, string address) to,
+            string subject,
+            string body
+        );
     }
 }

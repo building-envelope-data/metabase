@@ -14,9 +14,11 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task LoggedInUser_ResendsUserEmailVerification()
         {
             // Arrange
+            var name = "John Doe";
             var email = "john.doe@ise.fraunhofer.de";
             var password = DefaultPassword;
             await RegisterAndConfirmAndLoginUser(
+                name: name,
                 email: email,
                 password: password
                 ).ConfigureAwait(false);
@@ -31,9 +33,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                  )
                 );
             EmailsShouldContainSingle(
-                address: email,
+                to: (name, email),
                 subject: "Confirm your email",
-                messageRegEx: @"^Please confirm your email address by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+\.$"
+                bodyRegEx: @"^Please confirm your email address by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+\.$"
                 );
         }
 

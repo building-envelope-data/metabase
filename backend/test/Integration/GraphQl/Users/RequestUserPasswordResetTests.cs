@@ -13,8 +13,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ExistingAndConfirmedEmailAddress_RequestsUserPasswordReset()
         {
             // Arrange
+            var name = "John Doe";
             var email = "john.doe@ise.fraunhofer.de";
-            await RegisterAndConfirmUser(email: email).ConfigureAwait(false);
+            await RegisterAndConfirmUser(
+                name: name,
+                email: email
+                ).ConfigureAwait(false);
             EmailSender.Clear();
             // Act
             var response = await RequestUserPasswordReset(
@@ -23,9 +27,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Assert
             Snapshot.Match(response);
             EmailsShouldContainSingle(
-                address: email,
+                to: (name, email),
                 subject: "Reset password",
-                messageRegEx: @"^Please reset your password by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
+                bodyRegEx: @"^Please reset your password by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
                 );
         }
 

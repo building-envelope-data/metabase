@@ -25,6 +25,28 @@ services:
     volumes:
       - data:/var/lib/postgresql/data
 
+  email: # https://hub.docker.com/r/rnwood/smtp4dev
+    image: rnwood/smtp4dev:v3.1
+    # For all configuration options see
+    # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
+    ports:
+      # Web interface
+      - ${EMAIL_PORT}:80
+      # SMTP server
+      # - 25:25
+      # Imap server
+      # - 143:143
+    volumes:
+      - emails:/smtp4dev
+    environment:
+      - ServerOptions__BasePath=/email
+      - ServerOptions__HostName=${HOST}
+      - ServerOptions__Database=database.db
+      - ServerOptions__NumberOfMessagesToKeep=100
+      - ServerOptions__NumberOfSessionsToKeep=100
+      - ServerOptions__TlsMode=StartTls
+      - ServerOptions__TlsCertificate=
+
   backend:
     build:
       context: ./backend
@@ -67,6 +89,8 @@ services:
       - XBASE_Host=https://${HOST}:${HTTPS_PORT}
       - XBASE_JsonWebToken__EncryptionCertificatePassword=${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD}
       - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
+      - XBASE_Email__SmtpHost=${SMTP_HOST}
+      - XBASE_Email__SmtpPort=${SMTP_PORT}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
@@ -78,6 +102,7 @@ services:
       # - ${LBNL_HOST}:host-gateway
     depends_on:
       - database
+      - email
 
   frontend:
     build:
@@ -124,8 +149,10 @@ services:
     depends_on:
       - frontend
       - backend
+      - email
 
 volumes:
   data:
+  emails:
   # backend_node_modules:
   frontend_node_modules:

@@ -21,7 +21,6 @@ namespace Metabase.Tests.Integration
     {
         protected CustomWebApplicationFactory Factory { get; }
         protected CollectingEmailSender EmailSender { get => Factory.EmailSender; }
-        protected CollectingSmsSender SmsSender { get => Factory.SmsSender; }
         protected HttpClient HttpClient { get; }
         public const string DefaultName = "John Doe";
         public const string DefaultEmail = "john.doe@ise.fraunhofer.de";
@@ -137,7 +136,7 @@ namespace Metabase.Tests.Integration
         protected string ExtractConfirmationCodeFromEmail()
         {
             return Regex.Match(
-                EmailSender.Emails.Single().Message,
+                EmailSender.Emails.Single().Body,
                 @"confirmationCode=(?<confirmationCode>\w+)"
                 )
                 .Groups["confirmationCode"]
@@ -149,7 +148,7 @@ namespace Metabase.Tests.Integration
         protected string ExtractResetCodeFromEmail()
         {
             return Regex.Match(
-                EmailSender.Emails.Single().Message,
+                EmailSender.Emails.Single().Body,
                 @"resetCode=(?<resetCode>\w+)"
                 )
                 .Groups["resetCode"]
@@ -174,12 +173,14 @@ namespace Metabase.Tests.Integration
         }
 
         protected async Task<Guid> RegisterAndConfirmUser(
+            string name = DefaultName,
             string email = DefaultEmail,
             string password = DefaultPassword
         )
         {
             var uuid =
                 await RegisterUserReturningUuid(
+                    name: name,
                     email: email,
                     password: password
                     ).ConfigureAwait(false);
@@ -207,12 +208,14 @@ namespace Metabase.Tests.Integration
         // }
 
         protected async Task<Guid> RegisterAndConfirmAndLoginUser(
+            string name = DefaultName,
             string email = DefaultEmail,
             string password = DefaultPassword
         )
         {
             var uuid =
                 await RegisterAndConfirmUser(
+                    name: name,
                     email: email,
                     password: password
                     ).ConfigureAwait(false);
@@ -474,27 +477,16 @@ namespace Metabase.Tests.Integration
         }
 
         protected void EmailsShouldContainSingle(
-            string address,
+            (string name, string address) to,
             string subject,
-            string messageRegEx
+            string bodyRegEx
         )
         {
             EmailSender.Emails.Should().ContainSingle();
             var email = EmailSender.Emails.First();
-            email.Address.Should().Be(address);
+            email.To.Should().Be(to);
             email.Subject.Should().Be(subject);
-            email.Message.Should().MatchRegex(messageRegEx);
-        }
-
-        protected void SmsesShouldContainSingle(
-            string number,
-            string messageRegEx
-        )
-        {
-            SmsSender.Smses.Should().ContainSingle();
-            var sms = SmsSender.Smses.First();
-            sms.Number.Should().Be(number);
-            sms.Message.Should().MatchRegex(messageRegEx);
+            email.Body.Should().MatchRegex(bodyRegEx);
         }
 
         private static HttpContent MakeJsonHttpContent<TContent>(

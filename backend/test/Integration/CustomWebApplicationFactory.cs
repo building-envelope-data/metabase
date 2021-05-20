@@ -19,12 +19,10 @@ namespace Metabase.Tests.Integration
       : WebApplicationFactory<Startup>
     {
         public CollectingEmailSender EmailSender { get; }
-        public CollectingSmsSender SmsSender { get; }
 
         public CustomWebApplicationFactory()
         {
             EmailSender = new CollectingEmailSender();
-            SmsSender = new CollectingSmsSender();
             Do(
                 services =>
                     SetUpDatabase(services.GetRequiredService<Data.ApplicationDbContext>())
@@ -89,16 +87,6 @@ namespace Metabase.Tests.Integration
                         serviceCollection.Remove(emailSenderServiceDescriptor);
                     }
                     serviceCollection.AddTransient<Services.IEmailSender>(_ => EmailSender);
-                    // Configure `ISmsSender`
-                    var smsSenderServiceDescriptor =
-                    serviceCollection.SingleOrDefault(d =>
-                     d.ServiceType == typeof(Services.ISmsSender)
-                        );
-                    if (smsSenderServiceDescriptor is not null)
-                    {
-                        serviceCollection.Remove(smsSenderServiceDescriptor);
-                    }
-                    serviceCollection.AddTransient<Services.ISmsSender>(_ => SmsSender);
                 }
             );
         }
