@@ -31,13 +31,21 @@ services:
     # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
     ports:
       # Web interface
-      - 5000:80
+      - ${EMAIL_PORT}:80
       # SMTP server
       # - 25:25
       # Imap server
       # - 143:143
+    volumes:
+      - email_data:/smtp4dev
     environment:
       - ServerOptions__BasePath=/email
+      - ServerOptions__HostName=${HOST}
+      - ServerOptions__Database=database.db
+      - ServerOptions__NumberOfMessagesToKeep=100
+      - ServerOptions__NumberOfSessionsToKeep=100
+      - ServerOptions__TlsMode=StartTls
+      - ServerOptions__TlsCertificate=
 
   backend:
     build:
@@ -141,8 +149,10 @@ services:
     depends_on:
       - frontend
       - backend
+      - email
 
 volumes:
   data:
+  email_data:
   # backend_node_modules:
   frontend_node_modules:
