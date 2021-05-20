@@ -38,6 +38,10 @@ upstream frontend {
   server frontend:8080;
 }
 
+upstream email {
+  server email:80;
+}
+
 server {
   listen                    *:80;
 
@@ -81,6 +85,11 @@ server {
 
   location /health {
     proxy_pass http://backend;
+    limit_req  zone=one burst=1 nodelay;
+  }
+
+  location /email {
+    proxy_pass http://email;
     limit_req  zone=one burst=1 nodelay;
   }
 
