@@ -107,7 +107,10 @@ The same works for frontend containers by running `make shellf`.
    works as expected and if that is the case, repeat all stages but this one in
    the directory `/app/production` (instead of `/app/staging`). Note that in
    the staging environment sent emails can be viewed in the web browser under
-   `https://staging.buildingenvelopedata.org/email/`.
+   `https://staging.buildingenvelopedata.org/email/` and emails to addresses in
+   the variable `RELAY_ALLOWED_EMAILS` in the `.env` file are delivered to the
+   respective inboxes (the variable's value is a comma separated list of email
+   addresses).
 
 For information on using Docker in production see
 [Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)
