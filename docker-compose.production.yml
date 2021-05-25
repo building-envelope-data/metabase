@@ -51,6 +51,7 @@ services:
       context: ./backend
       dockerfile: ./Dockerfile-production
     # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#command-line
+    # command: ["dotnet", "App.dll", "/Serilog:MinimumLevel:Default=Debug", "/Serilog:MinimumLevel:Microsoft=Debug", "/Serilog:MinimumLevel:Microsoft.Hosting.Lifetime=Debug", "/Serilog:MinimumLevel:Override:Microsoft=Debug", "/Serilog:MinimumLevel:Override:Microsoft.AspNetCore=Debug", "/Serilog:MinimumLevel:Override:System=Debug"]
     command: ["dotnet", "App.dll"]
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:8080
