@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System.IO;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Compact;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 
 namespace Metabase
@@ -66,9 +67,10 @@ namespace Metabase
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithProperty("Environment", environment)
-                .WriteTo.Console()
+                .WriteTo.Console(new RenderedCompactJsonFormatter())
                 .WriteTo.File(
-                    "./logs/seri.log",
+                    path: "./logs/seri.log",
+                    formatter: new RenderedCompactJsonFormatter(),
                     fileSizeLimitBytes: 1073741824, // 1 GB
                     retainedFileCountLimit: 31,
                     rollingInterval: RollingInterval.Day,
