@@ -69,8 +69,8 @@ namespace Metabase
                 .Enrich.WithProperty("Environment", environment)
                 .WriteTo.Console(new RenderedCompactJsonFormatter())
                 .WriteTo.File(
-                    path: "./logs/seri.log",
-                    formatter: new RenderedCompactJsonFormatter(),
+                    formatter: new CompactJsonFormatter(),
+                    path: "./logs/serilog.json",
                     fileSizeLimitBytes: 1073741824, // 1 GB
                     retainedFileCountLimit: 31,
                     rollingInterval: RollingInterval.Day,
