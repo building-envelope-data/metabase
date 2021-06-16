@@ -85,12 +85,12 @@ server {
 
   location /health {
     proxy_pass http://backend;
-    limit_req  zone=one burst=1 nodelay;
+    limit_req  zone=one burst=20 nodelay;
   }
 
   location /email {
     proxy_pass http://email;
-    limit_req  zone=one burst=1 nodelay;
+    limit_req  zone=one burst=20 nodelay;
   }
 
   error_page 503 @maintenance;
