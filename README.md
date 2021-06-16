@@ -35,8 +35,7 @@
    the GraphQL API navigate to
    `https://local.buildingenvelopedata.org:4041/graphql/`, and to see sent
    emails navigate to
-   `https://local.buildingenvelopedata.org:4041/email/` (and in case this
-   address does not work use `http://localhost:4042`).
+   `https://local.buildingenvelopedata.org:4041/email/`.
 
 In another shell
 1. Drop into `ash` with the working directory `/app`, which is mounted to the

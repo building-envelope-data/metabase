@@ -29,9 +29,9 @@ services:
     image: rnwood/smtp4dev:v3.1
     # For all configuration options see
     # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
-    ports:
+    # ports:
       # Web interface
-      - ${EMAIL_PORT}:80
+      # - 4042:80
       # SMTP server
       # - 25:25
       # Imap server
