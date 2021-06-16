@@ -102,7 +102,7 @@ server {
     proxy_pass http://email;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
-    limit_req  zone=one burst=10 nodelay;
+    limit_req  zone=one burst=20 nodelay;
   }
 
   error_page 503 @maintenance;
