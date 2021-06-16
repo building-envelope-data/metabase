@@ -39,7 +39,7 @@ services:
       - ServerOptions__Database=database.db
       - ServerOptions__NumberOfMessagesToKeep=100
       - ServerOptions__NumberOfSessionsToKeep=100
-      - ServerOptions__TlsMode=StartTls
+      - ServerOptions__TlsMode=None
       - ServerOptions__TlsCertificate=
       - RelayOptions__SmtpServer=${RELAY_SMTP_HOST}
       - RelayOptions__SmtpPort=${RELAY_SMTP_PORT}

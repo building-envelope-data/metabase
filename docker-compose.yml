@@ -44,7 +44,7 @@ services:
       - ServerOptions__Database=database.db
       - ServerOptions__NumberOfMessagesToKeep=100
       - ServerOptions__NumberOfSessionsToKeep=100
-      - ServerOptions__TlsMode=StartTls
+      - ServerOptions__TlsMode=None
       - ServerOptions__TlsCertificate=
 
   backend:

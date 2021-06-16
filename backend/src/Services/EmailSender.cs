@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using MimeKit;
 
@@ -53,7 +54,7 @@ namespace Metabase.Services
                 client.Connect(
                     _smtpHost,
                     _smtpPort,
-                    useSsl: false
+                    SecureSocketOptions.StartTlsWhenAvailable
                 );
                 // client.Authenticate("joey", "password");
                 client.Send(message);
