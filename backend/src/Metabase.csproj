@@ -17,8 +17,8 @@
   <ItemGroup>
     <!-- <PackageReference Include="AutoMapper" Version="10.1.1" /> -->
     <!-- <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" /> -->
-    <PackageReference Include="MailKit" Version="2.12.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.5">
+    <PackageReference Include="MailKit" Version="2.13.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -27,23 +27,23 @@
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
-    <PackageReference Include="HotChocolate" Version="11.1.0" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.1.0" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.1.0" />
-    <PackageReference Include="HotChocolate.Data" Version="11.1.0" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="11.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.5" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
+    <PackageReference Include="HotChocolate" Version="11.3.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.3.0" />
+    <PackageReference Include="HotChocolate.Data" Version="11.3.0" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="11.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.7" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
     <!-- <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="5.0.0" /> -->
     <!-- <PackageReference Include="StyleCop.Analyzers" Version="1.1.118"> -->
     <!--   <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets> -->
     <!--   <PrivateAssets>all</PrivateAssets> -->
     <!-- </PackageReference> -->
-    <PackageReference Include="OpenIddict.AspNetCore" Version="3.0.3" />
-    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.0.3" />
-    <PackageReference Include="OpenIddict.Quartz" Version="3.0.3" />
+    <PackageReference Include="OpenIddict.AspNetCore" Version="3.0.5" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.0.5" />
+    <PackageReference Include="OpenIddict.Quartz" Version="3.0.5" />
     <PackageReference Include="Quartz" Version="3.3.2" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.3.2" />
   </ItemGroup>

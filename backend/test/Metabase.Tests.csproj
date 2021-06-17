@@ -11,11 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonPath.Net" Version="0.1.5" />
+    <PackageReference Include="JsonPath.Net" Version="0.1.6" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="IdentityModel" Version="5.1.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.5" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.7" />
     <PackageReference Include="Snapshooter.Xunit" Version="0.6.2" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.console" Version="2.4.1" />
