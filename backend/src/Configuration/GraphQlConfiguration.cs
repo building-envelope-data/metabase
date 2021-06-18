@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
+using Microsoft.Extensions.Logging;
 
 namespace Metabase.Configuration
 {
@@ -71,6 +72,11 @@ namespace Metabase.Configuration
                           httpContext.User = authenticateResult.Principal;
                       }
                   })
+                  .AddDiagnosticEventListener(_ =>
+                      new GraphQl.LoggingDiagnosticEventListener(
+                          _.GetApplicationService<ILogger<GraphQl.LoggingDiagnosticEventListener>>()
+                      )
+                  )
                   .AddQueryType(d => d.Name(nameof(GraphQl.Query)))
                       .AddType<GraphQl.Components.ComponentQueries>()
                       .AddType<GraphQl.DataFormats.DataFormatQueries>()
