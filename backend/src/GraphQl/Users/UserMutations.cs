@@ -8,9 +8,11 @@ using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Array = System.Array;
 
 // Note that `SignInManager` relies on cookies, see https://github.com/aspnet/Identity/issues/1421. For its source code see https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/SignInManager.cs
@@ -595,6 +597,67 @@ namespace Metabase.GraphQl.Users
                 }
             }
             return new ResetUserPasswordPayload();
+        }
+
+        [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<DeleteUserPayload> DeleteUserAsync(
+            DeleteUserInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager
+            )
+        {
+            if (!await UserAuthorization.IsAuthorizedToDeleteUsers(
+                    claimsPrincipal,
+                    userManager
+                ).ConfigureAwait(false)
+            )
+            {
+                return new DeleteUserPayload(
+                    new DeleteUserError(
+                      DeleteUserErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to delete user with identifier {input.UserId}.",
+                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                      )
+                    );
+            }
+            var user =
+                await userManager.Users.SingleOrDefaultAsync(_ =>
+                    _.Id == input.UserId
+                ).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new DeleteUserPayload(
+                    new DeleteUserError(
+                      DeleteUserErrorCode.UNKNOWN_USER,
+                      $"Unable to load user with identifier {input.UserId}.",
+                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                      )
+                    );
+            }
+            var identityResult = await userManager.DeleteAsync(user).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<DeleteUserError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Add(
+                        // TODO Which errors can occur here?
+                        error.Code switch
+                        {
+                            _ =>
+                        new DeleteUserError(
+                            DeleteUserErrorCode.UNKNOWN,
+                            $"{error.Description} (error code `{error.Code}`)",
+                            new[] { nameof(input) }
+                            )
+                        }
+                    );
+                }
+                return new DeleteUserPayload(user, errors);
+            }
+            return new DeleteUserPayload(user);
         }
 
         ////////////////////

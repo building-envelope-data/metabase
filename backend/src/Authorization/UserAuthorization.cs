@@ -7,6 +7,17 @@ namespace Metabase.Authorization
 {
     public static class UserAuthorization
     {
+        public static async Task<bool> IsAuthorizedToDeleteUsers(
+            ClaimsPrincipal claimsPrincipal,
+            UserManager<Data.User> userManager
+        )
+        {
+            return await userManager.IsInRoleAsync(
+                    await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false),
+                    Data.Role.Administrator
+                ).ConfigureAwait(false);
+        }
+
         public static async Task<bool> IsAuthorizedToManageUser(
             ClaimsPrincipal claimsPrincipal,
             Guid userId,

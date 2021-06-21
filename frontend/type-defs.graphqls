@@ -267,6 +267,17 @@ type DeletePersonalUserDataPayload {
   user: User
 }
 
+type DeleteUserError {
+  code: DeleteUserErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type DeleteUserPayload {
+  errors: [DeleteUserError!]
+  user: User
+}
+
 type DisableUserTwoFactorAuthenticationError {
   code: DisableUserTwoFactorAuthenticationErrorCode!
   message: String!
@@ -508,6 +519,7 @@ type Mutation {
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser") @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   enableUserTwoFactorAuthenticator(input: EnableUserTwoFactorAuthenticatorInput!): EnableUserTwoFactorAuthenticatorPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
@@ -1056,6 +1068,10 @@ input DeletePersonalUserDataInput {
   password: String
 }
 
+input DeleteUserInput {
+  userId: Uuid!
+}
+
 input EnableUserTwoFactorAuthenticatorInput {
   verificationCode: String!
 }
@@ -1437,6 +1453,11 @@ enum DeletePersonalUserDataErrorCode {
   UNKNOWN_USER
   MISSING_PASSWORD
   INCORRECT_PASSWORD
+}
+
+enum DeleteUserErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
 }
 
 enum DisableUserTwoFactorAuthenticationErrorCode {

@@ -13,6 +13,12 @@ query Users {
   }
 }
 
+query User($uuid: Uuid!) {
+  user(uuid: $uuid) {
+    ...UserPartial
+  }
+}
+
 mutation RegisterUser(
   $name: String!
   $email: String!
@@ -100,6 +106,16 @@ mutation ResetUserPassword(
       resetCode: $resetCode
     }
   ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteUser($userId: Uuid!) {
+  deleteUser(input: { userId: $userId }) {
     errors {
       code
       message
