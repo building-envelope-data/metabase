@@ -23,7 +23,13 @@ namespace Metabase.Authorization
             {
                 return true;
             }
-            // TODO Allow admins to manage other users.
+            if (await userManager.IsInRoleAsync(
+                    loggedInUser,
+                    Data.Role.Administrator
+                ).ConfigureAwait(false))
+            {
+                return true;
+            }
             return false;
         }
     }
