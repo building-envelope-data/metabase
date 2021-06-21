@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.Data
 {
@@ -19,8 +20,27 @@ namespace Metabase.Data
             logger.LogDebug("Seeding the database");
             var environment = services.GetRequiredService<IWebHostEnvironment>();
             var appSettings = services.GetRequiredService<AppSettings>();
+            await CreateRolesAsync(services, logger).ConfigureAwait(false);
             await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
             await RegisterScopesAsync(services, logger, appSettings).ConfigureAwait(false);
+        }
+
+        private static async Task CreateRolesAsync(
+            IServiceProvider services,
+            ILogger<DbSeeder> logger
+        )
+        {
+            var manager = services.GetRequiredService<RoleManager<Role>>();
+            foreach (var role in Role.All)
+            {
+                if (await manager.FindByNameAsync(role).ConfigureAwait(false) is null)
+                {
+                    logger.LogDebug($"Creating role {role}");
+                    await manager.CreateAsync(
+                        new Role(role)
+                        ).ConfigureAwait(false);
+                }
+            }
         }
 
         private static async Task RegisterApplicationsAsync(
