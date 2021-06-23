@@ -17,6 +17,8 @@
   <ItemGroup>
     <!-- <PackageReference Include="AutoMapper" Version="10.1.1" /> -->
     <!-- <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" /> -->
+    <PackageReference Include="GraphQL.Client" Version="3.2.4" />
+    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="3.2.4" />
     <PackageReference Include="MailKit" Version="2.13.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -51,5 +53,11 @@
   <ItemGroup>
     <EmbeddedResource Include="./jwt-encryption-certificate.pfx" />
     <EmbeddedResource Include="./jwt-signing-certificate.pfx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="**/*.graphql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
