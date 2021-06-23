@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.DataX
 {
-    public class GetHttpsResource {
+    public sealed class GetHttpsResource {
       public string Description { get; set; }
       public string HashValue { get; set; }
       public Uri Locator { get; set; }

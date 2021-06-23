@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.DataX
 {
-    public class CalorimetricDataConnection {
+    public sealed class CalorimetricDataConnection {
       public List<CalorimetricDataEdge> Edges { get; set; }
       public List<CalorimetricData> Nodes { get; set; }
       public PageInfo PageInfo { get; set; }

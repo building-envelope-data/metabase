@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.DataX
 {
-    public class PhotovoltaicDataEdge {
+    public sealed class PhotovoltaicDataEdge {
       public string Cursor { get; set; }
       public PhotovoltaicData Node { get; set; }
     }

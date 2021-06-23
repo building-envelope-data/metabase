@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.DataX
 {
-    public class HygrothermalDataPropositionInput {
-      public Guid ComponentId { get; set; }
-      public List<HygrothermalDataPropositionInput> And { get; set; }
-      public HygrothermalDataPropositionInput Not { get; set; }
-      public List<HygrothermalDataPropositionInput> Or { get; set; }
-    }
+  public record HygrothermalDataPropositionInput(
+      Guid? ComponentId,
+      List<HygrothermalDataPropositionInput>? And,
+      HygrothermalDataPropositionInput? Not,
+      List<HygrothermalDataPropositionInput>? Or
+      );
 }

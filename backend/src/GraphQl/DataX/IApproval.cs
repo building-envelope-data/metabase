@@ -1,9 +1,10 @@
 using System;
-using System.Collections.Generic;
+using HotChocolate.Types;
 
 namespace Metabase.GraphQl.DataX
 {
-    public interface Approval {
+    [InterfaceType("Approval")]
+    public interface IApproval {
       DateTime Timestamp { get; set; }
       string Signature { get; set; }
       string KeyFingerprint { get; set; }

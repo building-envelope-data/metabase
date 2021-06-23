@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.DataX
 {
-    public class ResponseApproval : Approval {
+    public sealed class ResponseApproval : IApproval {
       public DateTime Timestamp { get; set; }
       public string Signature { get; set; }
       public string KeyFingerprint { get; set; }
