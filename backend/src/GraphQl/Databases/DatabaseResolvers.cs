@@ -21,20 +21,6 @@ namespace Metabase.GraphQl.Databases
             _logger = logger;
         }
 
-        public string Hi(
-            Data.Database database,
-            DataX.OpticalDataPropositionInput where,
-            DateTime? timestamp,
-            string? locale,
-            int? first,
-            string? after,
-            int? last,
-            string? before,
-            CancellationToken cancellationToken
-        ) {
-            return "";
-        }
-
         public Task<DataX.DataConnection?> GetAllOpticalDataAsync(
             Data.Database database,
             DataX.OpticalDataPropositionInput where,
