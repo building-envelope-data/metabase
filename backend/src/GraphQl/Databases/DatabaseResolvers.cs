@@ -21,7 +21,37 @@ namespace Metabase.GraphQl.Databases
             _logger = logger;
         }
 
-        public Task<DataX.DataConnection?> GetAllOpticalDataAsync(
+        public async Task<DataX.OpticalData?> GetOpticalDataAsync(
+            Data.Database database,
+            Guid id,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+        )
+        {
+            return await QueryDatabase<DataX.OpticalData>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "OpticalDataFields.graphql",
+                            "OpticalData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        id,
+                        timestamp,
+                        locale,
+                    },
+                    operationName: "OpticalData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        public async Task<DataX.DataConnection?> GetAllOpticalDataAsync(
             Data.Database database,
             DataX.OpticalDataPropositionInput where,
             DateTime? timestamp,
@@ -33,10 +63,17 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
             )
         {
-            return QueryDatabase<DataX.DataConnection>(
+            return await QueryDatabase<DataX.DataConnection>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: File.ReadAllText("GraphQl/Databases/AllOpticalData.graphql"),
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "OpticalDataFields.graphql",
+                            "PageInfoFields.graphql",
+                            "AllOpticalData.graphql"
+                        }
+                    ).ConfigureAwait(false),
                     variables: new
                     {
                         where,
@@ -50,6 +87,20 @@ namespace Metabase.GraphQl.Databases
                     operationName: "AllOpticalData"
                 ),
                 cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        private static async Task<string> ConstructQuery(
+            string[] fileNames
+        )
+        {
+            return string.Join(
+                Environment.NewLine,
+                await Task.WhenAll(
+                    fileNames.Select(fileName =>
+                        File.ReadAllTextAsync($"GraphQl/Databases/Queries/{fileName}")
+                    )
+                ).ConfigureAwait(false)
             );
         }
 
