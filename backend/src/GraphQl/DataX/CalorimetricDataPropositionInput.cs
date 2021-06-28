@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.DataX
 {
   public record CalorimetricDataPropositionInput(
-      Guid? ComponentId,
+      UuidPropositionInput? ComponentId,
       List<CalorimetricDataPropositionInput>? And,
       FloatPropositionInput? GValue,
       CalorimetricDataPropositionInput? Not,
