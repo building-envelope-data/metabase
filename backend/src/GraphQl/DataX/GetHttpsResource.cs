@@ -8,6 +8,6 @@ namespace Metabase.GraphQl.DataX
       public string HashValue { get; set; }
       public Uri Locator { get; set; }
       public Guid FormatId { get; set; }
-      public List<FileMetaInformation> ArchivedFilesMetaInformation { get; set; }
+      // public List<FileMetaInformation> ArchivedFilesMetaInformation { get; set; }
     }
 }

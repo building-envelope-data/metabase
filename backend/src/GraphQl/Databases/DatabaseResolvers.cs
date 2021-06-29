@@ -1,4 +1,5 @@
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using GraphQL.Client.Serializer.SystemTextJson;
 using System;
 using HotChocolate;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Metabase.GraphQl.Databases
 {
@@ -51,7 +54,17 @@ namespace Metabase.GraphQl.Databases
             ).ConfigureAwait(false);
         }
 
-        public async Task<DataX.DataConnection?> GetAllOpticalDataAsync(
+        private record AllDataVariables(
+            DataX.OpticalDataPropositionInput Where
+            // DateTime? Timestamp,
+            // string? Locale,
+            // /*TODO add `u`*/int? First,
+            // string? After,
+            // /*TODO add `u`*/int? Last,
+            // string? Before
+        );
+
+        public async Task<DataX.OpticalDataConnection?> GetAllOpticalDataAsync(
             Data.Database database,
             DataX.OpticalDataPropositionInput where,
             DateTime? timestamp,
@@ -63,7 +76,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
             )
         {
-            return await QueryDatabase<DataX.DataConnection>(
+            return await QueryDatabase<DataX.OpticalDataConnection>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -74,16 +87,15 @@ namespace Metabase.GraphQl.Databases
                             "AllOpticalData.graphql"
                         }
                     ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where,
-                        timestamp,
-                        locale,
-                        first,
-                        after,
-                        last,
-                        before
-                    },
+                    variables: new AllDataVariables(
+                        where
+                        // timestamp,
+                        // locale,
+                        // first,
+                        // after,
+                        // last,
+                        // before
+                    ),
                     operationName: "AllOpticalData"
                 ),
                 cancellationToken
@@ -135,7 +147,17 @@ namespace Metabase.GraphQl.Databases
                     _logger.LogWarning($"Accessing the database {database.Locator} failed with status code {response.StatusCode} and errors {(response.Errors is null ? "" : string.Join(", ", response.Errors.Select(GraphQlErrorToString)))}");
                     return null;
                 }
+                Console.WriteLine("bbbbbbbbbbb");
+                Console.WriteLine(database.Locator);
+                Console.WriteLine(response.StatusCode);
+                Console.WriteLine(response.Errors?.ToString());
+                Console.WriteLine(JsonSerializer.Serialize(response.Data));
                 return response.Data;
+            }
+            catch (GraphQLHttpRequestException e)
+            {
+                _logger.LogError(e, $"Message: {e.Message}; Response Headers: {e.ResponseHeaders}; Content: {e.Content}");
+                throw;
             }
             catch (Exception e)
             {
@@ -164,7 +186,21 @@ namespace Metabase.GraphQl.Databases
         {
             return new GraphQLHttpClient(
                 endPoint: database.Locator.AbsoluteUri,
-                serializer: new SystemTextJsonSerializer()
+                serializer: new SystemTextJsonSerializer(
+                    new JsonSerializerOptions
+                    {
+                        Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false)},
+                        NumberHandling = JsonNumberHandling.Strict,
+                        PropertyNameCaseInsensitive = false,
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                        ReadCommentHandling = JsonCommentHandling.Disallow,
+                        IncludeFields = false,
+                        IgnoreReadOnlyProperties = false,
+                        IgnoreReadOnlyFields = true,
+                        IgnoreNullValues = false
+                    }
+                    //.SetupImmutableConverter()
+                    )
                 );
         }
     }

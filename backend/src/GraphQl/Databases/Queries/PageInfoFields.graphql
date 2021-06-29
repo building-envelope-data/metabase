@@ -1,7 +1,7 @@
-fragment PageInfoFields on PageInfo {
-  hasNextPage
-  hasPreviousPage
-  startCursor
-  endCursor
-  count
-}
+# fragment PageInfoFields on PageInfo {
+#   hasNextPage
+#   hasPreviousPage
+#   startCursor
+#   endCursor
+#   count
+# }

@@ -1,87 +1,87 @@
 fragment DataFields on Data {
-  id
+  # id
   uuid
   timestamp
   componentId
   name
-  description
-  warnings
-  creatorId
-  createdAt
+  # description
+  # warnings
+  # creatorId
+  # createdAt
   appliedMethod {
     methodId
-    arguments {
-      name
-      value
-    }
-    sources {
-      name
-      value {
-        dataId
-        dataTimestamp
-        dataKind
-        databaseId
-      }
-    }
+    # arguments {
+    #   name
+    #   value
+    # }
+    # sources {
+    #   name
+    #   value {
+    #     dataId
+    #     dataTimestamp
+    #     dataKind
+    #     databaseId
+    #   }
+    # }
   }
-  approvals {
-    timestamp
-    signature
-    keyFingerprint
-    query
-    response
-    approverId
-  }
-  resources {
-    description
-    hashValue
-    locator
-    formatId
-    archivedFilesMetaInformation {
-      path
-      formatId
-    }
-  }
+  # approvals {
+  #   timestamp
+  #   signature
+  #   keyFingerprint
+  #   query
+  #   response
+  #   approverId
+  # }
+  # resources {
+  #   description
+  #   hashValue
+  #   locator
+  #   formatId
+  #   archivedFilesMetaInformation {
+  #     path
+  #     formatId
+  #   }
+  # }
   resourceTree {
     root {
-      vertexId
+      # vertexId
       value {
         description
         hashValue
         locator
         formatId
-        archivedFilesMetaInformation {
-          path
-          formatId
-        }
+        # archivedFilesMetaInformation {
+        #   path
+        #   formatId
+        # }
       }
     }
-    nonRootVertices {
-      vertexId
-      parentId
-      value {
-        description
-        hashValue
-        locator
-        formatId
-        archivedFilesMetaInformation {
-          path
-          formatId
-        }
-      }
-      appliedConversionMethod {
-        methodId
-        arguments {
-          name
-          value
-        }
-        sourceName
-      }
-    }
+    # nonRootVertices {
+    #   vertexId
+    #   parentId
+    #   value {
+    #     description
+    #     hashValue
+    #     locator
+    #     formatId
+    #     archivedFilesMetaInformation {
+    #       path
+    #       formatId
+    #     }
+    #   }
+    #   appliedConversionMethod {
+    #     methodId
+    #     arguments {
+    #       name
+    #       value
+    #     }
+    #     sourceName
+    #   }
+    # }
   }
-  approval {
-    signature
-    keyFingerprint
-  }
-  locale
+  # approval {
+  #   signature
+  #   keyFingerprint
+  # }
+  # locale
 }

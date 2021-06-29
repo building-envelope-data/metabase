@@ -1,34 +1,32 @@
 query AllOpticalData(
   $where: OpticalDataPropositionInput!
-  $timestamp: DateTime
-  $locale: Locale
-  $first: NonNegativeInt
-  $after: Cursor
-  $last: NonNegativeInt
-  $before: Cursor
-) {
-  allOpticalData(
-    where: $where
-    timestamp: $timestamp
-    locale: $locale
-    first: $first
-    after: $after
-    last: $last
-    before: $before
-  ) {
-    edges {
-      cursor
-      node {
-        ...OpticalDataFields
-      }
-    }
+) # $timestamp: DateTime
+# $locale: Locale
+# $first: NonNegativeInt
+# $after: Cursor
+# $last: NonNegativeInt
+# $before: Cursor
+{
+  allOpticalData(where: $where) # timestamp: $timestamp
+  # locale: $locale
+  # first: $first
+  # after: $after
+  # last: $last
+  # before: $before
+  {
+    # edges {
+    #   cursor
+    #   node {
+    #     ...OpticalDataFields
+    #   }
+    # }
     nodes {
       ...OpticalDataFields
     }
-    totalCount
-    pageInfo {
-      ...PageInfoFields
-    }
-    timestamp
+    # totalCount
+    # pageInfo {
+    #   ...PageInfoFields
+    # }
+    # timestamp
   }
 }
