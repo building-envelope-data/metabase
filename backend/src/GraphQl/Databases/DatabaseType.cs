@@ -24,6 +24,17 @@ namespace Metabase.GraphQl.Databases
                 .Field(t => t.OperatorId).Ignore();
             ConfigureDataField(
                 descriptor,
+                "data",
+                _ => _.GetDataAsync(default!, default!, default!, default!, default!)
+            );
+            // TODO Why is the following not working?
+            // ConfigureAllDataField<DataX.DataPropositionInput>(
+            //     descriptor,
+            //     "allData",
+            //     _ => _.GetAllDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
+            // );
+            ConfigureDataField(
+                descriptor,
                 "opticalData",
                 _ => _.GetOpticalDataAsync(default!, default!, default!, default!, default!)
             );
@@ -31,6 +42,36 @@ namespace Metabase.GraphQl.Databases
                 descriptor,
                 "allOpticalData",
                 _ => _.GetAllOpticalDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
+            );
+            ConfigureDataField(
+                descriptor,
+                "hygrothermalData",
+                _ => _.GetHygrothermalDataAsync(default!, default!, default!, default!, default!)
+            );
+            ConfigureAllDataField<DataX.HygrothermalDataPropositionInput>(
+                descriptor,
+                "allHygrothermalData",
+                _ => _.GetAllHygrothermalDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
+            );
+            ConfigureDataField(
+                descriptor,
+                "calorimetricData",
+                _ => _.GetCalorimetricDataAsync(default!, default!, default!, default!, default!)
+            );
+            ConfigureAllDataField<DataX.CalorimetricDataPropositionInput>(
+                descriptor,
+                "allCalorimetricData",
+                _ => _.GetAllCalorimetricDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
+            );
+            ConfigureDataField(
+                descriptor,
+                "photovoltaicData",
+                _ => _.GetPhotovoltaicDataAsync(default!, default!, default!, default!, default!)
+            );
+            ConfigureAllDataField<DataX.PhotovoltaicDataPropositionInput>(
+                descriptor,
+                "allPhotovoltaicData",
+                _ => _.GetAllPhotovoltaicDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
             );
         }
 

@@ -24,6 +24,35 @@ namespace Metabase.GraphQl.Databases
             _logger = logger;
         }
 
+        public async Task<DataX.Data?> GetDataAsync(
+            Data.Database database,
+            Guid id,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+        )
+        {
+            return await QueryDatabase<DataX.Data>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "Data.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        id,
+                        timestamp,
+                        locale,
+                    },
+                    operationName: "Data"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+
         public async Task<DataX.OpticalData?> GetOpticalDataAsync(
             Data.Database database,
             Guid id,
@@ -54,15 +83,132 @@ namespace Metabase.GraphQl.Databases
             ).ConfigureAwait(false);
         }
 
-        private record AllDataVariables(
-            DataX.OpticalDataPropositionInput Where
-            // DateTime? Timestamp,
-            // string? Locale,
-            // /*TODO add `u`*/int? First,
-            // string? After,
-            // /*TODO add `u`*/int? Last,
-            // string? Before
-        );
+        public async Task<DataX.HygrothermalData?> GetHygrothermalDataAsync(
+            Data.Database database,
+            Guid id,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+        )
+        {
+            return await QueryDatabase<DataX.HygrothermalData>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "HygrothermalDataFields.graphql",
+                            "HygrothermalData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        id,
+                        timestamp,
+                        locale,
+                    },
+                    operationName: "HygrothermalData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        public async Task<DataX.CalorimetricData?> GetCalorimetricDataAsync(
+            Data.Database database,
+            Guid id,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+        )
+        {
+            return await QueryDatabase<DataX.CalorimetricData>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "CalorimetricDataFields.graphql",
+                            "CalorimetricData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        id,
+                        timestamp,
+                        locale,
+                    },
+                    operationName: "CalorimetricData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        public async Task<DataX.PhotovoltaicData?> GetPhotovoltaicDataAsync(
+            Data.Database database,
+            Guid id,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+        )
+        {
+            return await QueryDatabase<DataX.PhotovoltaicData>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "PhotovoltaicDataFields.graphql",
+                            "PhotovoltaicData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        id,
+                        timestamp,
+                        locale,
+                    },
+                    operationName: "PhotovoltaicData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        public async Task<DataX.DataConnection?> GetAllDataAsync(
+            Data.Database database,
+            DataX.DataPropositionInput where,
+            DateTime? timestamp,
+            string? locale,
+            /*TODO add `u`*/int? first,
+            string? after,
+            /*TODO add `u`*/int? last,
+            string? before,
+            CancellationToken cancellationToken
+            )
+        {
+            return await QueryDatabase<DataX.DataConnection>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "PageInfoFields.graphql",
+                            "AllData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new {
+                        where
+                        // timestamp,
+                        // locale,
+                        // first,
+                        // after,
+                        // last,
+                        // before
+                    },
+                    operationName: "AllData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
 
         public async Task<DataX.OpticalDataConnection?> GetAllOpticalDataAsync(
             Data.Database database,
@@ -87,7 +233,7 @@ namespace Metabase.GraphQl.Databases
                             "AllOpticalData.graphql"
                         }
                     ).ConfigureAwait(false),
-                    variables: new AllDataVariables(
+                    variables: new {
                         where
                         // timestamp,
                         // locale,
@@ -95,8 +241,122 @@ namespace Metabase.GraphQl.Databases
                         // after,
                         // last,
                         // before
-                    ),
+                    },
                     operationName: "AllOpticalData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        public async Task<DataX.HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
+            Data.Database database,
+            DataX.HygrothermalDataPropositionInput where,
+            DateTime? timestamp,
+            string? locale,
+            /*TODO add `u`*/int? first,
+            string? after,
+            /*TODO add `u`*/int? last,
+            string? before,
+            CancellationToken cancellationToken
+            )
+        {
+            return await QueryDatabase<DataX.HygrothermalDataConnection>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "HygrothermalDataFields.graphql",
+                            "PageInfoFields.graphql",
+                            "AllHygrothermalData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new {
+                        where
+                        // timestamp,
+                        // locale,
+                        // first,
+                        // after,
+                        // last,
+                        // before
+                    },
+                    operationName: "AllHygrothermalData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        public async Task<DataX.CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
+            Data.Database database,
+            DataX.CalorimetricDataPropositionInput where,
+            DateTime? timestamp,
+            string? locale,
+            /*TODO add `u`*/int? first,
+            string? after,
+            /*TODO add `u`*/int? last,
+            string? before,
+            CancellationToken cancellationToken
+            )
+        {
+            return await QueryDatabase<DataX.CalorimetricDataConnection>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "CalorimetricDataFields.graphql",
+                            "PageInfoFields.graphql",
+                            "AllCalorimetricData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new {
+                        where
+                        // timestamp,
+                        // locale,
+                        // first,
+                        // after,
+                        // last,
+                        // before
+                    },
+                    operationName: "AllCalorimetricData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        public async Task<DataX.PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
+            Data.Database database,
+            DataX.PhotovoltaicDataPropositionInput where,
+            DateTime? timestamp,
+            string? locale,
+            /*TODO add `u`*/int? first,
+            string? after,
+            /*TODO add `u`*/int? last,
+            string? before,
+            CancellationToken cancellationToken
+            )
+        {
+            return await QueryDatabase<DataX.PhotovoltaicDataConnection>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "DataFields.graphql",
+                            "PhotovoltaicDataFields.graphql",
+                            "PageInfoFields.graphql",
+                            "AllPhotovoltaicData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new {
+                        where
+                        // timestamp,
+                        // locale,
+                        // first,
+                        // after,
+                        // last,
+                        // before
+                    },
+                    operationName: "AllPhotovoltaicData"
                 ),
                 cancellationToken
             ).ConfigureAwait(false);
