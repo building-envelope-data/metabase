@@ -407,11 +407,6 @@ namespace Metabase.GraphQl.Databases
                     _logger.LogWarning($"Accessing the database {database.Locator} failed with status code {response.StatusCode} and errors {(response.Errors is null ? "" : string.Join(", ", response.Errors.Select(GraphQlErrorToString)))}");
                     return null;
                 }
-                Console.WriteLine("bbbbbbbbbbb");
-                Console.WriteLine(database.Locator);
-                Console.WriteLine(response.StatusCode);
-                Console.WriteLine(response.Errors?.ToString());
-                Console.WriteLine(JsonSerializer.Serialize(response.Data));
                 return response.Data;
             }
             catch (GraphQLHttpRequestException e)
