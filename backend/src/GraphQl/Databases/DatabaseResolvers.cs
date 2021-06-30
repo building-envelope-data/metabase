@@ -10,17 +10,36 @@ using System;
 using HotChocolate;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace Metabase.GraphQl.Databases
 {
     public class DatabaseResolvers
     {
+        private static readonly JsonSerializerOptions SerializerOptions =
+                new()
+                {
+                    Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false)},
+                    NumberHandling = JsonNumberHandling.Strict,
+                    PropertyNameCaseInsensitive = false,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    ReadCommentHandling = JsonCommentHandling.Disallow,
+                    IncludeFields = false,
+                    IgnoreReadOnlyProperties = false,
+                    IgnoreReadOnlyFields = true,
+                    IgnoreNullValues = false
+                }; //.SetupImmutableConverter();
+
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<DatabaseResolvers> _logger;
 
         public DatabaseResolvers(
+            IHttpClientFactory httpClientFactory,
             ILogger<DatabaseResolvers> logger
         )
         {
+            _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
 
@@ -210,6 +229,11 @@ namespace Metabase.GraphQl.Databases
             ).ConfigureAwait(false);
         }
 
+        private sealed class AllOpticalDataData
+        {
+            public DataX.OpticalDataConnection AllOpticalData { get; set; } = default!;
+        }
+
         public async Task<DataX.OpticalDataConnection?> GetAllOpticalDataAsync(
             Data.Database database,
             DataX.OpticalDataPropositionInput where,
@@ -222,7 +246,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
             )
         {
-            return await QueryDatabase<DataX.OpticalDataConnection>(
+            return (await QueryDatabase<AllOpticalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -245,7 +269,8 @@ namespace Metabase.GraphQl.Databases
                     operationName: "AllOpticalData"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.AllOpticalData;
         }
 
         public async Task<DataX.HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
@@ -385,31 +410,56 @@ namespace Metabase.GraphQl.Databases
             )
           where TGraphQlResponse : class
         {
-            // https://github.com/graphql-dotnet/graphql-client/blob/47b4abfbfda507a91b5c62a18a9789bd3a8079c7/src/GraphQL.Client/GraphQLHttpResponse.cs
             try
             {
-                var response =
-                  (
-                   await CreateGraphQlClient(database)
-                   .SendQueryAsync<TGraphQlResponse>(
-                     request,
-                     cancellationToken
-                     )
-                   .ConfigureAwait(false)
-                   )
-                  .AsGraphQLHttpResponse();
-                if (
-                    response.StatusCode != System.Net.HttpStatusCode.OK ||
-                    response.Errors?.Length >= 1 // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-value-types#lifted-operators
-                    )
+                // https://github.com/graphql-dotnet/graphql-client/blob/47b4abfbfda507a91b5c62a18a9789bd3a8079c7/src/GraphQL.Client/GraphQLHttpResponse.cs
+                // var response =
+                //   (
+                //    await CreateGraphQlClient(database)
+                //    .SendQueryAsync<TGraphQlResponse>(
+                //      request,
+                //      cancellationToken
+                //      )
+                //    .ConfigureAwait(false)
+                //    )
+                //   .AsGraphQLHttpResponse();
+                var client = _httpClientFactory.CreateClient();
+                var httpResponseMessage =
+                    await QueryGraphQl(
+                        client,
+                        database.Locator,
+                        request
+                    ).ConfigureAwait(false);
+                if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    // TODO Report errors to client? With error code `ErrorCodes.GraphQlRequestFailed`?
-                    _logger.LogWarning($"Accessing the database {database.Locator} failed with status code {response.StatusCode} and errors {(response.Errors is null ? "" : string.Join(", ", response.Errors.Select(GraphQlErrorToString)))}");
+                    _logger.LogWarning($"Accessing the database {database.Locator} failed with status code {response.StatusCode}.");
                     return null;
                 }
-                return response.Data;
+                using var graphQlResponseStream =
+                    await httpResponseMessage.Content
+                    .ReadAsStreamAsync(cancellationToken)
+                    .ConfigureAwait(false);
+                var deserializedGraphQlResponse =
+                    await JsonSerializer.DeserializeAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>(
+                        graphQlResponseStream,
+                        SerializerOptions,
+                        cancellationToken
+                    ).ConfigureAwait(false);
+                if (deserializedGraphQlResponse is null)
+                {
+                    // TODO add details
+                    _logger.LogWarning($"Failed to deserialize the GraphQL response received from the database {database.Locator}.");
+                }
+                // TODO What are `deserializedGraphQlResponse#Extensions`?
+                if (deserializedGraphQlResponse?.Errors?.Length >= 1)
+                {
+                    // TODO Report errors to client? With error code `ErrorCodes.GraphQlRequestFailed`?
+                    // TODO add details
+                    _logger.LogWarning($"Accessing the database {database.Locator} failed with errors {JsonSerializer.Serialize(deserializedGraphQlResponse?.Errors)}");
+                }
+                return deserializedGraphQlResponse?.Data;
             }
-            catch (GraphQLHttpRequestException e)
+            catch (GraphQLHttpRequestException e) // TODO Catch Http exceptions instead ...
             {
                 _logger.LogError(e, $"Message: {e.Message}; Response Headers: {e.ResponseHeaders}; Content: {e.Content}");
                 throw;
@@ -421,13 +471,6 @@ namespace Metabase.GraphQl.Databases
             }
         }
 
-        private static string GraphQlErrorToString(
-            GraphQL.GraphQLError error
-            )
-        {
-            return $"GraphQlError(message: {error.Message}, locations: [{(error.Locations is null ? "" : string.Join(", ", error.Locations.Select(GraphQlLocationToString)))}], path: [{(error.Path is null ? "" : string.Join(", ", error.Path))}], extensions: {(error.Extensions is null ? "[]" : string.Join(", ", error.Extensions))})";
-        }
-
         private static string GraphQlLocationToString(
             GraphQL.GraphQLLocation location
             )
@@ -435,28 +478,43 @@ namespace Metabase.GraphQl.Databases
             return $"{location.Line}:{location.Column}";
         }
 
-        private static GraphQLHttpClient CreateGraphQlClient(
-            Data.Database database
+        // private GraphQLHttpClient CreateGraphQlClient(
+        //     Data.Database database
+        //     )
+        // {
+        //     return new GraphQLHttpClient(
+        //         new GraphQLHttpClientOptions { EndPoint = database.Locator },
+        //         new SystemTextJsonSerializer(SerializerOptions),
+        //         _httpClientFactory.CreateClient()
+        //         );
+        // }
+
+        private static Task<HttpResponseMessage> QueryGraphQl(
+            HttpClient httpClient,
+            Uri locator,
+            GraphQL.GraphQLRequest request
             )
         {
-            return new GraphQLHttpClient(
-                endPoint: database.Locator.AbsoluteUri,
-                serializer: new SystemTextJsonSerializer(
-                    new JsonSerializerOptions
-                    {
-                        Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false)},
-                        NumberHandling = JsonNumberHandling.Strict,
-                        PropertyNameCaseInsensitive = false,
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        ReadCommentHandling = JsonCommentHandling.Disallow,
-                        IncludeFields = false,
-                        IgnoreReadOnlyProperties = false,
-                        IgnoreReadOnlyFields = true,
-                        IgnoreNullValues = false
-                    }
-                    //.SetupImmutableConverter()
-                    )
+            return httpClient.PostAsync(
+                locator,
+                MakeJsonHttpContent(request)
+            );
+        }
+
+        private static HttpContent MakeJsonHttpContent<TContent>(
+            TContent content
+            )
+        {
+            var result =
+              new ByteArrayContent(
+                JsonSerializer.SerializeToUtf8Bytes(
+                  content,
+                  SerializerOptions
+                  )
                 );
+            result.Headers.ContentType =
+              new MediaTypeHeaderValue("application/json");
+            return result;
         }
     }
 }
