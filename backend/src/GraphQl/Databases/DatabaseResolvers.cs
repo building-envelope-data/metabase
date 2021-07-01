@@ -1,18 +1,14 @@
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.Client.Http;
 using Microsoft.Extensions.Logging;
 using GraphQL.Client.Serializer.SystemTextJson;
 using System;
-using HotChocolate;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 
 namespace Metabase.GraphQl.Databases
 {
@@ -522,9 +518,14 @@ namespace Metabase.GraphQl.Databases
                 _logger.LogError(e, $"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request)}.");
                 throw;
             }
+            catch (JsonException e)
+            {
+                _logger.LogError(e, $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request)}. The details given are {JsonSerializer.Serialize(e)}.");
+                throw;
+            }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request)}.");
+                _logger.LogError(e, $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request)} or failed to deserialize the response.");
                 throw;
             }
         }
