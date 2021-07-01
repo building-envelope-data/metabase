@@ -481,16 +481,17 @@ namespace Metabase.GraphQl.Databases
                 //    .ConfigureAwait(false)
                 //    )
                 //   .AsGraphQLHttpResponse();
-                var client = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var httpResponseMessage =
-                    await QueryGraphQl(
-                        client,
+                    await httpClient.PostAsJsonAsync(
                         database.Locator,
-                        request
+                        request,
+                        SerializerOptions,
+                        cancellationToken
                     ).ConfigureAwait(false);
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    _logger.LogWarning($"Failed with status code {response.StatusCode} to query the database {database.Locator} for {JsonSerializer.Serialize(request)}.");
+                    _logger.LogWarning($"Failed with status code {httpResponseMessage.StatusCode} to query the database {database.Locator} for {JsonSerializer.Serialize(request)}.");
                     return null;
                 }
                 using var graphQlResponseStream =
@@ -544,33 +545,5 @@ namespace Metabase.GraphQl.Databases
         //         _httpClientFactory.CreateClient()
         //         );
         // }
-
-        private static Task<HttpResponseMessage> QueryGraphQl(
-            HttpClient httpClient,
-            Uri locator,
-            GraphQL.GraphQLRequest request
-            )
-        {
-            return httpClient.PostAsync(
-                locator,
-                MakeJsonHttpContent(request)
-            );
-        }
-
-        private static HttpContent MakeJsonHttpContent<TContent>(
-            TContent content
-            )
-        {
-            var result =
-              new ByteArrayContent(
-                JsonSerializer.SerializeToUtf8Bytes(
-                  content,
-                  SerializerOptions
-                  )
-                );
-            result.Headers.ContentType =
-              new MediaTypeHeaderValue("application/json");
-            return result;
-        }
     }
 }
