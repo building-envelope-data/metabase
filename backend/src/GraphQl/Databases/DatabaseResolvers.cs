@@ -21,7 +21,7 @@ namespace Metabase.GraphQl.Databases
         private static readonly JsonSerializerOptions SerializerOptions =
                 new()
                 {
-                    Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false)},
+                    Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false) },
                     NumberHandling = JsonNumberHandling.Strict,
                     PropertyNameCaseInsensitive = false,
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
