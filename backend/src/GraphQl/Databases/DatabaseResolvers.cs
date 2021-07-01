@@ -12,6 +12,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace Metabase.GraphQl.Databases
 {
@@ -43,6 +44,11 @@ namespace Metabase.GraphQl.Databases
             _logger = logger;
         }
 
+        private sealed class DataData
+        {
+            public DataX.Data Data { get; set; } = default!;
+        }
+
         public async Task<DataX.Data?> GetDataAsync(
             Data.Database database,
             Guid id,
@@ -51,7 +57,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
         )
         {
-            return await QueryDatabase<DataX.Data>(
+            return (await QueryDatabase<DataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -69,7 +75,13 @@ namespace Metabase.GraphQl.Databases
                     operationName: "Data"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.Data;
+        }
+
+        private sealed class OpticalDataData
+        {
+            public DataX.OpticalData OpticalData { get; set; } = default!;
         }
 
         public async Task<DataX.OpticalData?> GetOpticalDataAsync(
@@ -80,7 +92,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
         )
         {
-            return await QueryDatabase<DataX.OpticalData>(
+            return (await QueryDatabase<OpticalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -99,7 +111,13 @@ namespace Metabase.GraphQl.Databases
                     operationName: "OpticalData"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.OpticalData;
+        }
+
+        private sealed class HygrothermalDataData
+        {
+            public DataX.HygrothermalData HygrothermalData { get; set; } = default!;
         }
 
         public async Task<DataX.HygrothermalData?> GetHygrothermalDataAsync(
@@ -110,7 +128,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
         )
         {
-            return await QueryDatabase<DataX.HygrothermalData>(
+            return (await QueryDatabase<HygrothermalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -129,7 +147,13 @@ namespace Metabase.GraphQl.Databases
                     operationName: "HygrothermalData"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.HygrothermalData;
+        }
+
+        private sealed class CalorimetricDataData
+        {
+            public DataX.CalorimetricData CalorimetricData { get; set; } = default!;
         }
 
         public async Task<DataX.CalorimetricData?> GetCalorimetricDataAsync(
@@ -140,7 +164,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
         )
         {
-            return await QueryDatabase<DataX.CalorimetricData>(
+            return (await QueryDatabase<CalorimetricDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -159,7 +183,13 @@ namespace Metabase.GraphQl.Databases
                     operationName: "CalorimetricData"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.CalorimetricData;
+        }
+
+        private sealed class PhotovoltaicDataData
+        {
+            public DataX.PhotovoltaicData PhotovoltaicData { get; set; } = default!;
         }
 
         public async Task<DataX.PhotovoltaicData?> GetPhotovoltaicDataAsync(
@@ -170,7 +200,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
         )
         {
-            return await QueryDatabase<DataX.PhotovoltaicData>(
+            return (await QueryDatabase<PhotovoltaicDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -189,7 +219,13 @@ namespace Metabase.GraphQl.Databases
                     operationName: "PhotovoltaicData"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.PhotovoltaicData;
+        }
+
+        private sealed class AllDataData
+        {
+            public DataX.DataConnection AllData { get; set; } = default!;
         }
 
         public async Task<DataX.DataConnection?> GetAllDataAsync(
@@ -204,7 +240,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
             )
         {
-            return await QueryDatabase<DataX.DataConnection>(
+            return (await QueryDatabase<AllDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -226,7 +262,8 @@ namespace Metabase.GraphQl.Databases
                     operationName: "AllData"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.AllData;
         }
 
         private sealed class AllOpticalDataData
@@ -273,6 +310,12 @@ namespace Metabase.GraphQl.Databases
             )?.AllOpticalData;
         }
 
+        private sealed class AllHygrothermalDataData
+        {
+            public DataX.HygrothermalDataConnection AllHygrothermalData { get; set; } = default!;
+        }
+
+
         public async Task<DataX.HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
             Data.Database database,
             DataX.HygrothermalDataPropositionInput where,
@@ -285,7 +328,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
             )
         {
-            return await QueryDatabase<DataX.HygrothermalDataConnection>(
+            return (await QueryDatabase<AllHygrothermalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -308,8 +351,15 @@ namespace Metabase.GraphQl.Databases
                     operationName: "AllHygrothermalData"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.AllHygrothermalData;
         }
+
+        private sealed class AllCalorimetricDataData
+        {
+            public DataX.CalorimetricDataConnection AllCalorimetricData { get; set; } = default!;
+        }
+
 
         public async Task<DataX.CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
             Data.Database database,
@@ -323,7 +373,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
             )
         {
-            return await QueryDatabase<DataX.CalorimetricDataConnection>(
+            return (await QueryDatabase<AllCalorimetricDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -346,8 +396,15 @@ namespace Metabase.GraphQl.Databases
                     operationName: "AllCalorimetricData"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.AllCalorimetricData;
         }
+
+        private sealed class AllPhotovoltaicDataData
+        {
+            public DataX.PhotovoltaicDataConnection AllPhotovoltaicData { get; set; } = default!;
+        }
+
 
         public async Task<DataX.PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
             Data.Database database,
@@ -361,7 +418,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
             )
         {
-            return await QueryDatabase<DataX.PhotovoltaicDataConnection>(
+            return (await QueryDatabase<AllPhotovoltaicDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -384,7 +441,8 @@ namespace Metabase.GraphQl.Databases
                     operationName: "AllPhotovoltaicData"
                 ),
                 cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false)
+            )?.AllPhotovoltaicData;
         }
 
         private static async Task<string> ConstructQuery(
@@ -432,7 +490,7 @@ namespace Metabase.GraphQl.Databases
                     ).ConfigureAwait(false);
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    _logger.LogWarning($"Accessing the database {database.Locator} failed with status code {response.StatusCode}.");
+                    _logger.LogWarning($"Failed with status code {response.StatusCode} to query the database {database.Locator} for {JsonSerializer.Serialize(request)}.");
                     return null;
                 }
                 using var graphQlResponseStream =
@@ -447,15 +505,13 @@ namespace Metabase.GraphQl.Databases
                     ).ConfigureAwait(false);
                 if (deserializedGraphQlResponse is null)
                 {
-                    // TODO add details
-                    _logger.LogWarning($"Failed to deserialize the GraphQL response received from the database {database.Locator}.");
+                    _logger.LogWarning($"Failed to deserialize the GraphQL response received from the database {database.Locator} for {JsonSerializer.Serialize(request)}.");
                 }
                 // TODO What are `deserializedGraphQlResponse#Extensions`?
                 if (deserializedGraphQlResponse?.Errors?.Length >= 1)
                 {
                     // TODO Report errors to client? With error code `ErrorCodes.GraphQlRequestFailed`?
-                    // TODO add details
-                    _logger.LogWarning($"Accessing the database {database.Locator} failed with errors {JsonSerializer.Serialize(deserializedGraphQlResponse?.Errors)}");
+                    _logger.LogWarning($"Failed with errors {JsonSerializer.Serialize(deserializedGraphQlResponse?.Errors)} to query the database {database.Locator} for {JsonSerializer.Serialize(request)}");
                 }
                 return deserializedGraphQlResponse?.Data;
             }
