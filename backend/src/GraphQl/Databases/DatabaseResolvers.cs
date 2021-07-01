@@ -482,7 +482,7 @@ namespace Metabase.GraphQl.Databases
                 //    )
                 //   .AsGraphQLHttpResponse();
                 var httpClient = _httpClientFactory.CreateClient();
-                // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. Why?
+                // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
                 var httpResponseMessage =
                     await httpClient.PostAsync(
                         database.Locator,
@@ -517,14 +517,14 @@ namespace Metabase.GraphQl.Databases
                 }
                 return deserializedGraphQlResponse?.Data;
             }
-            catch (GraphQLHttpRequestException e) // TODO Catch Http exceptions instead ...
+            catch (HttpRequestException e)
             {
-                _logger.LogError(e, $"Message: {e.Message}; Response Headers: {e.ResponseHeaders}; Content: {e.Content}");
+                _logger.LogError(e, $"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request)}.");
                 throw;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, e.Message);
+                _logger.LogError(e, $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request)}.");
                 throw;
             }
         }
@@ -544,6 +544,7 @@ namespace Metabase.GraphQl.Databases
             TContent content
             )
         {
+            // For some reason using `JsonContent.Create<TContent>(content, null, SerializerOptions)` results in status code `BadRequest`.
             var result =
               new ByteArrayContent(
                 JsonSerializer.SerializeToUtf8Bytes(
