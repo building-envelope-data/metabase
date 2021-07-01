@@ -482,11 +482,11 @@ namespace Metabase.GraphQl.Databases
                 //    )
                 //   .AsGraphQLHttpResponse();
                 var httpClient = _httpClientFactory.CreateClient();
+                // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. Why?
                 var httpResponseMessage =
-                    await httpClient.PostAsJsonAsync(
+                    await httpClient.PostAsync(
                         database.Locator,
-                        request,
-                        SerializerOptions,
+                        MakeJsonHttpContent(request),
                         cancellationToken
                     ).ConfigureAwait(false);
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
@@ -494,6 +494,7 @@ namespace Metabase.GraphQl.Databases
                     _logger.LogWarning($"Failed with status code {httpResponseMessage.StatusCode} to query the database {database.Locator} for {JsonSerializer.Serialize(request)}.");
                     return null;
                 }
+                // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
                 using var graphQlResponseStream =
                     await httpResponseMessage.Content
                     .ReadAsStreamAsync(cancellationToken)
@@ -528,13 +529,6 @@ namespace Metabase.GraphQl.Databases
             }
         }
 
-        private static string GraphQlLocationToString(
-            GraphQL.GraphQLLocation location
-            )
-        {
-            return $"{location.Line}:{location.Column}";
-        }
-
         // private GraphQLHttpClient CreateGraphQlClient(
         //     Data.Database database
         //     )
@@ -545,5 +539,21 @@ namespace Metabase.GraphQl.Databases
         //         _httpClientFactory.CreateClient()
         //         );
         // }
+
+        private static HttpContent MakeJsonHttpContent<TContent>(
+            TContent content
+            )
+        {
+            var result =
+              new ByteArrayContent(
+                JsonSerializer.SerializeToUtf8Bytes(
+                  content,
+                  SerializerOptions
+                  )
+                );
+            result.Headers.ContentType =
+              new MediaTypeHeaderValue("application/json");
+            return result;
+        }
     }
 }
