@@ -505,10 +505,8 @@ namespace Metabase.GraphQl.Databases
                 {
                     _logger.LogWarning($"Failed to deserialize the GraphQL response received from the database {database.Locator} for {JsonSerializer.Serialize(request)}.");
                 }
-                // TODO What are `deserializedGraphQlResponse#Extensions`?
                 if (deserializedGraphQlResponse?.Errors?.Length >= 1)
                 {
-                    // TODO Report errors to client? With error code `ErrorCodes.GraphQlRequestFailed`?
                     _logger.LogWarning($"Failed with errors {JsonSerializer.Serialize(deserializedGraphQlResponse?.Errors)} to query the database {database.Locator} for {JsonSerializer.Serialize(request)}");
                 }
                 return deserializedGraphQlResponse?.Data;
