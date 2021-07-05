@@ -1,19 +1,21 @@
 query AllCalorimetricData(
-  $where: CalorimetricDataPropositionInput! # $timestamp: DateTime
-) # $locale: Locale
-# $first: NonNegativeInt
-# $after: Cursor
-# $last: NonNegativeInt
-# $before: Cursor
-{
+  $where: CalorimetricDataPropositionInput!
+  $timestamp: DateTime
+  $locale: Locale
+  $first: NonNegativeInt
+  $after: Cursor
+  $last: NonNegativeInt
+  $before: Cursor
+) {
   allCalorimetricData(
-    where: $where # timestamp: $timestamp
-  ) # locale: $locale
-  # first: $first
-  # after: $after
-  # last: $last
-  # before: $before
-  {
+    where: $where
+    timestamp: $timestamp
+    locale: $locale
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+  ) {
     # edges {
     #   cursor
     #   node {

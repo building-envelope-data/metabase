@@ -1,5 +1,5 @@
-query PhtovoltaicData($id: Uuid!, $timestamp: DateTime, $locale: Locale) {
+query PhotovoltaicData($id: Uuid!, $timestamp: DateTime, $locale: Locale) {
   photovoltaicData(id: $id, timestamp: $timestamp, locale: $locale) {
-    ...PhtovoltaicDataFields
+    ...PhotovoltaicDataFields
   }
 }

@@ -1,15 +1,21 @@
 query AllData(
-  $where: DataPropositionInput! # $timestamp: DateTime # $locale: Locale # $first: NonNegativeInt
-) # $after: Cursor
-# $last: NonNegativeInt
-# $before: Cursor
-{
+  $where: DataPropositionInput!
+  $timestamp: DateTime
+  $locale: Locale
+  $first: NonNegativeInt
+  $after: Cursor
+  $last: NonNegativeInt
+  $before: Cursor
+) {
   allData(
-    where: $where # timestamp: $timestamp # locale: $locale # first: $first
-  ) # after: $after
-  # last: $last
-  # before: $before
-  {
+    where: $where
+    timestamp: $timestamp
+    locale: $locale
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+  ) {
     # edges {
     #   cursor
     #   node {

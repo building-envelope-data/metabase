@@ -1,27 +1,29 @@
-query AllPhtovoltaicData(
-  $where: PhtovoltaicDataPropositionInput! # $timestamp: DateTime
-) # $locale: Locale
-# $first: NonNegativeInt
-# $after: Cursor
-# $last: NonNegativeInt
-# $before: Cursor
-{
-  allPhtovoltaicData(
-    where: $where # timestamp: $timestamp
-  ) # locale: $locale
-  # first: $first
-  # after: $after
-  # last: $last
-  # before: $before
-  {
+query AllPhotovoltaicData(
+  $where: PhotovoltaicDataPropositionInput!
+  $timestamp: DateTime
+  $locale: Locale
+  $first: NonNegativeInt
+  $after: Cursor
+  $last: NonNegativeInt
+  $before: Cursor
+) {
+  allPhotovoltaicData(
+    where: $where
+    timestamp: $timestamp
+    locale: $locale
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+  ) {
     # edges {
     #   cursor
     #   node {
-    #     ...PhtovoltaicDataFields
+    #     ...PhotovoltaicDataFields
     #   }
     # }
     nodes {
-      ...PhtovoltaicDataFields
+      ...PhotovoltaicDataFields
     }
     # totalCount
     # pageInfo {
