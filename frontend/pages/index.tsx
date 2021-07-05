@@ -41,7 +41,7 @@ const Index = () => {
     );
   }
 
-  return <Layout>You're not sigend in.</Layout>;
+  return <Layout>You're not signed in.</Layout>;
 };
 
 // export async function getStaticProps() {
