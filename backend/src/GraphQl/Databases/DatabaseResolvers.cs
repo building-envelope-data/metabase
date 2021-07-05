@@ -405,7 +405,6 @@ namespace Metabase.GraphQl.Databases
             public DataX.PhotovoltaicDataConnection AllPhotovoltaicData { get; set; } = default!;
         }
 
-
         public async Task<DataX.PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
             Data.Database database,
             DataX.PhotovoltaicDataPropositionInput where,
@@ -444,6 +443,176 @@ namespace Metabase.GraphQl.Databases
                 cancellationToken
             ).ConfigureAwait(false)
             )?.AllPhotovoltaicData;
+        }
+
+        private sealed class HasDataData
+        {
+            public bool HasData { get; set; }
+        }
+
+        public async Task<bool?> GetHasDataAsync(
+            Data.Database database,
+            DataX.DataPropositionInput where,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+            )
+        {
+            return (await QueryDatabase<HasDataData>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "HasData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale
+                    },
+                    operationName: "HasData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false)
+            )?.HasData;
+        }
+
+        private sealed class HasOpticalDataData
+        {
+            public bool HasOpticalData { get; set; }
+        }
+
+        public async Task<bool?> GetHasOpticalDataAsync(
+            Data.Database database,
+            DataX.DataPropositionInput where,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+            )
+        {
+            return (await QueryDatabase<HasOpticalDataData>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "HasOpticalData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale
+                    },
+                    operationName: "HasOpticalData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false)
+            )?.HasOpticalData;
+        }
+
+        private sealed class HasCalorimetricDataData
+        {
+            public bool HasCalorimetricData { get; set; }
+        }
+
+        public async Task<bool?> GetHasCalorimetricDataAsync(
+            Data.Database database,
+            DataX.DataPropositionInput where,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+            )
+        {
+            return (await QueryDatabase<HasCalorimetricDataData>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "HasCalorimetricData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale
+                    },
+                    operationName: "HasCalorimetricData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false)
+            )?.HasCalorimetricData;
+        }
+
+        private sealed class HasHygrothermalDataData
+        {
+            public bool HasHygrothermalData { get; set; }
+        }
+
+        public async Task<bool?> GetHasHygrothermalDataAsync(
+            Data.Database database,
+            DataX.DataPropositionInput where,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+            )
+        {
+            return (await QueryDatabase<HasHygrothermalDataData>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "HasHygrothermalData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale
+                    },
+                    operationName: "HasHygrothermalData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false)
+            )?.HasHygrothermalData;
+        }
+
+        private sealed class HasPhotovoltaicDataData
+        {
+            public bool HasPhotovoltaicData { get; set; }
+        }
+
+        public async Task<bool?> GetHasPhotovoltaicDataAsync(
+            Data.Database database,
+            DataX.DataPropositionInput where,
+            DateTime? timestamp,
+            string? locale,
+            CancellationToken cancellationToken
+            )
+        {
+            return (await QueryDatabase<HasPhotovoltaicDataData>(
+                database,
+                new GraphQL.GraphQLRequest(
+                    query: await ConstructQuery(
+                        new[] {
+                            "HasPhotovoltaicData.graphql"
+                        }
+                    ).ConfigureAwait(false),
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale
+                    },
+                    operationName: "HasPhotovoltaicData"
+                ),
+                cancellationToken
+            ).ConfigureAwait(false)
+            )?.HasPhotovoltaicData;
         }
 
         private static async Task<string> ConstructQuery(

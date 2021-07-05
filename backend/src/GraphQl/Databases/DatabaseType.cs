@@ -33,6 +33,11 @@ namespace Metabase.GraphQl.Databases
             //     "allData",
             //     _ => _.GetAllDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
             // );
+            ConfigureHasDataField<DataX.DataPropositionInput>(
+                descriptor,
+                "hasData",
+                _ => _.GetHasDataAsync(default!, default!, default!, default!, default!)
+            );
             ConfigureDataField(
                 descriptor,
                 "opticalData",
@@ -42,6 +47,11 @@ namespace Metabase.GraphQl.Databases
                 descriptor,
                 "allOpticalData",
                 _ => _.GetAllOpticalDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
+            );
+            ConfigureHasDataField<DataX.OpticalDataPropositionInput>(
+                descriptor,
+                "hasOpticalData",
+                _ => _.GetHasOpticalDataAsync(default!, default!, default!, default!, default!)
             );
             ConfigureDataField(
                 descriptor,
@@ -53,6 +63,11 @@ namespace Metabase.GraphQl.Databases
                 "allHygrothermalData",
                 _ => _.GetAllHygrothermalDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
             );
+            ConfigureHasDataField<DataX.HygrothermalDataPropositionInput>(
+                descriptor,
+                "hasHygrothermalData",
+                _ => _.GetHasHygrothermalDataAsync(default!, default!, default!, default!, default!)
+            );
             ConfigureDataField(
                 descriptor,
                 "calorimetricData",
@@ -63,6 +78,11 @@ namespace Metabase.GraphQl.Databases
                 "allCalorimetricData",
                 _ => _.GetAllCalorimetricDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
             );
+            ConfigureHasDataField<DataX.CalorimetricDataPropositionInput>(
+                descriptor,
+                "hasCalorimetricData",
+                _ => _.GetHasCalorimetricDataAsync(default!, default!, default!, default!, default!)
+            );
             ConfigureDataField(
                 descriptor,
                 "photovoltaicData",
@@ -72,6 +92,11 @@ namespace Metabase.GraphQl.Databases
                 descriptor,
                 "allPhotovoltaicData",
                 _ => _.GetAllPhotovoltaicDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
+            );
+            ConfigureHasDataField<DataX.PhotovoltaicDataPropositionInput>(
+                descriptor,
+                "hasPhotovoltaicData",
+                _ => _.GetHasPhotovoltaicDataAsync(default!, default!, default!, default!, default!)
             );
         }
 
@@ -104,6 +129,20 @@ namespace Metabase.GraphQl.Databases
                 .Argument("after", _ => _.Type<StringType>())
                 .Argument("last", _ => _.Type</*TODO Unsigned*/IntType>())
                 .Argument("before", _ => _.Type<StringType>())
+                .ResolveWith(resolverMethod);
+        }
+
+        private static void ConfigureHasDataField<TDataPropositionInput>(
+            IObjectTypeDescriptor<Data.Database> descriptor,
+            string fieldName,
+            Expression<Func<DatabaseResolvers, object?>> resolverMethod
+        )
+        {
+            descriptor
+                .Field(fieldName)
+                .Argument("where", _ => _.Type<NonNullType<InputObjectType<TDataPropositionInput>>>())
+                .Argument("timestamp", _ => _.Type<DateTimeType>())
+                .Argument("locale", _ => _.Type<StringType>())
                 .ResolveWith(resolverMethod);
         }
     }
