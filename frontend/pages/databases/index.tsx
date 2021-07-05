@@ -22,6 +22,9 @@ function Index() {
             title: "Name",
             dataIndex: "name",
             key: "name",
+            sorter: (a, b) => a.name.length - b.name.length,
+            sortDirections: ["ascend", "descend", "ascend"],
+            defaultSortOrder: "ascend",
           },
           {
             title: "Description",
@@ -32,6 +35,9 @@ function Index() {
             title: "Locator",
             dataIndex: "locator",
             key: "locator",
+            sorter: (a, b) => a.locator.length - b.locator.length,
+            sortDirections: ["ascend", "descend", "ascend"],
+            defaultSortOrder: "ascend",
             render: (locator) => (
               <Typography.Link href={locator}>{locator}</Typography.Link>
             ),
@@ -40,6 +46,10 @@ function Index() {
             title: "Operator",
             dataIndex: "operator",
             key: "operator",
+            sorter: (a, b) =>
+              a.operator.node.name.length - b.operator.node.name.length,
+            sortDirections: ["ascend", "descend", "ascend"],
+            defaultSortOrder: "ascend",
             render: (operator) => (
               <Link href={paths.institution(operator.node.uuid)}>
                 {operator.node.name}

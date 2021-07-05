@@ -20,6 +20,9 @@ function Index() {
             title: "Name",
             dataIndex: "name",
             key: "name",
+            sorter: (a, b) => a.name.length - b.name.length,
+            sortDirections: ["ascend", "descend", "ascend"],
+            defaultSortOrder: "ascend",
           },
           {
             title: "Description",

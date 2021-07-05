@@ -20,6 +20,9 @@ function Index() {
             title: "Name",
             dataIndex: "name",
             key: "name",
+            sorter: (a, b) => a.name.length - b.name.length,
+            sortDirections: ["ascend", "descend", "ascend"],
+            defaultSortOrder: "ascend",
           },
           {
             title: "Description",
@@ -30,6 +33,9 @@ function Index() {
             title: "Media Type",
             dataIndex: "mediaType",
             key: "mediaType",
+            sorter: (a, b) => a.mediaType.length - b.mediaType.length,
+            sortDirections: ["ascend", "descend", "ascend"],
+            defaultSortOrder: "ascend",
           },
         ]}
         dataSource={data?.dataFormats?.nodes || []}
