@@ -3,15 +3,18 @@ import { Table, message } from "antd";
 import { useUsersQuery } from "../../queries/users.graphql";
 import paths from "../../paths";
 import Link from "next/link";
+import { useEffect } from "react";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Index() {
   const { loading, error, data } = useUsersQuery();
 
-  if (error) {
-    message.error(error);
-  }
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+    }
+  }, [error]);
 
   return (
     <Layout>

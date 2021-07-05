@@ -1,15 +1,18 @@
 import Layout from "../../components/Layout";
 import { Table, message } from "antd";
 import { useDataFormatsQuery } from "../../queries/dataFormats.graphql";
+import { useEffect } from "react";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Index() {
   const { loading, error, data } = useDataFormatsQuery();
 
-  if (error) {
-    message.error(error);
-  }
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+    }
+  }, [error]);
 
   return (
     <Layout>
