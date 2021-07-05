@@ -246,14 +246,15 @@ namespace Metabase.GraphQl.Databases
                             "AllData.graphql"
                         }
                     ).ConfigureAwait(false),
-                    variables: new {
-                        where
-                        // timestamp,
-                        // locale,
-                        // first,
-                        // after,
-                        // last,
-                        // before
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale,
+                        first,
+                        after,
+                        last,
+                        before
                     },
                     operationName: "AllData"
                 ),
@@ -290,14 +291,15 @@ namespace Metabase.GraphQl.Databases
                             "AllOpticalData.graphql"
                         }
                     ).ConfigureAwait(false),
-                    variables: new {
-                        where
-                        // timestamp,
-                        // locale,
-                        // first,
-                        // after,
-                        // last,
-                        // before
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale,
+                        first,
+                        after,
+                        last,
+                        before
                     },
                     operationName: "AllOpticalData"
                 ),
@@ -335,14 +337,15 @@ namespace Metabase.GraphQl.Databases
                             "AllHygrothermalData.graphql"
                         }
                     ).ConfigureAwait(false),
-                    variables: new {
-                        where
-                        // timestamp,
-                        // locale,
-                        // first,
-                        // after,
-                        // last,
-                        // before
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale,
+                        first,
+                        after,
+                        last,
+                        before
                     },
                     operationName: "AllHygrothermalData"
                 ),
@@ -380,14 +383,15 @@ namespace Metabase.GraphQl.Databases
                             "AllCalorimetricData.graphql"
                         }
                     ).ConfigureAwait(false),
-                    variables: new {
-                        where
-                        // timestamp,
-                        // locale,
-                        // first,
-                        // after,
-                        // last,
-                        // before
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale,
+                        first,
+                        after,
+                        last,
+                        before
                     },
                     operationName: "AllCalorimetricData"
                 ),
@@ -425,14 +429,15 @@ namespace Metabase.GraphQl.Databases
                             "AllPhotovoltaicData.graphql"
                         }
                     ).ConfigureAwait(false),
-                    variables: new {
-                        where
-                        // timestamp,
-                        // locale,
-                        // first,
-                        // after,
-                        // last,
-                        // before
+                    variables: new
+                    {
+                        where,
+                        timestamp,
+                        locale,
+                        first,
+                        after,
+                        last,
+                        before
                     },
                     operationName: "AllPhotovoltaicData"
                 ),
