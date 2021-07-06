@@ -107,7 +107,7 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
       <Form
         {...layout}
         form={form}
-        name="basic"
+        name="createComponent"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >

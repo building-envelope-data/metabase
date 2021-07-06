@@ -98,7 +98,7 @@ export const CreateDatabase: React.FunctionComponent<CreateDatabaseProps> = ({
       <Form
         {...layout}
         form={form}
-        name="basic"
+        name="createDatabase"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
