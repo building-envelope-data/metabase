@@ -27,8 +27,8 @@ function Index() {
             key: "name",
             // onFilter: (value, user) =>
             //   typeof value === "string" ? user.name.includes(value) : false,
-            sorter: (a, b) => a.name.length - b.name.length,
-            sortDirections: ["ascend", "descend", "ascend"],
+            sorter: (a, b) => a.name.localeCompare(b.name, "en"),
+            sortDirections: ["ascend", "descend"],
             defaultSortOrder: "ascend",
             render: (name, user, _) => (
               <Link href={paths.user(user.uuid)}>{name}</Link>
@@ -40,7 +40,7 @@ function Index() {
             key: "email",
             sorter: (a, b) =>
               a.email && b.email ? a.email.length - b.email.length : 0,
-            sortDirections: ["ascend", "descend", "ascend"],
+            sortDirections: ["ascend", "descend"],
             defaultSortOrder: "ascend",
           },
         ]}

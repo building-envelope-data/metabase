@@ -25,8 +25,8 @@ function Index() {
             title: "Name",
             dataIndex: "name",
             key: "name",
-            sorter: (a, b) => a.name.length - b.name.length,
-            sortDirections: ["ascend", "descend", "ascend"],
+            sorter: (a, b) => a.name.localeCompare(b.name, "en"),
+            sortDirections: ["ascend", "descend"],
             defaultSortOrder: "ascend",
           },
           {
@@ -38,8 +38,8 @@ function Index() {
             title: "Locator",
             dataIndex: "locator",
             key: "locator",
-            sorter: (a, b) => a.locator.length - b.locator.length,
-            sortDirections: ["ascend", "descend", "ascend"],
+            sorter: (a, b) => a.locator.localeCompare(b.locator, "en"),
+            sortDirections: ["ascend", "descend"],
             defaultSortOrder: "ascend",
             render: (locator) => (
               <Typography.Link href={locator}>{locator}</Typography.Link>
@@ -50,8 +50,8 @@ function Index() {
             dataIndex: "operator",
             key: "operator",
             sorter: (a, b) =>
-              a.operator.node.name.length - b.operator.node.name.length,
-            sortDirections: ["ascend", "descend", "ascend"],
+              a.operator.node.name.localeCompare(b.operator.node.name, "en"),
+            sortDirections: ["ascend", "descend"],
             defaultSortOrder: "ascend",
             render: (operator) => (
               <Link href={paths.institution(operator.node.uuid)}>
