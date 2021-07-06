@@ -42,10 +42,10 @@ namespace Metabase.GraphQl.Databases
 
         private sealed class DataData
         {
-            public DataX.Data Data { get; set; } = default!;
+            public DataX.IData Data { get; set; } = default!;
         }
 
-        public async Task<DataX.Data?> GetDataAsync(
+        public async Task<DataX.IData?> GetDataAsync(
             Data.Database database,
             Guid id,
             DateTime? timestamp,

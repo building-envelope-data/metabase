@@ -23,10 +23,9 @@ namespace Metabase.GraphQl.DataX
       public GetHttpsResourceTree ResourceTree { get; set; }
       // public List<DataApproval> Approvals { get; set; }
       // public ResponseApproval Approval { get; set; }
-      public List<double> NearnormalHemisphericalVisibleTransmittances { get; set; }
 
-      [GraphQLIgnore]
-      [JsonExtensionData]
-      public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+      // [GraphQLIgnore]
+      // [JsonExtensionData]
+      // public Dictionary<string, JsonElement>? ExtensionData { get; set; }
     }
 }

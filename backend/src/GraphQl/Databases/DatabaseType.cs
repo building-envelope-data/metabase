@@ -27,12 +27,11 @@ namespace Metabase.GraphQl.Databases
                 "data",
                 _ => _.GetDataAsync(default!, default!, default!, default!, default!)
             );
-            // TODO Why is the following not working?
-            // ConfigureAllDataField<DataX.DataPropositionInput>(
-            //     descriptor,
-            //     "allData",
-            //     _ => _.GetAllDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
-            // );
+            ConfigureAllDataField<DataX.DataPropositionInput>(
+                descriptor,
+                "allData",
+                _ => _.GetAllDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
+            );
             ConfigureHasDataField<DataX.DataPropositionInput>(
                 descriptor,
                 "hasData",
