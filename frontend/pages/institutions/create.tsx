@@ -145,6 +145,9 @@ function Create() {
               {...layout}
               form={form}
               name="basic"
+              initialValues={{
+                state: InstitutionState.Unknown,
+              }}
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
             >
@@ -185,7 +188,7 @@ function Create() {
                   },
                 ]}
               >
-                <Select defaultValue={InstitutionState.Unknown}>
+                <Select>
                   <Select.Option value={InstitutionState.Unknown}>
                     Unknown
                   </Select.Option>
