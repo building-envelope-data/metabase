@@ -25,7 +25,6 @@ function Index() {
             key: "name",
             sorter: (a, b) => a.name.localeCompare(b.name, "en"),
             sortDirections: ["ascend", "descend"],
-            defaultSortOrder: "ascend",
           },
           {
             title: "Description",

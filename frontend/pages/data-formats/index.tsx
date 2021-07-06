@@ -25,7 +25,6 @@ function Index() {
             key: "name",
             sorter: (a, b) => a.name.localeCompare(b.name, "en"),
             sortDirections: ["ascend", "descend"],
-            defaultSortOrder: "ascend",
           },
           {
             title: "Description",
@@ -38,7 +37,6 @@ function Index() {
             key: "mediaType",
             sorter: (a, b) => a.mediaType.localeCompare(b.mediaType, "en"),
             sortDirections: ["ascend", "descend"],
-            defaultSortOrder: "ascend",
           },
         ]}
         dataSource={data?.dataFormats?.nodes || []}

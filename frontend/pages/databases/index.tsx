@@ -27,7 +27,6 @@ function Index() {
             key: "name",
             sorter: (a, b) => a.name.localeCompare(b.name, "en"),
             sortDirections: ["ascend", "descend"],
-            defaultSortOrder: "ascend",
           },
           {
             title: "Description",
@@ -40,7 +39,6 @@ function Index() {
             key: "locator",
             sorter: (a, b) => a.locator.localeCompare(b.locator, "en"),
             sortDirections: ["ascend", "descend"],
-            defaultSortOrder: "ascend",
             render: (locator) => (
               <Typography.Link href={locator}>{locator}</Typography.Link>
             ),
@@ -52,7 +50,6 @@ function Index() {
             sorter: (a, b) =>
               a.operator.node.name.localeCompare(b.operator.node.name, "en"),
             sortDirections: ["ascend", "descend"],
-            defaultSortOrder: "ascend",
             render: (operator) => (
               <Link href={paths.institution(operator.node.uuid)}>
                 {operator.node.name}
