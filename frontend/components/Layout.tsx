@@ -32,6 +32,10 @@ const navItems = [
     label: `Databases`,
   },
   {
+    path: paths.data,
+    label: `Data`,
+  },
+  {
     path: paths.users,
     label: `Users`,
   },
