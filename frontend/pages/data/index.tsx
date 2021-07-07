@@ -32,6 +32,47 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+enum Negator {
+  Is = "is",
+  IsNot = "isNot",
+}
+
+const negateIfNecessary = (
+  negator: Negator,
+  proposition: OpticalDataPropositionInput
+): OpticalDataPropositionInput => {
+  switch (negator) {
+    case Negator.Is:
+      return proposition;
+    case Negator.IsNot:
+      return { not: proposition };
+  }
+};
+
+const conjunct = (
+  propositions: OpticalDataPropositionInput[]
+): OpticalDataPropositionInput => {
+  if (propositions.length == 0) {
+    return {};
+  }
+  if (propositions.length == 1) {
+    return propositions[0];
+  }
+  return { and: propositions };
+};
+
+const disjunct = (
+  propositions: OpticalDataPropositionInput[]
+): OpticalDataPropositionInput => {
+  if (propositions.length == 0) {
+    return {};
+  }
+  if (propositions.length == 1) {
+    return propositions[0];
+  }
+  return { or: propositions };
+};
+
 enum ComponentIdComperator {
   EqualTo = "equalTo",
 }
@@ -60,16 +101,21 @@ function Index() {
   });
 
   const onFinish = ({
-    componentId,
-    componentIdComperator,
+    componentIds,
     nearnormalHemisphericalVisibleTransmittances,
   }: {
-    componentId: Scalars["Uuid"] | undefined;
-    componentIdComperator: ComponentIdComperator;
+    componentIds:
+      | {
+          negator: Negator;
+          comperator: ComponentIdComperator;
+          value: Scalars["Uuid"] | undefined;
+        }[]
+      | undefined;
     nearnormalHemisphericalVisibleTransmittances:
       | {
-          nearnormalHemisphericalVisibleTransmittance: number | undefined;
-          nearnormalHemisphericalVisibleTransmittanceComperator: NearnormalHemisphericalVisibleTransmittanceComperator;
+          negator: Negator;
+          comperator: NearnormalHemisphericalVisibleTransmittanceComperator;
+          value: number | undefined;
         }[]
       | undefined;
   }) => {
@@ -77,53 +123,48 @@ function Index() {
       try {
         setFiltering(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        var propositions: OpticalDataPropositionInput[] = [];
-        if (componentId) {
-          propositions.push({
-            componentId: { [componentIdComperator]: componentId },
-          });
+        const propositions: OpticalDataPropositionInput[] = [];
+        if (componentIds) {
+          for (let { negator, comperator, value } of componentIds) {
+            propositions.push(
+              negateIfNecessary(negator, {
+                componentId: { [comperator]: value },
+              })
+            );
+          }
         }
         // Note that `0` evaluates to `false`, so below we cannot use
         // `if (nearnormalHemisphericalVisibleTransmittance)`.
         if (nearnormalHemisphericalVisibleTransmittances) {
-          for (var {
-            nearnormalHemisphericalVisibleTransmittance,
-            nearnormalHemisphericalVisibleTransmittanceComperator,
+          for (let {
+            negator,
+            comperator,
+            value,
           } of nearnormalHemisphericalVisibleTransmittances) {
-            if (
-              nearnormalHemisphericalVisibleTransmittance !== undefined &&
-              nearnormalHemisphericalVisibleTransmittance !== null
-            ) {
-              propositions.push({
-                nearnormalHemisphericalVisibleTransmittance: {
-                  [nearnormalHemisphericalVisibleTransmittanceComperator]:
-                    nearnormalHemisphericalVisibleTransmittance,
-                },
-              });
+            if (value !== undefined && value !== null) {
+              propositions.push(
+                negateIfNecessary(negator, {
+                  nearnormalHemisphericalVisibleTransmittance: {
+                    [comperator]: value,
+                  },
+                })
+              );
             }
           }
         }
-        var where: OpticalDataPropositionInput;
-        if (propositions.length == 0) {
-          where = {};
-        } else if (propositions.length == 1) {
-          where = propositions[0];
-        } else {
-          where = { and: propositions };
-        }
         const { error, data } = await allOpticalDataQuery.refetch({
-          where: where,
+          where: conjunct(propositions),
         });
         if (error) {
           // TODO Handle properly.
           message.error(error);
         }
         // TODO Add `edge.node.databaseId to nodes?
-        var nestedData =
+        const nestedData =
           data?.databases?.edges?.map(
             (edge) => edge?.node?.allOpticalData?.nodes || []
           ) || [];
-        var flatData = ([] as OpticalData[]).concat(...nestedData);
+        const flatData = ([] as OpticalData[]).concat(...nestedData);
         setData(flatData);
       } catch (error) {
         // TODO Handle properly.
@@ -149,72 +190,149 @@ function Index() {
         {...layout}
         form={form}
         name="filterData"
-        initialValues={{
-          componentIdComperator: "equalTo",
-          nearnormalHemisphericalVisibleTransmittanceComperator: "equalTo",
-        }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-        <Form.Item label="Component Id">
-          <Input.Group>
-            <Form.Item noStyle name="componentIdComperator">
-              <Select style={{ width: "20%" }}>
-                <Select.Option value="equalTo">Equal to</Select.Option>
-              </Select>
-            </Form.Item>
-            <Form.Item noStyle name="componentId">
-              <Input style={{ float: "none", width: "80%" }} />
-            </Form.Item>
-          </Input.Group>
-        </Form.Item>
+        <Form.List name="componentIds">
+          {(fields, { add, remove }, { errors }) => (
+            <>
+              {fields.map(({ key, name, fieldKey, ...restField }, index) => (
+                <Form.Item label={index === 0 ? "Component Id" : " "}>
+                  <Input.Group>
+                    <Form.Item
+                      {...restField}
+                      key={`negator${key}`}
+                      name={[name, "negator"]}
+                      fieldKey={[fieldKey, "negator"]}
+                      noStyle
+                      initialValue={Negator.Is}
+                    >
+                      <Select style={{ width: "10%" }}>
+                        <Select.Option value={Negator.Is}>Is</Select.Option>
+                        <Select.Option value={Negator.IsNot}>
+                          Is not
+                        </Select.Option>
+                      </Select>
+                    </Form.Item>
+                    <Form.Item
+                      {...restField}
+                      key={`comperator${key}`}
+                      name={[name, "comperator"]}
+                      fieldKey={[fieldKey, "comperator"]}
+                      noStyle
+                      initialValue={ComponentIdComperator.EqualTo}
+                    >
+                      <Select style={{ width: "20%" }}>
+                        <Select.Option value={ComponentIdComperator.EqualTo}>
+                          equal to
+                        </Select.Option>
+                      </Select>
+                    </Form.Item>
+                    <Form.Item
+                      {...restField}
+                      key={`value${key}`}
+                      name={[name, "value"]}
+                      fieldKey={[fieldKey, "value"]}
+                      noStyle
+                    >
+                      <Input style={{ float: "none", width: "60%" }} />
+                    </Form.Item>
+                    <MinusCircleOutlined
+                      style={{ width: "10%" }}
+                      onClick={() => remove(name)}
+                    />
+                  </Input.Group>
+                </Form.Item>
+              ))}
+              <Form.Item {...tailLayout}>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  style={{ width: "100%" }}
+                  icon={<PlusOutlined />}
+                >
+                  Add component UUID proposition
+                </Button>
+                <Form.ErrorList errors={errors} />
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
 
         <Form.List name="nearnormalHemisphericalVisibleTransmittances">
           {(fields, { add, remove }, { errors }) => (
             <>
-              {fields.map(({ key, name, fieldKey, ...restField }) => (
-                <Form.Item label="Nearnormal hemispherical visible transmittance">
+              {fields.map(({ key, name, fieldKey, ...restField }, index) => (
+                <Form.Item
+                  label={
+                    index === 0
+                      ? "Nearnormal hemispherical visible transmittance"
+                      : " "
+                  }
+                >
                   <Input.Group>
                     <Form.Item
                       {...restField}
-                      name={[
-                        name,
-                        "nearnormalHemisphericalVisibleTransmittanceComperator",
-                      ]}
-                      fieldKey={[
-                        fieldKey,
-                        "nearnormalHemisphericalVisibleTransmittanceComperator",
-                      ]}
+                      key={`negator${key}`}
+                      name={[name, "negator"]}
+                      fieldKey={[fieldKey, "negator"]}
                       noStyle
+                      initialValue={Negator.Is}
+                    >
+                      <Select style={{ width: "10%" }}>
+                        <Select.Option value={Negator.Is}>Is</Select.Option>
+                        <Select.Option value={Negator.IsNot}>
+                          Is not
+                        </Select.Option>
+                      </Select>
+                    </Form.Item>
+                    <Form.Item
+                      {...restField}
+                      key={`comperator${key}`}
+                      name={[name, "comperator"]}
+                      fieldKey={[fieldKey, "comperator"]}
+                      noStyle
+                      initialValue={
+                        NearnormalHemisphericalVisibleTransmittanceComperator.EqualTo
+                      }
                     >
                       <Select style={{ width: "20%" }}>
-                        <Select.Option value="equalTo">Equal to</Select.Option>
-                        <Select.Option value="greaterThanOrEqualTo">
-                          Greater than or equal to
+                        <Select.Option
+                          value={
+                            NearnormalHemisphericalVisibleTransmittanceComperator.EqualTo
+                          }
+                        >
+                          equal to
                         </Select.Option>
-                        <Select.Option value="lessThanOrEqualTo">
-                          Less than or equal to
+                        <Select.Option
+                          value={
+                            NearnormalHemisphericalVisibleTransmittanceComperator.GreaterThanOrEqualTo
+                          }
+                        >
+                          greater than or equal to
+                        </Select.Option>
+                        <Select.Option
+                          value={
+                            NearnormalHemisphericalVisibleTransmittanceComperator.LessThanOrEqualTo
+                          }
+                        >
+                          less than or equal to
                         </Select.Option>
                         {/* TODO `inClosedInverval` */}
                       </Select>
                     </Form.Item>
                     <Form.Item
                       {...restField}
-                      name={[
-                        name,
-                        "nearnormalHemisphericalVisibleTransmittance",
-                      ]}
-                      fieldKey={[
-                        fieldKey,
-                        "nearnormalHemisphericalVisibleTransmittance",
-                      ]}
+                      key={`value${key}`}
+                      name={[name, "value"]}
+                      fieldKey={[fieldKey, "value"]}
                       noStyle
                     >
                       <InputNumber
                         min={0}
                         max={1}
                         step="0.01"
-                        style={{ width: "70%" }}
+                        style={{ width: "60%" }}
                       />
                     </Form.Item>
                     <MinusCircleOutlined
@@ -228,7 +346,7 @@ function Index() {
                 <Button
                   type="dashed"
                   onClick={() => add()}
-                  style={{ width: "60%" }}
+                  style={{ width: "100%" }}
                   icon={<PlusOutlined />}
                 >
                   Add nearnormal hemispherical visible transmittance proposition
@@ -259,24 +377,40 @@ function Index() {
             title: "Timestamp",
             dataIndex: "timestamp",
             key: "timestamp",
-            sorter: (a, b) => b.timestamp - a.timestamp,
+            sorter: (a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp),
             sortDirections: ["ascend", "descend"],
           },
           {
             title: "Component UUID",
             dataIndex: "componentId",
             key: "componentId",
+            render: (_text, row, _index) => (
+              <Link href={paths.component(row.componentId)}>
+                {row.componentId}
+              </Link>
+            ),
           },
-          {
-            title: "Database UUID",
-            dataIndex: "databaseId",
-            key: "databaseId",
-          },
+          // {
+          //   title: "Database UUID",
+          //   dataIndex: "databaseId",
+          //   key: "databaseId",
+          //   render: (_text, row, _index) => (
+          //     <Link href={paths.database(row.databaseId)}>{row.databaseId}</Link>
+          //   ),
+          // },
           {
             title: "Applied Method",
             dataIndex: "appliedMethod",
             key: "appliedMethod",
-            render: (_text, row, _index) => row.appliedMethod.methodId,
+            render: (_text, row, _index) => (
+              <Descriptions column={1}>
+                <Descriptions.Item label="Method UUID">
+                  <Link href={paths.method(row.appliedMethod.methodId)}>
+                    {row.appliedMethod.methodId}
+                  </Link>
+                </Descriptions.Item>
+              </Descriptions>
+            ),
           },
           {
             title: "Resource Tree",
