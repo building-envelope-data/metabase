@@ -1,15 +1,24 @@
 using System;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace Test
 {
+    [TestFixture]
     public sealed class Play
     {
-        [Fact]
+        
+        [Test]
         public async Task Do()
         {
-            Console.WriteLine("Do play!");
+            // arrange
+            var actual = true;           
+            
+            // act
+
+            // assert
+            Assert.IsTrue(actual, "actual should be true.");
+
         }
     }
 }
