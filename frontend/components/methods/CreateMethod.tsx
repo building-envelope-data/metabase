@@ -1,14 +1,13 @@
 import * as React from "react";
-import { DatePicker, Alert, Select, Form, Input, Button } from "antd";
+import { DatePicker, Select, Alert, Form, Input, Button } from "antd";
 import {
-  useCreateComponentMutation,
-  ComponentCategory,
+  useCreateMethodMutation,
   Scalars,
-  ComponentsDocument,
-} from "../../queries/components.graphql";
+  MethodsDocument,
+  MethodCategory,
+} from "../../queries/methods.graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import * as moment from "moment";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
 
 const layout = {
@@ -19,25 +18,25 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-export type CreateComponentProps = {
-  manufacturerId: Scalars["Uuid"];
+export type CreateMethodProps = {
+  institutionDeveloperId: Scalars["Uuid"];
 };
 
-export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
-  manufacturerId,
+export const CreateMethod: React.FunctionComponent<CreateMethodProps> = ({
+  institutionDeveloperId,
 }) => {
-  const [createComponentMutation] = useCreateComponentMutation({
+  const [createMethodMutation] = useCreateMethodMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
       {
         query: InstitutionDocument,
         variables: {
-          uuid: manufacturerId,
+          uuid: institutionDeveloperId,
         },
       },
       {
-        query: ComponentsDocument,
+        query: MethodsDocument,
       },
     ],
   });
@@ -49,34 +48,46 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
 
   const onFinish = ({
     name,
-    abbreviation,
     description,
+    validity,
     availability,
+    // standard,
+    // publication,
+    calculationLocator,
     categories,
   }: {
     name: string;
-    abbreviation: string | null;
     description: string;
+    validity: [moment.Moment | null, moment.Moment | null] | null;
     availability: [moment.Moment | null, moment.Moment | null] | null;
-    categories: ComponentCategory[];
+    // standard: CreateStandardInput;
+    // publication: CreatePublicationInput;
+    calculationLocator: Scalars["Url"] | null;
+    categories: MethodCategory[] | null;
+    // institutionDeveloperIds: Scalars["Uuid"][];
+    // userDeveloperIds: Scalars["Uuid"][];
   }) => {
     const create = async () => {
       try {
         setCreating(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createComponentMutation({
+        const { errors, data } = await createMethodMutation({
           variables: {
             name: name,
-            abbreviation: abbreviation,
             description: description,
+            validity: { from: validity?.[0], to: validity?.[1] },
             availability: { from: availability?.[0], to: availability?.[1] },
+            // standard: standard,
+            // publication: publication,
+            calculationLocator: calculationLocator,
             categories: categories || [],
-            manufacturerId: manufacturerId,
+            institutionDeveloperIds: [institutionDeveloperId],
+            userDeveloperIds: [],
           },
         });
         handleFormErrors(
           errors,
-          data?.createComponent?.errors?.map((x) => {
+          data?.createMethod?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
@@ -106,7 +117,7 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
       <Form
         {...layout}
         form={form}
-        name="createComponent"
+        name="createMethod"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
@@ -121,9 +132,6 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Abbreviation" name="abbreviation">
-          <Input />
-        </Form.Item>
         <Form.Item
           label="Description"
           name="description"
@@ -135,18 +143,40 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
         >
           <Input />
         </Form.Item>
+        <Form.Item label="Validity" name="validity">
+          <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
+        </Form.Item>
         <Form.Item label="Availability" name="availability">
           <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
         </Form.Item>
-        <Form.Item label="Categories" name="categories">
+        {/* TODO $standard: CreateStandardInput
+            $publication: CreatePublicationInput */}
+        <Form.Item
+          label="Calculation Locator"
+          name="calculationLocator"
+          rules={[
+            {
+              required: false,
+            },
+            {
+              type: "url",
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item label="Categories" name="categories" initialValue={[]}>
           <Select mode="multiple" placeholder="Please select">
-            <Select.Option value={ComponentCategory.Layer}>Layer</Select.Option>
-            <Select.Option value={ComponentCategory.Unit}>Unit</Select.Option>
-            <Select.Option value={ComponentCategory.Material}>
-              Material
+            <Select.Option value={MethodCategory.Measurement}>
+              Measurement
+            </Select.Option>
+            <Select.Option value={MethodCategory.Calculation}>
+              Calculation
             </Select.Option>
           </Select>
         </Form.Item>
+        {/* TODO $institutionDeveloperIds: [Uuid]
+        $userDeveloperIds: [Uuid] */}
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>
             Create
@@ -157,4 +187,4 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
   );
 };
 
-export default CreateComponent;
+export default CreateMethod;

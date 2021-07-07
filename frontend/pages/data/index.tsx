@@ -61,17 +61,17 @@ const conjunct = (
   return { and: propositions };
 };
 
-const disjunct = (
-  propositions: OpticalDataPropositionInput[]
-): OpticalDataPropositionInput => {
-  if (propositions.length == 0) {
-    return {};
-  }
-  if (propositions.length == 1) {
-    return propositions[0];
-  }
-  return { or: propositions };
-};
+// const disjunct = (
+//   propositions: OpticalDataPropositionInput[]
+// ): OpticalDataPropositionInput => {
+//   if (propositions.length == 0) {
+//     return {};
+//   }
+//   if (propositions.length == 1) {
+//     return propositions[0];
+//   }
+//   return { or: propositions };
+// };
 
 enum ComponentIdComperator {
   EqualTo = "equalTo",

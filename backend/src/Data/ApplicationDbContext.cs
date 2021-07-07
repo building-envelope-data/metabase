@@ -215,6 +215,10 @@ namespace Metabase.Data
                 )
               .ToTable("database");
             ConfigureEntity(
+                builder.Entity<DataFormat>()
+                )
+              .ToTable("data_format");
+            ConfigureEntity(
                 builder.Entity<Institution>()
                 )
               .ToTable("institution");

@@ -145,8 +145,32 @@ query Institution($uuid: Uuid!) {
           id
           uuid
           name
+          extension
           description
           mediaType
+          schemaLocator
+          reference {
+            abstract
+            section
+            title
+            ... on Standard {
+              locator
+              numeration {
+                mainNumber
+                prefix
+                suffix
+              }
+              standardizers
+              year
+            }
+            ... on Publication {
+              arXiv
+              authors
+              doi
+              urn
+              webAddress
+            }
+          }
         }
       }
       canCurrentUserAddEdge
@@ -158,6 +182,38 @@ query Institution($uuid: Uuid!) {
           uuid
           name
           description
+          validity {
+            from
+            to
+          }
+          availability {
+            from
+            to
+          }
+          reference {
+            abstract
+            section
+            title
+            ... on Standard {
+              locator
+              numeration {
+                mainNumber
+                prefix
+                suffix
+              }
+              standardizers
+              year
+            }
+            ... on Publication {
+              arXiv
+              authors
+              doi
+              urn
+              webAddress
+            }
+          }
+          calculationLocator
+          categories
         }
       }
       canCurrentUserAddEdge
