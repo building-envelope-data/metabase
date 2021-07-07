@@ -49,6 +49,29 @@ test : ## Run tests
 	done
 .PHONY : test
 
+# JFe: Only for development. Only run tests with postfix NUnitTests.cs
+# Todo: Renaming
+testnunit : ## Run nUnit-Tests
+	@echo "--------------------------------------------------"
+	@echo "Complete test list"
+	@echo "--------------------------------------------------"
+	dotnet test \
+		--list-tests
+	@echo "--------------------------------------------------"
+	@echo "All test runs"
+	@echo "--------------------------------------------------"
+	for x in $$(find ./test/ -type f -name "*NUnitTests.cs" -exec basename {} '.cs' \;) ; do \
+		echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
+		echo "Test runs for file '$${x}'" && \
+		echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
+		dotnet test \
+			--filter "FullyQualifiedName~$${x}" \
+			--collect:"XPlat Code Coverage" \
+			--verbosity minimal ; \
+	done
+.PHONY : testnunit
+
+
 assets : ## Build assets
 	npm run all
 .PHONY : assets
