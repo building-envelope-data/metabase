@@ -157,7 +157,10 @@ function Index() {
         });
         if (error) {
           // TODO Handle properly.
-          message.error(error);
+          console.log(error);
+          message.error(
+            error.graphQLErrors.map((error) => error.message).join(" ")
+          );
         }
         // TODO Add `edge.node.databaseId to nodes?
         const nestedData =
