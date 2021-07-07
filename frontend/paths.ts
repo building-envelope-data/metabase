@@ -3,6 +3,9 @@ export default {
   legalNotice: "/legal-notice",
   dataProtectionInformation: "/data-protection-information",
   databases: "/databases",
+  database(uuid: string) {
+    return `/databases/${encodeURIComponent(uuid)}`;
+  },
   institutions: "/institutions",
   institution(uuid: string) {
     return `/institutions/${encodeURIComponent(uuid)}`;
@@ -44,5 +47,6 @@ export default {
   component(uuid: string) {
     return `/components/${encodeURIComponent(uuid)}`;
   },
+  data: "/data",
   openIdConnect: "/openIdConnect",
 };

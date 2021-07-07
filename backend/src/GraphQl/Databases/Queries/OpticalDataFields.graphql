@@ -1,0 +1,4 @@
+fragment OpticalDataFields on OpticalData {
+  ...DataFields
+  nearnormalHemisphericalVisibleTransmittances
+}

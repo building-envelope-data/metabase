@@ -67,7 +67,7 @@ export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
           <Menu.Item key={paths.me.manage.profile}>
             <Link href={paths.me.manage.profile}>Account</Link>
           </Menu.Item>
-          <Menu.Item>
+          <Menu.Item key="logout">
             <Button type="link" onClick={logout} loading={loggingOut}>
               Logout
             </Button>

@@ -1,15 +1,18 @@
 import Layout from "../../components/Layout";
 import { Table, message, Typography } from "antd";
 import { useOpenIdConnectQuery } from "../../queries/openIdConnect.graphql";
+import { useEffect } from "react";
 
 // TODO Load and display scopes.
 
 function Index() {
   const { loading, error, data } = useOpenIdConnectQuery();
 
-  if (error) {
-    message.error(error);
-  }
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+    }
+  }, [error]);
 
   return (
     <Layout>

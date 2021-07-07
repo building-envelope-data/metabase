@@ -105,6 +105,9 @@ function Page() {
         {...layout}
         form={form}
         name="basic"
+        initialValues={{
+          phoneNumber: currentUser.phoneNumber || undefined,
+        }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
@@ -117,7 +120,7 @@ function Page() {
             },
           ]}
         >
-          <Input defaultValue={currentUser.phoneNumber ?? undefined} />
+          <Input />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={setting}>

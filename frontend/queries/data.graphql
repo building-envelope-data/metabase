@@ -1,0 +1,91 @@
+fragment DataPartial on Data {
+  uuid
+  timestamp
+  componentId
+  name
+  appliedMethod {
+    methodId
+  }
+  resourceTree {
+    root {
+      value {
+        description
+        hashValue
+        locator
+        formatId
+      }
+    }
+  }
+}
+
+query AllData($where: DataPropositionInput!) {
+  databases {
+    edges {
+      node {
+        allData(where: $where) {
+          nodes {
+            ...DataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasData($where: DataPropositionInput!) {
+  databases {
+    edges {
+      node {
+        hasData(where: $where)
+      }
+    }
+  }
+}
+
+fragment OpticalDataPartial on OpticalData {
+  uuid
+  timestamp
+  componentId
+  name
+  appliedMethod {
+    methodId
+  }
+  resourceTree {
+    root {
+      value {
+        description
+        hashValue
+        locator
+        formatId
+      }
+    }
+  }
+  # TODO All the above should be replaced by `...DataPartial`. If we do so
+  # though, the result returned by the query `AllOpticalData` does not include
+  # the fields above. Why?
+  nearnormalHemisphericalVisibleTransmittances
+}
+
+query AllOpticalData($where: OpticalDataPropositionInput!) {
+  databases {
+    edges {
+      node {
+        allOpticalData(where: $where) {
+          nodes {
+            ...OpticalDataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasOpticalData($where: DataPropositionInput!) {
+  databases {
+    edges {
+      node {
+        hasData(where: $where)
+      }
+    }
+  }
+}

@@ -41,6 +41,7 @@ namespace Metabase
             ConfigureMessageSenderServices(services);
             ConfigureRequestResponseServices(services);
             ConfigureSessionServices(services);
+            services.AddHttpClient();
             services.AddHealthChecks();
             services.AddSingleton(_appSettings);
             services.AddSingleton(_environment);

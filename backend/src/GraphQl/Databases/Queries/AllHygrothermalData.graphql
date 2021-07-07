@@ -1,0 +1,34 @@
+query AllHygrothermalData(
+  $where: HygrothermalDataPropositionInput!
+  $timestamp: DateTime
+  $locale: Locale
+  $first: NonNegativeInt
+  $after: Cursor
+  $last: NonNegativeInt
+  $before: Cursor
+) {
+  allHygrothermalData(
+    where: $where
+    timestamp: $timestamp
+    locale: $locale
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+  ) {
+    # edges {
+    #   cursor
+    #   node {
+    #     ...HygrothermalDataFields
+    #   }
+    # }
+    nodes {
+      ...HygrothermalDataFields
+    }
+    # totalCount
+    # pageInfo {
+    #   ...PageInfoFields
+    # }
+    # timestamp
+  }
+}

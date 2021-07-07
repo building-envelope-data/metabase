@@ -1,0 +1,3 @@
+fragment HygrothermalDataFields on HygrothermalData {
+  ...DataFields
+}
