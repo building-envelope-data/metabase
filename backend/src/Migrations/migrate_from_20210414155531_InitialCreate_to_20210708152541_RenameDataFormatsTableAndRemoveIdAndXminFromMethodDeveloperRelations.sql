@@ -12,16 +12,6 @@ ALTER TABLE metabase."DataFormats" RENAME TO data_format;
 
 ALTER INDEX metabase."IX_DataFormats_ManagerId" RENAME TO "IX_data_format_ManagerId";
 
-CREATE TYPE public.component_category AS ENUM ('material', 'layer', 'unit');
-CREATE TYPE public.institution_representative_role AS ENUM ('owner', 'maintainer', 'assistant');
-CREATE TYPE public.institution_state AS ENUM ('unknown', 'operative', 'inoperative');
-CREATE TYPE public.method_category AS ENUM ('measurement', 'calculation');
-CREATE TYPE public.standardizer AS ENUM ('aerc', 'agi', 'ashrae', 'breeam', 'bs', 'bsi', 'cen', 'cie', 'dgnb', 'din', 'dvwg', 'iec', 'ies', 'ift', 'iso', 'jis', 'leed', 'nfrc', 'riba', 'ul', 'unece', 'vdi', 'vff', 'well');
-DROP TYPE metabase.component_category;
-DROP TYPE metabase.institution_representative_role;
-DROP TYPE metabase.institution_state;
-DROP TYPE metabase.method_category;
-DROP TYPE metabase.standardizer;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 ALTER TABLE metabase.data_format ALTER COLUMN "Id" SET DEFAULT (gen_random_uuid());
