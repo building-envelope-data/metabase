@@ -1,11 +1,77 @@
+fragment DataFormatPartial on DataFormat {
+  id
+  uuid
+  name
+  extension
+  description
+  mediaType
+  schemaLocator
+  reference {
+    abstract
+    section
+    title
+    ... on Standard {
+      locator
+      numeration {
+        mainNumber
+        prefix
+        suffix
+      }
+      standardizers
+      year
+    }
+    ... on Publication {
+      arXiv
+      authors
+      doi
+      urn
+      webAddress
+    }
+  }
+  manager {
+    node {
+      id
+    }
+  }
+}
+
 query DataFormats {
   dataFormats {
     nodes {
-      id
-      uuid
-      name
-      description
-      mediaType
+      ...DataFormatPartial
+    }
+  }
+}
+
+mutation CreateDataFormat(
+  $name: String!
+  $extension: String
+  $description: String!
+  $mediaType: String!
+  $schemaLocator: Url
+  $standard: CreateStandardInput
+  $publication: CreatePublicationInput
+  $managerId: Uuid!
+) {
+  createDataFormat(
+    input: {
+      name: $name
+      extension: $extension
+      description: $description
+      mediaType: $mediaType
+      schemaLocator: $schemaLocator
+      standard: $standard
+      publication: $publication
+      managerId: $managerId
+    }
+  ) {
+    dataFormat {
+      ...DataFormatPartial
+    }
+    errors {
+      code
+      message
+      path
     }
   }
 }

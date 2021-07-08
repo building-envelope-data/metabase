@@ -1,10 +1,96 @@
+fragment MethodPartial on Method {
+  id
+  uuid
+  name
+  description
+  validity {
+    from
+    to
+  }
+  availability {
+    from
+    to
+  }
+  reference {
+    abstract
+    section
+    title
+    ... on Standard {
+      locator
+      numeration {
+        mainNumber
+        prefix
+        suffix
+      }
+      standardizers
+      year
+    }
+    ... on Publication {
+      arXiv
+      authors
+      doi
+      urn
+      webAddress
+    }
+  }
+  calculationLocator
+  categories
+  developers {
+    edges {
+      node {
+        name
+        ... on Institution {
+          id
+        }
+        ... on User {
+          id
+        }
+      }
+    }
+  }
+}
+
 query Methods {
   methods {
     nodes {
-      id
-      uuid
-      name
-      description
+      ...MethodPartial
+    }
+  }
+}
+
+mutation CreateMethod(
+  $name: String!
+  $description: String!
+  $validity: OpenEndedDateTimeRangeInput
+  $availability: OpenEndedDateTimeRangeInput
+  $standard: CreateStandardInput
+  $publication: CreatePublicationInput
+  $calculationLocator: Url
+  $categories: [MethodCategory!]!
+  $institutionDeveloperIds: [Uuid!]!
+  $userDeveloperIds: [Uuid!]!
+) {
+  createMethod(
+    input: {
+      name: $name
+      description: $description
+      validity: $validity
+      availability: $availability
+      standard: $standard
+      publication: $publication
+      calculationLocator: $calculationLocator
+      categories: $categories
+      institutionDeveloperIds: $institutionDeveloperIds
+      userDeveloperIds: $userDeveloperIds
+    }
+  ) {
+    method {
+      ...MethodPartial
+    }
+    errors {
+      code
+      message
+      path
     }
   }
 }

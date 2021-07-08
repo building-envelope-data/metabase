@@ -37,6 +37,17 @@ enum Negator {
   IsNot = "isNot",
 }
 
+enum ComponentIdComperator {
+  EqualTo = "equalTo",
+}
+
+enum NearnormalHemisphericalVisibleTransmittanceComperator {
+  EqualTo = "equalTo",
+  LessThanOrEqualTo = "lessThanOrEqualTo",
+  GreaterThanOrEqualTo = "greaterThanOrEqualTo",
+  // InClosedInterval = "inClosedInterval"
+}
+
 const negateIfNecessary = (
   negator: Negator,
   proposition: OpticalDataPropositionInput
@@ -61,28 +72,17 @@ const conjunct = (
   return { and: propositions };
 };
 
-const disjunct = (
-  propositions: OpticalDataPropositionInput[]
-): OpticalDataPropositionInput => {
-  if (propositions.length == 0) {
-    return {};
-  }
-  if (propositions.length == 1) {
-    return propositions[0];
-  }
-  return { or: propositions };
-};
-
-enum ComponentIdComperator {
-  EqualTo = "equalTo",
-}
-
-enum NearnormalHemisphericalVisibleTransmittanceComperator {
-  EqualTo = "equalTo",
-  LessThanOrEqualTo = "lessThanOrEqualTo",
-  GreaterThanOrEqualTo = "greaterThanOrEqualTo",
-  // InClosedInterval = "inClosedInterval"
-}
+// const disjunct = (
+//   propositions: OpticalDataPropositionInput[]
+// ): OpticalDataPropositionInput => {
+//   if (propositions.length == 0) {
+//     return {};
+//   }
+//   if (propositions.length == 1) {
+//     return propositions[0];
+//   }
+//   return { or: propositions };
+// };
 
 function Index() {
   const [form] = Form.useForm();
@@ -185,6 +185,7 @@ function Index() {
 
   return (
     <Layout>
+      <Typography.Title>Optical Data</Typography.Title>
       {/* TODO Display error messages in a list? */}
       {globalErrorMessages.length > 0 && (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
@@ -443,6 +444,15 @@ function Index() {
                 </Descriptions.Item>
               </Descriptions>
             ),
+          },
+          {
+            title: "Nearnormal Hemispherical Visible Transmittances",
+            dataIndex: "nearnormalHemisphericalVisibleTransmittances",
+            key: "nearnormalHemisphericalVisibleTransmittances",
+            render: (_text, row, _index) =>
+              row.nearnormalHemisphericalVisibleTransmittances
+                .map((x) => x.toLocaleString("en"))
+                .join(", "),
           },
         ]}
         dataSource={data}

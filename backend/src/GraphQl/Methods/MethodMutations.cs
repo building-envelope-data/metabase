@@ -51,7 +51,7 @@ namespace Metabase.GraphQl.Methods
             // }
             var unknownInstitutionDeveloperIds =
                 input.InstitutionDeveloperIds.Except(
-                    await context.Users.AsQueryable()
+                    await context.Institutions.AsQueryable()
                     .Where(x => input.InstitutionDeveloperIds.Contains(x.Id))
                     .Select(x => x.Id)
                     .ToListAsync(cancellationToken)
@@ -150,7 +150,24 @@ namespace Metabase.GraphQl.Methods
                                 webAddress: input.Publication.WebAddress
                 )
             };
-            ;
+            foreach (var institutionDeveloperId in input.InstitutionDeveloperIds)
+            {
+                method.InstitutionDeveloperEdges.Add(
+                    new Data.InstitutionMethodDeveloper
+                    {
+                        InstitutionId = institutionDeveloperId
+                    }
+                );
+            }
+            foreach (var userDeveloperId in input.UserDeveloperIds)
+            {
+                method.UserDeveloperEdges.Add(
+                    new Data.UserMethodDeveloper
+                    {
+                        UserId = userDeveloperId
+                    }
+                );
+            }
             context.Methods.Add(method);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new CreateMethodPayload(method);

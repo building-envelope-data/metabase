@@ -1,10 +1,20 @@
+fragment ComponentPartial on Component {
+  id
+  uuid
+  name
+  abbreviation
+  description
+  categories
+  availability {
+    from
+    to
+  }
+}
+
 query Components {
   components {
     nodes {
-      id
-      uuid
-      name
-      description
+      ...ComponentPartial
     }
   }
 }
@@ -14,7 +24,7 @@ mutation CreateComponent(
   $abbreviation: String
   $description: String!
   $categories: [ComponentCategory!]!
-  $availableFrom: DateTime
+  $availability: OpenEndedDateTimeRangeInput
   $availableTo: DateTime
   $manufacturerId: Uuid!
 ) {
@@ -24,21 +34,12 @@ mutation CreateComponent(
       abbreviation: $abbreviation
       description: $description
       categories: $categories
-      availability: { from: $availableFrom, to: $availableTo }
+      availability: $availability
       manufacturerId: $manufacturerId
     }
   ) {
     component {
-      id
-      uuid
-      name
-      abbreviation
-      description
-      categories
-      availability {
-        from
-        to
-      }
+      ...ComponentPartial
     }
     errors {
       code
