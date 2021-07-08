@@ -37,6 +37,17 @@ enum Negator {
   IsNot = "isNot",
 }
 
+enum ComponentIdComperator {
+  EqualTo = "equalTo",
+}
+
+enum NearnormalHemisphericalVisibleTransmittanceComperator {
+  EqualTo = "equalTo",
+  LessThanOrEqualTo = "lessThanOrEqualTo",
+  GreaterThanOrEqualTo = "greaterThanOrEqualTo",
+  // InClosedInterval = "inClosedInterval"
+}
+
 const negateIfNecessary = (
   negator: Negator,
   proposition: OpticalDataPropositionInput
@@ -72,17 +83,6 @@ const conjunct = (
 //   }
 //   return { or: propositions };
 // };
-
-enum ComponentIdComperator {
-  EqualTo = "equalTo",
-}
-
-enum NearnormalHemisphericalVisibleTransmittanceComperator {
-  EqualTo = "equalTo",
-  LessThanOrEqualTo = "lessThanOrEqualTo",
-  GreaterThanOrEqualTo = "greaterThanOrEqualTo",
-  // InClosedInterval = "inClosedInterval"
-}
 
 function Index() {
   const [form] = Form.useForm();
@@ -185,6 +185,7 @@ function Index() {
 
   return (
     <Layout>
+      <Typography.Title>Optical Data</Typography.Title>
       {/* TODO Display error messages in a list? */}
       {globalErrorMessages.length > 0 && (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
