@@ -445,6 +445,15 @@ function Index() {
               </Descriptions>
             ),
           },
+          {
+            title: "Nearnormal Hemispherical Visible Transmittances",
+            dataIndex: "nearnormalHemisphericalVisibleTransmittances",
+            key: "nearnormalHemisphericalVisibleTransmittances",
+            render: (_text, row, _index) =>
+              row.nearnormalHemisphericalVisibleTransmittances
+                .map((x) => x.toLocaleString("en"))
+                .join(", "),
+          },
         ]}
         dataSource={data}
       />
