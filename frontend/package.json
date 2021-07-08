@@ -42,6 +42,8 @@
     "@types/react-test-renderer": "^17.0",
     "babel-jest": "^27.0",
     "deepmerge": "^4.0",
+    "eslint": "^7.30.0",
+    "eslint-config-next": "^11.0.1",
     "graphql-let": "^0.18",
     "graphql-tag": "^2.0",
     "jest": "^27.0",
