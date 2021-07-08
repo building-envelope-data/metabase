@@ -21,6 +21,14 @@ upgrade : ## Upgrade packages
 	yarn upgrade
 .PHONY : upgrade
 
+outdated : ## Show outdated packages
+	yarn outdated
+.PHONY : outdated
+
+lint : ## Lint code
+	next lint
+.PHONY : lint
+
 update-schema : ## Update GraphQl schema
 	wget \
 		--output-document ./type-defs.graphqls \
