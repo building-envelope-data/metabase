@@ -7,14 +7,14 @@ import {
   Skeleton,
   Table,
 } from "antd";
+import { useInstitutionQuery } from "../../queries/institutions.graphql";
 import {
-  useInstitutionQuery,
   Scalars,
   Maybe,
   Numeration,
   Publication,
   Standard,
-} from "../../queries/institutions.graphql";
+} from "../../__generated__/__types__";
 import CreateComponent from "../components/CreateComponent";
 import CreateMethod from "../methods/CreateMethod";
 import CreateDataFormat from "../dataFormats/CreateDataFormat";

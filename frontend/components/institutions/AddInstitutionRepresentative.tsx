@@ -1,10 +1,8 @@
 import * as React from "react";
 import { Select, Alert, Form, Button } from "antd";
-import {
-  useAddInstitutionRepresentativeMutation,
-  InstitutionRepresentativeRole,
-  Scalars,
-} from "../../queries/institutions.graphql";
+import { useAddInstitutionRepresentativeMutation } from "../../queries/institutions.graphql";
+import { InstitutionRepresentativeRole } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.graphql";

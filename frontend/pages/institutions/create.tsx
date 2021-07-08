@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import {
-  useCreateInstitutionMutation,
   InstitutionsDocument,
-  InstitutionState,
+  useCreateInstitutionMutation,
 } from "../../queries/institutions.graphql";
+import { InstitutionState } from "../../__generated__/__types__";
 import {
   Skeleton,
   Select,

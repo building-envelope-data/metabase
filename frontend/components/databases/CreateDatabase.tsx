@@ -2,9 +2,9 @@ import * as React from "react";
 import { Alert, Form, Input, Button } from "antd";
 import {
   useCreateDatabaseMutation,
-  Scalars,
   DatabasesDocument,
 } from "../../queries/databases.graphql";
+import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.graphql";

@@ -3,8 +3,8 @@ import {
   UsersDocument,
   useUserQuery,
   useDeleteUserMutation,
-  Scalars,
 } from "../../queries/users.graphql";
+import { Scalars } from "../../__generated__/__types__";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
 import { useEffect } from "react";
 import { useRouter } from "next/router";

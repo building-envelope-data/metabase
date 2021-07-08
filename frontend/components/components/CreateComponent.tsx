@@ -2,10 +2,9 @@ import * as React from "react";
 import { DatePicker, Alert, Select, Form, Input, Button } from "antd";
 import {
   useCreateComponentMutation,
-  ComponentCategory,
-  Scalars,
   ComponentsDocument,
 } from "../../queries/components.graphql";
+import { ComponentCategory, Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import * as moment from "moment";

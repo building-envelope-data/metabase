@@ -12,12 +12,12 @@ import {
   Typography,
 } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { useAllOpticalDataQuery } from "../../queries/data.graphql";
 import {
-  useAllOpticalDataQuery,
   OpticalData,
   Scalars,
   OpticalDataPropositionInput,
-} from "../../queries/data.graphql";
+} from "../../__generated__/__types__";
 import { useState } from "react";
 import Link from "next/link";
 import paths from "../../paths";

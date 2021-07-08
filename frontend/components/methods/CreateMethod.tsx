@@ -2,10 +2,9 @@ import * as React from "react";
 import { DatePicker, Select, Alert, Form, Input, Button } from "antd";
 import {
   useCreateMethodMutation,
-  Scalars,
   MethodsDocument,
-  MethodCategory,
 } from "../../queries/methods.graphql";
+import { MethodCategory, Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
