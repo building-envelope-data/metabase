@@ -229,9 +229,9 @@ namespace Metabase.GraphQl.Databases
             DataX.DataPropositionInput where,
             DateTime? timestamp,
             string? locale,
-            /*TODO add `u`*/int? first,
+            uint? first,
             string? after,
-            /*TODO add `u`*/int? last,
+            uint? last,
             string? before,
             CancellationToken cancellationToken
             )
@@ -273,9 +273,9 @@ namespace Metabase.GraphQl.Databases
             DataX.OpticalDataPropositionInput where,
             DateTime? timestamp,
             string? locale,
-            /*TODO add `u`*/int? first,
+            uint? first,
             string? after,
-            /*TODO add `u`*/int? last,
+            uint? last,
             string? before,
             CancellationToken cancellationToken
             )
@@ -319,9 +319,9 @@ namespace Metabase.GraphQl.Databases
             DataX.HygrothermalDataPropositionInput where,
             DateTime? timestamp,
             string? locale,
-            /*TODO add `u`*/int? first,
+            uint? first,
             string? after,
-            /*TODO add `u`*/int? last,
+            uint? last,
             string? before,
             CancellationToken cancellationToken
             )
@@ -365,9 +365,9 @@ namespace Metabase.GraphQl.Databases
             DataX.CalorimetricDataPropositionInput where,
             DateTime? timestamp,
             string? locale,
-            /*TODO add `u`*/int? first,
+            uint? first,
             string? after,
-            /*TODO add `u`*/int? last,
+            uint? last,
             string? before,
             CancellationToken cancellationToken
             )
@@ -410,9 +410,9 @@ namespace Metabase.GraphQl.Databases
             DataX.PhotovoltaicDataPropositionInput where,
             DateTime? timestamp,
             string? locale,
-            /*TODO add `u`*/int? first,
+            uint? first,
             string? after,
-            /*TODO add `u`*/int? last,
+            uint? last,
             string? before,
             CancellationToken cancellationToken
             )

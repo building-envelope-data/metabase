@@ -124,9 +124,9 @@ namespace Metabase.GraphQl.Databases
                 .Argument("where", _ => _.Type<NonNullType<InputObjectType<TDataPropositionInput>>>())
                 .Argument("timestamp", _ => _.Type<DateTimeType>())
                 .Argument("locale", _ => _.Type<StringType>())
-                .Argument("first", _ => _.Type</*TODO Unsigned*/IntType>())
+                .Argument("first", _ => _.Type<NonNegativeIntType>())
                 .Argument("after", _ => _.Type<StringType>())
-                .Argument("last", _ => _.Type</*TODO Unsigned*/IntType>())
+                .Argument("last", _ => _.Type<NonNegativeIntType>())
                 .Argument("before", _ => _.Type<StringType>())
                 .ResolveWith(resolverMethod);
         }
