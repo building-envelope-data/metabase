@@ -45,7 +45,7 @@ namespace Metabase.GraphQl.DataFormats
                     )
                 );
             }
-            if (!await context.Institutions
+            if (!await context.Institutions.AsQueryable()
             .AnyAsync(
                 x => x.Id == input.ManagerId,
              cancellationToken: cancellationToken

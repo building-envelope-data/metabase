@@ -175,7 +175,7 @@ query Institution($uuid: Uuid!) {
       }
       canCurrentUserAddEdge
     }
-    developedMethods {
+    managedMethods {
       edges {
         node {
           id

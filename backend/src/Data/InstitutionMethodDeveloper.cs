@@ -10,5 +10,7 @@ namespace Metabase.Data
 
         public Guid InstitutionId { get; set; }
         public Institution Institution { get; set; } = default!;
+
+        public bool Pending { get; set; } = true;
     }
 }

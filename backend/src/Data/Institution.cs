@@ -32,6 +32,9 @@ namespace Metabase.Data
         public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } = new List<InstitutionMethodDeveloper>();
         public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
 
+        [InverseProperty(nameof(Method.Manager))]
+        public ICollection<Method> ManagedMethods { get; } = new List<Method>();
+
         [InverseProperty(nameof(DataFormat.Manager))]
         public ICollection<DataFormat> ManagedDataFormats { get; } = new List<DataFormat>();
 

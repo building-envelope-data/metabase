@@ -18,6 +18,17 @@ namespace Metabase.GraphQl.Methods
             .Field(t => t.Publication)
             .Ignore();
             descriptor
+                .Field(t => t.Manager)
+                .Type<NonNullType<ObjectType<MethodManagerEdge>>>()
+                .Resolve(context =>
+                    new MethodManagerEdge(
+                        context.Parent<Data.Method>()
+                        )
+                    );
+            descriptor
+                .Field(t => t.ManagerId)
+                .Ignore();
+            descriptor
             .Field(t => t.Developers)
                 .Type<NonNullType<ObjectType<MethodDeveloperConnection>>>()
                 .Resolve(context =>

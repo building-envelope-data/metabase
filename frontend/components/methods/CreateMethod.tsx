@@ -18,11 +18,11 @@ const tailLayout = {
 };
 
 export type CreateMethodProps = {
-  institutionDeveloperId: Scalars["Uuid"];
+  managerId: Scalars["Uuid"];
 };
 
 export const CreateMethod: React.FunctionComponent<CreateMethodProps> = ({
-  institutionDeveloperId,
+  managerId,
 }) => {
   const [createMethodMutation] = useCreateMethodMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -31,7 +31,7 @@ export const CreateMethod: React.FunctionComponent<CreateMethodProps> = ({
       {
         query: InstitutionDocument,
         variables: {
-          uuid: institutionDeveloperId,
+          uuid: managerId,
         },
       },
       {
@@ -80,7 +80,8 @@ export const CreateMethod: React.FunctionComponent<CreateMethodProps> = ({
             // publication: publication,
             calculationLocator: calculationLocator,
             categories: categories || [],
-            institutionDeveloperIds: [institutionDeveloperId],
+            managerId: managerId,
+            institutionDeveloperIds: [],
             userDeveloperIds: [],
           },
         });

@@ -1,12 +1,12 @@
 using Metabase.GraphQl.Institutions;
 
-namespace Metabase.GraphQl.DataFormats
+namespace Metabase.GraphQl.Methods
 {
-    public sealed class DataFormatManagerEdge
+    public sealed class MethodManagerEdge
         : Edge<Data.Institution, InstitutionByIdDataLoader>
     {
-        public DataFormatManagerEdge(
-            Data.DataFormat association
+        public MethodManagerEdge(
+            Data.Method association
         )
             : base(association.ManagerId)
         {

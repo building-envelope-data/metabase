@@ -10,5 +10,7 @@ namespace Metabase.Data
 
         public Guid UserId { get; set; }
         public User User { get; set; } = default!;
+
+        public bool Pending { get; set; } = true;
     }
 }

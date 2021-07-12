@@ -249,7 +249,7 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
         <></>
       )}
       <Divider />
-      <Typography.Title level={2}>Developed Methods</Typography.Title>
+      <Typography.Title level={2}>Managed Methods</Typography.Title>
       <Table
         columns={[
           {
@@ -299,10 +299,10 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             render: (_text, row, _index) => row.categories.join(", "),
           },
         ]}
-        dataSource={institution.developedMethods.edges.map((x) => x.node)}
+        dataSource={institution.managedMethods.edges.map((x) => x.node)}
       />
-      {institution.developedMethods.canCurrentUserAddEdge ? (
-        <CreateMethod institutionDeveloperId={institution.uuid} />
+      {institution.managedMethods.canCurrentUserAddEdge ? (
+        <CreateMethod managerId={institution.uuid} />
       ) : (
         <></>
       )}

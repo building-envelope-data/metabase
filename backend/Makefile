@@ -164,7 +164,10 @@ add-migration : ## Add migration with name `${NAME}`, for example, `make NAME=In
 .PHONY : add-migration
 
 migrate : ## Migrate database
-	dotnet ef database update
+	dotnet ef \
+		--project src/Metabase.csproj \
+		database \
+		update
 .PHONY : migrate
 
 prepare-release : find-latest-migration generate-migration-script switch-migrations ## Prepare release

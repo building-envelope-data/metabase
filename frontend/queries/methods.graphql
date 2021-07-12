@@ -67,6 +67,7 @@ mutation CreateMethod(
   $publication: CreatePublicationInput
   $calculationLocator: Url
   $categories: [MethodCategory!]!
+  $managerId: Uuid!
   $institutionDeveloperIds: [Uuid!]!
   $userDeveloperIds: [Uuid!]!
 ) {
@@ -80,6 +81,7 @@ mutation CreateMethod(
       publication: $publication
       calculationLocator: $calculationLocator
       categories: $categories
+      managerId: $managerId
       institutionDeveloperIds: $institutionDeveloperIds
       userDeveloperIds: $userDeveloperIds
     }

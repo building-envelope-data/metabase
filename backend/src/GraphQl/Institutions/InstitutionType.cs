@@ -41,6 +41,14 @@ namespace Metabase.GraphQl.Institutions
                         )
                 );
             descriptor
+                .Field(t => t.ManagedMethods)
+                .Type<NonNullType<ObjectType<InstitutionManagedMethodConnection>>>()
+                .Resolve(context =>
+                    new InstitutionManagedMethodConnection(
+                        context.Parent<Data.Institution>()
+                    )
+                );
+            descriptor
                 .Field(t => t.OperatedDatabases)
                 .Type<NonNullType<ObjectType<InstitutionOperatedDatabaseConnection>>>()
                 .Resolve(context =>

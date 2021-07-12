@@ -49,20 +49,6 @@ namespace Metabase.Migrations
                 table: "data_format",
                 newName: "IX_data_format_ManagerId");
 
-            migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:public.component_category", "material,layer,unit")
-                .Annotation("Npgsql:Enum:public.institution_representative_role", "owner,maintainer,assistant")
-                .Annotation("Npgsql:Enum:public.institution_state", "unknown,operative,inoperative")
-                .Annotation("Npgsql:Enum:public.method_category", "measurement,calculation")
-                .Annotation("Npgsql:Enum:public.standardizer", "aerc,agi,ashrae,breeam,bs,bsi,cen,cie,dgnb,din,dvwg,iec,ies,ift,iso,jis,leed,nfrc,riba,ul,unece,vdi,vff,well")
-                .Annotation("Npgsql:PostgresExtension:pgcrypto", ",,")
-                .OldAnnotation("Npgsql:Enum:component_category", "material,layer,unit")
-                .OldAnnotation("Npgsql:Enum:institution_representative_role", "owner,maintainer,assistant")
-                .OldAnnotation("Npgsql:Enum:institution_state", "unknown,operative,inoperative")
-                .OldAnnotation("Npgsql:Enum:method_category", "measurement,calculation")
-                .OldAnnotation("Npgsql:Enum:standardizer", "aerc,agi,ashrae,breeam,bs,bsi,cen,cie,dgnb,din,dvwg,iec,ies,ift,iso,jis,leed,nfrc,riba,ul,unece,vdi,vff,well")
-                .OldAnnotation("Npgsql:PostgresExtension:pgcrypto", ",,");
-
             migrationBuilder.AlterColumn<uint>(
                 name: "xmin",
                 schema: "metabase",
@@ -123,20 +109,6 @@ namespace Metabase.Migrations
                 schema: "metabase",
                 table: "DataFormats",
                 newName: "IX_DataFormats_ManagerId");
-
-            migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:component_category", "material,layer,unit")
-                .Annotation("Npgsql:Enum:institution_representative_role", "owner,maintainer,assistant")
-                .Annotation("Npgsql:Enum:institution_state", "unknown,operative,inoperative")
-                .Annotation("Npgsql:Enum:method_category", "measurement,calculation")
-                .Annotation("Npgsql:Enum:standardizer", "aerc,agi,ashrae,breeam,bs,bsi,cen,cie,dgnb,din,dvwg,iec,ies,ift,iso,jis,leed,nfrc,riba,ul,unece,vdi,vff,well")
-                .Annotation("Npgsql:PostgresExtension:pgcrypto", ",,")
-                .OldAnnotation("Npgsql:Enum:public.component_category", "material,layer,unit")
-                .OldAnnotation("Npgsql:Enum:public.institution_representative_role", "owner,maintainer,assistant")
-                .OldAnnotation("Npgsql:Enum:public.institution_state", "unknown,operative,inoperative")
-                .OldAnnotation("Npgsql:Enum:public.method_category", "measurement,calculation")
-                .OldAnnotation("Npgsql:Enum:public.standardizer", "aerc,agi,ashrae,breeam,bs,bsi,cen,cie,dgnb,din,dvwg,iec,ies,ift,iso,jis,leed,nfrc,riba,ul,unece,vdi,vff,well")
-                .OldAnnotation("Npgsql:PostgresExtension:pgcrypto", ",,");
 
             migrationBuilder.AddColumn<Guid>(
                 name: "Id",

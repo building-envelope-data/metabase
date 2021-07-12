@@ -59,6 +59,11 @@ namespace Metabase.Data
                 );
         }
 
+        public Guid ManagerId { get; set; }
+
+        [InverseProperty(nameof(Institution.ManagedMethods))]
+        public Institution? Manager { get; set; }
+
 #nullable disable
         public Method()
         {

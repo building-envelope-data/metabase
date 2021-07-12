@@ -3,12 +3,12 @@ using System.Linq;
 using GreenDonut;
 using Microsoft.EntityFrameworkCore;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Institutions
 {
-    public sealed class UserDevelopedMethodsByUserIdDataLoader
-      : Entities.AssociationsByAssociateIdDataLoader<Data.UserMethodDeveloper>
+    public sealed class InstitutionManagedMethodsByInstitutionIdDataLoader
+      : Entities.AssociationsByAssociateIdDataLoader<Data.Method>
     {
-        public UserDevelopedMethodsByUserIdDataLoader(
+        public InstitutionManagedMethodsByInstitutionIdDataLoader(
             IBatchScheduler batchScheduler,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
@@ -16,10 +16,10 @@ namespace Metabase.GraphQl.Users
                 batchScheduler,
                 dbContextFactory,
                 (dbContext, ids) =>
-                    dbContext.UserMethodDevelopers.AsQueryable().Where(x =>
-                        !x.Pending && ids.Contains(x.UserId)
+                    dbContext.Methods.AsQueryable().Where(x =>
+                        ids.Contains(x.ManagerId)
                     ),
-                x => x.UserId
+                x => x.ManagerId
                 )
         {
         }

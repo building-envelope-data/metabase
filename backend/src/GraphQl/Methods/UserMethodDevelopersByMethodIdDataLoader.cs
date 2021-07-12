@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.Methods
                 dbContextFactory,
                 (dbContext, ids) =>
                     dbContext.UserMethodDevelopers.AsQueryable().Where(x =>
-                        ids.Contains(x.MethodId)
+                        !x.Pending && ids.Contains(x.MethodId)
                     ),
                 x => x.MethodId
                 )

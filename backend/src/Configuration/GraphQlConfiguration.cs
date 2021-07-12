@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Types;
 using HotChocolate.Data.Filters;
 using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication;

@@ -460,6 +460,7 @@ type Institution implements Node & Stakeholder {
   developedMethods: InstitutionDevelopedMethodConnection!
   id: ID!
   managedDataFormats: InstitutionManagedDataFormatConnection!
+  managedMethods: InstitutionManagedMethodConnection!
   manufacturedComponents: InstitutionManufacturedComponentConnection!
   name: String!
   operatedDatabases: InstitutionOperatedDatabaseConnection!
@@ -482,12 +483,12 @@ type InstitutionConnection {
 }
 
 type InstitutionDevelopedMethodConnection {
-  canCurrentUserAddEdge: Boolean!
   edges: [InstitutionDevelopedMethodEdge!]!
 }
 
 type InstitutionDevelopedMethodEdge {
   node: Method!
+  pending: Boolean!
 }
 
 "An edge in a connection."
@@ -505,6 +506,15 @@ type InstitutionManagedDataFormatConnection {
 
 type InstitutionManagedDataFormatEdge {
   node: DataFormat!
+}
+
+type InstitutionManagedMethodConnection {
+  canCurrentUserAddEdge: Boolean!
+  edges: [InstitutionManagedMethodEdge!]!
+}
+
+type InstitutionManagedMethodEdge {
+  node: Method!
 }
 
 type InstitutionManufacturedComponentConnection {
@@ -587,6 +597,7 @@ type Method implements Node {
   description: String!
   developers: MethodDeveloperConnection!
   id: ID!
+  manager: MethodManagerEdge!
   name: String!
   reference: Reference
   uuid: Uuid!
@@ -618,6 +629,10 @@ type MethodEdge {
   cursor: String!
   "The item at the end of the edge."
   node: Method!
+}
+
+type MethodManagerEdge {
+  node: Institution!
 }
 
 type Mutation {
@@ -1173,6 +1188,7 @@ input CreateMethodInput {
   categories: [MethodCategory!]!
   description: String!
   institutionDeveloperIds: [Uuid!]!
+  managerId: Uuid!
   name: String!
   publication: CreatePublicationInput
   standard: CreateStandardInput
@@ -1375,6 +1391,8 @@ input MethodSortInput {
   calculationLocator: UriSortInput
   description: SortEnumType
   id: SortEnumType
+  manager: InstitutionSortInput
+  managerId: SortEnumType
   name: SortEnumType
   publication: PublicationSortInput
   reference: IReferenceSortInput
@@ -1670,6 +1688,7 @@ enum CreateInstitutionErrorCode {
 enum CreateMethodErrorCode {
   UNKNOWN
   TWO_REFERENCES
+  UNKNOWN_MANAGER
   UNKNOWN_INSTITUTION_DEVELOPERS
   UNKNOWN_USER_DEVELOPERS
   UNAUTHORIZED
