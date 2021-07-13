@@ -26,7 +26,7 @@ namespace Metabase.GraphQl.OpenIdConnect
             )
         {
             // TODO Is there a more efficient way to return an `AsyncEnumerable` or `AsyncEnumerator` or to turn such a thing into an `Enumerable` or `Enumerator`?
-            return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken);
+            return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false);
         }
 
         [Authorize(Roles = new[] { Data.Role.Administrator })]
@@ -36,7 +36,7 @@ namespace Metabase.GraphQl.OpenIdConnect
             CancellationToken cancellationToken
             )
         {
-            return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken);
+            return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false);
         }
 
         [Authorize(Roles = new[] { Data.Role.Administrator })]
@@ -46,7 +46,7 @@ namespace Metabase.GraphQl.OpenIdConnect
             CancellationToken cancellationToken
             )
         {
-            return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken);
+            return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false);
         }
 
         [Authorize(Roles = new[] { Data.Role.Administrator })]
@@ -56,7 +56,7 @@ namespace Metabase.GraphQl.OpenIdConnect
             CancellationToken cancellationToken
             )
         {
-            return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken);
+            return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }
