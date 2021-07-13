@@ -692,7 +692,7 @@ namespace Metabase.GraphQl.Databases
             }
             catch (JsonException e)
             {
-                _logger.LogError(e, $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request)}. The details given are {JsonSerializer.Serialize(e)}.");
+                _logger.LogError(e, $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is {e.Message}, path within the JSON where the exception was encountered is {e.Path}.");
                 throw;
             }
             catch (Exception e)
