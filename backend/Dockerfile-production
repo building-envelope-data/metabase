@@ -8,7 +8,7 @@
 #########
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:5.0.202-alpine3.13-amd64 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0.302-alpine3.13-amd64 AS build
 
 COPY ./ /app
 

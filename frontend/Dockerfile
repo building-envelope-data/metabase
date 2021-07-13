@@ -1,7 +1,7 @@
 # Inspired by https://mherman.org/blog/dockerizing-a-react-app/
 
 # https://hub.docker.com/_/node
-FROM node:14.16.0-alpine3.13
+FROM node:14.17.3-alpine3.14
 
 ARG GROUP_ID
 ARG USER_ID
