@@ -4,11 +4,11 @@ namespace Metabase.GraphQl.DataX
 {
   public record DataPropositionInput(
       UuidPropositionInput? ComponentId,
-      List<DataPropositionInput>? And,
+      IReadOnlyList<DataPropositionInput>? And,
       FloatPropositionInput? GValue,
       FloatPropositionInput? NearnormalHemisphericalVisibleTransmittance,
       DataPropositionInput? Not,
-      List<DataPropositionInput>? Or,
+      IReadOnlyList<DataPropositionInput>? Or,
       FloatPropositionInput? UValue
       );
 }

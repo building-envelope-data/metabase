@@ -1,10 +1,15 @@
-using System;
-using System.Collections.Generic;
-
 namespace Metabase.GraphQl.DataX
 {
-    public sealed class GetHttpsResourceTreeRoot : IGetHttpsResourceTreeVertex {
-      // public string VertexId { get; set; }
-      public GetHttpsResource Value { get; set; }
+    public sealed class GetHttpsResourceTreeRoot : IGetHttpsResourceTreeVertex
+    {
+      public GetHttpsResourceTreeRoot(
+        GetHttpsResource value
+      )
+      {
+        Value = value;
+      }
+
+      // public string VertexId { get; }
+      public GetHttpsResource Value { get; }
     }
 }

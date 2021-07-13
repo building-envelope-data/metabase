@@ -1,10 +1,19 @@
 using System;
-using System.Collections.Generic;
 
 namespace Metabase.GraphQl.DataX
 {
-    public sealed class OpenEndedDateTimeRange {
-      public DateTime From { get; set; }
-      public DateTime Until { get; set; }
+    public sealed class OpenEndedDateTimeRange
+    {
+      public OpenEndedDateTimeRange(
+      DateTime from,
+      DateTime until
+      )
+      {
+      From = from;
+      Until = until;
+      }
+
+      public DateTime From { get; }
+      public DateTime Until { get; }
     }
 }

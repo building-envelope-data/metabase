@@ -5,9 +5,9 @@ namespace Metabase.GraphQl.DataX
 {
   public record OpticalDataPropositionInput(
       UuidPropositionInput? ComponentId,
-      List<OpticalDataPropositionInput>? And,
+      IReadOnlyList<OpticalDataPropositionInput>? And,
       FloatPropositionInput? NearnormalHemisphericalVisibleTransmittance,
       OpticalDataPropositionInput? Not,
-      List<OpticalDataPropositionInput>? Or
+      IReadOnlyList<OpticalDataPropositionInput>? Or
       );
 }

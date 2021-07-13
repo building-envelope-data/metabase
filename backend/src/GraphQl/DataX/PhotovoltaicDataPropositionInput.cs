@@ -5,8 +5,8 @@ namespace Metabase.GraphQl.DataX
 {
   public record PhotovoltaicDataPropositionInput(
       UuidPropositionInput? ComponentId,
-      List<PhotovoltaicDataPropositionInput>? And,
+      IReadOnlyList<PhotovoltaicDataPropositionInput>? And,
       PhotovoltaicDataPropositionInput? Not,
-      List<PhotovoltaicDataPropositionInput>? Or
+      IReadOnlyList<PhotovoltaicDataPropositionInput>? Or
       );
 }

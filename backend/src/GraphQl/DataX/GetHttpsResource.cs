@@ -3,11 +3,25 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.DataX
 {
-    public sealed class GetHttpsResource {
-      public string Description { get; set; }
-      public string HashValue { get; set; }
-      public Uri Locator { get; set; }
-      public Guid FormatId { get; set; }
-      // public List<FileMetaInformation> ArchivedFilesMetaInformation { get; set; }
+    public sealed class GetHttpsResource
+    {
+      public GetHttpsResource(
+        string description,
+        string hashValue,
+        Uri locator,
+        Guid formatId
+      )
+      {
+        Description = description;
+        HashValue = hashValue;
+        Locator = locator;
+        FormatId = formatId;
+      }
+
+      public string Description { get; }
+      public string HashValue { get; }
+      public Uri Locator { get; }
+      public Guid FormatId { get; }
+      // public IReadOnlyList<FileMetaInformation> ArchivedFilesMetaInformation { get; }
     }
 }

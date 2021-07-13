@@ -1,27 +1,34 @@
 using System;
 using System.Collections.Generic;
+using HotChocolate;
+using HotChocolate.Types;
 
 namespace Metabase.GraphQl.DataX
 {
     public abstract class DataConnectionBase<TDataEdge, TData>
     {
-      // public DataConnectionBase(
-      //   List<TDataEdge> edges,
-      //   List<TData> nodes,
-      //   /*TODO add `u`*/int totalCount,
-      //   DateTime timestamp
-      // )
-      // {
-      //   Edges = edges;
-      //   Nodes = nodes;
-      //   TotalCount = totalCount;
-      //   Timestamp = timestamp;
-      // }
+      protected DataConnectionBase(
+        IReadOnlyList<TDataEdge> edges,
+        IReadOnlyList<TData> nodes,
+        uint totalCount,
+        DateTime timestamp
+      )
+      {
+        Edges = edges;
+        Nodes = nodes;
+        TotalCount = totalCount;
+        Timestamp = timestamp;
+      }
 
-      public List<TDataEdge> Edges { get; set; } = new List<TDataEdge>();
-      public List<TData> Nodes { get; set; } = new List<TData>();
-      public /*TODO add `u`*/int TotalCount { get; }
-      // public PageInfo PageInfo { get; set; } // TODO Resolve clash with `PageInfo` provided by `HotChocolate` 
+      public IReadOnlyList<TDataEdge> Edges { get; }
+
+      public IReadOnlyList<TData> Nodes { get; }
+
+      [GraphQLType(typeof(NonNegativeIntType))]
+      public uint TotalCount { get; }
+
+      // public PageInfo PageInfo { get; } // TODO Resolve clash with `PageInfo` provided by `HotChocolate` 
+
       public DateTime Timestamp { get; }
     }
 }

@@ -4,11 +4,12 @@ using HotChocolate.Types;
 namespace Metabase.GraphQl.DataX
 {
     [InterfaceType("Approval")]
-    public interface IApproval {
-      DateTime Timestamp { get; set; }
-      string Signature { get; set; }
-      string KeyFingerprint { get; set; }
-      string Query { get; set; }
-      string Response { get; set; }
+    public interface IApproval
+    {
+      DateTime Timestamp { get; }
+      string Signature { get; }
+      string KeyFingerprint { get; }
+      string Query { get; }
+      string Response { get; }
     }
 }

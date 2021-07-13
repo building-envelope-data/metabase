@@ -5,10 +5,10 @@ namespace Metabase.GraphQl.DataX
 {
   public record CalorimetricDataPropositionInput(
       UuidPropositionInput? ComponentId,
-      List<CalorimetricDataPropositionInput>? And,
+      IReadOnlyList<CalorimetricDataPropositionInput>? And,
       FloatPropositionInput? GValue,
       CalorimetricDataPropositionInput? Not,
-      List<CalorimetricDataPropositionInput>? Or,
+      IReadOnlyList<CalorimetricDataPropositionInput>? Or,
       FloatPropositionInput? UValue
       );
 }

@@ -5,7 +5,7 @@ namespace Metabase.GraphQl.DataX
     [InterfaceType("GetHttpsResourceTreeVertex")]
     public interface IGetHttpsResourceTreeVertex
     {
-      // string VertexId { get; set; }
-      GetHttpsResource Value { get; set; }
+      // string VertexId { get; }
+      GetHttpsResource Value { get; }
     }
 }
