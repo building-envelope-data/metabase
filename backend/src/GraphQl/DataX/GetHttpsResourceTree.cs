@@ -4,14 +4,14 @@ namespace Metabase.GraphQl.DataX
 {
     public sealed class GetHttpsResourceTree
     {
-      public GetHttpsResourceTree(
-        GetHttpsResourceTreeRoot root
-      )
-      {
-        Root = root;
-      }
+        public GetHttpsResourceTree(
+          GetHttpsResourceTreeRoot root
+        )
+        {
+            Root = root;
+        }
 
-      public GetHttpsResourceTreeRoot Root { get; }
-      // public IReadOnlyList<GetHttpsResourceTreeNonRootVertex> NonRootVertices { get; }
+        public GetHttpsResourceTreeRoot Root { get; }
+        // public IReadOnlyList<GetHttpsResourceTreeNonRootVertex> NonRootVertices { get; }
     }
 }

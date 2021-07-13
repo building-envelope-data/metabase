@@ -97,7 +97,7 @@ namespace Metabase.Configuration
                   /*     .AddType<ComponentSubscriptions>() */
                   // Scalar Types
                   .AddType(new UuidType('D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
-                  // Object Types
+                                              // Object Types
                   .AddType<GraphQl.Components.ComponentType>()
                   .AddType<GraphQl.DataFormats.DataFormatType>()
                   .AddType<GraphQl.DataX.CalorimetricData>()
