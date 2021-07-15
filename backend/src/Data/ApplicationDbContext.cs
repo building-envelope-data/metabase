@@ -114,26 +114,6 @@ namespace Metabase.Data
               );
         }
 
-        private static void ConfigureInstitutionRepresentative(ModelBuilder builder)
-        {
-            builder.Entity<Institution>()
-              .HasMany(i => i.Representatives)
-              .WithMany(u => u.RepresentedInstitutions)
-              .UsingEntity<InstitutionRepresentative>(
-                j => j
-                .HasOne(e => e.User)
-                .WithMany(u => u.RepresentedInstitutionEdges)
-                .HasForeignKey(e => e.UserId),
-                j => j
-                .HasOne(e => e.Institution)
-                .WithMany(i => i.RepresentativeEdges)
-                .HasForeignKey(e => e.InstitutionId),
-                j => j
-                .ToTable("institution_representative")
-                .HasKey(a => new { a.InstitutionId, a.UserId })
-              );
-        }
-
         private static void ConfigureInstitutionMethodDeveloper(ModelBuilder builder)
         {
             builder.Entity<Method>()
@@ -151,6 +131,26 @@ namespace Metabase.Data
                 j => j
                 .ToTable("institution_method_developer")
                 .HasKey(a => new { a.InstitutionId, a.MethodId })
+              );
+        }
+
+        private static void ConfigureInstitutionRepresentative(ModelBuilder builder)
+        {
+            builder.Entity<Institution>()
+              .HasMany(i => i.Representatives)
+              .WithMany(u => u.RepresentedInstitutions)
+              .UsingEntity<InstitutionRepresentative>(
+                j => j
+                .HasOne(e => e.User)
+                .WithMany(u => u.RepresentedInstitutionEdges)
+                .HasForeignKey(e => e.UserId),
+                j => j
+                .HasOne(e => e.Institution)
+                .WithMany(i => i.RepresentativeEdges)
+                .HasForeignKey(e => e.InstitutionId),
+                j => j
+                .ToTable("institution_representative")
+                .HasKey(a => new { a.InstitutionId, a.UserId })
               );
         }
 

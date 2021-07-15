@@ -58,7 +58,7 @@ type CalorimetricDataConnection {
   edges: [CalorimetricDataEdge!]!
   nodes: [CalorimetricData!]!
   timestamp: DateTime!
-  totalCount: Int!
+  totalCount: NonNegativeInt
 }
 
 type CalorimetricDataEdge {
@@ -228,7 +228,7 @@ type DataConnection {
   edges: [DataEdge!]!
   nodes: [Data!]!
   timestamp: DateTime!
-  totalCount: Int!
+  totalCount: NonNegativeInt
 }
 
 type DataEdge {
@@ -272,11 +272,11 @@ type DataFormatManagerEdge {
 }
 
 type Database implements Node {
-  allCalorimetricData(after: String before: String first: Int last: Int locale: String timestamp: DateTime where: CalorimetricDataPropositionInput!): CalorimetricDataConnection
-  allData(after: String before: String first: Int last: Int locale: String timestamp: DateTime where: DataPropositionInput!): DataConnection
-  allHygrothermalData(after: String before: String first: Int last: Int locale: String timestamp: DateTime where: HygrothermalDataPropositionInput!): HygrothermalDataConnection
-  allOpticalData(after: String before: String first: Int last: Int locale: String timestamp: DateTime where: OpticalDataPropositionInput!): OpticalDataConnection
-  allPhotovoltaicData(after: String before: String first: Int last: Int locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput!): PhotovoltaicDataConnection
+  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: CalorimetricDataPropositionInput!): CalorimetricDataConnection
+  allData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: DataPropositionInput!): DataConnection
+  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: HygrothermalDataPropositionInput!): HygrothermalDataConnection
+  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput!): OpticalDataConnection
+  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput!): PhotovoltaicDataConnection
   calorimetricData(id: Uuid! locale: String timestamp: DateTime): CalorimetricData
   data(id: Uuid! locale: String timestamp: DateTime): Data
   description: String!
@@ -446,7 +446,7 @@ type HygrothermalDataConnection {
   edges: [HygrothermalDataEdge!]!
   nodes: [HygrothermalData!]!
   timestamp: DateTime!
-  totalCount: Int!
+  totalCount: NonNegativeInt
 }
 
 type HygrothermalDataEdge {
@@ -460,7 +460,9 @@ type Institution implements Node & Stakeholder {
   developedMethods: InstitutionDevelopedMethodConnection!
   id: ID!
   managedDataFormats: InstitutionManagedDataFormatConnection!
+  managedInstitutions: InstitutionManagedInstitutionConnection!
   managedMethods: InstitutionManagedMethodConnection!
+  manager: InstitutionManagerEdge
   manufacturedComponents: InstitutionManufacturedComponentConnection!
   name: String!
   operatedDatabases: InstitutionOperatedDatabaseConnection!
@@ -488,7 +490,6 @@ type InstitutionDevelopedMethodConnection {
 
 type InstitutionDevelopedMethodEdge {
   node: Method!
-  pending: Boolean!
 }
 
 "An edge in a connection."
@@ -508,6 +509,15 @@ type InstitutionManagedDataFormatEdge {
   node: DataFormat!
 }
 
+type InstitutionManagedInstitutionConnection {
+  canCurrentUserAddEdge: Boolean!
+  edges: [InstitutionManagedInstitutionEdge!]!
+}
+
+type InstitutionManagedInstitutionEdge {
+  node: Institution!
+}
+
 type InstitutionManagedMethodConnection {
   canCurrentUserAddEdge: Boolean!
   edges: [InstitutionManagedMethodEdge!]!
@@ -515,6 +525,10 @@ type InstitutionManagedMethodConnection {
 
 type InstitutionManagedMethodEdge {
   node: Method!
+}
+
+type InstitutionManagerEdge {
+  node: Institution!
 }
 
 type InstitutionManufacturedComponentConnection {
@@ -759,7 +773,7 @@ type OpticalDataConnection {
   edges: [OpticalDataEdge!]!
   nodes: [OpticalData!]!
   timestamp: DateTime!
-  totalCount: Int!
+  totalCount: NonNegativeInt
 }
 
 type OpticalDataEdge {
@@ -792,7 +806,7 @@ type PhotovoltaicDataConnection {
   edges: [PhotovoltaicDataEdge!]!
   nodes: [PhotovoltaicData!]!
   timestamp: DateTime!
-  totalCount: Int!
+  totalCount: NonNegativeInt
 }
 
 type PhotovoltaicDataEdge {
@@ -1175,6 +1189,7 @@ input CreateDatabaseInput {
 input CreateInstitutionInput {
   abbreviation: String
   description: String!
+  managerId: Uuid
   name: String!
   ownerIds: [Uuid!]!
   publicKey: String
@@ -1326,6 +1341,8 @@ input InstitutionSortInput {
   abbreviation: SortEnumType
   description: SortEnumType
   id: SortEnumType
+  manager: InstitutionSortInput
+  managerId: SortEnumType
   name: SortEnumType
   publicKey: SortEnumType
   state: SortEnumType
@@ -1681,8 +1698,10 @@ enum CreateDatabaseErrorCode {
 
 enum CreateInstitutionErrorCode {
   UNKNOWN
-  NO_OWNER
+  NEITHER_OWNER_NOR_MANAGER
   UNKNOWN_OWNERS
+  UNKNOWN_MANAGER
+  UNAUTHORIZED
 }
 
 enum CreateMethodErrorCode {
@@ -1743,7 +1762,6 @@ enum GenerateUserTwoFactorRecoveryCodesErrorCode {
 
 enum InstitutionRepresentativeRole {
   OWNER
-  MAINTAINER
   ASSISTANT
 }
 
@@ -1915,6 +1933,9 @@ directive @stream("Streamed when true." if: Boolean! "The initial elements that 
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The NonNegativeInt scalar type represents a unsigned 32-bit numeric non-fractional value equal to or greater than 0."
+scalar NonNegativeInt
 
 scalar Url
 

@@ -20,20 +20,51 @@ namespace Metabase.GraphQl.Institutions
     public sealed class InstitutionMutations
     {
         [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateInstitutionPayload> CreateInstitutionAsync(
             CreateInstitutionInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
             [ScopedService] Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
-            if (input.OwnerIds.Count is 0)
+            if (input.ManagerId is not null && !await InstitutionAuthorization.IsAuthorizedToCreateInstitutionManagedByInstitution(
+                 claimsPrincipal,
+                 input.ManagerId ?? Guid.Empty,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
             {
                 return new CreateInstitutionPayload(
                     new CreateInstitutionError(
-                      CreateInstitutionErrorCode.NO_OWNER,
-                      "No owner assigned.",
-                      new[] { nameof(input), nameof(input.OwnerIds).FirstCharToLower() }
+                      CreateInstitutionErrorCode.UNAUTHORIZED,
+                      "You are not authorized to create components for the institution.",
+                      new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
+                    )
+                );
+            }
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new CreateInstitutionPayload(
+                    new CreateInstitutionError(
+                      CreateInstitutionErrorCode.UNKNOWN,
+                      "Unknown user.",
+                      Array.Empty<string>()
+                      )
+                );
+            }
+            if (input.OwnerIds.Count is 0 && input.ManagerId is null)
+            {
+                return new CreateInstitutionPayload(
+                    new CreateInstitutionError(
+                      CreateInstitutionErrorCode.NEITHER_OWNER_NOR_MANAGER,
+                      "Neither owner nor manager given.",
+                      new[] { nameof(input) }
                       )
                 );
             }
@@ -55,6 +86,23 @@ namespace Metabase.GraphQl.Institutions
                       )
                 );
             }
+            if (input.ManagerId is not null &&
+                !await context.Institutions.AsQueryable()
+                .AnyAsync(
+                    x => x.Id == input.ManagerId,
+                    cancellationToken: cancellationToken
+                 )
+                .ConfigureAwait(false)
+            )
+            {
+                return new CreateInstitutionPayload(
+                    new CreateInstitutionError(
+                        CreateInstitutionErrorCode.UNKNOWN_MANAGER,
+                        "Unknown manager.",
+                      new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
+                    )
+                );
+            }
             var institution = new Data.Institution(
                 name: input.Name,
                 abbreviation: input.Abbreviation,
@@ -62,14 +110,18 @@ namespace Metabase.GraphQl.Institutions
                 websiteLocator: input.WebsiteLocator,
                 publicKey: input.PublicKey,
                 state: input.State
-            );
+            )
+            {
+                ManagerId = input.ManagerId
+            };
             foreach (var ownerId in input.OwnerIds)
             {
                 institution.RepresentativeEdges.Add(
                     new Data.InstitutionRepresentative
                     {
                         UserId = ownerId,
-                        Role = Enumerations.InstitutionRepresentativeRole.OWNER
+                        Role = Enumerations.InstitutionRepresentativeRole.OWNER,
+                        Pending = ownerId != user.Id
                     }
                 );
             }

@@ -58,5 +58,22 @@ namespace Metabase.Authorization
                 cancellationToken
             );
         }
+
+        public static Task<bool> IsAuthorizedToCreateInstitutionManagedByInstitution(
+            ClaimsPrincipal claimsPrincipal,
+            Guid institutionId,
+            UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return CommonAuthorization.IsAtLeastAssistant(
+                claimsPrincipal,
+                institutionId,
+                userManager,
+                context,
+                cancellationToken
+            );
+        }
     }
 }

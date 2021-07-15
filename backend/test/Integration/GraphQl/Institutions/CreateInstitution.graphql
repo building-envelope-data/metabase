@@ -3,6 +3,7 @@ mutation createInstitution(
   $abbreviation: String
   $description: String!
   $ownerIds: [Uuid!]!
+  $managerId: Uuid
   $websiteLocator: Url
   $state: InstitutionState!
 ) {
@@ -12,6 +13,7 @@ mutation createInstitution(
       abbreviation: $abbreviation
       description: $description
       ownerIds: $ownerIds
+      managerId: $managerId
       websiteLocator: $websiteLocator
       state: $state
     }

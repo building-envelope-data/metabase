@@ -18,7 +18,8 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             WebsiteLocator: new Uri("https://institution-a.com"),
             PublicKey: null,
             State: Enumerations.InstitutionState.OPERATIVE,
-            OwnerIds: Array.Empty<Guid>()
+            OwnerIds: Array.Empty<Guid>(),
+            ManagerId: null
             );
 
         internal static IEnumerable<CreateInstitutionInput> InstitutionInputs

@@ -13,5 +13,7 @@ namespace Metabase.Data
 
         [Required]
         public Enumerations.InstitutionRepresentativeRole Role { get; set; }
+
+        public bool Pending { get; set; } = true;
     }
 }

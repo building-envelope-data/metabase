@@ -10,6 +10,7 @@ namespace Metabase.GraphQl.Institutions
           Uri? WebsiteLocator,
           string? PublicKey,
           Enumerations.InstitutionState State,
-          IReadOnlyList<Guid> OwnerIds
+          IReadOnlyList<Guid> OwnerIds,
+          Guid? ManagerId
         );
 }

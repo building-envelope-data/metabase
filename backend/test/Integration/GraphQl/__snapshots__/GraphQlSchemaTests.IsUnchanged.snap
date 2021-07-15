@@ -3,6 +3,15 @@
   mutation: Mutation
 }
 
+interface Data {
+  appliedMethod: AppliedMethod!
+  componentId: Uuid!
+  name: String
+  resourceTree: GetHttpsResourceTree!
+  timestamp: DateTime!
+  uuid: Uuid!
+}
+
 "The node interface is implemented by entities that have a global unique identifier."
 interface Node {
   id: ID!
@@ -28,6 +37,33 @@ type AddInstitutionRepresentativePayload {
   errors: [AddInstitutionRepresentativeError!]
   institutionRepresentativeEdge: InstitutionRepresentativeEdge
   representedInstitutionEdge: RepresentedInstitutionEdge
+}
+
+type AppliedMethod {
+  methodId: Uuid!
+}
+
+type CalorimetricData implements Data {
+  appliedMethod: AppliedMethod!
+  componentId: Uuid!
+  gValues: [Float!]!
+  name: String
+  resourceTree: GetHttpsResourceTree!
+  timestamp: DateTime!
+  uuid: Uuid!
+  uValues: [Float!]!
+}
+
+type CalorimetricDataConnection {
+  edges: [CalorimetricDataEdge!]!
+  nodes: [CalorimetricData!]!
+  timestamp: DateTime!
+  totalCount: NonNegativeInt
+}
+
+type CalorimetricDataEdge {
+  cursor: String!
+  node: CalorimetricData!
 }
 
 type ChangeInstitutionRepresentativeRoleError {
@@ -179,6 +215,27 @@ type CreateMethodPayload {
   method: Method
 }
 
+type DataApproval {
+  approverId: Uuid!
+  keyFingerprint: String!
+  query: String!
+  response: String!
+  signature: String!
+  timestamp: DateTime!
+}
+
+type DataConnection {
+  edges: [DataEdge!]!
+  nodes: [Data!]!
+  timestamp: DateTime!
+  totalCount: NonNegativeInt
+}
+
+type DataEdge {
+  cursor: String!
+  node: Data!
+}
+
 type DataFormat implements Node {
   description: String!
   extension: String
@@ -215,11 +272,26 @@ type DataFormatManagerEdge {
 }
 
 type Database implements Node {
+  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: CalorimetricDataPropositionInput!): CalorimetricDataConnection
+  allData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: DataPropositionInput!): DataConnection
+  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: HygrothermalDataPropositionInput!): HygrothermalDataConnection
+  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput!): OpticalDataConnection
+  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput!): PhotovoltaicDataConnection
+  calorimetricData(id: Uuid! locale: String timestamp: DateTime): CalorimetricData
+  data(id: Uuid! locale: String timestamp: DateTime): Data
   description: String!
+  hasCalorimetricData(locale: String timestamp: DateTime where: CalorimetricDataPropositionInput!): Boolean
+  hasData(locale: String timestamp: DateTime where: DataPropositionInput!): Boolean
+  hasHygrothermalData(locale: String timestamp: DateTime where: HygrothermalDataPropositionInput!): Boolean
+  hasOpticalData(locale: String timestamp: DateTime where: OpticalDataPropositionInput!): Boolean
+  hasPhotovoltaicData(locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput!): Boolean
+  hygrothermalData(id: Uuid! locale: String timestamp: DateTime): HygrothermalData
   id: ID!
   locator: Url!
   name: String!
   operator: DatabaseOperatorEdge!
+  opticalData(id: Uuid! locale: String timestamp: DateTime): OpticalData
+  photovoltaicData(id: Uuid! locale: String timestamp: DateTime): PhotovoltaicData
   uuid: Uuid!
 }
 
@@ -264,6 +336,17 @@ type DeletePersonalUserDataError {
 
 type DeletePersonalUserDataPayload {
   errors: [DeletePersonalUserDataError!]
+  user: User
+}
+
+type DeleteUserError {
+  code: DeleteUserErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type DeleteUserPayload {
+  errors: [DeleteUserError!]
   user: User
 }
 
@@ -328,12 +411,58 @@ type GenerateUserTwoFactorRecoveryCodesPayload {
   user: User
 }
 
+type GetHttpsResource {
+  description: String!
+  formatId: Uuid!
+  hashValue: String!
+  locator: Url!
+}
+
+type GetHttpsResourceTree {
+  root: GetHttpsResourceTreeRoot!
+}
+
+type GetHttpsResourceTreeNonRootVertex {
+  appliedConversionMethod: ToTreeVertexAppliedConversionMethod!
+  parentId: String!
+  value: GetHttpsResource!
+  vertexId: String!
+}
+
+type GetHttpsResourceTreeRoot {
+  value: GetHttpsResource!
+}
+
+type HygrothermalData implements Data {
+  appliedMethod: AppliedMethod!
+  componentId: Uuid!
+  name: String
+  resourceTree: GetHttpsResourceTree!
+  timestamp: DateTime!
+  uuid: Uuid!
+}
+
+type HygrothermalDataConnection {
+  edges: [HygrothermalDataEdge!]!
+  nodes: [HygrothermalData!]!
+  timestamp: DateTime!
+  totalCount: NonNegativeInt
+}
+
+type HygrothermalDataEdge {
+  cursor: String!
+  node: HygrothermalData!
+}
+
 type Institution implements Node & Stakeholder {
   abbreviation: String
   description: String!
   developedMethods: InstitutionDevelopedMethodConnection!
   id: ID!
   managedDataFormats: InstitutionManagedDataFormatConnection!
+  managedInstitutions: InstitutionManagedInstitutionConnection!
+  managedMethods: InstitutionManagedMethodConnection!
+  manager: InstitutionManagerEdge
   manufacturedComponents: InstitutionManufacturedComponentConnection!
   name: String!
   operatedDatabases: InstitutionOperatedDatabaseConnection!
@@ -356,7 +485,6 @@ type InstitutionConnection {
 }
 
 type InstitutionDevelopedMethodConnection {
-  canCurrentUserAddEdge: Boolean!
   edges: [InstitutionDevelopedMethodEdge!]!
 }
 
@@ -379,6 +507,28 @@ type InstitutionManagedDataFormatConnection {
 
 type InstitutionManagedDataFormatEdge {
   node: DataFormat!
+}
+
+type InstitutionManagedInstitutionConnection {
+  canCurrentUserAddEdge: Boolean!
+  edges: [InstitutionManagedInstitutionEdge!]!
+}
+
+type InstitutionManagedInstitutionEdge {
+  node: Institution!
+}
+
+type InstitutionManagedMethodConnection {
+  canCurrentUserAddEdge: Boolean!
+  edges: [InstitutionManagedMethodEdge!]!
+}
+
+type InstitutionManagedMethodEdge {
+  node: Method!
+}
+
+type InstitutionManagerEdge {
+  node: Institution!
 }
 
 type InstitutionManufacturedComponentConnection {
@@ -461,6 +611,7 @@ type Method implements Node {
   description: String!
   developers: MethodDeveloperConnection!
   id: ID!
+  manager: MethodManagerEdge!
   name: String!
   reference: Reference
   uuid: Uuid!
@@ -494,6 +645,10 @@ type MethodEdge {
   node: Method!
 }
 
+type MethodManagerEdge {
+  node: Institution!
+}
+
 type Mutation {
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
@@ -508,6 +663,7 @@ type Mutation {
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   enableUserTwoFactorAuthenticator(input: EnableUserTwoFactorAuthenticatorInput!): EnableUserTwoFactorAuthenticatorPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
@@ -527,6 +683,10 @@ type Mutation {
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+}
+
+type NamedMethodArgument {
+  name: String!
 }
 
 type Numeration {
@@ -599,6 +759,28 @@ type OpenIdConnectToken {
   type: String
 }
 
+type OpticalData implements Data {
+  appliedMethod: AppliedMethod!
+  componentId: Uuid!
+  name: String
+  nearnormalHemisphericalVisibleTransmittances: [Float!]!
+  resourceTree: GetHttpsResourceTree!
+  timestamp: DateTime!
+  uuid: Uuid!
+}
+
+type OpticalDataConnection {
+  edges: [OpticalDataEdge!]!
+  nodes: [OpticalData!]!
+  timestamp: DateTime!
+  totalCount: NonNegativeInt
+}
+
+type OpticalDataEdge {
+  cursor: String!
+  node: OpticalData!
+}
+
 "Information about pagination in a connection."
 type PageInfo {
   "When paginating forwards, the cursor to continue."
@@ -609,6 +791,27 @@ type PageInfo {
   hasPreviousPage: Boolean!
   "When paginating backwards, the cursor to continue."
   startCursor: String
+}
+
+type PhotovoltaicData implements Data {
+  appliedMethod: AppliedMethod!
+  componentId: Uuid!
+  name: String
+  resourceTree: GetHttpsResourceTree!
+  timestamp: DateTime!
+  uuid: Uuid!
+}
+
+type PhotovoltaicDataConnection {
+  edges: [PhotovoltaicDataEdge!]!
+  nodes: [PhotovoltaicData!]!
+  timestamp: DateTime!
+  totalCount: NonNegativeInt
+}
+
+type PhotovoltaicDataEdge {
+  cursor: String!
+  node: PhotovoltaicData!
 }
 
 type Publication implements Reference {
@@ -728,6 +931,14 @@ type ResetUserTwoFactorAuthenticatorPayload {
   user: User
 }
 
+type ResponseApproval {
+  keyFingerprint: String!
+  query: String!
+  response: String!
+  signature: String!
+  timestamp: DateTime!
+}
+
 type SetUserPasswordError {
   code: SetUserPasswordErrorCode!
   message: String!
@@ -761,6 +972,12 @@ type Standard implements Reference {
   title: String!
   "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
   year: Int
+}
+
+type ToTreeVertexAppliedConversionMethod {
+  arguments: [NamedMethodArgument!]!
+  methodId: Uuid!
+  sourceName: String!
 }
 
 type TwoFactorAuthentication {
@@ -845,6 +1062,15 @@ input BooleanOperationFilterInput {
   neq: Boolean
 }
 
+input CalorimetricDataPropositionInput {
+  and: [CalorimetricDataPropositionInput!]
+  componentId: UuidPropositionInput
+  gValue: FloatPropositionInput
+  not: CalorimetricDataPropositionInput
+  or: [CalorimetricDataPropositionInput!]
+  uValue: FloatPropositionInput
+}
+
 input ChangeInstitutionRepresentativeRoleInput {
   institutionId: Uuid!
   newRole: InstitutionRepresentativeRole!
@@ -859,6 +1085,11 @@ input ChangeUserPasswordInput {
   currentPassword: String!
   newPassword: String!
   newPasswordConfirmation: String!
+}
+
+input ClosedIntervalInput {
+  lowerBound: Float!
+  upperBound: Float!
 }
 
 input ComparableGuidOperationFilterInput {
@@ -958,6 +1189,7 @@ input CreateDatabaseInput {
 input CreateInstitutionInput {
   abbreviation: String
   description: String!
+  managerId: Uuid
   name: String!
   ownerIds: [Uuid!]!
   publicKey: String
@@ -971,6 +1203,7 @@ input CreateMethodInput {
   categories: [MethodCategory!]!
   description: String!
   institutionDeveloperIds: [Uuid!]!
+  managerId: Uuid!
   name: String!
   publication: CreatePublicationInput
   standard: CreateStandardInput
@@ -1029,6 +1262,16 @@ input DataFormatSortInput {
   xmin: SortEnumType
 }
 
+input DataPropositionInput {
+  and: [DataPropositionInput!]
+  componentId: UuidPropositionInput
+  gValue: FloatPropositionInput
+  nearnormalHemisphericalVisibleTransmittance: FloatPropositionInput
+  not: DataPropositionInput
+  or: [DataPropositionInput!]
+  uValue: FloatPropositionInput
+}
+
 input DatabaseFilterInput {
   and: [DatabaseFilterInput!]
   description: StringOperationFilterInput
@@ -1056,8 +1299,26 @@ input DeletePersonalUserDataInput {
   password: String
 }
 
+input DeleteUserInput {
+  userId: Uuid!
+}
+
 input EnableUserTwoFactorAuthenticatorInput {
   verificationCode: String!
+}
+
+input FloatPropositionInput {
+  equalTo: Float
+  greaterThanOrEqualTo: Float
+  inClosedInterval: ClosedIntervalInput
+  lessThanOrEqualTo: Float
+}
+
+input HygrothermalDataPropositionInput {
+  and: [HygrothermalDataPropositionInput!]
+  componentId: UuidPropositionInput
+  not: HygrothermalDataPropositionInput
+  or: [HygrothermalDataPropositionInput!]
 }
 
 input IReferenceSortInput {
@@ -1080,6 +1341,8 @@ input InstitutionSortInput {
   abbreviation: SortEnumType
   description: SortEnumType
   id: SortEnumType
+  manager: InstitutionSortInput
+  managerId: SortEnumType
   name: SortEnumType
   publicKey: SortEnumType
   state: SortEnumType
@@ -1145,6 +1408,8 @@ input MethodSortInput {
   calculationLocator: UriSortInput
   description: SortEnumType
   id: SortEnumType
+  manager: InstitutionSortInput
+  managerId: SortEnumType
   name: SortEnumType
   publication: PublicationSortInput
   reference: IReferenceSortInput
@@ -1162,6 +1427,21 @@ input NumerationSortInput {
 input OpenEndedDateTimeRangeInput {
   from: DateTime
   to: DateTime
+}
+
+input OpticalDataPropositionInput {
+  and: [OpticalDataPropositionInput!]
+  componentId: UuidPropositionInput
+  nearnormalHemisphericalVisibleTransmittance: FloatPropositionInput
+  not: OpticalDataPropositionInput
+  or: [OpticalDataPropositionInput!]
+}
+
+input PhotovoltaicDataPropositionInput {
+  and: [PhotovoltaicDataPropositionInput!]
+  componentId: UuidPropositionInput
+  not: PhotovoltaicDataPropositionInput
+  or: [PhotovoltaicDataPropositionInput!]
 }
 
 input PublicationSortInput {
@@ -1333,6 +1613,10 @@ input UserSortInput {
   xmin: SortEnumType
 }
 
+input UuidPropositionInput {
+  equalTo: Uuid
+}
+
 enum AddInstitutionRepresentativeErrorCode {
   UNKNOWN
   UNKNOWN_INSTITUTION
@@ -1414,13 +1698,16 @@ enum CreateDatabaseErrorCode {
 
 enum CreateInstitutionErrorCode {
   UNKNOWN
-  NO_OWNER
+  NEITHER_OWNER_NOR_MANAGER
   UNKNOWN_OWNERS
+  UNKNOWN_MANAGER
+  UNAUTHORIZED
 }
 
 enum CreateMethodErrorCode {
   UNKNOWN
   TWO_REFERENCES
+  UNKNOWN_MANAGER
   UNKNOWN_INSTITUTION_DEVELOPERS
   UNKNOWN_USER_DEVELOPERS
   UNAUTHORIZED
@@ -1437,6 +1724,12 @@ enum DeletePersonalUserDataErrorCode {
   UNKNOWN_USER
   MISSING_PASSWORD
   INCORRECT_PASSWORD
+}
+
+enum DeleteUserErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+  UNAUTHORIZED
 }
 
 enum DisableUserTwoFactorAuthenticationErrorCode {
@@ -1469,7 +1762,6 @@ enum GenerateUserTwoFactorRecoveryCodesErrorCode {
 
 enum InstitutionRepresentativeRole {
   OWNER
-  MAINTAINER
   ASSISTANT
 }
 
@@ -1641,6 +1933,9 @@ directive @stream("Streamed when true." if: Boolean! "The initial elements that 
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The NonNegativeInt scalar type represents a unsigned 32-bit numeric non-fractional value equal to or greater than 0."
+scalar NonNegativeInt
 
 scalar Url
 

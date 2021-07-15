@@ -71,7 +71,26 @@ namespace Metabase.Authorization
                 .Select(x => new { x.Role }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
                 .SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
-            return wrappedRole?.Role;
+            if (wrappedRole is not null)
+            {
+                return wrappedRole.Role;
+            }
+            var wrappedManagerRole =
+                await context.InstitutionRepresentatives.AsQueryable()
+                .Join(
+                    context.Institutions,
+                    representative => representative.InstitutionId,
+                    institution => institution.ManagerId,
+                    (representative, institution) => new {Representative = representative, Institution = institution}
+                )
+                .Where(x =>
+                    x.Institution.Id == institutionId &&
+                    x.Representative.UserId == user.Id
+                    )
+                .Select(x => new { x.Representative.Role }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+            return wrappedManagerRole?.Role;
         }
     }
 }

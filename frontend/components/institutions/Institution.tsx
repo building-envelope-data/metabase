@@ -18,6 +18,7 @@ import {
 import CreateComponent from "../components/CreateComponent";
 import CreateMethod from "../methods/CreateMethod";
 import CreateDataFormat from "../dataFormats/CreateDataFormat";
+import CreateInstitution from "../institutions/CreateInstitution";
 import CreateDatabase from "../databases/CreateDatabase";
 import AddInstitutionRepresentative from "./AddInstitutionRepresentative";
 import Link from "next/link";
@@ -307,6 +308,19 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
         <></>
       )}
       <Divider />
+      <Typography.Title level={2}>Managed Institutions</Typography.Title>
+      <List
+        dataSource={institution.managedInstitutions.edges.map((x) => x.node)}
+        renderItem={(item) => (
+          <Link href={paths.institution(item?.uuid)}>{item?.name}</Link>
+        )}
+      />
+      {institution.managedInstitutions.canCurrentUserAddEdge ? (
+        <CreateInstitution managerId={institution.uuid} />
+      ) : (
+        <></>
+      )}
+      <Divider />
       <Typography.Title level={2}>Representatives</Typography.Title>
       <List
         dataSource={institution.representatives.edges.map((x) => x.node)}
@@ -318,6 +332,15 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
         <AddInstitutionRepresentative institutionId={institution.uuid} />
       ) : (
         <></>
+      )}
+      {institution.manager?.node && (
+        <>
+          <Divider />
+          <Typography.Title level={2}>Managing Institution</Typography.Title>
+          <Link href={paths.institution(institution.manager?.node?.uuid)}>
+            {institution.manager?.node?.name}
+          </Link>
+        </>
       )}
     </>
   );

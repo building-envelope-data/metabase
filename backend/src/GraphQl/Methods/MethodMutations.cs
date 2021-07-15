@@ -42,7 +42,7 @@ namespace Metabase.GraphQl.Methods
                 return new CreateMethodPayload(
                     new CreateMethodError(
                       CreateMethodErrorCode.UNAUTHORIZED,
-                      "You are not authorized to create components for the institution.",
+                      "You are not authorized to create methods for the institution.",
                       new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
                     )
                 );
@@ -58,7 +58,7 @@ namespace Metabase.GraphQl.Methods
                 return new CreateMethodPayload(
                     new CreateMethodError(
                         CreateMethodErrorCode.UNKNOWN_MANAGER,
-                        "Unknown manufacturer",
+                        "Unknown manager.",
                       new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
                     )
                 );

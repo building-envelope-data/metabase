@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Institutions
 {
-    public sealed class InstitutionRepresentativesByInstitutionIdDataLoader
-      : Entities.AssociationsByAssociateIdDataLoader<Data.InstitutionRepresentative>
+    public sealed class InstitutionManagedInstitutionsByInstitutionIdDataLoader
+      : Entities.AssociationsByAssociateIdDataLoader<Data.Institution>
     {
-        public InstitutionRepresentativesByInstitutionIdDataLoader(
+        public InstitutionManagedInstitutionsByInstitutionIdDataLoader(
             IBatchScheduler batchScheduler,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
@@ -16,10 +16,10 @@ namespace Metabase.GraphQl.Institutions
                 batchScheduler,
                 dbContextFactory,
                 (dbContext, ids) =>
-                    dbContext.InstitutionRepresentatives.AsQueryable().Where(x =>
-                        !x.Pending && ids.Contains(x.InstitutionId)
+                    dbContext.Institutions.AsQueryable().Where(x =>
+                        ids.Contains(x.ManagerId ?? Guid.Empty)
                     ),
-                x => x.InstitutionId
+                x => x.ManagerId ?? Guid.Empty
                 )
         {
         }

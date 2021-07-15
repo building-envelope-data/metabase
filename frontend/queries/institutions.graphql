@@ -44,6 +44,7 @@ mutation CreateInstitution(
   $abbreviation: String
   $description: String!
   $ownerIds: [Uuid!]!
+  $managerId: Uuid
   $websiteLocator: Url
   $state: InstitutionState!
 ) {
@@ -53,6 +54,7 @@ mutation CreateInstitution(
       abbreviation: $abbreviation
       description: $description
       ownerIds: $ownerIds
+      managerId: $managerId
       websiteLocator: $websiteLocator
       state: $state
     }
@@ -139,6 +141,13 @@ query Institution($uuid: Uuid!) {
       }
       canCurrentUserAddEdge
     }
+    manager {
+      node {
+        id
+        uuid
+        name
+      }
+    }
     managedDataFormats {
       edges {
         node {
@@ -214,6 +223,16 @@ query Institution($uuid: Uuid!) {
           }
           calculationLocator
           categories
+        }
+      }
+      canCurrentUserAddEdge
+    }
+    managedInstitutions {
+      edges {
+        node {
+          id
+          uuid
+          name
         }
       }
       canCurrentUserAddEdge

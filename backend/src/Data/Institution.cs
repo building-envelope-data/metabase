@@ -44,6 +44,14 @@ namespace Metabase.Data
         [InverseProperty(nameof(Database.Operator))]
         public ICollection<Database> OperatedDatabases { get; } = new List<Database>();
 
+        public Guid? ManagerId { get; set; }
+
+        [InverseProperty(nameof(ManagedInstitutions))]
+        public Institution? Manager { get; set; }
+
+        [InverseProperty(nameof(Manager))]
+        public ICollection<Institution> ManagedInstitutions { get; } = new List<Institution>();
+
         public ICollection<InstitutionRepresentative> RepresentativeEdges { get; } = new List<InstitutionRepresentative>();
         public ICollection<User> Representatives { get; } = new List<User>();
 
