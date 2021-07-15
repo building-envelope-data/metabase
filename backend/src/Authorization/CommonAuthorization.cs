@@ -28,7 +28,7 @@ namespace Metabase.Authorization
             == Enumerations.InstitutionRepresentativeRole.OWNER;
         }
 
-        public static async Task<bool> IsAtLeastMaintainer(
+        public static async Task<bool> IsAtLeastAssistant(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,
@@ -46,7 +46,7 @@ namespace Metabase.Authorization
             ).ConfigureAwait(false);
             return
                 role == Enumerations.InstitutionRepresentativeRole.OWNER
-                || role == Enumerations.InstitutionRepresentativeRole.MAINTAINER;
+                || role == Enumerations.InstitutionRepresentativeRole.ASSISTANT;
         }
 
         private static async Task<Enumerations.InstitutionRepresentativeRole?> FetchRole(

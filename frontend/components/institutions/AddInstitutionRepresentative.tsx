@@ -124,9 +124,6 @@ export const AddInstitutionRepresentative: React.FunctionComponent<AddInstitutio
               <Select.Option value={InstitutionRepresentativeRole.Owner}>
                 Owner
               </Select.Option>
-              <Select.Option value={InstitutionRepresentativeRole.Maintainer}>
-                Maintainer
-              </Select.Option>
               <Select.Option value={InstitutionRepresentativeRole.Assistant}>
                 Assistant
               </Select.Option>
