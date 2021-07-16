@@ -25,7 +25,6 @@ mutation CreateComponent(
   $description: String!
   $categories: [ComponentCategory!]!
   $availability: OpenEndedDateTimeRangeInput
-  $availableTo: DateTime
   $manufacturerId: Uuid!
 ) {
   createComponent(
