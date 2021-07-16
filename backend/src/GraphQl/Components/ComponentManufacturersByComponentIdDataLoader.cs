@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.Components
                 dbContextFactory,
                 (dbContext, ids) =>
                     dbContext.ComponentManufacturers.AsQueryable().Where(x =>
-                        ids.Contains(x.ComponentId)
+                        !x.Pending && ids.Contains(x.ComponentId)
                     ),
                 x => x.ComponentId
                 )

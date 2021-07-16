@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.Institutions
                 dbContextFactory,
                 (dbContext, ids) =>
                     dbContext.ComponentManufacturers.AsQueryable().Where(x =>
-                        ids.Contains(x.InstitutionId)
+                        !x.Pending && ids.Contains(x.InstitutionId)
                     ),
                 x => x.InstitutionId
                 )

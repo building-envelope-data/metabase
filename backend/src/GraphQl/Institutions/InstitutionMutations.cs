@@ -315,7 +315,8 @@ namespace Metabase.GraphQl.Institutions
             {
                 InstitutionId = input.InstitutionId,
                 UserId = input.UserId,
-                Role = input.Role
+                Role = input.Role,
+                Pending = true
             };
             context.InstitutionRepresentatives.Add(institutionRepresentative);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

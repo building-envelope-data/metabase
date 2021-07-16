@@ -11,5 +11,7 @@ namespace Metabase.Data
         public Institution Institution { get; set; } = default!;
 
         // TODO public Enumerations.ComponentManufacturerMarketingInformation? MarketingInformation { get; }
+
+        public bool Pending { get; set; } = true;
     }
 }
