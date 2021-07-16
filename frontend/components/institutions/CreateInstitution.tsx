@@ -41,13 +41,13 @@ export const CreateInstitution: React.FunctionComponent<CreateInstitutionProps> 
           query: InstitutionsDocument,
         },
         ...(managerId
-          ? []
-          : [
+          ? [
               {
                 query: InstitutionDocument,
                 variables: { uuid: managerId },
               },
-            ]),
+            ]
+          : []),
       ],
     });
     const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -95,7 +95,7 @@ export const CreateInstitution: React.FunctionComponent<CreateInstitutionProps> 
               abbreviation: abbreviation,
               description: description,
               websiteLocator: websiteLocator,
-              ownerIds: ownerIds,
+              ownerIds: ownerIds || [],
               managerId: managerId,
               state: state,
             },
@@ -109,6 +109,7 @@ export const CreateInstitution: React.FunctionComponent<CreateInstitutionProps> 
             form
           );
           if (
+            !managerId &&
             !errors &&
             !data?.createInstitution?.errors &&
             data?.createInstitution?.institution
