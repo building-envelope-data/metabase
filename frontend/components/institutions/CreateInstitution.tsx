@@ -45,7 +45,7 @@ export const CreateInstitution: React.FunctionComponent<CreateInstitutionProps> 
           : [
               {
                 query: InstitutionDocument,
-                variables: { institutionId: managerId },
+                variables: { uuid: managerId },
               },
             ]),
       ],
