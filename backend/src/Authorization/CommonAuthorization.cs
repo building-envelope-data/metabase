@@ -66,7 +66,8 @@ namespace Metabase.Authorization
                 await context.InstitutionRepresentatives.AsQueryable()
                 .Where(x =>
                     x.InstitutionId == institutionId &&
-                    x.UserId == user.Id
+                    x.UserId == user.Id &&
+                    !x.Pending
                     )
                 .Select(x => new { x.Role }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
                 .SingleOrDefaultAsync(cancellationToken)
@@ -77,11 +78,12 @@ namespace Metabase.Authorization
             }
             var wrappedManagerRole =
                 await context.InstitutionRepresentatives.AsQueryable()
+                .Where(x => !x.Pending)
                 .Join(
                     context.Institutions,
                     representative => representative.InstitutionId,
                     institution => institution.ManagerId,
-                    (representative, institution) => new {Representative = representative, Institution = institution}
+                    (representative, institution) => new { Representative = representative, Institution = institution }
                 )
                 .Where(x =>
                     x.Institution.Id == institutionId &&
