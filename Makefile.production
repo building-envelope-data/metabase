@@ -135,6 +135,10 @@ backup : ## Backup databases to file with path `${DUMP_FILE}`, for example, `mak
 	docker container rm backup_${NAME}_database
 .PHONY : backup
 
+prune-backups : ## Keep the most recent 7 backups, delete the rest
+	cd /app/data/backups && ls -t --indicator-style=slash | grep --invert-match '/$$' | tail --lines=+8 | xargs --delimiter='\n' --no-run-if-empty rm --
+.PHONY : prune-backups
+
 restore : ## Restore databases from file with path `${DUMP_FILE}`, for example, `make --file Makefile.production DUMP_FILE=/app/data/backups/dump_2021-04-22_15_43_35.gz restore`
 	${docker_compose} run \
 		--name restore_${NAME}_database \
