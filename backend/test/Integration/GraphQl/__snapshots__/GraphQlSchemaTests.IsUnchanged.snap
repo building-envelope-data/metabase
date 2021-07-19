@@ -106,7 +106,7 @@ type Component implements Node {
   categories: [ComponentCategory!]!
   description: String!
   id: ID!
-  manufacturers(pending: Boolean): ComponentManufacturerConnection!
+  manufacturers(pending: Boolean! = false): ComponentManufacturerConnection!
   name: String!
   uuid: Uuid!
 }
@@ -457,17 +457,17 @@ type HygrothermalDataEdge {
 type Institution implements Node & Stakeholder {
   abbreviation: String
   description: String!
-  developedMethods(pending: Boolean): InstitutionDevelopedMethodConnection!
+  developedMethods(pending: Boolean! = false): InstitutionDevelopedMethodConnection!
   id: ID!
   managedDataFormats: InstitutionManagedDataFormatConnection!
   managedInstitutions: InstitutionManagedInstitutionConnection!
   managedMethods: InstitutionManagedMethodConnection!
   manager: InstitutionManagerEdge
-  manufacturedComponents(pending: Boolean): InstitutionManufacturedComponentConnection!
+  manufacturedComponents(pending: Boolean! = false): InstitutionManufacturedComponentConnection!
   name: String!
   operatedDatabases: InstitutionOperatedDatabaseConnection!
   publicKey: String
-  representatives(pending: Boolean): InstitutionRepresentativeConnection!
+  representatives(pending: Boolean! = false): InstitutionRepresentativeConnection!
   state: InstitutionState!
   uuid: Uuid!
   websiteLocator: Url
@@ -609,7 +609,7 @@ type Method implements Node {
   calculationLocator: Url
   categories: [MethodCategory!]!
   description: String!
-  developers(pending: Boolean): MethodDeveloperConnection!
+  developers(pending: Boolean! = false): MethodDeveloperConnection!
   id: ID!
   manager: MethodManagerEdge!
   name: String!
@@ -999,7 +999,7 @@ type UpdateInstitutionPayload {
 }
 
 type User implements Node & Stakeholder {
-  developedMethods(pending: Boolean): UserDevelopedMethodConnection!
+  developedMethods(pending: Boolean! = false): UserDevelopedMethodConnection!
   email: String
   hasPassword: Boolean
   id: ID!
@@ -1008,7 +1008,7 @@ type User implements Node & Stakeholder {
   "Full name"
   name: String!
   phoneNumber: String
-  representedInstitutions(pending: Boolean): UserRepresentedInstitutionConnection!
+  representedInstitutions(pending: Boolean! = false): UserRepresentedInstitutionConnection!
   roles: [String]
   twoFactorAuthentication: TwoFactorAuthentication
   uuid: Uuid!
