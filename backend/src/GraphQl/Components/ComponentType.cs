@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Metabase.Extensions;
 
 namespace Metabase.GraphQl.Components
 {
@@ -12,10 +13,12 @@ namespace Metabase.GraphQl.Components
             base.Configure(descriptor);
             descriptor
                 .Field(t => t.Manufacturers)
+                .Argument(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
                 .Type<NonNullType<ObjectType<ComponentManufacturerConnection>>>()
                 .Resolve(context =>
                     new ComponentManufacturerConnection(
-                        context.Parent<Data.Component>()
+                        context.Parent<Data.Component>(),
+                        context.ArgumentValue<bool>(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower())
                         )
                     );
             // TODO Use connections for concretization and generalization as is done above for manufacturers.

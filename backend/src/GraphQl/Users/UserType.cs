@@ -5,6 +5,7 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Extensions;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Users
@@ -181,21 +182,23 @@ namespace Metabase.GraphQl.Users
               .UseDbContext<Data.ApplicationDbContext>()
               .UseUserManager();
             descriptor
-              .Field(t => t.DevelopedMethods);
-            descriptor
               .Field(t => t.DevelopedMethods)
+              .Argument(nameof(Data.UserMethodDeveloper.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
               .Type<NonNullType<ObjectType<UserDevelopedMethodConnection>>>()
               .Resolve(context =>
                   new UserDevelopedMethodConnection(
-                      context.Parent<Data.User>()
+                      context.Parent<Data.User>(),
+                      context.ArgumentValue<bool>(nameof(Data.UserMethodDeveloper.Pending).FirstCharToLower())
                   )
               );
             descriptor
               .Field(t => t.RepresentedInstitutions)
+              .Argument(nameof(Data.InstitutionRepresentative.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
               .Type<NonNullType<ObjectType<UserRepresentedInstitutionConnection>>>()
               .Resolve(context =>
                   new UserRepresentedInstitutionConnection(
-                      context.Parent<Data.User>()
+                      context.Parent<Data.User>(),
+                      context.ArgumentValue<bool>(nameof(Data.InstitutionRepresentative.Pending).FirstCharToLower())
                   )
               );
         }

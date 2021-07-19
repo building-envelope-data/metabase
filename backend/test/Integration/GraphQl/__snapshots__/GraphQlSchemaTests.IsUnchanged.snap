@@ -106,7 +106,7 @@ type Component implements Node {
   categories: [ComponentCategory!]!
   description: String!
   id: ID!
-  manufacturers: ComponentManufacturerConnection!
+  manufacturers(pending: Boolean): ComponentManufacturerConnection!
   name: String!
   uuid: Uuid!
 }
@@ -457,17 +457,17 @@ type HygrothermalDataEdge {
 type Institution implements Node & Stakeholder {
   abbreviation: String
   description: String!
-  developedMethods: InstitutionDevelopedMethodConnection!
+  developedMethods(pending: Boolean): InstitutionDevelopedMethodConnection!
   id: ID!
   managedDataFormats: InstitutionManagedDataFormatConnection!
   managedInstitutions: InstitutionManagedInstitutionConnection!
   managedMethods: InstitutionManagedMethodConnection!
   manager: InstitutionManagerEdge
-  manufacturedComponents: InstitutionManufacturedComponentConnection!
+  manufacturedComponents(pending: Boolean): InstitutionManufacturedComponentConnection!
   name: String!
   operatedDatabases: InstitutionOperatedDatabaseConnection!
   publicKey: String
-  representatives: InstitutionRepresentativeConnection!
+  representatives(pending: Boolean): InstitutionRepresentativeConnection!
   state: InstitutionState!
   uuid: Uuid!
   websiteLocator: Url
@@ -609,7 +609,7 @@ type Method implements Node {
   calculationLocator: Url
   categories: [MethodCategory!]!
   description: String!
-  developers: MethodDeveloperConnection!
+  developers(pending: Boolean): MethodDeveloperConnection!
   id: ID!
   manager: MethodManagerEdge!
   name: String!
@@ -999,7 +999,7 @@ type UpdateInstitutionPayload {
 }
 
 type User implements Node & Stakeholder {
-  developedMethods: UserDevelopedMethodConnection!
+  developedMethods(pending: Boolean): UserDevelopedMethodConnection!
   email: String
   hasPassword: Boolean
   id: ID!
@@ -1008,7 +1008,7 @@ type User implements Node & Stakeholder {
   "Full name"
   name: String!
   phoneNumber: String
-  representedInstitutions: UserRepresentedInstitutionConnection!
+  representedInstitutions(pending: Boolean): UserRepresentedInstitutionConnection!
   roles: [String]
   twoFactorAuthentication: TwoFactorAuthentication
   uuid: Uuid!

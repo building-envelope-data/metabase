@@ -3,30 +3,35 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using Metabase.GraphQl.Institutions;
-using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Methods
 {
     public sealed class MethodDeveloperConnection
     {
         private readonly Data.Method _subject;
+        private readonly bool _pending;
+
         public MethodDeveloperConnection(
-            Data.Method subject
+            Data.Method subject,
+            bool pending
             )
         {
             _subject = subject;
+            _pending = pending;
         }
 
         public async Task<IEnumerable<MethodDeveloperEdge>> GetEdgesAsync(
             [DataLoader] InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
             [DataLoader] UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
+            [DataLoader] PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
+            [DataLoader] PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
             CancellationToken cancellationToken
             )
         {
             return
-                (await new InstitutionMethodDeveloperConnection(_subject)
+                (await new InstitutionMethodDeveloperConnection(_subject, _pending)
                 .GetEdgesAsync(
+                    pendingInstitutionMethodDevelopersDataLoader,
                     institutionMethodDevelopersDataLoader,
                     cancellationToken
                     )
@@ -34,8 +39,9 @@ namespace Metabase.GraphQl.Methods
                 )
                 .Select(e => new MethodDeveloperEdge(e))
                 .Concat(
-                (await new UserMethodDeveloperConnection(_subject)
+                (await new UserMethodDeveloperConnection(_subject, _pending)
                 .GetEdgesAsync(
+                    pendingUserMethodDevelopersDataLoader,
                     userMethodDevelopersDataLoader,
                     cancellationToken
                     )
@@ -47,13 +53,15 @@ namespace Metabase.GraphQl.Methods
     }
 
     internal sealed class InstitutionMethodDeveloperConnection
-        : Connection<Data.Method, Data.InstitutionMethodDeveloper, InstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperEdge>
+        : ForkingConnection<Data.Method, Data.InstitutionMethodDeveloper, PendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperEdge>
     {
         public InstitutionMethodDeveloperConnection(
-            Data.Method subject
+            Data.Method subject,
+            bool pending
         )
             : base(
                 subject,
+                pending,
                 x => new InstitutionMethodDeveloperEdge(x)
                 )
         {
@@ -61,13 +69,15 @@ namespace Metabase.GraphQl.Methods
     }
 
     internal sealed class UserMethodDeveloperConnection
-        : Connection<Data.Method, Data.UserMethodDeveloper, UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>
+        : ForkingConnection<Data.Method, Data.UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader, UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>
     {
         public UserMethodDeveloperConnection(
-            Data.Method subject
+            Data.Method subject,
+            bool pending
         )
             : base(
                 subject,
+                pending,
                 x => new UserMethodDeveloperEdge(x)
                 )
         {

@@ -1,13 +1,15 @@
 namespace Metabase.GraphQl.Users
 {
     public sealed class UserRepresentedInstitutionConnection
-        : Connection<Data.User, Data.InstitutionRepresentative, UserRepresentedInstitutionsByUserIdDataLoader, UserRepresentedInstitutionEdge>
+        : ForkingConnection<Data.User, Data.InstitutionRepresentative, PendingUserRepresentedInstitutionsByUserIdDataLoader, UserRepresentedInstitutionsByUserIdDataLoader, UserRepresentedInstitutionEdge>
     {
         public UserRepresentedInstitutionConnection(
-            Data.User subject
+            Data.User subject,
+            bool pending
         )
             : base(
                 subject,
+                pending,
                 x => new UserRepresentedInstitutionEdge(x)
                 )
         {

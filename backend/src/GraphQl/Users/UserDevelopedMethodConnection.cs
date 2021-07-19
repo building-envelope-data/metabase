@@ -1,13 +1,15 @@
 namespace Metabase.GraphQl.Users
 {
     public sealed class UserDevelopedMethodConnection
-        : Connection<Data.User, Data.UserMethodDeveloper, UserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge>
+        : ForkingConnection<Data.User, Data.UserMethodDeveloper, PendingUserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge>
     {
         public UserDevelopedMethodConnection(
-            Data.User subject
+            Data.User subject,
+            bool pending
         )
             : base(
                 subject,
+                pending,
                 x => new UserDevelopedMethodEdge(x)
                 )
         {

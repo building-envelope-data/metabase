@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Metabase.Extensions;
 
 namespace Metabase.GraphQl.Institutions
 {
@@ -12,10 +13,12 @@ namespace Metabase.GraphQl.Institutions
             base.Configure(descriptor);
             descriptor
                 .Field(t => t.DevelopedMethods)
+                .Argument(nameof(Data.InstitutionMethodDeveloper.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
                 .Type<NonNullType<ObjectType<InstitutionDevelopedMethodConnection>>>()
                 .Resolve(context =>
                     new InstitutionDevelopedMethodConnection(
-                        context.Parent<Data.Institution>()
+                        context.Parent<Data.Institution>(),
+                        context.ArgumentValue<bool>(nameof(Data.InstitutionMethodDeveloper.Pending).FirstCharToLower())
                     )
                 );
             descriptor
@@ -23,10 +26,12 @@ namespace Metabase.GraphQl.Institutions
                 .Ignore();
             descriptor
                 .Field(t => t.ManufacturedComponents)
+                .Argument(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
                 .Type<NonNullType<ObjectType<InstitutionManufacturedComponentConnection>>>()
                 .Resolve(context =>
                     new InstitutionManufacturedComponentConnection(
-                        context.Parent<Data.Institution>()
+                        context.Parent<Data.Institution>(),
+                        context.ArgumentValue<bool>(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower())
                         )
                     );
             descriptor
@@ -80,10 +85,12 @@ namespace Metabase.GraphQl.Institutions
                     );
             descriptor
                 .Field(t => t.Representatives)
+                .Argument(nameof(Data.InstitutionRepresentative.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
                 .Type<NonNullType<ObjectType<InstitutionRepresentativeConnection>>>()
                 .Resolve(context =>
                     new InstitutionRepresentativeConnection(
-                        context.Parent<Data.Institution>()
+                        context.Parent<Data.Institution>(),
+                        context.ArgumentValue<bool>(nameof(Data.InstitutionRepresentative.Pending).FirstCharToLower())
                         )
                     );
             descriptor

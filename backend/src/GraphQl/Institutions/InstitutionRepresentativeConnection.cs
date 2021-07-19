@@ -10,13 +10,15 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionRepresentativeConnection
-        : Connection<Data.Institution, Data.InstitutionRepresentative, InstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge>
+        : ForkingConnection<Data.Institution, Data.InstitutionRepresentative, PendingInstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge>
     {
         public InstitutionRepresentativeConnection(
-            Data.Institution institution
+            Data.Institution institution,
+            bool pending
         )
             : base(
                 institution,
+                pending,
                 x => new InstitutionRepresentativeEdge(x)
                 )
         {
