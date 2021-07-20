@@ -1,7 +1,7 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:5.0.302-alpine3.13-amd64
+FROM mcr.microsoft.com/dotnet/sdk:5.0.302-buster-slim-amd64
 
 ARG GROUP_ID
 ARG USER_ID
@@ -10,8 +10,8 @@ ARG CERTIFICATE_AUTHORITY_PASSWORD
 
 # Create non-root user to run commands in (see https://medium.com/@mccode/processes-in-containers-should-not-run-as-root-2feae3f0df3b)
 RUN \
-  addgroup -S -g ${GROUP_ID} us && \
-  adduser -S -D -u ${USER_ID} -G us me
+  addgroup --system --gid ${GROUP_ID} us && \
+  adduser --system --uid ${USER_ID} --ingroup us me
 
 #############
 # As `root` #
@@ -30,23 +30,39 @@ RUN \
 # https://stackoverflow.com/questions/55477684/how-to-configure-network-tracing-dotnet-core-for-httpclient-calls/58700657#58700657
 # and
 # https://lttng.org/docs/#doc-tracing-your-own-user-application
+# For best practices on using `apt-get` see
+# https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
 RUN \
-  apk add --no-cache \
+  apt-get update && \
+  apt-get install \
+    --yes \
+    --no-install-recommends \
     curl \
     dumb-init \
     gawk \
     lldb \
     make \
     # npm \
-    openssl
+    openssl && \
+  rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
 
 # Add dependencies for interactive examples in ./examples
 # `jq` can be used to format and filter JSON data
 RUN \
-  apk add --no-cache \
+  apt-get update && \
+  apt-get install \
+    --yes \
+    --no-install-recommends \
     bash \
     jq \
-    neovim
+    neovim && \
+  rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
 
 # Inspired by https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust/59702094#59702094
 # See also https://github.com/dotnet/aspnetcore/issues/7246#issuecomment-541201757
@@ -63,7 +79,7 @@ RUN \
   chown \
     me:us \
     ${HOME}/app && \
-  ln -s ${HOME}/app /app
+  ln --symbolic ${HOME}/app /app
 
 ###########
 # As `me` #
@@ -118,7 +134,7 @@ COPY \
   ./
 RUN \
   dotnet clean && \
-  dotnet restore --runtime linux-musl-x64 && \
+  dotnet restore && \
   dotnet tool run dotnet-sos install # https://github.com/dotnet/diagnostics/blob/master/documentation/installing-sos-instructions.md
 
 # Add the certificate authority PKCS#12 file to the X.509 certificate store for
@@ -259,9 +275,9 @@ RUN \
 # group `us` to make the respective mounted volumes be owned by the user `me`
 # and the group `us`.
 RUN \
-  mkdir -p ./src/bin && \
-  mkdir -p ./src/obj && \
-  mkdir -p ./test/bin && \
-  mkdir -p ./test/obj
+  mkdir --parents ./src/bin && \
+  mkdir --parents ./src/obj && \
+  mkdir --parents ./test/bin && \
+  mkdir --parents ./test/obj
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]

@@ -94,11 +94,11 @@ execb : CONTAINER = backend
 execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
 .PHONY : execb
 
-shellf : COMMAND = ash -c "make install && exec ash"
+shellf : COMMAND = bash -c "make install && exec bash"
 shellf : execf ## Enter shell in an existing `frontend` container (after starting all containers if necessary)
 .PHONY : shellf
 
-shellb : COMMAND = ash
+shellb : COMMAND = bash
 shellb : execb ## Enter shell in an existing `backend` container (after starting all containers if necessary)
 .PHONY : shellb
 
@@ -111,7 +111,7 @@ traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for examp
 	${docker_compose} exec \
 			--privileged \
 			backend \
-			ash -c " \
+			bash -c " \
 				make trace \
 				"
 .PHONY : traceb
@@ -127,7 +127,7 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 shelld : up ## Enter shell in an existing `database` container (after starting all containers if necessary)
 	${docker_compose} exec \
 		database \
-		ash
+		bash
 .PHONY : shelld
 
 createdb : ## Create databases
@@ -171,7 +171,7 @@ jwt-certificates : ## Create JWT encryption and signing certificates if necessar
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/backend",target=/app \
 		${NAME}_bootstrap \
-		ash -cx " \
+		bash -cx " \
 			dotnet-script \
 				create-certificates.csx \
 				-- \

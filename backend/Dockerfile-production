@@ -8,18 +8,16 @@
 #########
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:5.0.302-alpine3.13-amd64 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0.302-buster-slim-amd64 AS build
 
 COPY ./ /app
 
 WORKDIR /app
 
 RUN \
-  dotnet restore \
-    --runtime linux-musl-x64
+  dotnet restore
 RUN \
   dotnet publish \
-    --runtime linux-musl-x64 \
     --configuration release \
     --output out \
     --self-contained false \
@@ -30,7 +28,7 @@ RUN \
 ###########
 
 # https://hub.docker.com/_/microsoft-dotnet-aspnet
-FROM mcr.microsoft.com/dotnet/aspnet:5.0.5-alpine3.13-amd64
+FROM mcr.microsoft.com/dotnet/aspnet:5.0.8-buster-slim-amd64
 
 WORKDIR /app
 
@@ -40,11 +38,11 @@ COPY \
   ./
 
 RUN \
-  ln -s Metabase.dll App.dll
+  ln --symbolic Metabase.dll App.dll
 
 # See: https://github.com/dotnet/announcements/issues/20
 # Uncomment to enable globalization APIs
 #ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT false
-#RUN apk add --no-cache icu-libs
+#RUN apt-get install icu-libs
 ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8

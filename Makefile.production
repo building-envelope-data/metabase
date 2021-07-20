@@ -53,7 +53,7 @@ exec : up ## Execute the one-time command `${COMMAND}` against an existing `${CO
 execb : CONTAINER = backend
 execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
 
-shellb : COMMAND = ash
+shellb : COMMAND = bash
 shellb : execb ## Enter shell in a running `backend` container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
 .PHONY : shellb
 
