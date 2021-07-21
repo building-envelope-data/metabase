@@ -60,8 +60,7 @@ services:
       "--project", "./src/Metabase.csproj",
       "--",
       "run",
-      "--no-launch-profile",
-      "--runtime", "linux-musl-x64"
+      "--no-launch-profile"
       ]
       # "--no-restore",
       # ["dotnet", "watch", "run", "--no-restore"]
