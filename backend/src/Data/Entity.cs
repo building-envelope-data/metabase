@@ -6,7 +6,7 @@ namespace Metabase.Data
     public abstract class Entity
       : IEntity
     {
-        public Guid Id { get; private set; }
+        public Guid Id { get; set; }
 
         // [NotMapped]
         // public Guid Uuid { get => Id; }

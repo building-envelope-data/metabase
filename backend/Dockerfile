@@ -115,6 +115,10 @@ COPY \
   --chown=me:us \
   ./test/Metabase.Tests.csproj \
   ./test/
+COPY \
+  --chown=me:us \
+  ./import/Metabase.Import.csproj \
+  ./import/
 
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/aspnetapp/Dockerfile.alpine-x64
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/run-aspnetcore-https-development.md
