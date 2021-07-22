@@ -105,19 +105,19 @@ function Index() {
     nearnormalHemisphericalVisibleTransmittances,
   }: {
     componentIds:
-      | {
-          negator: Negator;
-          comperator: ComponentIdComperator;
-          value: Scalars["Uuid"] | undefined;
-        }[]
-      | undefined;
+    | {
+      negator: Negator;
+      comperator: ComponentIdComperator;
+      value: Scalars["Uuid"] | undefined;
+    }[]
+    | undefined;
     nearnormalHemisphericalVisibleTransmittances:
-      | {
-          negator: Negator;
-          comperator: NearnormalHemisphericalVisibleTransmittanceComperator;
-          value: number | undefined;
-        }[]
-      | undefined;
+    | {
+      negator: Negator;
+      comperator: NearnormalHemisphericalVisibleTransmittanceComperator;
+      value: number | undefined;
+    }[]
+    | undefined;
   }) => {
     const filter = async () => {
       try {
@@ -388,9 +388,9 @@ function Index() {
             title: "Component UUID",
             dataIndex: "componentId",
             key: "componentId",
-            render: (_text, row, _index) => (
-              <Link href={paths.component(row.componentId)}>
-                {row.componentId}
+            render: (_text, record, _index) => (
+              <Link href={paths.component(record.componentId)}>
+                {record.componentId}
               </Link>
             ),
           },
@@ -398,19 +398,19 @@ function Index() {
           //   title: "Database UUID",
           //   dataIndex: "databaseId",
           //   key: "databaseId",
-          //   render: (_text, row, _index) => (
-          //     <Link href={paths.database(row.databaseId)}>{row.databaseId}</Link>
+          //   render: (_text, record, _index) => (
+          //     <Link href={paths.database(record.databaseId)}>{record.databaseId}</Link>
           //   ),
           // },
           {
             title: "Applied Method",
             dataIndex: "appliedMethod",
             key: "appliedMethod",
-            render: (_text, row, _index) => (
+            render: (_text, record, _index) => (
               <Descriptions column={1}>
                 <Descriptions.Item label="Method UUID">
-                  <Link href={paths.method(row.appliedMethod.methodId)}>
-                    {row.appliedMethod.methodId}
+                  <Link href={paths.method(record.appliedMethod.methodId)}>
+                    {record.appliedMethod.methodId}
                   </Link>
                 </Descriptions.Item>
               </Descriptions>
@@ -420,26 +420,26 @@ function Index() {
             title: "Resource Tree",
             dataIndex: "resourceTree",
             key: "resourceTree",
-            render: (_text, row, _index) => (
+            render: (_text, record, _index) => (
               <Descriptions column={1}>
                 <Descriptions.Item label="Description">
-                  {row.resourceTree.root.value.description}
+                  {record.resourceTree.root.value.description}
                 </Descriptions.Item>
                 <Descriptions.Item label="Hash Value">
-                  {row.resourceTree.root.value.hashValue}
+                  {record.resourceTree.root.value.hashValue}
                 </Descriptions.Item>
                 <Descriptions.Item label="Locator">
-                  <Typography.Link href={row.resourceTree.root.value.locator}>
-                    {row.resourceTree.root.value.locator}
+                  <Typography.Link href={record.resourceTree.root.value.locator}>
+                    {record.resourceTree.root.value.locator}
                   </Typography.Link>
                 </Descriptions.Item>
                 <Descriptions.Item label="Format UUID">
                   <Link
                     href={paths.dataFormat(
-                      row.resourceTree.root.value.formatId
+                      record.resourceTree.root.value.formatId
                     )}
                   >
-                    {row.resourceTree.root.value.formatId}
+                    {record.resourceTree.root.value.formatId}
                   </Link>
                 </Descriptions.Item>
               </Descriptions>
@@ -449,8 +449,8 @@ function Index() {
             title: "Nearnormal Hemispherical Visible Transmittances",
             dataIndex: "nearnormalHemisphericalVisibleTransmittances",
             key: "nearnormalHemisphericalVisibleTransmittances",
-            render: (_text, row, _index) =>
-              row.nearnormalHemisphericalVisibleTransmittances
+            render: (_text, record, _index) =>
+              record.nearnormalHemisphericalVisibleTransmittances
                 .map((x) => x.toLocaleString("en"))
                 .join(", "),
           },

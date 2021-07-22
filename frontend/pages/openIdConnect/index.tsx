@@ -89,7 +89,7 @@ function Index() {
           //     title: "authorizations",
           //     dataIndex: "authorizations",
           //     key: "authorizations",
-          //     render: (authorizations) => (
+          //     render: (_value, record, _index) => (
           //     ),
           //   },
         ]}
@@ -143,7 +143,7 @@ function Index() {
           //     title: "tokens",
           //     dataIndex: "tokens",
           //     key: "tokens",
-          //     render: (tokens) => (
+          //     render: (_value, record, _index) => (
           //     ),
           //   },
         ]}

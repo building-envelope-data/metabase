@@ -29,8 +29,8 @@ function Index() {
             //   typeof value === "string" ? user.name.includes(value) : false,
             sorter: (a, b) => a.name.localeCompare(b.name, "en"),
             sortDirections: ["ascend", "descend"],
-            render: (name, user, _) => (
-              <Link href={paths.user(user.uuid)}>{name}</Link>
+            render: (_value, user, _) => (
+              <Link href={paths.user(user.uuid)}>{user.name}</Link>
             ),
           },
           {

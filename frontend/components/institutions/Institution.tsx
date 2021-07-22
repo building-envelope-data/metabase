@@ -28,32 +28,32 @@ import { useEffect } from "react";
 const renderReference = (
   reference:
     | Maybe<
-        | ({ __typename?: "Publication" | undefined } & Pick<
-            Publication,
-            | "title"
-            | "arXiv"
-            | "authors"
-            | "doi"
-            | "urn"
-            | "webAddress"
-            | "abstract"
-            | "section"
-          >)
-        | ({ __typename?: "Standard" | undefined } & Pick<
-            Standard,
-            | "title"
-            | "abstract"
-            | "section"
-            | "locator"
-            | "standardizers"
-            | "year"
-          > & {
-              numeration: { __typename?: "Numeration" | undefined } & Pick<
-                Numeration,
-                "mainNumber" | "prefix" | "suffix"
-              >;
-            })
-      >
+      | ({ __typename?: "Publication" | undefined } & Pick<
+        Publication,
+        | "title"
+        | "arXiv"
+        | "authors"
+        | "doi"
+        | "urn"
+        | "webAddress"
+        | "abstract"
+        | "section"
+      >)
+      | ({ __typename?: "Standard" | undefined } & Pick<
+        Standard,
+        | "title"
+        | "abstract"
+        | "section"
+        | "locator"
+        | "standardizers"
+        | "year"
+      > & {
+        numeration: { __typename?: "Numeration" | undefined } & Pick<
+          Numeration,
+          "mainNumber" | "prefix" | "suffix"
+        >;
+      })
+    >
     | undefined
 ) => (
   <Descriptions column={1}>
@@ -157,14 +157,14 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             title: "Categories",
             dataIndex: "categories",
             key: "categories",
-            render: (categories) => categories.join(", "),
+            render: (_value, record, _index) => record.categories.join(", "),
           },
           {
             title: "Availability",
             dataIndex: "availability",
             key: "availability",
-            render: (availability) =>
-              `${availability.from} to ${availability.to}`,
+            render: (_value, record, _index) =>
+              `${record.availability?.from} to ${record.availability?.to}`,
           },
         ]}
         dataSource={institution.manufacturedComponents.edges.map((x) => x.node)}
@@ -229,9 +229,9 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             title: "Schema",
             dataIndex: "schemaLocator",
             key: "schemaLocator",
-            render: (_text, row, _index) => (
-              <Typography.Link href={row.schemaLocator}>
-                {row.schemaLocator}
+            render: (_text, record, _index) => (
+              <Typography.Link href={record.schemaLocator}>
+                {record.schemaLocator}
               </Typography.Link>
             ),
           },
@@ -239,7 +239,7 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             title: "Reference",
             dataIndex: "reference",
             key: "reference",
-            render: (_text, row, _index) => renderReference(row?.reference),
+            render: (_text, record, _index) => renderReference(record.reference),
           },
         ]}
         dataSource={institution.managedDataFormats.edges.map((x) => x.node)}
@@ -267,29 +267,29 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             title: "Validity",
             dataIndex: "validity",
             key: "validity",
-            render: (_text, row, _index) =>
-              `from ${row?.validity?.from} to ${row?.validity?.to}`,
+            render: (_text, record, _index) =>
+              `from ${record.validity?.from} to ${record.validity?.to}`,
           },
           {
             title: "Availability",
             dataIndex: "availability",
             key: "availability",
-            render: (_text, row, _index) =>
-              `from ${row?.availability?.from} to ${row?.availability?.to}`,
+            render: (_text, record, _index) =>
+              `from ${record.availability?.from} to ${record.availability?.to}`,
           },
           {
             title: "Reference",
             dataIndex: "reference",
             key: "reference",
-            render: (_text, row, _index) => renderReference(row.reference),
+            render: (_text, record, _index) => renderReference(record.reference),
           },
           {
             title: "Calculation Locator",
             dataIndex: "calculationLocator",
             key: "calculationLocator",
-            render: (_text, row, _index) => (
-              <Typography.Link href={row.calculationLocator}>
-                {row.calculationLocator}
+            render: (_text, record, _index) => (
+              <Typography.Link href={record.calculationLocator}>
+                {record.calculationLocator}
               </Typography.Link>
             ),
           },
@@ -297,7 +297,7 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             title: "Categories",
             dataIndex: "categories",
             key: "categories",
-            render: (_text, row, _index) => row.categories.join(", "),
+            render: (_text, record, _index) => record.categories.join(", "),
           },
         ]}
         dataSource={institution.managedMethods.edges.map((x) => x.node)}

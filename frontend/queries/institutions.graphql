@@ -5,37 +5,13 @@ fragment InstitutionPartial on Institution {
   abbreviation
   description
   websiteLocator
-  state
 }
 
-# query Institutions(
-#     $after: String
-#     $before: String
-#     $first: Int
-#     $last: Int
-# ) {
-#   institutions(
-#       after: $after,
-#       before: $before,
-#       first: $first,
-#       last: $last
-#   ) {
-#     nodes {
-#         ...InstitutionPartial
-#       }
-#     pageInfo {
-#         endCursor
-#         startCursor
-#     }
-#     totalCount
-#   }
-# }
 query Institutions {
   institutions {
     nodes {
       ...InstitutionPartial
     }
-    totalCount
   }
 }
 

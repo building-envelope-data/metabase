@@ -1,8 +1,8 @@
 import Layout from "../../components/Layout";
-import { Table, message, Typography } from "antd";
-import { useDatabasesQuery } from "../../queries/databases.graphql";
 import Link from "next/link";
 import paths from "../../paths";
+import { Table, message, Typography } from "antd";
+import { useDatabasesQuery } from "../../queries/databases.graphql";
 import { useEffect } from "react";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
@@ -39,8 +39,8 @@ function Index() {
             key: "locator",
             sorter: (a, b) => a.locator.localeCompare(b.locator, "en"),
             sortDirections: ["ascend", "descend"],
-            render: (locator) => (
-              <Typography.Link href={locator}>{locator}</Typography.Link>
+            render: (_value, record, _index) => (
+              <Typography.Link href={record.locator}>{record.locator}</Typography.Link>
             ),
           },
           {
@@ -50,9 +50,9 @@ function Index() {
             sorter: (a, b) =>
               a.operator.node.name.localeCompare(b.operator.node.name, "en"),
             sortDirections: ["ascend", "descend"],
-            render: (operator) => (
-              <Link href={paths.institution(operator.node.uuid)}>
-                {operator.node.name}
+            render: (_value, record, _index) => (
+              <Link href={paths.institution(record.operator.node.uuid)}>
+                {record.operator.node.name}
               </Link>
             ),
           },

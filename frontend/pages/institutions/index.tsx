@@ -1,23 +1,19 @@
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import paths from "../../paths";
-import { Skeleton, List, message } from "antd";
+import { Table, message, Typography } from "antd";
 import { useInstitutionsQuery } from "../../queries/institutions.graphql";
 import { useEffect } from "react";
-// import { useState } from 'react'
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
-// {
-// variables: {
-//     first: pageSize,
-//     after: cursor
-// }
-// }
+
+// Taken from https://stackoverflow.com/questions/43118692/typescript-filter-out-nulls-from-an-array/46700791#46700791
+function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+  return value !== null && value !== undefined;
+}
 
 function Index() {
-  const pageSize = 100;
   const { loading, error, data } = useInstitutionsQuery();
-  // const [institutions, setInstitutions] = useState([])
 
   useEffect(() => {
     if (error) {
@@ -27,35 +23,49 @@ function Index() {
 
   return (
     <Layout>
-      {/* Inspired by https://ant.design/components/skeleton/#components-skeleton-demo-list */}
-      <List
-        itemLayout="vertical"
-        size="large"
-        dataSource={data?.institutions?.nodes || []}
-        pagination={{
-          total: data?.institutions?.totalCount,
-          defaultCurrent: 1,
-          defaultPageSize: pageSize,
-          hideOnSinglePage: false,
-          responsive: true,
-          position: "bottom",
-          // onChange: (page, pageSize) => // TODO
-        }}
-        renderItem={(item) => (
-          <List.Item key={item?.uuid}>
-            <Skeleton loading={item === null || loading} active avatar>
-              <List.Item.Meta
-                //   avatar={<Avatar src={item.avatar} />}
-                title={
-                  <Link href={paths.institution(item?.uuid)}>{item?.name}</Link>
-                }
-                description={item?.abbreviation}
-              />
-              {item?.description}
-            </Skeleton>
-          </List.Item>
-        )}
-      ></List>
+      <Table
+        loading={loading}
+        columns={[
+          {
+            title: "UUID",
+            dataIndex: "uuid",
+            key: "uuid",
+            sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
+            sortDirections: ["ascend", "descend"],
+            render: (_value, record, _index) => <Link href={paths.institution(record.uuid)}>{record.uuid}</Link>
+          },
+          {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+            sorter: (a, b) => a.name.localeCompare(b.name, "en"),
+            sortDirections: ["ascend", "descend"],
+          },
+          {
+            title: "Abbreviation",
+            dataIndex: "abbreviation",
+            key: "abbreviation",
+            sorter: (a, b) => a.abbreviation && b.abbreviation ? a.abbreviation.localeCompare(b.abbreviation, "en") : 0,
+            sortDirections: ["ascend", "descend"],
+          },
+          {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+            sorter: (a, b) => a.description.localeCompare(b.description, "en"),
+            sortDirections: ["ascend", "descend"],
+          },
+          {
+            title: "Website",
+            dataIndex: "websiteLocator",
+            key: "websiteLocator",
+            sorter: (a, b) => a.websiteLocator.localeCompare(b.websiteLocator, "en"),
+            sortDirections: ["ascend", "descend"],
+            render: (_value, record, _index) => <Typography.Link href={record.websiteLocator}>{record.websiteLocator}</Typography.Link>
+          },
+        ]}
+        dataSource={data?.institutions?.nodes?.filter(notEmpty) || []}
+      />
       <Link href={paths.institutionCreate}>Create Institution</Link>
     </Layout>
   );
