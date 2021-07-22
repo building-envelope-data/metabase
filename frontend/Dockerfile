@@ -27,7 +27,8 @@ RUN \
     ca-certificates \
     dumb-init \
     make \
-    openssl && \
+    openssl \
+    wget && \
   rm \
     --recursive \
     --force \
