@@ -10,8 +10,10 @@ ALTER TABLE metabase.institution DROP COLUMN "ManagerId";
 
 CREATE SCHEMA IF NOT EXISTS metabase;
 
-CREATE TYPE metabase.institution_representative_role AS ENUM ('owner', 'maintainer', 'assistant');
-DROP TYPE public.institution_representative_role;
+ALTER TYPE institution_representative_role RENAME TO institution_representative_role_old;
+CREATE TYPE institution_representative_role AS ENUM ('owner', 'maintainer', 'assistant');;
+ALTER TABLE metabase.institution_representative ALTER COLUMN "Role" TYPE institution_representative_role USING "Role"::text::institution_representative_role;
+DROP TYPE institution_representative_role_old;
 
 DELETE FROM "__EFMigrationsHistory"
 WHERE "MigrationId" = '20210715150119_AddManagerRelationToInstitution';
