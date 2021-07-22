@@ -44,5 +44,5 @@ RUN \
 # Uncomment to enable globalization APIs
 #ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT false
 #RUN apt-get install icu-libs
-ENV LC_ALL=en_US.UTF-8
-ENV LANG=en_US.UTF-8
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
