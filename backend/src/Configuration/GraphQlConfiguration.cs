@@ -144,8 +144,8 @@ namespace Metabase.Configuration
                   .SetPagingOptions(
                       new PagingOptions
                       {
-                          // MaxPageSize = ...,
-                          // DefaultPageSize = ...,
+                          MaxPageSize = int.MaxValue,
+                          DefaultPageSize = int.MaxValue,
                           IncludeTotalCount = true
                       }
                   );
