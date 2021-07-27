@@ -22,6 +22,14 @@ function Index() {
         loading={loading}
         columns={[
           {
+            title: "UUID",
+            dataIndex: "uuid",
+            key: "uuid",
+            sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
+            sortDirections: ["ascend", "descend"],
+            render: (_value, record, _index) => <Link href={paths.user(record.uuid)}>{record.uuid}</Link>
+          },
+          {
             title: "Name",
             dataIndex: "name",
             key: "name",
@@ -29,16 +37,12 @@ function Index() {
             //   typeof value === "string" ? user.name.includes(value) : false,
             sorter: (a, b) => a.name.localeCompare(b.name, "en"),
             sortDirections: ["ascend", "descend"],
-            render: (_value, user, _) => (
-              <Link href={paths.user(user.uuid)}>{user.name}</Link>
-            ),
           },
           {
             title: "Email",
             dataIndex: "email",
             key: "email",
-            sorter: (a, b) =>
-              a.email && b.email ? a.email.length - b.email.length : 0,
+            sorter: (a, b) => a.email && b.email ? a.email.localeCompare(b.email, "en") : 0,
             sortDirections: ["ascend", "descend"],
           },
         ]}

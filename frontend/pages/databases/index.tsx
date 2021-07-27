@@ -22,6 +22,14 @@ function Index() {
         loading={loading}
         columns={[
           {
+            title: "UUID",
+            dataIndex: "uuid",
+            key: "uuid",
+            sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
+            sortDirections: ["ascend", "descend"],
+            render: (_value, record, _index) => <Link href={paths.database(record.uuid)}>{record.uuid}</Link>
+          },
+          {
             title: "Name",
             dataIndex: "name",
             key: "name",
@@ -32,6 +40,8 @@ function Index() {
             title: "Description",
             dataIndex: "description",
             key: "description",
+            sorter: (a, b) => a.description.localeCompare(b.description, "en"),
+            sortDirections: ["ascend", "descend"],
           },
           {
             title: "Locator",
