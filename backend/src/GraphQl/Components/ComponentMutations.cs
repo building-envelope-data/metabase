@@ -78,7 +78,8 @@ namespace Metabase.GraphQl.Components
             component.ManufacturerEdges.Add(
                 new Data.ComponentManufacturer
                 {
-                    InstitutionId = input.ManufacturerId
+                    InstitutionId = input.ManufacturerId,
+                    Pending = false
                 }
             );
             context.Components.Add(component);
