@@ -7,6 +7,7 @@ export type FooterProps = {};
 export const Footer: React.FunctionComponent<FooterProps> = () => (
   <>
     <Typography.Link href={paths.legalNotice}>Legal Notice</Typography.Link>
+    {" "}&middot;{" "}
     <Typography.Link href={paths.dataProtectionInformation}>
       Data Protection Information
     </Typography.Link>
