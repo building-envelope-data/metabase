@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using HotChocolate;
 using HotChocolate.Execution;
 using HotChocolate.Execution.Instrumentation;
+using HotChocolate.Execution.Processing;
+using HotChocolate.Resolvers;
 using Microsoft.Extensions.Logging;
 
 namespace Metabase.GraphQl
@@ -35,7 +39,59 @@ namespace Metabase.GraphQl
             Exception exception
             )
         {
-            _logger.LogError($"During execution of the query {context.Request.Query} the exception {exception} occurred.");
+            _logger.LogError(exception, $"During execution of the query {context.Request.Query} the exception {exception} occurred.");
+        }
+
+        public override void ResolverError(
+            IMiddlewareContext context,
+            IError error
+            )
+        {
+            _logger.LogError(error.Exception, $"During execution of the operation {context.Operation} the error {ConvertErrorToString(error)} occurred.");
+        }
+
+        public override void SubscriptionEventError(SubscriptionEventContext context, Exception exception)
+        {
+            _logger.LogError(exception, $"During execution of the subscription operation {context.Subscription.Operation.Print()} the exception {exception} occurred.");
+        }
+
+        public override void SubscriptionTransportError(ISubscription subscription, Exception exception)
+        {
+            _logger.LogError(exception, $"During execution of the subscription operation {subscription.Operation.Print()} the exception {exception} occurred.");
+        }
+
+        public override void SyntaxError(
+            IRequestContext context,
+            IError error
+            )
+        {
+            _logger.LogError(error.Exception, $"During execution of the query {context.Request.Query} the error {ConvertErrorToString(error)} occurred.");
+        }
+
+        public override void TaskError(
+            IExecutionTask task,
+            IError error
+            )
+        {
+            _logger.LogError(error.Exception, $"During execution of the task {task} the error {ConvertErrorToString(error)} occurred.");
+        }
+
+        public override void ValidationErrors(
+            IRequestContext context,
+            IReadOnlyList<IError> errors
+            )
+        {
+            foreach (var error in errors)
+            {
+                _logger.LogError(error.Exception, $"During execution of the query {context.Request.Query} the error {ConvertErrorToString(error)} occurred.");
+            }
+        }
+
+        private static string ConvertErrorToString(
+            IError error
+        )
+        {
+            return $"{error}(Code {error.Code}, Message {error.Message}, Path {error.Path?.Print()})";
         }
 
         private class RequestScope : IActivityScope
