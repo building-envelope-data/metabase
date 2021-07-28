@@ -1,4 +1,4 @@
-namespace Metabase.GraphQl.Institutions
+namespace Metabase.GraphQl.InstitutionRepresentatives
 {
     public enum RemoveInstitutionRepresentativeErrorCode
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Metabase.GraphQl.Institutions
+namespace Metabase.GraphQl.InstitutionRepresentatives
 {
     public record ChangeInstitutionRepresentativeRoleInput(
           Guid InstitutionId,

@@ -4,8 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Metabase.GraphQl.Users;
+using Metabase.GraphQl.Institutions;
 
-namespace Metabase.GraphQl.Institutions
+namespace Metabase.GraphQl.InstitutionRepresentatives
 {
     public sealed class RemoveInstitutionRepresentativePayload
     {

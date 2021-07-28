@@ -10,6 +10,20 @@ namespace Metabase.Authorization
 {
     public static class CommonAuthorization
     {
+        public static async Task<bool> IsSame(
+            ClaimsPrincipal claimsPrincipal,
+            Guid userId,
+            UserManager<Data.User> userManager
+        )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return false;
+            }
+            return user.Id == userId;
+        }
+
         public static async Task<bool> IsOwner(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,

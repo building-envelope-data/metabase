@@ -87,11 +87,15 @@ namespace Metabase.Configuration
                       .AddType<GraphQl.OpenIdConnect.OpendIdConnectQueries>()
                       .AddType<GraphQl.Users.UserQueries>()
                   .AddMutationType(d => d.Name(nameof(GraphQl.Mutation)))
+                      .AddType<GraphQl.ComponentManufacturers.ComponentManufacturerMutations>()
                       .AddType<GraphQl.Components.ComponentMutations>()
                       .AddType<GraphQl.DataFormats.DataFormatMutations>()
                       .AddType<GraphQl.Databases.DatabaseMutations>()
+                      .AddType<GraphQl.InstitutionMethodDevelopers.InstitutionMethodDeveloperMutations>()
+                      .AddType<GraphQl.InstitutionRepresentatives.InstitutionRepresentativeMutations>()
                       .AddType<GraphQl.Institutions.InstitutionMutations>()
                       .AddType<GraphQl.Methods.MethodMutations>()
+                      .AddType<GraphQl.UserMethodDevelopers.UserMethodDeveloperMutations>()
                       .AddType<GraphQl.Users.UserMutations>()
                   /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
                   /*     .AddType<ComponentSubscriptions>() */

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Metabase.GraphQl.Institutions
+namespace Metabase.GraphQl.InstitutionRepresentatives
 {
     public sealed class AddInstitutionRepresentativeError
       : UserErrorBase<AddInstitutionRepresentativeErrorCode>

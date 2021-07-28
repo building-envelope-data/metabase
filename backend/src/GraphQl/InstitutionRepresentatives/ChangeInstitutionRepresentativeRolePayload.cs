@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-using HotChocolate.Types.Pagination;
 using Metabase.GraphQl.Users;
+using Metabase.GraphQl.Institutions;
 
-namespace Metabase.GraphQl.Institutions
+namespace Metabase.GraphQl.InstitutionRepresentatives
 {
     public sealed class ChangeInstitutionRepresentativeRolePayload
     {
-        public RepresentedInstitutionEdge? RepresentedInstitutionEdge { get; }
+        public UserRepresentedInstitutionEdge? RepresentedInstitutionEdge { get; }
         public InstitutionRepresentativeEdge? InstitutionRepresentativeEdge { get; }
         public IReadOnlyCollection<ChangeInstitutionRepresentativeRoleError>? Errors { get; }
 
@@ -14,7 +14,7 @@ namespace Metabase.GraphQl.Institutions
             Data.InstitutionRepresentative institutionRepresentative
             )
         {
-            RepresentedInstitutionEdge = new RepresentedInstitutionEdge(institutionRepresentative);
+            RepresentedInstitutionEdge = new UserRepresentedInstitutionEdge(institutionRepresentative);
             InstitutionRepresentativeEdge = new InstitutionRepresentativeEdge(institutionRepresentative);
         }
 
