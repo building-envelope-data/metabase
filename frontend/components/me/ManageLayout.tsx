@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
@@ -25,7 +25,11 @@ const navItems = [
   },
 ];
 
-const ManageLayout = ({ children }) => {
+type ManageLayoutProps = {
+  children?: ReactNode;
+};
+
+const ManageLayout = ({ children }: ManageLayoutProps) => {
   const router = useRouter();
 
   const { loading, error, data } = useCurrentUserQuery();
