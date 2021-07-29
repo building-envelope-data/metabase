@@ -240,6 +240,9 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             title: "UUID",
             dataIndex: "uuid",
             key: "uuid",
+            render: (_value, record, _index) => (
+              <Link href={paths.component(record.uuid)}>{record.uuid}</Link>
+            ),
           },
           {
             title: "Name",
@@ -304,6 +307,9 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             title: "UUID",
             dataIndex: "uuid",
             key: "uuid",
+            render: (_value, record, _index) => (
+              <Link href={paths.database(record.uuid)}>{record.uuid}</Link>
+            ),
           },
           {
             title: "Name",
@@ -336,6 +342,9 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             title: "UUID",
             dataIndex: "uuid",
             key: "uuid",
+            render: (_value, record, _index) => (
+              <Link href={paths.dataFormat(record.uuid)}>{record.uuid}</Link>
+            ),
           },
           {
             title: "Name",
@@ -390,6 +399,9 @@ export const Institution: React.FunctionComponent<InstitutionProps> = ({
             title: "UUID",
             dataIndex: "uuid",
             key: "uuid",
+            render: (_value, record, _index) => (
+              <Link href={paths.method(record.uuid)}>{record.uuid}</Link>
+            ),
           },
           {
             title: "Name",
