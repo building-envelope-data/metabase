@@ -25,7 +25,7 @@ const navItems = [
   },
 ];
 
-const ManageLayout: React.FunctionComponent = ({ children }) => {
+const ManageLayout = ({ children }) => {
   const router = useRouter();
 
   const { loading, error, data } = useCurrentUserQuery();

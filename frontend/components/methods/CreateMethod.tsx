@@ -21,9 +21,11 @@ export type CreateMethodProps = {
   managerId: Scalars["Uuid"];
 };
 
-export const CreateMethod: React.FunctionComponent<CreateMethodProps> = ({
-  managerId,
-}) => {
+export const CreateMethod = (
+  {
+    managerId
+  }: CreateMethodProps
+) => {
   const [createMethodMutation] = useCreateMethodMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options

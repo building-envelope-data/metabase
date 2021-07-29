@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { FunctionComponent, useEffect } from "react";
+import { useEffect } from "react";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
 import { Modal, Layout as AntLayout, Typography } from "antd";
@@ -41,7 +41,7 @@ const navItems = [
   },
 ];
 
-const Layout: FunctionComponent = ({ children }) => {
+const Layout = ({ children }) => {
   const appTitle = `Building Envelope Data`;
   const cookieConsentName = "consent";
   const cookieConsentValue = "yes";

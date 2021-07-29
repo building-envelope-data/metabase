@@ -7,9 +7,11 @@ export type DataFormatProps = {
   dataFormatId: Scalars["Uuid"];
 };
 
-export const DataFormat: React.FunctionComponent<DataFormatProps> = ({
-  dataFormatId,
-}) => {
+export const DataFormat = (
+  {
+    dataFormatId
+  }: DataFormatProps
+) => {
   const { loading, error, data } = useDataFormatQuery({
     variables: {
       uuid: dataFormatId,

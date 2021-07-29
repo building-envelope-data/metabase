@@ -7,9 +7,11 @@ export type DatabaseProps = {
   databaseId: Scalars["Uuid"];
 };
 
-export const Database: React.FunctionComponent<DatabaseProps> = ({
-  databaseId,
-}) => {
+export const Database = (
+  {
+    databaseId
+  }: DatabaseProps
+) => {
   const { loading, error, data } = useDatabaseQuery({
     variables: {
       uuid: databaseId,

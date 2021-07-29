@@ -7,9 +7,11 @@ export type ComponentProps = {
   componentId: Scalars["Uuid"];
 };
 
-export const Component: React.FunctionComponent<ComponentProps> = ({
-  componentId,
-}) => {
+export const Component = (
+  {
+    componentId
+  }: ComponentProps
+) => {
   const { loading, error, data } = useComponentQuery({
     variables: {
       uuid: componentId,

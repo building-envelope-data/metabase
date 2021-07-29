@@ -110,9 +110,11 @@ export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
 };
 
-export const Institution: React.FunctionComponent<InstitutionProps> = ({
-  institutionId,
-}) => {
+export const Institution = (
+  {
+    institutionId
+  }: InstitutionProps
+) => {
   const { loading, error, data } = useInstitutionQuery({
     variables: {
       uuid: institutionId,

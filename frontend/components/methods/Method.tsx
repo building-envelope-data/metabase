@@ -7,7 +7,11 @@ export type MethodProps = {
   methodId: Scalars["Uuid"];
 };
 
-export const Method: React.FunctionComponent<MethodProps> = ({ methodId }) => {
+export const Method = (
+  {
+    methodId
+  }: MethodProps
+) => {
   const { loading, error, data } = useMethodQuery({
     variables: {
       uuid: methodId,

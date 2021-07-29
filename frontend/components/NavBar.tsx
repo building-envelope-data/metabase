@@ -19,7 +19,11 @@ export type NavBarProps = {
   items: NavItemProps[];
 };
 
-export const NavBar: React.FunctionComponent<NavBarProps> = ({ items }) => {
+export const NavBar = (
+  {
+    items
+  }: NavBarProps
+) => {
   const router = useRouter();
   const currentUser = useCurrentUserQuery()?.data?.currentUser;
   const apolloClient = initializeApollo();

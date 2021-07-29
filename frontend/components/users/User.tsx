@@ -29,7 +29,11 @@ export type UserProps = {
   userId: Scalars["Uuid"];
 };
 
-export const User: React.FunctionComponent<UserProps> = ({ userId }) => {
+export const User = (
+  {
+    userId
+  }: UserProps
+) => {
   const router = useRouter();
   const { loading, error, data } = useUserQuery({
     variables: {

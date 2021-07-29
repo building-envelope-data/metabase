@@ -4,7 +4,7 @@ import paths from "../paths";
 
 export type FooterProps = {};
 
-export const Footer: React.FunctionComponent<FooterProps> = () => (
+export const Footer = () => (
   <>
     <Typography.Link href={paths.legalNotice}>Legal Notice</Typography.Link>
     {" "}&middot;{" "}
