@@ -29,7 +29,7 @@ function createIsomorphLink(context: ResolverContext = {}) {
       typeof window === "undefined"
         ? `${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`
         : `${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`,
-    useGETForQueries: true,
+    useGETForQueries: false, // Use `POST` for queries to avoid "414 Request-URI Too Large" errors
     credentials: "same-origin",
     headers: {
       cookie: context.req ? context.req.headers.cookie : null,
