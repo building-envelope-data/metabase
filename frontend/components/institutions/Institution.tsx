@@ -110,11 +110,7 @@ export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
 };
 
-export const Institution = (
-  {
-    institutionId
-  }: InstitutionProps
-) => {
+export default function Institution({ institutionId }: InstitutionProps) {
   const { loading, error, data } = useInstitutionQuery({
     variables: {
       uuid: institutionId,
@@ -536,6 +532,4 @@ export const Institution = (
       )}
     </>
   );
-};
-
-export default Institution;
+}

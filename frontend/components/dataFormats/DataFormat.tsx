@@ -7,11 +7,7 @@ export type DataFormatProps = {
   dataFormatId: Scalars["Uuid"];
 };
 
-export const DataFormat = (
-  {
-    dataFormatId
-  }: DataFormatProps
-) => {
+export default function DataFormat({ dataFormatId }: DataFormatProps) {
   const { loading, error, data } = useDataFormatQuery({
     variables: {
       uuid: dataFormatId,
@@ -44,6 +40,4 @@ export const DataFormat = (
       <Typography.Title>{dataFormat.name}</Typography.Title>
     </>
   );
-};
-
-export default DataFormat;
+}

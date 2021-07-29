@@ -29,11 +29,7 @@ export type UserProps = {
   userId: Scalars["Uuid"];
 };
 
-export const User = (
-  {
-    userId
-  }: UserProps
-) => {
+export default function User({ userId }: UserProps) {
   const router = useRouter();
   const { loading, error, data } = useUserQuery({
     variables: {
@@ -283,6 +279,4 @@ export const User = (
       )}
     </>
   );
-};
-
-export default User;
+}

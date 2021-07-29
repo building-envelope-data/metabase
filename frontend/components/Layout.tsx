@@ -41,11 +41,11 @@ const navItems = [
   },
 ];
 
-type LayoutProps = {
+export type LayoutProps = {
   children?: ReactNode;
 };
 
-const Layout = ({ children }: LayoutProps) => {
+export default function Layout({ children }: LayoutProps) {
   const appTitle = `Building Envelope Data`;
   const cookieConsentName = "consent";
   const cookieConsentValue = "yes";
@@ -89,6 +89,4 @@ const Layout = ({ children }: LayoutProps) => {
       </AntLayout.Footer>
     </AntLayout>
   );
-};
-
-export default Layout;
+}

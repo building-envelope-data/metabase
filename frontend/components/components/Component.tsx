@@ -7,11 +7,7 @@ export type ComponentProps = {
   componentId: Scalars["Uuid"];
 };
 
-export const Component = (
-  {
-    componentId
-  }: ComponentProps
-) => {
+export default function Component({ componentId }: ComponentProps) {
   const { loading, error, data } = useComponentQuery({
     variables: {
       uuid: componentId,
@@ -44,6 +40,4 @@ export const Component = (
       <Typography.Title>{component.name}</Typography.Title>
     </>
   );
-};
-
-export default Component;
+}

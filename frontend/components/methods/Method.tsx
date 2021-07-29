@@ -7,11 +7,7 @@ export type MethodProps = {
   methodId: Scalars["Uuid"];
 };
 
-export const Method = (
-  {
-    methodId
-  }: MethodProps
-) => {
+export default function Method({ methodId }: MethodProps) {
   const { loading, error, data } = useMethodQuery({
     variables: {
       uuid: methodId,
@@ -44,6 +40,4 @@ export const Method = (
       <Typography.Title>{method.name}</Typography.Title>
     </>
   );
-};
-
-export default Method;
+}

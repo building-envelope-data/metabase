@@ -21,11 +21,7 @@ export type CreateDatabaseProps = {
   operatorId: Scalars["Uuid"];
 };
 
-export const CreateDatabase = (
-  {
-    operatorId
-  }: CreateDatabaseProps
-) => {
+export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
   const [createDatabaseMutation] = useCreateDatabaseMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -148,6 +144,4 @@ export const CreateDatabase = (
       </Form>
     </>
   );
-};
-
-export default CreateDatabase;
+}

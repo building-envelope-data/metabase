@@ -4,14 +4,14 @@ import paths from "../paths";
 
 export type FooterProps = {};
 
-export const Footer = () => (
-  <>
-    <Typography.Link href={paths.legalNotice}>Legal Notice</Typography.Link>
-    {" "}&middot;{" "}
-    <Typography.Link href={paths.dataProtectionInformation}>
-      Data Protection Information
-    </Typography.Link>
-  </>
-);
-
-export default Footer;
+export default function Footer() {
+  return (
+    <>
+      <Typography.Link href={paths.legalNotice}>Legal Notice</Typography.Link>{" "}
+      &middot;{" "}
+      <Typography.Link href={paths.dataProtectionInformation}>
+        Data Protection Information
+      </Typography.Link>
+    </>
+  );
+}

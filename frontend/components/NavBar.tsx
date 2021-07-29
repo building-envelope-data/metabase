@@ -19,11 +19,7 @@ export type NavBarProps = {
   items: NavItemProps[];
 };
 
-export const NavBar = (
-  {
-    items
-  }: NavBarProps
-) => {
+export default function NavBar({ items }: NavBarProps) {
   const router = useRouter();
   const currentUser = useCurrentUserQuery()?.data?.currentUser;
   const apolloClient = initializeApollo();
@@ -89,6 +85,4 @@ export const NavBar = (
       )}
     </Menu>
   );
-};
-
-export default NavBar;
+}

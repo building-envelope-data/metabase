@@ -20,11 +20,9 @@ export type AddInstitutionRepresentativeProps = {
   institutionId: Scalars["Uuid"];
 };
 
-export const AddInstitutionRepresentative = (
-  {
-    institutionId
-  }: AddInstitutionRepresentativeProps
-) => {
+export default function AddInstitutionRepresentative({
+  institutionId,
+}: AddInstitutionRepresentativeProps) {
   const [addInstitutionRepresentativeMutation] =
     useAddInstitutionRepresentativeMutation({
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -140,6 +138,4 @@ export const AddInstitutionRepresentative = (
       </Form>
     </>
   );
-};
-
-export default AddInstitutionRepresentative;
+}

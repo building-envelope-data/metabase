@@ -29,7 +29,7 @@ type ManageLayoutProps = {
   children?: ReactNode;
 };
 
-const ManageLayout = ({ children }: ManageLayoutProps) => {
+export default function ManageLayout({ children }: ManageLayoutProps) {
   const router = useRouter();
 
   const { loading, error, data } = useCurrentUserQuery();
@@ -86,6 +86,4 @@ const ManageLayout = ({ children }: ManageLayoutProps) => {
       </AntLayout>
     </Layout>
   );
-};
-
-export default ManageLayout;
+}

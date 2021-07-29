@@ -21,11 +21,7 @@ export type CreateDataFormatProps = {
   managerId: Scalars["Uuid"];
 };
 
-export const CreateDataFormat = (
-  {
-    managerId
-  }: CreateDataFormatProps
-) => {
+export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
   const [createDataFormatMutation] = useCreateDataFormatMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -182,6 +178,4 @@ export const CreateDataFormat = (
       </Form>
     </>
   );
-};
-
-export default CreateDataFormat;
+}

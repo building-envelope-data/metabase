@@ -7,11 +7,7 @@ export type DatabaseProps = {
   databaseId: Scalars["Uuid"];
 };
 
-export const Database = (
-  {
-    databaseId
-  }: DatabaseProps
-) => {
+export default function Database({ databaseId }: DatabaseProps) {
   const { loading, error, data } = useDatabaseQuery({
     variables: {
       uuid: databaseId,
@@ -44,6 +40,4 @@ export const Database = (
       <Typography.Title>{database.name}</Typography.Title>
     </>
   );
-};
-
-export default Database;
+}

@@ -22,11 +22,9 @@ export type CreateComponentProps = {
   manufacturerId: Scalars["Uuid"];
 };
 
-export const CreateComponent = (
-  {
-    manufacturerId
-  }: CreateComponentProps
-) => {
+export default function CreateComponent({
+  manufacturerId,
+}: CreateComponentProps) {
   const [createComponentMutation] = useCreateComponentMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -156,6 +154,4 @@ export const CreateComponent = (
       </Form>
     </>
   );
-};
-
-export default CreateComponent;
+}

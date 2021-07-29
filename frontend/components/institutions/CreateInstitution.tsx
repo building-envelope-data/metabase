@@ -25,12 +25,10 @@ export type CreateInstitutionProps = {
   managerId?: Scalars["Uuid"];
 };
 
-export const CreateInstitution = (
-  {
-    ownerIds,
-    managerId
-  }: CreateInstitutionProps
-) => {
+export default function CreateInstitution({
+  ownerIds,
+  managerId,
+}: CreateInstitutionProps) {
   const router = useRouter();
 
   const currentUserQuery = useCurrentUserQuery();
@@ -218,6 +216,4 @@ export const CreateInstitution = (
       </Form>
     </>
   );
-};
-
-export default CreateInstitution;
+}
