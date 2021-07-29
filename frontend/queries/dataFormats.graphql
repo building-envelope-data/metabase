@@ -43,6 +43,12 @@ query DataFormats {
   }
 }
 
+query DataFormat($uuid: Uuid!) {
+  dataFormat(uuid: $uuid) {
+    ...DataFormatPartial
+  }
+}
+
 mutation CreateDataFormat(
   $name: String!
   $extension: String

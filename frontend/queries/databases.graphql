@@ -20,6 +20,12 @@ query Databases {
   }
 }
 
+query Database($uuid: Uuid!) {
+  database(uuid: $uuid) {
+    ...DatabasePartial
+  }
+}
+
 mutation CreateDatabase(
   $name: String!
   $description: String!
