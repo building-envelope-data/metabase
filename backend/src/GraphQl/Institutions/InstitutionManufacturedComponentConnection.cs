@@ -41,5 +41,23 @@ namespace Metabase.GraphQl.Institutions
                  cancellationToken
                  );
         }
+
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public Task<bool> CanCurrentUserConfirmEdgeAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return ComponentManufacturerAuthorization.IsAuthorizedToConfirm(
+                 claimsPrincipal,
+                 Subject.Id,
+                 userManager,
+                 context,
+                 cancellationToken
+                 );
+        }
     }
 }

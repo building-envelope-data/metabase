@@ -99,7 +99,7 @@ namespace Metabase.GraphQl.ComponentManufacturers
                 );
             }
             componentManufacturer.Pending = false;
-            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            var x = await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new ConfirmComponentManufacturerPayload(componentManufacturer);
         }
     }

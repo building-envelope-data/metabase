@@ -1,0 +1,14 @@
+mutation ConfirmInstitutionMethodDeveloper(
+  $methodId: Uuid!
+  $institutionId: Uuid!
+) {
+  confirmInstitutionMethodDeveloper(
+    input: { methodId: $methodId, institutionId: $institutionId }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

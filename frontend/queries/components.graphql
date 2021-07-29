@@ -19,6 +19,14 @@ query Components {
   }
 }
 
+query Component($uuid: Uuid!) {
+  component(uuid: $uuid) {
+    id
+    uuid
+    name
+  }
+}
+
 mutation CreateComponent(
   $name: String!
   $abbreviation: String

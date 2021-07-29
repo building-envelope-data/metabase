@@ -15,7 +15,50 @@ query Users {
 
 query User($uuid: Uuid!) {
   user(uuid: $uuid) {
-    ...UserPartial
+    id
+    uuid
+    name
+    email
+    phoneNumber
+    websiteLocator
+    developedMethods {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    pendingDevelopedMethods: developedMethods(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+      canCurrentUserConfirmEdge
+    }
+    representedInstitutions {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    pendingRepresentedInstitutions: representedInstitutions(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+      canCurrentUserConfirmEdge
+    }
   }
 }
 

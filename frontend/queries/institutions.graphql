@@ -95,6 +95,16 @@ query Institution($uuid: Uuid!) {
       }
       canCurrentUserAddEdge
     }
+    pendingManufacturedComponents: manufacturedComponents(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+      canCurrentUserConfirmEdge
+    }
     operatedDatabases {
       edges {
         node {
@@ -114,6 +124,7 @@ query Institution($uuid: Uuid!) {
           uuid
           name
         }
+        role
       }
       canCurrentUserAddEdge
     }
@@ -202,6 +213,25 @@ query Institution($uuid: Uuid!) {
         }
       }
       canCurrentUserAddEdge
+    }
+    developedMethods {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    pendingDevelopedMethods: developedMethods(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+      canCurrentUserConfirmEdge
     }
     managedInstitutions {
       edges {

@@ -58,6 +58,12 @@ query Methods {
   }
 }
 
+query Method($uuid: Uuid!) {
+  method(uuid: $uuid) {
+    ...MethodPartial
+  }
+}
+
 mutation CreateMethod(
   $name: String!
   $description: String!

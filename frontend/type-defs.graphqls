@@ -36,7 +36,7 @@ type AddInstitutionRepresentativeError {
 type AddInstitutionRepresentativePayload {
   errors: [AddInstitutionRepresentativeError!]
   institutionRepresentativeEdge: InstitutionRepresentativeEdge
-  representedInstitutionEdge: RepresentedInstitutionEdge
+  representedInstitutionEdge: UserRepresentedInstitutionEdge
 }
 
 type AppliedMethod {
@@ -75,7 +75,7 @@ type ChangeInstitutionRepresentativeRoleError {
 type ChangeInstitutionRepresentativeRolePayload {
   errors: [ChangeInstitutionRepresentativeRoleError!]
   institutionRepresentativeEdge: InstitutionRepresentativeEdge
-  representedInstitutionEdge: RepresentedInstitutionEdge
+  representedInstitutionEdge: UserRepresentedInstitutionEdge
 }
 
 type ChangeUserEmailError {
@@ -138,6 +138,42 @@ type ComponentManufacturerEdge {
   node: Institution!
 }
 
+type ConfirmComponentManufacturerError {
+  code: ConfirmComponentManufacturerErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ConfirmComponentManufacturerPayload {
+  componentManufacturerEdge: ComponentManufacturerEdge
+  errors: [ConfirmComponentManufacturerError!]
+  manufacturedComponentEdge: InstitutionManufacturedComponentEdge
+}
+
+type ConfirmInstitutionMethodDeveloperError {
+  code: ConfirmInstitutionMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ConfirmInstitutionMethodDeveloperPayload {
+  developedMethodEdge: InstitutionDevelopedMethodEdge
+  errors: [ConfirmInstitutionMethodDeveloperError!]
+  methodDeveloperEdge: InstitutionMethodDeveloperEdge
+}
+
+type ConfirmInstitutionRepresentativeError {
+  code: ConfirmInstitutionRepresentativeErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ConfirmInstitutionRepresentativePayload {
+  errors: [ConfirmInstitutionRepresentativeError!]
+  institutionRepresentativeEdge: InstitutionRepresentativeEdge
+  representedInstitutionEdge: UserRepresentedInstitutionEdge
+}
+
 type ConfirmUserEmailChangeError {
   code: ConfirmUserEmailChangeErrorCode!
   message: String!
@@ -158,6 +194,18 @@ type ConfirmUserEmailError {
 type ConfirmUserEmailPayload {
   errors: [ConfirmUserEmailError!]
   user: User
+}
+
+type ConfirmUserMethodDeveloperError {
+  code: ConfirmUserMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ConfirmUserMethodDeveloperPayload {
+  developedMethodEdge: UserDevelopedMethodEdge
+  errors: [ConfirmUserMethodDeveloperError!]
+  methodDeveloperEdge: UserMethodDeveloperEdge
 }
 
 type CreateComponentError {
@@ -485,6 +533,7 @@ type InstitutionConnection {
 }
 
 type InstitutionDevelopedMethodConnection {
+  canCurrentUserConfirmEdge: Boolean!
   edges: [InstitutionDevelopedMethodEdge!]!
 }
 
@@ -533,11 +582,16 @@ type InstitutionManagerEdge {
 
 type InstitutionManufacturedComponentConnection {
   canCurrentUserAddEdge: Boolean!
+  canCurrentUserConfirmEdge: Boolean!
   edges: [InstitutionManufacturedComponentEdge!]!
 }
 
 type InstitutionManufacturedComponentEdge {
   node: Component!
+}
+
+type InstitutionMethodDeveloperEdge {
+  node: Institution!
 }
 
 type InstitutionOperatedDatabaseConnection {
@@ -654,8 +708,12 @@ type Mutation {
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
+  confirmComponentManufacturer(input: ConfirmComponentManufacturerInput!): ConfirmComponentManufacturerPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  confirmInstitutionMethodDeveloper(input: ConfirmInstitutionMethodDeveloperInput!): ConfirmInstitutionMethodDeveloperPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  confirmInstitutionRepresentative(input: ConfirmInstitutionRepresentativeInput!): ConfirmInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
   confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload!
+  confirmUserMethodDeveloper(input: ConfirmUserMethodDeveloperInput!): ConfirmUserMethodDeveloperPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   createComponent(input: CreateComponentInput!): CreateComponentPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   createDataFormat(input: CreateDataFormatInput!): CreateDataFormatPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
@@ -874,11 +932,6 @@ type RemoveInstitutionRepresentativePayload {
   user: User!
 }
 
-type RepresentedInstitutionEdge {
-  node: Institution!
-  role: InstitutionRepresentativeRole!
-}
-
 type RequestUserPasswordResetError {
   code: RequestUserPasswordResetErrorCode!
   message: String!
@@ -1027,6 +1080,7 @@ type UserConnection {
 }
 
 type UserDevelopedMethodConnection {
+  canCurrentUserConfirmEdge: Boolean!
   edges: [UserDevelopedMethodEdge!]!
 }
 
@@ -1042,7 +1096,12 @@ type UserEdge {
   node: User!
 }
 
+type UserMethodDeveloperEdge {
+  node: User!
+}
+
 type UserRepresentedInstitutionConnection {
+  canCurrentUserConfirmEdge: Boolean!
   edges: [UserRepresentedInstitutionEdge!]!
 }
 
@@ -1148,6 +1207,21 @@ input ComponentSortInput {
   xmin: SortEnumType
 }
 
+input ConfirmComponentManufacturerInput {
+  componentId: Uuid!
+  institutionId: Uuid!
+}
+
+input ConfirmInstitutionMethodDeveloperInput {
+  institutionId: Uuid!
+  methodId: Uuid!
+}
+
+input ConfirmInstitutionRepresentativeInput {
+  institutionId: Uuid!
+  userId: Uuid!
+}
+
 input ConfirmUserEmailChangeInput {
   confirmationCode: String!
   currentEmail: String!
@@ -1157,6 +1231,11 @@ input ConfirmUserEmailChangeInput {
 input ConfirmUserEmailInput {
   confirmationCode: String!
   email: String!
+}
+
+input ConfirmUserMethodDeveloperInput {
+  methodId: Uuid!
+  userId: Uuid!
 }
 
 input CreateComponentInput {
@@ -1664,6 +1743,30 @@ enum ComponentCategory {
   UNIT
 }
 
+enum ConfirmComponentManufacturerErrorCode {
+  UNKNOWN
+  UNKNOWN_COMPONENT
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  UNKNOWN_MANUFACTURER
+}
+
+enum ConfirmInstitutionMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  UNKNOWN_DEVELOPER
+}
+
+enum ConfirmInstitutionRepresentativeErrorCode {
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+  UNKNOWN_USER
+  UNAUTHORIZED
+  UNKNOWN_REPRESENTATIVE
+}
+
 enum ConfirmUserEmailChangeErrorCode {
   UNKNOWN
   DUPLICATE_EMAIL
@@ -1675,6 +1778,14 @@ enum ConfirmUserEmailErrorCode {
   UNKNOWN
   UNKNOWN_USER
   INVALID_CONFIRMATION_CODE
+}
+
+enum ConfirmUserMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_USER
+  UNAUTHORIZED
+  UNKNOWN_DEVELOPER
 }
 
 enum CreateComponentErrorCode {
