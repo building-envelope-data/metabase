@@ -108,7 +108,9 @@ export default function AddInstitutionRepresentative({
         >
           <Select placeholder="Please select">
             {usersQuery.data?.users?.nodes?.map((user) => (
-              <Select.Option value={user.uuid}>{user.name}</Select.Option>
+              <Select.Option key={user.uuid} value={user.uuid}>
+                {user.name}
+              </Select.Option>
             ))}
           </Select>
         </Form.Item>

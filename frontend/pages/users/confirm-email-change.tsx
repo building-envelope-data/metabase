@@ -44,7 +44,13 @@ function Page() {
       }
     };
     confirm();
-  }, [currentEmail, newEmail, confirmationCode]);
+  }, [
+    router,
+    confirmUserEmailChangeMutation,
+    currentEmail,
+    newEmail,
+    confirmationCode,
+  ]);
 
   return (
     <Layout>

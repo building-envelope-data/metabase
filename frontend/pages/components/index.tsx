@@ -27,7 +27,9 @@ function Index() {
             key: "uuid",
             sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
             sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => <Link href={paths.component(record.uuid)}>{record.uuid}</Link>
+            render: (_value, record, _index) => (
+              <Link href={paths.component(record.uuid)}>{record.uuid}</Link>
+            ),
           },
           {
             title: "Name",
@@ -54,7 +56,13 @@ function Index() {
             title: "Categories",
             dataIndex: "categories",
             key: "categories",
-            render: (_value, record, _index) => <List>{record.categories.map(category => <List.Item>{category}</List.Item>)}</List>
+            render: (_value, record, _index) => (
+              <List>
+                {record.categories.map((category) => (
+                  <List.Item key={category}>{category}</List.Item>
+                ))}
+              </List>
+            ),
           },
         ]}
         dataSource={data?.components?.nodes || []}

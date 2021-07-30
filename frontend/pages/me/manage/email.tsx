@@ -46,9 +46,8 @@ function Page() {
         });
     },
   });
-  const [
-    resendUserEmailVerificationMutation,
-  ] = useResendUserEmailVerificationMutation();
+  const [resendUserEmailVerificationMutation] =
+    useResendUserEmailVerificationMutation();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -129,7 +128,7 @@ function Page() {
         {!currentUser.isEmailConfirmed && (
           <>
             Please confirm it by clicking the confirmation link in the
-            confirmation email you received. If you didn't receive a
+            confirmation email you received. If you didn&apos;t receive a
             confirmation email, click the following button to resend it:{" "}
             <Button onClick={resendUserEmailVerification} loading={resending}>
               Resend confirmation email

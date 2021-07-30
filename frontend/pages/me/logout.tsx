@@ -20,7 +20,7 @@ function Logout() {
       }
     };
     logout();
-  }, [router]);
+  }, [router, logoutUserMutation, apolloClient]);
 
   return (
     <Layout>

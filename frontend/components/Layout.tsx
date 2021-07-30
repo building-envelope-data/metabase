@@ -45,15 +45,18 @@ export type LayoutProps = {
   children?: ReactNode;
 };
 
+const cookieConsentName = "consent";
+const cookieConsentValue = "yes";
+
 export default function Layout({ children }: LayoutProps) {
   const appTitle = `Building Envelope Data`;
-  const cookieConsentName = "consent";
-  const cookieConsentValue = "yes";
 
   const [cookies, setCookie] = useCookies([cookieConsentName]);
+  const shouldShowCookieConsent =
+    cookies[cookieConsentName] != cookieConsentValue;
 
   useEffect(() => {
-    if (cookies[cookieConsentName] != cookieConsentValue) {
+    if (shouldShowCookieConsent) {
       Modal.info({
         title: "Cookie Consent",
         content: (
@@ -69,7 +72,7 @@ export default function Layout({ children }: LayoutProps) {
         },
       });
     }
-  }, []);
+  }, [shouldShowCookieConsent, setCookie]);
 
   return (
     <AntLayout>

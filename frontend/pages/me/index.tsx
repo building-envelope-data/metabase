@@ -12,13 +12,13 @@ function Index() {
   const shouldRedirect = !(loading || error || currentUser);
 
   useEffect(() => {
-    if (shouldRedirect) {
+    if (router.isReady && shouldRedirect) {
       router.push({
         pathname: paths.userLogin,
         query: { returnTo: paths.userCurrent },
       });
     }
-  }, [shouldRedirect]);
+  }, [router, shouldRedirect]);
 
   return <Layout></Layout>;
 }

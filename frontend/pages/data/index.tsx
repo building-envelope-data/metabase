@@ -105,19 +105,19 @@ function Index() {
     nearnormalHemisphericalVisibleTransmittances,
   }: {
     componentIds:
-    | {
-      negator: Negator;
-      comperator: ComponentIdComperator;
-      value: Scalars["Uuid"] | undefined;
-    }[]
-    | undefined;
+      | {
+          negator: Negator;
+          comperator: ComponentIdComperator;
+          value: Scalars["Uuid"] | undefined;
+        }[]
+      | undefined;
     nearnormalHemisphericalVisibleTransmittances:
-    | {
-      negator: Negator;
-      comperator: NearnormalHemisphericalVisibleTransmittanceComperator;
-      value: number | undefined;
-    }[]
-    | undefined;
+      | {
+          negator: Negator;
+          comperator: NearnormalHemisphericalVisibleTransmittanceComperator;
+          value: number | undefined;
+        }[]
+      | undefined;
   }) => {
     const filter = async () => {
       try {
@@ -201,7 +201,7 @@ function Index() {
           {(fields, { add, remove }, { errors }) => (
             <>
               {fields.map(({ key, name, fieldKey, ...restField }, index) => (
-                <Form.Item label={index === 0 ? "Component Id" : " "}>
+                <Form.Item key={key} label={index === 0 ? "Component Id" : " "}>
                   <Input.Group>
                     <Form.Item
                       {...restField}
@@ -268,6 +268,7 @@ function Index() {
             <>
               {fields.map(({ key, name, fieldKey, ...restField }, index) => (
                 <Form.Item
+                  key={key}
                   label={
                     index === 0
                       ? "Nearnormal hemispherical visible transmittance"
@@ -429,7 +430,9 @@ function Index() {
                   {record.resourceTree.root.value.hashValue}
                 </Descriptions.Item>
                 <Descriptions.Item label="Locator">
-                  <Typography.Link href={record.resourceTree.root.value.locator}>
+                  <Typography.Link
+                    href={record.resourceTree.root.value.locator}
+                  >
                     {record.resourceTree.root.value.locator}
                   </Typography.Link>
                 </Descriptions.Item>

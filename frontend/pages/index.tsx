@@ -34,14 +34,14 @@ const Index = () => {
     return (
       <Layout>
         <Typography.Paragraph>
-          You're signed in as {currentUser.name}, your email address it{" "}
+          You&apos;re signed in as {currentUser.name}, your email address it{" "}
           {currentUser.email}, and your UUID is {currentUser.uuid}.
         </Typography.Paragraph>
       </Layout>
     );
   }
 
-  return <Layout>You're not signed in.</Layout>;
+  return <Layout>You&apos;re not signed in.</Layout>;
 };
 
 // export async function getStaticProps() {

@@ -43,7 +43,7 @@ export default function ManageLayout({ children }: ManageLayoutProps) {
         query: { returnTo: paths.userCurrent },
       });
     }
-  }, [shouldRedirect]);
+  }, [router, shouldRedirect]);
 
   if (!currentUser) {
     return (

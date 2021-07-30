@@ -27,7 +27,9 @@ function Index() {
             key: "uuid",
             sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
             sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => <Link href={paths.method(record.uuid)}>{record.uuid}</Link>
+            render: (_value, record, _index) => (
+              <Link href={paths.method(record.uuid)}>{record.uuid}</Link>
+            ),
           },
           {
             title: "Name",
@@ -47,16 +49,27 @@ function Index() {
             title: "Categories",
             dataIndex: "categories",
             key: "categories",
-            render: (_value, record, _index) => <List>{record.categories.map(category => <List.Item>{category}</List.Item>)}</List>
+            render: (_value, record, _index) => (
+              <List>
+                {record.categories.map((category) => (
+                  <List.Item key={category}>{category}</List.Item>
+                ))}
+              </List>
+            ),
           },
           {
             title: "Calculation",
             dataIndex: "calculationLocator",
             key: "calculationLocator",
-            sorter: (a, b) => a.calculationLocator.localeCompare(b.calculationLocator, "en"),
+            sorter: (a, b) =>
+              a.calculationLocator.localeCompare(b.calculationLocator, "en"),
             sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => <Typography.Link href={record.calculationLocator}>{record.calculationLocator}</Typography.Link>
-          }
+            render: (_value, record, _index) => (
+              <Typography.Link href={record.calculationLocator}>
+                {record.calculationLocator}
+              </Typography.Link>
+            ),
+          },
         ]}
         dataSource={data?.methods?.nodes || []}
       />

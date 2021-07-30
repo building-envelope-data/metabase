@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { NextRouter, useRouter } from "next/router";
 import {
   InstitutionDocument,
   InstitutionsDocument,
@@ -25,6 +25,13 @@ export type CreateInstitutionProps = {
   managerId?: Scalars["Uuid"];
 };
 
+function redirectToLoginPage(router: NextRouter): void {
+  router.push({
+    pathname: paths.userLogin,
+    query: { returnTo: paths.institutionCreate },
+  });
+}
+
 export default function CreateInstitution({
   ownerIds,
   managerId,
@@ -34,6 +41,11 @@ export default function CreateInstitution({
   const currentUserQuery = useCurrentUserQuery();
   const currentUserLoading = currentUserQuery.loading;
   const currentUser = currentUserQuery.data?.currentUser;
+  const shouldRedirect = !(
+    currentUserLoading ||
+    currentUserQuery.error ||
+    currentUser
+  );
 
   const [createInstitutionMutation] = useCreateInstitutionMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -59,17 +71,10 @@ export default function CreateInstitution({
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    if (!currentUserLoading && !currentUser) {
-      redirectToLoginPage();
+    if (router.isReady && shouldRedirect) {
+      redirectToLoginPage(router);
     }
-  }, [currentUserLoading, currentUser]);
-
-  const redirectToLoginPage = () => {
-    router.push({
-      pathname: paths.userLogin,
-      query: { returnTo: paths.institutionCreate },
-    });
-  };
+  }, [router, shouldRedirect]);
 
   const onFinish = ({
     name,
@@ -87,7 +92,7 @@ export default function CreateInstitution({
     const create = async () => {
       try {
         if (!currentUser) {
-          return redirectToLoginPage();
+          return redirectToLoginPage(router);
         }
         setCreating(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
