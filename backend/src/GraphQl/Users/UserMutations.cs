@@ -1385,7 +1385,7 @@ namespace Metabase.GraphQl.Users
             await emailSender.SendAsync(
                 to,
                 "Confirm your email",
-                $"Please confirm your email address by clicking the link {host}/users/confirm-email?email={to.address}&confirmationCode={confirmationCode}.")
+                $"Please confirm your email address by following the link {host}/users/confirm-email?email={to.address}&confirmationCode={confirmationCode}")
                 .ConfigureAwait(false);
         }
 
