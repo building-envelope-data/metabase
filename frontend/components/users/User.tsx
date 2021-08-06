@@ -12,15 +12,11 @@ import {
   useUserQuery,
   useDeleteUserMutation,
 } from "../../queries/users.graphql";
-import {
-  InstitutionDocument,
-  InstitutionsDocument,
-  useVerifyInstitutionMutation,
-} from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.graphql";
 import { MethodDocument } from "../../queries/methods.graphql";
 import { useConfirmInstitutionRepresentativeMutation } from "../../queries/institutionRepresentatives.graphql";
 import { useConfirmUserMethodDeveloperMutation } from "../../queries/userMethodDevelopers.graphql";
-import { InstitutionState, Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/__types__";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
@@ -28,7 +24,6 @@ import paths from "../../paths";
 import { useState } from "react";
 import Link from "next/link";
 import { UserDocument } from "../../__generated__/queries/users.graphql";
-import { useInstitutionsQuery } from "../../__generated__/queries/institutions.graphql";
 
 export type UserProps = {
   userId: Scalars["Uuid"];
@@ -43,56 +38,6 @@ export default function User({ userId }: UserProps) {
   });
   const user = data?.user;
   const currentUser = useCurrentUserQuery()?.data?.currentUser;
-  const pendingInstitutionsQuery = useInstitutionsQuery({
-    variables: {
-      state: InstitutionState.Pending,
-    },
-  });
-  const pendingInstitutions =
-    pendingInstitutionsQuery.data?.institutions?.nodes;
-
-  const [verifyInstitutionMutation] = useVerifyInstitutionMutation();
-  const [verifyingInstitution, setVerifyingInstitution] = useState(false);
-
-  const verifyInstitution = async (institutionId: Scalars["Uuid"]) => {
-    try {
-      setVerifyingInstitution(true);
-      const { errors, data } = await verifyInstitutionMutation({
-        variables: {
-          institutionId: institutionId,
-        },
-        refetchQueries: [
-          {
-            query: InstitutionsDocument,
-          },
-          {
-            query: InstitutionsDocument,
-            variables: {
-              state: InstitutionState.Pending,
-            },
-          },
-          {
-            query: InstitutionDocument,
-            variables: {
-              uuid: institutionId,
-            },
-          },
-        ],
-      });
-      if (errors) {
-        console.log(errors); // TODO What to do?
-      } else if (data?.verifyInstitution?.errors) {
-        // TODO Is this how we want to display errors?
-        message.error(
-          data?.verifyInstitution?.errors
-            .map((error) => error.message)
-            .join(" ")
-        );
-      }
-    } finally {
-      setVerifyingInstitution(false);
-    }
-  };
 
   const [confirmInstitutionRepresentativeMutation] =
     useConfirmInstitutionRepresentativeMutation();
@@ -316,31 +261,6 @@ export default function User({ userId }: UserProps) {
           />
         )}
 
-      {/* TODO Make role name `Verifier` a constant. */}
-      {currentUser &&
-        currentUser?.roles?.includes("Verifier") &&
-        pendingInstitutions &&
-        pendingInstitutions.length >= 1 && (
-          <>
-            <Divider />
-            <Typography.Title level={2}>Pending Institutions</Typography.Title>
-            <List
-              size="small"
-              dataSource={pendingInstitutions}
-              renderItem={(item) => (
-                <List.Item>
-                  <Link href={paths.institution(item?.uuid)}>{item?.name}</Link>
-                  <Button
-                    onClick={() => verifyInstitution(item?.uuid)}
-                    loading={verifyingInstitution}
-                  >
-                    Verify
-                  </Button>
-                </List.Item>
-              )}
-            />
-          </>
-        )}
       {/* TODO Make role name `Administrator` a constant. */}
       {currentUser && currentUser?.roles?.includes("Administrator") && (
         <>

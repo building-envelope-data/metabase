@@ -1,9 +1,11 @@
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import paths from "../../paths";
-import { Table, message, Typography } from "antd";
+import { Table, message, Typography, Divider } from "antd";
 import { useInstitutionsQuery } from "../../queries/institutions.graphql";
 import { useEffect } from "react";
+import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
+import PendingInstitutions from "../../components/institutions/PendingInstitutions";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -14,6 +16,7 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
 
 function Index() {
   const { loading, error, data } = useInstitutionsQuery();
+  const currentUser = useCurrentUserQuery()?.data?.currentUser;
 
   useEffect(() => {
     if (error) {
@@ -32,7 +35,9 @@ function Index() {
             key: "uuid",
             sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
             sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => <Link href={paths.institution(record.uuid)}>{record.uuid}</Link>
+            render: (_value, record, _index) => (
+              <Link href={paths.institution(record.uuid)}>{record.uuid}</Link>
+            ),
           },
           {
             title: "Name",
@@ -45,7 +50,10 @@ function Index() {
             title: "Abbreviation",
             dataIndex: "abbreviation",
             key: "abbreviation",
-            sorter: (a, b) => a.abbreviation && b.abbreviation ? a.abbreviation.localeCompare(b.abbreviation, "en") : 0,
+            sorter: (a, b) =>
+              a.abbreviation && b.abbreviation
+                ? a.abbreviation.localeCompare(b.abbreviation, "en")
+                : 0,
             sortDirections: ["ascend", "descend"],
           },
           {
@@ -59,14 +67,29 @@ function Index() {
             title: "Website",
             dataIndex: "websiteLocator",
             key: "websiteLocator",
-            sorter: (a, b) => a.websiteLocator.localeCompare(b.websiteLocator, "en"),
+            sorter: (a, b) =>
+              a.websiteLocator.localeCompare(b.websiteLocator, "en"),
             sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => <Typography.Link href={record.websiteLocator}>{record.websiteLocator}</Typography.Link>
+            render: (_value, record, _index) => (
+              <Typography.Link href={record.websiteLocator}>
+                {record.websiteLocator}
+              </Typography.Link>
+            ),
           },
         ]}
         dataSource={data?.institutions?.nodes?.filter(notEmpty) || []}
       />
-      <Link href={paths.institutionCreate}>Create Institution</Link>
+      {/* TODO Make role name `Verifier` a constant. */}
+      {currentUser && currentUser?.roles?.includes("Verifier") && (
+        <>
+          <Divider />
+          <Typography.Title level={2}>Pending Institutions</Typography.Title>
+          <PendingInstitutions />
+        </>
+      )}
+      {currentUser && (
+        <Link href={paths.institutionCreate}>Create Institution</Link>
+      )}
     </Layout>
   );
 }
