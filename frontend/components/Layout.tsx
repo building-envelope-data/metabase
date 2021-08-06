@@ -9,35 +9,35 @@ import { useCookies } from "react-cookie";
 const navItems = [
   {
     path: paths.home,
-    label: `Home`,
-  },
-  {
-    path: paths.institutions,
-    label: `Institutions`,
-  },
-  {
-    path: paths.dataFormats,
-    label: `Data Formats`,
-  },
-  {
-    path: paths.methods,
-    label: `Methods`,
-  },
-  {
-    path: paths.components,
-    label: `Components`,
-  },
-  {
-    path: paths.databases,
-    label: `Databases`,
+    label: "Home",
   },
   {
     path: paths.data,
-    label: `Data`,
+    label: "Data",
+  },
+  {
+    path: paths.components,
+    label: "Components",
+  },
+  {
+    path: paths.institutions,
+    label: "Institutions",
+  },
+  {
+    path: paths.databases,
+    label: "Databases",
+  },
+  {
+    path: paths.dataFormats,
+    label: "Data Formats",
+  },
+  {
+    path: paths.methods,
+    label: "Methods",
   },
   {
     path: paths.users,
-    label: `Users`,
+    label: "Users",
   },
 ];
 
@@ -49,7 +49,7 @@ const cookieConsentName = "consent";
 const cookieConsentValue = "yes";
 
 export default function Layout({ children }: LayoutProps) {
-  const appTitle = `Building Envelope Data`;
+  const appTitle = "Building Envelope Data";
 
   const [cookies, setCookie] = useCookies([cookieConsentName]);
   const shouldShowCookieConsent =
