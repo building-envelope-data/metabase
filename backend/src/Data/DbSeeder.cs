@@ -7,11 +7,25 @@ using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Identity;
+using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace Metabase.Data
 {
     public sealed class DbSeeder
     {
+        public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password, string Role)> Users =
+            Role.All.Select(role => (
+                role,
+                $"{role.ToLower()}@buildingenvelopedata.org",
+                "abcABC123@",
+                role
+            )).ToList().AsReadOnly();
+        public static readonly (string Name, string EmailAddress, string Password, string Role) AdministratorUser =
+            Users.First(x => x.Role == Role.Administrator);
+        public static readonly (string Name, string EmailAddress, string Password, string Role) VerifierUser =
+            Users.First(x => x.Role == Role.Verifier);
+
         public static async Task DoAsync(
             IServiceProvider services
             )
@@ -21,6 +35,7 @@ namespace Metabase.Data
             var environment = services.GetRequiredService<IWebHostEnvironment>();
             var appSettings = services.GetRequiredService<AppSettings>();
             await CreateRolesAsync(services, logger).ConfigureAwait(false);
+            await CreateUsersAsync(services, logger).ConfigureAwait(false);
             await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
             await RegisterScopesAsync(services, logger, appSettings).ConfigureAwait(false);
         }
@@ -39,6 +54,29 @@ namespace Metabase.Data
                     await manager.CreateAsync(
                         new Role(role)
                         ).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private static async Task CreateUsersAsync(
+            IServiceProvider services,
+            ILogger<DbSeeder> logger
+        )
+        {
+            var manager = services.GetRequiredService<UserManager<User>>();
+            foreach (var (Name, EmailAddress, Password, Role) in Users)
+            {
+                if (await manager.FindByNameAsync(Name).ConfigureAwait(false) is null)
+                {
+                    logger.LogDebug($"Creating user {Name}");
+                    var user = new User(Name, EmailAddress, null, null);
+                    await manager.CreateAsync(
+                        user,
+                        Password
+                        ).ConfigureAwait(false);
+                    var confirmationToken = await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+                    await manager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
+                    await manager.AddToRoleAsync(user, Role).ConfigureAwait(false);
                 }
             }
         }

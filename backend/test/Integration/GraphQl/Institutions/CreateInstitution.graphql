@@ -5,7 +5,6 @@ mutation createInstitution(
   $ownerIds: [Uuid!]!
   $managerId: Uuid
   $websiteLocator: Url
-  $state: InstitutionState!
 ) {
   createInstitution(
     input: {
@@ -15,7 +14,6 @@ mutation createInstitution(
       ownerIds: $ownerIds
       managerId: $managerId
       websiteLocator: $websiteLocator
-      state: $state
     }
   ) {
     institution {
@@ -25,7 +23,6 @@ mutation createInstitution(
       abbreviation
       description
       websiteLocator
-      state
     }
     errors {
       code

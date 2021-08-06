@@ -28,9 +28,9 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         {
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
+            var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationTests.OperativeInstitutionInput with
+                InstitutionIntegrationTests.PendingInstitutionInput with
                 {
                     OwnerIds = new[] { userId }
                 }
@@ -57,9 +57,9 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         {
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
+            var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationTests.OperativeInstitutionInput with
+                InstitutionIntegrationTests.PendingInstitutionInput with
                 {
                     OwnerIds = new[] { userId }
                 }

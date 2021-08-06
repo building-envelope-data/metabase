@@ -84,8 +84,7 @@ namespace Metabase.Data
             string? abbreviation,
             string description,
             Uri? websiteLocator,
-            string? publicKey,
-            Enumerations.InstitutionState state
+            string? publicKey
         )
         {
             Name = name;
@@ -93,7 +92,11 @@ namespace Metabase.Data
             Description = description;
             WebsiteLocator = websiteLocator;
             PublicKey = publicKey;
-            State = state;
+        }
+
+        public void Verify()
+        {
+            State = Enumerations.InstitutionState.VERIFIED;
         }
     }
 }

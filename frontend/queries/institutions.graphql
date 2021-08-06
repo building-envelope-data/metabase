@@ -7,8 +7,8 @@ fragment InstitutionPartial on Institution {
   websiteLocator
 }
 
-query Institutions {
-  institutions {
+query Institutions($state: InstitutionState! = VERIFIED) {
+  institutions(where: { state: { eq: $state } }) {
     nodes {
       ...InstitutionPartial
     }
@@ -22,7 +22,6 @@ mutation CreateInstitution(
   $ownerIds: [Uuid!]!
   $managerId: Uuid
   $websiteLocator: Url
-  $state: InstitutionState!
 ) {
   createInstitution(
     input: {
@@ -32,7 +31,6 @@ mutation CreateInstitution(
       ownerIds: $ownerIds
       managerId: $managerId
       websiteLocator: $websiteLocator
-      state: $state
     }
   ) {
     institution {
@@ -52,7 +50,6 @@ mutation UpdateInstitution(
   $abbreviation: String
   $description: String!
   $websiteLocator: Url
-  $state: InstitutionState!
 ) {
   updateInstitution(
     input: {
@@ -61,9 +58,21 @@ mutation UpdateInstitution(
       abbreviation: $abbreviation
       description: $description
       websiteLocator: $websiteLocator
-      state: $state
     }
   ) {
+    institution {
+      ...InstitutionPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation VerifyInstitution($institutionId: Uuid!) {
+  verifyInstitution(input: { institutionId: $institutionId }) {
     institution {
       ...InstitutionPartial
     }

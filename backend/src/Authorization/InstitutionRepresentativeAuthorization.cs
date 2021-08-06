@@ -16,7 +16,7 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsOwner(
+            return CommonAuthorization.IsOwnerOfVerifiedInstitution(
                 claimsPrincipal,
                 institutionId,
                 userManager,

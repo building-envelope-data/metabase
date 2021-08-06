@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.Authorization
@@ -50,7 +51,7 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsOwner(
+            return CommonAuthorization.IsOwnerOfVerifiedInstitution(
                 claimsPrincipal,
                 institutionId,
                 userManager,
@@ -67,12 +68,23 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
         )
         {
-            return CommonAuthorization.IsAtLeastAssistant(
+            return CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
                 claimsPrincipal,
                 institutionId,
                 userManager,
                 context,
                 cancellationToken
+            );
+        }
+
+        internal static Task<bool> IsAuthorizedToVerifyInstitution(
+            ClaimsPrincipal claimsPrincipal,
+            UserManager<Data.User> userManager
+            )
+        {
+            return CommonAuthorization.IsVerifier(
+                claimsPrincipal,
+                userManager
             );
         }
     }

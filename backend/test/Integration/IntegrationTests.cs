@@ -32,26 +32,40 @@ namespace Metabase.Tests.Integration
             HttpClient = CreateHttpClient();
         }
 
-        protected HttpClient CreateHttpClient(bool allowAutoRedirect = true)
+        protected static HttpClient CreateHttpClient(
+            CustomWebApplicationFactory factory,
+            bool allowAutoRedirect = true
+            )
         {
-            return Factory.CreateClient(
-            new WebApplicationFactoryClientOptions
-            {
-                AllowAutoRedirect = allowAutoRedirect,
-                BaseAddress = new Uri("http://localhost"),
-                HandleCookies = true,
-                MaxAutomaticRedirections = 3,
-            }
+            return factory.CreateClient(
+                new WebApplicationFactoryClientOptions
+                {
+                    AllowAutoRedirect = allowAutoRedirect,
+                    BaseAddress = new Uri("http://localhost"),
+                    HandleCookies = true,
+                    MaxAutomaticRedirections = 3,
+                }
             );
         }
 
-        protected async Task<TokenResponse> RequestAuthToken(
+        protected HttpClient CreateHttpClient(
+            bool allowAutoRedirect = true
+            )
+        {
+            return CreateHttpClient(
+                Factory,
+                allowAutoRedirect
+            );
+        }
+
+        protected static async Task<TokenResponse> RequestAuthToken(
+            HttpClient httpClient,
             string emailAddress,
             string password
             )
         {
             var response =
-              await HttpClient.RequestPasswordTokenAsync(
+              await httpClient.RequestPasswordTokenAsync(
                 new PasswordTokenRequest
                 {
                     Address = "http://localhost/connect/token",
@@ -70,23 +84,86 @@ namespace Metabase.Tests.Integration
             return response;
         }
 
-        protected async Task LoginUser(
+        protected Task<TokenResponse> RequestAuthToken(
+            string emailAddress,
+            string password
+            )
+        {
+            return RequestAuthToken(
+                HttpClient,
+                emailAddress,
+                password
+            );
+        }
+
+        protected static async Task LoginUser(
+            HttpClient httpClient,
             string email = DefaultEmail,
             string password = DefaultPassword
             )
         {
             var tokenResponse =
               await RequestAuthToken(
+                  httpClient,
                   emailAddress: email,
                   password: password
                   )
               .ConfigureAwait(false);
-            HttpClient.SetBearerToken(tokenResponse.AccessToken);
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+        }
+
+        protected Task LoginUser(
+            string email = DefaultEmail,
+            string password = DefaultPassword
+            )
+        {
+            return LoginUser(
+                HttpClient,
+                email,
+                password
+            );
+        }
+
+        protected static void LogoutUser(
+            HttpClient httpClient
+        )
+        {
+            httpClient.SetBearerToken(null);
         }
 
         protected void LogoutUser()
         {
-            HttpClient.SetBearerToken(null);
+            LogoutUser(HttpClient);
+        }
+
+        protected static async Task<TResult> AsUser<TResult>(
+            HttpClient httpClient,
+            string email,
+            string password,
+            Func<HttpClient, Task<TResult>> task
+        )
+        {
+            // This is fragile as it uses the fact that at the moment of this
+            // writing, `LoginUser` calls `SetBearerToken` which sets
+            // `httpClient.DefaultRequestHeaders.Authorization`. Thus, by
+            // remembering and restoring this value the original user is kept
+            // logged-in.
+            var originalAuthorizationRequestHeader = httpClient.DefaultRequestHeaders.Authorization;
+            try
+            {
+                await LoginUser(
+                    httpClient,
+                    email,
+                    password
+                ).ConfigureAwait(false);
+                var result = await task(httpClient).ConfigureAwait(false);
+                LogoutUser(httpClient);
+                return result;
+            }
+            finally
+            {
+                httpClient.DefaultRequestHeaders.Authorization = originalAuthorizationRequestHeader;
+            }
         }
 
         protected async Task<string> RegisterUser(

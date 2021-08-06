@@ -20,7 +20,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             var response =
                 await UnsuccessfullyQueryGraphQlContentAsString(
                     File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-                    variables: OperativeInstitutionInput
+                    variables: PendingInstitutionInput
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -32,7 +32,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             // Act
             await UnsuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-                variables: OperativeInstitutionInput
+                variables: PendingInstitutionInput
                 ).ConfigureAwait(false);
             var response = await GetInstitutions().ConfigureAwait(false);
             // Assert

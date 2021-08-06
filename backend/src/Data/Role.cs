@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Collections;
 using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Identity;
 using Guid = System.Guid;
@@ -11,10 +9,12 @@ namespace Metabase.Data
     {
         public static readonly ReadOnlyCollection<string> All =
             Array.AsReadOnly(new[] {
-                Administrator
+                Administrator,
+                Verifier
             });
 
         public const string Administrator = "Administrator";
+        public const string Verifier = "Verifier";
 
         // public ICollection<UserRole> UserRoles { get; } = new List<UserRole>();
 

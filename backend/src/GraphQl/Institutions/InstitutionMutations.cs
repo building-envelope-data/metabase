@@ -108,7 +108,7 @@ namespace Metabase.GraphQl.Institutions
                 description: input.Description,
                 websiteLocator: input.WebsiteLocator,
                 publicKey: input.PublicKey,
-                state: input.State
+                state: await GetInitialInstitutionState(input, user, userManager).ConfigureAwait(false)
             )
             {
                 ManagerId = input.ManagerId
@@ -127,6 +127,67 @@ namespace Metabase.GraphQl.Institutions
             context.Institutions.Add(institution);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new CreateInstitutionPayload(institution);
+        }
+
+        private static async Task<Enumerations.InstitutionState> GetInitialInstitutionState(
+            CreateInstitutionInput input,
+            Data.User user,
+            UserManager<Data.User> userManager
+        )
+        {
+            if (input.ManagerId is not null
+                || await userManager.IsInRoleAsync(user, Data.Role.Administrator).ConfigureAwait(false)
+                || await userManager.IsInRoleAsync(user, Data.Role.Verifier).ConfigureAwait(false)
+            )
+            {
+                return Enumerations.InstitutionState.VERIFIED;
+            }
+            return Enumerations.InstitutionState.PENDING;
+        }
+
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+        public async Task<VerifyInstitutionPayload> VerifyInstitutionAsync(
+            VerifyInstitutionInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await InstitutionAuthorization.IsAuthorizedToVerifyInstitution(
+                 claimsPrincipal,
+                 userManager
+                 ).ConfigureAwait(false)
+               )
+            {
+                return new VerifyInstitutionPayload(
+                    new VerifyInstitutionError(
+                      VerifyInstitutionErrorCode.UNAUTHORIZED,
+                      "You are not authorized to verify institutions.",
+                      Array.Empty<string>()
+                      )
+                      );
+            }
+            var institution =
+                await context.Institutions.AsQueryable()
+                .Where(i => i.Id == input.InstitutionId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+            if (institution is null)
+            {
+                return new VerifyInstitutionPayload(
+                    new VerifyInstitutionError(
+                      VerifyInstitutionErrorCode.UNKNOWN_INSTITUTION,
+                      "Unknown institution.",
+                      new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                      )
+                      );
+            }
+            institution.Verify();
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return new VerifyInstitutionPayload(institution);
         }
 
         [UseDbContext(typeof(Data.ApplicationDbContext))]
@@ -177,8 +238,7 @@ namespace Metabase.GraphQl.Institutions
                 abbreviation: input.Abbreviation,
                 description: input.Description,
                 websiteLocator: input.WebsiteLocator,
-                publicKey: input.PublicKey,
-                state: input.State
+                publicKey: input.PublicKey
             );
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new UpdateInstitutionPayload(institution);

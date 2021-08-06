@@ -24,6 +24,61 @@ namespace Metabase.Authorization
             return user.Id == userId;
         }
 
+        public static Task<bool> IsAdministrator(
+            ClaimsPrincipal claimsPrincipal,
+            UserManager<Data.User> userManager
+        )
+        {
+            return IsInRole(
+                claimsPrincipal,
+                Data.Role.Administrator,
+                userManager
+            );
+        }
+
+        public static Task<bool> IsVerifier(
+            ClaimsPrincipal claimsPrincipal,
+            UserManager<Data.User> userManager
+        )
+        {
+            return IsInRole(
+                claimsPrincipal,
+                Data.Role.Verifier,
+                userManager
+            );
+        }
+
+        private static async Task<bool> IsInRole(
+            ClaimsPrincipal claimsPrincipal,
+            string role,
+            UserManager<Data.User> userManager
+        )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return false;
+            }
+            return await userManager.IsInRoleAsync(
+                user,
+                role
+            ).ConfigureAwait(false);
+        }
+
+        public static async Task<bool> IsVerified(
+            Guid institutionId,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return await context.Institutions.AsQueryable()
+                .AnyAsync(x =>
+                    x.Id == institutionId &&
+                    x.State == Enumerations.InstitutionState.VERIFIED,
+                    cancellationToken
+                ).ConfigureAwait(false);
+        }
+
         public static async Task<bool> IsOwner(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
@@ -40,6 +95,30 @@ namespace Metabase.Authorization
                 cancellationToken
             ).ConfigureAwait(false)
             == Enumerations.InstitutionRepresentativeRole.OWNER;
+        }
+
+        public static async Task<bool> IsOwnerOfVerifiedInstitution(
+            ClaimsPrincipal claimsPrincipal,
+            Guid institutionId,
+            UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return
+                (await IsVerified(
+                    institutionId,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)) &&
+                (await IsOwner(
+                    claimsPrincipal,
+                    institutionId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
+            );
         }
 
         public static async Task<bool> IsAtLeastAssistant(
@@ -61,6 +140,30 @@ namespace Metabase.Authorization
             return
                 role == Enumerations.InstitutionRepresentativeRole.OWNER
                 || role == Enumerations.InstitutionRepresentativeRole.ASSISTANT;
+        }
+
+        public static async Task<bool> IsAtLeastAssistantOfVerifiedInstitution(
+            ClaimsPrincipal claimsPrincipal,
+            Guid institutionId,
+            UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return
+                (await IsVerified(
+                    institutionId,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)) &&
+                (await IsAtLeastAssistant(
+                    claimsPrincipal,
+                    institutionId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
+            );
         }
 
         private static async Task<Enumerations.InstitutionRepresentativeRole?> FetchRole(

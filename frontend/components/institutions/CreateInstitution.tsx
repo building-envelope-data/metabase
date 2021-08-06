@@ -4,8 +4,8 @@ import {
   InstitutionsDocument,
   useCreateInstitutionMutation,
 } from "../../queries/institutions.graphql";
-import { InstitutionState, Scalars } from "../../__generated__/__types__";
-import { Skeleton, Select, Alert, Form, Input, Button } from "antd";
+import { Scalars } from "../../__generated__/__types__";
+import { Skeleton, Alert, Form, Input, Button } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { useState, useEffect } from "react";
@@ -81,13 +81,11 @@ export default function CreateInstitution({
     abbreviation,
     description,
     websiteLocator,
-    state,
   }: {
     name: string;
     abbreviation: string;
     description: string;
     websiteLocator: string;
-    state: InstitutionState;
   }) => {
     const create = async () => {
       try {
@@ -104,7 +102,6 @@ export default function CreateInstitution({
             websiteLocator: websiteLocator,
             ownerIds: ownerIds || [],
             managerId: managerId,
-            state: state,
           },
         });
         handleFormErrors(
@@ -190,28 +187,6 @@ export default function CreateInstitution({
         </Form.Item>
         <Form.Item label="Website" name="websiteLocator">
           <Input />
-        </Form.Item>
-        <Form.Item
-          label="State"
-          name="state"
-          initialValue={InstitutionState.Operative}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select>
-            <Select.Option value={InstitutionState.Unknown}>
-              Unknown
-            </Select.Option>
-            <Select.Option value={InstitutionState.Operative}>
-              Operative
-            </Select.Option>
-            <Select.Option value={InstitutionState.Inoperative}>
-              Inoperative
-            </Select.Option>
-          </Select>
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>

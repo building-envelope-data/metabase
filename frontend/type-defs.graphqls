@@ -741,6 +741,7 @@ type Mutation {
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
 }
 
 type NamedMethodArgument {
@@ -1110,6 +1111,17 @@ type UserRepresentedInstitutionEdge {
   role: InstitutionRepresentativeRole!
 }
 
+type VerifyInstitutionError {
+  code: VerifyInstitutionErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type VerifyInstitutionPayload {
+  errors: [VerifyInstitutionError!]
+  institution: Institution
+}
+
 input AddInstitutionRepresentativeInput {
   institutionId: Uuid!
   role: InstitutionRepresentativeRole!
@@ -1272,7 +1284,6 @@ input CreateInstitutionInput {
   name: String!
   ownerIds: [Uuid!]!
   publicKey: String
-  state: InstitutionState!
   websiteLocator: Url
 }
 
@@ -1413,6 +1424,7 @@ input InstitutionFilterInput {
   id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   or: [InstitutionFilterInput!]
+  state: InstitutionStateOperationFilterInput
   websiteLocator: UriFilterInput
 }
 
@@ -1427,6 +1439,13 @@ input InstitutionSortInput {
   state: SortEnumType
   websiteLocator: UriSortInput
   xmin: SortEnumType
+}
+
+input InstitutionStateOperationFilterInput {
+  eq: InstitutionState
+  in: [InstitutionState!]
+  neq: InstitutionState
+  nin: [InstitutionState!]
 }
 
 input ListComponentCategoryOperationFilterInput {
@@ -1607,7 +1626,6 @@ input UpdateInstitutionInput {
   institutionId: Uuid!
   name: String!
   publicKey: String
-  state: InstitutionState!
   websiteLocator: Url
 }
 
@@ -1694,6 +1712,10 @@ input UserSortInput {
 
 input UuidPropositionInput {
   equalTo: Uuid
+}
+
+input VerifyInstitutionInput {
+  institutionId: Uuid!
 }
 
 enum AddInstitutionRepresentativeErrorCode {
@@ -1877,9 +1899,8 @@ enum InstitutionRepresentativeRole {
 }
 
 enum InstitutionState {
-  UNKNOWN
-  OPERATIVE
-  INOPERATIVE
+  PENDING
+  VERIFIED
 }
 
 enum LoginUserErrorCode {
@@ -2029,6 +2050,12 @@ enum UriHostNameType {
   DNS
   I_PV4
   I_PV6
+}
+
+enum VerifyInstitutionErrorCode {
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
 }
 
 directive @authorize("Defines when when the resolver shall be executed.By default the resolver is executed after the policy has determined that the current user is allowed to access the field." apply: ApplyPolicy! = BEFORE_RESOLVER "The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!]) repeatable on SCHEMA | OBJECT | FIELD_DEFINITION
