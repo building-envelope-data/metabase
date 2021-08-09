@@ -137,6 +137,16 @@ query Institution($uuid: Uuid!) {
       }
       canCurrentUserAddEdge
     }
+    pendingRepresentatives: representatives(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+        role
+      }
+    }
     manager {
       node {
         id

@@ -327,10 +327,8 @@ export default function Institution({ institutionId }: InstitutionProps) {
         ]}
         dataSource={institution.operatedDatabases.edges.map((x) => x.node)}
       />
-      {institution.operatedDatabases.canCurrentUserAddEdge ? (
+      {institution.operatedDatabases.canCurrentUserAddEdge && (
         <CreateDatabase operatorId={institution.uuid} />
-      ) : (
-        <></>
       )}
       <Divider />
       <Typography.Title level={2}>Managed Data Formats</Typography.Title>
@@ -384,10 +382,8 @@ export default function Institution({ institutionId }: InstitutionProps) {
         ]}
         dataSource={institution.managedDataFormats.edges.map((x) => x.node)}
       />
-      {institution.managedDataFormats.canCurrentUserAddEdge ? (
+      {institution.managedDataFormats.canCurrentUserAddEdge && (
         <CreateDataFormat managerId={institution.uuid} />
-      ) : (
-        <></>
       )}
       <Divider />
       <Typography.Title level={2}>Managed Methods</Typography.Title>
@@ -499,10 +495,8 @@ export default function Institution({ institutionId }: InstitutionProps) {
           </List.Item>
         )}
       />
-      {institution.managedInstitutions.canCurrentUserAddEdge ? (
+      {institution.managedInstitutions.canCurrentUserAddEdge && (
         <CreateInstitution managerId={institution.uuid} />
-      ) : (
-        <></>
       )}
       <Divider />
       <Typography.Title level={2}>Representatives</Typography.Title>
@@ -516,10 +510,22 @@ export default function Institution({ institutionId }: InstitutionProps) {
           </List.Item>
         )}
       />
-      {institution.representatives.canCurrentUserAddEdge ? (
+      {institution.representatives.canCurrentUserAddEdge &&
+        institution.pendingRepresentatives.edges.length >= 1 && (
+          <List
+            size="small"
+            header="Pending"
+            dataSource={institution.pendingRepresentatives.edges}
+            renderItem={(item) => (
+              <List.Item>
+                <Link href={paths.user(item.node.uuid)}>{item.node.name}</Link>
+                <Typography.Text>{item.role}</Typography.Text>
+              </List.Item>
+            )}
+          />
+        )}
+      {institution.representatives.canCurrentUserAddEdge && (
         <AddInstitutionRepresentative institutionId={institution.uuid} />
-      ) : (
-        <></>
       )}
       {institution.manager?.node && (
         <>
