@@ -147,7 +147,8 @@ namespace Metabase.Tests.Integration
             // writing, `LoginUser` calls `SetBearerToken` which sets
             // `httpClient.DefaultRequestHeaders.Authorization`. Thus, by
             // remembering and restoring this value the original user is kept
-            // logged-in.
+            // logged-in. For details see
+            // https://github.com/IdentityModel/IdentityModel/blob/main/src/Client/Extensions/AuthorizationHeaderExtensions.cs
             var originalAuthorizationRequestHeader = httpClient.DefaultRequestHeaders.Authorization;
             try
             {
