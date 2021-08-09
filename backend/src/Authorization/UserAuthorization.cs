@@ -7,15 +7,12 @@ namespace Metabase.Authorization
 {
     public static class UserAuthorization
     {
-        public static async Task<bool> IsAuthorizedToDeleteUsers(
+        public static Task<bool> IsAuthorizedToDeleteUsers(
             ClaimsPrincipal claimsPrincipal,
             UserManager<Data.User> userManager
         )
         {
-            return await userManager.IsInRoleAsync(
-                    await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false),
-                    Data.Role.Administrator
-                ).ConfigureAwait(false);
+            return CommonAuthorization.IsAdministrator(claimsPrincipal, userManager);
         }
 
         public static async Task<bool> IsAuthorizedToManageUser(
@@ -35,7 +32,7 @@ namespace Metabase.Authorization
             }
             if (await userManager.IsInRoleAsync(
                     loggedInUser,
-                    Data.Role.Administrator
+                    Data.Role.EnumToName(Enumerations.UserRole.ADMINISTRATOR)
                 ).ConfigureAwait(false))
             {
                 return true;

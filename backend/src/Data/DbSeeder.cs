@@ -14,17 +14,19 @@ namespace Metabase.Data
 {
     public sealed class DbSeeder
     {
-        public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password, string Role)> Users =
-            Role.All.Select(role => (
-                role,
-                $"{role.ToLower()}@buildingenvelopedata.org",
+        public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password, Enumerations.UserRole Role)> Users =
+            Role.AllEnum.Select(role => (
+                Role.EnumToName(role),
+                $"{Role.EnumToName(role).ToLower()}@buildingenvelopedata.org",
                 "abcABC123@",
                 role
             )).ToList().AsReadOnly();
-        public static readonly (string Name, string EmailAddress, string Password, string Role) AdministratorUser =
-            Users.First(x => x.Role == Role.Administrator);
-        public static readonly (string Name, string EmailAddress, string Password, string Role) VerifierUser =
-            Users.First(x => x.Role == Role.Verifier);
+
+        public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role) AdministratorUser =
+            Users.First(x => x.Role == Enumerations.UserRole.ADMINISTRATOR);
+
+        public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role) VerifierUser =
+            Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
 
         public static async Task DoAsync(
             IServiceProvider services
@@ -46,9 +48,9 @@ namespace Metabase.Data
         )
         {
             var manager = services.GetRequiredService<RoleManager<Role>>();
-            foreach (var role in Role.All)
+            foreach (var role in Role.AllEnum)
             {
-                if (await manager.FindByNameAsync(role).ConfigureAwait(false) is null)
+                if (await manager.FindByNameAsync(Role.EnumToName(role)).ConfigureAwait(false) is null)
                 {
                     logger.LogDebug($"Creating role {role}");
                     await manager.CreateAsync(
@@ -76,7 +78,7 @@ namespace Metabase.Data
                         ).ConfigureAwait(false);
                     var confirmationToken = await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
                     await manager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
-                    await manager.AddToRoleAsync(user, Role).ConfigureAwait(false);
+                    await manager.AddToRoleAsync(user, Data.Role.EnumToName(Role)).ConfigureAwait(false);
                 }
             }
         }

@@ -31,7 +31,7 @@ namespace Metabase.Authorization
         {
             return IsInRole(
                 claimsPrincipal,
-                Data.Role.Administrator,
+                Enumerations.UserRole.ADMINISTRATOR,
                 userManager
             );
         }
@@ -43,14 +43,14 @@ namespace Metabase.Authorization
         {
             return IsInRole(
                 claimsPrincipal,
-                Data.Role.Verifier,
+                Enumerations.UserRole.VERIFIER,
                 userManager
             );
         }
 
         private static async Task<bool> IsInRole(
             ClaimsPrincipal claimsPrincipal,
-            string role,
+            Enumerations.UserRole role,
             UserManager<Data.User> userManager
         )
         {
@@ -61,7 +61,7 @@ namespace Metabase.Authorization
             }
             return await userManager.IsInRoleAsync(
                 user,
-                role
+                Data.Role.EnumToName(role)
             ).ConfigureAwait(false);
         }
 

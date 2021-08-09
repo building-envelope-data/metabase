@@ -136,8 +136,8 @@ namespace Metabase.GraphQl.Institutions
         )
         {
             if (input.ManagerId is not null
-                || await userManager.IsInRoleAsync(user, Data.Role.Administrator).ConfigureAwait(false)
-                || await userManager.IsInRoleAsync(user, Data.Role.Verifier).ConfigureAwait(false)
+                || await userManager.IsInRoleAsync(user, Data.Role.EnumToName(Enumerations.UserRole.ADMINISTRATOR)).ConfigureAwait(false)
+                || await userManager.IsInRoleAsync(user, Data.Role.EnumToName(Enumerations.UserRole.VERIFIER)).ConfigureAwait(false)
             )
             {
                 return Enumerations.InstitutionState.VERIFIED;
