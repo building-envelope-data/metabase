@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
@@ -1372,6 +1373,124 @@ namespace Metabase.GraphQl.Users
             }
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new SetUserPasswordPayload(user);
+        }
+
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<AddUserRolePayload> AddUserRoleAsync(
+            AddUserRoleInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager).ConfigureAwait(false))
+            {
+                return new AddUserRolePayload(
+                    new AddUserRoleError(
+                      AddUserRoleErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to add role {input.Role}.",
+                      Array.Empty<string>()
+                    )
+                );
+            }
+            var user = await context.Users.AsQueryable()
+                .SingleOrDefaultAsync(
+                    x => x.Id == input.UserId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new AddUserRolePayload(
+                    new AddUserRoleError(
+                      AddUserRoleErrorCode.UNKNOWN_USER,
+                      "Unknown user.",
+                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                      )
+                    );
+            }
+            var identityResult = await userManager.AddToRoleAsync(user, Data.Role.EnumToName(input.Role)).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<AddUserRoleError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Add(
+                        // TODO Which error codes occur here? When known, translate the properly into `AddUserRoleErrorCode`.
+                        error.Code switch
+                        {
+                            _ =>
+                                new AddUserRoleError(
+                                    AddUserRoleErrorCode.UNKNOWN,
+                                    $"{error.Description} (error code `{error.Code}`)",
+                                    new[] { nameof(input) }
+                                    )
+                        }
+                    );
+                }
+                return new AddUserRolePayload(user, errors);
+            }
+            return new AddUserRolePayload(user);
+        }
+
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<RemoveUserRolePayload> RemoveUserRoleAsync(
+            RemoveUserRoleInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager).ConfigureAwait(false))
+            {
+                return new RemoveUserRolePayload(
+                    new RemoveUserRoleError(
+                      RemoveUserRoleErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to remove role {input.Role}.",
+                      Array.Empty<string>()
+                    )
+                );
+            }
+            var user = await context.Users.AsQueryable()
+                .SingleOrDefaultAsync(
+                    x => x.Id == input.UserId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new RemoveUserRolePayload(
+                    new RemoveUserRoleError(
+                      RemoveUserRoleErrorCode.UNKNOWN_USER,
+                      "Unknown user.",
+                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                      )
+                    );
+            }
+            var identityResult = await userManager.RemoveFromRoleAsync(user, Data.Role.EnumToName(input.Role)).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<RemoveUserRoleError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Remove(
+                        // TODO Which error codes occur here? When known, translate the properly into `RemoveUserRoleErrorCode`.
+                        error.Code switch
+                        {
+                            _ =>
+                                new RemoveUserRoleError(
+                                    RemoveUserRoleErrorCode.UNKNOWN,
+                                    $"{error.Description} (error code `{error.Code}`)",
+                                    new[] { nameof(input) }
+                                    )
+                        }
+                    );
+                }
+                return new RemoveUserRolePayload(user, errors);
+            }
+            return new RemoveUserRolePayload(user);
         }
 
         private static async Task SendUserEmailConfirmation(

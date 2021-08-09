@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Resolvers;
@@ -176,9 +179,25 @@ namespace Metabase.GraphQl.Users
               .Field("roles")
               .Resolve(context =>
                 AuthorizeAsync(context, async (user, userManager) =>
-                  await userManager.GetRolesAsync(user).ConfigureAwait(false)
+                  (await userManager.GetRolesAsync(user).ConfigureAwait(false))
+                  .Select(x => Data.Role.EnumFromName(x))
                   )
               )
+              .UseDbContext<Data.ApplicationDbContext>()
+              .UseUserManager();
+            descriptor
+              .Field("rolesCurrentUserCanAdd")
+              .ResolveWith<UserResolvers>(x => x.GetRolesCurrentUserCanAddAsync(default!, default!, default!))
+              .UseDbContext<Data.ApplicationDbContext>()
+              .UseUserManager();
+            descriptor
+              .Field("rolesCurrentUserCanRemove")
+              .ResolveWith<UserResolvers>(x => x.GetRolesCurrentUserCanRemoveAsync(default!, default!, default!))
+              .UseDbContext<Data.ApplicationDbContext>()
+              .UseUserManager();
+            descriptor
+              .Field("canCurrentUserDeleteUser")
+              .ResolveWith<UserResolvers>(x => x.GetCanCurrentUserDeleteUserAsync(default!, default!))
               .UseDbContext<Data.ApplicationDbContext>()
               .UseUserManager();
             descriptor
@@ -227,6 +246,54 @@ namespace Metabase.GraphQl.Users
                     isMachineRemembered: await signInManager.IsTwoFactorClientRememberedAsync(user).ConfigureAwait(false),
                     recoveryCodesLeftCount: await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false)
                     );
+            }
+
+            public Task<bool> GetCanCurrentUserDeleteUserAsync(
+              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              [ScopedService] UserManager<Data.User> userManager
+            )
+            {
+                return UserAuthorization.IsAuthorizedToDeleteUsers(claimsPrincipal, userManager);
+            }
+
+            public async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanAddAsync(
+              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              [ScopedService] UserManager<Data.User> userManager,
+              CancellationToken cancellationToken
+            )
+            {
+                return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, userManager)
+                  .ToListAsync(cancellationToken)
+                  .ConfigureAwait(false);
+            }
+
+            public async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanRemoveAsync(
+              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              [ScopedService] UserManager<Data.User> userManager,
+              CancellationToken cancellationToken
+            )
+            {
+                return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, userManager)
+                  .ToListAsync(cancellationToken)
+                  .ConfigureAwait(false);
+            }
+
+            private async IAsyncEnumerable<Enumerations.UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
+              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              [ScopedService] UserManager<Data.User> userManager
+            )
+            {
+                foreach (var role in Data.Role.AllEnum)
+                {
+                    if (await UserAuthorization.IsAuthorizedToAddOrRemoveRole(
+                      claimsPrincipal,
+                      role,
+                      userManager
+                    ).ConfigureAwait(false))
+                    {
+                        yield return role;
+                    }
+                }
             }
         }
     }

@@ -39,5 +39,25 @@ namespace Metabase.Authorization
             }
             return false;
         }
+
+        public static async Task<bool> IsAuthorizedToAddOrRemoveRole(
+            ClaimsPrincipal claimsPrincipal,
+            Enumerations.UserRole role,
+            UserManager<Data.User> userManager
+        )
+        {
+            if (await CommonAuthorization.IsAdministrator(claimsPrincipal, userManager).ConfigureAwait(false))
+            {
+                return true;
+            }
+            return role switch
+            {
+                Enumerations.UserRole.ADMINISTRATOR =>
+                    await CommonAuthorization.IsAdministrator(claimsPrincipal, userManager).ConfigureAwait(false),
+                Enumerations.UserRole.VERIFIER =>
+                    await CommonAuthorization.IsVerifier(claimsPrincipal, userManager).ConfigureAwait(false),
+                _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown role `{role}.`")
+            };
+        }
     }
 }
