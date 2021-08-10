@@ -99,7 +99,9 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
         >
           <Select>
             {roles.map((role) => (
-              <Select.Option value={role}>{role}</Select.Option>
+              <Select.Option key={role} value={role}>
+                {role}
+              </Select.Option>
             ))}
           </Select>
         </Form.Item>

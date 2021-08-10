@@ -6,6 +6,7 @@ import { useInstitutionsQuery } from "../../queries/institutions.graphql";
 import { useEffect } from "react";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
 import PendingInstitutions from "../../components/institutions/PendingInstitutions";
+import { UserRole } from "../../__generated__/__types__";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -79,8 +80,7 @@ function Index() {
         ]}
         dataSource={data?.institutions?.nodes?.filter(notEmpty) || []}
       />
-      {/* TODO Make role name `Verifier` a constant. */}
-      {currentUser && currentUser?.roles?.includes("Verifier") && (
+      {currentUser && currentUser?.roles?.includes(UserRole.Verifier) && (
         <>
           <Divider />
           <Typography.Title level={2}>Pending Institutions</Typography.Title>

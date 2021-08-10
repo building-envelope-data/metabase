@@ -9,6 +9,7 @@ import {
 import paths from "../paths";
 import { initializeApollo } from "../lib/apollo";
 import { useState } from "react";
+import { UserRole } from "../__generated__/__types__";
 
 type NavItemProps = {
   path: string;
@@ -58,8 +59,8 @@ export default function NavBar({ items }: NavBarProps) {
       {/* I would like the following to be on the right but that is not possible at the moment, see issue https://github.com/ant-design/ant-design/issues/10749 */}
       {currentUser ? (
         <>
-          {/* TODO Make role name `Administrator` a constant. */}
-          {currentUser?.roles?.includes("Administrator") && (
+          {/* TODO Put information whether person is allowed to access OpenIdConnect information in query result of current user (using OpenIdConnectAuthorization) */}
+          {currentUser?.roles?.includes(UserRole.Administrator) && (
             <Menu.Item key={paths.openIdConnect}>
               <Link href={paths.openIdConnect}>OpenId Connect</Link>
             </Menu.Item>
