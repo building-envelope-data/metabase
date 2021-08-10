@@ -3,7 +3,7 @@
 FROM node:14.17.3-buster-slim AS dependencies
 WORKDIR /app
 COPY ./package.json ./yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --pure-lockfile
 
 FROM node:14.17.3-buster-slim AS build
 WORKDIR /app

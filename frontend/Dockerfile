@@ -61,6 +61,6 @@ COPY \
 COPY \
   --chown=node:node \
   ./yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --pure-lockfile
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
