@@ -11,19 +11,19 @@ import {
   UsersDocument,
   useUserQuery,
   useDeleteUserMutation,
+  UserDocument,
+  useRemoveUserRoleMutation,
 } from "../../queries/users.graphql";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
 import { MethodDocument } from "../../queries/methods.graphql";
 import { useConfirmInstitutionRepresentativeMutation } from "../../queries/institutionRepresentatives.graphql";
 import { useConfirmUserMethodDeveloperMutation } from "../../queries/userMethodDevelopers.graphql";
-import { Scalars } from "../../__generated__/__types__";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
-import { useEffect } from "react";
+import { Scalars, UserRole } from "../../__generated__/__types__";
 import { useRouter } from "next/router";
 import paths from "../../paths";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { UserDocument } from "../../__generated__/queries/users.graphql";
+import AddUserRole from "./AddUserRole";
 
 export type UserProps = {
   userId: Scalars["Uuid"];
@@ -37,7 +37,8 @@ export default function User({ userId }: UserProps) {
     },
   });
   const user = data?.user;
-  const currentUser = useCurrentUserQuery()?.data?.currentUser;
+  const rolesCurrentUserCanAndMayWantToAdd =
+    user?.rolesCurrentUserCanAdd?.filter((role) => !user.roles?.includes(role));
 
   const [confirmInstitutionRepresentativeMutation] =
     useConfirmInstitutionRepresentativeMutation();
@@ -163,6 +164,45 @@ export default function User({ userId }: UserProps) {
     }
   };
 
+  const [removeUserRoleMutation] = useRemoveUserRoleMutation({
+    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+    // See https://www.apollographql.com/docs/react/data/mutations/#options
+    refetchQueries: [
+      {
+        query: UsersDocument,
+      },
+      {
+        query: UserDocument,
+        variables: {
+          uuid: userId,
+        },
+      },
+    ],
+  });
+  const [removingUserRole, setRemovingUserRole] = useState(false);
+
+  const removeUserRole = async (role: UserRole) => {
+    try {
+      setRemovingUserRole(true);
+      const { errors, data } = await removeUserRoleMutation({
+        variables: {
+          userId: userId,
+          role: role,
+        },
+      });
+      if (errors) {
+        console.log(errors); // TODO What to do?
+      } else if (data?.removeUserRole?.errors) {
+        // TODO Is this how we want to display errors?
+        message.error(
+          data?.removeUserRole?.errors.map((error) => error.message).join(" ")
+        );
+      }
+    } finally {
+      setRemovingUserRole(false);
+    }
+  };
+
   useEffect(() => {
     if (error) {
       message.error(error);
@@ -197,7 +237,7 @@ export default function User({ userId }: UserProps) {
         size="small"
         dataSource={user.representedInstitutions.edges}
         renderItem={(item) => (
-          <List.Item>
+          <List.Item key={item.node.uuid}>
             <Link href={paths.institution(item.node.uuid)}>
               {item.node.name}
             </Link>
@@ -211,7 +251,7 @@ export default function User({ userId }: UserProps) {
             header="Pending"
             dataSource={user.pendingRepresentedInstitutions.edges}
             renderItem={(item) => (
-              <List.Item>
+              <List.Item key={item.node.uuid}>
                 <Link href={paths.institution(item.node.uuid)}>
                   {item.node.name}
                 </Link>
@@ -234,7 +274,7 @@ export default function User({ userId }: UserProps) {
         size="small"
         dataSource={user.developedMethods.edges}
         renderItem={(item) => (
-          <List.Item>
+          <List.Item key={item.node.uuid}>
             <Link href={paths.method(item.node.uuid)}>{item.node.name}</Link>
           </List.Item>
         )}
@@ -246,7 +286,7 @@ export default function User({ userId }: UserProps) {
             header="Pending"
             dataSource={user.pendingDevelopedMethods.edges}
             renderItem={(item) => (
-              <List.Item>
+              <List.Item key={item.node.uuid}>
                 <Link href={paths.method(item.node.uuid)}>
                   {item.node.name}
                 </Link>
@@ -261,8 +301,39 @@ export default function User({ userId }: UserProps) {
           />
         )}
 
-      {/* TODO Make role name `Administrator` a constant. */}
-      {currentUser && currentUser?.roles?.includes("Administrator") && (
+      {user.roles && (
+        <>
+          <Divider />
+          <Typography.Title level={2}>Roles</Typography.Title>
+          <List
+            size="small"
+            dataSource={user.roles}
+            renderItem={(item) => (
+              <List.Item key={item}>
+                <Typography.Text>{item}</Typography.Text>
+                {user.rolesCurrentUserCanRemove &&
+                  user.rolesCurrentUserCanRemove.includes(item) && (
+                    <Button
+                      onClick={() => removeUserRole(item)}
+                      loading={removingUserRole}
+                    >
+                      Remove
+                    </Button>
+                  )}
+              </List.Item>
+            )}
+          />
+        </>
+      )}
+      {rolesCurrentUserCanAndMayWantToAdd &&
+        rolesCurrentUserCanAndMayWantToAdd.length >= 1 && (
+          <AddUserRole
+            userId={user.uuid}
+            roles={rolesCurrentUserCanAndMayWantToAdd}
+          />
+        )}
+
+      {user.canCurrentUserDeleteUser && (
         <>
           <Divider />
           <Typography.Title level={2}>Actions</Typography.Title>

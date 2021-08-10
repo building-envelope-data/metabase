@@ -280,7 +280,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             header="Pending"
             dataSource={institution.pendingManufacturedComponents.edges}
             renderItem={(item) => (
-              <List.Item>
+              <List.Item key={item.node.uuid}>
                 <Link href={paths.component(item.node.uuid)}>
                   {item.node.name}
                 </Link>
@@ -456,7 +456,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         size="small"
         dataSource={institution.developedMethods.edges}
         renderItem={(item) => (
-          <List.Item>
+          <List.Item key={item.node.uuid}>
             <Link href={paths.method(item.node.uuid)}>{item.node.name}</Link>
           </List.Item>
         )}
@@ -468,7 +468,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             header="Pending"
             dataSource={institution.pendingDevelopedMethods.edges}
             renderItem={(item) => (
-              <List.Item>
+              <List.Item key={item.node.uuid}>
                 <Link href={paths.method(item.node.uuid)}>
                   {item.node.name}
                 </Link>
@@ -490,8 +490,8 @@ export default function Institution({ institutionId }: InstitutionProps) {
         size="small"
         dataSource={institution.managedInstitutions.edges.map((x) => x.node)}
         renderItem={(item) => (
-          <List.Item>
-            <Link href={paths.institution(item?.uuid)}>{item?.name}</Link>
+          <List.Item key={item.uuid}>
+            <Link href={paths.institution(item.uuid)}>{item.name}</Link>
           </List.Item>
         )}
       />
@@ -504,7 +504,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         size="small"
         dataSource={institution.representatives.edges}
         renderItem={(item) => (
-          <List.Item>
+          <List.Item key={item.node.uuid}>
             <Link href={paths.user(item.node.uuid)}>{item.node.name}</Link>
             <Typography.Text>{item.role}</Typography.Text>
           </List.Item>
@@ -517,7 +517,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             header="Pending"
             dataSource={institution.pendingRepresentatives.edges}
             renderItem={(item) => (
-              <List.Item>
+              <List.Item key={item.node.uuid}>
                 <Link href={paths.user(item.node.uuid)}>{item.node.name}</Link>
                 <Typography.Text>{item.role}</Typography.Text>
               </List.Item>

@@ -39,6 +39,17 @@ type AddInstitutionRepresentativePayload {
   representedInstitutionEdge: UserRepresentedInstitutionEdge
 }
 
+type AddUserRoleError {
+  code: AddUserRoleErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddUserRolePayload {
+  errors: [AddUserRoleError!]
+  user: User
+}
+
 type AppliedMethod {
   methodId: Uuid!
 }
@@ -705,6 +716,7 @@ type MethodManagerEdge {
 
 type Mutation {
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  addUserRole(input: AddUserRoleInput!): AddUserRolePayload!
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
@@ -733,6 +745,7 @@ type Mutation {
   logoutUser: LogoutUserPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(apply: BEFORE_RESOLVER, policy: "Write")
+  removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
   resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
   resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(apply: BEFORE_RESOLVER, policy: "ManageUser")
@@ -902,10 +915,10 @@ type Query {
   method(uuid: Uuid!): Method
   methods(after: String before: String first: Int last: Int order: [MethodSortInput!] where: MethodFilterInput): MethodConnection
   node(id: ID!): Node
-  openIdConnectApplications: [OpenIdConnectApplication!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
-  openIdConnectAuthorizations: [OpenIdConnectAuthorization!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
-  openIdConnectScopes: [OpenIdConnectScope!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
-  openIdConnectTokens: [OpenIdConnectToken!]! @authorize(apply: BEFORE_RESOLVER, roles: [ "Administrator" ])
+  openIdConnectApplications: [OpenIdConnectApplication!]!
+  openIdConnectAuthorizations: [OpenIdConnectAuthorization!]!
+  openIdConnectScopes: [OpenIdConnectScope!]!
+  openIdConnectTokens: [OpenIdConnectToken!]!
   user(uuid: Uuid!): User
   users(after: String before: String first: Int last: Int order: [UserSortInput!]): UserConnection
 }
@@ -931,6 +944,17 @@ type RemoveInstitutionRepresentativePayload {
   errors: [RemoveInstitutionRepresentativeError!]
   institution: Institution!
   user: User!
+}
+
+type RemoveUserRoleError {
+  code: RemoveUserRoleErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveUserRolePayload {
+  errors: [RemoveUserRoleError!]
+  user: User
 }
 
 type RequestUserPasswordResetError {
@@ -1053,6 +1077,7 @@ type UpdateInstitutionPayload {
 }
 
 type User implements Node & Stakeholder {
+  canCurrentUserDeleteUser: Boolean!
   developedMethods(pending: Boolean! = false): UserDevelopedMethodConnection!
   email: String
   hasPassword: Boolean
@@ -1063,7 +1088,9 @@ type User implements Node & Stakeholder {
   name: String!
   phoneNumber: String
   representedInstitutions(pending: Boolean! = false): UserRepresentedInstitutionConnection!
-  roles: [String]
+  roles: [UserRole!]
+  rolesCurrentUserCanAdd: [UserRole!]
+  rolesCurrentUserCanRemove: [UserRole!]
   twoFactorAuthentication: TwoFactorAuthentication
   uuid: Uuid!
   websiteLocator: Url
@@ -1125,6 +1152,11 @@ type VerifyInstitutionPayload {
 input AddInstitutionRepresentativeInput {
   institutionId: Uuid!
   role: InstitutionRepresentativeRole!
+  userId: Uuid!
+}
+
+input AddUserRoleInput {
+  role: UserRole!
   userId: Uuid!
 }
 
@@ -1569,6 +1601,11 @@ input RemoveInstitutionRepresentativeInput {
   userId: Uuid!
 }
 
+input RemoveUserRoleInput {
+  role: UserRole!
+  userId: Uuid!
+}
+
 input RequestUserPasswordResetInput {
   email: String!
 }
@@ -1723,6 +1760,12 @@ enum AddInstitutionRepresentativeErrorCode {
   UNKNOWN_INSTITUTION
   UNKNOWN_USER
   DUPLICATE
+  UNAUTHORIZED
+}
+
+enum AddUserRoleErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
   UNAUTHORIZED
 }
 
@@ -1957,6 +2000,12 @@ enum RemoveInstitutionRepresentativeErrorCode {
   UNKNOWN_USER
 }
 
+enum RemoveUserRoleErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+  UNAUTHORIZED
+}
+
 enum RequestUserPasswordResetErrorCode {
   UNKNOWN
 }
@@ -2050,6 +2099,11 @@ enum UriHostNameType {
   DNS
   I_PV4
   I_PV6
+}
+
+enum UserRole {
+  ADMINISTRATOR
+  VERIFIER
 }
 
 enum VerifyInstitutionErrorCode {

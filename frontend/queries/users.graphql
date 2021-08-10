@@ -21,6 +21,10 @@ query User($uuid: Uuid!) {
     email
     phoneNumber
     websiteLocator
+    roles
+    rolesCurrentUserCanAdd
+    rolesCurrentUserCanRemove
+    canCurrentUserDeleteUser
     developedMethods {
       edges {
         node {
@@ -159,6 +163,26 @@ mutation ResetUserPassword(
 
 mutation DeleteUser($userId: Uuid!) {
   deleteUser(input: { userId: $userId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation AddUserRole($userId: Uuid!, $role: UserRole!) {
+  addUserRole(input: { userId: $userId, role: $role }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RemoveUserRole($userId: Uuid!, $role: UserRole!) {
+  removeUserRole(input: { userId: $userId, role: $role }) {
     errors {
       code
       message
