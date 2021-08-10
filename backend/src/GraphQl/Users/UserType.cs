@@ -177,12 +177,7 @@ namespace Metabase.GraphQl.Users
               .UseUserManager();
             descriptor
               .Field("roles")
-              .Resolve(context =>
-                AuthorizeAsync(context, async (user, userManager) =>
-                  (await userManager.GetRolesAsync(user).ConfigureAwait(false))
-                  .Select(x => Data.Role.EnumFromName(x))
-                  )
-              )
+              .ResolveWith<UserResolvers>(x => x.GetRolesAsync(default!, default!))
               .UseDbContext<Data.ApplicationDbContext>()
               .UseUserManager();
             descriptor
@@ -254,6 +249,15 @@ namespace Metabase.GraphQl.Users
             )
             {
                 return UserAuthorization.IsAuthorizedToDeleteUsers(claimsPrincipal, userManager);
+            }
+
+            public async Task<IEnumerable<Enumerations.UserRole>> GetRolesAsync(
+              Data.User user,
+              [ScopedService] UserManager<Data.User> userManager
+            )
+            {
+                return (await userManager.GetRolesAsync(user).ConfigureAwait(false))
+                  .Select(Data.Role.EnumFromName);
             }
 
             public async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanAddAsync(
