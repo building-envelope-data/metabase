@@ -1,5 +1,5 @@
-import { Input, Space, Button } from "antd";
-import { FilterOutlined } from "@ant-design/icons";
+import { Input, Space, Button, Typography } from "antd";
+import { FilterFilled } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import {
   FilterConfirmProps,
@@ -15,9 +15,8 @@ export function resolvePath(path: string | string[], object: any) {
   );
 }
 
-export function getFreeTextFilterProps(
+export function getFreeTextFilterProps<RecordType extends object = any>(
   dataIndex: string | string[],
-  filterText: string,
   onFilterTextChange: (
     dataIndex: string | string[],
     newFilterText: string
@@ -67,7 +66,7 @@ export function getFreeTextFilterProps(
           <Button
             type="primary"
             onClick={() => filter(selectedKeys, confirm)}
-            icon={<FilterOutlined />}
+            icon={<FilterFilled />}
             size="small"
             style={{ width: 90 }}
           >
@@ -84,9 +83,9 @@ export function getFreeTextFilterProps(
       </div>
     ),
     filterIcon: (filtered: boolean) => (
-      <FilterOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+      <FilterFilled style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
-    onFilter: (value: string | number | boolean, record: any) =>
+    onFilter: (value: string | number | boolean, record: RecordType) =>
       resolvePath(dataIndex, record)
         ? resolvePath(dataIndex, record)
             .toString()
@@ -98,16 +97,26 @@ export function getFreeTextFilterProps(
         setTimeout(() => searchInput?.select(), 100);
       }
     },
-    render: (text: string, _record: any, _index: number) =>
-      filterText !== "" ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[filterText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      ),
   };
+}
+
+export function highlight(
+  textToHightlight: string | null | undefined,
+  filterText: string | null | undefined
+) {
+  return textToHightlight !== null &&
+    textToHightlight !== undefined &&
+    textToHightlight !== "" &&
+    filterText !== null &&
+    filterText !== undefined &&
+    filterText !== "" ? (
+    <Highlighter
+      highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+      searchWords={[filterText]}
+      autoEscape
+      textToHighlight={textToHightlight}
+    />
+  ) : (
+    <Typography.Text>{textToHightlight}</Typography.Text>
+  );
 }

@@ -4,7 +4,8 @@ import { useComponentsQuery } from "../../queries/components.graphql";
 import { useEffect, useState } from "react";
 import paths from "../../paths";
 import Link from "next/link";
-import { getFreeTextFilterProps } from "../../lib/freeTextFilter";
+import { getFreeTextFilterProps, highlight } from "../../lib/freeTextFilter";
+import { ComponentCategory } from "../../__generated__/__types__";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -42,9 +43,11 @@ function Index() {
             key: "uuid",
             sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
             sortDirections: ["ascend", "descend"],
-            // TODO Pass optional render method to free text filter props that takes function that outputs highlighted text
-            render: (_value, record, _index) => (
-              <Link href={paths.component(record.uuid)}>{record.uuid}</Link>
+            ...getFreeTextFilterProps("uuid", onFreeTextFilterTextChange),
+            render: (_text, record, _index) => (
+              <Link href={paths.component(record.uuid)}>
+                {highlight(record.uuid, freeTextFilterText.get("uuid"))}
+              </Link>
             ),
           },
           {
@@ -53,11 +56,9 @@ function Index() {
             key: "name",
             sorter: (a, b) => a.name.localeCompare(b.name, "en"),
             sortDirections: ["ascend", "descend"],
-            ...getFreeTextFilterProps(
-              "name",
-              freeTextFilterText.get("name") || "",
-              onFreeTextFilterTextChange
-            ),
+            ...getFreeTextFilterProps("name", onFreeTextFilterTextChange),
+            render: (_text, record, _index) =>
+              highlight(record.name, freeTextFilterText.get("name")),
           },
           {
             title: "Abbreviation",
@@ -67,9 +68,13 @@ function Index() {
             sortDirections: ["ascend", "descend"],
             ...getFreeTextFilterProps(
               "abbreviation",
-              freeTextFilterText.get("abbreviation") || "",
               onFreeTextFilterTextChange
             ),
+            render: (_text, record, _index) =>
+              highlight(
+                record.abbreviation,
+                freeTextFilterText.get("abbreviation")
+              ),
           },
           {
             title: "Description",
@@ -79,14 +84,29 @@ function Index() {
             sortDirections: ["ascend", "descend"],
             ...getFreeTextFilterProps(
               "description",
-              freeTextFilterText.get("description") || "",
               onFreeTextFilterTextChange
             ),
+            render: (_text, record, _index) =>
+              highlight(
+                record.description,
+                freeTextFilterText.get("description")
+              ),
           },
           {
             title: "Categories",
             dataIndex: "categories",
             key: "categories",
+            filters: Object.entries(ComponentCategory).map(([key, value]) => ({
+              text: key,
+              value: value,
+            })),
+            onFilter: (value, record) =>
+              typeof value === "string" &&
+              Object.values(ComponentCategory)
+                .map((x) => x.toString())
+                .includes(value)
+                ? record.categories.includes(value as ComponentCategory)
+                : true,
             render: (_value, record, _index) => (
               <List>
                 {record.categories.map((category) => (
