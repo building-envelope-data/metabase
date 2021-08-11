@@ -5,22 +5,26 @@ import {
   FilterConfirmProps,
   FilterDropdownProps,
 } from "antd/lib/table/interface";
-import { Key } from "react";
+import { Dispatch, forwardRef, Key, SetStateAction } from "react";
 
-export function resolvePath(path: string | string[], object: any) {
-  const properties = Array.isArray(path) ? path : [path];
-  return properties.reduce(
-    (previous, current) => previous && previous[current],
-    object
-  );
+export function setMapValue(
+  map: Map<string, string>,
+  setMap: Dispatch<SetStateAction<Map<string, string>>>
+) {
+  return (key: string) => {
+    return (newValue: string) => {
+      if (map.get(key) !== newValue) {
+        const copy = new Map(map);
+        copy.set(key, newValue);
+        setMap(copy);
+      }
+    };
+  };
 }
 
-export function getFreeTextFilterProps<RecordType extends object = any>(
-  dataIndex: string | string[],
-  onFilterTextChange: (
-    dataIndex: string | string[],
-    newFilterText: string
-  ) => void
+export function getFreeTextFilterProps<RecordType>(
+  getField: (record: RecordType) => string | null | undefined,
+  onFilterTextChange: (newFilterText: string) => void
 ) {
   const filter = (
     selectedKeys: Key[],
@@ -28,7 +32,6 @@ export function getFreeTextFilterProps<RecordType extends object = any>(
   ) => {
     confirm();
     onFilterTextChange(
-      dataIndex,
       selectedKeys.length === 0 ? "" : selectedKeys[0].toString()
     );
   };
@@ -36,7 +39,7 @@ export function getFreeTextFilterProps<RecordType extends object = any>(
   const reset = (clearFilters: (() => void) | undefined) => {
     if (clearFilters !== undefined) {
       clearFilters();
-      onFilterTextChange(dataIndex, "");
+      onFilterTextChange("");
     }
   };
 
@@ -54,7 +57,7 @@ export function getFreeTextFilterProps<RecordType extends object = any>(
           ref={(node) => {
             searchInput = node;
           }}
-          placeholder={`Filter ${dataIndex}`}
+          placeholder={"Filter"}
           value={selectedKeys[0]}
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -85,13 +88,12 @@ export function getFreeTextFilterProps<RecordType extends object = any>(
     filterIcon: (filtered: boolean) => (
       <FilterFilled style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
-    onFilter: (value: string | number | boolean, record: RecordType) =>
-      resolvePath(dataIndex, record)
-        ? resolvePath(dataIndex, record)
-            .toString()
-            .toLowerCase()
-            .includes(value.toString().toLowerCase())
-        : "",
+    onFilter: (value: string | number | boolean, record: RecordType) => {
+      const field = getField(record);
+      return field
+        ? field.toLowerCase().includes(value.toString().toLowerCase())
+        : false;
+    },
     onFilterDropdownVisibleChange: (visible: boolean) => {
       if (visible) {
         setTimeout(() => searchInput?.select(), 100);
@@ -104,19 +106,48 @@ export function highlight(
   textToHightlight: string | null | undefined,
   filterText: string | null | undefined
 ) {
-  return textToHightlight !== null &&
-    textToHightlight !== undefined &&
-    textToHightlight !== "" &&
-    filterText !== null &&
-    filterText !== undefined &&
-    filterText !== "" ? (
-    <Highlighter
-      highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-      searchWords={[filterText]}
-      autoEscape
-      textToHighlight={textToHightlight}
-    />
-  ) : (
-    <Typography.Text>{textToHightlight}</Typography.Text>
+  return (
+    <Highlight textToHightlight={textToHightlight} filterText={filterText} />
   );
+  // return textToHightlight !== null &&
+  //   textToHightlight !== undefined &&
+  //   textToHightlight !== "" &&
+  //   filterText !== null &&
+  //   filterText !== undefined &&
+  //   filterText !== "" ? (
+  //   <Highlighter
+  //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+  //     searchWords={[filterText]}
+  //     autoEscape
+  //     textToHighlight={textToHightlight}
+  //   />
+  // ) : (
+  //   <>{textToHightlight}</>
+  // );
 }
+
+type HighlightProps = {
+  textToHightlight: string | null | undefined;
+  filterText: string | null | undefined;
+};
+
+export const Highlight = forwardRef<Highlighter, HighlightProps>(
+  ({ textToHightlight, filterText }, ref) => {
+    return textToHightlight !== null &&
+      textToHightlight !== undefined &&
+      textToHightlight !== "" &&
+      filterText !== null &&
+      filterText !== undefined &&
+      filterText !== "" ? (
+      <Highlighter
+        ref={ref}
+        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+        searchWords={[filterText]}
+        autoEscape
+        textToHighlight={textToHightlight}
+      />
+    ) : (
+      <Typography.Text>{textToHightlight}</Typography.Text>
+    );
+  }
+);

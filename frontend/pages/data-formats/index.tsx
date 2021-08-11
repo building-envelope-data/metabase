@@ -1,14 +1,20 @@
 import Layout from "../../components/Layout";
 import { Typography, Table, message } from "antd";
 import { useDataFormatsQuery } from "../../queries/dataFormats.graphql";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import paths from "../../paths";
 import Link from "next/link";
+import { setMapValue } from "../../lib/freeTextFilter";
+import { getFilterableStringColumnProps } from "../../lib/table";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Index() {
   const { loading, error, data } = useDataFormatsQuery();
+  const nodes = data?.dataFormats?.nodes || [];
+
+  const [filterText, setFilterText] = useState(() => new Map<string, string>());
+  const onFilterTextChange = setMapValue(filterText, setFilterText);
 
   useEffect(() => {
     if (error) {
@@ -22,51 +28,69 @@ function Index() {
         loading={loading}
         columns={[
           {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
-            sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => <Link href={paths.dataFormat(record.uuid)}>{record.uuid}</Link>
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "UUID",
+              "uuid",
+              (record) => record.uuid,
+              onFilterTextChange,
+              (x) => filterText.get(x),
+              (record, _highlightedValue, value) => (
+                <Link href={paths.dataFormat(record.uuid)}>{value}</Link>
+              )
+            ),
           },
           {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-            sorter: (a, b) => a.name.localeCompare(b.name, "en"),
-            sortDirections: ["ascend", "descend"],
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Name",
+              "name",
+              (record) => record.name,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
           },
           {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-            sorter: (a, b) => a.description.localeCompare(b.description, "en"),
-            sortDirections: ["ascend", "descend"],
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Description",
+              "description",
+              (record) => record.description,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
           },
           {
-            title: "Media Type",
-            dataIndex: "mediaType",
-            key: "mediaType",
-            sorter: (a, b) => a.mediaType.localeCompare(b.mediaType, "en"),
-            sortDirections: ["ascend", "descend"],
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Media Type",
+              "mediaType",
+              (record) => record.mediaType,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
           },
           {
-            title: "Extension",
-            dataIndex: "extension",
-            key: "extension",
-            sorter: (a, b) => a.extension && b.extension ? a.extension.localeCompare(b.extension, "en") : 0,
-            sortDirections: ["ascend", "descend"],
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Extension",
+              "extension",
+              (record) => record.extension,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
           },
           {
-            title: "Schema",
-            dataIndex: "schemaLocator",
-            key: "schemaLocator",
-            sorter: (a, b) => a.schemaLocator && b.schemaLocator ? a.schemaLocator.localeCompare(b.schemaLocator, "en") : 0,
-            sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => <Typography.Link href={record.schemaLocator}>{record.schemaLocator}</Typography.Link>
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Schema",
+              "schemaLocator",
+              (record) => record.schemaLocator,
+              onFilterTextChange,
+              (x) => filterText.get(x),
+              (record, highlightedValue) => (
+                <Typography.Link href={record.schemaLocator}>
+                  {highlightedValue}
+                </Typography.Link>
+              )
+            ),
           },
         ]}
-        dataSource={data?.dataFormats?.nodes || []}
+        dataSource={nodes}
       />
     </Layout>
   );
