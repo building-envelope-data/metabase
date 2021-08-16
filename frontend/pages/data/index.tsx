@@ -22,7 +22,10 @@ import { useState } from "react";
 import Link from "next/link";
 import paths from "../../paths";
 import { setMapValue } from "../../lib/freeTextFilter";
-import { getFilterableStringColumnProps } from "../../lib/table";
+import {
+  getInternallyLinkedFilterableStringColumnProps,
+  getUuidColumnProps,
+} from "../../lib/table";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -377,15 +380,10 @@ function Index() {
         loading={filtering}
         columns={[
           {
-            ...getFilterableStringColumnProps<typeof data[0]>(
-              "UUID",
-              "uuid",
-              (record) => record.uuid,
+            ...getUuidColumnProps<typeof data[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              (record, _highlightedValue, value) => (
-                <Link href={paths.component(record.uuid)}>{value}</Link>
-              )
+              (_uuid) => "/" // TODO Link somewhere useful!
             ),
           },
           {
@@ -395,22 +393,23 @@ function Index() {
             sortDirections: ["ascend", "descend"],
           },
           {
-            ...getFilterableStringColumnProps<typeof data[0]>(
+            ...getInternallyLinkedFilterableStringColumnProps<typeof data[0]>(
               "Component UUID",
               "componentId",
-              (record) => record.componentId,
+              (x) => x.componentId,
               onFilterTextChange,
               (x) => filterText.get(x),
-              (record, _highlightedValue, value) => (
-                <Link href={paths.component(record.componentId)}>{value}</Link>
-              )
+              (x) => paths.component(x.componentId)
             ),
           },
           // {
-          //   title: "Database UUID",
-          //   key: "databaseId",
-          //   render: (_text, record, _index) => (
-          //     <Link href={paths.database(record.databaseId)}>{record.databaseId}</Link>
+          //   ...getInternallyLinkedFilterableStringColumnProps<typeof data[0]>(
+          //     "Database UUID",
+          //     "databaseId",
+          //     (x) => x.databaseId,
+          //     onFilterTextChange,
+          //     (x) => filterText.get(x),
+          //     (x) => paths.database(x.databaseId)
           //   ),
           // },
           {

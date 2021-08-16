@@ -1,6 +1,7 @@
-import { List } from "antd";
+import { List, Typography } from "antd";
 import { SortOrder } from "antd/lib/table/interface";
 import { getFreeTextFilterProps, highlight } from "./freeTextFilter";
+import Link from "next/link";
 
 const sortDirections: SortOrder[] = ["ascend", "descend"];
 
@@ -87,6 +88,76 @@ export function getFilterableStringColumnProps<RecordType>(
   };
 }
 
+export function getInternallyLinkedFilterableStringColumnProps<RecordType>(
+  title: string,
+  key: keyof RecordType,
+  getValue: (record: RecordType) => string | null | undefined,
+  onFilterTextChange: (
+    key: keyof RecordType
+  ) => (newFilterText: string) => void,
+  getFilterText: (key: keyof RecordType) => string | undefined,
+  getPath: (record: RecordType) => string
+) {
+  return getFilterableStringColumnProps(
+    title,
+    key,
+    getValue,
+    onFilterTextChange,
+    getFilterText,
+    (record, _highlightedValue, value) =>
+      value ? (
+        // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
+        <Link href={getPath(record)}>{value}</Link>
+      ) : (
+        <></>
+      )
+  );
+}
+
+export function getExternallyLinkedFilterableLocatorColumnProps<RecordType>(
+  title: string,
+  key: keyof RecordType,
+  getValue: (record: RecordType) => string | null | undefined,
+  onFilterTextChange: (
+    key: keyof RecordType
+  ) => (newFilterText: string) => void,
+  getFilterText: (key: keyof RecordType) => string | undefined
+) {
+  return getFilterableStringColumnProps(
+    title,
+    key,
+    getValue,
+    onFilterTextChange,
+    getFilterText,
+    (record, highlightedValue, _value) => {
+      const href = getValue(record);
+      return href ? (
+        // TODO Why does coloring not work before when filter text is empty?
+        <Typography.Link href={href}>{highlightedValue}</Typography.Link>
+      ) : (
+        <></>
+      );
+    }
+  );
+}
+
+export function getUuidColumnProps<RecordType extends { uuid: string }>(
+  onFilterTextChange: (
+    key: keyof RecordType
+  ) => (newFilterText: string) => void,
+  getFilterText: (key: keyof RecordType) => string | undefined,
+  getPath: (uuid: string) => string
+) {
+  return getInternallyLinkedFilterableStringColumnProps(
+    "UUID",
+    "uuid",
+    (record) => record.uuid,
+    onFilterTextChange,
+    getFilterText,
+    (record) => getPath(record.uuid)
+  );
+}
+
 // TODO Use `EnumType extends enum` once there is an `enum` constraint as asked for in https://github.com/microsoft/TypeScript/issues/30611
 export function getEnumListColumnProps<RecordType, EnumType extends string>(
   title: string,
@@ -111,7 +182,7 @@ export function getFilterableEnumListColumnProps<
   key: keyof RecordType,
   entries: [string, EnumType][],
   getValues: (record: RecordType) => EnumType[] | null | undefined,
-  // TODO Call `onFilterTextChange` when the filter text changes. Note though that it cannot be called inside `onFilter` because that function is being called on render and we may not change state on render!
+  // TODO Call `onFilterTextChange` when the filter text changes (that is not done right now and that is the reason why matches are not highlighted). Note though that it cannot be called inside `onFilter` because that function is being called on render and we may not change state on render!
   _onFilterTextChange: (
     key: keyof RecordType
   ) => (newFilterText: string) => void,

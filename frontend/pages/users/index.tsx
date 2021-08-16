@@ -2,13 +2,21 @@ import Layout from "../../components/Layout";
 import { Table, message } from "antd";
 import { useUsersQuery } from "../../queries/users.graphql";
 import paths from "../../paths";
-import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { setMapValue } from "../../lib/freeTextFilter";
+import {
+  getFilterableStringColumnProps,
+  getUuidColumnProps,
+} from "../../lib/table";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Index() {
   const { loading, error, data } = useUsersQuery();
+  const nodes = data?.users?.nodes || [];
+
+  const [filterText, setFilterText] = useState(() => new Map<string, string>());
+  const onFilterTextChange = setMapValue(filterText, setFilterText);
 
   useEffect(() => {
     if (error) {
@@ -22,31 +30,32 @@ function Index() {
         loading={loading}
         columns={[
           {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
-            sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => <Link href={paths.user(record.uuid)}>{record.uuid}</Link>
+            ...getUuidColumnProps<typeof nodes[0]>(
+              onFilterTextChange,
+              (x) => filterText.get(x),
+              paths.method
+            ),
           },
           {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-            // onFilter: (value, user) =>
-            //   typeof value === "string" ? user.name.includes(value) : false,
-            sorter: (a, b) => a.name.localeCompare(b.name, "en"),
-            sortDirections: ["ascend", "descend"],
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Name",
+              "name",
+              (record) => record.name,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
           },
           {
-            title: "Email",
-            dataIndex: "email",
-            key: "email",
-            sorter: (a, b) => a.email && b.email ? a.email.localeCompare(b.email, "en") : 0,
-            sortDirections: ["ascend", "descend"],
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Email",
+              "email",
+              (record) => record.email,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
           },
         ]}
-        dataSource={data?.users?.nodes || []}
+        dataSource={nodes}
       />
     </Layout>
   );

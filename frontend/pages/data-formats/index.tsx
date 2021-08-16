@@ -1,11 +1,14 @@
 import Layout from "../../components/Layout";
-import { Typography, Table, message } from "antd";
+import { Table, message } from "antd";
 import { useDataFormatsQuery } from "../../queries/dataFormats.graphql";
 import { useEffect, useState } from "react";
 import paths from "../../paths";
-import Link from "next/link";
 import { setMapValue } from "../../lib/freeTextFilter";
-import { getFilterableStringColumnProps } from "../../lib/table";
+import {
+  getExternallyLinkedFilterableLocatorColumnProps,
+  getFilterableStringColumnProps,
+  getUuidColumnProps,
+} from "../../lib/table";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -28,15 +31,10 @@ function Index() {
         loading={loading}
         columns={[
           {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "UUID",
-              "uuid",
-              (record) => record.uuid,
+            ...getUuidColumnProps<typeof nodes[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              (record, _highlightedValue, value) => (
-                <Link href={paths.dataFormat(record.uuid)}>{value}</Link>
-              )
+              paths.dataFormat
             ),
           },
           {
@@ -76,17 +74,12 @@ function Index() {
             ),
           },
           {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
+            ...getExternallyLinkedFilterableLocatorColumnProps<typeof nodes[0]>(
               "Schema",
               "schemaLocator",
               (record) => record.schemaLocator,
               onFilterTextChange,
-              (x) => filterText.get(x),
-              (record, highlightedValue) => (
-                <Typography.Link href={record.schemaLocator}>
-                  {highlightedValue}
-                </Typography.Link>
-              )
+              (x) => filterText.get(x)
             ),
           },
         ]}

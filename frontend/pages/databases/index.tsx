@@ -1,14 +1,24 @@
 import Layout from "../../components/Layout";
-import Link from "next/link";
 import paths from "../../paths";
-import { Table, message, Typography } from "antd";
+import { Table, message } from "antd";
 import { useDatabasesQuery } from "../../queries/databases.graphql";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { setMapValue } from "../../lib/freeTextFilter";
+import {
+  getExternallyLinkedFilterableLocatorColumnProps,
+  getFilterableStringColumnProps,
+  getInternallyLinkedFilterableStringColumnProps,
+  getUuidColumnProps,
+} from "../../lib/table";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Index() {
   const { loading, error, data } = useDatabasesQuery();
+  const nodes = data?.databases?.nodes || [];
+
+  const [filterText, setFilterText] = useState(() => new Map<string, string>());
+  const onFilterTextChange = setMapValue(filterText, setFilterText);
 
   useEffect(() => {
     if (error) {
@@ -22,48 +32,47 @@ function Index() {
         loading={loading}
         columns={[
           {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
-            sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => <Link href={paths.database(record.uuid)}>{record.uuid}</Link>
-          },
-          {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-            sorter: (a, b) => a.name.localeCompare(b.name, "en"),
-            sortDirections: ["ascend", "descend"],
-          },
-          {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-            sorter: (a, b) => a.description.localeCompare(b.description, "en"),
-            sortDirections: ["ascend", "descend"],
-          },
-          {
-            title: "Locator",
-            dataIndex: "locator",
-            key: "locator",
-            sorter: (a, b) => a.locator.localeCompare(b.locator, "en"),
-            sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => (
-              <Typography.Link href={record.locator}>{record.locator}</Typography.Link>
+            ...getUuidColumnProps<typeof nodes[0]>(
+              onFilterTextChange,
+              (x) => filterText.get(x),
+              paths.database
             ),
           },
           {
-            title: "Operator",
-            dataIndex: "operator",
-            key: "operator",
-            sorter: (a, b) =>
-              a.operator.node.name.localeCompare(b.operator.node.name, "en"),
-            sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => (
-              <Link href={paths.institution(record.operator.node.uuid)}>
-                {record.operator.node.name}
-              </Link>
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Name",
+              "name",
+              (record) => record.name,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
+          },
+          {
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Description",
+              "description",
+              (record) => record.description,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
+          },
+          {
+            ...getExternallyLinkedFilterableLocatorColumnProps<typeof nodes[0]>(
+              "Locator",
+              "locator",
+              (record) => record.locator,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
+          },
+          {
+            ...getInternallyLinkedFilterableStringColumnProps<typeof nodes[0]>(
+              "Operator",
+              "operator",
+              (record) => record.operator.node.name,
+              onFilterTextChange,
+              (x) => filterText.get(x),
+              (x) => paths.institution(x.operator.node.uuid)
             ),
           },
         ]}
