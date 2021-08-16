@@ -1,61 +1,35 @@
-import { useCurrentUserQuery } from "../queries/currentUser.graphql";
 import Layout from "../components/Layout";
-import { Skeleton, Typography } from "antd";
+import { Typography } from "antd";
 
 const Index = () => {
-  const { loading, error, data } = useCurrentUserQuery();
-  const currentUser = data?.currentUser;
-  // const shouldRedirect = !(loading || error || currentUser)
-
-  // useEffect(() => {
-  //   if (shouldRedirect) {
-  //     router.push('/login')
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [shouldRedirect])
-
-  if (loading) {
-    return (
-      <Layout>
-        <Skeleton />
-      </Layout>
-    );
-  }
-
-  if (error) {
-    return (
-      <Layout>
-        <p>{error.message}</p>
-      </Layout>
-    );
-  }
-
-  if (currentUser) {
-    return (
-      <Layout>
-        <Typography.Paragraph>
-          You&apos;re signed in as {currentUser.name}, your email address it{" "}
-          {currentUser.email}, and your UUID is {currentUser.uuid}.
-        </Typography.Paragraph>
-      </Layout>
-    );
-  }
-
-  return <Layout>You&apos;re not signed in.</Layout>;
+  return (
+    <Layout>
+      <Typography.Paragraph>
+        <Typography.Link href="https://www.buildingenvelopedata.org">
+          buildingenvelopedata.org
+        </Typography.Link>{" "}
+        offers you access to a network of databases. It contains detailed
+        optical data for thousands of building envelope components and can be
+        used for example to calculate the energy performance of buildings. The
+        data is ready to be used by software companies and advanced engineering
+        offices.
+      </Typography.Paragraph>
+      <Typography.Paragraph>
+        This website offers an overview of the components for which data is
+        available and the databases of the network. It can also be used to
+        search for data in all databases. In order to identify institutions,
+        data formats and methods across the databases, they are managed by a
+        metabase together with the components and databases. This website is the
+        front end of the metabase.
+      </Typography.Paragraph>
+      <Typography.Paragraph>
+        The metabase can be queried through its GraphQL endpoint. This is the
+        most powerful way to query all databases. It is well suited to be used
+        by software. The tabs of this website can offer only a part of the
+        functions of the GraphQL endpoint.
+      </Typography.Paragraph>
+    </Layout>
+  );
 };
-
-// export async function getStaticProps() {
-//   const apolloClient = initializeApollo()
-
-//   await apolloClient.query({
-//     query: CurrentUserDocument,
-//   })
-
-//   return {
-//     props: {
-//       initialApolloState: apolloClient.cache.extract(),
-//     },
-//   }
-// }
 
 export default Index;
