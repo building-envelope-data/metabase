@@ -14,7 +14,7 @@ namespace Metabase.GraphQl.DataX
           // Guid databaseId,
           Guid componentId,
           string? name,
-          // string? description,
+          string? description,
           // IReadOnlyList<string> warnings,
           // Guid creatorId,
           // DateTime createdAt,
@@ -29,6 +29,7 @@ namespace Metabase.GraphQl.DataX
           timestamp: timestamp,
           componentId: componentId,
           name: name,
+          description: description,
           appliedMethod: appliedMethod,
           resourceTree: resourceTree
         )

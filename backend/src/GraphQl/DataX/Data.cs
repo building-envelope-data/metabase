@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.DataX
           // Guid databaseId,
           Guid componentId,
           string? name,
-          // string? description,
+          string? description,
           // IReadOnlyList<string> warnings,
           // Guid creatorId,
           // DateTime createdAt,
@@ -35,7 +35,7 @@ namespace Metabase.GraphQl.DataX
             // DatabaseId = databaseId;
             ComponentId = componentId;
             Name = name;
-            // Description = description;
+            Description = description;
             // Warnings = warnings;
             // CreatorId = creatorId;
             // CreatedAt = createdAt;
@@ -53,7 +53,7 @@ namespace Metabase.GraphQl.DataX
         // public Guid DatabaseId { get; }
         public Guid ComponentId { get; }
         public string? Name { get; }
-        // public string? Description { get; }
+        public string? Description { get; }
         // public IReadOnlyList<string> Warnings { get; }
         // public Guid CreatorId { get; }
         // public DateTime CreatedAt { get; }

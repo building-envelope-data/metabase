@@ -4,7 +4,7 @@ fragment DataFields on Data {
   timestamp
   componentId
   name
-  # description
+  description
   # warnings
   # creatorId
   # createdAt

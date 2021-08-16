@@ -10,7 +10,7 @@ namespace Metabase.GraphQl.DataX
         DateTime Timestamp { get; }
         Guid ComponentId { get; }
         string? Name { get; }
-        // string? Description { get; }
+        string? Description { get; }
         // IReadOnlyList<string> Warnings { get; }
         // Guid CreatorId { get; }
         // DateTime CreatedAt { get; }
