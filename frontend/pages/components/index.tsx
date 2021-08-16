@@ -1,14 +1,24 @@
 import Layout from "../../components/Layout";
-import { Table, message, List } from "antd";
+import { Table, message } from "antd";
 import { useComponentsQuery } from "../../queries/components.graphql";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import paths from "../../paths";
-import Link from "next/link";
+import { setMapValue } from "../../lib/freeTextFilter";
+import { ComponentCategory } from "../../__generated__/__types__";
+import {
+  getFilterableEnumListColumnProps,
+  getFilterableStringColumnProps,
+  getUuidColumnProps,
+} from "../../lib/table";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Index() {
   const { loading, error, data } = useComponentsQuery();
+  const nodes = data?.components?.nodes || [];
+
+  const [filterText, setFilterText] = useState(() => new Map<string, string>());
+  const onFilterTextChange = setMapValue(filterText, setFilterText);
 
   useEffect(() => {
     if (error) {
@@ -22,50 +32,54 @@ function Index() {
         loading={loading}
         columns={[
           {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
-            sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => (
-              <Link href={paths.component(record.uuid)}>{record.uuid}</Link>
+            ...getUuidColumnProps<typeof nodes[0]>(
+              onFilterTextChange,
+              (x) => filterText.get(x),
+              paths.component
             ),
           },
           {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-            sorter: (a, b) => a.name.localeCompare(b.name, "en"),
-            sortDirections: ["ascend", "descend"],
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Name",
+              "name",
+              (record) => record.name,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
           },
           {
-            title: "Abbreviation",
-            dataIndex: "abbreviation",
-            key: "abbreviation",
-            sorter: (a, b) => a.name.localeCompare(b.name, "en"),
-            sortDirections: ["ascend", "descend"],
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Abbreviation",
+              "abbreviation",
+              (record) => record.abbreviation,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
           },
           {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-            sorter: (a, b) => a.description.localeCompare(b.description, "en"),
-            sortDirections: ["ascend", "descend"],
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Description",
+              "description",
+              (record) => record.description,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
           },
           {
-            title: "Categories",
-            dataIndex: "categories",
-            key: "categories",
-            render: (_value, record, _index) => (
-              <List>
-                {record.categories.map((category) => (
-                  <List.Item key={category}>{category}</List.Item>
-                ))}
-              </List>
+            ...getFilterableEnumListColumnProps<
+              typeof nodes[0],
+              ComponentCategory
+            >(
+              "Categories",
+              "categories",
+              Object.entries(ComponentCategory),
+              (record) => record.categories,
+              onFilterTextChange,
+              (x) => filterText.get(x)
             ),
           },
         ]}
-        dataSource={data?.components?.nodes || []}
+        dataSource={nodes}
       />
     </Layout>
   );

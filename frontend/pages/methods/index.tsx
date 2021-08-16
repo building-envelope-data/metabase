@@ -1,14 +1,25 @@
 import Layout from "../../components/Layout";
-import { Table, message, List, Typography } from "antd";
+import { Table, message } from "antd";
 import { useMethodsQuery } from "../../queries/methods.graphql";
-import { useEffect } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import paths from "../../paths";
+import { setMapValue } from "../../lib/freeTextFilter";
+import {
+  getExternallyLinkedFilterableLocatorColumnProps,
+  getFilterableEnumListColumnProps,
+  getFilterableStringColumnProps,
+  getUuidColumnProps,
+} from "../../lib/table";
+import { MethodCategory } from "../../__generated__/__types__";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Index() {
   const { loading, error, data } = useMethodsQuery();
+  const nodes = data?.methods?.nodes || [];
+
+  const [filterText, setFilterText] = useState(() => new Map<string, string>());
+  const onFilterTextChange = setMapValue(filterText, setFilterText);
 
   useEffect(() => {
     if (error) {
@@ -22,56 +33,54 @@ function Index() {
         loading={loading}
         columns={[
           {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
-            sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => (
-              <Link href={paths.method(record.uuid)}>{record.uuid}</Link>
+            ...getUuidColumnProps<typeof nodes[0]>(
+              onFilterTextChange,
+              (x) => filterText.get(x),
+              paths.method
             ),
           },
           {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-            sorter: (a, b) => a.name.localeCompare(b.name, "en"),
-            sortDirections: ["ascend", "descend"],
-          },
-          {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-            sorter: (a, b) => a.description.localeCompare(b.description, "en"),
-            sortDirections: ["ascend", "descend"],
-          },
-          {
-            title: "Categories",
-            dataIndex: "categories",
-            key: "categories",
-            render: (_value, record, _index) => (
-              <List>
-                {record.categories.map((category) => (
-                  <List.Item key={category}>{category}</List.Item>
-                ))}
-              </List>
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Name",
+              "name",
+              (record) => record.name,
+              onFilterTextChange,
+              (x) => filterText.get(x)
             ),
           },
           {
-            title: "Calculation",
-            dataIndex: "calculationLocator",
-            key: "calculationLocator",
-            sorter: (a, b) =>
-              a.calculationLocator.localeCompare(b.calculationLocator, "en"),
-            sortDirections: ["ascend", "descend"],
-            render: (_value, record, _index) => (
-              <Typography.Link href={record.calculationLocator}>
-                {record.calculationLocator}
-              </Typography.Link>
+            ...getFilterableStringColumnProps<typeof nodes[0]>(
+              "Description",
+              "description",
+              (record) => record.description,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
+          },
+          {
+            ...getFilterableEnumListColumnProps<
+              typeof nodes[0],
+              MethodCategory
+            >(
+              "Categories",
+              "categories",
+              Object.entries(MethodCategory),
+              (record) => record.categories,
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
+          },
+          {
+            ...getExternallyLinkedFilterableLocatorColumnProps<typeof nodes[0]>(
+              "Calculation",
+              "calculationLocator",
+              (record) => record.calculationLocator,
+              onFilterTextChange,
+              (x) => filterText.get(x)
             ),
           },
         ]}
-        dataSource={data?.methods?.nodes || []}
+        dataSource={nodes}
       />
     </Layout>
   );

@@ -185,7 +185,15 @@ export default function CreateInstitution({
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Website" name="websiteLocator">
+        <Form.Item
+          label="Website"
+          name="websiteLocator"
+          rules={[
+            {
+              type: "url",
+            },
+          ]}
+        >
           <Input />
         </Form.Item>
         <Form.Item {...tailLayout}>

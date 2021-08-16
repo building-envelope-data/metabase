@@ -21,6 +21,11 @@ import {
 import { useState } from "react";
 import Link from "next/link";
 import paths from "../../paths";
+import { setMapValue } from "../../lib/freeTextFilter";
+import {
+  getInternallyLinkedFilterableStringColumnProps,
+  getUuidColumnProps,
+} from "../../lib/table";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -99,6 +104,9 @@ function Index() {
     skip: true,
     errorPolicy: "all",
   });
+
+  const [filterText, setFilterText] = useState(() => new Map<string, string>());
+  const onFilterTextChange = setMapValue(filterText, setFilterText);
 
   const onFinish = ({
     componentIds,
@@ -372,40 +380,40 @@ function Index() {
         loading={filtering}
         columns={[
           {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            sorter: (a, b) => a.uuid.localeCompare(b.uuid, "en"),
-            sortDirections: ["ascend", "descend"],
+            ...getUuidColumnProps<typeof data[0]>(
+              onFilterTextChange,
+              (x) => filterText.get(x),
+              (_uuid) => "/" // TODO Link somewhere useful!
+            ),
           },
           {
             title: "Timestamp",
-            dataIndex: "timestamp",
             key: "timestamp",
             sorter: (a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp),
             sortDirections: ["ascend", "descend"],
           },
           {
-            title: "Component UUID",
-            dataIndex: "componentId",
-            key: "componentId",
-            render: (_text, record, _index) => (
-              <Link href={paths.component(record.componentId)}>
-                {record.componentId}
-              </Link>
+            ...getInternallyLinkedFilterableStringColumnProps<typeof data[0]>(
+              "Component UUID",
+              "componentId",
+              (x) => x.componentId,
+              onFilterTextChange,
+              (x) => filterText.get(x),
+              (x) => paths.component(x.componentId)
             ),
           },
           // {
-          //   title: "Database UUID",
-          //   dataIndex: "databaseId",
-          //   key: "databaseId",
-          //   render: (_text, record, _index) => (
-          //     <Link href={paths.database(record.databaseId)}>{record.databaseId}</Link>
+          //   ...getInternallyLinkedFilterableStringColumnProps<typeof data[0]>(
+          //     "Database UUID",
+          //     "databaseId",
+          //     (x) => x.databaseId,
+          //     onFilterTextChange,
+          //     (x) => filterText.get(x),
+          //     (x) => paths.database(x.databaseId)
           //   ),
           // },
           {
             title: "Applied Method",
-            dataIndex: "appliedMethod",
             key: "appliedMethod",
             render: (_text, record, _index) => (
               <Descriptions column={1}>
@@ -419,7 +427,6 @@ function Index() {
           },
           {
             title: "Resource Tree",
-            dataIndex: "resourceTree",
             key: "resourceTree",
             render: (_text, record, _index) => (
               <Descriptions column={1}>
@@ -450,7 +457,6 @@ function Index() {
           },
           {
             title: "Nearnormal Hemispherical Visible Transmittances",
-            dataIndex: "nearnormalHemisphericalVisibleTransmittances",
             key: "nearnormalHemisphericalVisibleTransmittances",
             render: (_text, record, _index) =>
               record.nearnormalHemisphericalVisibleTransmittances
