@@ -41,7 +41,7 @@ function Index() {
             ...getUuidColumnProps<typeof nodes[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              paths.method
+              paths.user
             ),
           },
           {
