@@ -94,16 +94,31 @@ execb : CONTAINER = backend
 execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
 .PHONY : execb
 
+run : up ## Run the one-time command `${COMMAND}` against a fresh `${CONTAINER}` container (after starting all containers if necessary)
+	${docker_compose} run \
+		--user $(shell id --user):$(shell id --group) \
+		${CONTAINER} \
+		${COMMAND}
+.PHONY : run
+
+runf : CONTAINER = frontend
+runf : run ## Run the one-time command `${COMMAND}` against a fresh `frontend` container (after starting all containers if necessary)
+.PHONY : runf
+
+runb : CONTAINER = backend
+runb : run ## runute the one-time command `${COMMAND}` against a fresh `backend` container (after starting all containers if necessary)
+.PHONY : runb
+
 shellf : COMMAND = bash -c "make install && exec bash"
 shellf : execf ## Enter shell in an existing `frontend` container (after starting all containers if necessary)
 .PHONY : shellf
 
 shellb : COMMAND = bash
-shellb : execb ## Enter shell in an existing `backend` container (after starting all containers if necessary)
+shellb : runb ## Enter shell in a fresh `backend` container (after starting all containers if necessary)
 .PHONY : shellb
 
 shellb-examples : COMMAND = bash -c "cd ./examples && bash"
-shellb-examples : execb ## Enter Bourne-again shell, aka, bash, in an existing `backend` container (after starting all containers if necessary)
+shellb-examples : runb ## Enter Bourne-again shell, aka, bash, in an existing `backend` container (after starting all containers if necessary)
 .PHONY : shellb-examples
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
