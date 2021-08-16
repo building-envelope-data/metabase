@@ -1,5 +1,5 @@
 import Layout from "../../components/Layout";
-import { Table, message } from "antd";
+import { Table, message, Typography } from "antd";
 import { useDataFormatsQuery } from "../../queries/dataFormats.graphql";
 import { useEffect, useState } from "react";
 import paths from "../../paths";
@@ -9,6 +9,7 @@ import {
   getFilterableStringColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
+import Link from "next/link";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -27,6 +28,10 @@ function Index() {
 
   return (
     <Layout>
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        <Link href={paths.data}>Data</Link> is shared as resources. Each
+        resource has one of the following data formats:
+      </Typography.Paragraph>
       <Table
         loading={loading}
         columns={[
@@ -85,6 +90,15 @@ function Index() {
         ]}
         dataSource={nodes}
       />
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        The{" "}
+        <Typography.Link
+          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+        >
+          GraphQL endpoint
+        </Typography.Link>{" "}
+        provides all information about data formats.
+      </Typography.Paragraph>
     </Layout>
   );
 }

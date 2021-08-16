@@ -193,6 +193,11 @@ function Index() {
 
   return (
     <Layout>
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        The network of <Link href={paths.databases}>databases</Link> can be
+        queried here for data on building envelope{" "}
+        <Link href={paths.components}>components</Link>.
+      </Typography.Paragraph>
       <Typography.Title>Optical Data</Typography.Title>
       {/* TODO Display error messages in a list? */}
       {globalErrorMessages.length > 0 && (
@@ -466,6 +471,15 @@ function Index() {
         ]}
         dataSource={data}
       />
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        The{" "}
+        <Typography.Link
+          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+        >
+          GraphQL endpoint
+        </Typography.Link>{" "}
+        is the most powerful way of querying the databases.
+      </Typography.Paragraph>
     </Layout>
   );
 }

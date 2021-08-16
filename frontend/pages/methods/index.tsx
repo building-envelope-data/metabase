@@ -1,5 +1,5 @@
 import Layout from "../../components/Layout";
-import { Table, message } from "antd";
+import { Table, message, Typography } from "antd";
 import { useMethodsQuery } from "../../queries/methods.graphql";
 import { useEffect, useState } from "react";
 import paths from "../../paths";
@@ -11,6 +11,7 @@ import {
   getUuidColumnProps,
 } from "../../lib/table";
 import { MethodCategory } from "../../__generated__/__types__";
+import Link from "next/link";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -29,6 +30,10 @@ function Index() {
 
   return (
     <Layout>
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        <Link href={paths.data}>Data</Link> is created by applying a method.
+        Methods can be defined for example by a standard.
+      </Typography.Paragraph>
       <Table
         loading={loading}
         columns={[
@@ -82,6 +87,15 @@ function Index() {
         ]}
         dataSource={nodes}
       />
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        The{" "}
+        <Typography.Link
+          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+        >
+          GraphQL endpoint
+        </Typography.Link>{" "}
+        provides all information about methods.
+      </Typography.Paragraph>
     </Layout>
   );
 }

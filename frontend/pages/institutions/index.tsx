@@ -38,6 +38,13 @@ function Index() {
 
   return (
     <Layout>
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        Institutions can manufacture{" "}
+        <Link href={paths.components}>components</Link>, operate{" "}
+        <Link href={paths.databases}>databases</Link> and create{" "}
+        <Link href={paths.dataFormats}>data formats</Link> and{" "}
+        <Link href={paths.methods}>methods</Link>.
+      </Typography.Paragraph>
       <Table
         loading={loading}
         columns={[
@@ -87,6 +94,15 @@ function Index() {
         ]}
         dataSource={nodes}
       />
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        The{" "}
+        <Typography.Link
+          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+        >
+          GraphQL endpoint
+        </Typography.Link>{" "}
+        provides all information about institutions.
+      </Typography.Paragraph>
       {currentUser && currentUser?.roles?.includes(UserRole.Verifier) && (
         <>
           <Divider />

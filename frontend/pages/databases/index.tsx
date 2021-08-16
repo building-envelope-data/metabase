@@ -1,6 +1,6 @@
 import Layout from "../../components/Layout";
 import paths from "../../paths";
-import { Table, message } from "antd";
+import { Table, message, Typography } from "antd";
 import { useDatabasesQuery } from "../../queries/databases.graphql";
 import { useEffect, useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
@@ -10,6 +10,7 @@ import {
   getInternallyLinkedFilterableStringColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
+import Link from "next/link";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -28,6 +29,12 @@ function Index() {
 
   return (
     <Layout>
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        The following databases are connected to{" "}
+        <Link href={paths.home}>buildingenvelopedata.org</Link> and contain{" "}
+        <Link href={paths.data}>data</Link> on{" "}
+        <Link href={paths.components}>components</Link>.
+      </Typography.Paragraph>
       <Table
         loading={loading}
         columns={[
@@ -78,6 +85,15 @@ function Index() {
         ]}
         dataSource={data?.databases?.nodes || []}
       />
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        The{" "}
+        <Typography.Link
+          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+        >
+          GraphQL endpoint
+        </Typography.Link>{" "}
+        provides all information about databases.
+      </Typography.Paragraph>
     </Layout>
   );
 }

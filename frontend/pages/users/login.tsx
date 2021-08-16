@@ -91,6 +91,17 @@ function Login() {
       <Row justify="center">
         <Col>
           <Card title="Login">
+            <Typography.Paragraph style={{ maxWidth: 768 }}>
+              You don't need to login to query the{" "}
+              <Link href={paths.data}>data</Link> for free! However, if you want
+              to change information about{" "}
+              <Link href={paths.institutions}>institutions</Link>,{" "}
+              <Link href={paths.dataFormats}>data formats</Link>,{" "}
+              <Link href={paths.methods}>methods</Link>,{" "}
+              <Link href={paths.components}>components</Link> or{" "}
+              <Link href={paths.databases}>databases</Link>, please login here
+              or <Link href={paths.userRegister}>register</Link>.
+            </Typography.Paragraph>
             {/* Display error messages in a list? */}
             {globalErrorMessages.length > 0 ? (
               <Alert type="error" message={globalErrorMessages.join(" ")} />
@@ -173,6 +184,16 @@ function Login() {
                 </Link>
               </Form.Item>
             </Form>
+            <Typography.Paragraph style={{ maxWidth: 768 }}>
+              The{" "}
+              <Typography.Link
+                href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+              >
+                GraphQL endpoint
+              </Typography.Link>{" "}
+              can be used without an account for queries. For mutations, please
+              login here or <Link href={paths.userRegister}>register</Link>.
+            </Typography.Paragraph>
           </Card>
         </Col>
       </Row>
