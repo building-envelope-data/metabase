@@ -69,7 +69,7 @@ createdb : ## Create database
 			--username postgres \
 			xbase
 	docker container stop create_${NAME}_database
-	docker container rm create_${NAME}_database
+	docker container rm --volumes create_${NAME}_database
 .PHONY : createdb
 
 psql : ## Enter PostgreSQL interactive terminal in the running `database` service
@@ -132,7 +132,7 @@ backup : ## Backup databases to file with path `${DUMP_FILE}`, for example, `mak
 		| gzip \
 		> ${DUMP_FILE}
 	docker container stop backup_${NAME}_database
-	docker container rm backup_${NAME}_database
+	docker container rm --volumes backup_${NAME}_database
 .PHONY : backup
 
 # Inspired by https://stackoverflow.com/questions/25785/delete-all-but-the-most-recent-x-files-in-bash/34862475#34862475
@@ -156,7 +156,7 @@ restore : ## Restore databases from file with path `${DUMP_FILE}`, for example, 
 			--username=postgres \
 			--dbname=postgres
 	docker container stop restore_${NAME}_database
-	docker container rm restore_${NAME}_database
+	docker container rm --volumes restore_${NAME}_database
 .PHONY : restore
 
 begin-maintenance : ## Begin maintenance
@@ -223,7 +223,7 @@ migrate : ## Migrate database (note that other PostgreSQL instances using the sa
 			--username=postgres \
 			--dbname=xbase
 	docker container stop migrate_${NAME}_database
-	docker container rm migrate_${NAME}_database
+	docker container rm --volumes migrate_${NAME}_database
 .PHONY : migrate
 
 # Note that NGINX is because of its dependencies taken down and up last and in
