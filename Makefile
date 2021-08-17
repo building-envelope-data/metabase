@@ -96,6 +96,7 @@ execb : exec ## Execute the one-time command `${COMMAND}` against an existing `b
 
 run : up ## Run the one-time command `${COMMAND}` against a fresh `${CONTAINER}` container (after starting all containers if necessary)
 	${docker_compose} run \
+		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		${CONTAINER} \
 		${COMMAND}
