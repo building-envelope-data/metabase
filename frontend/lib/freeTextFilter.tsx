@@ -1,4 +1,4 @@
-import { Input, Space, Button, Typography } from "antd";
+import { Input, Space, Button } from "antd";
 import { FilterFilled } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import {
@@ -152,7 +152,7 @@ export const Highlight = forwardRef<Highlighter, HighlightProps>(
         textToHighlight={textToHightlight}
       />
     ) : (
-      <Typography.Text>{textToHightlight}</Typography.Text>
+      <>{textToHightlight}</>
     );
   }
 );

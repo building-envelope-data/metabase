@@ -458,7 +458,6 @@ function Index() {
                   value: x.resourceTree.root.value.locator,
                   render: (_record, hightlightedValue, value) => (
                     // TODO Actually, `value` is neither `null` nor `undefined` but the type system does not know about it. How can we make it know about it so we don't need `|| ""` here?
-                    // TODO Why does coloring not work when filter text is empty?
                     <Typography.Link href={value || ""}>
                       {hightlightedValue}
                     </Typography.Link>
