@@ -271,13 +271,20 @@ RUN \
 #   ./package.json ./package-lock.json ./
 # RUN npm install
 
-# Create empty directories `/app/*/bin` and `/app/*/obj` for user `me` and
-# group `us` to make the respective mounted volumes be owned by the user `me`
-# and the group `us`.
+# Create empty directories `/app/*/bin`, `/app/*/obj`, and
+# `${HOME}/.vscode-server/*` for user `me` and group `us` to make the
+# respective mounted volumes be owned by the user `me` and the group `us`.
+# For an explanation for the Visual Studio Code Server directories see
+# https://code.visualstudio.com/docs/remote/containers-advanced#_avoiding-extension-reinstalls-on-container-rebuild
 RUN \
-  mkdir --parents ./src/bin && \
-  mkdir --parents ./src/obj && \
-  mkdir --parents ./test/bin && \
-  mkdir --parents ./test/obj
+  mkdir --parents \
+    ./src/bin \
+    ./src/obj && \
+  mkdir --parents \
+    ./test/bin \
+    ./test/obj && \
+  mkdir --parents \
+    ${HOME}/.vscode-server/extensions \
+    ${HOME}/.vscode-server-insiders/extensions
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
