@@ -1,14 +1,34 @@
 using System;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using HotChocolate;
+using System.Threading;
+using System.Threading.Tasks;
+using Metabase.GraphQl.Components;
 
 namespace Metabase.GraphQl.DataX
 {
     public abstract class Data
     : IData
     {
+        // public string Id { get; }
+        public Guid Uuid { get; }
+        public DateTime Timestamp { get; }
+        // public string Locale { get; }
+        // public Guid DatabaseId { get; }
+        public Guid ComponentId { get; }
+        public string? Name { get; }
+        public string? Description { get; }
+        // public IReadOnlyList<string> Warnings { get; }
+        // public Guid CreatorId { get; }
+        // public DateTime CreatedAt { get; }
+        public AppliedMethod AppliedMethod { get; }
+        // public IReadOnlyList<GetHttpsResource> Resources { get; }
+        public GetHttpsResourceTree ResourceTree { get; }
+        // public IReadOnlyList<DataApproval> Approvals { get; }
+        // public ResponseApproval Approval { get; }
+
+        // [GraphQLIgnore]
+        // [JsonExtensionData]
+        // public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+
         protected Data(
           // string id,
           Guid uuid,
@@ -46,25 +66,37 @@ namespace Metabase.GraphQl.DataX
             // Approval = approval;
         }
 
-        // public string Id { get; }
-        public Guid Uuid { get; }
-        public DateTime Timestamp { get; }
-        // public string Locale { get; }
-        // public Guid DatabaseId { get; }
-        public Guid ComponentId { get; }
-        public string? Name { get; }
-        public string? Description { get; }
-        // public IReadOnlyList<string> Warnings { get; }
-        // public Guid CreatorId { get; }
-        // public DateTime CreatedAt { get; }
-        public AppliedMethod AppliedMethod { get; }
-        // public IReadOnlyList<GetHttpsResource> Resources { get; }
-        public GetHttpsResourceTree ResourceTree { get; }
-        // public IReadOnlyList<DataApproval> Approvals { get; }
-        // public ResponseApproval Approval { get; }
+        // public Task<Metabase.Data.Database?> GetDatabaseAsync(
+        //         DatabaseByIdDataLoader databaseById,
+        //         CancellationToken cancellationToken
+        // )
+        // {
+        //     return databaseById.LoadAsync(
+        //         DatabaseId,
+        //         cancellationToken
+        //         );
+        // }
 
-        // [GraphQLIgnore]
-        // [JsonExtensionData]
-        // public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+        public Task<Metabase.Data.Component?> GetComponentAsync(
+                ComponentByIdDataLoader componentById,
+                CancellationToken cancellationToken
+        )
+        {
+            return componentById.LoadAsync(
+                ComponentId,
+                cancellationToken
+                );
+        }
+
+        // public Task<Metabase.Data.Institution?> GetInstitutionAsync(
+        //         InstitutionByIdDataLoader institutionById,
+        //         CancellationToken cancellationToken
+        // )
+        // {
+        //     return institutionById.LoadAsync(
+        //         CreatorId,
+        //         cancellationToken
+        //         );
+        // }
     }
 }

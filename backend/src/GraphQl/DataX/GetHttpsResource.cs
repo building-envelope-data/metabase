@@ -1,10 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Metabase.GraphQl.DataFormats;
 
 namespace Metabase.GraphQl.DataX
 {
     public sealed class GetHttpsResource
     {
+        public string Description { get; }
+        public string HashValue { get; }
+        public Uri Locator { get; }
+        public Guid FormatId { get; }
+        // public IReadOnlyList<FileMetaInformation> ArchivedFilesMetaInformation { get; }
+
         public GetHttpsResource(
           string description,
           string hashValue,
@@ -18,10 +27,15 @@ namespace Metabase.GraphQl.DataX
             FormatId = formatId;
         }
 
-        public string Description { get; }
-        public string HashValue { get; }
-        public Uri Locator { get; }
-        public Guid FormatId { get; }
-        // public IReadOnlyList<FileMetaInformation> ArchivedFilesMetaInformation { get; }
+        public Task<Metabase.Data.DataFormat?> GetDataFormatAsync(
+                DataFormatByIdDataLoader dataFormatById,
+                CancellationToken cancellationToken
+        )
+        {
+            return dataFormatById.LoadAsync(
+                FormatId,
+                cancellationToken
+                );
+        }
     }
 }

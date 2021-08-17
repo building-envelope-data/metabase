@@ -6,6 +6,7 @@
 interface Data {
   appliedMethod: AppliedMethod!
   componentId: Uuid!
+  description: String
   name: String
   resourceTree: GetHttpsResourceTree!
   timestamp: DateTime!
@@ -51,12 +52,15 @@ type AddUserRolePayload {
 }
 
 type AppliedMethod {
+  method: Method
   methodId: Uuid!
 }
 
 type CalorimetricData implements Data {
   appliedMethod: AppliedMethod!
+  component: Component
   componentId: Uuid!
+  description: String
   gValues: [Float!]!
   name: String
   resourceTree: GetHttpsResourceTree!
@@ -275,6 +279,7 @@ type CreateMethodPayload {
 }
 
 type DataApproval {
+  approver: Institution
   approverId: Uuid!
   keyFingerprint: String!
   query: String!
@@ -471,6 +476,7 @@ type GenerateUserTwoFactorRecoveryCodesPayload {
 }
 
 type GetHttpsResource {
+  dataFormat: DataFormat
   description: String!
   formatId: Uuid!
   hashValue: String!
@@ -494,7 +500,9 @@ type GetHttpsResourceTreeRoot {
 
 type HygrothermalData implements Data {
   appliedMethod: AppliedMethod!
+  component: Component
   componentId: Uuid!
+  description: String
   name: String
   resourceTree: GetHttpsResourceTree!
   timestamp: DateTime!
@@ -833,7 +841,9 @@ type OpenIdConnectToken {
 
 type OpticalData implements Data {
   appliedMethod: AppliedMethod!
+  component: Component
   componentId: Uuid!
+  description: String
   name: String
   nearnormalHemisphericalVisibleTransmittances: [Float!]!
   resourceTree: GetHttpsResourceTree!
@@ -867,7 +877,9 @@ type PageInfo {
 
 type PhotovoltaicData implements Data {
   appliedMethod: AppliedMethod!
+  component: Component
   componentId: Uuid!
+  description: String
   name: String
   resourceTree: GetHttpsResourceTree!
   timestamp: DateTime!
@@ -1054,6 +1066,7 @@ type Standard implements Reference {
 
 type ToTreeVertexAppliedConversionMethod {
   arguments: [NamedMethodArgument!]!
+  method: Method
   methodId: Uuid!
   sourceName: String!
 }

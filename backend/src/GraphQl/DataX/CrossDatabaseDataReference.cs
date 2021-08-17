@@ -1,9 +1,17 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.DataX
 {
     public sealed class CrossDatabaseDataReference
     {
+        public Guid DataId { get; }
+        public DateTime DataTimestamp { get; }
+        public DataKind DataKind { get; }
+        public Guid DatabaseId { get; }
+
         public CrossDatabaseDataReference(
         Guid dataId,
         DateTime dataTimestamp,
@@ -16,9 +24,16 @@ namespace Metabase.GraphQl.DataX
             DataKind = dataKind;
             DatabaseId = databaseId;
         }
-        public Guid DataId { get; }
-        public DateTime DataTimestamp { get; }
-        public DataKind DataKind { get; }
-        public Guid DatabaseId { get; }
+
+        public Task<Metabase.Data.Institution?> GetDatabaseAsync(
+                InstitutionByIdDataLoader databaseById,
+                CancellationToken cancellationToken
+        )
+        {
+            return databaseById.LoadAsync(
+                DatabaseId,
+                cancellationToken
+                );
+        }
     }
 }
