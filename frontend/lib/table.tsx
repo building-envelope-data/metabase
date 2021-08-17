@@ -1,6 +1,10 @@
-import { List, Typography } from "antd";
+import { List, Typography, Descriptions } from "antd";
 import { SortOrder } from "antd/lib/table/interface";
-import { getFreeTextFilterProps, highlight } from "./freeTextFilter";
+import {
+  doesFieldIncludeFilterValue,
+  getFreeTextFilterProps,
+  highlight,
+} from "./freeTextFilter";
 import Link from "next/link";
 
 const sortDirections: SortOrder[] = ["ascend", "descend"];
@@ -23,13 +27,13 @@ function compare<ValueType>(
 }
 
 function compareLexicographically<ValueType>(
-  xs: ValueType[],
-  ys: ValueType[],
+  xs: (ValueType | null | undefined)[],
+  ys: (ValueType | null | undefined)[],
   elementCompare: (x: ValueType, y: ValueType) => number
 ) {
   let i = 0;
   while (i < xs.length && i < ys.length) {
-    const comparison = elementCompare(xs[i], ys[i]);
+    const comparison = compare(xs[i], ys[i], elementCompare);
     if (comparison !== 0) {
       return comparison;
     }
@@ -224,6 +228,126 @@ export function getFilterableEnumListColumnProps<
               </List.Item>
             ))}
           </List>
+        );
+      }
+    },
+  };
+}
+
+export function getDescriptionListColumnProps<RecordType>(
+  title: string,
+  key: keyof RecordType,
+  getEntries: (record: RecordType) =>
+    | {
+        key: string;
+        title: string;
+        value: string | null | undefined;
+      }[]
+    | null
+    | undefined
+) {
+  return {
+    ...getColumnProps(title, key),
+    sorter: (a: RecordType, b: RecordType) => {
+      const aValues = getEntries(a)?.map((x) => x.value);
+      const bValues = getEntries(b)?.map((x) => x.value);
+      return compare(aValues, bValues, (xs, ys) =>
+        compareLexicographically(xs, ys, (x, y) => x.localeCompare(y, "en"))
+      );
+    },
+    sortDirections: sortDirections,
+  };
+}
+
+const titleValueDescriptionListSeparator = ": ";
+
+function splitDescriptionListFilterText(filterText: string | null | undefined) {
+  if (filterText == null) {
+    return [null, null];
+  }
+  const filterTexts = filterText.split(titleValueDescriptionListSeparator);
+  switch (filterTexts.length) {
+    case 1:
+      return [null, filterTexts[0]];
+    case 2:
+      return [filterTexts[0], filterTexts[1]];
+    default:
+      return [
+        filterTexts[0],
+        // TODO There are more efficient ways to do this than creating a new array without the first entry just to join them later on.
+        filterTexts.slice(1, -1).join(titleValueDescriptionListSeparator),
+      ];
+  }
+}
+
+export function getFilterableDescriptionListColumnProps<RecordType>(
+  title: string,
+  key: keyof RecordType,
+  getEntries: (record: RecordType) =>
+    | {
+        key: string;
+        title: string;
+        value: string | null | undefined;
+        render?: (
+          record: RecordType,
+          highlightedValue: JSX.Element,
+          value: string | null | undefined
+        ) => JSX.Element;
+      }[]
+    | null
+    | undefined,
+  onFilterTextChange: (
+    key: keyof RecordType
+  ) => (newFilterText: string) => void,
+  getFilterText: (key: keyof RecordType) => string | undefined
+) {
+  return {
+    ...getDescriptionListColumnProps(title, key, getEntries),
+    ...getFreeTextFilterProps<RecordType>(
+      (record) =>
+        getEntries(record)
+          ?.map(
+            ({ title, value }) =>
+              `${title}${titleValueDescriptionListSeparator}${value}`
+          )
+          ?.join("\n"),
+      onFilterTextChange(key)
+    ),
+    render: (_value: string, record: RecordType, _index: number) => {
+      const titlesAndValues = getEntries(record);
+      if (titlesAndValues == null) {
+        return null;
+      } else {
+        return (
+          <Descriptions column={1}>
+            {titlesAndValues.map(
+              ({
+                key: entryKey,
+                title,
+                value,
+                render = (_record, highlightedValue, _value) =>
+                  highlightedValue,
+              }) => {
+                const [titleFilterText, valueFilterText] =
+                  splitDescriptionListFilterText(getFilterText(key));
+                return (
+                  <Descriptions.Item
+                    key={entryKey}
+                    label={highlight(title, titleFilterText)}
+                  >
+                    {render(
+                      record,
+                      titleFilterText !== null &&
+                        doesFieldIncludeFilterValue(title, titleFilterText)
+                        ? highlight(value, valueFilterText)
+                        : highlight(value, null),
+                      value
+                    )}
+                  </Descriptions.Item>
+                );
+              }
+            )}
+          </Descriptions>
         );
       }
     },

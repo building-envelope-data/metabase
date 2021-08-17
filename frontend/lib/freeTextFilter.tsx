@@ -22,6 +22,13 @@ export function setMapValue(
   };
 }
 
+export function doesFieldIncludeFilterValue(
+  field: string,
+  value: string | number | boolean
+) {
+  return field.toLowerCase().includes(value.toString().toLowerCase());
+}
+
 export function getFreeTextFilterProps<RecordType>(
   getField: (record: RecordType) => string | null | undefined,
   onFilterTextChange: (newFilterText: string) => void
@@ -90,9 +97,7 @@ export function getFreeTextFilterProps<RecordType>(
     ),
     onFilter: (value: string | number | boolean, record: RecordType) => {
       const field = getField(record);
-      return field
-        ? field.toLowerCase().includes(value.toString().toLowerCase())
-        : false;
+      return field ? doesFieldIncludeFilterValue(field, value) : false;
     },
     onFilterDropdownVisibleChange: (visible: boolean) => {
       if (visible) {
