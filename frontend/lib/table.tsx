@@ -136,7 +136,7 @@ export function getExternallyLinkedFilterableLocatorColumnProps<RecordType>(
     (record, highlightedValue, _value) => {
       const href = getValue(record);
       return href ? (
-        // TODO Why does coloring not work before when filter text is empty?
+        // TODO Why does coloring not work when filter text is empty?
         <Typography.Link href={href}>{highlightedValue}</Typography.Link>
       ) : (
         <></>
