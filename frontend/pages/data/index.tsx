@@ -89,7 +89,7 @@ const conjunct = (
 //   return { or: propositions };
 // };
 
-function Index() {
+function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -502,4 +502,4 @@ function Index() {
   );
 }
 
-export default Index;
+export default Page;

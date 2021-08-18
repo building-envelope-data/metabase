@@ -21,7 +21,7 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined;
 }
 
-function Index() {
+function Page() {
   const { loading, error, data } = useInstitutionsQuery();
   const nodes = data?.institutions?.nodes?.filter(notEmpty) || [];
 
@@ -117,4 +117,4 @@ function Index() {
   );
 }
 
-export default Index;
+export default Page;

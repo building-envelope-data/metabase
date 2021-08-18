@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 // TODO Load and display scopes.
 
-function Index() {
+function Page() {
   const { loading, error, data } = useOpenIdConnectQuery();
 
   useEffect(() => {
@@ -22,72 +22,72 @@ function Index() {
         columns={[
           {
             title: "clientId",
-            dataIndex: "clientId",
+            dataPage: "clientId",
             key: "clientId",
           },
           {
             title: "clientSecret",
-            dataIndex: "clientSecret",
+            dataPage: "clientSecret",
             key: "clientSecret",
           },
           {
             title: "concurrencyToken",
-            dataIndex: "concurrencyToken",
+            dataPage: "concurrencyToken",
             key: "concurrencyToken",
           },
           {
             title: "consentType",
-            dataIndex: "consentType",
+            dataPage: "consentType",
             key: "consentType",
           },
           {
             title: "displayName",
-            dataIndex: "displayName",
+            dataPage: "displayName",
             key: "displayName",
           },
           {
             title: "displayNames",
-            dataIndex: "displayNames",
+            dataPage: "displayNames",
             key: "displayNames",
           },
           {
             title: "id",
-            dataIndex: "id",
+            dataPage: "id",
             key: "id",
           },
           {
             title: "permissions",
-            dataIndex: "permissions",
+            dataPage: "permissions",
             key: "permissions",
           },
           {
             title: "postLogoutRedirectUris",
-            dataIndex: "postLogoutRedirectUris",
+            dataPage: "postLogoutRedirectUris",
             key: "postLogoutRedirectUris",
           },
           {
             title: "properties",
-            dataIndex: "properties",
+            dataPage: "properties",
             key: "properties",
           },
           {
             title: "redirectUris",
-            dataIndex: "redirectUris",
+            dataPage: "redirectUris",
             key: "redirectUris",
           },
           {
             title: "requirements",
-            dataIndex: "requirements",
+            dataPage: "requirements",
             key: "requirements",
           },
           {
             title: "type",
-            dataIndex: "type",
+            dataPage: "type",
             key: "type",
           },
           //   {
           //     title: "authorizations",
-          //     dataIndex: "authorizations",
+          //     dataPage: "authorizations",
           //     key: "authorizations",
           //     render: (_value, record, _index) => (
           //     ),
@@ -101,47 +101,47 @@ function Index() {
         columns={[
           {
             title: "concurrencyToken",
-            dataIndex: "concurrencyToken",
+            dataPage: "concurrencyToken",
             key: "concurrencyToken",
           },
           {
             title: "creationDate",
-            dataIndex: "creationDate",
+            dataPage: "creationDate",
             key: "creationDate",
           },
           {
             title: "id",
-            dataIndex: "id",
+            dataPage: "id",
             key: "id",
           },
           {
             title: "properties",
-            dataIndex: "properties",
+            dataPage: "properties",
             key: "properties",
           },
           {
             title: "scopes",
-            dataIndex: "scopes",
+            dataPage: "scopes",
             key: "scopes",
           },
           {
             title: "status",
-            dataIndex: "status",
+            dataPage: "status",
             key: "status",
           },
           {
             title: "subject",
-            dataIndex: "subject",
+            dataPage: "subject",
             key: "subject",
           },
           {
             title: "type",
-            dataIndex: "type",
+            dataPage: "type",
             key: "type",
           },
           //   {
           //     title: "tokens",
-          //     dataIndex: "tokens",
+          //     dataPage: "tokens",
           //     key: "tokens",
           //     render: (_value, record, _index) => (
           //     ),
@@ -155,57 +155,57 @@ function Index() {
         columns={[
           {
             title: "concurrencyToken",
-            dataIndex: "concurrencyToken",
+            dataPage: "concurrencyToken",
             key: "concurrencyToken",
           },
           {
             title: "creationDate",
-            dataIndex: "creationDate",
+            dataPage: "creationDate",
             key: "creationDate",
           },
           {
             title: "expirationDate",
-            dataIndex: "expirationDate",
+            dataPage: "expirationDate",
             key: "expirationDate",
           },
           {
             title: "id",
-            dataIndex: "id",
+            dataPage: "id",
             key: "id",
           },
           {
             title: "payload",
-            dataIndex: "payload",
+            dataPage: "payload",
             key: "payload",
           },
           {
             title: "properties",
-            dataIndex: "properties",
+            dataPage: "properties",
             key: "properties",
           },
           {
             title: "redemptionDate",
-            dataIndex: "redemptionDate",
+            dataPage: "redemptionDate",
             key: "redemptionDate",
           },
           {
             title: "referenceId",
-            dataIndex: "referenceId",
+            dataPage: "referenceId",
             key: "referenceId",
           },
           {
             title: "status",
-            dataIndex: "status",
+            dataPage: "status",
             key: "status",
           },
           {
             title: "subject",
-            dataIndex: "subject",
+            dataPage: "subject",
             key: "subject",
           },
           {
             title: "type",
-            dataIndex: "type",
+            dataPage: "type",
             key: "type",
           },
         ]}
@@ -217,47 +217,47 @@ function Index() {
         columns={[
           {
             title: "concurrencyToken",
-            dataIndex: "concurrencyToken",
+            dataPage: "concurrencyToken",
             key: "concurrencyToken",
           },
           {
             title: "description",
-            dataIndex: "description",
+            dataPage: "description",
             key: "description",
           },
           {
             title: "descriptions",
-            dataIndex: "descriptions",
+            dataPage: "descriptions",
             key: "descriptions",
           },
           {
             title: "displayName",
-            dataIndex: "displayName",
+            dataPage: "displayName",
             key: "displayName",
           },
           {
             title: "displayNames",
-            dataIndex: "displayNames",
+            dataPage: "displayNames",
             key: "displayNames",
           },
           {
             title: "id",
-            dataIndex: "id",
+            dataPage: "id",
             key: "id",
           },
           {
             title: "name",
-            dataIndex: "name",
+            dataPage: "name",
             key: "name",
           },
           {
             title: "properties",
-            dataIndex: "properties",
+            dataPage: "properties",
             key: "properties",
           },
           {
             title: "resources",
-            dataIndex: "resources",
+            dataPage: "resources",
             key: "resources",
           },
         ]}
@@ -267,4 +267,4 @@ function Index() {
   );
 }
 
-export default Index;
+export default Page;

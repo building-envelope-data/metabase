@@ -3,7 +3,7 @@ import { Typography } from "antd";
 import Link from "next/link";
 import paths from "../paths";
 
-const Index = () => {
+function Page() {
   return (
     <Layout>
       <div style={{ maxWidth: 768 }}>
@@ -54,6 +54,6 @@ const Index = () => {
       </div>
     </Layout>
   );
-};
+}
 
-export default Index;
+export default Page;

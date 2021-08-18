@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import Method from "../../components/methods/Method";
 import Layout from "../../components/Layout";
 
-function Show() {
+function Page() {
   const router = useRouter();
 
   if (!router.isReady) {
@@ -19,4 +19,4 @@ function Show() {
   );
 }
 
-export default Show;
+export default Page;

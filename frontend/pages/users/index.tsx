@@ -12,7 +12,7 @@ import Link from "next/link";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
-function Index() {
+function Page() {
   const { loading, error, data } = useUsersQuery();
   const nodes = data?.users?.nodes || [];
 
@@ -79,4 +79,4 @@ function Index() {
   );
 }
 
-export default Index;
+export default Page;

@@ -4,7 +4,7 @@ import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 
-function Index() {
+function Page() {
   const router = useRouter();
 
   const { loading, error, data } = useCurrentUserQuery();
@@ -23,4 +23,4 @@ function Index() {
   return <Layout></Layout>;
 }
 
-export default Index;
+export default Page;
