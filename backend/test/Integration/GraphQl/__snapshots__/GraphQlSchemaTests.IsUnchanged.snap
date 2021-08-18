@@ -844,7 +844,11 @@ type OpticalData implements Data {
   component: Component
   componentId: Uuid!
   description: String
+  infraredEmittances: [Float!]!
   name: String
+  nearnormalHemisphericalSolarReflectances: [Float!]!
+  nearnormalHemisphericalSolarTransmittances: [Float!]!
+  nearnormalHemisphericalVisibleReflectances: [Float!]!
   nearnormalHemisphericalVisibleTransmittances: [Float!]!
   resourceTree: GetHttpsResourceTree!
   timestamp: DateTime!
@@ -1181,6 +1185,7 @@ input BooleanOperationFilterInput {
 input CalorimetricDataPropositionInput {
   and: [CalorimetricDataPropositionInput!]
   componentId: UuidPropositionInput
+  dataFormatId: UuidPropositionInput
   gValue: FloatPropositionInput
   not: CalorimetricDataPropositionInput
   or: [CalorimetricDataPropositionInput!]
@@ -1401,6 +1406,10 @@ input DataPropositionInput {
   and: [DataPropositionInput!]
   componentId: UuidPropositionInput
   gValue: FloatPropositionInput
+  infraredEmittance: FloatPropositionInput
+  nearnormalHemisphericalSolarReflectance: FloatPropositionInput
+  nearnormalHemisphericalSolarTransmittance: FloatPropositionInput
+  nearnormalHemisphericalVisibleReflectance: FloatPropositionInput
   nearnormalHemisphericalVisibleTransmittance: FloatPropositionInput
   not: DataPropositionInput
   or: [DataPropositionInput!]
@@ -1452,6 +1461,7 @@ input FloatPropositionInput {
 input HygrothermalDataPropositionInput {
   and: [HygrothermalDataPropositionInput!]
   componentId: UuidPropositionInput
+  dataFormatId: UuidPropositionInput
   not: HygrothermalDataPropositionInput
   or: [HygrothermalDataPropositionInput!]
 }
@@ -1575,6 +1585,10 @@ input OpenEndedDateTimeRangeInput {
 input OpticalDataPropositionInput {
   and: [OpticalDataPropositionInput!]
   componentId: UuidPropositionInput
+  infraredEmittance: FloatPropositionInput
+  nearnormalHemisphericalSolarReflectance: FloatPropositionInput
+  nearnormalHemisphericalSolarTransmittance: FloatPropositionInput
+  nearnormalHemisphericalVisibleReflectance: FloatPropositionInput
   nearnormalHemisphericalVisibleTransmittance: FloatPropositionInput
   not: OpticalDataPropositionInput
   or: [OpticalDataPropositionInput!]
@@ -1583,6 +1597,7 @@ input OpticalDataPropositionInput {
 input PhotovoltaicDataPropositionInput {
   and: [PhotovoltaicDataPropositionInput!]
   componentId: UuidPropositionInput
+  dataFormatId: UuidPropositionInput
   not: PhotovoltaicDataPropositionInput
   or: [PhotovoltaicDataPropositionInput!]
 }
