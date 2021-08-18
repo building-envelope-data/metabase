@@ -5,6 +5,7 @@ fragment InstitutionPartial on Institution {
   abbreviation
   description
   websiteLocator
+  state
 }
 
 query Institutions($state: InstitutionState! = VERIFIED) {

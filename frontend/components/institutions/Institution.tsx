@@ -1,5 +1,5 @@
 import {
-  Descriptions,
+  PageHeader,
   Divider,
   List,
   Typography,
@@ -7,18 +7,15 @@ import {
   Skeleton,
   Table,
   Button,
+  Result,
+  Descriptions,
+  Tag,
 } from "antd";
 import {
   InstitutionDocument,
   useInstitutionQuery,
 } from "../../queries/institutions.graphql";
-import {
-  Scalars,
-  Maybe,
-  Numeration,
-  Publication,
-  Standard,
-} from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/__types__";
 import CreateComponent from "../components/CreateComponent";
 import CreateMethod from "../methods/CreateMethod";
 import CreateDataFormat from "../dataFormats/CreateDataFormat";
@@ -32,79 +29,7 @@ import { useConfirmInstitutionMethodDeveloperMutation } from "../../queries/inst
 import { MethodDocument } from "../../queries/methods.graphql";
 import { useConfirmComponentManufacturerMutation } from "../../queries/componentManufacturers.graphql";
 import { ComponentDocument } from "../../queries/components.graphql";
-
-const renderReference = (
-  reference:
-    | Maybe<
-        | ({ __typename?: "Publication" | undefined } & Pick<
-            Publication,
-            | "title"
-            | "arXiv"
-            | "authors"
-            | "doi"
-            | "urn"
-            | "webAddress"
-            | "abstract"
-            | "section"
-          >)
-        | ({ __typename?: "Standard" | undefined } & Pick<
-            Standard,
-            | "title"
-            | "abstract"
-            | "section"
-            | "locator"
-            | "standardizers"
-            | "year"
-          > & {
-              numeration: { __typename?: "Numeration" | undefined } & Pick<
-                Numeration,
-                "mainNumber" | "prefix" | "suffix"
-              >;
-            })
-      >
-    | undefined
-) => (
-  <Descriptions column={1}>
-    {reference && (
-      <>
-        <Descriptions.Item label="Abstract">
-          {reference?.abstract}
-        </Descriptions.Item>
-        <Descriptions.Item label="Section">
-          {reference?.section}
-        </Descriptions.Item>
-        <Descriptions.Item label="Title">{reference?.title}</Descriptions.Item>
-      </>
-    )}
-    {reference?.__typename === "Standard" && (
-      <>
-        <Descriptions.Item label="Locator">
-          <Typography.Link href={reference.locator}>
-            {reference.locator}
-          </Typography.Link>
-        </Descriptions.Item>
-        <Descriptions.Item label="Numeration">{`${reference.numeration.prefix} ${reference.numeration.mainNumber} ${reference.numeration.suffix}`}</Descriptions.Item>
-        <Descriptions.Item label="Standardizers">
-          {reference.standardizers.join(", ")}
-        </Descriptions.Item>
-        <Descriptions.Item label="Year">{reference.year}</Descriptions.Item>
-      </>
-    )}
-    {reference?.__typename === "Publication" && (
-      <>
-        <Descriptions.Item label="arXiv">{reference.arXiv}</Descriptions.Item>
-        <Descriptions.Item label="Authors">
-          {reference.authors?.join(", ")}
-        </Descriptions.Item>
-        <Descriptions.Item label="DOI">{reference.doi}</Descriptions.Item>
-        <Descriptions.Item label="URN">{reference.urn}</Descriptions.Item>
-        <Descriptions.Item label="Web Address">
-          {reference.webAddress}
-        </Descriptions.Item>
-      </>
-    )}
-  </Descriptions>
-);
+import { Reference } from "../Reference";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -214,22 +139,44 @@ export default function Institution({ institutionId }: InstitutionProps) {
     }
   }, [error]);
 
-  if (loading || !institution) {
+  if (loading) {
     return <Skeleton active avatar title />;
   }
 
+  if (!institution) {
+    return (
+      <Result
+        status="500"
+        title="500"
+        subTitle="Sorry, something went wrong."
+      />
+    );
+  }
+
   return (
-    <>
-      <Typography.Title>
-        {institution.websiteLocator ? (
-          <Typography.Link href={institution.websiteLocator}>
-            {`${institution.name} (${institution.abbreviation})`}
-          </Typography.Link>
-        ) : (
-          `${institution.name} (${institution.abbreviation})`
+    <PageHeader
+      title={[
+        institution.name,
+        institution.abbreviation == null
+          ? null
+          : `(${institution.abbreviation})`,
+      ]
+        .filter((x) => x != null)
+        .join(" ")}
+      subTitle={institution.description}
+      tags={[<Tag color="magenta">{institution.state}</Tag>]}
+      onBack={() => window.history.back()}
+    >
+      <Descriptions size="small" column={1}>
+        <Descriptions.Item label="UUID">{institution.uuid}</Descriptions.Item>
+        {institution.websiteLocator && (
+          <Descriptions.Item label="Website">
+            <Typography.Link href={institution.websiteLocator}>
+              {institution.websiteLocator}
+            </Typography.Link>
+          </Descriptions.Item>
         )}
-      </Typography.Title>
-      <Typography.Text>{institution.description}</Typography.Text>
+      </Descriptions>
       <Divider />
       <Typography.Title level={2}>Manufactured Components</Typography.Title>
       <Table
@@ -376,8 +323,9 @@ export default function Institution({ institutionId }: InstitutionProps) {
             title: "Reference",
             dataIndex: "reference",
             key: "reference",
-            render: (_text, record, _index) =>
-              renderReference(record.reference),
+            render: (_text, record, _index) => (
+              <Reference reference={record.reference} />
+            ),
           },
         ]}
         dataSource={institution.managedDataFormats.edges.map((x) => x.node)}
@@ -425,8 +373,9 @@ export default function Institution({ institutionId }: InstitutionProps) {
             title: "Reference",
             dataIndex: "reference",
             key: "reference",
-            render: (_text, record, _index) =>
-              renderReference(record.reference),
+            render: (_text, record, _index) => (
+              <Reference reference={record.reference} />
+            ),
           },
           {
             title: "Calculation Locator",
@@ -536,6 +485,6 @@ export default function Institution({ institutionId }: InstitutionProps) {
           </Link>
         </>
       )}
-    </>
+    </PageHeader>
   );
 }

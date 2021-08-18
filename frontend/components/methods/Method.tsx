@@ -1,7 +1,41 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useMethodQuery } from "../../queries/methods.graphql";
-import { message, Skeleton, Result, Typography } from "antd";
+import {
+  Tag,
+  message,
+  Skeleton,
+  Result,
+  PageHeader,
+  Descriptions,
+  Typography,
+  List,
+} from "antd";
 import { useEffect } from "react";
+import Link from "next/link";
+import paths from "../../paths";
+import { Reference } from "../Reference";
+import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
+
+function getDeveloperHref(
+  node:
+    | {
+        __typename?: "Institution" | undefined;
+        id: string;
+        uuid: any;
+        name: string;
+      }
+    | { __typename?: "User" | undefined; id: string; uuid: any; name: string }
+) {
+  switch (node.__typename) {
+    case "Institution":
+      return paths.institution(node.uuid);
+    case "User":
+      return paths.user(node.uuid);
+    default:
+      // TODO What shall we do in this supposedly impossible case?
+      return "https://www.buildingenvelopedata.org";
+  }
+}
 
 export type MethodProps = {
   methodId: Scalars["Uuid"];
@@ -36,8 +70,53 @@ export default function Method({ methodId }: MethodProps) {
   }
 
   return (
-    <>
-      <Typography.Title>{method.name}</Typography.Title>
-    </>
+    <PageHeader
+      title={method.name}
+      subTitle={method.description}
+      tags={method.categories.map((x) => (
+        <Tag key={x} color="magenta">
+          {x}
+        </Tag>
+      ))}
+      onBack={() => window.history.back()}
+    >
+      <Descriptions size="small" column={1}>
+        <Descriptions.Item label="UUID">{method.uuid}</Descriptions.Item>
+        <Descriptions.Item label="Valid">
+          <OpenEndedDateTimeRangeX range={method.validity} />
+        </Descriptions.Item>
+        <Descriptions.Item label="Available">
+          <OpenEndedDateTimeRangeX range={method.availability} />
+        </Descriptions.Item>
+        <Descriptions.Item label="Calculation">
+          <Typography.Link href={method.calculationLocator}>
+            {method.calculationLocator}
+          </Typography.Link>
+        </Descriptions.Item>
+        <Descriptions.Item label="Reference">
+          <Reference reference={method.reference} />
+        </Descriptions.Item>
+        <Descriptions.Item label="Developed by">
+          {method.developers.edges.length == 1 ? (
+            <Link href={getDeveloperHref(method.developers.edges[0].node)}>
+              {method.developers.edges[0].node.name}
+            </Link>
+          ) : (
+            <List size="small">
+              {method.developers.edges.map((x) => (
+                <List.Item key={x.node.uuid}>
+                  <Link href={getDeveloperHref(x.node)}>{x.node.name}</Link>
+                </List.Item>
+              ))}
+            </List>
+          )}
+        </Descriptions.Item>
+        <Descriptions.Item label="Managed by">
+          <Typography.Link href={paths.institution(method.manager.node.uuid)}>
+            {method.manager.node.name}
+          </Typography.Link>
+        </Descriptions.Item>
+      </Descriptions>
+    </PageHeader>
   );
 }

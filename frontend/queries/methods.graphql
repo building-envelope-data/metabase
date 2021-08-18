@@ -41,11 +41,20 @@ fragment MethodPartial on Method {
         name
         ... on Institution {
           id
+          uuid
         }
         ... on User {
           id
+          uuid
         }
       }
+    }
+  }
+  manager {
+    node {
+      id
+      uuid
+      name
     }
   }
 }

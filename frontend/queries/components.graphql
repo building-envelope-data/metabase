@@ -24,6 +24,22 @@ query Component($uuid: Uuid!) {
     id
     uuid
     name
+    abbreviation
+    description
+    categories
+    availability {
+      from
+      to
+    }
+    manufacturers {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
   }
 }
 

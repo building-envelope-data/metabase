@@ -1,4 +1,6 @@
 import {
+  Tag,
+  PageHeader,
   Button,
   Divider,
   Typography,
@@ -6,7 +8,9 @@ import {
   Skeleton,
   Descriptions,
   List,
+  Result,
 } from "antd";
+import { SyncOutlined } from "@ant-design/icons";
 import {
   UsersDocument,
   useUserQuery,
@@ -209,27 +213,81 @@ export default function User({ userId }: UserProps) {
     }
   }, [error]);
 
-  if (loading || !user) {
+  if (loading) {
     return <Skeleton active avatar title />;
   }
 
+  if (!user) {
+    return (
+      <Result
+        status="500"
+        title="500"
+        subTitle="Sorry, something went wrong."
+      />
+    );
+  }
+
   return (
-    <>
-      <Typography.Title level={1}>{user.name}</Typography.Title>
+    <PageHeader
+      title={user.name}
+      tags={user.roles?.map((x) => (
+        <Tag
+          key={x}
+          icon={removingUserRole && <SyncOutlined spin />}
+          closable={
+            (!removingUserRole &&
+              user.rolesCurrentUserCanRemove?.includes(x)) ||
+            false
+          }
+          onClose={() => removeUserRole(x)}
+          color="magenta"
+        >
+          {x}
+        </Tag>
+      ))}
+      extra={[
+        user.canCurrentUserDeleteUser && (
+          <Button
+            danger
+            type="primary"
+            onClick={deleteUser}
+            loading={deletingUser}
+          >
+            Delete User
+          </Button>
+        ),
+      ].filter((x) => x != null)}
+      onBack={() => window.history.back()}
+    >
       <Descriptions column={1}>
         <Descriptions.Item label="UUID">{user.uuid}</Descriptions.Item>
-        <Descriptions.Item label="Email Address">
-          {user.email}
-        </Descriptions.Item>
-        <Descriptions.Item label="Phone Number">
-          {user.phoneNumber}
-        </Descriptions.Item>
-        <Descriptions.Item label="Website">
-          <Typography.Link href={user.websiteLocator}>
-            {user.websiteLocator}
-          </Typography.Link>
-        </Descriptions.Item>
+        {user.email && (
+          <Descriptions.Item label="Email Address">
+            <Typography.Link href={`mailto:${user.email}`}>
+              {user.email}
+            </Typography.Link>
+          </Descriptions.Item>
+        )}
+        {user.phoneNumber && (
+          <Descriptions.Item label="Phone Number">
+            {user.phoneNumber}
+          </Descriptions.Item>
+        )}
+        {user.websiteLocator && (
+          <Descriptions.Item label="Website">
+            <Typography.Link href={user.websiteLocator}>
+              {user.websiteLocator}
+            </Typography.Link>
+          </Descriptions.Item>
+        )}
       </Descriptions>
+      {rolesCurrentUserCanAndMayWantToAdd &&
+        rolesCurrentUserCanAndMayWantToAdd.length >= 1 && (
+          <AddUserRole
+            userId={user.uuid}
+            roles={rolesCurrentUserCanAndMayWantToAdd}
+          />
+        )}
 
       <Divider />
       <Typography.Title level={2}>Represented Institutions</Typography.Title>
@@ -300,53 +358,6 @@ export default function User({ userId }: UserProps) {
             )}
           />
         )}
-
-      {user.roles && (
-        <>
-          <Divider />
-          <Typography.Title level={2}>Roles</Typography.Title>
-          <List
-            size="small"
-            dataSource={user.roles}
-            renderItem={(item) => (
-              <List.Item key={item}>
-                <Typography.Text>{item}</Typography.Text>
-                {user.rolesCurrentUserCanRemove &&
-                  user.rolesCurrentUserCanRemove.includes(item) && (
-                    <Button
-                      onClick={() => removeUserRole(item)}
-                      loading={removingUserRole}
-                    >
-                      Remove
-                    </Button>
-                  )}
-              </List.Item>
-            )}
-          />
-        </>
-      )}
-      {rolesCurrentUserCanAndMayWantToAdd &&
-        rolesCurrentUserCanAndMayWantToAdd.length >= 1 && (
-          <AddUserRole
-            userId={user.uuid}
-            roles={rolesCurrentUserCanAndMayWantToAdd}
-          />
-        )}
-
-      {user.canCurrentUserDeleteUser && (
-        <>
-          <Divider />
-          <Typography.Title level={2}>Actions</Typography.Title>
-          <Button
-            danger
-            type="primary"
-            onClick={deleteUser}
-            loading={deletingUser}
-          >
-            Delete User
-          </Button>
-        </>
-      )}
-    </>
+    </PageHeader>
   );
 }

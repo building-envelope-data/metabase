@@ -1,7 +1,16 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useDatabaseQuery } from "../../queries/databases.graphql";
-import { message, Skeleton, Result, Typography } from "antd";
+import {
+  message,
+  Skeleton,
+  Result,
+  PageHeader,
+  Descriptions,
+  Typography,
+} from "antd";
 import { useEffect } from "react";
+import Link from "next/link";
+import paths from "../../paths";
 
 export type DatabaseProps = {
   databaseId: Scalars["Uuid"];
@@ -36,8 +45,24 @@ export default function Database({ databaseId }: DatabaseProps) {
   }
 
   return (
-    <>
-      <Typography.Title>{database.name}</Typography.Title>
-    </>
+    <PageHeader
+      title={database.name}
+      subTitle={database.description}
+      onBack={() => window.history.back()}
+    >
+      <Descriptions size="small" column={1}>
+        <Descriptions.Item label="UUID">{database.uuid}</Descriptions.Item>
+        <Descriptions.Item label="Located at">
+          <Typography.Link href={database.locator}>
+            {database.locator}
+          </Typography.Link>
+        </Descriptions.Item>
+        <Descriptions.Item label="Operated by">
+          <Link href={paths.database(database.operator.node.uuid)}>
+            {database.operator.node.name}
+          </Link>
+        </Descriptions.Item>
+      </Descriptions>
+    </PageHeader>
   );
 }

@@ -1,7 +1,18 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useComponentQuery } from "../../queries/components.graphql";
-import { message, Skeleton, Result, Typography } from "antd";
+import {
+  message,
+  Skeleton,
+  Result,
+  PageHeader,
+  Descriptions,
+  Tag,
+  List,
+} from "antd";
 import { useEffect } from "react";
+import paths from "../../paths";
+import Link from "next/link";
+import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
 
 export type ComponentProps = {
   componentId: Scalars["Uuid"];
@@ -36,8 +47,48 @@ export default function Component({ componentId }: ComponentProps) {
   }
 
   return (
-    <>
-      <Typography.Title>{component.name}</Typography.Title>
-    </>
+    <PageHeader
+      title={[
+        component.name,
+        component.abbreviation == null ? null : `(${component.abbreviation})`,
+      ]
+        .filter((x) => x != null)
+        .join(" ")}
+      subTitle={component.description}
+      tags={component.categories.map((x) => (
+        <Tag key={x} color="magenta">
+          {x}
+        </Tag>
+      ))}
+      onBack={() => window.history.back()}
+    >
+      <Descriptions size="small" column={1}>
+        <Descriptions.Item label="UUID">{component.uuid}</Descriptions.Item>
+        <Descriptions.Item label="Available">
+          <OpenEndedDateTimeRangeX range={component.availability} />
+        </Descriptions.Item>
+        <Descriptions.Item label="Manufactured by">
+          {component.manufacturers.edges.length == 1 ? (
+            <Link
+              href={paths.institution(
+                component.manufacturers.edges[0].node.uuid
+              )}
+            >
+              {component.manufacturers.edges[0].node.name}
+            </Link>
+          ) : (
+            <List size="small">
+              {component.manufacturers.edges.map((x) => (
+                <List.Item key={x.node.uuid}>
+                  <Link href={paths.institution(x.node.uuid)}>
+                    {x.node.name}
+                  </Link>
+                </List.Item>
+              ))}
+            </List>
+          )}
+        </Descriptions.Item>
+      </Descriptions>
+    </PageHeader>
   );
 }

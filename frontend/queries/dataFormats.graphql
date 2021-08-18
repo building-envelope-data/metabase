@@ -31,6 +31,8 @@ fragment DataFormatPartial on DataFormat {
   manager {
     node {
       id
+      uuid
+      name
     }
   }
 }
