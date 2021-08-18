@@ -23,7 +23,13 @@ namespace Metabase.GraphQl.DataX
           GetHttpsResourceTree resourceTree,
           // IReadOnlyList<DataApproval> approvals
           // ResponseApproval approval
-          IReadOnlyList<double> nearnormalHemisphericalVisibleTransmittances
+          IReadOnlyList<double> nearnormalHemisphericalVisibleTransmittances,
+          IReadOnlyList<double> nearnormalHemisphericalVisibleReflectances,
+          IReadOnlyList<double> nearnormalHemisphericalSolarTransmittances,
+          IReadOnlyList<double> nearnormalHemisphericalSolarReflectances,
+          IReadOnlyList<double> infraredEmittances
+        // IReadOnlyList<double> colorRenderingIndices,
+        // IReadOnlyList<CielabColor> cielabColors
         ) : base(
           uuid: uuid,
           timestamp: timestamp,
@@ -35,8 +41,20 @@ namespace Metabase.GraphQl.DataX
         )
         {
             NearnormalHemisphericalVisibleTransmittances = nearnormalHemisphericalVisibleTransmittances;
+            NearnormalHemisphericalVisibleReflectances = nearnormalHemisphericalVisibleReflectances;
+            NearnormalHemisphericalSolarTransmittances = nearnormalHemisphericalSolarTransmittances;
+            NearnormalHemisphericalSolarReflectances = nearnormalHemisphericalSolarReflectances;
+            InfraredEmittances = infraredEmittances;
+            // ColorRenderingIndices = colorRenderingIndices;
+            // CielabColors = cielabColors;
         }
 
         public IReadOnlyList<double> NearnormalHemisphericalVisibleTransmittances { get; }
+        public IReadOnlyList<double> NearnormalHemisphericalVisibleReflectances { get; }
+        public IReadOnlyList<double> NearnormalHemisphericalSolarTransmittances { get; }
+        public IReadOnlyList<double> NearnormalHemisphericalSolarReflectances { get; }
+        public IReadOnlyList<double> InfraredEmittances { get; }
+        // public IReadOnlyList<double> ColorRenderingIndices { get; }
+        // public IReadOnlyList<CielabColor> CielabColors { get; }
     }
 }

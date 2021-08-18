@@ -7,6 +7,7 @@ namespace Metabase.GraphQl.DataX
         UuidPropositionInput? ComponentId,
         IReadOnlyList<PhotovoltaicDataPropositionInput>? And,
         PhotovoltaicDataPropositionInput? Not,
-        IReadOnlyList<PhotovoltaicDataPropositionInput>? Or
+        IReadOnlyList<PhotovoltaicDataPropositionInput>? Or,
+        UuidPropositionInput? DataFormatId
         );
 }

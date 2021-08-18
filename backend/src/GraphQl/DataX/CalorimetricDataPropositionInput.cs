@@ -9,6 +9,7 @@ namespace Metabase.GraphQl.DataX
         FloatPropositionInput? GValue,
         CalorimetricDataPropositionInput? Not,
         IReadOnlyList<CalorimetricDataPropositionInput>? Or,
-        FloatPropositionInput? UValue
+        FloatPropositionInput? UValue,
+        UuidPropositionInput? DataFormatId
         );
 }

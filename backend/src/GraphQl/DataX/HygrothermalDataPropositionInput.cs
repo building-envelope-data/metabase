@@ -6,6 +6,7 @@ namespace Metabase.GraphQl.DataX
         UuidPropositionInput? ComponentId,
         IReadOnlyList<HygrothermalDataPropositionInput>? And,
         HygrothermalDataPropositionInput? Not,
-        IReadOnlyList<HygrothermalDataPropositionInput>? Or
+        IReadOnlyList<HygrothermalDataPropositionInput>? Or,
+        UuidPropositionInput? DataFormatId
         );
 }

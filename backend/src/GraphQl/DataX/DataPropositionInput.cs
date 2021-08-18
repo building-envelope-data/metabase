@@ -5,10 +5,17 @@ namespace Metabase.GraphQl.DataX
     public record DataPropositionInput(
         UuidPropositionInput? ComponentId,
         IReadOnlyList<DataPropositionInput>? And,
-        FloatPropositionInput? GValue,
-        FloatPropositionInput? NearnormalHemisphericalVisibleTransmittance,
         DataPropositionInput? Not,
         IReadOnlyList<DataPropositionInput>? Or,
-        FloatPropositionInput? UValue
+        FloatPropositionInput? GValue,
+        FloatPropositionInput? UValue,
+        // UuidPropositionInput? DataFormatId,
+        FloatPropositionInput? NearnormalHemisphericalVisibleTransmittance,
+        FloatPropositionInput? NearnormalHemisphericalVisibleReflectance,
+        FloatPropositionInput? NearnormalHemisphericalSolarTransmittance,
+        FloatPropositionInput? NearnormalHemisphericalSolarReflectance,
+        FloatPropositionInput? InfraredEmittance
+        // FloatPropositionInput? ColorRenderingIndex,
+        // CielabColorPropositionInput? CielabColor
         );
 }
