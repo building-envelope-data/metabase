@@ -78,7 +78,7 @@ export default function Method({ methodId }: MethodProps) {
           {x}
         </Tag>
       ))}
-      onBack={() => window.history.back()}
+      backIcon={false}
     >
       <Descriptions size="small" column={1}>
         <Descriptions.Item label="UUID">{method.uuid}</Descriptions.Item>

@@ -48,7 +48,7 @@ export default function Database({ databaseId }: DatabaseProps) {
     <PageHeader
       title={database.name}
       subTitle={database.description}
-      onBack={() => window.history.back()}
+      backIcon={false}
     >
       <Descriptions size="small" column={1}>
         <Descriptions.Item label="UUID">{database.uuid}</Descriptions.Item>

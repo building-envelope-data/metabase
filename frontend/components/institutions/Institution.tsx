@@ -165,7 +165,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         .join(" ")}
       subTitle={institution.description}
       tags={[<Tag color="magenta">{institution.state}</Tag>]}
-      onBack={() => window.history.back()}
+      backIcon={false}
     >
       <Descriptions size="small" column={1}>
         <Descriptions.Item label="UUID">{institution.uuid}</Descriptions.Item>

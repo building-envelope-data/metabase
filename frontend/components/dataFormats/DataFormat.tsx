@@ -48,7 +48,7 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
     <PageHeader
       title={dataFormat.name}
       subTitle={dataFormat.description}
-      onBack={() => window.history.back()}
+      backIcon={false}
     >
       <Descriptions size="small" column={1}>
         <Descriptions.Item label="UUID">{dataFormat.uuid}</Descriptions.Item>

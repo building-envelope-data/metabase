@@ -60,7 +60,7 @@ export default function Component({ componentId }: ComponentProps) {
           {x}
         </Tag>
       ))}
-      onBack={() => window.history.back()}
+      backIcon={false}
     >
       <Descriptions size="small" column={1}>
         <Descriptions.Item label="UUID">{component.uuid}</Descriptions.Item>

@@ -257,7 +257,7 @@ export default function User({ userId }: UserProps) {
           </Button>
         ),
       ].filter((x) => x != null)}
-      onBack={() => window.history.back()}
+      backIcon={false}
     >
       <Descriptions column={1}>
         <Descriptions.Item label="UUID">{user.uuid}</Descriptions.Item>
