@@ -1,11 +1,10 @@
 import { Input, Space, Button } from "antd";
 import { FilterFilled } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import {
   FilterConfirmProps,
   FilterDropdownProps,
 } from "antd/lib/table/interface";
-import { Dispatch, forwardRef, Key, SetStateAction } from "react";
+import { Dispatch, Key, SetStateAction } from "react";
 
 export function setMapValue(
   map: Map<string, string>,
@@ -106,53 +105,3 @@ export function getFreeTextFilterProps<RecordType>(
     },
   };
 }
-
-export function highlight(
-  textToHightlight: string | null | undefined,
-  filterText: string | null | undefined
-) {
-  return (
-    <Highlight textToHightlight={textToHightlight} filterText={filterText} />
-  );
-  // return textToHightlight !== null &&
-  //   textToHightlight !== undefined &&
-  //   textToHightlight !== "" &&
-  //   filterText !== null &&
-  //   filterText !== undefined &&
-  //   filterText !== "" ? (
-  //   <Highlighter
-  //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-  //     searchWords={[filterText]}
-  //     autoEscape
-  //     textToHighlight={textToHightlight}
-  //   />
-  // ) : (
-  //   <>{textToHightlight}</>
-  // );
-}
-
-type HighlightProps = {
-  textToHightlight: string | null | undefined;
-  filterText: string | null | undefined;
-};
-
-export const Highlight = forwardRef<Highlighter, HighlightProps>(
-  ({ textToHightlight, filterText }, ref) => {
-    return textToHightlight !== null &&
-      textToHightlight !== undefined &&
-      textToHightlight !== "" &&
-      filterText !== null &&
-      filterText !== undefined &&
-      filterText !== "" ? (
-      <Highlighter
-        ref={ref}
-        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-        searchWords={[filterText]}
-        autoEscape
-        textToHighlight={textToHightlight}
-      />
-    ) : (
-      <>{textToHightlight}</>
-    );
-  }
-);

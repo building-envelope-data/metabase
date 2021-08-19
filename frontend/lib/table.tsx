@@ -3,10 +3,10 @@ import { SortOrder } from "antd/lib/table/interface";
 import {
   doesFieldIncludeFilterValue,
   getFreeTextFilterProps,
-  highlight,
 } from "./freeTextFilter";
 import Link from "next/link";
 import { Scalars } from "../__generated__/__types__";
+import { Highlight } from "../components/Highlight";
 
 const sortDirections: SortOrder[] = ["ascend", "descend"];
 
@@ -116,7 +116,7 @@ export function getFilterableStringColumnProps<RecordType>(
     render: (_text: string, record: RecordType, _index: number) =>
       doRender(
         record,
-        highlight(getValue(record), getFilterText(key)),
+        <Highlight text={getValue(record)} snippet={getFilterText(key)} />,
         getValue(record)
       ),
   };
@@ -302,7 +302,11 @@ export function getFilterableEnumListColumnProps<
           <List>
             {values.map((value) => (
               <List.Item key={value}>
-                {doRender(record, highlight(value, getFilterText(key)), value)}
+                {doRender(
+                  record,
+                  <Highlight text={value} snippet={getFilterText(key)} />,
+                  value
+                )}
               </List.Item>
             ))}
           </List>
@@ -411,14 +415,16 @@ export function getFilterableDescriptionListColumnProps<RecordType>(
                 return (
                   <Descriptions.Item
                     key={entryKey}
-                    label={highlight(title, titleFilterText)}
+                    label={<Highlight text={title} snippet={titleFilterText} />}
                   >
                     {render(
                       record,
                       titleFilterText === null ||
-                        doesFieldIncludeFilterValue(title, titleFilterText)
-                        ? highlight(value, valueFilterText)
-                        : highlight(value, null),
+                        doesFieldIncludeFilterValue(title, titleFilterText) ? (
+                        <Highlight text={value} snippet={valueFilterText} />
+                      ) : (
+                        <Highlight text={value} snippet={null} />
+                      ),
                       value
                     )}
                   </Descriptions.Item>
