@@ -97,13 +97,12 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
             },
           ]}
         >
-          <Select>
-            {roles.map((role) => (
-              <Select.Option key={role} value={role}>
-                {role}
-              </Select.Option>
-            ))}
-          </Select>
+          <Select
+            options={roles.map((role) => ({
+              label: role,
+              value: role,
+            }))}
+          />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={adding}>

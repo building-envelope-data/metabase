@@ -15,13 +15,9 @@ import {
   getDescriptionColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
+import { notEmpty } from "../../lib/array";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
-
-// Taken from https://stackoverflow.com/questions/43118692/typescript-filter-out-nulls-from-an-array/46700791#46700791
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-  return value !== null && value !== undefined;
-}
 
 function Page() {
   const { loading, error, data } = useInstitutionsQuery();
