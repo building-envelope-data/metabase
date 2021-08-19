@@ -18,6 +18,7 @@ export default {
   userCurrent: "me",
   me: {
     manage: {
+      home: "/me/manage",
       profile: "/me/manage/profile",
       email: "/me/manage/email",
       changePassword: "/me/manage/change-password",

@@ -10,6 +10,7 @@ import paths from "../paths";
 import { initializeApollo } from "../lib/apollo";
 import { useState } from "react";
 import { UserRole } from "../__generated__/__types__";
+import { UserOutlined } from "@ant-design/icons";
 
 type NavItemProps = {
   path: string;
@@ -65,14 +66,23 @@ export default function NavBar({ items }: NavBarProps) {
               <Link href={paths.openIdConnect}>OpenId Connect</Link>
             </Menu.Item>
           )}
-          <Menu.Item key={paths.me.manage.profile}>
-            <Link href={paths.me.manage.profile}>Account</Link>
-          </Menu.Item>
-          <Menu.Item key="logout">
-            <Button type="link" onClick={logout} loading={loggingOut}>
-              Logout
-            </Button>
-          </Menu.Item>
+          <Menu.SubMenu
+            title={currentUser.name}
+            key={paths.me.manage.home}
+            icon={<UserOutlined />}
+          >
+            <Menu.Item key={paths.user(currentUser.uuid)}>
+              <Link href={paths.user(currentUser.uuid)}>Profile</Link>
+            </Menu.Item>
+            <Menu.Item key={paths.me.manage.profile}>
+              <Link href={paths.me.manage.profile}>Account</Link>
+            </Menu.Item>
+            <Menu.Item key="logout">
+              <Button type="primary" onClick={logout} loading={loggingOut}>
+                Logout
+              </Button>
+            </Menu.Item>
+          </Menu.SubMenu>
         </>
       ) : (
         <>

@@ -38,43 +38,28 @@ function Page() {
       <Table
         loading={loading}
         columns={[
-          {
-            ...getUuidColumnProps<typeof nodes[0]>(
-              onFilterTextChange,
-              (x) => filterText.get(x),
-              paths.component
-            ),
-          },
-          {
-            ...getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
-            ),
-          },
-          {
-            ...getAbbreviationColumnProps<typeof nodes[0]>(
-              onFilterTextChange,
-              (x) => filterText.get(x)
-            ),
-          },
-          {
-            ...getDescriptionColumnProps<typeof nodes[0]>(
-              onFilterTextChange,
-              (x) => filterText.get(x)
-            ),
-          },
-          {
-            ...getFilterableEnumListColumnProps<
-              typeof nodes[0],
-              ComponentCategory
-            >(
-              "Categories",
-              "categories",
-              Object.entries(ComponentCategory),
-              (record) => record.categories,
-              onFilterTextChange,
-              (x) => filterText.get(x)
-            ),
-          },
+          getUuidColumnProps<typeof nodes[0]>(
+            onFilterTextChange,
+            (x) => filterText.get(x),
+            paths.component
+          ),
+          getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+            filterText.get(x)
+          ),
+          getAbbreviationColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+            filterText.get(x)
+          ),
+          getDescriptionColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+            filterText.get(x)
+          ),
+          getFilterableEnumListColumnProps<typeof nodes[0], ComponentCategory>(
+            "Categories",
+            "categories",
+            Object.entries(ComponentCategory),
+            (record) => record.categories,
+            onFilterTextChange,
+            (x) => filterText.get(x)
+          ),
         ]}
         dataSource={nodes}
       />

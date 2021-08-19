@@ -38,27 +38,21 @@ function Page() {
       <Table
         loading={loading}
         columns={[
-          {
-            ...getUuidColumnProps<typeof nodes[0]>(
-              onFilterTextChange,
-              (x) => filterText.get(x),
-              paths.user
-            ),
-          },
-          {
-            ...getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
-            ),
-          },
-          {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Email",
-              "email",
-              (record) => record.email,
-              onFilterTextChange,
-              (x) => filterText.get(x)
-            ),
-          },
+          getUuidColumnProps<typeof nodes[0]>(
+            onFilterTextChange,
+            (x) => filterText.get(x),
+            paths.user
+          ),
+          getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+            filterText.get(x)
+          ),
+          getFilterableStringColumnProps<typeof nodes[0]>(
+            "Email",
+            "email",
+            (record) => record.email,
+            onFilterTextChange,
+            (x) => filterText.get(x)
+          ),
         ]}
         dataSource={nodes}
       />
