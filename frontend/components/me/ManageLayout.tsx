@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
-import { Skeleton, Layout as AntLayout, Menu } from "antd";
+import { Skeleton, Layout as AntLayout, Menu, Result } from "antd";
 import Layout from "../Layout";
 import paths from "../../paths";
 
@@ -45,10 +45,22 @@ export default function ManageLayout({ children }: ManageLayoutProps) {
     }
   }, [router, shouldRedirect]);
 
+  if (loading) {
+    return (
+      <Layout>
+        <Skeleton active avatar title />
+      </Layout>
+    );
+  }
+
   if (!currentUser) {
     return (
       <Layout>
-        <Skeleton />
+        <Result
+          status="500"
+          title="500"
+          subTitle="Sorry, something went wrong."
+        />
       </Layout>
     );
   }
