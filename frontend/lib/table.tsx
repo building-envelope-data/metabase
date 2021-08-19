@@ -6,6 +6,7 @@ import {
   highlight,
 } from "./freeTextFilter";
 import Link from "next/link";
+import { Scalars } from "../__generated__/__types__";
 
 const sortDirections: SortOrder[] = ["ascend", "descend"];
 
@@ -50,6 +51,35 @@ export function getColumnProps<RecordType>(
     title: title,
     key: key,
     // dataIndex: key,
+  };
+}
+
+export function getDateTimeColumnProps<RecordType>(
+  title: string,
+  key: keyof RecordType,
+  getValue: (record: RecordType) => Scalars["DateTime"] | null | undefined
+) {
+  return {
+    ...getColumnProps(title, key),
+    sorter: (a: RecordType, b: RecordType) =>
+      compare(
+        getValue(a),
+        getValue(b),
+        (x, y) => Date.parse(y) - Date.parse(x)
+      ),
+    sortDirections: sortDirections,
+  };
+}
+
+export function getTimestampColumnProps<
+  RecordType extends { timestamp: string }
+>() {
+  return {
+    ...getDateTimeColumnProps<RecordType>(
+      "Timestamp",
+      "timestamp",
+      (record) => record.timestamp
+    ),
   };
 }
 
@@ -158,6 +188,55 @@ export function getUuidColumnProps<RecordType extends { uuid: string }>(
     onFilterTextChange,
     getFilterText,
     (record) => getPath(record.uuid)
+  );
+}
+
+export function getNameColumnProps<RecordType extends { name?: string | null }>(
+  onFilterTextChange: (
+    key: keyof RecordType
+  ) => (newFilterText: string) => void,
+  getFilterText: (key: keyof RecordType) => string | undefined
+) {
+  return getFilterableStringColumnProps(
+    "Name",
+    "name",
+    (record) => record.name,
+    onFilterTextChange,
+    getFilterText
+  );
+}
+
+export function getDescriptionColumnProps<
+  RecordType extends { description?: string | null }
+>(
+  onFilterTextChange: (
+    key: keyof RecordType
+  ) => (newFilterText: string) => void,
+  getFilterText: (key: keyof RecordType) => string | undefined
+) {
+  return getFilterableStringColumnProps(
+    "Description",
+    "description",
+    (record) => record.description,
+    onFilterTextChange,
+    getFilterText
+  );
+}
+
+export function getAbbreviationColumnProps<
+  RecordType extends { abbreviation?: string | null }
+>(
+  onFilterTextChange: (
+    key: keyof RecordType
+  ) => (newFilterText: string) => void,
+  getFilterText: (key: keyof RecordType) => string | undefined
+) {
+  return getFilterableStringColumnProps(
+    "Abbreviation",
+    "abbreviation",
+    (record) => record.abbreviation,
+    onFilterTextChange,
+    getFilterText
   );
 }
 

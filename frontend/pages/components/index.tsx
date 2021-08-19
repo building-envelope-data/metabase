@@ -6,8 +6,10 @@ import paths from "../../paths";
 import { setMapValue } from "../../lib/freeTextFilter";
 import { ComponentCategory } from "../../__generated__/__types__";
 import {
+  getAbbreviationColumnProps,
+  getDescriptionColumnProps,
   getFilterableEnumListColumnProps,
-  getFilterableStringColumnProps,
+  getNameColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
 import Link from "next/link";
@@ -44,28 +46,18 @@ function Page() {
             ),
           },
           {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Name",
-              "name",
-              (record) => record.name,
+            ...getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+              filterText.get(x)
+            ),
+          },
+          {
+            ...getAbbreviationColumnProps<typeof nodes[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Abbreviation",
-              "abbreviation",
-              (record) => record.abbreviation,
-              onFilterTextChange,
-              (x) => filterText.get(x)
-            ),
-          },
-          {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Description",
-              "description",
-              (record) => record.description,
+            ...getDescriptionColumnProps<typeof nodes[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),

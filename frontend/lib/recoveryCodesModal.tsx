@@ -1,6 +1,6 @@
 import { Modal, Typography, List } from "antd";
 
-const recoveryCodesModal = (recoveryCodes: string[]) => {
+export function recoveryCodesModal(recoveryCodes: string[]) {
   Modal.success({
     title: "New Recovery Codes",
     content: (
@@ -20,6 +20,4 @@ const recoveryCodesModal = (recoveryCodes: string[]) => {
       </div>
     ),
   });
-};
-
-export default recoveryCodesModal;
+}

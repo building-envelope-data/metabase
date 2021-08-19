@@ -3,6 +3,7 @@ fragment DataPartial on Data {
   timestamp
   componentId
   name
+  description
   appliedMethod {
     methodId
   }

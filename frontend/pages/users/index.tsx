@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
   getFilterableStringColumnProps,
+  getNameColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
 import Link from "next/link";
@@ -45,12 +46,8 @@ function Page() {
             ),
           },
           {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Name",
-              "name",
-              (record) => record.name,
-              onFilterTextChange,
-              (x) => filterText.get(x)
+            ...getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+              filterText.get(x)
             ),
           },
           {

@@ -10,7 +10,9 @@ import { UserRole } from "../../__generated__/__types__";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
   getExternallyLinkedFilterableLocatorColumnProps,
-  getFilterableStringColumnProps,
+  getNameColumnProps,
+  getAbbreviationColumnProps,
+  getDescriptionColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
 
@@ -56,28 +58,18 @@ function Page() {
             ),
           },
           {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Name",
-              "name",
-              (record) => record.name,
+            ...getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+              filterText.get(x)
+            ),
+          },
+          {
+            ...getAbbreviationColumnProps<typeof nodes[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Abbreviation",
-              "abbreviation",
-              (record) => record.description,
-              onFilterTextChange,
-              (x) => filterText.get(x)
-            ),
-          },
-          {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Description",
-              "description",
-              (record) => record.description,
+            ...getDescriptionColumnProps<typeof nodes[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),

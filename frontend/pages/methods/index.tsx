@@ -7,7 +7,8 @@ import { setMapValue } from "../../lib/freeTextFilter";
 import {
   getExternallyLinkedFilterableLocatorColumnProps,
   getFilterableEnumListColumnProps,
-  getFilterableStringColumnProps,
+  getNameColumnProps,
+  getDescriptionColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
 import { MethodCategory } from "../../__generated__/__types__";
@@ -45,19 +46,12 @@ function Page() {
             ),
           },
           {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Name",
-              "name",
-              (record) => record.name,
-              onFilterTextChange,
-              (x) => filterText.get(x)
+            ...getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+              filterText.get(x)
             ),
           },
           {
-            ...getFilterableStringColumnProps<typeof nodes[0]>(
-              "Description",
-              "description",
-              (record) => record.description,
+            ...getDescriptionColumnProps<typeof nodes[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),

@@ -22,8 +22,11 @@ import Link from "next/link";
 import paths from "../../paths";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
+  getDescriptionColumnProps,
   getFilterableDescriptionListColumnProps,
   getInternallyLinkedFilterableStringColumnProps,
+  getNameColumnProps,
+  getTimestampColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
 
@@ -392,10 +395,18 @@ function Page() {
             ),
           },
           {
-            title: "Timestamp",
-            key: "timestamp",
-            sorter: (a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp),
-            sortDirections: ["ascend", "descend"],
+            ...getNameColumnProps<typeof data[0]>(onFilterTextChange, (x) =>
+              filterText.get(x)
+            ),
+          },
+          {
+            ...getDescriptionColumnProps<typeof data[0]>(
+              onFilterTextChange,
+              (x) => filterText.get(x)
+            ),
+          },
+          {
+            ...getTimestampColumnProps<typeof data[0]>(),
           },
           {
             ...getInternallyLinkedFilterableStringColumnProps<typeof data[0]>(
