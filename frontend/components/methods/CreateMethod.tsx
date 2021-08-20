@@ -184,14 +184,14 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           <Input />
         </Form.Item>
         <Form.Item label="Categories" name="categories" initialValue={[]}>
-          <Select mode="multiple" placeholder="Please select">
-            <Select.Option value={MethodCategory.Measurement}>
-              Measurement
-            </Select.Option>
-            <Select.Option value={MethodCategory.Calculation}>
-              Calculation
-            </Select.Option>
-          </Select>
+          <Select
+            mode="multiple"
+            placeholder="Please select"
+            options={Object.entries(MethodCategory).map(([_key, value]) => ({
+              label: value,
+              value: value,
+            }))}
+          />
         </Form.Item>
         <Form.Item
           label="Institution Developers"
