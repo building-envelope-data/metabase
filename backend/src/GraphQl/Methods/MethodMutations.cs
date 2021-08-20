@@ -165,7 +165,7 @@ namespace Metabase.GraphQl.Methods
                                 webAddress: input.Publication.WebAddress
                 )
             };
-            foreach (var institutionDeveloperId in input.InstitutionDeveloperIds)
+            foreach (var institutionDeveloperId in input.InstitutionDeveloperIds.Distinct())
             {
                 method.InstitutionDeveloperEdges.Add(
                     new Data.InstitutionMethodDeveloper
@@ -175,7 +175,7 @@ namespace Metabase.GraphQl.Methods
                     }
                 );
             }
-            foreach (var userDeveloperId in input.UserDeveloperIds)
+            foreach (var userDeveloperId in input.UserDeveloperIds.Distinct())
             {
                 method.UserDeveloperEdges.Add(
                     new Data.UserMethodDeveloper
