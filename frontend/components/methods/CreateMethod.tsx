@@ -1,15 +1,5 @@
 import * as React from "react";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import {
-  DatePicker,
-  Select,
-  Alert,
-  Form,
-  Input,
-  Button,
-  InputNumber,
-  Divider,
-} from "antd";
+import { DatePicker, Select, Alert, Form, Input, Button, Divider } from "antd";
 import {
   useCreateMethodMutation,
   MethodsDocument,
@@ -19,13 +9,13 @@ import {
   CreateStandardInput,
   MethodCategory,
   Scalars,
-  Standardizer,
 } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
 import { SelectMultipleInstitutionIds } from "../SelectMultipleInstitutionIds";
 import { SelectMultipleUserIds } from "../SelectMultipleUserIds";
+import { ReferenceForm } from "../ReferenceForm";
 
 const layout = {
   labelCol: { span: 8 },
@@ -35,15 +25,28 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  name: string;
+  description: string;
+  validity:
+    | [moment.Moment | null | undefined, moment.Moment | null | undefined]
+    | null
+    | undefined;
+  availability:
+    | [moment.Moment | null | undefined, moment.Moment | null | undefined]
+    | null
+    | undefined;
+  standard: CreateStandardInput | null | undefined;
+  publication: CreatePublicationInput | null | undefined;
+  calculationLocator: Scalars["Url"] | null | undefined;
+  categories: MethodCategory[] | null | undefined;
+  institutionDeveloperIds: Scalars["Uuid"][] | null | undefined;
+  userDeveloperIds: Scalars["Uuid"][] | null | undefined;
+};
+
 export type CreateMethodProps = {
   managerId: Scalars["Uuid"];
 };
-
-enum Reference {
-  None = "None",
-  Standard = "Standard",
-  Publication = "Publication",
-}
 
 export default function CreateMethod({ managerId }: CreateMethodProps) {
   const [createMethodMutation] = useCreateMethodMutation({
@@ -64,12 +67,8 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
-
-  const [selectedReferenceOption, setSelectedReferenceOption] = useState(
-    Reference.None
-  );
 
   const onFinish = ({
     name,
@@ -82,24 +81,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
     categories,
     institutionDeveloperIds,
     userDeveloperIds,
-  }: {
-    name: string;
-    description: string;
-    validity:
-      | [moment.Moment | null | undefined, moment.Moment | null | undefined]
-      | null
-      | undefined;
-    availability:
-      | [moment.Moment | null | undefined, moment.Moment | null | undefined]
-      | null
-      | undefined;
-    standard: CreateStandardInput | undefined;
-    publication: CreatePublicationInput | undefined;
-    calculationLocator: Scalars["Url"] | undefined;
-    categories: MethodCategory[] | undefined;
-    institutionDeveloperIds: Scalars["Uuid"][] | undefined;
-    userDeveloperIds: Scalars["Uuid"][] | undefined;
-  }) => {
+  }: FormValues) => {
     const create = async () => {
       try {
         setCreating(true);
@@ -143,24 +125,6 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
 
   const onFinishFailed = () => {
     setGlobalErrorMessages(["Fix the errors below."]);
-  };
-
-  const onReferenceChange = (value: Reference) => {
-    switch (value) {
-      case Reference.None:
-        form.setFieldsValue({ standard: null });
-        form.setFieldsValue({ publication: null });
-        break;
-      case Reference.Publication:
-        form.setFieldsValue({ standard: null });
-        break;
-      case Reference.Standard:
-        form.setFieldsValue({ publication: null });
-        break;
-      default:
-        console.error("Impossible!");
-    }
-    setSelectedReferenceOption(value);
   };
 
   return (
@@ -244,148 +208,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           <SelectMultipleUserIds />
         </Form.Item>
         <Divider />
-        <Form.Item
-          label="Reference"
-          name="reference"
-          initialValue={Reference.None}
-        >
-          <Select
-            options={[
-              { label: "None", value: Reference.None },
-              { label: "Standard", value: Reference.Standard },
-              { label: "Publication", value: Reference.Publication },
-            ]}
-            onChange={onReferenceChange}
-          />
-        </Form.Item>
-        {selectedReferenceOption === Reference.Publication && (
-          <>
-            <Form.Item label="Title" name={["publication", "title"]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="Abstract" name={["publication", "abstract"]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="Section" name={["publication", "section"]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="arXiv" name={["publication", "arXiv"]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="DOI" name={["publication", "doi"]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="URN" name={["publication", "urn"]}>
-              <Input />
-            </Form.Item>
-            <Form.Item
-              label="WebAddress"
-              name={["publication", "webAddress"]}
-              rules={[
-                {
-                  type: "url",
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.List name={["publication", "authors"]}>
-              {(fields, { add, remove }, { errors }) => (
-                <>
-                  {fields.map((field, index) => (
-                    <Form.Item
-                      key={field.key}
-                      label={index === 0 ? "Authors" : " "}
-                    >
-                      <Input.Group>
-                        <Form.Item {...field} noStyle>
-                          <Input style={{ width: "90%" }} />
-                        </Form.Item>
-                        <MinusCircleOutlined
-                          style={{ width: "10%" }}
-                          onClick={() => remove(field.name)}
-                        />
-                      </Input.Group>
-                    </Form.Item>
-                  ))}
-                  <Form.Item {...tailLayout}>
-                    <Button
-                      type="dashed"
-                      onClick={() => add()}
-                      style={{ width: "100%" }}
-                      icon={<PlusOutlined />}
-                    >
-                      Add author
-                    </Button>
-                    <Form.ErrorList errors={errors} />
-                  </Form.Item>
-                </>
-              )}
-            </Form.List>
-          </>
-        )}
-        {selectedReferenceOption === Reference.Standard && (
-          <>
-            <Form.Item label="Title" name={["standard", "title"]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="Abstract" name={["standard", "abstract"]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="Section" name={["standard", "section"]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="Numeration">
-              <Input.Group>
-                <Form.Item
-                  noStyle
-                  name={["standard", "numeration", "mainNumber"]}
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input placeholder="Main Number" />
-                </Form.Item>
-                <Form.Item noStyle name={["standard", "numeration", "prefix"]}>
-                  <Input placeholder="Prefix" />
-                </Form.Item>
-                <Form.Item noStyle name={["standard", "numeration", "suffix"]}>
-                  <Input placeholder="Suffix" />
-                </Form.Item>
-              </Input.Group>
-            </Form.Item>
-            <Form.Item label="Year" name={["standard", "year"]}>
-              <InputNumber />
-            </Form.Item>
-            <Form.Item
-              label="Locator"
-              name={["standard", "locator"]}
-              rules={[
-                {
-                  type: "url",
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              label="Standardizers"
-              name={["standard", "standardizers"]}
-              initialValue={[]}
-            >
-              <Select
-                mode="multiple"
-                placeholder="Please select"
-                options={Object.entries(Standardizer).map(([_key, value]) => ({
-                  label: value,
-                  value: value,
-                }))}
-              />
-            </Form.Item>
-          </>
-        )}
+        <ReferenceForm form={form} />
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>
             Create
