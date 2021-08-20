@@ -18,7 +18,7 @@ import paths from "../../../paths";
 import { handleFormErrors } from "../../../lib/form";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode.react";
-import recoveryCodesModal from "../../../lib/recoveryCodesModal";
+import { recoveryCodesModal } from "../../../lib/recoveryCodesModal";
 
 const layout = {
   labelCol: { span: 8 },

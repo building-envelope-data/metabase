@@ -22,72 +22,72 @@ function Page() {
         columns={[
           {
             title: "clientId",
-            dataPage: "clientId",
+            dataIndex: "clientId",
             key: "clientId",
           },
           {
             title: "clientSecret",
-            dataPage: "clientSecret",
+            dataIndex: "clientSecret",
             key: "clientSecret",
           },
           {
             title: "concurrencyToken",
-            dataPage: "concurrencyToken",
+            dataIndex: "concurrencyToken",
             key: "concurrencyToken",
           },
           {
             title: "consentType",
-            dataPage: "consentType",
+            dataIndex: "consentType",
             key: "consentType",
           },
           {
             title: "displayName",
-            dataPage: "displayName",
+            dataIndex: "displayName",
             key: "displayName",
           },
           {
             title: "displayNames",
-            dataPage: "displayNames",
+            dataIndex: "displayNames",
             key: "displayNames",
           },
           {
             title: "id",
-            dataPage: "id",
+            dataIndex: "id",
             key: "id",
           },
           {
             title: "permissions",
-            dataPage: "permissions",
+            dataIndex: "permissions",
             key: "permissions",
           },
           {
             title: "postLogoutRedirectUris",
-            dataPage: "postLogoutRedirectUris",
+            dataIndex: "postLogoutRedirectUris",
             key: "postLogoutRedirectUris",
           },
           {
             title: "properties",
-            dataPage: "properties",
+            dataIndex: "properties",
             key: "properties",
           },
           {
             title: "redirectUris",
-            dataPage: "redirectUris",
+            dataIndex: "redirectUris",
             key: "redirectUris",
           },
           {
             title: "requirements",
-            dataPage: "requirements",
+            dataIndex: "requirements",
             key: "requirements",
           },
           {
             title: "type",
-            dataPage: "type",
+            dataIndex: "type",
             key: "type",
           },
           //   {
           //     title: "authorizations",
-          //     dataPage: "authorizations",
+          //     dataIndex: "authorizations",
           //     key: "authorizations",
           //     render: (_value, record, _index) => (
           //     ),
@@ -101,47 +101,47 @@ function Page() {
         columns={[
           {
             title: "concurrencyToken",
-            dataPage: "concurrencyToken",
+            dataIndex: "concurrencyToken",
             key: "concurrencyToken",
           },
           {
             title: "creationDate",
-            dataPage: "creationDate",
+            dataIndex: "creationDate",
             key: "creationDate",
           },
           {
             title: "id",
-            dataPage: "id",
+            dataIndex: "id",
             key: "id",
           },
           {
             title: "properties",
-            dataPage: "properties",
+            dataIndex: "properties",
             key: "properties",
           },
           {
             title: "scopes",
-            dataPage: "scopes",
+            dataIndex: "scopes",
             key: "scopes",
           },
           {
             title: "status",
-            dataPage: "status",
+            dataIndex: "status",
             key: "status",
           },
           {
             title: "subject",
-            dataPage: "subject",
+            dataIndex: "subject",
             key: "subject",
           },
           {
             title: "type",
-            dataPage: "type",
+            dataIndex: "type",
             key: "type",
           },
           //   {
           //     title: "tokens",
-          //     dataPage: "tokens",
+          //     dataIndex: "tokens",
           //     key: "tokens",
           //     render: (_value, record, _index) => (
           //     ),
@@ -155,57 +155,57 @@ function Page() {
         columns={[
           {
             title: "concurrencyToken",
-            dataPage: "concurrencyToken",
+            dataIndex: "concurrencyToken",
             key: "concurrencyToken",
           },
           {
             title: "creationDate",
-            dataPage: "creationDate",
+            dataIndex: "creationDate",
             key: "creationDate",
           },
           {
             title: "expirationDate",
-            dataPage: "expirationDate",
+            dataIndex: "expirationDate",
             key: "expirationDate",
           },
           {
             title: "id",
-            dataPage: "id",
+            dataIndex: "id",
             key: "id",
           },
           {
             title: "payload",
-            dataPage: "payload",
+            dataIndex: "payload",
             key: "payload",
           },
           {
             title: "properties",
-            dataPage: "properties",
+            dataIndex: "properties",
             key: "properties",
           },
           {
             title: "redemptionDate",
-            dataPage: "redemptionDate",
+            dataIndex: "redemptionDate",
             key: "redemptionDate",
           },
           {
             title: "referenceId",
-            dataPage: "referenceId",
+            dataIndex: "referenceId",
             key: "referenceId",
           },
           {
             title: "status",
-            dataPage: "status",
+            dataIndex: "status",
             key: "status",
           },
           {
             title: "subject",
-            dataPage: "subject",
+            dataIndex: "subject",
             key: "subject",
           },
           {
             title: "type",
-            dataPage: "type",
+            dataIndex: "type",
             key: "type",
           },
         ]}
@@ -217,47 +217,47 @@ function Page() {
         columns={[
           {
             title: "concurrencyToken",
-            dataPage: "concurrencyToken",
+            dataIndex: "concurrencyToken",
             key: "concurrencyToken",
           },
           {
             title: "description",
-            dataPage: "description",
+            dataIndex: "description",
             key: "description",
           },
           {
             title: "descriptions",
-            dataPage: "descriptions",
+            dataIndex: "descriptions",
             key: "descriptions",
           },
           {
             title: "displayName",
-            dataPage: "displayName",
+            dataIndex: "displayName",
             key: "displayName",
           },
           {
             title: "displayNames",
-            dataPage: "displayNames",
+            dataIndex: "displayNames",
             key: "displayNames",
           },
           {
             title: "id",
-            dataPage: "id",
+            dataIndex: "id",
             key: "id",
           },
           {
             title: "name",
-            dataPage: "name",
+            dataIndex: "name",
             key: "name",
           },
           {
             title: "properties",
-            dataPage: "properties",
+            dataIndex: "properties",
             key: "properties",
           },
           {
             title: "resources",
-            dataPage: "resources",
+            dataIndex: "resources",
             key: "resources",
           },
         ]}

@@ -48,6 +48,7 @@ fragment OpticalDataPartial on OpticalData {
   timestamp
   componentId
   name
+  description
   appliedMethod {
     methodId
   }
@@ -65,6 +66,10 @@ fragment OpticalDataPartial on OpticalData {
   # though, the result returned by the query `AllOpticalData` does not include
   # the fields above. Why?
   nearnormalHemisphericalVisibleTransmittances
+  nearnormalHemisphericalSolarReflectances
+  nearnormalHemisphericalSolarTransmittances
+  nearnormalHemisphericalVisibleReflectances
+  infraredEmittances
 }
 
 query AllOpticalData($where: OpticalDataPropositionInput!) {

@@ -11,23 +11,22 @@ import { Button, Alert, message, Skeleton, Typography } from "antd";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import paths from "../../../paths";
-import recoveryCodesModal from "../../../lib/recoveryCodesModal";
+import { recoveryCodesModal } from "../../../lib/recoveryCodesModal";
 
 function Page() {
   const { error, data } = useTwoFactorAuthenticationQuery();
   const twoFactorAuthentication = data?.currentUser?.twoFactorAuthentication;
 
-  const [
-    forgetUserTwoFactorAuthenticationClientMutation,
-  ] = useForgetUserTwoFactorAuthenticationClientMutation({
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: TwoFactorAuthenticationDocument,
-      },
-    ],
-  });
+  const [forgetUserTwoFactorAuthenticationClientMutation] =
+    useForgetUserTwoFactorAuthenticationClientMutation({
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: TwoFactorAuthenticationDocument,
+        },
+      ],
+    });
   const [
     forgettingUserTwoFactorAuthenticationClient,
     setForgettingUserTwoFactorAuthenticationClient,
@@ -35,10 +34,8 @@ function Page() {
   const forgetUserTwoFactorAuthenticationClient = async () => {
     try {
       setForgettingUserTwoFactorAuthenticationClient(true);
-      const {
-        errors,
-        data,
-      } = await forgetUserTwoFactorAuthenticationClientMutation();
+      const { errors, data } =
+        await forgetUserTwoFactorAuthenticationClientMutation();
       if (errors) {
         console.log(errors); // TODO What to do?
       } else if (data?.forgetUserTwoFactorAuthenticationClient?.errors) {
@@ -58,17 +55,16 @@ function Page() {
     }
   };
 
-  const [
-    disableUserTwoFactorAuthenticationMutation,
-  ] = useDisableUserTwoFactorAuthenticationMutation({
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: TwoFactorAuthenticationDocument,
-      },
-    ],
-  });
+  const [disableUserTwoFactorAuthenticationMutation] =
+    useDisableUserTwoFactorAuthenticationMutation({
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: TwoFactorAuthenticationDocument,
+        },
+      ],
+    });
   const [
     disablingUserTwoFactorAuthentication,
     setDisablingUserTwoFactorAuthentication,
@@ -76,10 +72,8 @@ function Page() {
   const disableUserTwoFactorAuthentication = async () => {
     try {
       setDisablingUserTwoFactorAuthentication(true);
-      const {
-        errors,
-        data,
-      } = await disableUserTwoFactorAuthenticationMutation();
+      const { errors, data } =
+        await disableUserTwoFactorAuthenticationMutation();
       if (errors) {
         console.log(errors); // TODO What to do?
       } else if (data?.disableUserTwoFactorAuthentication?.errors) {
@@ -99,17 +93,16 @@ function Page() {
     }
   };
 
-  const [
-    resetUserTwoFactorAuthenticatorMutation,
-  ] = useResetUserTwoFactorAuthenticatorMutation({
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: TwoFactorAuthenticationDocument,
-      },
-    ],
-  });
+  const [resetUserTwoFactorAuthenticatorMutation] =
+    useResetUserTwoFactorAuthenticatorMutation({
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: TwoFactorAuthenticationDocument,
+        },
+      ],
+    });
   const [
     resettingUserTwoFactorAuthenticator,
     setResettingUserTwoFactorAuthenticator,
@@ -137,17 +130,16 @@ function Page() {
     }
   };
 
-  const [
-    generateUserTwoFactorRecoveryCodesMutation,
-  ] = useGenerateUserTwoFactorRecoveryCodesMutation({
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: TwoFactorAuthenticationDocument,
-      },
-    ],
-  });
+  const [generateUserTwoFactorRecoveryCodesMutation] =
+    useGenerateUserTwoFactorRecoveryCodesMutation({
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: TwoFactorAuthenticationDocument,
+        },
+      ],
+    });
   const [
     generatingUserTwoFactorRecoveryCodes,
     setGeneratingUserTwoFactorRecoveryCodes,
@@ -155,10 +147,8 @@ function Page() {
   const generateUserTwoFactorRecoveryCodes = async () => {
     try {
       setGeneratingUserTwoFactorRecoveryCodes(true);
-      const {
-        errors,
-        data,
-      } = await generateUserTwoFactorRecoveryCodesMutation();
+      const { errors, data } =
+        await generateUserTwoFactorRecoveryCodesMutation();
       if (errors) {
         console.log(errors); // TODO What to do?
       } else if (data?.generateUserTwoFactorRecoveryCodes?.errors) {

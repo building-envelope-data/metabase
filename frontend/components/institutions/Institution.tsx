@@ -164,7 +164,11 @@ export default function Institution({ institutionId }: InstitutionProps) {
         .filter((x) => x != null)
         .join(" ")}
       subTitle={institution.description}
-      tags={[<Tag color="magenta">{institution.state}</Tag>]}
+      tags={[
+        <Tag key={institution.state} color="magenta">
+          {institution.state}
+        </Tag>,
+      ]}
       backIcon={false}
     >
       <Descriptions size="small" column={1}>

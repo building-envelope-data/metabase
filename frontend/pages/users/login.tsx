@@ -92,7 +92,7 @@ function Login() {
         <Col>
           <Card title="Login">
             <Typography.Paragraph style={{ maxWidth: 768 }}>
-              You don't need to login to query the{" "}
+              You don&apos;t need to login to query the{" "}
               <Link href={paths.data}>data</Link> for free! However, if you want
               to change information about{" "}
               <Link href={paths.institutions}>institutions</Link>,{" "}
