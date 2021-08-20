@@ -1,13 +1,16 @@
-import { Scalars } from "../__generated__/__types__";
 import { Select } from "antd";
 
-export type SelectMultipleViaSearchProps = {
-  options: { label: string; value: Scalars["Uuid"] }[];
+export type SelectMultipleViaSearchProps<ValueType> = {
+  options: { label: string; value: ValueType }[];
+  value?: ValueType;
+  onChange?: (value: ValueType) => void;
 };
 
-export function SelectMultipleViaSearch({
+export function SelectMultipleViaSearch<ValueType extends string>({
   options,
-}: SelectMultipleViaSearchProps) {
+  value,
+  onChange,
+}: SelectMultipleViaSearchProps<ValueType>) {
   return (
     <Select
       showSearch
@@ -25,6 +28,8 @@ export function SelectMultipleViaSearch({
               .localeCompare(optionB.label.toLocaleString("en"), "en")
           : 0
       }
+      value={value}
+      onChange={onChange}
     />
   );
 }

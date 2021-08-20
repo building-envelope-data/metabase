@@ -246,28 +246,28 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           name="institutionDeveloperIds"
           initialValue={[]}
         >
-          {/* TODO Why can't this component not be used as component but just as method? If we use it as component `*DeveloperIds` is always `[]` when the form is submitted. */}
-          {SelectMultipleViaSearch({
-            options:
+          <SelectMultipleViaSearch
+            options={
               institutions?.map((institution) => ({
                 label: institution.name,
                 value: institution.uuid,
-              })) || [],
-          })}
+              })) || []
+            }
+          />
         </Form.Item>
         <Form.Item
           label="User Developers"
           name="userDeveloperIds"
           initialValue={[]}
         >
-          {/* TODO Why can't this component not be used as component but just as method? If we use it as component `*DeveloperIds` is always `[]` when the form is submitted. */}
-          {SelectMultipleViaSearch({
-            options:
+          <SelectMultipleViaSearch
+            options={
               users?.map((user) => ({
                 label: user.name,
                 value: user.uuid,
-              })) || [],
-          })}
+              })) || []
+            }
+          />
         </Form.Item>
         <Divider />
         <Form.Item
