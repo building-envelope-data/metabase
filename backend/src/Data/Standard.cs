@@ -10,7 +10,6 @@ namespace Metabase.Data
     public sealed class Standard
     : IReference
     {
-        [Required]
         [MinLength(1)]
         public string? Title { get; private set; }
 
