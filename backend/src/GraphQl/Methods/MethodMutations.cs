@@ -171,7 +171,7 @@ namespace Metabase.GraphQl.Methods
                     new Data.InstitutionMethodDeveloper
                     {
                         InstitutionId = institutionDeveloperId,
-                        Pending = true
+                        Pending = institutionDeveloperId != input.ManagerId
                     }
                 );
             }
