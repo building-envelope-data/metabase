@@ -9,7 +9,7 @@ import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import * as moment from "moment";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
-import { SelectMultipleInstitutionIds } from "../SelectMultipleInstitutionIds";
+import { SelectInstitutionId } from "../SelectInstitutionId";
 
 const layout = {
   labelCol: { span: 8 },
@@ -152,7 +152,7 @@ export default function CreateComponent({
           />
         </Form.Item>
         <Form.Item label="Further Manufacturers" name="furtherManufacturerIds">
-          <SelectMultipleInstitutionIds />
+          <SelectInstitutionId mode="multiple" />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>

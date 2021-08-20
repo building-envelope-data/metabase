@@ -13,8 +13,8 @@ import {
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
-import { SelectMultipleInstitutionIds } from "../SelectMultipleInstitutionIds";
-import { SelectMultipleUserIds } from "../SelectMultipleUserIds";
+import { SelectInstitutionId } from "../SelectInstitutionId";
+import { SelectUserId } from "../SelectUserId";
 import { ReferenceForm } from "../ReferenceForm";
 
 const layout = {
@@ -198,14 +198,14 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           name="institutionDeveloperIds"
           initialValue={[]}
         >
-          <SelectMultipleInstitutionIds />
+          <SelectInstitutionId mode="multiple" />
         </Form.Item>
         <Form.Item
           label="User Developers"
           name="userDeveloperIds"
           initialValue={[]}
         >
-          <SelectMultipleUserIds />
+          <SelectUserId mode="multiple" />
         </Form.Item>
         <Divider />
         <ReferenceForm form={form} />

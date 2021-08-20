@@ -6,7 +6,7 @@ import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
-import { useUsersQuery } from "../../queries/users.graphql";
+import { SelectUserId } from "../SelectUserId";
 
 const layout = {
   labelCol: { span: 8 },
@@ -41,7 +41,6 @@ export default function AddInstitutionRepresentative({
   );
   const [form] = Form.useForm();
   const [adding, setAdding] = useState(false);
-  const usersQuery = useUsersQuery();
 
   const onFinish = ({
     userId,
@@ -106,15 +105,7 @@ export default function AddInstitutionRepresentative({
             },
           ]}
         >
-          <Select
-            placeholder="Please select"
-            options={
-              usersQuery.data?.users?.nodes?.map((user) => ({
-                label: user.name,
-                value: user.uuid,
-              })) || []
-            }
-          />
+          <SelectUserId />
         </Form.Item>
         <Form.Item
           label="Role"
@@ -125,14 +116,12 @@ export default function AddInstitutionRepresentative({
             },
           ]}
         >
-          <Select placeholder="Please select">
-            <Select.Option value={InstitutionRepresentativeRole.Owner}>
-              Owner
-            </Select.Option>
-            <Select.Option value={InstitutionRepresentativeRole.Assistant}>
-              Assistant
-            </Select.Option>
-          </Select>
+          <Select
+            placeholder="Please select"
+            options={Object.entries(InstitutionRepresentativeRole).map(
+              ([_key, value]) => ({ label: value, value: value })
+            )}
+          />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={adding}>

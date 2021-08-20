@@ -1,20 +1,22 @@
 import { Select } from "antd";
 
-export type SelectMultipleViaSearchProps<ValueType> = {
+export type SearchSelectProps<ValueType> = {
   options: { label: string; value: ValueType }[];
+  mode?: "multiple" | "tags";
   value?: ValueType;
   onChange?: (value: ValueType) => void;
 };
 
-export function SelectMultipleViaSearch<ValueType extends string>({
+export function SearchSelect<ValueType extends string>({
   options,
+  mode,
   value,
   onChange,
-}: SelectMultipleViaSearchProps<ValueType>) {
+}: SearchSelectProps<ValueType>) {
   return (
     <Select
       showSearch
-      mode="multiple"
+      mode={mode}
       placeholder="Please select"
       options={options}
       optionFilterProp="label"

@@ -1,17 +1,19 @@
 import { Skeleton, Result } from "antd";
-import { SelectMultipleViaSearch } from "./SelectMultipleViaSearch";
+import { SearchSelect } from "./SearchSelect";
 import { notEmpty } from "../lib/array";
 import { useInstitutionsQuery } from "../queries/institutions.graphql";
 
-export type SelectMultipleInstitutionIdsProps<ValueType> = {
+export type SelectInstitutionIdProps<ValueType> = {
+  mode?: "multiple" | "tags";
   value?: ValueType;
   onChange?: (value: ValueType) => void;
 };
 
-export function SelectMultipleInstitutionIds<ValueType extends string>({
+export function SelectInstitutionId<ValueType extends string>({
+  mode,
   value,
   onChange,
-}: SelectMultipleInstitutionIdsProps<ValueType>) {
+}: SelectInstitutionIdProps<ValueType>) {
   // TODO Only fetch `name` and `uuid` because nothing more is needed.
   // TODO Use search instead of drop-down with all users/institutions preloaded. Be inspired by https://ant.design/components/select/#components-select-demo-select-users
   const { loading, data, error } = useInstitutionsQuery();
@@ -30,8 +32,9 @@ export function SelectMultipleInstitutionIds<ValueType extends string>({
   }
 
   return (
-    <SelectMultipleViaSearch
+    <SearchSelect
       value={value}
+      mode={mode}
       onChange={onChange}
       options={
         institutions?.map((institution) => ({
