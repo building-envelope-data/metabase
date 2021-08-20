@@ -9,6 +9,7 @@ import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import * as moment from "moment";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { SelectMultipleInstitutionIds } from "../SelectMultipleInstitutionIds";
 
 const layout = {
   labelCol: { span: 8 },
@@ -52,12 +53,14 @@ export default function CreateComponent({
     description,
     availability,
     categories,
+    furtherManufacturerIds,
   }: {
     name: string;
     abbreviation: string | null;
     description: string;
     availability: [moment.Moment | null, moment.Moment | null] | null;
     categories: ComponentCategory[];
+    furtherManufacturerIds: Scalars["Uuid"];
   }) => {
     const create = async () => {
       try {
@@ -71,6 +74,7 @@ export default function CreateComponent({
             availability: { from: availability?.[0], to: availability?.[1] },
             categories: categories || [],
             manufacturerId: manufacturerId,
+            furtherManufacturerIds: furtherManufacturerIds,
           },
         });
         handleFormErrors(
@@ -138,13 +142,17 @@ export default function CreateComponent({
           <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
         </Form.Item>
         <Form.Item label="Categories" name="categories">
-          <Select mode="multiple" placeholder="Please select">
-            <Select.Option value={ComponentCategory.Layer}>Layer</Select.Option>
-            <Select.Option value={ComponentCategory.Unit}>Unit</Select.Option>
-            <Select.Option value={ComponentCategory.Material}>
-              Material
-            </Select.Option>
-          </Select>
+          <Select
+            mode="multiple"
+            placeholder="Please select"
+            options={Object.entries(ComponentCategory).map(([_key, value]) => ({
+              label: value,
+              value: value,
+            }))}
+          />
+        </Form.Item>
+        <Form.Item label="Further Manufacturers" name="furtherManufacturerIds">
+          <SelectMultipleInstitutionIds />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>

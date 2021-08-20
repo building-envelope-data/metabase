@@ -1063,7 +1063,7 @@ type Standard implements Reference {
   "The section of the standard to which the reference refers to."
   section: String
   standardizers: [Standardizer!]!
-  title: String!
+  title: String
   "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
   year: Int
 }
@@ -1305,6 +1305,7 @@ input CreateComponentInput {
   availability: OpenEndedDateTimeRangeInput
   categories: [ComponentCategory!]!
   description: String!
+  furtherManufacturerIds: [Uuid!]!
   manufacturerId: Uuid!
   name: String!
 }
@@ -1884,6 +1885,7 @@ enum ConfirmUserMethodDeveloperErrorCode {
 enum CreateComponentErrorCode {
   UNKNOWN
   UNKNOWN_MANUFACTURER
+  UNKNOWN_FURTHER_MANUFACTURERS
   UNAUTHORIZED
 }
 

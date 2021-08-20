@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace Metabase.GraphQl.Components
                     )
                 );
             }
-            if (!await context.Institutions
+            if (!await context.Institutions.AsQueryable()
             .AnyAsync(
                 x => x.Id == input.ManufacturerId,
              cancellationToken: cancellationToken
@@ -60,6 +61,24 @@ namespace Metabase.GraphQl.Components
                         "Unknown manufacturer",
                       new[] { nameof(input), nameof(input.ManufacturerId).FirstCharToLower() }
                     )
+                );
+            }
+            var unknownFurtherManufacturerIds =
+                input.FurtherManufacturerIds.Except(
+                    await context.Institutions.AsQueryable()
+                    .Where(x => input.FurtherManufacturerIds.Contains(x.Id))
+                    .Select(x => x.Id)
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false)
+                );
+            if (unknownFurtherManufacturerIds.Any())
+            {
+                return new CreateComponentPayload(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNKNOWN_FURTHER_MANUFACTURERS,
+                      $"There are no institutions with identifier(s) {string.Join(", ", unknownFurtherManufacturerIds)}.",
+                      new[] { nameof(input), nameof(input.FurtherManufacturerIds).FirstCharToLower() }
+                      )
                 );
             }
             var component = new Data.Component(
@@ -82,6 +101,19 @@ namespace Metabase.GraphQl.Components
                     Pending = false
                 }
             );
+            foreach (var manufacturerId in input.FurtherManufacturerIds.Distinct())
+            {
+                if (manufacturerId != input.ManufacturerId)
+                {
+                    component.ManufacturerEdges.Add(
+                        new Data.ComponentManufacturer
+                        {
+                            InstitutionId = manufacturerId,
+                            Pending = true
+                        }
+                    );
+                }
+            }
             context.Components.Add(component);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new CreateComponentPayload(component);

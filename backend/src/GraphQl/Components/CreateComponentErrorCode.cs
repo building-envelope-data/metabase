@@ -4,6 +4,7 @@ namespace Metabase.GraphQl.Components
     {
         UNKNOWN,
         UNKNOWN_MANUFACTURER,
+        UNKNOWN_FURTHER_MANUFACTURERS,
         UNAUTHORIZED
     }
 }
