@@ -1,13 +1,18 @@
 import * as React from "react";
-import { Alert, Form, Input, Button } from "antd";
+import { Alert, Form, Input, Button, Divider } from "antd";
 import {
   useCreateDataFormatMutation,
   DataFormatsDocument,
 } from "../../queries/dataFormats.graphql";
-import { Scalars } from "../../__generated__/__types__";
+import {
+  CreatePublicationInput,
+  CreateStandardInput,
+  Scalars,
+} from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { ReferenceForm } from "../ReferenceForm";
 
 const layout = {
   labelCol: { span: 8 },
@@ -15,6 +20,16 @@ const layout = {
 };
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
+};
+
+type FormValues = {
+  name: string;
+  extension: string | null | undefined;
+  description: string;
+  mediaType: string;
+  schemaLocator: Scalars["Url"] | null | undefined;
+  standard: CreateStandardInput | null | undefined;
+  publication: CreatePublicationInput | null | undefined;
 };
 
 export type CreateDataFormatProps = {
@@ -40,7 +55,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
 
   const onFinish = ({
@@ -49,15 +64,9 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
     description,
     mediaType,
     schemaLocator,
-  }: {
-    name: string;
-    extension: string | null;
-    description: string;
-    mediaType: string;
-    schemaLocator: Scalars["Url"] | null;
-    // standard: CreateStandardInput;
-    // publication: CreatePublicationInput;
-  }) => {
+    standard,
+    publication,
+  }: FormValues) => {
     const create = async () => {
       try {
         setCreating(true);
@@ -69,8 +78,8 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
             description: description,
             mediaType: mediaType,
             schemaLocator: schemaLocator,
-            // standard: standard,
-            // publication: publication,
+            standard: standard,
+            publication: publication,
             managerId: managerId,
           },
         });
@@ -168,8 +177,8 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
         >
           <Input />
         </Form.Item>
-        {/* TODO $standard: CreateStandardInput
-          $publication: CreatePublicationInput */}
+        <Divider />
+        <ReferenceForm form={form} />
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>
             Create
