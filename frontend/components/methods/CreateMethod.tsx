@@ -23,13 +23,9 @@ import {
 } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import {
-  InstitutionDocument,
-  useInstitutionsQuery,
-} from "../../queries/institutions.graphql";
-import { useUsersQuery } from "../../queries/users.graphql";
-import { notEmpty } from "../../lib/array";
-import { SelectMultipleViaSearch } from "../SelectMultipleViaSearch";
+import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { SelectMultipleInstitutionIds } from "../SelectMultipleInstitutionIds";
+import { SelectMultipleUserIds } from "../SelectMultipleUserIds";
 
 const layout = {
   labelCol: { span: 8 },
@@ -74,14 +70,6 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
   const [selectedReferenceOption, setSelectedReferenceOption] = useState(
     Reference.None
   );
-
-  // TODO Only fetch `name` and `uuid` because nothing more is needed.
-  // TODO Use search instead of drop-down with all users/institutions preloaded. Be inspired by https://ant.design/components/select/#components-select-demo-select-users
-  const usersQuery = useUsersQuery();
-  const users = usersQuery.data?.users?.nodes;
-  const institutionsQuery = useInstitutionsQuery();
-  const institutions =
-    institutionsQuery.data?.institutions?.nodes?.filter(notEmpty);
 
   const onFinish = ({
     name,
@@ -246,28 +234,14 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           name="institutionDeveloperIds"
           initialValue={[]}
         >
-          <SelectMultipleViaSearch
-            options={
-              institutions?.map((institution) => ({
-                label: institution.name,
-                value: institution.uuid,
-              })) || []
-            }
-          />
+          <SelectMultipleInstitutionIds />
         </Form.Item>
         <Form.Item
           label="User Developers"
           name="userDeveloperIds"
           initialValue={[]}
         >
-          <SelectMultipleViaSearch
-            options={
-              users?.map((user) => ({
-                label: user.name,
-                value: user.uuid,
-              })) || []
-            }
-          />
+          <SelectMultipleUserIds />
         </Form.Item>
         <Divider />
         <Form.Item
