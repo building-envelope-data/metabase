@@ -44,38 +44,38 @@ export function Reference({ reference }: ReferenceProps) {
   ) : (
     <Descriptions column={1}>
       <>
+        <Descriptions.Item label="Title">{reference?.title}</Descriptions.Item>
         <Descriptions.Item label="Abstract">
           {reference?.abstract}
         </Descriptions.Item>
         <Descriptions.Item label="Section">
           {reference?.section}
         </Descriptions.Item>
-        <Descriptions.Item label="Title">{reference?.title}</Descriptions.Item>
       </>
       {reference.__typename === "Standard" && (
         <>
+          <Descriptions.Item label="Numeration">{`${reference.numeration.prefix} ${reference.numeration.mainNumber} ${reference.numeration.suffix}`}</Descriptions.Item>
+          <Descriptions.Item label="Year">{reference.year}</Descriptions.Item>
           <Descriptions.Item label="Locator">
             <Typography.Link href={reference.locator}>
               {reference.locator}
             </Typography.Link>
           </Descriptions.Item>
-          <Descriptions.Item label="Numeration">{`${reference.numeration.prefix} ${reference.numeration.mainNumber} ${reference.numeration.suffix}`}</Descriptions.Item>
           <Descriptions.Item label="Standardizers">
             {reference.standardizers.join(", ")}
           </Descriptions.Item>
-          <Descriptions.Item label="Year">{reference.year}</Descriptions.Item>
         </>
       )}
       {reference.__typename === "Publication" && (
         <>
           <Descriptions.Item label="arXiv">{reference.arXiv}</Descriptions.Item>
-          <Descriptions.Item label="Authors">
-            {reference.authors?.join(", ")}
-          </Descriptions.Item>
           <Descriptions.Item label="DOI">{reference.doi}</Descriptions.Item>
           <Descriptions.Item label="URN">{reference.urn}</Descriptions.Item>
           <Descriptions.Item label="Web Address">
             {reference.webAddress}
+          </Descriptions.Item>
+          <Descriptions.Item label="Authors">
+            {reference.authors?.join(", ")}
           </Descriptions.Item>
         </>
       )}
