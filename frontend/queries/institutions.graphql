@@ -123,6 +123,13 @@ query Institution($uuid: Uuid!) {
           name
           description
           locator
+          operator {
+            node {
+              id
+              uuid
+              name
+            }
+          }
         }
       }
       canCurrentUserAddEdge
@@ -185,6 +192,13 @@ query Institution($uuid: Uuid!) {
               doi
               urn
               webAddress
+            }
+          }
+          manager {
+            node {
+              id
+              uuid
+              name
             }
           }
         }

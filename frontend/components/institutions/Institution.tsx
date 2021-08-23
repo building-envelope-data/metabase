@@ -5,7 +5,6 @@ import {
   Typography,
   message,
   Skeleton,
-  Table,
   Button,
   Result,
   Descriptions,
@@ -29,7 +28,10 @@ import { useConfirmInstitutionMethodDeveloperMutation } from "../../queries/inst
 import { MethodDocument } from "../../queries/methods.graphql";
 import { useConfirmComponentManufacturerMutation } from "../../queries/componentManufacturers.graphql";
 import { ComponentDocument } from "../../queries/components.graphql";
-import { Reference } from "../Reference";
+import { DataFormatTable } from "../dataFormats/DataFormatTable";
+import { ComponentTable } from "../components/ComponentTable";
+import DatabaseTable from "../databases/DatabaseTable";
+import MethodTable from "../methods/MethodTable";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -183,46 +185,9 @@ export default function Institution({ institutionId }: InstitutionProps) {
       </Descriptions>
       <Divider />
       <Typography.Title level={2}>Manufactured Components</Typography.Title>
-      <Table
-        columns={[
-          {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            render: (_value, record, _index) => (
-              <Link href={paths.component(record.uuid)}>{record.uuid}</Link>
-            ),
-          },
-          {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-          },
-          {
-            title: "Abbreviation",
-            dataIndex: "abbreviation",
-            key: "abbreviation",
-          },
-          {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-          },
-          {
-            title: "Categories",
-            dataIndex: "categories",
-            key: "categories",
-            render: (_value, record, _index) => record.categories.join(", "),
-          },
-          {
-            title: "Availability",
-            dataIndex: "availability",
-            key: "availability",
-            render: (_value, record, _index) =>
-              `${record.availability?.from} to ${record.availability?.to}`,
-          },
-        ]}
-        dataSource={institution.manufacturedComponents.edges.map((x) => x.node)}
+      <ComponentTable
+        loading={loading}
+        components={institution.manufacturedComponents.edges.map((x) => x.node)}
       />
       {institution.pendingManufacturedComponents.canCurrentUserConfirmEdge &&
         institution.pendingManufacturedComponents.edges.length >= 1 && (
@@ -250,155 +215,27 @@ export default function Institution({ institutionId }: InstitutionProps) {
       )}
       <Divider />
       <Typography.Title level={2}>Operated Databases</Typography.Title>
-      <Table
-        columns={[
-          {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            render: (_value, record, _index) => (
-              <Link href={paths.database(record.uuid)}>{record.uuid}</Link>
-            ),
-          },
-          {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-          },
-          {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-          },
-          {
-            title: "Locator",
-            dataIndex: "locator",
-            key: "locator",
-          },
-        ]}
-        dataSource={institution.operatedDatabases.edges.map((x) => x.node)}
+      <DatabaseTable
+        loading={loading}
+        databases={institution.operatedDatabases.edges.map((x) => x.node)}
       />
       {institution.operatedDatabases.canCurrentUserAddEdge && (
         <CreateDatabase operatorId={institution.uuid} />
       )}
       <Divider />
       <Typography.Title level={2}>Managed Data Formats</Typography.Title>
-      <Table
-        columns={[
-          {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            render: (_value, record, _index) => (
-              <Link href={paths.dataFormat(record.uuid)}>{record.uuid}</Link>
-            ),
-          },
-          {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-          },
-          {
-            title: "Extension",
-            dataIndex: "extension",
-            key: "extension",
-          },
-          {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-          },
-          {
-            title: "Media Type",
-            dataIndex: "mediaType",
-            key: "mediaType",
-          },
-          {
-            title: "Schema",
-            dataIndex: "schemaLocator",
-            key: "schemaLocator",
-            render: (_text, record, _index) => (
-              <Typography.Link href={record.schemaLocator}>
-                {record.schemaLocator}
-              </Typography.Link>
-            ),
-          },
-          {
-            title: "Reference",
-            dataIndex: "reference",
-            key: "reference",
-            render: (_text, record, _index) => (
-              <Reference reference={record.reference} />
-            ),
-          },
-        ]}
-        dataSource={institution.managedDataFormats.edges.map((x) => x.node)}
+      <DataFormatTable
+        loading={loading}
+        dataFormats={institution.managedDataFormats.edges.map((x) => x.node)}
       />
       {institution.managedDataFormats.canCurrentUserAddEdge && (
         <CreateDataFormat managerId={institution.uuid} />
       )}
       <Divider />
       <Typography.Title level={2}>Managed Methods</Typography.Title>
-      <Table
-        columns={[
-          {
-            title: "UUID",
-            dataIndex: "uuid",
-            key: "uuid",
-            render: (_value, record, _index) => (
-              <Link href={paths.method(record.uuid)}>{record.uuid}</Link>
-            ),
-          },
-          {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-          },
-          {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-          },
-          {
-            title: "Validity",
-            dataIndex: "validity",
-            key: "validity",
-            render: (_text, record, _index) =>
-              `from ${record.validity?.from} to ${record.validity?.to}`,
-          },
-          {
-            title: "Availability",
-            dataIndex: "availability",
-            key: "availability",
-            render: (_text, record, _index) =>
-              `from ${record.availability?.from} to ${record.availability?.to}`,
-          },
-          {
-            title: "Reference",
-            dataIndex: "reference",
-            key: "reference",
-            render: (_text, record, _index) => (
-              <Reference reference={record.reference} />
-            ),
-          },
-          {
-            title: "Calculation Locator",
-            dataIndex: "calculationLocator",
-            key: "calculationLocator",
-            render: (_text, record, _index) => (
-              <Typography.Link href={record.calculationLocator}>
-                {record.calculationLocator}
-              </Typography.Link>
-            ),
-          },
-          {
-            title: "Categories",
-            dataIndex: "categories",
-            key: "categories",
-            render: (_text, record, _index) => record.categories.join(", "),
-          },
-        ]}
-        dataSource={institution.managedMethods.edges.map((x) => x.node)}
+      <MethodTable
+        loading={loading}
+        methods={institution.managedMethods.edges.map((x) => x.node)}
       />
       {institution.managedMethods.canCurrentUserAddEdge && (
         <CreateMethod managerId={institution.uuid} />

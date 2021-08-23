@@ -5,7 +5,7 @@ import {
   getFreeTextFilterProps,
 } from "./freeTextFilter";
 import Link from "next/link";
-import { Scalars } from "../__generated__/__types__";
+import { Publication, Scalars, Standard } from "../__generated__/__types__";
 import { Highlight } from "../components/Highlight";
 
 const sortDirections: SortOrder[] = ["ascend", "descend"];
@@ -436,4 +436,101 @@ export function getFilterableDescriptionListColumnProps<RecordType>(
       }
     },
   };
+}
+
+export function getReferenceColumnProps<
+  RecordType extends { reference?: Publication | Standard | null }
+>(
+  onFilterTextChange: (
+    key: keyof RecordType
+  ) => (newFilterText: string) => void,
+  getFilterText: (key: keyof RecordType) => string | undefined
+) {
+  return getFilterableDescriptionListColumnProps(
+    "Reference",
+    "reference",
+    (record) =>
+      record.reference && [
+        {
+          key: "title",
+          title: "Title",
+          value: record.reference.title,
+        },
+        {
+          key: "abstract",
+          title: "Abstract",
+          value: record.reference.abstract,
+        },
+        {
+          key: "section",
+          title: "Section",
+          value: record.reference.section,
+        },
+        ...(record.reference.__typename !== "Standard"
+          ? []
+          : [
+              {
+                key: "numeration",
+                title: "Numeration",
+                value: `${record.reference.numeration.prefix} ${record.reference.numeration.mainNumber} ${record.reference.numeration.suffix}`,
+              },
+              {
+                key: "year",
+                title: "Year",
+                value: record.reference.year,
+              },
+              {
+                key: "locator",
+                title: "Locator",
+                value: record.reference.locator,
+                render: (
+                  _record: RecordType,
+                  hightlightedValue: JSX.Element,
+                  value: string | null | undefined
+                ) => (
+                  // TODO Actually, `value` is neither `null` nor `undefined` but the type system does not know about it. How can we make it know about it so we don't need `|| ""` here?
+                  <Typography.Link href={value || ""}>
+                    {hightlightedValue}
+                  </Typography.Link>
+                ),
+              },
+              {
+                key: "Standardizers",
+                title: "Standardizers",
+                value: record.reference.standardizers.join(", "),
+              },
+            ]),
+        ...(record.reference.__typename !== "Publication"
+          ? []
+          : [
+              {
+                key: "arXiv",
+                title: "arXiv",
+                value: record.reference.arXiv,
+              },
+              {
+                key: "doi",
+                title: "DOI",
+                value: record.reference.doi,
+              },
+              {
+                key: "urn",
+                title: "URN",
+                value: record.reference.urn,
+              },
+              {
+                key: "webAddress",
+                title: "Website",
+                value: record.reference.webAddress,
+              },
+              {
+                key: "authors",
+                title: "Authors",
+                value: record.reference.authors?.join(", "),
+              },
+            ]),
+      ],
+    onFilterTextChange,
+    getFilterText
+  );
 }
