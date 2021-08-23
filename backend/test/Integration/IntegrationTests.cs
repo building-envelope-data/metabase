@@ -9,14 +9,18 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using FluentAssertions;
 using IdentityModel.Client;
 using Json.Path;
 using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
+using NUnit.Framework;
+using Snapshooter;
 
 namespace Metabase.Tests.Integration
 {
+    [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
     public abstract class IntegrationTests
     {
         protected CustomWebApplicationFactory Factory { get; }
@@ -269,21 +273,6 @@ namespace Metabase.Tests.Integration
                 ).ConfigureAwait(false);
             return uuid;
         }
-
-        // protected async Task RegisterAndLoginUser(
-        //     string email,
-        //     string password
-        // )
-        // {
-        //     await RegisterUser(
-        //             email: email,
-        //             password: password
-        //             ).ConfigureAwait(false);
-        //     await LoginUser(
-        //         email: email,
-        //         password: password
-        //     ).ConfigureAwait(false);
-        // }
 
         protected async Task<Guid> RegisterAndConfirmAndLoginUser(
             string name = DefaultName,
@@ -586,6 +575,24 @@ namespace Metabase.Tests.Integration
             result.Headers.ContentType =
               new MediaTypeHeaderValue("application/json");
             return result;
+        }
+
+        // With NUnit using async Snapshooter is not able to calculate
+        // the necessary Fullname, due to reasons mentioned in
+        // https://stackoverflow.com/questions/22598323/movenext-instead-of-actual-method-task-name
+        // The workaround with optional parameters is inspired by the same source.
+        protected static SnapshotFullName SnapshotFullNameHelper(
+            Type testType,
+            string keyName,
+            [CallerMemberName] string testMethod="",
+            [CallerFilePath] string testFilePath=""
+        )
+        {
+            string testName = $"{testType.Name}.{testMethod}_{keyName}.snap";
+            string testDirectory =
+                Path.GetDirectoryName(testFilePath)
+                ?? throw new Exception($"The path '{testFilePath}' denotes a root directory or is `null`.");
+            return new SnapshotFullName(testName, testDirectory);
         }
 
         private sealed class GraphQlRequest
