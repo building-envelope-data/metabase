@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metabase", "src\Metabase.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metabase.Tests", "test\Metabase.Tests.csproj", "{B467E845-22A0-4AA5-9876-DE800B29DA1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metabase.NTests", "ntest\Metabase.NTests.csproj", "{8F89692E-4745-45B4-83BE-A4D75606064C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Release|x64.Build.0 = Release|Any CPU
 		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Release|x86.ActiveCfg = Release|Any CPU
 		{B467E845-22A0-4AA5-9876-DE800B29DA1D}.Release|x86.Build.0 = Release|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Debug|x64.Build.0 = Debug|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Debug|x86.Build.0 = Debug|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Release|x64.ActiveCfg = Release|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Release|x64.Build.0 = Release|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Release|x86.ActiveCfg = Release|Any CPU
+		{8F89692E-4745-45B4-83BE-A4D75606064C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

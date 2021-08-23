@@ -49,6 +49,26 @@ test : ## Run tests
 	done
 .PHONY : test
 
+ntest : ## Run NUnit-tests
+	@echo "--------------------------------------------------"
+	@echo "Complete test list"
+	@echo "--------------------------------------------------"
+	dotnet test ./ntest/Metabase.NTests.csproj \
+		--list-tests
+	@echo "--------------------------------------------------"
+	@echo "All test runs"
+	@echo "--------------------------------------------------"
+	for x in $$(find ./ntest/ -type f -name "*NTests.cs" -exec basename {} '.cs' \;) ; do \
+		echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
+		echo "Test runs for file '$${x}'" && \
+		echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
+		dotnet test ./ntest/Metabase.NTests.csproj \
+			--filter "FullyQualifiedName~$${x}" \
+			--collect:"XPlat Code Coverage" \
+			--verbosity minimal ; \
+	done
+.PHONY : ntest
+
 assets : ## Build assets
 	npm run all
 .PHONY : assets
