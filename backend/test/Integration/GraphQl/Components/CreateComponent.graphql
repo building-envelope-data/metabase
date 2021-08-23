@@ -5,6 +5,7 @@ mutation createComponent(
   $availability: OpenEndedDateTimeRangeInput
   $categories: [ComponentCategory!]!
   $manufacturerId: Uuid!
+  $furtherManufacturerIds: [Uuid!]!
 ) {
   createComponent(
     input: {
@@ -14,6 +15,7 @@ mutation createComponent(
       availability: $availability
       categories: $categories
       manufacturerId: $manufacturerId
+      furtherManufacturerIds: $furtherManufacturerIds
     }
   ) {
     component {
