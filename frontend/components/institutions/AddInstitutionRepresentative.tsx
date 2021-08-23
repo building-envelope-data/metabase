@@ -68,6 +68,9 @@ export default function AddInstitutionRepresentative({
           setGlobalErrorMessages,
           form
         );
+        if (!errors && !data?.addInstitutionRepresentative?.errors) {
+          form.resetFields();
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);

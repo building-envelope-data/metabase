@@ -113,6 +113,9 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           setGlobalErrorMessages,
           form
         );
+        if (!errors && !data?.createMethod?.errors) {
+          form.resetFields();
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);

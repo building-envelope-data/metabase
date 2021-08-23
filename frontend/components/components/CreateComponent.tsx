@@ -56,11 +56,14 @@ export default function CreateComponent({
     furtherManufacturerIds,
   }: {
     name: string;
-    abbreviation: string | null;
+    abbreviation: string | null | undefined;
     description: string;
-    availability: [moment.Moment | null, moment.Moment | null] | null;
-    categories: ComponentCategory[];
-    furtherManufacturerIds: Scalars["Uuid"];
+    availability:
+      | [moment.Moment | null | undefined, moment.Moment | null | undefined]
+      | null
+      | undefined;
+    categories: ComponentCategory[] | null | undefined;
+    furtherManufacturerIds: Scalars["Uuid"] | null | undefined;
   }) => {
     const create = async () => {
       try {
@@ -74,7 +77,7 @@ export default function CreateComponent({
             availability: { from: availability?.[0], to: availability?.[1] },
             categories: categories || [],
             manufacturerId: manufacturerId,
-            furtherManufacturerIds: furtherManufacturerIds,
+            furtherManufacturerIds: furtherManufacturerIds || [],
           },
         });
         handleFormErrors(
@@ -85,6 +88,9 @@ export default function CreateComponent({
           setGlobalErrorMessages,
           form
         );
+        if (!errors && !data?.createComponent?.errors) {
+          form.resetFields();
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);

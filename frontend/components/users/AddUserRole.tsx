@@ -59,6 +59,9 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
           setGlobalErrorMessages,
           form
         );
+        if (!errors && !data?.addUserRole?.errors) {
+          form.resetFields();
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);

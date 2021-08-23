@@ -91,6 +91,9 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
           setGlobalErrorMessages,
           form
         );
+        if (!errors && !data?.createDataFormat?.errors) {
+          form.resetFields();
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);

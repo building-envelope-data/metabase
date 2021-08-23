@@ -72,6 +72,9 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
           setGlobalErrorMessages,
           form
         );
+        if (!errors && !data?.createDatabase?.errors) {
+          form.resetFields();
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);
