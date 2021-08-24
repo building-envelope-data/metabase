@@ -381,14 +381,24 @@ function Page() {
               "appliedMethod",
               (x) => [
                 {
-                  key: "methodId",
-                  title: "Method UUID",
+                  key: "appliedMethodId",
+                  title: "UUID",
                   value: x.appliedMethod.methodId,
                   render: (_record, _highlightedValue, value) => (
                     // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
                     // TODO Actually, `value` is neither `null` nor `undefined` but the type system does not know about it. How can we make it know about it so we don't need `|| ""` here?
                     <Link href={paths.method(value || "")}>{value}</Link>
                   ),
+                },
+                {
+                  key: "appliedMethodName",
+                  title: "Name",
+                  value: x.appliedMethod.method?.name,
+                },
+                {
+                  key: "appliedMethodDescription",
+                  title: "Description",
+                  value: x.appliedMethod.method?.description,
                 },
               ],
               onFilterTextChange,

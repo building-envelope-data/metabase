@@ -51,6 +51,10 @@ fragment OpticalDataPartial on OpticalData {
   description
   appliedMethod {
     methodId
+    method {
+      name
+      description
+    }
   }
   resourceTree {
     root {
