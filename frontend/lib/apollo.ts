@@ -77,9 +77,9 @@ export function messageApolloError(error: ApolloError) {
   message.error(
     `Name(${error.name}); Message(${
       error.message
-    }); GraphQL Errors(${error.graphQLErrors.map(
-      (e) => `Name(${e.name}); Message(${e.message})`
-    )}); Network Error(Name(${error.networkError?.name}); Message(${
+    }); GraphQL Errors(${error.graphQLErrors
+      .map((e) => `[Name(${e.name}); Message(${e.message})]`)
+      .join(", ")}); Network Error(Name(${error.networkError?.name}); Message(${
       error.networkError?.message
     }))`
   );
