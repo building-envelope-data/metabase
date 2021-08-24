@@ -390,16 +390,16 @@ function Page() {
                     <Link href={paths.method(value || "")}>{value}</Link>
                   ),
                 },
-                {
-                  key: "appliedMethodName",
-                  title: "Name",
-                  value: x.appliedMethod.method?.name,
-                },
-                {
-                  key: "appliedMethodDescription",
-                  title: "Description",
-                  value: x.appliedMethod.method?.description,
-                },
+                // {
+                //   key: "appliedMethodName",
+                //   title: "Name",
+                //   value: x.appliedMethod.method?.name,
+                // },
+                // {
+                //   key: "appliedMethodDescription",
+                //   title: "Description",
+                //   value: x.appliedMethod.method?.description,
+                // },
               ],
               onFilterTextChange,
               (x) => filterText.get(x)
