@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Metabase.GraphQl.DataX;
 
 namespace Metabase.GraphQl.DataFormats
 {
@@ -27,6 +28,21 @@ namespace Metabase.GraphQl.DataFormats
             descriptor
                 .Field(t => t.ManagerId)
                 .Ignore();
+            DataFieldConfigurator.ConfigureDataField<Data.DataFormat, DataFormatResolvers>(
+                descriptor,
+                "opticalData",
+                _ => _.GetOpticalDataAsync(default!, default!, default!, default!, default!)
+            );
+            DataFieldConfigurator.ConfigureAllDataField<Data.DataFormat, DataFormatResolvers, OpticalDataPropositionInput>(
+                descriptor,
+                "allOpticalData",
+                _ => _.GetAllOpticalDataAsync(default!, default!, default!, default!, default!, default!, default!, default!, default!)
+            );
+            DataFieldConfigurator.ConfigureHasDataField<Data.DataFormat, DataFormatResolvers, OpticalDataPropositionInput>(
+                descriptor,
+                "hasOpticalData",
+                _ => _.GetHasOpticalDataAsync(default!, default!, default!, default!, default!)
+            );
         }
     }
 }
