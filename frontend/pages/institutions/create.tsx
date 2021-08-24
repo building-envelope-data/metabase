@@ -1,5 +1,6 @@
+import { messageApolloError } from "../../lib/apollo";
 import { NextRouter, useRouter } from "next/router";
-import { Skeleton, Row, Col, Card, message } from "antd";
+import { Skeleton, Row, Col, Card } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { useEffect } from "react";
@@ -28,7 +29,7 @@ function Create() {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

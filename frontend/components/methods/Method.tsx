@@ -2,7 +2,6 @@ import { Scalars } from "../../__generated__/__types__";
 import { useMethodQuery } from "../../queries/methods.graphql";
 import {
   Tag,
-  message,
   Skeleton,
   Result,
   PageHeader,
@@ -15,6 +14,7 @@ import Link from "next/link";
 import paths from "../../paths";
 import { Reference } from "../Reference";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
+import { messageApolloError } from "../../lib/apollo";
 
 function getDeveloperHref(
   node:
@@ -51,7 +51,7 @@ export default function Method({ methodId }: MethodProps) {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

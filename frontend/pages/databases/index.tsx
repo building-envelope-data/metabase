@@ -1,6 +1,7 @@
+import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
-import { Table, message, Typography } from "antd";
+import { Table, Typography } from "antd";
 import { useDatabasesQuery } from "../../queries/databases.graphql";
 import { useEffect, useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
@@ -24,7 +25,7 @@ function Page() {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

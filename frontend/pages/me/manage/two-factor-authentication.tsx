@@ -1,3 +1,4 @@
+import { messageApolloError } from "../../../lib/apollo";
 import ManageLayout from "../../../components/me/ManageLayout";
 import {
   useTwoFactorAuthenticationQuery,
@@ -170,7 +171,7 @@ function Page() {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

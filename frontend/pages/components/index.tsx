@@ -1,5 +1,6 @@
+import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
-import { message, Typography } from "antd";
+import { Typography } from "antd";
 import { useComponentsQuery } from "../../queries/components.graphql";
 import { useEffect } from "react";
 import paths from "../../paths";
@@ -14,7 +15,7 @@ function Page() {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

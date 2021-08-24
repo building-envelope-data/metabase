@@ -32,6 +32,7 @@ import { DataFormatTable } from "../dataFormats/DataFormatTable";
 import { ComponentTable } from "../components/ComponentTable";
 import DatabaseTable from "../databases/DatabaseTable";
 import MethodTable from "../methods/MethodTable";
+import { messageApolloError } from "../../lib/apollo";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -137,7 +138,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

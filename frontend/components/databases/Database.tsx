@@ -1,16 +1,10 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useDatabaseQuery } from "../../queries/databases.graphql";
-import {
-  message,
-  Skeleton,
-  Result,
-  PageHeader,
-  Descriptions,
-  Typography,
-} from "antd";
+import { Skeleton, Result, PageHeader, Descriptions, Typography } from "antd";
 import { useEffect } from "react";
 import Link from "next/link";
 import paths from "../../paths";
+import { messageApolloError } from "../../lib/apollo";
 
 export type DatabaseProps = {
   databaseId: Scalars["Uuid"];
@@ -26,7 +20,7 @@ export default function Database({ databaseId }: DatabaseProps) {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

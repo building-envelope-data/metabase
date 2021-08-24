@@ -1,18 +1,11 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useComponentQuery } from "../../queries/components.graphql";
-import {
-  message,
-  Skeleton,
-  Result,
-  PageHeader,
-  Descriptions,
-  Tag,
-  List,
-} from "antd";
+import { Skeleton, Result, PageHeader, Descriptions, Tag, List } from "antd";
 import { useEffect } from "react";
 import paths from "../../paths";
 import Link from "next/link";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
+import { messageApolloError } from "../../lib/apollo";
 
 export type ComponentProps = {
   componentId: Scalars["Uuid"];
@@ -28,7 +21,7 @@ export default function Component({ componentId }: ComponentProps) {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

@@ -28,6 +28,7 @@ import paths from "../../paths";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AddUserRole from "./AddUserRole";
+import { messageApolloError } from "../../lib/apollo";
 
 export type UserProps = {
   userId: Scalars["Uuid"];
@@ -209,7 +210,7 @@ export default function User({ userId }: UserProps) {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

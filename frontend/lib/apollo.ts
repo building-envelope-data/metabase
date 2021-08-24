@@ -2,11 +2,13 @@ import { IncomingMessage, ServerResponse } from "http";
 import { useMemo } from "react";
 import {
   ApolloClient,
+  ApolloError,
   createHttpLink,
   InMemoryCache,
   NormalizedCacheObject,
 } from "@apollo/client";
 import merge from "deepmerge";
+import { message } from "antd";
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 
@@ -69,6 +71,18 @@ export function initializeApollo(
   if (!apolloClient) apolloClient = _apolloClient;
 
   return _apolloClient;
+}
+
+export function messageApolloError(error: ApolloError) {
+  message.error(
+    `Name(${error.name}); Message(${
+      error.message
+    }); GraphQL Errors(${error.graphQLErrors.map(
+      (e) => `Name(${e.name}); Message(${e.message})`
+    )}); Network Error(Name(${error.networkError?.name}); Message(${
+      error.networkError?.message
+    }))`
+  );
 }
 
 export function useApollo(initialState: any) {

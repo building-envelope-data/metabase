@@ -1,5 +1,6 @@
+import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
-import { Table, message, Typography } from "antd";
+import { Table, Typography } from "antd";
 import { useOpenIdConnectQuery } from "../../queries/openIdConnect.graphql";
 import { useEffect } from "react";
 
@@ -10,7 +11,7 @@ function Page() {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

@@ -1,16 +1,10 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useDataFormatQuery } from "../../queries/dataFormats.graphql";
-import {
-  message,
-  Skeleton,
-  Result,
-  PageHeader,
-  Descriptions,
-  Typography,
-} from "antd";
+import { Skeleton, Result, PageHeader, Descriptions, Typography } from "antd";
 import { useEffect } from "react";
 import paths from "../../paths";
 import { Reference } from "../Reference";
+import { messageApolloError } from "../../lib/apollo";
 
 export type DataFormatProps = {
   dataFormatId: Scalars["Uuid"];
@@ -26,7 +20,7 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

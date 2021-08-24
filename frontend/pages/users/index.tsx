@@ -1,5 +1,5 @@
 import Layout from "../../components/Layout";
-import { Table, message, Typography } from "antd";
+import { Table, Typography } from "antd";
 import { useUsersQuery } from "../../queries/users.graphql";
 import paths from "../../paths";
 import { useEffect, useState } from "react";
@@ -10,6 +10,7 @@ import {
   getUuidColumnProps,
 } from "../../lib/table";
 import Link from "next/link";
+import { messageApolloError } from "../../lib/apollo";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -22,7 +23,7 @@ function Page() {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

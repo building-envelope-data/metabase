@@ -1,7 +1,8 @@
+import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import paths from "../../paths";
-import { Table, message, Typography, Divider } from "antd";
+import { Table, Typography, Divider } from "antd";
 import { useInstitutionsQuery } from "../../queries/institutions.graphql";
 import { useEffect, useState } from "react";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
@@ -30,7 +31,7 @@ function Page() {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 

@@ -9,6 +9,7 @@ import {
 import { InstitutionState, Scalars } from "../../__generated__/__types__";
 import Link from "next/link";
 import paths from "../../paths";
+import { messageApolloError } from "../../lib/apollo";
 
 export type PendingInstitutionsProps = {};
 
@@ -21,7 +22,7 @@ export default function PendingInstitutions({}: PendingInstitutionsProps) {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApolloError(error);
     }
   }, [error]);
 
