@@ -65,11 +65,11 @@ fragment OpticalDataPartial on OpticalData {
   # TODO All the above should be replaced by `...DataPartial`. If we do so
   # though, the result returned by the query `AllOpticalData` does not include
   # the fields above. Why?
-  nearnormalHemisphericalVisibleTransmittances
+  infraredEmittances
   nearnormalHemisphericalSolarReflectances
   nearnormalHemisphericalSolarTransmittances
   nearnormalHemisphericalVisibleReflectances
-  infraredEmittances
+  nearnormalHemisphericalVisibleTransmittances
 }
 
 query AllOpticalData($where: OpticalDataPropositionInput!) {

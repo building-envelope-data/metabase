@@ -1,4 +1,8 @@
 fragment OpticalDataFields on OpticalData {
   ...DataFields
+  infraredEmittances
+  nearnormalHemisphericalSolarReflectances
+  nearnormalHemisphericalSolarTransmittances
+  nearnormalHemisphericalVisibleReflectances
   nearnormalHemisphericalVisibleTransmittances
 }

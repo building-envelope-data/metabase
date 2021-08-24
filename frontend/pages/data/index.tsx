@@ -1,16 +1,13 @@
 import Layout from "../../components/Layout";
 import {
-  Select,
-  Input,
   Table,
-  InputNumber,
   message,
   Form,
   Button,
   Alert,
   Typography,
+  Descriptions,
 } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useAllOpticalDataQuery } from "../../queries/data.graphql";
 import {
   OpticalData,
@@ -29,6 +26,14 @@ import {
   getTimestampColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
+import {
+  FloatPropositionComparator,
+  FloatPropositionFormList,
+} from "../../components/FloatPropositionFormList";
+import {
+  UuidPropositionComparator,
+  UuidPropositionFormList,
+} from "../../components/UuidPropositionFormList";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -43,17 +48,6 @@ const tailLayout = {
 enum Negator {
   Is = "is",
   IsNot = "isNot",
-}
-
-enum ComponentIdComperator {
-  EqualTo = "equalTo",
-}
-
-enum NearnormalHemisphericalVisibleTransmittanceComperator {
-  EqualTo = "equalTo",
-  LessThanOrEqualTo = "lessThanOrEqualTo",
-  GreaterThanOrEqualTo = "greaterThanOrEqualTo",
-  // InClosedInterval = "inClosedInterval"
 }
 
 const negateIfNecessary = (
@@ -113,19 +107,51 @@ function Page() {
 
   const onFinish = ({
     componentIds,
+    infraredEmittances,
+    nearnormalHemisphericalSolarReflectances,
+    nearnormalHemisphericalSolarTransmittances,
+    nearnormalHemisphericalVisibleReflectances,
     nearnormalHemisphericalVisibleTransmittances,
   }: {
     componentIds:
       | {
           negator: Negator;
-          comperator: ComponentIdComperator;
+          comparator: UuidPropositionComparator;
           value: Scalars["Uuid"] | undefined;
+        }[]
+      | undefined;
+    infraredEmittances:
+      | {
+          negator: Negator;
+          comparator: FloatPropositionComparator;
+          value: number | undefined;
+        }[]
+      | undefined;
+    nearnormalHemisphericalSolarReflectances:
+      | {
+          negator: Negator;
+          comparator: FloatPropositionComparator;
+          value: number | undefined;
+        }[]
+      | undefined;
+    nearnormalHemisphericalSolarTransmittances:
+      | {
+          negator: Negator;
+          comparator: FloatPropositionComparator;
+          value: number | undefined;
+        }[]
+      | undefined;
+    nearnormalHemisphericalVisibleReflectances:
+      | {
+          negator: Negator;
+          comparator: FloatPropositionComparator;
+          value: number | undefined;
         }[]
       | undefined;
     nearnormalHemisphericalVisibleTransmittances:
       | {
           negator: Negator;
-          comperator: NearnormalHemisphericalVisibleTransmittanceComperator;
+          comparator: FloatPropositionComparator;
           value: number | undefined;
         }[]
       | undefined;
@@ -136,27 +162,91 @@ function Page() {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         const propositions: OpticalDataPropositionInput[] = [];
         if (componentIds) {
-          for (let { negator, comperator, value } of componentIds) {
+          for (let { negator, comparator, value } of componentIds) {
             propositions.push(
               negateIfNecessary(negator, {
-                componentId: { [comperator]: value },
+                componentId: { [comparator]: value },
               })
             );
           }
         }
         // Note that `0` evaluates to `false`, so below we cannot use
         // `if (nearnormalHemisphericalVisibleTransmittance)`.
+        if (infraredEmittances) {
+          for (let { negator, comparator, value } of infraredEmittances) {
+            if (value !== undefined && value !== null) {
+              propositions.push(
+                negateIfNecessary(negator, {
+                  infraredEmittance: {
+                    [comparator]: value,
+                  },
+                })
+              );
+            }
+          }
+        }
+        if (nearnormalHemisphericalSolarReflectances) {
+          for (let {
+            negator,
+            comparator,
+            value,
+          } of nearnormalHemisphericalSolarReflectances) {
+            if (value !== undefined && value !== null) {
+              propositions.push(
+                negateIfNecessary(negator, {
+                  nearnormalHemisphericalSolarReflectance: {
+                    [comparator]: value,
+                  },
+                })
+              );
+            }
+          }
+        }
+        if (nearnormalHemisphericalSolarTransmittances) {
+          for (let {
+            negator,
+            comparator,
+            value,
+          } of nearnormalHemisphericalSolarTransmittances) {
+            if (value !== undefined && value !== null) {
+              propositions.push(
+                negateIfNecessary(negator, {
+                  nearnormalHemisphericalSolarTransmittance: {
+                    [comparator]: value,
+                  },
+                })
+              );
+            }
+          }
+        }
+        if (nearnormalHemisphericalVisibleReflectances) {
+          for (let {
+            negator,
+            comparator,
+            value,
+          } of nearnormalHemisphericalVisibleReflectances) {
+            if (value !== undefined && value !== null) {
+              propositions.push(
+                negateIfNecessary(negator, {
+                  nearnormalHemisphericalVisibleReflectance: {
+                    [comparator]: value,
+                  },
+                })
+              );
+            }
+          }
+        }
         if (nearnormalHemisphericalVisibleTransmittances) {
           for (let {
             negator,
-            comperator,
+            comparator,
             value,
           } of nearnormalHemisphericalVisibleTransmittances) {
             if (value !== undefined && value !== null) {
               propositions.push(
                 negateIfNecessary(negator, {
                   nearnormalHemisphericalVisibleTransmittance: {
-                    [comperator]: value,
+                    [comparator]: value,
                   },
                 })
               );
@@ -213,170 +303,27 @@ function Page() {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-        <Form.List name="componentIds">
-          {(fields, { add, remove }, { errors }) => (
-            <>
-              {fields.map(({ key, name, fieldKey, ...restField }, index) => (
-                <Form.Item key={key} label={index === 0 ? "Component Id" : " "}>
-                  <Input.Group>
-                    <Form.Item
-                      {...restField}
-                      key={`negator${key}`}
-                      name={[name, "negator"]}
-                      fieldKey={[fieldKey, "negator"]}
-                      noStyle
-                      initialValue={Negator.Is}
-                    >
-                      <Select style={{ width: "10%" }}>
-                        <Select.Option value={Negator.Is}>Is</Select.Option>
-                        <Select.Option value={Negator.IsNot}>
-                          Is not
-                        </Select.Option>
-                      </Select>
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      key={`comperator${key}`}
-                      name={[name, "comperator"]}
-                      fieldKey={[fieldKey, "comperator"]}
-                      noStyle
-                      initialValue={ComponentIdComperator.EqualTo}
-                    >
-                      <Select style={{ width: "20%" }}>
-                        <Select.Option value={ComponentIdComperator.EqualTo}>
-                          equal to
-                        </Select.Option>
-                      </Select>
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      key={`value${key}`}
-                      name={[name, "value"]}
-                      fieldKey={[fieldKey, "value"]}
-                      noStyle
-                    >
-                      <Input style={{ float: "none", width: "60%" }} />
-                    </Form.Item>
-                    <MinusCircleOutlined
-                      style={{ width: "10%" }}
-                      onClick={() => remove(name)}
-                    />
-                  </Input.Group>
-                </Form.Item>
-              ))}
-              <Form.Item {...tailLayout}>
-                <Button
-                  type="dashed"
-                  onClick={() => add()}
-                  style={{ width: "100%" }}
-                  icon={<PlusOutlined />}
-                >
-                  Add component UUID proposition
-                </Button>
-                <Form.ErrorList errors={errors} />
-              </Form.Item>
-            </>
-          )}
-        </Form.List>
-
-        <Form.List name="nearnormalHemisphericalVisibleTransmittances">
-          {(fields, { add, remove }, { errors }) => (
-            <>
-              {fields.map(({ key, name, fieldKey, ...restField }, index) => (
-                <Form.Item
-                  key={key}
-                  label={
-                    index === 0
-                      ? "Nearnormal hemispherical visible transmittance"
-                      : " "
-                  }
-                >
-                  <Input.Group>
-                    <Form.Item
-                      {...restField}
-                      key={`negator${key}`}
-                      name={[name, "negator"]}
-                      fieldKey={[fieldKey, "negator"]}
-                      noStyle
-                      initialValue={Negator.Is}
-                    >
-                      <Select style={{ width: "10%" }}>
-                        <Select.Option value={Negator.Is}>Is</Select.Option>
-                        <Select.Option value={Negator.IsNot}>
-                          Is not
-                        </Select.Option>
-                      </Select>
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      key={`comperator${key}`}
-                      name={[name, "comperator"]}
-                      fieldKey={[fieldKey, "comperator"]}
-                      noStyle
-                      initialValue={
-                        NearnormalHemisphericalVisibleTransmittanceComperator.EqualTo
-                      }
-                    >
-                      <Select style={{ width: "20%" }}>
-                        <Select.Option
-                          value={
-                            NearnormalHemisphericalVisibleTransmittanceComperator.EqualTo
-                          }
-                        >
-                          equal to
-                        </Select.Option>
-                        <Select.Option
-                          value={
-                            NearnormalHemisphericalVisibleTransmittanceComperator.GreaterThanOrEqualTo
-                          }
-                        >
-                          greater than or equal to
-                        </Select.Option>
-                        <Select.Option
-                          value={
-                            NearnormalHemisphericalVisibleTransmittanceComperator.LessThanOrEqualTo
-                          }
-                        >
-                          less than or equal to
-                        </Select.Option>
-                        {/* TODO `inClosedInverval` */}
-                      </Select>
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      key={`value${key}`}
-                      name={[name, "value"]}
-                      fieldKey={[fieldKey, "value"]}
-                      noStyle
-                    >
-                      <InputNumber
-                        min={0}
-                        max={1}
-                        step="0.01"
-                        style={{ width: "60%" }}
-                      />
-                    </Form.Item>
-                    <MinusCircleOutlined
-                      style={{ width: "10%" }}
-                      onClick={() => remove(name)}
-                    />
-                  </Input.Group>
-                </Form.Item>
-              ))}
-              <Form.Item {...tailLayout}>
-                <Button
-                  type="dashed"
-                  onClick={() => add()}
-                  style={{ width: "100%" }}
-                  icon={<PlusOutlined />}
-                >
-                  Add nearnormal hemispherical visible transmittance proposition
-                </Button>
-                <Form.ErrorList errors={errors} />
-              </Form.Item>
-            </>
-          )}
-        </Form.List>
+        <UuidPropositionFormList name="componentIds" label="Component Id" />
+        <FloatPropositionFormList
+          name="infraredEmittances"
+          label="Infrared emittance"
+        />
+        <FloatPropositionFormList
+          name="nearnormalHemisphericalSolarReflectances"
+          label="Nearnormal hemispherical solar reflectance"
+        />
+        <FloatPropositionFormList
+          name="nearnormalHemisphericalSolarTransmittances"
+          label="Nearnormal hemispherical solar transmittance"
+        />
+        <FloatPropositionFormList
+          name="nearnormalHemisphericalVisibleReflectances"
+          label="Nearnormal hemispherical visible reflectance"
+        />
+        <FloatPropositionFormList
+          name="nearnormalHemisphericalVisibleTransmittances"
+          label="Nearnormal hemispherical visible transmittance"
+        />
 
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={filtering}>
@@ -490,12 +437,52 @@ function Page() {
             ),
           },
           {
-            title: "Nearnormal Hemispherical Visible Transmittances",
-            key: "nearnormalHemisphericalVisibleTransmittances",
-            render: (_text, record, _index) =>
-              record.nearnormalHemisphericalVisibleTransmittances
-                .map((x) => x.toLocaleString("en"))
-                .join(", "),
+            title: "Emittances, Reflectances, and Transmittances",
+            key: "nearnormalHemisphericalX",
+            render: (_text, record, _index) => (
+              <Descriptions column={1}>
+                <Descriptions.Item
+                  key="infraredEmittances"
+                  label="Infrared Emittances"
+                >
+                  {record.infraredEmittances
+                    .map((x) => x.toLocaleString("en"))
+                    .join(", ")}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  key="nearnormalHemisphericalSolarReflectances"
+                  label="Nearnormal Hemispherical Solar Reflectances"
+                >
+                  {record.nearnormalHemisphericalSolarReflectances
+                    .map((x) => x.toLocaleString("en"))
+                    .join(", ")}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  key="nearnormalHemisphericalSolarTransmittances"
+                  label="Nearnormal Hemispherical Solar Transmittances"
+                >
+                  {record.nearnormalHemisphericalSolarTransmittances
+                    .map((x) => x.toLocaleString("en"))
+                    .join(", ")}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  key="nearnormalHemisphericalVisibleReflectances"
+                  label="Nearnormal Hemispherical Visible Reflectances"
+                >
+                  {record.nearnormalHemisphericalVisibleReflectances
+                    .map((x) => x.toLocaleString("en"))
+                    .join(", ")}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  key="nearnormalHemisphericalVisibleTransmittances"
+                  label="Nearnormal Hemispherical Visible Transmittances"
+                >
+                  {record.nearnormalHemisphericalVisibleTransmittances
+                    .map((x) => x.toLocaleString("en"))
+                    .join(", ")}
+                </Descriptions.Item>
+              </Descriptions>
+            ),
           },
         ]}
         dataSource={data}
