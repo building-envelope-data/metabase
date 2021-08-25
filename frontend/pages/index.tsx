@@ -2,6 +2,8 @@ import Layout from "../components/Layout";
 import { Typography } from "antd";
 import Link from "next/link";
 import paths from "../paths";
+import Image from "next/image";
+import overviewImage from "../public/overview.png";
 
 function Page() {
   return (
@@ -51,6 +53,27 @@ function Page() {
           </Typography.Link>
           .
         </Typography.Paragraph>
+        <Typography.Paragraph>
+          With{" "}
+          <Typography.Link
+            href={paths.dataFormat("9ca9e8f5-94bf-4fdd-81e3-31a58d7ca708")}
+          >
+            BED-JSON
+          </Typography.Link>
+          , <Link href={paths.home}>buildingenvelopedata.org</Link> offers a
+          general format for optical, calorimetric and photovoltaic data sets.
+          It is defined by the JSON Schemas of the{" "}
+          <Typography.Link href="https://github.com/ise621/building-envelope-data">
+            buildingenvelopedata.org API specification
+          </Typography.Link>
+          . Other data formats are as well available. The{" "}
+          <Typography.Link href="https://github.com/ise621/metabase">
+            source code
+          </Typography.Link>{" "}
+          of the metabase is available at{" "}
+          <Typography.Link href="https://github.com">GitHub</Typography.Link>.
+        </Typography.Paragraph>
+        <Image width={1619} height={724} src={overviewImage} />
       </div>
     </Layout>
   );
