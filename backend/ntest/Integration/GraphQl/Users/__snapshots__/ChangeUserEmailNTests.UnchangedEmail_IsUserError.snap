@@ -1,0 +1,1 @@
+﻿{"data":{"changeUserEmail":{"user":{"id":"VXNlcgpnNmRjOTkwY2UyMGU5NDc3MzljNmJjMGQxYjYzMmI5MzA=","email":"john.doe@ise.fraunhofer.de"},"errors":[{"code":"UNCHANGED_EMAIL","message":"Your email is unchanged.","path":["input","newEmail"]}]}}}

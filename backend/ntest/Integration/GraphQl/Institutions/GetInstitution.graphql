@@ -1,0 +1,11 @@
+query institution($uuid: Uuid!) {
+  institution(uuid: $uuid) {
+    id
+    uuid
+    name
+    abbreviation
+    description
+    websiteLocator
+    state
+  }
+}
