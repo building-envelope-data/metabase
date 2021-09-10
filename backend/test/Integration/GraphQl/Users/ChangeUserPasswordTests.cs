@@ -69,25 +69,27 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        // [Fact]
-        // public async Task UnconfirmedUser_IsError()
-        // {
-        //     // Arrange
-        //     var email = "john.doe@ise.fraunhofer.de";
-        //     var password = "aaaAAA123$!@";
-        //     await RegisterAndLoginUser(
-        //         email: email,
-        //         password: password
-        //     ).ConfigureAwait(false);
-        //     // Act
-        //     var response = await ChangeUserPassword(
-        //         currentPassword: password,
-        //         newPassword: "new" + password
-        //         ).ConfigureAwait(false);
-        //     // Assert
-        //     Snapshot.Match(response);
-        // }
 
+         [Fact]
+         public async Task UnconfirmedUser_IsError()
+         {
+             // Arrange
+             var email = "john.doe@ise.fraunhofer.de";
+             var password = "aaaAAA123$!@";
+             await RegisterAndConfirmAndLoginUser(
+                 email: email,
+                 password: password
+             ).ConfigureAwait(false);
+             // Act
+             var response = await ChangeUserPassword(
+                 currentPassword: password,
+                 newPassword: "new" + password
+                 ).ConfigureAwait(false);
+             // Assert
+             Snapshot.Match(response);
+         }
+
+ 
         [Fact]
         public async Task PasswordConfirmationMismatch_IsUserError()
         {
