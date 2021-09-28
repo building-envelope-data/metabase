@@ -10,7 +10,6 @@ using NUnit.Framework;
 namespace Metabase.NTests.Integration.GraphQl.Components
 {
     [TestFixture]
-    //[Collection(nameof(Data.Component))]
     public sealed class GetComponentsNTests
       : ComponentIntegrationNTests
     {
