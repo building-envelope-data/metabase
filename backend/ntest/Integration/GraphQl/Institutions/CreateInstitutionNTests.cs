@@ -10,7 +10,6 @@ using NUnit.Framework;
 namespace Metabase.NTests.Integration.GraphQl.Institutions
 {
     [TestFixture]
-    //[Collection(nameof(Data.Institution))]
     public sealed class CreateInstitutionNTests
       : InstitutionIntegrationNTests
     {
@@ -39,16 +38,16 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
             // Assert
             Snapshot.Match(response);
         }
-/*
-        [Datapoint]
-        string input = nameof(EnumerateInstitutionInputs);
+        
+        [TestCaseSource(nameof(EnumerateInstitutionInputs))]
         [Theory]
-        //[MemberData(nameof(EnumerateInstitutionInputs))]
         public async Task LoggedInUser_IsSuccess(
             string key,
             CreateInstitutionInput input
         )
         {
+            SnapshotFullName testName = new SnapshotFullName("CreateInstitutionNTests.LoggedInUser_IsSuccess_" + key, @".");
+
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
@@ -61,7 +60,7 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
             // Assert
             Snapshot.Match(
                 response,
-                SnapshotNameExtension.Create(key),
+                testName,
                 matchOptions => matchOptions
                 .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.createInstitution.institution.id").Should().NotBeNullOrWhiteSpace()
@@ -71,14 +70,17 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
                  )
                 );
         }
+
         
+        [TestCaseSource(nameof(EnumerateInstitutionInputs))]
         [Theory]
-        [MemberData(nameof(EnumerateInstitutionInputs))]
         public async Task LoggedInUser_CreatesInstitution(
             string key,
             CreateInstitutionInput input
         )
         {
+            SnapshotFullName testName = new SnapshotFullName("CreateInstitutionNTests.LoggedInUser_CreatesInstitution_" + key, @".");
+
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
@@ -92,7 +94,7 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
             // Assert
             Snapshot.Match(
                 response,
-                SnapshotNameExtension.Create(key),
+                testName,
                 matchOptions => matchOptions
                 .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.institutions.edges[*].node.id").Should().Be(institutionId)
@@ -101,6 +103,6 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
                  fieldOptions.Field<Guid>("data.institutions.edges[*].node.uuid").Should().Be(institutionUuid)
                  )
                 );
-        } */
+        }
     }
-}
+}    
