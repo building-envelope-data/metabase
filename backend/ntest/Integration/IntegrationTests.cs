@@ -14,9 +14,11 @@ using IdentityModel.Client;
 using Json.Path;
 using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
+using NUnit.Framework;
 
 namespace Metabase.NTests.Integration
 {
+    [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
     public abstract class IntegrationTests
     {
         protected CustomWebApplicationFactory Factory { get; }
@@ -269,21 +271,6 @@ namespace Metabase.NTests.Integration
                 ).ConfigureAwait(false);
             return uuid;
         }
-
-        // protected async Task RegisterAndLoginUser(
-        //     string email,
-        //     string password
-        // )
-        // {
-        //     await RegisterUser(
-        //             email: email,
-        //             password: password
-        //             ).ConfigureAwait(false);
-        //     await LoginUser(
-        //         email: email,
-        //         password: password
-        //     ).ConfigureAwait(false);
-        // }
 
         protected async Task<Guid> RegisterAndConfirmAndLoginUser(
             string name = DefaultName,
