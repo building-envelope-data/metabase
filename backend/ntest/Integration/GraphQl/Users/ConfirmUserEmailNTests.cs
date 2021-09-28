@@ -6,7 +6,6 @@ using NUnit.Framework;
 namespace Metabase.NTests.Integration.GraphQl.Users
 {
     [TestFixture]
-    //[Collection(nameof(Data.User))]
     public sealed class ConfirmUserEmailNTests
       : UserIntegrationNTests
     {
@@ -102,7 +101,6 @@ namespace Metabase.NTests.Integration.GraphQl.Users
                  )
             );
         }
-
 
         [Test]
         public async Task UnknownUser_IsUserError()

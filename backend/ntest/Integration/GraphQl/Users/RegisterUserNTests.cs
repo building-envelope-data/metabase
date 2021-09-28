@@ -7,7 +7,6 @@ using NUnit.Framework;
 namespace Metabase.NTests.Integration.GraphQl.Users
 {
     [TestFixture]
-    //[Collection(nameof(Data.User))]
     public sealed class RegisterUserNTests
       : UserIntegrationNTests
     {

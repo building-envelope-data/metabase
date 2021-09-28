@@ -6,7 +6,6 @@ using NUnit.Framework;
 namespace Metabase.NTests.Integration.GraphQl.Users
 {
     [TestFixture]
-    //[Collection(nameof(Data.User))]
     public sealed class ConfirmUserEmailChangeNTests
       : UserIntegrationNTests
     {
@@ -29,7 +28,6 @@ namespace Metabase.NTests.Integration.GraphQl.Users
         }
 
         [Test]
-        
         public async Task ValidData_ConfirmsUserEmailChange()
         {
             // Arrange
@@ -55,7 +53,6 @@ namespace Metabase.NTests.Integration.GraphQl.Users
         }
 
         [Test]
-        
         public async Task UnknownUser_IsUserError()
         {
             // Arrange
@@ -76,7 +73,6 @@ namespace Metabase.NTests.Integration.GraphQl.Users
         }
 
         [Test]
-        
         public async Task DuplicateEmail_IsUserError()
         {
             // Arrange
@@ -101,7 +97,6 @@ namespace Metabase.NTests.Integration.GraphQl.Users
         }
 
         [Test]
-        
         public async Task DifferentNewEmail_IsUserError()
         {
             // Arrange
@@ -122,7 +117,6 @@ namespace Metabase.NTests.Integration.GraphQl.Users
         }
 
         [Test]
-        
         public async Task InvalidConfirmationCode_IsUserError()
         {
             // Arrange
