@@ -1,1 +1,1 @@
-﻿{"data":{"changeUserEmail":{"user":{"id":"VXNlcgpnYjIyMWQ0MjYxMTYwNDgwNGEzY2ViYTQ0N2NmNjMzNWQ=","email":"john.doe@ise.fraunhofer.de"},"errors":[{"code":"UNCHANGED_EMAIL","message":"Your email is unchanged.","path":["input","newEmail"]}]}}}
+﻿{"data":{"changeUserEmail":{"user":{"id":"VXNlcgpnMzQxNzBmN2M4OGU1NDc4ZmJlMjJlYzFhZTI0ODY5N2E=","email":"john.doe@ise.fraunhofer.de"},"errors":[{"code":"UNCHANGED_EMAIL","message":"Your email is unchanged.","path":["input","newEmail"]}]}}}
