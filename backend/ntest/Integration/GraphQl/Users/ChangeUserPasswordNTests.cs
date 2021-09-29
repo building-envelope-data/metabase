@@ -75,7 +75,6 @@ namespace Metabase.NTests.Integration.GraphQl.Users
             // Arrange
             var email = "john.doe@ise.fraunhofer.de";
             var password = "aaaAAA123$!@";
-            //await RegisterAndLoginUser(  TODO remove this when tests succeed
             await RegisterAndConfirmAndLoginUser(              
                 email: email,
                 password: password
