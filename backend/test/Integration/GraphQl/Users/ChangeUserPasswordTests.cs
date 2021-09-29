@@ -86,7 +86,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                  newPassword: "new" + password
                  ).ConfigureAwait(false);
              // Assert
-             Snapshot.Match(response);
+             Snapshot.Match(
+                response,
+                matchOptions => matchOptions
+                .Assert(fieldOptions =>
+                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
+                 )
+            );
          }
 
  
