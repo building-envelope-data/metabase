@@ -575,6 +575,14 @@ namespace Metabase.NTests.Integration
             return result;
         }
 
+        protected static string SnapshooterNameHelper(
+            string classname,
+            string testname,
+            string keyname
+        ){
+            return classname + "." + testname + "_" + keyname;
+        }
+
         private sealed class GraphQlRequest
         {
             public string Query { get; }
