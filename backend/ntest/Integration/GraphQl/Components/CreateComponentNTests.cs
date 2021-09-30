@@ -49,7 +49,7 @@ namespace Metabase.NTests.Integration.GraphQl.Components
             CreateComponentInput input
         )
         {
-            SnapshotFullName testName = new SnapshotFullName("CreateComponentNTests.LoggedInUser_IsSuccess_" + key, @".");
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentNTests), nameof(LoggedInUser_IsSuccess), key), @".");
             
             // Arrange        
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
@@ -89,7 +89,7 @@ namespace Metabase.NTests.Integration.GraphQl.Components
             CreateComponentInput input
         )
         {
-            SnapshotFullName testName = new SnapshotFullName("CreateComponentNTests.LoggedInUser_CreatesComponent_" + key, @".");
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentNTests), nameof(LoggedInUser_CreatesComponent), key), @".");
 
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);

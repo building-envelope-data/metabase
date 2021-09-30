@@ -46,7 +46,7 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
             CreateInstitutionInput input
         )
         {
-            SnapshotFullName testName = new SnapshotFullName("CreateInstitutionNTests.LoggedInUser_IsSuccess_" + key, @".");
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateInstitutionNTests), nameof(LoggedInUser_IsSuccess),key), @".");
 
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
@@ -79,7 +79,7 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
             CreateInstitutionInput input
         )
         {
-            SnapshotFullName testName = new SnapshotFullName("CreateInstitutionNTests.LoggedInUser_CreatesInstitution_" + key, @".");
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateInstitutionNTests), nameof(LoggedInUser_CreatesInstitution), key), @".");
 
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
