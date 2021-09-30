@@ -119,10 +119,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -
 -
 
-## [0.0.0] - 2019-10-17
-
--   Put source code under version control
-
-[Unreleased]: https://github.com/ise621/metabase/compare/v0.0.0...HEAD
-
-[0.0.0]: https://gitlab.cc-asp.fraunhofer.de/ise621/icon/tree/v0.0.0
+[Unreleased]: https://github.com/ise621/metabase/compare/main...develop
