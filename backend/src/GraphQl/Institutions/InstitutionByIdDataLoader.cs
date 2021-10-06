@@ -1,5 +1,5 @@
 using GreenDonut;
-using Metabase.GraphQl.Entitys;
+using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Institutions
