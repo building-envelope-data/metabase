@@ -221,7 +221,7 @@ namespace Metabase.GraphQl.Users
         {
             // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
             public async Task<TwoFactorAuthentication?> GetTwoFactorAuthenticationAsync(
-              Data.User user,
+              [Parent] Data.User user,
               [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
               [ScopedService] UserManager<Data.User> userManager,
               [ScopedService] SignInManager<Data.User> signInManager
@@ -252,7 +252,7 @@ namespace Metabase.GraphQl.Users
             }
 
             public async Task<IEnumerable<Enumerations.UserRole>> GetRolesAsync(
-              Data.User user,
+              [Parent] Data.User user,
               [ScopedService] UserManager<Data.User> userManager
             )
             {

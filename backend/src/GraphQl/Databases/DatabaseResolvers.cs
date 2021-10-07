@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using HotChocolate;
 
 namespace Metabase.GraphQl.Databases
 {
@@ -46,7 +47,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<DataX.IData?> GetDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             Guid id,
             DateTime? timestamp,
             string? locale,
@@ -81,7 +82,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<DataX.OpticalData?> GetOpticalDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             Guid id,
             DateTime? timestamp,
             string? locale,
@@ -117,7 +118,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<DataX.HygrothermalData?> GetHygrothermalDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             Guid id,
             DateTime? timestamp,
             string? locale,
@@ -153,7 +154,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<DataX.CalorimetricData?> GetCalorimetricDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             Guid id,
             DateTime? timestamp,
             string? locale,
@@ -189,7 +190,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<DataX.PhotovoltaicData?> GetPhotovoltaicDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             Guid id,
             DateTime? timestamp,
             string? locale,
@@ -225,7 +226,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<DataX.DataConnection?> GetAllDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.DataPropositionInput where,
             DateTime? timestamp,
             string? locale,
@@ -269,7 +270,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<DataX.OpticalDataConnection?> GetAllOpticalDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.OpticalDataPropositionInput where,
             DateTime? timestamp,
             string? locale,
@@ -315,7 +316,7 @@ namespace Metabase.GraphQl.Databases
 
 
         public async Task<DataX.HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.HygrothermalDataPropositionInput where,
             DateTime? timestamp,
             string? locale,
@@ -361,7 +362,7 @@ namespace Metabase.GraphQl.Databases
 
 
         public async Task<DataX.CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.CalorimetricDataPropositionInput where,
             DateTime? timestamp,
             string? locale,
@@ -406,7 +407,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<DataX.PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.PhotovoltaicDataPropositionInput where,
             DateTime? timestamp,
             string? locale,
@@ -451,7 +452,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<bool?> GetHasDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.DataPropositionInput where,
             DateTime? timestamp,
             string? locale,
@@ -485,7 +486,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<bool?> GetHasOpticalDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.DataPropositionInput where,
             DateTime? timestamp,
             string? locale,
@@ -519,7 +520,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<bool?> GetHasCalorimetricDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.DataPropositionInput where,
             DateTime? timestamp,
             string? locale,
@@ -553,7 +554,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<bool?> GetHasHygrothermalDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.DataPropositionInput where,
             DateTime? timestamp,
             string? locale,
@@ -587,7 +588,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public async Task<bool?> GetHasPhotovoltaicDataAsync(
-            Data.Database database,
+            [Parent] Data.Database database,
             DataX.DataPropositionInput where,
             DateTime? timestamp,
             string? locale,

@@ -35,7 +35,7 @@ import MethodTable from "../methods/MethodTable";
 import { messageApolloError } from "../../lib/apollo";
 
 export type InstitutionProps = {
-  institutionId: Scalars["Uuid"];
+  institutionId: Scalars["UUID"];
 };
 
 export default function Institution({ institutionId }: InstitutionProps) {
@@ -54,7 +54,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
   ] = useState(false);
 
   const confirmInstitutionMethodDeveloper = async (
-    methodId: Scalars["Uuid"]
+    methodId: Scalars["UUID"]
   ) => {
     try {
       setConfirmingInstitutionMethodDeveloper(true);
@@ -98,7 +98,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
   const [confirmingComponentManufacturer, setConfirmingComponentManufacturer] =
     useState(false);
 
-  const confirmComponentManufacturer = async (componentId: Scalars["Uuid"]) => {
+  const confirmComponentManufacturer = async (componentId: Scalars["UUID"]) => {
     try {
       setConfirmingComponentManufacturer(true);
       const { errors, data } = await confirmComponentManufacturerMutation({

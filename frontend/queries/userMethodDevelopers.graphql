@@ -1,4 +1,4 @@
-mutation ConfirmUserMethodDeveloper($methodId: Uuid!, $userId: Uuid!) {
+mutation ConfirmUserMethodDeveloper($methodId: UUID!, $userId: UUID!) {
   confirmUserMethodDeveloper(input: { methodId: $methodId, userId: $userId }) {
     errors {
       code

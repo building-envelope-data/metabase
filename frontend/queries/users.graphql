@@ -13,7 +13,7 @@ query Users {
   }
 }
 
-query User($uuid: Uuid!) {
+query User($uuid: UUID!) {
   user(uuid: $uuid) {
     id
     uuid
@@ -161,7 +161,7 @@ mutation ResetUserPassword(
   }
 }
 
-mutation DeleteUser($userId: Uuid!) {
+mutation DeleteUser($userId: UUID!) {
   deleteUser(input: { userId: $userId }) {
     errors {
       code
@@ -171,7 +171,7 @@ mutation DeleteUser($userId: Uuid!) {
   }
 }
 
-mutation AddUserRole($userId: Uuid!, $role: UserRole!) {
+mutation AddUserRole($userId: UUID!, $role: UserRole!) {
   addUserRole(input: { userId: $userId, role: $role }) {
     errors {
       code
@@ -181,7 +181,7 @@ mutation AddUserRole($userId: Uuid!, $role: UserRole!) {
   }
 }
 
-mutation RemoveUserRole($userId: Uuid!, $role: UserRole!) {
+mutation RemoveUserRole($userId: UUID!, $role: UserRole!) {
   removeUserRole(input: { userId: $userId, role: $role }) {
     errors {
       code

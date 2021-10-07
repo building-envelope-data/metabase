@@ -20,7 +20,7 @@ query Databases {
   }
 }
 
-query Database($uuid: Uuid!) {
+query Database($uuid: UUID!) {
   database(uuid: $uuid) {
     ...DatabasePartial
   }
@@ -29,8 +29,8 @@ query Database($uuid: Uuid!) {
 mutation CreateDatabase(
   $name: String!
   $description: String!
-  $locator: Url!
-  $operatorId: Uuid!
+  $locator: URL!
+  $operatorId: UUID!
 ) {
   createDatabase(
     input: {

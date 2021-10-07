@@ -19,7 +19,7 @@ query Components {
   }
 }
 
-query Component($uuid: Uuid!) {
+query Component($uuid: UUID!) {
   component(uuid: $uuid) {
     id
     uuid
@@ -49,8 +49,8 @@ mutation CreateComponent(
   $description: String!
   $categories: [ComponentCategory!]!
   $availability: OpenEndedDateTimeRangeInput
-  $manufacturerId: Uuid!
-  $furtherManufacturerIds: [Uuid!]!
+  $manufacturerId: UUID!
+  $furtherManufacturerIds: [UUID!]!
 ) {
   createComponent(
     input: {

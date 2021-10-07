@@ -7,7 +7,7 @@ import { Reference } from "../Reference";
 import { messageApolloError } from "../../lib/apollo";
 
 export type DataFormatProps = {
-  dataFormatId: Scalars["Uuid"];
+  dataFormatId: Scalars["UUID"];
 };
 
 export default function DataFormat({ dataFormatId }: DataFormatProps) {

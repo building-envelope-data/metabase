@@ -1,6 +1,6 @@
 mutation ConfirmInstitutionRepresentative(
-  $institutionId: Uuid!
-  $userId: Uuid!
+  $institutionId: UUID!
+  $userId: UUID!
 ) {
   confirmInstitutionRepresentative(
     input: { institutionId: $institutionId, userId: $userId }

@@ -18,7 +18,7 @@ const tailLayout = {
 };
 
 export type CreateDatabaseProps = {
-  operatorId: Scalars["Uuid"];
+  operatorId: Scalars["UUID"];
 };
 
 export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
@@ -50,7 +50,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
   }: {
     name: string;
     description: string;
-    locator: Scalars["Url"];
+    locator: Scalars["URL"];
   }) => {
     const create = async () => {
       try {

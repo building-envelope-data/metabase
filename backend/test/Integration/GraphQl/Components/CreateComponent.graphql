@@ -4,8 +4,8 @@ mutation createComponent(
   $description: String!
   $availability: OpenEndedDateTimeRangeInput
   $categories: [ComponentCategory!]!
-  $manufacturerId: Uuid!
-  $furtherManufacturerIds: [Uuid!]!
+  $manufacturerId: UUID!
+  $furtherManufacturerIds: [UUID!]!
 ) {
   createComponent(
     input: {

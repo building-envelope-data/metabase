@@ -7,7 +7,7 @@ import paths from "../../paths";
 import { messageApolloError } from "../../lib/apollo";
 
 export type DatabaseProps = {
-  databaseId: Scalars["Uuid"];
+  databaseId: Scalars["UUID"];
 };
 
 export default function Database({ databaseId }: DatabaseProps) {

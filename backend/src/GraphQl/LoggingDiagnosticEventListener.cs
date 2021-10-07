@@ -15,7 +15,7 @@ namespace Metabase.GraphQl
     // Inspired by https://chillicream.com/blog/2019/03/19/logging-with-hotchocolate
     // and https://chillicream.com/blog/2021/01/10/hot-chocolate-logging
     public sealed class LoggingDiagnosticEventListener
-    : DiagnosticEventListener
+    : ExecutionDiagnosticEventListener
     {
         private static Stopwatch s_queryTimer = null!;
         private readonly ILogger<LoggingDiagnosticEventListener> _logger;
@@ -28,7 +28,7 @@ namespace Metabase.GraphQl
         }
 
         // this diagnostic event is raised when a request is executed ...
-        public override IActivityScope ExecuteRequest(IRequestContext context)
+        public override IDisposable ExecuteRequest(IRequestContext context)
         {
             // ... we will return an activity scope that is used to signal when the request is finished.
             return new RequestScope(_logger, context);
@@ -94,7 +94,7 @@ namespace Metabase.GraphQl
             return $"{error}(Code {error.Code}, Message {error.Message}, Path {error.Path?.Print()})";
         }
 
-        private class RequestScope : IActivityScope
+        private class RequestScope : IDisposable
         {
             private readonly IRequestContext _context;
             private readonly ILogger<LoggingDiagnosticEventListener> _logger;

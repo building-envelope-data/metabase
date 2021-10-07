@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
-using HotChocolate.DataLoader;
 using Microsoft.EntityFrameworkCore;
 using Guid = System.Guid;
 
@@ -19,11 +18,12 @@ namespace Metabase.GraphQl.Entities
 
         protected AssociationsByAssociateIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory,
             Func<Data.ApplicationDbContext, IReadOnlyList<Guid>, IQueryable<TAssociation>> getAssociations,
             Func<TAssociation, Guid> getAssociateId
             )
-            : base(batchScheduler)
+            : base(batchScheduler, options)
         {
             _dbContextFactory = dbContextFactory;
             _getAssociations = getAssociations;

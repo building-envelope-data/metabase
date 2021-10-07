@@ -10,10 +10,12 @@ namespace Metabase.GraphQl.Methods
     {
         public PendingInstitutionMethodDevelopersByMethodIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
+                options,
                 dbContextFactory,
                 (dbContext, ids) =>
                     dbContext.InstitutionMethodDevelopers.AsQueryable().Where(x =>

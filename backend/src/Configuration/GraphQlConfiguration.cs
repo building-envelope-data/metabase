@@ -30,7 +30,8 @@ namespace Metabase.Configuration
             .AddApolloTracing(
                 HotChocolate.Execution.Options.TracingPreference.OnDemand
             ) // TODO Do we want or need this?
-            .EnableRelaySupport()
+            .AddGlobalObjectIdentification()
+            .AddQueryFieldToMutationPayloads()
             .ModifyOptions(options =>
               {
                   // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Configuration/Contracts/ISchemaOptions.cs

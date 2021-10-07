@@ -45,7 +45,7 @@ query DataFormats {
   }
 }
 
-query DataFormat($uuid: Uuid!) {
+query DataFormat($uuid: UUID!) {
   dataFormat(uuid: $uuid) {
     ...DataFormatPartial
   }
@@ -56,10 +56,10 @@ mutation CreateDataFormat(
   $extension: String
   $description: String!
   $mediaType: String!
-  $schemaLocator: Url
+  $schemaLocator: URL
   $standard: CreateStandardInput
   $publication: CreatePublicationInput
-  $managerId: Uuid!
+  $managerId: UUID!
 ) {
   createDataFormat(
     input: {

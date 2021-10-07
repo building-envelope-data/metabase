@@ -20,7 +20,7 @@ const tailLayout = {
 };
 
 export type CreateComponentProps = {
-  manufacturerId: Scalars["Uuid"];
+  manufacturerId: Scalars["UUID"];
 };
 
 export default function CreateComponent({
@@ -63,7 +63,7 @@ export default function CreateComponent({
       | null
       | undefined;
     categories: ComponentCategory[] | null | undefined;
-    furtherManufacturerIds: Scalars["Uuid"] | null | undefined;
+    furtherManufacturerIds: Scalars["UUID"] | null | undefined;
   }) => {
     const create = async () => {
       try {

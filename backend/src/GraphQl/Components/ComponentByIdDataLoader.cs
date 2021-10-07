@@ -9,10 +9,12 @@ namespace Metabase.GraphQl.Components
     {
         public ComponentByIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
+                options,
                 dbContextFactory,
                 dbContext => dbContext.Components
                 )

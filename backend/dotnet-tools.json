@@ -9,19 +9,19 @@
       ]
     },
     "dotnet-counters": {
-      "version": "5.0.227602",
+      "version": "5.0.248003",
       "commands": [
         "dotnet-counters"
       ]
     },
     "dotnet-dump": {
-      "version": "5.0.227602",
+      "version": "5.0.248003",
       "commands": [
         "dotnet-dump"
       ]
     },
     "dotnet-ef": {
-      "version": "5.0.8",
+      "version": "5.0.10",
       "commands": [
         "dotnet-ef"
       ]
@@ -33,37 +33,37 @@
       ]
     },
     "dotnet-script": {
-      "version": "1.1.0",
+      "version": "1.2.1",
       "commands": [
         "dotnet-script"
       ]
     },
     "dotnet-trace": {
-      "version": "5.0.227602",
+      "version": "5.0.248003",
       "commands": [
         "dotnet-trace"
       ]
     },
     "dotnet-gcdump": {
-      "version": "5.0.227602",
+      "version": "5.0.248003",
       "commands": [
         "dotnet-gcdump"
       ]
     },
     "dotnet-sos": {
-      "version": "5.0.227602",
+      "version": "5.0.248003",
       "commands": [
         "dotnet-sos"
       ]
     },
     "roslynator.dotnet.cli": {
-      "version": "0.1.5",
+      "version": "0.2.0",
       "commands": [
         "roslynator"
       ]
     },
     "jetbrains.resharper.globaltools": {
-      "version": "2021.1.4",
+      "version": "2021.2.1",
       "commands": [
         "jb"
       ]

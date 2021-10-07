@@ -27,13 +27,13 @@ type FormValues = {
   extension: string | null | undefined;
   description: string;
   mediaType: string;
-  schemaLocator: Scalars["Url"] | null | undefined;
+  schemaLocator: Scalars["URL"] | null | undefined;
   standard: CreateStandardInput | null | undefined;
   publication: CreatePublicationInput | null | undefined;
 };
 
 export type CreateDataFormatProps = {
-  managerId: Scalars["Uuid"];
+  managerId: Scalars["UUID"];
 };
 
 export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {

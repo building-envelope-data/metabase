@@ -10,10 +10,12 @@ namespace Metabase.GraphQl.Institutions
     {
         public InstitutionRepresentativesByInstitutionIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
+                options,
                 dbContextFactory,
                 (dbContext, ids) =>
                     dbContext.InstitutionRepresentatives.AsQueryable().Where(x =>

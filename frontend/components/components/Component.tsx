@@ -8,7 +8,7 @@ import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
 import { messageApolloError } from "../../lib/apollo";
 
 export type ComponentProps = {
-  componentId: Scalars["Uuid"];
+  componentId: Scalars["UUID"];
 };
 
 export default function Component({ componentId }: ComponentProps) {

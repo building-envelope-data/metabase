@@ -1,6 +1,6 @@
 mutation ConfirmInstitutionMethodDeveloper(
-  $methodId: Uuid!
-  $institutionId: Uuid!
+  $methodId: UUID!
+  $institutionId: UUID!
 ) {
   confirmInstitutionMethodDeveloper(
     input: { methodId: $methodId, institutionId: $institutionId }

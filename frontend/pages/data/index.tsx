@@ -117,7 +117,7 @@ function Page() {
       | {
           negator: Negator;
           comparator: UuidPropositionComparator;
-          value: Scalars["Uuid"] | undefined;
+          value: Scalars["UUID"] | undefined;
         }[]
       | undefined;
     infraredEmittances:

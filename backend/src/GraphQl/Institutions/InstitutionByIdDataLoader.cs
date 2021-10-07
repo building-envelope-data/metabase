@@ -9,10 +9,12 @@ namespace Metabase.GraphQl.Institutions
     {
         public InstitutionByIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
+                options,
                 dbContextFactory,
                 dbContext => dbContext.Institutions
                 )

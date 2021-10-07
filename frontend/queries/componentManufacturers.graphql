@@ -1,6 +1,6 @@
 mutation ConfirmComponentManufacturer(
-  $componentId: Uuid!
-  $institutionId: Uuid!
+  $componentId: UUID!
+  $institutionId: UUID!
 ) {
   confirmComponentManufacturer(
     input: { componentId: $componentId, institutionId: $institutionId }

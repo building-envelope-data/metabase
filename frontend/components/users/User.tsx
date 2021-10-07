@@ -31,7 +31,7 @@ import AddUserRole from "./AddUserRole";
 import { messageApolloError } from "../../lib/apollo";
 
 export type UserProps = {
-  userId: Scalars["Uuid"];
+  userId: Scalars["UUID"];
 };
 
 export default function User({ userId }: UserProps) {
@@ -53,7 +53,7 @@ export default function User({ userId }: UserProps) {
   ] = useState(false);
 
   const confirmInstitutionRepresentative = async (
-    institutionId: Scalars["Uuid"]
+    institutionId: Scalars["UUID"]
   ) => {
     try {
       setConfirmingInstitutionRepresentative(true);
@@ -97,7 +97,7 @@ export default function User({ userId }: UserProps) {
   const [confirmingUserMethodDeveloper, setConfirmingUserMethodDeveloper] =
     useState(false);
 
-  const confirmUserMethodDeveloper = async (methodId: Scalars["Uuid"]) => {
+  const confirmUserMethodDeveloper = async (methodId: Scalars["UUID"]) => {
     try {
       setConfirmingUserMethodDeveloper(true);
       const { errors, data } = await confirmUserMethodDeveloperMutation({
