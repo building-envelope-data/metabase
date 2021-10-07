@@ -4,7 +4,7 @@ using Enum = System.Enum;
 namespace Metabase.GraphQl
 {
     public abstract class UserErrorBase<TUserErrorCode>
-      : GraphQl.UserError
+      : GraphQl.IUserError
       where TUserErrorCode : struct, Enum
     {
         public TUserErrorCode Code { get; }

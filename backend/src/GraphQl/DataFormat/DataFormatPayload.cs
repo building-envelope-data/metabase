@@ -4,7 +4,7 @@ namespace Metabase.GraphQl.DataFormats
 {
     public abstract class DataFormatPayload<TDataFormatError>
       : Payload
-      where TDataFormatError : UserError
+      where TDataFormatError : IUserError
     {
         public Data.DataFormat? DataFormat { get; }
         public IReadOnlyCollection<TDataFormatError>? Errors { get; }

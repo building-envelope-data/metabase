@@ -4,7 +4,7 @@ namespace Metabase.GraphQl.Institutions
 {
     public abstract class InstitutionPayload<TInstitutionError>
       : Payload
-      where TInstitutionError : UserError
+      where TInstitutionError : IUserError
     {
         public Data.Institution? Institution { get; }
         public IReadOnlyCollection<TInstitutionError>? Errors { get; }
