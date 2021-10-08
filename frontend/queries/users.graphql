@@ -68,7 +68,7 @@ query User($uuid: Uuid!) {
 
 mutation RegisterUser(
   $name: String!
-  $email: String!
+  $email: EmailAddress!
   $password: String!
   $passwordConfirmation: String!
 ) {
@@ -91,7 +91,7 @@ mutation RegisterUser(
   }
 }
 
-mutation ConfirmUserEmail($email: String!, $confirmationCode: String!) {
+mutation ConfirmUserEmail($email: EmailAddress!, $confirmationCode: String!) {
   confirmUserEmail(
     input: { email: $email, confirmationCode: $confirmationCode }
   ) {
@@ -107,8 +107,8 @@ mutation ConfirmUserEmail($email: String!, $confirmationCode: String!) {
 }
 
 mutation ConfirmUserEmailChange(
-  $currentEmail: String!
-  $newEmail: String!
+  $currentEmail: EmailAddress!
+  $newEmail: EmailAddress!
   $confirmationCode: String!
 ) {
   confirmUserEmailChange(
@@ -129,7 +129,7 @@ mutation ConfirmUserEmailChange(
   }
 }
 
-mutation RequestUserPasswordReset($email: String!) {
+mutation RequestUserPasswordReset($email: EmailAddress!) {
   requestUserPasswordReset(input: { email: $email }) {
     errors {
       code
@@ -140,7 +140,7 @@ mutation RequestUserPasswordReset($email: String!) {
 }
 
 mutation ResetUserPassword(
-  $email: String!
+  $email: EmailAddress!
   $password: String!
   $passwordConfirmation: String!
   $resetCode: String!

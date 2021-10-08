@@ -4,6 +4,7 @@ import Layout from "../../components/Layout";
 import { UserOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
+import { Scalars } from "../../__generated__/__types__";
 
 function Page() {
   const [requestUserPasswordResetMutation] =
@@ -14,7 +15,7 @@ function Page() {
   const [form] = Form.useForm();
   const [requesting, setLoggingIn] = useState(false);
 
-  const onFinish = ({ email }: { email: string }) => {
+  const onFinish = ({ email }: { email: Scalars["EmailAddress"] }) => {
     const login = async () => {
       try {
         setLoggingIn(true);

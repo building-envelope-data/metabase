@@ -7,6 +7,7 @@ import paths from "../../paths";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import Link from "next/link";
+import { Scalars } from "../../__generated__/__types__";
 
 const layout = {
   labelCol: { span: 8 },
@@ -34,7 +35,7 @@ function Register() {
     passwordConfirmation,
   }: {
     name: string;
-    email: string;
+    email: Scalars["EmailAddress"];
     password: string;
     passwordConfirmation: string;
   }) => {

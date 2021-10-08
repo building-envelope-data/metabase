@@ -1,4 +1,4 @@
-mutation loginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
+mutation loginUser($email: EmailAddress!, $password: String!, $rememberMe: Boolean!) {
   loginUser(
     input: { email: $email, password: $password, rememberMe: $rememberMe }
   ) {

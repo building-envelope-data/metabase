@@ -16,6 +16,7 @@ import {
   useChangeUserEmailMutation,
   useResendUserEmailVerificationMutation,
 } from "../../../queries/currentUser.graphql";
+import { Scalars } from "../../__generated__/__types__";
 
 const layout = {
   labelCol: { span: 8 },
@@ -76,7 +77,7 @@ function Page() {
     }
   };
 
-  const onFinish = ({ newEmail }: { newEmail: string }) => {
+  const onFinish = ({ newEmail }: { newEmail: Scalars["EmailAddress"] }) => {
     const change = async () => {
       try {
         setChanging(true);

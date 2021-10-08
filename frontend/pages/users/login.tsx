@@ -18,6 +18,7 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import paths from "../../paths";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
+import { Scalars } from "../../__generated__/__types__";
 
 function Login() {
   const router = useRouter();
@@ -35,7 +36,7 @@ function Login() {
     password,
     rememberMe,
   }: {
-    email: string;
+    email: Scalars["EmailAddress"];
     password: string;
     rememberMe: boolean;
   }) => {

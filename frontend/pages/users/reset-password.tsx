@@ -5,6 +5,7 @@ import paths from "../../paths";
 import { Button, Alert, Form, Input, message, Card, Col, Row } from "antd";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
+import { Scalars } from "../../__generated__/__types__";
 
 const layout = {
   labelCol: { span: 8 },
@@ -30,7 +31,7 @@ function Page() {
     password,
     passwordConfirmation,
   }: {
-    email: string;
+    email: Scalars["EmailAddress"];
     password: string;
     passwordConfirmation: string;
   }) => {

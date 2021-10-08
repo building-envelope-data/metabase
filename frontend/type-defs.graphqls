@@ -1207,14 +1207,14 @@ type UpdateInstitutionPayload {
 type User implements Node & Stakeholder {
   canCurrentUserDeleteUser: Boolean!
   developedMethods(pending: Boolean! = false): UserDevelopedMethodConnection!
-  email: String
+  email: EmailAddress
   hasPassword: Boolean
   id: ID!
   isEmailConfirmed: Boolean
   isPhoneNumberConfirmed: Boolean
   "Full name"
   name: String!
-  phoneNumber: String
+  phoneNumber: PhoneNumber
   representedInstitutions(pending: Boolean! = false): UserRepresentedInstitutionConnection!
   roles: [UserRole!]!
   rolesCurrentUserCanAdd: [UserRole!]!
@@ -2328,8 +2328,14 @@ directive @stream("Streamed when true." if: Boolean "The initial elements that s
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
 
+"The EmailAddress scalar type constitutes a valid email address, represented as a UTF-8 character sequence. The scalar follows the specification defined by the HTML Spec https:\/\/html.spec.whatwg.org\/multipage\/input.html#valid-e-mail-address."
+scalar EmailAddress
+
 "The NonNegativeInt scalar type represents a unsigned 32-bit numeric non-fractional value equal to or greater than 0."
 scalar NonNegativeInt
+
+"The PhoneNumber scalar type represents a value that conforms to the standard E.164 format."
+scalar PhoneNumber
 
 scalar Url
 
