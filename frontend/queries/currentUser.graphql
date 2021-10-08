@@ -15,7 +15,7 @@ query CurrentUser {
   }
 }
 
-mutation LoginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
+mutation LoginUser($email: EmailAddress!, $password: String!, $rememberMe: Boolean!) {
   loginUser(
     input: { email: $email, password: $password, rememberMe: $rememberMe }
   ) {
@@ -77,7 +77,7 @@ mutation LogoutUser {
   }
 }
 
-mutation ChangeUserEmail($newEmail: String!) {
+mutation ChangeUserEmail($newEmail: EmailAddress!) {
   changeUserEmail(input: { newEmail: $newEmail }) {
     user {
       ...CurrentUserPartial
@@ -221,7 +221,7 @@ mutation ResendUserEmailVerification {
   }
 }
 
-mutation SetUserPhoneNumber($phoneNumber: String!) {
+mutation SetUserPhoneNumber($phoneNumber: PhoneNumber!) {
   setUserPhoneNumber(input: { phoneNumber: $phoneNumber }) {
     user {
       ...CurrentUserPartial

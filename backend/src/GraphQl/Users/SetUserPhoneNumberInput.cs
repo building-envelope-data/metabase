@@ -1,6 +1,9 @@
+using HotChocolate;
+using HotChocolate.Types;
+
 namespace Metabase.GraphQl.Users
 {
     public record SetUserPhoneNumberInput(
-          string PhoneNumber
+          [GraphQLType(typeof(PhoneNumberType))] string PhoneNumber
         );
 }
