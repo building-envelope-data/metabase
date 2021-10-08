@@ -1,6 +1,9 @@
+using HotChocolate;
+using HotChocolate.Types;
+
 namespace Metabase.GraphQl.Users
 {
     public record RequestUserPasswordResetInput(
-          string Email
+          [GraphQLType(typeof(EmailAddressType))] string Email
         );
 }

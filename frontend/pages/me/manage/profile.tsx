@@ -15,6 +15,7 @@ import {
   useCurrentUserQuery,
   useSetUserPhoneNumberMutation,
 } from "../../../queries/currentUser.graphql";
+import { Scalars } from "../../../__generated__/__types__";
 
 const layout = {
   labelCol: { span: 8 },
@@ -51,7 +52,7 @@ function Page() {
   const [form] = Form.useForm();
   const [setting, setSetting] = useState(false);
 
-  const onFinish = ({ phoneNumber }: { phoneNumber: string }) => {
+  const onFinish = ({ phoneNumber }: { phoneNumber: Scalars["PhoneNumber"] }) => {
     const set = async () => {
       try {
         setSetting(true);
