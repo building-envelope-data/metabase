@@ -576,11 +576,11 @@ namespace Metabase.NTests.Integration
         }
 
         protected static string SnapshooterNameHelper(
-            string classname,
-            string testname,
-            string keyname
+            string className,
+            string testName,
+            string keyName
         ){
-            return classname + "." + testname + "_" + keyname;
+            return $"{className}.{testName}_{keyName}";
         }
 
         private sealed class GraphQlRequest
