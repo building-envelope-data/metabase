@@ -58,7 +58,6 @@ namespace Metabase.Configuration
                   // TODO Persisted queries
                   /* .AddFileSystemQueryStorage("./persisted_queries") */
                   /* .UsePersistedQueryPipeline(); */
-                  /* TODO services.AddDiagnosticObserver<GraphQl.DiagnosticObserver>(); */
                   .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
                   {
                       // HotChocolate uses the default cookie authentication
