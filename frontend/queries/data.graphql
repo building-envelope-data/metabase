@@ -90,7 +90,7 @@ query HasOpticalData($where: DataPropositionInput!) {
   databases {
     edges {
       node {
-        hasData(where: $where)
+        hasOpticalData(where: $where)
       }
     }
   }
