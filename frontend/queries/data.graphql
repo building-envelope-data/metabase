@@ -86,7 +86,7 @@ query AllOpticalData($where: OpticalDataPropositionInput!) {
   }
 }
 
-query HasOpticalData($where: DataPropositionInput!) {
+query HasOpticalData($where: OpticalDataPropositionInput!) {
   databases {
     edges {
       node {
