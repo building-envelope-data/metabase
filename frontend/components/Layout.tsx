@@ -10,34 +10,62 @@ const navItems = [
   {
     path: paths.home,
     label: "Home",
+    subitems: null,
   },
   {
-    path: paths.data,
     label: "Data",
+    subitems: [
+      {
+        path: paths.data,
+        label: "Any Data",
+      },
+      {
+        path: paths.calorimetricData,
+        label: "Calorimetric Data",
+      },
+      {
+        path: paths.hygrothermalData,
+        label: "Hygrothermal Data",
+      },
+      {
+        path: paths.opticalData,
+        label: "Optical Data",
+      },
+      {
+        path: paths.photovoltaicData,
+        label: "Photovoltaic Data",
+      },
+    ],
   },
   {
     path: paths.components,
     label: "Components",
+    subitems: null,
   },
   {
     path: paths.institutions,
     label: "Institutions",
+    subitems: null,
   },
   {
     path: paths.databases,
     label: "Databases",
+    subitems: null,
   },
   {
     path: paths.dataFormats,
     label: "Data Formats",
+    subitems: null,
   },
   {
     path: paths.methods,
     label: "Methods",
+    subitems: null,
   },
   {
     path: paths.users,
     label: "Users",
+    subitems: null,
   },
 ];
 

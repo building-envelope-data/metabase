@@ -12,10 +12,13 @@ import { useState } from "react";
 import { UserRole } from "../__generated__/__types__";
 import { UserOutlined } from "@ant-design/icons";
 
-type NavItemProps = {
-  path: string;
-  label: string;
-};
+type NavItemProps =
+  | {
+      path: string;
+      label: string;
+      subitems: null;
+    }
+  | { label: string; subitems: { path: string; label: string }[] };
 
 export type NavBarProps = {
   items: NavItemProps[];
@@ -52,11 +55,22 @@ export default function NavBar({ items }: NavBarProps) {
 
   return (
     <Menu mode="horizontal" selectedKeys={[router.pathname]} theme="dark">
-      {items.map(({ path, label }) => (
-        <Menu.Item key={path}>
-          <Link href={path}>{label}</Link>
-        </Menu.Item>
-      ))}
+      {items.map((item) =>
+        item.subitems === null ? (
+          <Menu.Item key={item.path}>
+            <Link href={item.path}>{item.label}</Link>
+          </Menu.Item>
+        ) : (
+          // TODO find a better key
+          <Menu.SubMenu title={item.label} key={item.label}>
+            {item.subitems.map((subitem) => (
+              <Menu.Item key={subitem.path}>
+                <Link href={subitem.path}>{subitem.label}</Link>
+              </Menu.Item>
+            ))}
+          </Menu.SubMenu>
+        )
+      )}
       {/* I would like the following to be on the right but that is not possible at the moment, see issue https://github.com/ant-design/ant-design/issues/10749 */}
       {currentUser ? (
         <>
