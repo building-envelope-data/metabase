@@ -92,6 +92,7 @@ services:
       - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
       - XBASE_Email__SmtpHost=${SMTP_HOST}
       - XBASE_Email__SmtpPort=${SMTP_PORT}
+      - XBASE_TestlabSolarFacadesHost=${TESTLAB_SOLAR_FACADES_HOST}:${TESTLAB_SOLAR_FACADES_HOST_HTTPS_PORT}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
@@ -99,7 +100,7 @@ services:
       # - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
     extra_hosts:
       - ${HOST}:host-gateway
-      # - ${ISE_HOST}:host-gateway
+      - ${TESTLAB_SOLAR_FACADES_HOST}:host-gateway
       # - ${LBNL_HOST}:host-gateway
     depends_on:
       - database

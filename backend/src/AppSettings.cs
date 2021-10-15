@@ -7,6 +7,9 @@ namespace Metabase
         public string Host { get; set; }
         = "";
 
+        public string TestlabSolarFacadesHost { get; set; }
+        = "";
+
         public LoggingSettings Logging { get; set; }
         = new LoggingSettings();
 

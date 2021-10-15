@@ -95,7 +95,7 @@ namespace Metabase.Data
             {
                 logger.LogDebug("Creating application client 'testlab-solar-facades'");
                 // TODO Do not hardcode URL or at least port in development environment.
-                var host = environment.IsProduction() ? "https://solarbuildingenvelopes.com" : "https://local.solarbuildingenvelopes.com:5051";
+                var host = appSettings.TestlabSolarFacadesHost;
                 await manager.CreateAsync(
                     new OpenIddictApplicationDescriptor
                     {
