@@ -2,10 +2,10 @@ query AllPhotovoltaicData(
   $where: PhotovoltaicDataPropositionInput
   $timestamp: DateTime
   $locale: Locale
-  $first: NonNegativeInt
-  $after: Cursor
-  $last: NonNegativeInt
-  $before: Cursor
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
 ) {
   allPhotovoltaicData(
     where: $where

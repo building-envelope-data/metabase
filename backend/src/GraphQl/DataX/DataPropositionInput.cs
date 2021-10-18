@@ -7,15 +7,24 @@ namespace Metabase.GraphQl.DataX
         IReadOnlyList<DataPropositionInput>? And,
         DataPropositionInput? Not,
         IReadOnlyList<DataPropositionInput>? Or,
+        UuidPropositionInput? DataFormatId,
         FloatPropositionInput? GValue,
         FloatPropositionInput? UValue,
-        // UuidPropositionInput? DataFormatId,
         FloatPropositionInput? NearnormalHemisphericalVisibleTransmittance,
         FloatPropositionInput? NearnormalHemisphericalVisibleReflectance,
         FloatPropositionInput? NearnormalHemisphericalSolarTransmittance,
         FloatPropositionInput? NearnormalHemisphericalSolarReflectance,
-        FloatPropositionInput? InfraredEmittance
-        // FloatPropositionInput? ColorRenderingIndex,
-        // CielabColorPropositionInput? CielabColor
+        FloatPropositionInput? InfraredEmittance,
+        FloatPropositionInput? ColorRenderingIndex,
+        CielabColorPropositionInput? CielabColor,
+        FloatsPropositionInput? GValues,
+        FloatsPropositionInput? UValues,
+        FloatsPropositionInput? NearnormalHemisphericalVisibleTransmittances,
+        FloatsPropositionInput? NearnormalHemisphericalVisibleReflectances,
+        FloatsPropositionInput? NearnormalHemisphericalSolarTransmittances,
+        FloatsPropositionInput? NearnormalHemisphericalSolarReflectances,
+        FloatsPropositionInput? InfraredEmittances,
+        FloatsPropositionInput? ColorRenderingIndices,
+        CielabColorsPropositionInput? CielabColors
         );
 }

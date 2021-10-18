@@ -177,8 +177,10 @@ function Page() {
             if (value !== undefined && value !== null) {
               propositions.push(
                 negateIfNecessary(negator, {
-                  infraredEmittance: {
-                    [comparator]: value,
+                  infraredEmittances: {
+                    some: {
+                      [comparator]: value,
+                    },
                   },
                 })
               );
@@ -194,8 +196,10 @@ function Page() {
             if (value !== undefined && value !== null) {
               propositions.push(
                 negateIfNecessary(negator, {
-                  nearnormalHemisphericalSolarReflectance: {
-                    [comparator]: value,
+                  nearnormalHemisphericalSolarReflectances: {
+                    some: {
+                      [comparator]: value,
+                    },
                   },
                 })
               );
@@ -211,8 +215,10 @@ function Page() {
             if (value !== undefined && value !== null) {
               propositions.push(
                 negateIfNecessary(negator, {
-                  nearnormalHemisphericalSolarTransmittance: {
-                    [comparator]: value,
+                  nearnormalHemisphericalSolarTransmittances: {
+                    some: {
+                      [comparator]: value,
+                    },
                   },
                 })
               );
@@ -228,8 +234,10 @@ function Page() {
             if (value !== undefined && value !== null) {
               propositions.push(
                 negateIfNecessary(negator, {
-                  nearnormalHemisphericalVisibleReflectance: {
-                    [comparator]: value,
+                  nearnormalHemisphericalVisibleReflectances: {
+                    some: {
+                      [comparator]: value,
+                    },
                   },
                 })
               );
@@ -245,17 +253,23 @@ function Page() {
             if (value !== undefined && value !== null) {
               propositions.push(
                 negateIfNecessary(negator, {
-                  nearnormalHemisphericalVisibleTransmittance: {
-                    [comparator]: value,
+                  nearnormalHemisphericalVisibleTransmittances: {
+                    some: {
+                      [comparator]: value,
+                    },
                   },
                 })
               );
             }
           }
         }
-        const { error, data } = await allOpticalDataQuery.refetch({
-          where: conjunct(propositions),
-        });
+        const { error, data } = await allOpticalDataQuery.refetch(
+          propositions.length == 0
+            ? {}
+            : {
+                where: conjunct(propositions),
+              }
+        );
         if (error) {
           // TODO Handle properly.
           console.log(error);

@@ -152,8 +152,10 @@ function Page() {
             if (value !== undefined && value !== null) {
               propositions.push(
                 negateIfNecessary(negator, {
-                  gValue: {
-                    [comparator]: value,
+                  gValues: {
+                    some: {
+                      [comparator]: value,
+                    },
                   },
                 })
               );
@@ -165,8 +167,10 @@ function Page() {
             if (value !== undefined && value !== null) {
               propositions.push(
                 negateIfNecessary(negator, {
-                  uValue: {
-                    [comparator]: value,
+                  uValues: {
+                    some: {
+                      [comparator]: value,
+                    },
                   },
                 })
               );
