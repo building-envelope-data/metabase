@@ -1,5 +1,5 @@
 query AllHygrothermalData(
-  $where: HygrothermalDataPropositionInput!
+  $where: HygrothermalDataPropositionInput
   $timestamp: DateTime
   $locale: Locale
   $first: NonNegativeInt

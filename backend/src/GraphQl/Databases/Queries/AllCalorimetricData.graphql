@@ -1,5 +1,5 @@
 query AllCalorimetricData(
-  $where: CalorimetricDataPropositionInput!
+  $where: CalorimetricDataPropositionInput
   $timestamp: DateTime
   $locale: Locale
   $first: NonNegativeInt

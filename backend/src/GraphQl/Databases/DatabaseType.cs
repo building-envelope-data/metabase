@@ -121,7 +121,7 @@ namespace Metabase.GraphQl.Databases
         {
             descriptor
                 .Field(fieldName)
-                .Argument("where", _ => _.Type<NonNullType<InputObjectType<TDataPropositionInput>>>())
+                .Argument("where", _ => _.Type<InputObjectType<TDataPropositionInput>>())
                 .Argument("timestamp", _ => _.Type<DateTimeType>())
                 .Argument("locale", _ => _.Type<StringType>())
                 .Argument("first", _ => _.Type<NonNegativeIntType>())
@@ -139,7 +139,7 @@ namespace Metabase.GraphQl.Databases
         {
             descriptor
                 .Field(fieldName)
-                .Argument("where", _ => _.Type<NonNullType<InputObjectType<TDataPropositionInput>>>())
+                .Argument("where", _ => _.Type<InputObjectType<TDataPropositionInput>>())
                 .Argument("timestamp", _ => _.Type<DateTimeType>())
                 .Argument("locale", _ => _.Type<StringType>())
                 .ResolveWith(resolverMethod);

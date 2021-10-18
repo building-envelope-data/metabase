@@ -1,4 +1,4 @@
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
 import {
   Table,
   message,
@@ -8,16 +8,16 @@ import {
   Typography,
   Descriptions,
 } from "antd";
-import { useAllOpticalDataQuery } from "../queries/data.graphql";
+import { useAllOpticalDataQuery } from "../../queries/data.graphql";
 import {
   OpticalData,
   Scalars,
   OpticalDataPropositionInput,
-} from "../__generated__/__types__";
+} from "../../__generated__/__types__";
 import { useState } from "react";
 import Link from "next/link";
-import paths from "../paths";
-import { setMapValue } from "../lib/freeTextFilter";
+import paths from "../../paths";
+import { setMapValue } from "../../lib/freeTextFilter";
 import {
   getDescriptionColumnProps,
   getFilterableDescriptionListColumnProps,
@@ -25,15 +25,15 @@ import {
   getNameColumnProps,
   getTimestampColumnProps,
   getUuidColumnProps,
-} from "../lib/table";
+} from "../../lib/table";
 import {
   FloatPropositionComparator,
   FloatPropositionFormList,
-} from "../components/FloatPropositionFormList";
+} from "../../components/FloatPropositionFormList";
 import {
   UuidPropositionComparator,
   UuidPropositionFormList,
-} from "../components/UuidPropositionFormList";
+} from "../../components/UuidPropositionFormList";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 

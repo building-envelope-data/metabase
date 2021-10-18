@@ -1,5 +1,5 @@
 query AllPhotovoltaicData(
-  $where: PhotovoltaicDataPropositionInput!
+  $where: PhotovoltaicDataPropositionInput
   $timestamp: DateTime
   $locale: Locale
   $first: NonNegativeInt

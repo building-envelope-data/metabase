@@ -227,7 +227,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<DataX.DataConnection?> GetAllDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -271,7 +271,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<DataX.OpticalDataConnection?> GetAllOpticalDataAsync(
             [Parent] Data.Database database,
-            DataX.OpticalDataPropositionInput where,
+            DataX.OpticalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -317,7 +317,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<DataX.HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
             [Parent] Data.Database database,
-            DataX.HygrothermalDataPropositionInput where,
+            DataX.HygrothermalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -363,7 +363,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<DataX.CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
             [Parent] Data.Database database,
-            DataX.CalorimetricDataPropositionInput where,
+            DataX.CalorimetricDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -408,7 +408,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<DataX.PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
             [Parent] Data.Database database,
-            DataX.PhotovoltaicDataPropositionInput where,
+            DataX.PhotovoltaicDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -453,7 +453,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken
@@ -487,7 +487,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasOpticalDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken
@@ -521,7 +521,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasCalorimetricDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken
@@ -555,7 +555,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasHygrothermalDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken
@@ -589,7 +589,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasPhotovoltaicDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken

@@ -1,5 +1,5 @@
 query AllOpticalData(
-  $where: OpticalDataPropositionInput!
+  $where: OpticalDataPropositionInput
   $timestamp: DateTime
   $locale: Locale
   $first: NonNegativeInt

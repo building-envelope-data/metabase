@@ -1,13 +1,13 @@
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
 import { Table, message, Form, Button, Alert, Typography } from "antd";
-import { useAllHygrothermalDataQuery } from "../queries/data.graphql";
+import { useAllHygrothermalDataQuery } from "../../queries/data.graphql";
 import {
   HygrothermalData,
   Scalars,
   HygrothermalDataPropositionInput,
-} from "../__generated__/__types__";
+} from "../../__generated__/__types__";
 import { useState } from "react";
-import { setMapValue } from "../lib/freeTextFilter";
+import { setMapValue } from "../../lib/freeTextFilter";
 import {
   getDescriptionColumnProps,
   getFilterableDescriptionListColumnProps,
@@ -15,11 +15,11 @@ import {
   getNameColumnProps,
   getTimestampColumnProps,
   getUuidColumnProps,
-} from "../lib/table";
+} from "../../lib/table";
 import {
   UuidPropositionComparator,
   UuidPropositionFormList,
-} from "../components/UuidPropositionFormList";
+} from "../../components/UuidPropositionFormList";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -132,7 +132,12 @@ function Page() {
           );
         }
         // TODO Casting to `HygrothermalData` is wrong and error prone!
-        setData((data?.allHygrothermalData?.nodes || []) as HygrothermalData[]);
+        const nestedData =
+          data?.databases?.edges?.map(
+            (edge) => edge?.node?.allHygrothermalData?.nodes || []
+          ) || [];
+        const flatData = ([] as HygrothermalData[]).concat(...nestedData);
+        setData(flatData);
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);
@@ -266,7 +271,7 @@ function Page() {
                 {
                   key: "formatId",
                   title: "Format UUID",
-                  value: x.resourceTree.root.value.dataFormatId,
+                  value: x.resourceTree.root.value.formatId,
                 },
               ],
               onFilterTextChange,

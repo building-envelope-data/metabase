@@ -1,5 +1,5 @@
 query AllData(
-  $where: DataPropositionInput!
+  $where: DataPropositionInput
   $timestamp: DateTime
   $locale: Locale
   $first: NonNegativeInt

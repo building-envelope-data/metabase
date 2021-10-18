@@ -1,21 +1,13 @@
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
+import { Table, message, Form, Button, Alert, Typography } from "antd";
+import { useAllDataQuery } from "../../queries/data.graphql";
 import {
-  Table,
-  message,
-  Form,
-  Button,
-  Alert,
-  Typography,
-  Descriptions,
-} from "antd";
-import { useAllCalorimetricDataQuery } from "../queries/data.graphql";
-import {
-  CalorimetricData,
+  Data,
   Scalars,
-  CalorimetricDataPropositionInput,
-} from "../__generated__/__types__";
+  DataPropositionInput,
+} from "../../__generated__/__types__";
 import { useState } from "react";
-import { setMapValue } from "../lib/freeTextFilter";
+import { setMapValue } from "../../lib/freeTextFilter";
 import {
   getDescriptionColumnProps,
   getFilterableDescriptionListColumnProps,
@@ -23,15 +15,11 @@ import {
   getNameColumnProps,
   getTimestampColumnProps,
   getUuidColumnProps,
-} from "../lib/table";
-import {
-  FloatPropositionComparator,
-  FloatPropositionFormList,
-} from "../components/FloatPropositionFormList";
+} from "../../lib/table";
 import {
   UuidPropositionComparator,
   UuidPropositionFormList,
-} from "../components/UuidPropositionFormList";
+} from "../../components/UuidPropositionFormList";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -50,8 +38,8 @@ enum Negator {
 
 const negateIfNecessary = (
   negator: Negator,
-  proposition: CalorimetricDataPropositionInput
-): CalorimetricDataPropositionInput => {
+  proposition: DataPropositionInput
+): DataPropositionInput => {
   switch (negator) {
     case Negator.Is:
       return proposition;
@@ -62,8 +50,8 @@ const negateIfNecessary = (
 };
 
 const conjunct = (
-  propositions: CalorimetricDataPropositionInput[]
-): CalorimetricDataPropositionInput => {
+  propositions: DataPropositionInput[]
+): DataPropositionInput => {
   if (propositions.length == 0) {
     return {};
   }
@@ -74,8 +62,8 @@ const conjunct = (
 };
 
 // const disjunct = (
-//   propositions: CalorimetricDataPropositionInput[]
-// ): CalorimetricDataPropositionInput => {
+//   propositions: DataPropositionInput[]
+// ): DataPropositionInput => {
 //   if (propositions.length == 0) {
 //     return {};
 //   }
@@ -91,12 +79,12 @@ function Page() {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [data, setData] = useState<CalorimetricData[]>([]);
+  const [data, setData] = useState<Data[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
   // For error policies see https://www.apollographql.com/docs/react/v2/data/error-handling/#error-policies
-  const allCalorimetricDataQuery = useAllCalorimetricDataQuery({
+  const allDataQuery = useAllDataQuery({
     skip: true,
     errorPolicy: "all",
   });
@@ -106,8 +94,6 @@ function Page() {
 
   const onFinish = ({
     componentIds,
-    gValues,
-    uValues,
   }: {
     componentIds:
       | {
@@ -116,26 +102,12 @@ function Page() {
           value: Scalars["UUID"] | undefined;
         }[]
       | undefined;
-    gValues:
-      | {
-          negator: Negator;
-          comparator: FloatPropositionComparator;
-          value: number | undefined;
-        }[]
-      | undefined;
-    uValues:
-      | {
-          negator: Negator;
-          comparator: FloatPropositionComparator;
-          value: number | undefined;
-        }[]
-      | undefined;
   }) => {
     const filter = async () => {
       try {
         setFiltering(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const propositions: CalorimetricDataPropositionInput[] = [];
+        const propositions: DataPropositionInput[] = [];
         if (componentIds) {
           for (let { negator, comparator, value } of componentIds) {
             propositions.push(
@@ -145,35 +117,7 @@ function Page() {
             );
           }
         }
-        // Note that `0` evaluates to `false`, so below we cannot use
-        // `if (value)`.
-        if (gValues) {
-          for (let { negator, comparator, value } of gValues) {
-            if (value !== undefined && value !== null) {
-              propositions.push(
-                negateIfNecessary(negator, {
-                  gValue: {
-                    [comparator]: value,
-                  },
-                })
-              );
-            }
-          }
-        }
-        if (uValues) {
-          for (let { negator, comparator, value } of uValues) {
-            if (value !== undefined && value !== null) {
-              propositions.push(
-                negateIfNecessary(negator, {
-                  uValue: {
-                    [comparator]: value,
-                  },
-                })
-              );
-            }
-          }
-        }
-        const { error, data } = await allCalorimetricDataQuery.refetch(
+        const { error, data } = await allDataQuery.refetch(
           propositions.length == 0
             ? {}
             : {
@@ -187,8 +131,13 @@ function Page() {
             error.graphQLErrors.map((error) => error.message).join(" ")
           );
         }
-        // TODO Casting to `CalorimetricData` is wrong and error prone!
-        setData((data?.allCalorimetricData?.nodes || []) as CalorimetricData[]);
+        // TODO Casting to `Data` is wrong and error prone!
+        const nestedData =
+          data?.databases?.edges?.map(
+            (edge) => edge?.node?.allData?.nodes || []
+          ) || [];
+        const flatData = ([] as Data[]).concat(...nestedData);
+        setData(flatData);
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);
@@ -205,7 +154,7 @@ function Page() {
 
   return (
     <Layout>
-      <Typography.Title>Calorimetric Data</Typography.Title>
+      <Typography.Title> Data</Typography.Title>
       {/* TODO Display error messages in a list? */}
       {globalErrorMessages.length > 0 && (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
@@ -218,8 +167,6 @@ function Page() {
         onFinishFailed={onFinishFailed}
       >
         <UuidPropositionFormList name="componentIds" label="Component Id" />
-        <FloatPropositionFormList name="gValues" label="g Values" />
-        <FloatPropositionFormList name="uValues" label="u Values" />
 
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={filtering}>
@@ -329,20 +276,6 @@ function Page() {
               ],
               onFilterTextChange,
               (x) => filterText.get(x)
-            ),
-          },
-          {
-            title: "g and u Values",
-            key: "g-and-u-values",
-            render: (_text, record, _index) => (
-              <Descriptions column={1}>
-                <Descriptions.Item key="gValues" label="g Values">
-                  {record.gValues.map((x) => x.toLocaleString("en")).join(", ")}
-                </Descriptions.Item>
-                <Descriptions.Item key="uValues" label="u Values">
-                  {record.uValues.map((x) => x.toLocaleString("en")).join(", ")}
-                </Descriptions.Item>
-              </Descriptions>
             ),
           },
         ]}

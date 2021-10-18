@@ -352,19 +352,19 @@ type DataFormatsEdge {
 }
 
 type Database implements Node {
-  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: CalorimetricDataPropositionInput!): CalorimetricDataConnection
-  allData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: DataPropositionInput!): DataConnection
-  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: HygrothermalDataPropositionInput!): HygrothermalDataConnection
-  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput!): OpticalDataConnection
-  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput!): PhotovoltaicDataConnection
+  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: CalorimetricDataPropositionInput): CalorimetricDataConnection
+  allData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: DataPropositionInput): DataConnection
+  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: HygrothermalDataPropositionInput): HygrothermalDataConnection
+  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput): OpticalDataConnection
+  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection
   calorimetricData(id: UUID! locale: String timestamp: DateTime): CalorimetricData
   data(id: UUID! locale: String timestamp: DateTime): Data
   description: String!
-  hasCalorimetricData(locale: String timestamp: DateTime where: CalorimetricDataPropositionInput!): Boolean
-  hasData(locale: String timestamp: DateTime where: DataPropositionInput!): Boolean
-  hasHygrothermalData(locale: String timestamp: DateTime where: HygrothermalDataPropositionInput!): Boolean
-  hasOpticalData(locale: String timestamp: DateTime where: OpticalDataPropositionInput!): Boolean
-  hasPhotovoltaicData(locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput!): Boolean
+  hasCalorimetricData(locale: String timestamp: DateTime where: CalorimetricDataPropositionInput): Boolean
+  hasData(locale: String timestamp: DateTime where: DataPropositionInput): Boolean
+  hasHygrothermalData(locale: String timestamp: DateTime where: HygrothermalDataPropositionInput): Boolean
+  hasOpticalData(locale: String timestamp: DateTime where: OpticalDataPropositionInput): Boolean
+  hasPhotovoltaicData(locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): Boolean
   hygrothermalData(id: UUID! locale: String timestamp: DateTime): HygrothermalData
   id: ID!
   locator: URL!

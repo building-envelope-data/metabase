@@ -17,7 +17,7 @@ const navItems = [
     subitems: [
       {
         path: paths.data,
-        label: "Any Data",
+        label: "All Data",
       },
       {
         path: paths.calorimetricData,

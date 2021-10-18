@@ -19,7 +19,7 @@ fragment DataPartial on Data {
   }
 }
 
-query AllData($where: DataPropositionInput!) {
+query AllData($where: DataPropositionInput) {
   databases {
     edges {
       node {
@@ -33,7 +33,7 @@ query AllData($where: DataPropositionInput!) {
   }
 }
 
-query HasData($where: DataPropositionInput!) {
+query HasData($where: DataPropositionInput) {
   databases {
     edges {
       node {
@@ -69,7 +69,7 @@ fragment CalorimetricDataPartial on CalorimetricData {
   uValues
 }
 
-query AllCalorimetricData($where: CalorimetricDataPropositionInput!) {
+query AllCalorimetricData($where: CalorimetricDataPropositionInput) {
   databases {
     edges {
       node {
@@ -83,7 +83,7 @@ query AllCalorimetricData($where: CalorimetricDataPropositionInput!) {
   }
 }
 
-query HasCalorimetricData($where: CalorimetricDataPropositionInput!) {
+query HasCalorimetricData($where: CalorimetricDataPropositionInput) {
   databases {
     edges {
       node {
@@ -117,7 +117,7 @@ fragment HygrothermalDataPartial on HygrothermalData {
   # the fields above. Why?
 }
 
-query AllHygrothermalData($where: HygrothermalDataPropositionInput!) {
+query AllHygrothermalData($where: HygrothermalDataPropositionInput) {
   databases {
     edges {
       node {
@@ -131,7 +131,7 @@ query AllHygrothermalData($where: HygrothermalDataPropositionInput!) {
   }
 }
 
-query HasHygrothermalData($where: HygrothermalDataPropositionInput!) {
+query HasHygrothermalData($where: HygrothermalDataPropositionInput) {
   databases {
     edges {
       node {
@@ -170,7 +170,7 @@ fragment OpticalDataPartial on OpticalData {
   nearnormalHemisphericalVisibleTransmittances
 }
 
-query AllOpticalData($where: OpticalDataPropositionInput!) {
+query AllOpticalData($where: OpticalDataPropositionInput) {
   databases {
     edges {
       node {
@@ -184,7 +184,7 @@ query AllOpticalData($where: OpticalDataPropositionInput!) {
   }
 }
 
-query HasOpticalData($where: OpticalDataPropositionInput!) {
+query HasOpticalData($where: OpticalDataPropositionInput) {
   databases {
     edges {
       node {
@@ -218,7 +218,7 @@ fragment PhotovoltaicDataPartial on PhotovoltaicData {
   # the fields above. Why?
 }
 
-query AllPhotovoltaicData($where: PhotovoltaicDataPropositionInput!) {
+query AllPhotovoltaicData($where: PhotovoltaicDataPropositionInput) {
   databases {
     edges {
       node {
@@ -232,7 +232,7 @@ query AllPhotovoltaicData($where: PhotovoltaicDataPropositionInput!) {
   }
 }
 
-query HasPhotovoltaicData($where: PhotovoltaicDataPropositionInput!) {
+query HasPhotovoltaicData($where: PhotovoltaicDataPropositionInput) {
   databases {
     edges {
       node {

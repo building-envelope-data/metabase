@@ -1,5 +1,5 @@
 query HasData(
-  $where: DataPropositionInput!
+  $where: DataPropositionInput
   $timestamp: DateTime
   $locale: Locale
 ) {
