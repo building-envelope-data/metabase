@@ -1,11 +1,11 @@
 query AllCalorimetricData(
-  $where: CalorimetricDataPropositionInput!
+  $where: CalorimetricDataPropositionInput
   $timestamp: DateTime
   $locale: Locale
-  $first: NonNegativeInt
-  $after: Cursor
-  $last: NonNegativeInt
-  $before: Cursor
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
 ) {
   allCalorimetricData(
     where: $where

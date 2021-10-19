@@ -1,21 +1,9 @@
 query AllOpticalData(
-  $where: OpticalDataPropositionInput
+  $where: OpticalDataPropositionInput!
   $timestamp: DateTime
   $locale: Locale
-  $first: Int
-  $after: String
-  $last: Int
-  $before: String
 ) {
-  allOpticalData(
-    where: $where
-    timestamp: $timestamp
-    locale: $locale
-    first: $first
-    after: $after
-    last: $last
-    before: $before
-  ) {
+  allOpticalData(where: $where, timestamp: $timestamp, locale: $locale) {
     # edges {
     #   cursor
     #   node {

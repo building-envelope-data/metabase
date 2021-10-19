@@ -26,7 +26,8 @@ namespace Metabase.GraphQl.Databases
                     IncludeFields = false,
                     IgnoreReadOnlyProperties = false,
                     IgnoreReadOnlyFields = true,
-                    IgnoreNullValues = false
+                    IgnoreNullValues = false,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 }; //.SetupImmutableConverter();
 
         private readonly IHttpClientFactory _httpClientFactory;
@@ -227,7 +228,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<DataX.DataConnection?> GetAllDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -244,12 +245,12 @@ namespace Metabase.GraphQl.Databases
                         new[] {
                             "DataFields.graphql",
                             "PageInfoFields.graphql",
-                            "AllData.graphql"
+                            database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/" ? "AllDataX.graphql" : "AllData.graphql"
                         }
                     ).ConfigureAwait(false),
                     variables: new
                     {
-                        where,
+                        where = RewriteDataPropositionInput(where, database),
                         timestamp,
                         locale,
                         first,
@@ -264,6 +265,40 @@ namespace Metabase.GraphQl.Databases
             )?.AllData;
         }
 
+        private static DataX.DataPropositionInput? RewriteDataPropositionInput(
+            DataX.DataPropositionInput? where,
+            Data.Database database
+            )
+        {
+            if (where is null)
+            {
+                return null;
+            }
+            return database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
+                ? where with
+                {
+                    GValue = where?.GValues?.Some,
+                    GValues = null,
+                    UValue = where?.UValues?.Some,
+                    UValues = null,
+                    NearnormalHemisphericalSolarReflectance = where?.NearnormalHemisphericalSolarReflectances?.Some,
+                    NearnormalHemisphericalSolarReflectances = null,
+                    NearnormalHemisphericalSolarTransmittance = where?.NearnormalHemisphericalSolarTransmittances?.Some,
+                    NearnormalHemisphericalSolarTransmittances = null,
+                    NearnormalHemisphericalVisibleReflectance = where?.NearnormalHemisphericalVisibleReflectances?.Some,
+                    NearnormalHemisphericalVisibleReflectances = null,
+                    NearnormalHemisphericalVisibleTransmittance = where?.NearnormalHemisphericalVisibleTransmittances?.Some,
+                    NearnormalHemisphericalVisibleTransmittances = null,
+                    CielabColor = where?.CielabColors?.Some,
+                    CielabColors = null,
+                    ColorRenderingIndex = where?.ColorRenderingIndices?.Some,
+                    ColorRenderingIndices = null,
+                    InfraredEmittance = where?.InfraredEmittances?.Some,
+                    InfraredEmittances = null,
+                }
+                : where;
+        }
+
         private sealed class AllOpticalDataData
         {
             public DataX.OpticalDataConnection AllOpticalData { get; set; } = default!;
@@ -271,7 +306,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<DataX.OpticalDataConnection?> GetAllOpticalDataAsync(
             [Parent] Data.Database database,
-            DataX.OpticalDataPropositionInput where,
+            DataX.OpticalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -289,12 +324,12 @@ namespace Metabase.GraphQl.Databases
                             "DataFields.graphql",
                             "OpticalDataFields.graphql",
                             "PageInfoFields.graphql",
-                            "AllOpticalData.graphql"
+                            database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/" ? "AllOpticalDataX.graphql" : "AllOpticalData.graphql"
                         }
                     ).ConfigureAwait(false),
                     variables: new
                     {
-                        where,
+                        where = RewriteOpticalDataPropositionInput(where, database),
                         timestamp,
                         locale,
                         first,
@@ -309,15 +344,44 @@ namespace Metabase.GraphQl.Databases
             )?.AllOpticalData;
         }
 
+        private static DataX.OpticalDataPropositionInput? RewriteOpticalDataPropositionInput(
+            DataX.OpticalDataPropositionInput? where,
+            Data.Database database
+            )
+        {
+            if (where is null)
+            {
+                return null;
+            }
+            return database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
+                ? where with
+                {
+                    NearnormalHemisphericalSolarReflectance = where?.NearnormalHemisphericalSolarReflectances?.Some,
+                    NearnormalHemisphericalSolarReflectances = null,
+                    NearnormalHemisphericalSolarTransmittance = where?.NearnormalHemisphericalSolarTransmittances?.Some,
+                    NearnormalHemisphericalSolarTransmittances = null,
+                    NearnormalHemisphericalVisibleReflectance = where?.NearnormalHemisphericalVisibleReflectances?.Some,
+                    NearnormalHemisphericalVisibleReflectances = null,
+                    NearnormalHemisphericalVisibleTransmittance = where?.NearnormalHemisphericalVisibleTransmittances?.Some,
+                    NearnormalHemisphericalVisibleTransmittances = null,
+                    CielabColor = where?.CielabColors?.Some,
+                    CielabColors = null,
+                    ColorRenderingIndex = where?.ColorRenderingIndices?.Some,
+                    ColorRenderingIndices = null,
+                    InfraredEmittance = where?.InfraredEmittances?.Some,
+                    InfraredEmittances = null,
+                }
+                : where;
+        }
+
         private sealed class AllHygrothermalDataData
         {
             public DataX.HygrothermalDataConnection AllHygrothermalData { get; set; } = default!;
         }
 
-
         public async Task<DataX.HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
             [Parent] Data.Database database,
-            DataX.HygrothermalDataPropositionInput where,
+            DataX.HygrothermalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -363,7 +427,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<DataX.CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
             [Parent] Data.Database database,
-            DataX.CalorimetricDataPropositionInput where,
+            DataX.CalorimetricDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -408,7 +472,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<DataX.PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
             [Parent] Data.Database database,
-            DataX.PhotovoltaicDataPropositionInput where,
+            DataX.PhotovoltaicDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             uint? first,
@@ -453,7 +517,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken
@@ -469,7 +533,7 @@ namespace Metabase.GraphQl.Databases
                     ).ConfigureAwait(false),
                     variables: new
                     {
-                        where,
+                        where = RewriteDataPropositionInput(where, database),
                         timestamp,
                         locale
                     },
@@ -487,7 +551,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasOpticalDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.OpticalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken
@@ -503,7 +567,7 @@ namespace Metabase.GraphQl.Databases
                     ).ConfigureAwait(false),
                     variables: new
                     {
-                        where,
+                        where = RewriteOpticalDataPropositionInput(where, database),
                         timestamp,
                         locale
                     },
@@ -521,7 +585,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasCalorimetricDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.CalorimetricDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken
@@ -555,7 +619,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasHygrothermalDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.HygrothermalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken
@@ -589,7 +653,7 @@ namespace Metabase.GraphQl.Databases
 
         public async Task<bool?> GetHasPhotovoltaicDataAsync(
             [Parent] Data.Database database,
-            DataX.DataPropositionInput where,
+            DataX.PhotovoltaicDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
             CancellationToken cancellationToken
@@ -662,7 +726,7 @@ namespace Metabase.GraphQl.Databases
                     ).ConfigureAwait(false);
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    _logger.LogWarning($"Failed with status code {httpResponseMessage.StatusCode} to query the database {database.Locator} for {JsonSerializer.Serialize(request)}.");
+                    _logger.LogWarning($"Failed with status code {httpResponseMessage.StatusCode} to query the database {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}.");
                     return null;
                 }
                 // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
@@ -678,27 +742,27 @@ namespace Metabase.GraphQl.Databases
                     ).ConfigureAwait(false);
                 if (deserializedGraphQlResponse is null)
                 {
-                    _logger.LogWarning($"Failed to deserialize the GraphQL response received from the database {database.Locator} for {JsonSerializer.Serialize(request)}.");
+                    _logger.LogWarning($"Failed to deserialize the GraphQL response received from the database {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}.");
                 }
                 if (deserializedGraphQlResponse?.Errors?.Length >= 1)
                 {
-                    _logger.LogWarning($"Failed with errors {JsonSerializer.Serialize(deserializedGraphQlResponse?.Errors)} to query the database {database.Locator} for {JsonSerializer.Serialize(request)}");
+                    _logger.LogWarning($"Failed with errors {JsonSerializer.Serialize(deserializedGraphQlResponse?.Errors)} to query the database {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}");
                 }
                 return deserializedGraphQlResponse?.Data;
             }
             catch (HttpRequestException e)
             {
-                _logger.LogError(e, $"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request)}.");
+                _logger.LogError(e, $"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}.");
                 throw;
             }
             catch (JsonException e)
             {
-                _logger.LogError(e, $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is {e.Message}, path within the JSON where the exception was encountered is {e.Path}.");
+                _logger.LogError(e, $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is {e.Message}, path within the JSON where the exception was encountered is {e.Path}.");
                 throw;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request)} or failed to deserialize the response.");
+                _logger.LogError(e, $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)} or failed to deserialize the response.");
                 throw;
             }
         }

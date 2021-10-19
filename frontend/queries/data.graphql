@@ -19,7 +19,7 @@ fragment DataPartial on Data {
   }
 }
 
-query AllData($where: DataPropositionInput!) {
+query AllData($where: DataPropositionInput) {
   databases {
     edges {
       node {
@@ -33,11 +33,109 @@ query AllData($where: DataPropositionInput!) {
   }
 }
 
-query HasData($where: DataPropositionInput!) {
+query HasData($where: DataPropositionInput) {
   databases {
     edges {
       node {
         hasData(where: $where)
+      }
+    }
+  }
+}
+
+fragment CalorimetricDataPartial on CalorimetricData {
+  uuid
+  timestamp
+  componentId
+  name
+  description
+  appliedMethod {
+    methodId
+  }
+  resourceTree {
+    root {
+      value {
+        description
+        hashValue
+        locator
+        formatId
+      }
+    }
+  }
+  # TODO All the above should be replaced by `...DataPartial`. If we do so
+  # though, the result returned by the query `AllCalorimetricData` does not include
+  # the fields above. Why?
+  gValues
+  uValues
+}
+
+query AllCalorimetricData($where: CalorimetricDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allCalorimetricData(where: $where) {
+          nodes {
+            ...CalorimetricDataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasCalorimetricData($where: CalorimetricDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasCalorimetricData(where: $where)
+      }
+    }
+  }
+}
+
+fragment HygrothermalDataPartial on HygrothermalData {
+  uuid
+  timestamp
+  componentId
+  name
+  description
+  appliedMethod {
+    methodId
+  }
+  resourceTree {
+    root {
+      value {
+        description
+        hashValue
+        locator
+        formatId
+      }
+    }
+  }
+  # TODO All the above should be replaced by `...DataPartial`. If we do so
+  # though, the result returned by the query `AllHygrothermalData` does not include
+  # the fields above. Why?
+}
+
+query AllHygrothermalData($where: HygrothermalDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allHygrothermalData(where: $where) {
+          nodes {
+            ...HygrothermalDataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasHygrothermalData($where: HygrothermalDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasHygrothermalData(where: $where)
       }
     }
   }
@@ -72,7 +170,7 @@ fragment OpticalDataPartial on OpticalData {
   nearnormalHemisphericalVisibleTransmittances
 }
 
-query AllOpticalData($where: OpticalDataPropositionInput!) {
+query AllOpticalData($where: OpticalDataPropositionInput) {
   databases {
     edges {
       node {
@@ -86,11 +184,59 @@ query AllOpticalData($where: OpticalDataPropositionInput!) {
   }
 }
 
-query HasOpticalData($where: OpticalDataPropositionInput!) {
+query HasOpticalData($where: OpticalDataPropositionInput) {
   databases {
     edges {
       node {
         hasOpticalData(where: $where)
+      }
+    }
+  }
+}
+
+fragment PhotovoltaicDataPartial on PhotovoltaicData {
+  uuid
+  timestamp
+  componentId
+  name
+  description
+  appliedMethod {
+    methodId
+  }
+  resourceTree {
+    root {
+      value {
+        description
+        hashValue
+        locator
+        formatId
+      }
+    }
+  }
+  # TODO All the above should be replaced by `...DataPartial`. If we do so
+  # though, the result returned by the query `AllPhotovoltaicData` does not include
+  # the fields above. Why?
+}
+
+query AllPhotovoltaicData($where: PhotovoltaicDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allPhotovoltaicData(where: $where) {
+          nodes {
+            ...PhotovoltaicDataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasPhotovoltaicData($where: PhotovoltaicDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasPhotovoltaicData(where: $where)
       }
     }
   }

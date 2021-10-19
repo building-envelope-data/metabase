@@ -49,5 +49,9 @@ export default {
     return `/components/${encodeURIComponent(uuid)}`;
   },
   data: "/data",
+  calorimetricData: "/data/calorimetric",
+  hygrothermalData: "/data/hygrothermal",
+  opticalData: "/data/optical",
+  photovoltaicData: "/data/photovoltaic",
   openIdConnect: "/openIdConnect",
 };

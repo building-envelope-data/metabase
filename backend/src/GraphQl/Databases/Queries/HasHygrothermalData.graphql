@@ -1,5 +1,5 @@
 query HasHygrothermalData(
-  $where: HygrothermalDataPropositionInput!
+  $where: HygrothermalDataPropositionInput
   $timestamp: DateTime
   $locale: Locale
 ) {

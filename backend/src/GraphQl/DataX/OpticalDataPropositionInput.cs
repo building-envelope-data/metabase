@@ -12,8 +12,15 @@ namespace Metabase.GraphQl.DataX
         FloatPropositionInput? NearnormalHemisphericalVisibleReflectance,
         FloatPropositionInput? NearnormalHemisphericalSolarTransmittance,
         FloatPropositionInput? NearnormalHemisphericalSolarReflectance,
-        FloatPropositionInput? InfraredEmittance
-        // FloatPropositionInput? ColorRenderingIndex,
-        // CielabColorPropositionInput? CielabColor
+        FloatPropositionInput? InfraredEmittance,
+        FloatPropositionInput? ColorRenderingIndex,
+        CielabColorPropositionInput? CielabColor,
+        FloatsPropositionInput? NearnormalHemisphericalVisibleTransmittances,
+        FloatsPropositionInput? NearnormalHemisphericalVisibleReflectances,
+        FloatsPropositionInput? NearnormalHemisphericalSolarTransmittances,
+        FloatsPropositionInput? NearnormalHemisphericalSolarReflectances,
+        FloatsPropositionInput? InfraredEmittances,
+        FloatsPropositionInput? ColorRenderingIndices,
+        CielabColorsPropositionInput? CielabColors
         );
 }

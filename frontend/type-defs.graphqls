@@ -352,19 +352,19 @@ type DataFormatsEdge {
 }
 
 type Database implements Node {
-  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: CalorimetricDataPropositionInput!): CalorimetricDataConnection
-  allData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: DataPropositionInput!): DataConnection
-  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: HygrothermalDataPropositionInput!): HygrothermalDataConnection
-  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput!): OpticalDataConnection
-  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput!): PhotovoltaicDataConnection
+  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: CalorimetricDataPropositionInput): CalorimetricDataConnection
+  allData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: DataPropositionInput): DataConnection
+  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: HygrothermalDataPropositionInput): HygrothermalDataConnection
+  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput): OpticalDataConnection
+  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection
   calorimetricData(id: UUID! locale: String timestamp: DateTime): CalorimetricData
   data(id: UUID! locale: String timestamp: DateTime): Data
   description: String!
-  hasCalorimetricData(locale: String timestamp: DateTime where: CalorimetricDataPropositionInput!): Boolean
-  hasData(locale: String timestamp: DateTime where: DataPropositionInput!): Boolean
-  hasHygrothermalData(locale: String timestamp: DateTime where: HygrothermalDataPropositionInput!): Boolean
-  hasOpticalData(locale: String timestamp: DateTime where: OpticalDataPropositionInput!): Boolean
-  hasPhotovoltaicData(locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput!): Boolean
+  hasCalorimetricData(locale: String timestamp: DateTime where: CalorimetricDataPropositionInput): Boolean
+  hasData(locale: String timestamp: DateTime where: DataPropositionInput): Boolean
+  hasHygrothermalData(locale: String timestamp: DateTime where: HygrothermalDataPropositionInput): Boolean
+  hasOpticalData(locale: String timestamp: DateTime where: OpticalDataPropositionInput): Boolean
+  hasPhotovoltaicData(locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): Boolean
   hygrothermalData(id: UUID! locale: String timestamp: DateTime): HygrothermalData
   id: ID!
   locator: URL!
@@ -1230,9 +1230,11 @@ input CalorimetricDataPropositionInput {
   componentId: UuidPropositionInput
   dataFormatId: UuidPropositionInput
   gValue: FloatPropositionInput
+  gValues: FloatsPropositionInput
   not: CalorimetricDataPropositionInput
   or: [CalorimetricDataPropositionInput!]
   uValue: FloatPropositionInput
+  uValues: FloatsPropositionInput
 }
 
 input ChangeInstitutionRepresentativeRoleInput {
@@ -1249,6 +1251,18 @@ input ChangeUserPasswordInput {
   currentPassword: String!
   newPassword: String!
   newPasswordConfirmation: String!
+}
+
+input CielabColorPropositionInput {
+  aStar: FloatPropositionInput
+  bStar: FloatPropositionInput
+  lStar: FloatPropositionInput
+}
+
+input CielabColorsPropositionInput {
+  all: CielabColorPropositionInput
+  none: CielabColorPropositionInput
+  some: CielabColorPropositionInput
 }
 
 input ClosedIntervalInput {
@@ -1448,16 +1462,28 @@ input DataFormatSortInput {
 
 input DataPropositionInput {
   and: [DataPropositionInput!]
+  cielabColor: CielabColorPropositionInput
+  cielabColors: CielabColorsPropositionInput
+  colorRenderingIndex: FloatPropositionInput
+  colorRenderingIndices: FloatsPropositionInput
   componentId: UuidPropositionInput
+  dataFormatId: UuidPropositionInput
   gValue: FloatPropositionInput
+  gValues: FloatsPropositionInput
   infraredEmittance: FloatPropositionInput
+  infraredEmittances: FloatsPropositionInput
   nearnormalHemisphericalSolarReflectance: FloatPropositionInput
+  nearnormalHemisphericalSolarReflectances: FloatsPropositionInput
   nearnormalHemisphericalSolarTransmittance: FloatPropositionInput
+  nearnormalHemisphericalSolarTransmittances: FloatsPropositionInput
   nearnormalHemisphericalVisibleReflectance: FloatPropositionInput
+  nearnormalHemisphericalVisibleReflectances: FloatsPropositionInput
   nearnormalHemisphericalVisibleTransmittance: FloatPropositionInput
+  nearnormalHemisphericalVisibleTransmittances: FloatsPropositionInput
   not: DataPropositionInput
   or: [DataPropositionInput!]
   uValue: FloatPropositionInput
+  uValues: FloatsPropositionInput
 }
 
 input DatabaseFilterInput {
@@ -1500,6 +1526,12 @@ input FloatPropositionInput {
   greaterThanOrEqualTo: Float
   inClosedInterval: ClosedIntervalInput
   lessThanOrEqualTo: Float
+}
+
+input FloatsPropositionInput {
+  all: FloatPropositionInput
+  none: FloatPropositionInput
+  some: FloatPropositionInput
 }
 
 input HygrothermalDataPropositionInput {
@@ -1628,12 +1660,21 @@ input OpenEndedDateTimeRangeInput {
 
 input OpticalDataPropositionInput {
   and: [OpticalDataPropositionInput!]
+  cielabColor: CielabColorPropositionInput
+  cielabColors: CielabColorsPropositionInput
+  colorRenderingIndex: FloatPropositionInput
+  colorRenderingIndices: FloatsPropositionInput
   componentId: UuidPropositionInput
   infraredEmittance: FloatPropositionInput
+  infraredEmittances: FloatsPropositionInput
   nearnormalHemisphericalSolarReflectance: FloatPropositionInput
+  nearnormalHemisphericalSolarReflectances: FloatsPropositionInput
   nearnormalHemisphericalSolarTransmittance: FloatPropositionInput
+  nearnormalHemisphericalSolarTransmittances: FloatsPropositionInput
   nearnormalHemisphericalVisibleReflectance: FloatPropositionInput
+  nearnormalHemisphericalVisibleReflectances: FloatsPropositionInput
   nearnormalHemisphericalVisibleTransmittance: FloatPropositionInput
+  nearnormalHemisphericalVisibleTransmittances: FloatsPropositionInput
   not: OpticalDataPropositionInput
   or: [OpticalDataPropositionInput!]
 }

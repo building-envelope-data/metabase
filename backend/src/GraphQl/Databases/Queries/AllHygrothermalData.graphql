@@ -1,11 +1,11 @@
 query AllHygrothermalData(
-  $where: HygrothermalDataPropositionInput!
+  $where: HygrothermalDataPropositionInput
   $timestamp: DateTime
   $locale: Locale
-  $first: NonNegativeInt
-  $after: Cursor
-  $last: NonNegativeInt
-  $before: Cursor
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
 ) {
   allHygrothermalData(
     where: $where
