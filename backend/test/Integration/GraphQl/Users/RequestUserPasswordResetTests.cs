@@ -29,7 +29,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailsShouldContainSingle(
                 to: (name, email),
                 subject: "Reset password",
-                bodyRegEx: @"^Please reset your password by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
+                bodyRegEx: @"^Please reset your password by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
                 );
         }
 
