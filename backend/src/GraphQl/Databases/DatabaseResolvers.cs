@@ -270,32 +270,30 @@ namespace Metabase.GraphQl.Databases
             Data.Database database
             )
         {
-            if (where is null)
-            {
-                return null;
-            }
             return database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
-                ? where with
-                {
-                    GValue = where?.GValues?.Some,
-                    GValues = null,
-                    UValue = where?.UValues?.Some,
-                    UValues = null,
-                    NearnormalHemisphericalSolarReflectance = where?.NearnormalHemisphericalSolarReflectances?.Some,
-                    NearnormalHemisphericalSolarReflectances = null,
-                    NearnormalHemisphericalSolarTransmittance = where?.NearnormalHemisphericalSolarTransmittances?.Some,
-                    NearnormalHemisphericalSolarTransmittances = null,
-                    NearnormalHemisphericalVisibleReflectance = where?.NearnormalHemisphericalVisibleReflectances?.Some,
-                    NearnormalHemisphericalVisibleReflectances = null,
-                    NearnormalHemisphericalVisibleTransmittance = where?.NearnormalHemisphericalVisibleTransmittances?.Some,
-                    NearnormalHemisphericalVisibleTransmittances = null,
-                    CielabColor = where?.CielabColors?.Some,
-                    CielabColors = null,
-                    ColorRenderingIndex = where?.ColorRenderingIndices?.Some,
-                    ColorRenderingIndices = null,
-                    InfraredEmittance = where?.InfraredEmittances?.Some,
-                    InfraredEmittances = null,
-                }
+                ? (where is null
+                    ? new DataX.DataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+                    : where with
+                    {
+                        GValue = where?.GValues?.Some,
+                        GValues = null,
+                        UValue = where?.UValues?.Some,
+                        UValues = null,
+                        NearnormalHemisphericalSolarReflectance = where?.NearnormalHemisphericalSolarReflectances?.Some,
+                        NearnormalHemisphericalSolarReflectances = null,
+                        NearnormalHemisphericalSolarTransmittance = where?.NearnormalHemisphericalSolarTransmittances?.Some,
+                        NearnormalHemisphericalSolarTransmittances = null,
+                        NearnormalHemisphericalVisibleReflectance = where?.NearnormalHemisphericalVisibleReflectances?.Some,
+                        NearnormalHemisphericalVisibleReflectances = null,
+                        NearnormalHemisphericalVisibleTransmittance = where?.NearnormalHemisphericalVisibleTransmittances?.Some,
+                        NearnormalHemisphericalVisibleTransmittances = null,
+                        CielabColor = where?.CielabColors?.Some,
+                        CielabColors = null,
+                        ColorRenderingIndex = where?.ColorRenderingIndices?.Some,
+                        ColorRenderingIndices = null,
+                        InfraredEmittance = where?.InfraredEmittances?.Some,
+                        InfraredEmittances = null,
+                    })
                 : where;
         }
 
@@ -349,28 +347,26 @@ namespace Metabase.GraphQl.Databases
             Data.Database database
             )
         {
-            if (where is null)
-            {
-                return null;
-            }
             return database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
-                ? where with
-                {
-                    NearnormalHemisphericalSolarReflectance = where?.NearnormalHemisphericalSolarReflectances?.Some,
-                    NearnormalHemisphericalSolarReflectances = null,
-                    NearnormalHemisphericalSolarTransmittance = where?.NearnormalHemisphericalSolarTransmittances?.Some,
-                    NearnormalHemisphericalSolarTransmittances = null,
-                    NearnormalHemisphericalVisibleReflectance = where?.NearnormalHemisphericalVisibleReflectances?.Some,
-                    NearnormalHemisphericalVisibleReflectances = null,
-                    NearnormalHemisphericalVisibleTransmittance = where?.NearnormalHemisphericalVisibleTransmittances?.Some,
-                    NearnormalHemisphericalVisibleTransmittances = null,
-                    CielabColor = where?.CielabColors?.Some,
-                    CielabColors = null,
-                    ColorRenderingIndex = where?.ColorRenderingIndices?.Some,
-                    ColorRenderingIndices = null,
-                    InfraredEmittance = where?.InfraredEmittances?.Some,
-                    InfraredEmittances = null,
-                }
+                ? (where is null
+                    ? new DataX.OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+                    : where with
+                    {
+                        NearnormalHemisphericalSolarReflectance = where?.NearnormalHemisphericalSolarReflectances?.Some,
+                        NearnormalHemisphericalSolarReflectances = null,
+                        NearnormalHemisphericalSolarTransmittance = where?.NearnormalHemisphericalSolarTransmittances?.Some,
+                        NearnormalHemisphericalSolarTransmittances = null,
+                        NearnormalHemisphericalVisibleReflectance = where?.NearnormalHemisphericalVisibleReflectances?.Some,
+                        NearnormalHemisphericalVisibleReflectances = null,
+                        NearnormalHemisphericalVisibleTransmittance = where?.NearnormalHemisphericalVisibleTransmittances?.Some,
+                        NearnormalHemisphericalVisibleTransmittances = null,
+                        CielabColor = where?.CielabColors?.Some,
+                        CielabColors = null,
+                        ColorRenderingIndex = where?.ColorRenderingIndices?.Some,
+                        ColorRenderingIndices = null,
+                        InfraredEmittance = where?.InfraredEmittances?.Some,
+                        InfraredEmittances = null,
+                    })
                 : where;
         }
 
