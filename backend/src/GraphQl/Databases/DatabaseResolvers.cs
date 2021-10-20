@@ -267,7 +267,8 @@ namespace Metabase.GraphQl.Databases
             }
 
             public override bool CanConvert(Type typeToConvert) =>
-                typeof(DataX.IData).IsAssignableFrom(typeToConvert);
+                // typeof(DataX.IData).IsAssignableFrom(typeToConvert);
+                typeof(DataX.IData).IsEquivalentTo(typeToConvert);
 
             public override DataX.IData Read(
                 ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
