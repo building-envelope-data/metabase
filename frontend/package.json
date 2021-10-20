@@ -5,7 +5,7 @@
   "author": "Simon Wacker",
   "license": "MIT",
   "scripts": {
-    "codegen": "graphql-let",
+    "codegen": "graphql-let && graphql-codegen --config codegen.yml",
     "dev": "yarn codegen && next -p 8080",
     "build": "yarn codegen && next build",
     "test": "yarn codegen && jest",
