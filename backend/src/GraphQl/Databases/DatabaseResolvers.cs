@@ -10,25 +10,44 @@ using System.Text.Json.Serialization;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using HotChocolate;
+using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Databases
 {
     public class DatabaseResolvers
     {
+        private static readonly JsonSerializerOptions NonDataSerializerOptions =
+            new()
+            {
+                Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false), },
+                NumberHandling = JsonNumberHandling.Strict,
+                PropertyNameCaseInsensitive = false,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                ReadCommentHandling = JsonCommentHandling.Disallow,
+                IncludeFields = false,
+                IgnoreReadOnlyProperties = false,
+                IgnoreReadOnlyFields = true,
+                IgnoreNullValues = false,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            }; //.SetupImmutableConverter();
+
         private static readonly JsonSerializerOptions SerializerOptions =
-                new()
-                {
-                    Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false) },
-                    NumberHandling = JsonNumberHandling.Strict,
-                    PropertyNameCaseInsensitive = false,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    ReadCommentHandling = JsonCommentHandling.Disallow,
-                    IncludeFields = false,
-                    IgnoreReadOnlyProperties = false,
-                    IgnoreReadOnlyFields = true,
-                    IgnoreNullValues = false,
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-                }; //.SetupImmutableConverter();
+            new()
+            {
+                Converters = {
+                        new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
+                        new DataConverterWithTypeDiscriminatorProperty(NonDataSerializerOptions)
+                        },
+                NumberHandling = JsonNumberHandling.Strict,
+                PropertyNameCaseInsensitive = false,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                ReadCommentHandling = JsonCommentHandling.Disallow,
+                IncludeFields = false,
+                IgnoreReadOnlyProperties = false,
+                IgnoreReadOnlyFields = true,
+                IgnoreNullValues = false,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            }; //.SetupImmutableConverter();
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<DatabaseResolvers> _logger;
@@ -44,7 +63,7 @@ namespace Metabase.GraphQl.Databases
 
         private sealed class DataData
         {
-            public DataX.IData Data { get; set; } = default!;
+            public DataX.Data Data { get; set; } = default!;
         }
 
         public async Task<DataX.IData?> GetDataAsync(
@@ -226,6 +245,102 @@ namespace Metabase.GraphQl.Databases
             public DataX.DataConnection AllData { get; set; } = default!;
         }
 
+        // Inspired by https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#support-polymorphic-deserialization
+        // and https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#an-alternative-way-to-do-polymorphic-deserialization
+        public class DataConverterWithTypeDiscriminatorProperty : JsonConverter<DataX.IData>
+        {
+            private const string DISCRIMINATOR_PROPERTY_NAME = "__typename";
+
+            // type discriminators
+            private const string CALORIMETRIC_DATA = "CalorimetricData";
+            private const string HYGROTHERMAL_DATA = "HygrothermalData";
+            private const string OPTICAL_DATA = "OpticalData";
+            private const string PHOTOVOLTAIC_DATA = "PhotovoltaicData";
+
+            private readonly JsonSerializerOptions _options;
+
+            public DataConverterWithTypeDiscriminatorProperty(
+                JsonSerializerOptions options
+            )
+            {
+                _options = options;
+            }
+
+            public override bool CanConvert(Type typeToConvert) =>
+                typeof(DataX.IData).IsAssignableFrom(typeToConvert);
+
+            public override DataX.IData Read(
+                ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                var readerClone = reader; // clones `reader` because it is a struct!
+                if (readerClone.TokenType != JsonTokenType.StartObject)
+                {
+                    throw new JsonException($"Token is not a start object but {readerClone.TokenType}.");
+                }
+                readerClone.Read();
+                if (readerClone.TokenType != JsonTokenType.PropertyName)
+                {
+                    throw new JsonException($"Token is not a property but {readerClone.TokenType}.");
+                }
+                var propertyName = readerClone.GetString();
+                if (propertyName != DISCRIMINATOR_PROPERTY_NAME)
+                {
+                    throw new JsonException($"Property is not discriminator property but {propertyName}.");
+                }
+                readerClone.Read();
+                if (readerClone.TokenType != JsonTokenType.String)
+                {
+                    throw new JsonException($"Token is not a string but {readerClone.TokenType}.");
+                }
+                var typeDiscriminator = readerClone.GetString();
+                // Note that you can't pass in the original options instance
+                // that registers the converter to `Deserialize` as told on
+                // https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#an-alternative-way-to-do-polymorphic-deserialization
+                return typeDiscriminator switch
+                {
+                    CALORIMETRIC_DATA => JsonSerializer.Deserialize<DataX.CalorimetricData>(ref reader, _options) ?? throw new JsonException("Could not deserialize calorimetric data."),
+                    HYGROTHERMAL_DATA => JsonSerializer.Deserialize<DataX.HygrothermalData>(ref reader, _options) ?? throw new JsonException("Could not deserialize hygrothermal data."),
+                    OPTICAL_DATA => JsonSerializer.Deserialize<DataX.OpticalData>(ref reader, _options) ?? throw new JsonException("Could not deserialize optical data."),
+                    PHOTOVOLTAIC_DATA => JsonSerializer.Deserialize<DataX.PhotovoltaicData>(ref reader, _options) ?? throw new JsonException("Could not deserialize photovoltaic data."),
+                    _ => throw new JsonException($"Type discriminator has unknown value {typeDiscriminator}.")
+                };
+            }
+
+            public override void Write(
+                Utf8JsonWriter writer, DataX.IData data, JsonSerializerOptions options)
+            {
+                try
+                {
+                    writer.WriteStartObject();
+                    if (data is DataX.CalorimetricData calorimetricData)
+                    {
+                        writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, CALORIMETRIC_DATA);
+                        throw new JsonException("Unsupported!");
+                    }
+                    else if (data is DataX.HygrothermalData hygrothermalData)
+                    {
+                        writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, HYGROTHERMAL_DATA);
+                        throw new JsonException("Unsupported!");
+                    }
+                    else if (data is DataX.OpticalData opticalData)
+                    {
+                        writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, OPTICAL_DATA);
+                        throw new JsonException("Unsupported!");
+                    }
+                    else if (data is DataX.PhotovoltaicData photovoltaicData)
+                    {
+                        writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, PHOTOVOLTAIC_DATA);
+                        throw new JsonException("Unsupported!");
+                    }
+                    throw new JsonException("Unsupported!");
+                }
+                finally
+                {
+                    writer.WriteEndObject();
+                }
+            }
+        }
+
         public async Task<DataX.DataConnection?> GetAllDataAsync(
             [Parent] Data.Database database,
             DataX.DataPropositionInput? where,
@@ -238,7 +353,7 @@ namespace Metabase.GraphQl.Databases
             CancellationToken cancellationToken
             )
         {
-            return (await QueryDatabase<AllDataData>(
+            var dataConnection = (await QueryDatabase<AllDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
@@ -263,6 +378,12 @@ namespace Metabase.GraphQl.Databases
                 cancellationToken
             ).ConfigureAwait(false)
             )?.AllData;
+            return dataConnection is null ? null : new DataX.DataConnection(
+                dataConnection.Edges,
+                dataConnection.Nodes,
+                dataConnection.TotalCount,
+                dataConnection.Timestamp
+            );
         }
 
         private static DataX.DataPropositionInput? RewriteDataPropositionInput(
@@ -419,7 +540,6 @@ namespace Metabase.GraphQl.Databases
         {
             public DataX.CalorimetricDataConnection AllCalorimetricData { get; set; } = default!;
         }
-
 
         public async Task<DataX.CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
             [Parent] Data.Database database,

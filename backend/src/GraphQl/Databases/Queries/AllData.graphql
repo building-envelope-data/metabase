@@ -23,6 +23,7 @@ query AllData(
     #   }
     # }
     nodes {
+      __typename
       ...DataFields
     }
     # totalCount
