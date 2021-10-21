@@ -33,7 +33,7 @@ test : ## Run tests
 	@echo "--------------------------------------------------"
 	@echo "Complete test list"
 	@echo "--------------------------------------------------"
-	dotnet test \
+	dotnet test ./test/Metabase.Tests.csproj \
 		--list-tests
 	@echo "--------------------------------------------------"
 	@echo "All test runs"
@@ -42,7 +42,7 @@ test : ## Run tests
 		echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
 		echo "Test runs for file '$${x}'" && \
 		echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
-		dotnet test \
+		dotnet test ./test/Metabase.Tests.csproj \
 			--filter "FullyQualifiedName~$${x}" \
 			--collect:"XPlat Code Coverage" \
 			--verbosity minimal ; \
