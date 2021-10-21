@@ -580,7 +580,17 @@ namespace Metabase.NTests.Integration
             string testName,
             string keyName
         ){
-            return $"{className}.{testName}_{keyName}";
+            return $"{className}.{testName}_{keyName}.snap";
+        }
+
+        protected static string SnapshooterDirectoryHelper(
+            string className
+        )
+        {
+            if(className.Contains("Component")) return @"/home/me/app/ntest/Integration/GraphQl/Components";
+            if(className.Contains("Institution")) return @"/home/me/app/ntest/Integration/GraphQl/Institutions";
+            if(className.Contains("User")) return @"/home/me/app/ntest/Integration/GraphQl/Users";
+            return "";
         }
 
         private sealed class GraphQlRequest
