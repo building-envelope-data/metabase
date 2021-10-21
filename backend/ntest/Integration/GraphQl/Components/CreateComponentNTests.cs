@@ -14,7 +14,6 @@ namespace Metabase.NTests.Integration.GraphQl.Components
     public sealed class CreateComponentNTests
       : ComponentIntegrationNTests
     {
-
         [Test]
         public async Task AnonymousUser_IsAuthenticationError()
         {
@@ -48,9 +47,9 @@ namespace Metabase.NTests.Integration.GraphQl.Components
             string key,
             CreateComponentInput input
         )
-        {
-            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentNTests), nameof(LoggedInUser_IsSuccess), key), @".");
-            
+        {            
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentNTests), nameof(LoggedInUser_IsSuccess), key), SnapshooterDirectoryHelper(nameof(CreateComponentNTests)));
+                       
             // Arrange        
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             var institutionId = await InstitutionIntegrationNTests.CreateAndVerifyInstitutionReturningUuid(
@@ -71,7 +70,7 @@ namespace Metabase.NTests.Integration.GraphQl.Components
             // Assert
             Snapshot.Match(
                 response,
-                testName,
+                testName,              
                 matchOptions => matchOptions
                 .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.createComponent.component.id").Should().NotBeNullOrWhiteSpace()
@@ -89,7 +88,7 @@ namespace Metabase.NTests.Integration.GraphQl.Components
             CreateComponentInput input
         )
         {
-            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentNTests), nameof(LoggedInUser_CreatesComponent), key), @".");
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentNTests), nameof(LoggedInUser_CreatesComponent), key), SnapshooterDirectoryHelper(nameof(CreateComponentNTests)));
 
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
