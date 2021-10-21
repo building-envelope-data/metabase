@@ -5,11 +5,11 @@ using FluentAssertions;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Users
+namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
-    public sealed class DeletePersonalUserDataNTests
-      : UserIntegrationNTests
+    public sealed class DeletePersonalUserDataTests
+      : UserIntegrationTests
     {
         [Test]
         public async Task CorrectPassword_IsSuccess()

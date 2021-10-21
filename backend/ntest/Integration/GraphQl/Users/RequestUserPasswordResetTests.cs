@@ -3,11 +3,11 @@ using FluentAssertions;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Users
+namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
-    public sealed class RequestUserPasswordResetNTests
-      : UserIntegrationNTests
+    public sealed class RequestUserPasswordResetTests
+      : UserIntegrationTests
     {
         [Test]
         public async Task ExistingAndConfirmedEmailAddress_RequestsUserPasswordReset()

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Components;
 
-namespace Metabase.NTests.Integration.GraphQl.Components
+namespace Metabase.Tests.Integration.GraphQl.Components
 {
-    public abstract class ComponentIntegrationNTests
+    public abstract class ComponentIntegrationTests
       : IntegrationTests
     {
         internal static CreateComponentInput MinimalComponentInput { get; } = new(

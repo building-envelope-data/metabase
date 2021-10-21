@@ -102,7 +102,6 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             );
         }
 
-
         [Fact]
         public async Task UnknownUser_IsUserError()
         {

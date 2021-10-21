@@ -16,7 +16,7 @@ using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration
+namespace Metabase.Tests.Integration
 {
     [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
     public abstract class IntegrationTests
@@ -587,9 +587,9 @@ namespace Metabase.NTests.Integration
             string className
         )
         {
-            if(className.Contains("Component")) return @"/home/me/app/ntest/Integration/GraphQl/Components";
-            if(className.Contains("Institution")) return @"/home/me/app/ntest/Integration/GraphQl/Institutions";
-            if(className.Contains("User")) return @"/home/me/app/ntest/Integration/GraphQl/Users";
+            if(className.Contains("Component")) return @"/home/me/app/test/Integration/GraphQl/Components";
+            if(className.Contains("Institution")) return @"/home/me/app/test/Integration/GraphQl/Institutions";
+            if(className.Contains("User")) return @"/home/me/app/test/Integration/GraphQl/Users";
             return "";
         }
 

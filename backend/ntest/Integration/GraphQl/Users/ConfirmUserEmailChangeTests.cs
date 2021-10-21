@@ -3,11 +3,11 @@ using FluentAssertions;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Users
+namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
-    public sealed class ConfirmUserEmailChangeNTests
-      : UserIntegrationNTests
+    public sealed class ConfirmUserEmailChangeTests
+      : UserIntegrationTests
     {
         private async Task<string> Arrange(
             string email,

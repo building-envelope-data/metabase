@@ -3,16 +3,16 @@ using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Metabase.GraphQl.Components;
-using Metabase.NTests.Integration.GraphQl.Institutions;
+using Metabase.Tests.Integration.GraphQl.Institutions;
 using Snapshooter;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Components
+namespace Metabase.Tests.Integration.GraphQl.Components
 {
     [TestFixture]
-    public sealed class CreateComponentNTests
-      : ComponentIntegrationNTests
+    public sealed class CreateComponentTests
+      : ComponentIntegrationTests
     {
         [Test]
         public async Task AnonymousUser_IsAuthenticationError()
@@ -25,7 +25,6 @@ namespace Metabase.NTests.Integration.GraphQl.Components
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
-
         }
 
         [Test]
@@ -47,19 +46,18 @@ namespace Metabase.NTests.Integration.GraphQl.Components
             string key,
             CreateComponentInput input
         )
-        {            
-            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentNTests), nameof(LoggedInUser_IsSuccess), key), SnapshooterDirectoryHelper(nameof(CreateComponentNTests)));
-                       
-            // Arrange        
+        {
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentTests), nameof(LoggedInUser_IsSuccess), key), SnapshooterDirectoryHelper(nameof(CreateComponentTests)));
+ 
+            // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var institutionId = await InstitutionIntegrationNTests.CreateAndVerifyInstitutionReturningUuid(
+            var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationNTests.PendingInstitutionInput with
+                InstitutionIntegrationTests.PendingInstitutionInput with
                 {
                     OwnerIds = new[] { userId }
                 }
                 ).ConfigureAwait(false);
-            
             // Act
             var response = await CreateComponent(
                 input with
@@ -70,7 +68,7 @@ namespace Metabase.NTests.Integration.GraphQl.Components
             // Assert
             Snapshot.Match(
                 response,
-                testName,              
+                testName,
                 matchOptions => matchOptions
                 .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.createComponent.component.id").Should().NotBeNullOrWhiteSpace()
@@ -88,13 +86,13 @@ namespace Metabase.NTests.Integration.GraphQl.Components
             CreateComponentInput input
         )
         {
-            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentNTests), nameof(LoggedInUser_CreatesComponent), key), SnapshooterDirectoryHelper(nameof(CreateComponentNTests)));
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentTests), nameof(LoggedInUser_CreatesComponent), key), SnapshooterDirectoryHelper(nameof(CreateComponentTests)));
 
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var institutionId = await InstitutionIntegrationNTests.CreateAndVerifyInstitutionReturningUuid(
+            var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationNTests.PendingInstitutionInput with
+                InstitutionIntegrationTests.PendingInstitutionInput with
                 {
                     OwnerIds = new[] { userId }
                 }

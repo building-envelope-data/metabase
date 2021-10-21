@@ -5,11 +5,11 @@ using FluentAssertions;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Users
+namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
-    public sealed class LoginUserNTests
-      : UserIntegrationNTests
+    public sealed class LoginUserTests
+      : UserIntegrationTests
     {
         [Test]
         public async Task ValidDataOfRegisteredAndConfirmedUser_LogsInUser()

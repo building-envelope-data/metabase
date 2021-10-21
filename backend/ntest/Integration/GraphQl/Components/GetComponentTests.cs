@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Metabase.NTests.Integration.GraphQl.Institutions;
+using Metabase.Tests.Integration.GraphQl.Institutions;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Components
+namespace Metabase.Tests.Integration.GraphQl.Components
 {
     [TestFixture]
-    public sealed class GetComponentNTests
-      : ComponentIntegrationNTests
+    public sealed class GetComponentTests
+      : ComponentIntegrationTests
     {
         [Test]
         public async Task NoComponent_Fails()
@@ -28,9 +28,9 @@ namespace Metabase.NTests.Integration.GraphQl.Components
         {
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var institutionId = await InstitutionIntegrationNTests.CreateAndVerifyInstitutionReturningUuid(
+            var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationNTests.PendingInstitutionInput with
+                InstitutionIntegrationTests.PendingInstitutionInput with
                 {
                     OwnerIds = new[] { userId }
                 }
@@ -57,9 +57,9 @@ namespace Metabase.NTests.Integration.GraphQl.Components
         {
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var institutionId = await InstitutionIntegrationNTests.CreateAndVerifyInstitutionReturningUuid(
+            var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationNTests.PendingInstitutionInput with
+                InstitutionIntegrationTests.PendingInstitutionInput with
                 {
                     OwnerIds = new[] { userId }
                 }

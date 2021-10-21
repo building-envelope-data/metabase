@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Metabase.NTests.Integration.GraphQl.Users
+namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    public abstract class UserIntegrationNTests
+    public abstract class UserIntegrationTests
       : IntegrationTests
     {
         protected Task<string> GetUser(Guid uuid)

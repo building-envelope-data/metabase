@@ -7,11 +7,11 @@ using Snapshooter;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Institutions
+namespace Metabase.Tests.Integration.GraphQl.Institutions
 {
     [TestFixture]
-    public sealed class CreateInstitutionNTests
-      : InstitutionIntegrationNTests
+    public sealed class CreateInstitutionTests
+      : InstitutionIntegrationTests
     {
         [Test]
         public async Task AnonymousUser_IsAuthenticationError()
@@ -38,7 +38,7 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
             // Assert
             Snapshot.Match(response);
         }
-        
+
         [TestCaseSource(nameof(EnumerateInstitutionInputs))]
         [Theory]
         public async Task LoggedInUser_IsSuccess(
@@ -46,7 +46,7 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
             CreateInstitutionInput input
         )
         {
-            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateInstitutionNTests), nameof(LoggedInUser_IsSuccess),key), SnapshooterDirectoryHelper(nameof(CreateInstitutionNTests)));
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateInstitutionTests), nameof(LoggedInUser_IsSuccess),key), SnapshooterDirectoryHelper(nameof(CreateInstitutionTests)));
 
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
@@ -79,7 +79,7 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
             CreateInstitutionInput input
         )
         {
-            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateInstitutionNTests), nameof(LoggedInUser_CreatesInstitution), key), SnapshooterDirectoryHelper(nameof(CreateInstitutionNTests)));
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateInstitutionTests), nameof(LoggedInUser_CreatesInstitution), key), SnapshooterDirectoryHelper(nameof(CreateInstitutionTests)));
 
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
@@ -105,4 +105,4 @@ namespace Metabase.NTests.Integration.GraphQl.Institutions
                 );
         }
     }
-}    
+}

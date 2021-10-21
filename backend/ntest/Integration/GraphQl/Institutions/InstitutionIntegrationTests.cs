@@ -7,9 +7,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Metabase.GraphQl.Institutions;
 
-namespace Metabase.NTests.Integration.GraphQl.Institutions
+namespace Metabase.Tests.Integration.GraphQl.Institutions
 {
-    public abstract class InstitutionIntegrationNTests
+    public abstract class InstitutionIntegrationTests
       : IntegrationTests
     {
         internal static CreateInstitutionInput PendingInstitutionInput { get; } = new(

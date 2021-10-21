@@ -4,10 +4,10 @@ using FluentAssertions;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl
+namespace Metabase.Tests.Integration.GraphQl
 {
     [TestFixture]
-    public sealed class GraphQlSchemaNTests
+    public sealed class GraphQlSchemaTests
       : IntegrationTests
     {
         [Test]

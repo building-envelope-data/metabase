@@ -2,11 +2,11 @@ using System.Threading.Tasks;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Users
+namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
-    public sealed class ResetUserPasswordNTests
-      : UserIntegrationNTests
+    public sealed class ResetUserPasswordTests
+      : UserIntegrationTests
     {
         private async Task<string> RegisterAndConfirmUserAndRequestPasswordReset(
             string email,

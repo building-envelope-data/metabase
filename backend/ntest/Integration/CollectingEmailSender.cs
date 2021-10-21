@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Metabase.NTests.Integration
+namespace Metabase.Tests.Integration
 {
     public sealed class CollectingEmailSender
       : Services.IEmailSender

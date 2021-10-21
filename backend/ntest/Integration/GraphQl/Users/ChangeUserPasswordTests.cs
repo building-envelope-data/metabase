@@ -5,11 +5,11 @@ using FluentAssertions;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Users
+namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
-    public sealed class ChangeUserPasswordNTests
-      : UserIntegrationNTests
+    public sealed class ChangeUserPasswordTests
+      : UserIntegrationTests
     {
         [Test]
         public async Task ValidData_ChangesUserPassword()
@@ -75,7 +75,7 @@ namespace Metabase.NTests.Integration.GraphQl.Users
             // Arrange
             var email = "john.doe@ise.fraunhofer.de";
             var password = "aaaAAA123$!@";
-            await RegisterAndConfirmAndLoginUser(              
+            await RegisterAndConfirmAndLoginUser(
                 email: email,
                 password: password
             ).ConfigureAwait(false);

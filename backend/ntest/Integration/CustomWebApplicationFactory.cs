@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Hosting;
 
-namespace Metabase.NTests.Integration
+namespace Metabase.Tests.Integration
 {
     public sealed class CustomWebApplicationFactory
       : WebApplicationFactory<Startup>

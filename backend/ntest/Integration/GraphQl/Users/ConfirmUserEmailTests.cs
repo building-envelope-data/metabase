@@ -3,11 +3,11 @@ using FluentAssertions;
 using Snapshooter.NUnit;
 using NUnit.Framework;
 
-namespace Metabase.NTests.Integration.GraphQl.Users
+namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
-    public sealed class ConfirmUserEmailNTests
-      : UserIntegrationNTests
+    public sealed class ConfirmUserEmailTests
+      : UserIntegrationTests
     {
         [Test]
         public async Task ValidDataWithConfirmationCodeFromRegistrationEmail_ConfirmsUserEmail()
