@@ -106,8 +106,7 @@ RUN \
 
 RUN \
   mkdir ./src && \
-  mkdir ./test && \
-  mkdir ./ntest
+  mkdir ./test
 COPY \
   --chown=me:us \
   ./src/Metabase.csproj \
@@ -116,10 +115,6 @@ COPY \
   --chown=me:us \
   ./test/Metabase.Tests.csproj \
   ./test/
-COPY \
-  --chown=me:us \
-  ./ntest/Metabase.NTests.csproj \
-  ./ntest/  
 
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/aspnetapp/Dockerfile.alpine-x64
 # https://github.com/dotnet/dotnet-docker/blob/master/samples/run-aspnetcore-https-development.md
@@ -288,9 +283,6 @@ RUN \
   mkdir --parents \
     ./test/bin \
     ./test/obj && \
-  mkdir --parents \
-    ./ntest/bin \
-    ./ntest/obj && \    
   mkdir --parents \
     ${HOME}/.vscode-server/extensions \
     ${HOME}/.vscode-server-insiders/extensions

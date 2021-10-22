@@ -77,8 +77,6 @@ services:
       - /app/src/obj
       - /app/test/bin
       - /app/test/obj
-      - /app/ntest/bin
-      - /app/ntest/obj      
       # Create anonymous volumes for dotnet tools
       - /home/me/.nuget
       - /home/me/.dotnet
