@@ -14,9 +14,11 @@ using IdentityModel.Client;
 using Json.Path;
 using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration
 {
+    [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
     public abstract class IntegrationTests
     {
         protected CustomWebApplicationFactory Factory { get; }
@@ -269,21 +271,6 @@ namespace Metabase.Tests.Integration
                 ).ConfigureAwait(false);
             return uuid;
         }
-
-        // protected async Task RegisterAndLoginUser(
-        //     string email,
-        //     string password
-        // )
-        // {
-        //     await RegisterUser(
-        //             email: email,
-        //             password: password
-        //             ).ConfigureAwait(false);
-        //     await LoginUser(
-        //         email: email,
-        //         password: password
-        //     ).ConfigureAwait(false);
-        // }
 
         protected async Task<Guid> RegisterAndConfirmAndLoginUser(
             string name = DefaultName,
@@ -586,6 +573,24 @@ namespace Metabase.Tests.Integration
             result.Headers.ContentType =
               new MediaTypeHeaderValue("application/json");
             return result;
+        }
+
+        protected static string SnapshooterNameHelper(
+            string className,
+            string testName,
+            string keyName
+        ){
+            return $"{className}.{testName}_{keyName}.snap";
+        }
+
+        protected static string SnapshooterDirectoryHelper(
+            string className
+        )
+        {
+            if(className.Contains("Component")) return @"/home/me/app/test/Integration/GraphQl/Components";
+            if(className.Contains("Institution")) return @"/home/me/app/test/Integration/GraphQl/Institutions";
+            if(className.Contains("User")) return @"/home/me/app/test/Integration/GraphQl/Users";
+            return "";
         }
 
         private sealed class GraphQlRequest

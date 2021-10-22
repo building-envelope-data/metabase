@@ -1,15 +1,16 @@
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl
 {
+    [TestFixture]
     public sealed class GraphQlSchemaTests
       : IntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task IsUnchanged()
         {
             // Act

@@ -5,16 +5,16 @@ using FluentAssertions;
 using Metabase.GraphQl.Components;
 using Metabase.Tests.Integration.GraphQl.Institutions;
 using Snapshooter;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Components
 {
-    [Collection(nameof(Data.Component))]
+    [TestFixture]
     public sealed class CreateComponentTests
       : ComponentIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task AnonymousUser_IsAuthenticationError()
         {
             // Act
@@ -27,7 +27,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             Snapshot.Match(response);
         }
 
-        [Fact]
+        [Test]
         public async Task AnonymousUser_CannotCreateComponent()
         {
             // Act
@@ -40,13 +40,15 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             Snapshot.Match(response);
         }
 
+        [TestCaseSource(nameof(EnumerateComponentInputs))]
         [Theory]
-        [MemberData(nameof(EnumerateComponentInputs))]
         public async Task LoggedInUser_IsSuccess(
             string key,
             CreateComponentInput input
         )
         {
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentTests), nameof(LoggedInUser_IsSuccess), key), SnapshooterDirectoryHelper(nameof(CreateComponentTests)));
+ 
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
@@ -66,7 +68,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             // Assert
             Snapshot.Match(
                 response,
-                SnapshotNameExtension.Create(key),
+                testName,
                 matchOptions => matchOptions
                 .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.createComponent.component.id").Should().NotBeNullOrWhiteSpace()
@@ -77,13 +79,15 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 );
         }
 
+        [TestCaseSource(nameof(EnumerateComponentInputs))]
         [Theory]
-        [MemberData(nameof(EnumerateComponentInputs))]
         public async Task LoggedInUser_CreatesComponent(
             string key,
             CreateComponentInput input
         )
         {
+            SnapshotFullName testName = new SnapshotFullName(SnapshooterNameHelper(nameof(CreateComponentTests), nameof(LoggedInUser_CreatesComponent), key), SnapshooterDirectoryHelper(nameof(CreateComponentTests)));
+
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
@@ -104,7 +108,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             // Assert
             Snapshot.Match(
                 response,
-                SnapshotNameExtension.Create(key),
+                testName,
                 matchOptions => matchOptions
                 .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.components.edges[*].node.id").Should().Be(componentId)

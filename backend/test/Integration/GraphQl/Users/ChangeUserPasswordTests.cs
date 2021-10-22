@@ -2,16 +2,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class ChangeUserPasswordTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task ValidData_ChangesUserPassword()
         {
             // Arrange
@@ -40,7 +40,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
@@ -69,7 +69,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task UnconfirmedUser_IsError()
         {
             // Arrange
@@ -94,7 +94,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             );
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordConfirmationMismatch_IsUserError()
         {
             // Arrange
@@ -123,7 +123,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordRequiresDigit_IsUserError()
         {
             // Arrange
@@ -151,7 +151,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordRequiresLower_IsUserError()
         {
             // Arrange
@@ -179,7 +179,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordRequiresNonAlphanumeric_IsUserError()
         {
             // Arrange
@@ -207,7 +207,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordRequiresUpper_IsUserError()
         {
             // Arrange
@@ -235,7 +235,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordTooShort_IsUserError()
         {
             // Arrange

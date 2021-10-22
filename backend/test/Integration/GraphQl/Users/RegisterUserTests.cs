@@ -1,16 +1,16 @@
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class RegisterUserTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task ValidData_RegistersUser()
         {
             // Act
@@ -39,7 +39,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordConfirmationMismatch_IsUserError()
         {
             // Act
@@ -53,7 +53,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task DuplicateEmail_IsUserError()
         {
             // Arrange
@@ -72,7 +72,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task InvalidEmail_IsUserError()
         {
             // Act
@@ -85,7 +85,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordRequiresDigit_IsUserError()
         {
             // Act
@@ -98,7 +98,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordRequiresLower_IsUserError()
         {
             // Act
@@ -111,7 +111,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordRequiresNonAlphanumeric_IsUserError()
         {
             // Act
@@ -124,7 +124,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordRequiresUpper_IsUserError()
         {
             // Act
@@ -137,7 +137,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task PasswordTooShort_IsUserError()
         {
             // Act
@@ -150,7 +150,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task NullOrEmptyEmail_IsUserError()
         {
             // Act

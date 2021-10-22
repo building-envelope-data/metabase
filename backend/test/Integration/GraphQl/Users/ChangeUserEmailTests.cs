@@ -2,16 +2,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class ChangeUserEmailTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task ValidData_EmailsConfirmationCode()
         {
             // Arrange
@@ -47,7 +47,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
@@ -74,7 +74,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task UnchangedEmail_IsUserError()
         {
             // Arrange
@@ -101,7 +101,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task InvalidEmail_IsUserError()
         {
             // Arrange
