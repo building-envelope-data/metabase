@@ -1,1 +1,0 @@
-﻿{"data":{"confirmUserEmailChange":{"user":null,"errors":[{"code":"DUPLICATE_EMAIL","message":"Email \u0027new.john.doe@ise.fraunhofer.de\u0027 is already taken.","path":["input","newEmail"]},{"code":"UNKNOWN","message":"Email \u0027new.john.doe@ise.fraunhofer.de\u0027 is already taken.","path":["input"]}]}}}
