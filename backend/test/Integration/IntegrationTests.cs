@@ -9,12 +9,14 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using FluentAssertions;
 using IdentityModel.Client;
 using Json.Path;
 using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 using NUnit.Framework;
+using Snapshooter;
 
 namespace Metabase.Tests.Integration
 {
@@ -575,22 +577,19 @@ namespace Metabase.Tests.Integration
             return result;
         }
 
-        protected static string SnapshooterNameHelper(
-            string className,
-            string testName,
-            string keyName
-        ){
-            return $"{className}.{testName}_{keyName}.snap";
-        }
-
-        protected static string SnapshooterDirectoryHelper(
-            string className
+        // With NUnit using async Snapshooter is not able to calculate
+        // the necessary Fullname, due to reasons mentioned in
+        // https://stackoverflow.com/questions/22598323/movenext-instead-of-actual-method-task-name
+        // The workaround with optional parameter is inspired by the same source.
+        protected static SnapshotFullName SnapshotFullNameHelper(
+            Type testType, 
+            string keyName, 
+            [CallerMemberName] string testMethod=""
         )
         {
-            if(className.Contains("Component")) return @"/home/me/app/test/Integration/GraphQl/Components";
-            if(className.Contains("Institution")) return @"/home/me/app/test/Integration/GraphQl/Institutions";
-            if(className.Contains("User")) return @"/home/me/app/test/Integration/GraphQl/Users";
-            return "";
+            string testName = $"{testType.Name}.{testMethod}_{keyName}.snap";
+            string targetDirectory = testType.Namespace.Replace("Metabase.Tests.", @"/home/me/app/test/").Replace(".", "/");
+            return new SnapshotFullName(testName, targetDirectory);
         }
 
         private sealed class GraphQlRequest
