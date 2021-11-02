@@ -19,10 +19,11 @@ import Link from "next/link";
 import paths from "../../paths";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
+  getAppliedMethodColumnProps,
+  getComponentUuidColumnProps,
   getDescriptionColumnProps,
-  getFilterableDescriptionListColumnProps,
-  getInternallyLinkedFilterableStringColumnProps,
   getNameColumnProps,
+  getResourceTreeColumnProps,
   getTimestampColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
@@ -368,13 +369,9 @@ function Page() {
             ...getTimestampColumnProps<typeof data[0]>(),
           },
           {
-            ...getInternallyLinkedFilterableStringColumnProps<typeof data[0]>(
-              "Component UUID",
-              "componentId",
-              (x) => x.componentId,
+            ...getComponentUuidColumnProps<typeof data[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x),
-              (x) => paths.component(x.componentId)
+              (x) => filterText.get(x)
             ),
           },
           // {
@@ -388,72 +385,13 @@ function Page() {
           //   ),
           // },
           {
-            ...getFilterableDescriptionListColumnProps<typeof data[0]>(
-              "Applied Method",
-              "appliedMethod",
-              (x) => [
-                {
-                  key: "appliedMethodId",
-                  title: "UUID",
-                  value: x.appliedMethod.methodId,
-                  render: (_record, _highlightedValue, value) => (
-                    // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
-                    // TODO Actually, `value` is neither `null` nor `undefined` but the type system does not know about it. How can we make it know about it so we don't need `|| ""` here?
-                    <Link href={paths.method(value || "")}>{value}</Link>
-                  ),
-                },
-                // {
-                //   key: "appliedMethodName",
-                //   title: "Name",
-                //   value: x.appliedMethod.method?.name,
-                // },
-                // {
-                //   key: "appliedMethodDescription",
-                //   title: "Description",
-                //   value: x.appliedMethod.method?.description,
-                // },
-              ],
+            ...getAppliedMethodColumnProps<typeof data[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getFilterableDescriptionListColumnProps<typeof data[0]>(
-              "Resource Tree Root",
-              "resourceTree",
-              (x) => [
-                {
-                  key: "description",
-                  title: "Description",
-                  value: x.resourceTree.root.value.description,
-                },
-                {
-                  key: "hashValue",
-                  title: "Hash Value",
-                  value: x.resourceTree.root.value.hashValue,
-                },
-                {
-                  key: "locator",
-                  title: "Locator",
-                  value: x.resourceTree.root.value.locator,
-                  render: (_record, hightlightedValue, value) => (
-                    // TODO Actually, `value` is neither `null` nor `undefined` but the type system does not know about it. How can we make it know about it so we don't need `|| ""` here?
-                    <Typography.Link href={value || ""}>
-                      {hightlightedValue}
-                    </Typography.Link>
-                  ),
-                },
-                {
-                  key: "formatId",
-                  title: "Format UUID",
-                  value: x.resourceTree.root.value.formatId,
-                  render: (_record, _highlightedValue, value) => (
-                    // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
-                    // TODO Actually, `value` is neither `null` nor `undefined` but the type system does not know about it. How can we make it know about it so we don't need `|| ""` here?
-                    <Link href={paths.dataFormat(value || "")}>{value}</Link>
-                  ),
-                },
-              ],
+            ...getResourceTreeColumnProps<typeof data[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),

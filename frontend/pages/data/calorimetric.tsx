@@ -17,10 +17,11 @@ import {
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
+  getAppliedMethodColumnProps,
+  getComponentUuidColumnProps,
   getDescriptionColumnProps,
-  getFilterableDescriptionListColumnProps,
-  getFilterableStringColumnProps,
   getNameColumnProps,
+  getResourceTreeColumnProps,
   getTimestampColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
@@ -259,10 +260,7 @@ function Page() {
             ...getTimestampColumnProps<typeof data[0]>(),
           },
           {
-            ...getFilterableStringColumnProps<typeof data[0]>(
-              "Component UUID",
-              "componentId",
-              (x) => x.componentId,
+            ...getComponentUuidColumnProps<typeof data[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
@@ -278,62 +276,13 @@ function Page() {
           //   ),
           // },
           {
-            ...getFilterableDescriptionListColumnProps<typeof data[0]>(
-              "Applied Method",
-              "appliedMethod",
-              (x) => [
-                {
-                  key: "appliedMethodId",
-                  title: "UUID",
-                  value: x.appliedMethod.methodId,
-                },
-                // {
-                //   key: "appliedMethodName",
-                //   title: "Name",
-                //   value: x.appliedMethod.method?.name,
-                // },
-                // {
-                //   key: "appliedMethodDescription",
-                //   title: "Description",
-                //   value: x.appliedMethod.method?.description,
-                // },
-              ],
+            ...getAppliedMethodColumnProps<typeof data[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getFilterableDescriptionListColumnProps<typeof data[0]>(
-              "Resource Tree Root",
-              "resourceTree",
-              (x) => [
-                {
-                  key: "description",
-                  title: "Description",
-                  value: x.resourceTree.root.value.description,
-                },
-                {
-                  key: "hashValue",
-                  title: "Hash Value",
-                  value: x.resourceTree.root.value.hashValue,
-                },
-                {
-                  key: "locator",
-                  title: "Locator",
-                  value: x.resourceTree.root.value.locator,
-                  render: (_record, hightlightedValue, value) => (
-                    // TODO Actually, `value` is neither `null` nor `undefined` but the type system does not know about it. How can we make it know about it so we don't need `|| ""` here?
-                    <Typography.Link href={value || ""}>
-                      {hightlightedValue}
-                    </Typography.Link>
-                  ),
-                },
-                {
-                  key: "formatId",
-                  title: "Format UUID",
-                  value: x.resourceTree.root.value.formatId,
-                },
-              ],
+            ...getResourceTreeColumnProps<typeof data[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
