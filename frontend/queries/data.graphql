@@ -44,27 +44,7 @@ query HasData($where: DataPropositionInput) {
 }
 
 fragment CalorimetricDataPartial on CalorimetricData {
-  uuid
-  timestamp
-  componentId
-  name
-  description
-  appliedMethod {
-    methodId
-  }
-  resourceTree {
-    root {
-      value {
-        description
-        hashValue
-        locator
-        formatId
-      }
-    }
-  }
-  # TODO All the above should be replaced by `...DataPartial`. If we do so
-  # though, the result returned by the query `AllCalorimetricData` does not include
-  # the fields above. Why?
+  ...DataPartial
   gValues
   uValues
 }
@@ -94,27 +74,7 @@ query HasCalorimetricData($where: CalorimetricDataPropositionInput) {
 }
 
 fragment HygrothermalDataPartial on HygrothermalData {
-  uuid
-  timestamp
-  componentId
-  name
-  description
-  appliedMethod {
-    methodId
-  }
-  resourceTree {
-    root {
-      value {
-        description
-        hashValue
-        locator
-        formatId
-      }
-    }
-  }
-  # TODO All the above should be replaced by `...DataPartial`. If we do so
-  # though, the result returned by the query `AllHygrothermalData` does not include
-  # the fields above. Why?
+  ...DataPartial
 }
 
 query AllHygrothermalData($where: HygrothermalDataPropositionInput) {
@@ -142,27 +102,7 @@ query HasHygrothermalData($where: HygrothermalDataPropositionInput) {
 }
 
 fragment OpticalDataPartial on OpticalData {
-  uuid
-  timestamp
-  componentId
-  name
-  description
-  appliedMethod {
-    methodId
-  }
-  resourceTree {
-    root {
-      value {
-        description
-        hashValue
-        locator
-        formatId
-      }
-    }
-  }
-  # TODO All the above should be replaced by `...DataPartial`. If we do so
-  # though, the result returned by the query `AllOpticalData` does not include
-  # the fields above. Why?
+  ...DataPartial
   infraredEmittances
   nearnormalHemisphericalSolarReflectances
   nearnormalHemisphericalSolarTransmittances
@@ -195,27 +135,7 @@ query HasOpticalData($where: OpticalDataPropositionInput) {
 }
 
 fragment PhotovoltaicDataPartial on PhotovoltaicData {
-  uuid
-  timestamp
-  componentId
-  name
-  description
-  appliedMethod {
-    methodId
-  }
-  resourceTree {
-    root {
-      value {
-        description
-        hashValue
-        locator
-        formatId
-      }
-    }
-  }
-  # TODO All the above should be replaced by `...DataPartial`. If we do so
-  # though, the result returned by the query `AllPhotovoltaicData` does not include
-  # the fields above. Why?
+  ...DataPartial
 }
 
 query AllPhotovoltaicData($where: PhotovoltaicDataPropositionInput) {
