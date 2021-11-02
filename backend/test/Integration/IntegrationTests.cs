@@ -580,16 +580,17 @@ namespace Metabase.Tests.Integration
         // With NUnit using async Snapshooter is not able to calculate
         // the necessary Fullname, due to reasons mentioned in
         // https://stackoverflow.com/questions/22598323/movenext-instead-of-actual-method-task-name
-        // The workaround with optional parameter is inspired by the same source.
+        // The workaround with optional parameters is inspired by the same source.
         protected static SnapshotFullName SnapshotFullNameHelper(
             Type testType, 
             string keyName, 
-            [CallerMemberName] string testMethod=""
+            [CallerMemberName] string testMethod="",
+            [CallerFilePath] string testFilePath=""
         )
         {
             string testName = $"{testType.Name}.{testMethod}_{keyName}.snap";
-            string targetDirectory = testType.Namespace.Replace("Metabase.Tests.", @"/home/me/app/test/").Replace(".", "/");
-            return new SnapshotFullName(testName, targetDirectory);
+            string testDirectory = Path.GetDirectoryName(testFilePath);
+            return new SnapshotFullName(testName, testDirectory);
         }
 
         private sealed class GraphQlRequest
