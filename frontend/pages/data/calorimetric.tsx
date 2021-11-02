@@ -33,8 +33,6 @@ import {
   UuidPropositionFormList,
 } from "../../components/UuidPropositionFormList";
 
-// TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
-
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
