@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Metabase.Tests.Integration.GraphQl.Institutions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Components
 {
-    [Collection(nameof(Data.Component))]
+    [TestFixture]
     public sealed class GetComponentTests
       : ComponentIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task NoComponent_Fails()
         {
             // Act
@@ -23,7 +23,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             Snapshot.Match(response);
         }
 
-        [Fact]
+        [Test]
         public async Task UnknownId_Fails()
         {
             // Arrange
@@ -52,7 +52,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             Snapshot.Match(response);
         }
 
-        [Fact]
+        [Test]
         public async Task KnownId_Succeeds()
         {
             // Arrange

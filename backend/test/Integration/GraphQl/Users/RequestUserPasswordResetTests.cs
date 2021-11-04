@@ -1,15 +1,15 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class RequestUserPasswordResetTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task ExistingAndConfirmedEmailAddress_RequestsUserPasswordReset()
         {
             // Arrange
@@ -33,7 +33,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task UnknownEmailAddress_DoesNothing()
         {
             // Arrange
@@ -49,7 +49,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task UnconfirmedEmailAddress_DoesNothing()
         {
             // Arrange

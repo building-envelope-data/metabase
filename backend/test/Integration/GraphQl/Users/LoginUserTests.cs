@@ -2,16 +2,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class LoginUserTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task ValidDataOfRegisteredAndConfirmedUser_LogsInUser()
         {
             // Arrange
