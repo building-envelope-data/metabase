@@ -73,8 +73,8 @@ analyze : ## Analyze with Roslynator
 	dotnet tool run roslynator analyze
 .PHONY : analyze
 
-play : ## Run facts in `Test.Play` (semi-alternative to the buggy `dotnet script` REPL)
-	dotnet test --filter "FullyQualifiedName~Test.Play"
+play : ## Run tests in `Metabase.Tests.Play` (semi-alternative to the buggy `dotnet script` REPL)
+	dotnet test --filter "FullyQualifiedName~Metabase.Tests.Play"
 .PHONY : play
 
 # TODO Apply not only to `src` folder but ignore files and directories within .gitignore.
