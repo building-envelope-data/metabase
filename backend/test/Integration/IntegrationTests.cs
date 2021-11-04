@@ -582,14 +582,16 @@ namespace Metabase.Tests.Integration
         // https://stackoverflow.com/questions/22598323/movenext-instead-of-actual-method-task-name
         // The workaround with optional parameters is inspired by the same source.
         protected static SnapshotFullName SnapshotFullNameHelper(
-            Type testType, 
-            string keyName, 
+            Type testType,
+            string keyName,
             [CallerMemberName] string testMethod="",
             [CallerFilePath] string testFilePath=""
         )
         {
             string testName = $"{testType.Name}.{testMethod}_{keyName}.snap";
-            string testDirectory = Path.GetDirectoryName(testFilePath);
+            string testDirectory =
+                Path.GetDirectoryName(testFilePath)
+                ?? throw new Exception($"The path '{testFilePath}' denotes a root directory or is `null`.");
             return new SnapshotFullName(testName, testDirectory);
         }
 
