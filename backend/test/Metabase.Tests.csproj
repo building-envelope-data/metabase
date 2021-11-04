@@ -5,15 +5,17 @@
     <IsPackable>false</IsPackable>
     <LangVersion>9.0</LangVersion>
     <IsPackable>false</IsPackable>
-    <Nullable>enable</Nullable>    
+    <Nullable>enable</Nullable>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="JsonPath.Net" Version="0.1.7" />
     <PackageReference Include="FluentAssertions" Version="6.0.0" />
-    <PackageReference Include="IdentityModel" Version="5.1.0" />  
+    <PackageReference Include="IdentityModel" Version="5.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.9" />    
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.9" />
     <PackageReference Include="NUnit" Version="3.13.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="coverlet.collector" Version="3.1.0">
