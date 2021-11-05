@@ -1,7 +1,7 @@
 # Inspired by https://mherman.org/blog/dockerizing-a-react-app/
 
 # https://hub.docker.com/_/node
-FROM node:14.17.3-buster-slim
+FROM node:16.13.0-bullseye-slim
 
 ARG GROUP_ID
 ARG USER_ID
