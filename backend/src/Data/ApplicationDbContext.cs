@@ -72,6 +72,27 @@ namespace Metabase.Data
             builder.Entity<UserToken>().ToTable("user_token");
         }
 
+        private static void ConfigureComponentAssembly(ModelBuilder builder)
+        {
+            // https://docs.microsoft.com/en-us/ef/core/modeling/relationships#join-entity-type-configuration
+            builder.Entity<Component>()
+              .HasMany(c => c.Parts)
+              .WithMany(c => c.PartOf)
+              .UsingEntity<ComponentAssembly>(
+                j => j
+                .HasOne(e => e.PartComponent)
+                .WithMany(c => c.PartOfEdges)
+                .HasForeignKey(e => e.PartComponentId),
+                j => j
+                .HasOne(e => e.AssembledComponent)
+                .WithMany(c => c.PartEdges)
+                .HasForeignKey(e => e.AssembledComponentId),
+                j => j
+                .ToTable("component_assembly")
+                .HasKey(a => new { a.AssembledComponentId, a.PartComponentId })
+              );
+        }
+
         private static void ConfigureComponentConcretizationAndGeneralization(ModelBuilder builder)
         {
             // https://docs.microsoft.com/en-us/ef/core/modeling/relationships#join-entity-type-configuration
@@ -81,15 +102,36 @@ namespace Metabase.Data
               .UsingEntity<ComponentConcretizationAndGeneralization>(
                 j => j
                 .HasOne(e => e.ConcreteComponent)
-                .WithMany(c => c.ConcretizationEdges)
+                .WithMany(c => c.GeneralizationEdges)
                 .HasForeignKey(e => e.ConcreteComponentId),
                 j => j
                 .HasOne(e => e.GeneralComponent)
-                .WithMany(c => c.GeneralizationEdges)
+                .WithMany(c => c.ConcretizationEdges)
                 .HasForeignKey(e => e.GeneralComponentId),
                 j => j
                 .ToTable("component_concretization_and_generalization")
                 .HasKey(a => new { a.GeneralComponentId, a.ConcreteComponentId })
+              );
+        }
+
+        private static void ConfigureComponentVariant(ModelBuilder builder)
+        {
+            // https://docs.microsoft.com/en-us/ef/core/modeling/relationships#join-entity-type-configuration
+            builder.Entity<Component>()
+              .HasMany(c => c.Variants)
+              .WithMany(c => c.VariantOf)
+              .UsingEntity<ComponentVariant>(
+                j => j
+                .HasOne(e => e.ToComponent)
+                .WithMany(c => c.VariantOfEdges)
+                .HasForeignKey(e => e.ToComponentId),
+                j => j
+                .HasOne(e => e.OfComponent)
+                .WithMany(c => c.VariantEdges)
+                .HasForeignKey(e => e.OfComponentId),
+                j => j
+                .ToTable("component_variant")
+                .HasKey(a => new { a.OfComponentId, a.ToComponentId })
               );
         }
 
@@ -178,8 +220,10 @@ namespace Metabase.Data
 
         // https://docs.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
         public DbSet<Component> Components { get; private set; } = default!;
+        public DbSet<ComponentAssembly> ComponentAssemblies { get; private set; } = default!;
         public DbSet<ComponentConcretizationAndGeneralization> ComponentConcretizationAndGeneralizations { get; private set; } = default!;
         public DbSet<ComponentManufacturer> ComponentManufacturers { get; private set; } = default!;
+        public DbSet<ComponentVariant> ComponentVariants { get; private set; } = default!;
         public DbSet<DataFormat> DataFormats { get; private set; } = default!;
         public DbSet<Database> Databases { get; private set; } = default!;
         public DbSet<Institution> Institutions { get; private set; } = default!;
@@ -208,6 +252,7 @@ namespace Metabase.Data
                 builder.Entity<Component>()
                 )
               .ToTable("component");
+            ConfigureComponentAssembly(builder);
             ConfigureComponentConcretizationAndGeneralization(builder);
             ConfigureComponentManufacturer(builder);
             ConfigureEntity(
@@ -229,6 +274,7 @@ namespace Metabase.Data
                 )
               .ToTable("method");
             ConfigureUserMethodDeveloper(builder);
+            ConfigureComponentVariant(builder);
         }
     }
 }
