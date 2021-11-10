@@ -81,51 +81,61 @@ export default function Component({ componentId }: ComponentProps) {
             </List>
           )}
         </Descriptions.Item>
-        <Descriptions.Item label="Assembled Of">
-          <List size="small">
-            {component.assembledOf.edges.map((x) => (
-              <List.Item key={x.node.uuid}>
-                <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-              </List.Item>
-            ))}
-          </List>
-        </Descriptions.Item>
-        <Descriptions.Item label="Part Of">
-          <List size="small">
-            {component.partOf.edges.map((x) => (
-              <List.Item key={x.node.uuid}>
-                <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-              </List.Item>
-            ))}
-          </List>
-        </Descriptions.Item>
-        <Descriptions.Item label="Concretization Of">
-          <List size="small">
-            {component.concretizationOf.edges.map((x) => (
-              <List.Item key={x.node.uuid}>
-                <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-              </List.Item>
-            ))}
-          </List>
-        </Descriptions.Item>
-        <Descriptions.Item label="Generalization Of">
-          <List size="small">
-            {component.generalizationOf.edges.map((x) => (
-              <List.Item key={x.node.uuid}>
-                <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-              </List.Item>
-            ))}
-          </List>
-        </Descriptions.Item>
-        <Descriptions.Item label="Variant Of">
-          <List size="small">
-            {component.variantOf.edges.map((x) => (
-              <List.Item key={x.node.uuid}>
-                <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-              </List.Item>
-            ))}
-          </List>
-        </Descriptions.Item>
+        {component.assembledOf.edges.length >= 1 && (
+          <Descriptions.Item label="Assembled Of">
+            <List size="small">
+              {component.assembledOf.edges.map((x) => (
+                <List.Item key={x.node.uuid}>
+                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+                </List.Item>
+              ))}
+            </List>
+          </Descriptions.Item>
+        )}
+        {component.partOf.edges.length >= 1 && (
+          <Descriptions.Item label="Part Of">
+            <List size="small">
+              {component.partOf.edges.map((x) => (
+                <List.Item key={x.node.uuid}>
+                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+                </List.Item>
+              ))}
+            </List>
+          </Descriptions.Item>
+        )}
+        {component.concretizationOf.edges.length >= 1 && (
+          <Descriptions.Item label="Concretization Of">
+            <List size="small">
+              {component.concretizationOf.edges.map((x) => (
+                <List.Item key={x.node.uuid}>
+                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+                </List.Item>
+              ))}
+            </List>
+          </Descriptions.Item>
+        )}
+        {component.generalizationOf.edges.length >= 1 && (
+          <Descriptions.Item label="Generalization Of">
+            <List size="small">
+              {component.generalizationOf.edges.map((x) => (
+                <List.Item key={x.node.uuid}>
+                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+                </List.Item>
+              ))}
+            </List>
+          </Descriptions.Item>
+        )}
+        {component.variantOf.edges.length >= 1 && (
+          <Descriptions.Item label="Variant Of">
+            <List size="small">
+              {component.variantOf.edges.map((x) => (
+                <List.Item key={x.node.uuid}>
+                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+                </List.Item>
+              ))}
+            </List>
+          </Descriptions.Item>
+        )}
       </Descriptions>
     </PageHeader>
   );
