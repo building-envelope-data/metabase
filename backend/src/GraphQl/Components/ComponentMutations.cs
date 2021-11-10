@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -47,6 +48,7 @@ namespace Metabase.GraphQl.Components
                     )
                 );
             }
+            var errors = new List<CreateComponentError>();
             if (!await context.Institutions.AsQueryable()
             .AnyAsync(
                 x => x.Id == input.ManufacturerId,
@@ -55,7 +57,7 @@ namespace Metabase.GraphQl.Components
             .ConfigureAwait(false)
             )
             {
-                return new CreateComponentPayload(
+                errors.Add(
                     new CreateComponentError(
                         CreateComponentErrorCode.UNKNOWN_MANUFACTURER,
                         "Unknown manufacturer",
@@ -73,13 +75,107 @@ namespace Metabase.GraphQl.Components
                 );
             if (unknownFurtherManufacturerIds.Any())
             {
-                return new CreateComponentPayload(
+                errors.Add(
                     new CreateComponentError(
                       CreateComponentErrorCode.UNKNOWN_FURTHER_MANUFACTURERS,
                       $"There are no institutions with identifier(s) {string.Join(", ", unknownFurtherManufacturerIds)}.",
                       new[] { nameof(input), nameof(input.FurtherManufacturerIds).FirstCharToLower() }
                       )
                 );
+            }
+            var unknownAssembledOfIds =
+                input.AssembledOfIds.Except(
+                    await context.Components.AsQueryable()
+                    .Where(x => input.AssembledOfIds.Contains(x.Id))
+                    .Select(x => x.Id)
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false)
+                );
+            if (unknownAssembledOfIds.Any())
+            {
+                errors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNKNOWN_ASSEMBLED_OF_COMPONENTS,
+                      $"There are no components with identifier(s) {string.Join(", ", unknownAssembledOfIds)}.",
+                      new[] { nameof(input), nameof(input.AssembledOfIds).FirstCharToLower() }
+                      )
+                );
+            }
+            var unknownPartOfIds =
+                input.PartOfIds.Except(
+                    await context.Components.AsQueryable()
+                    .Where(x => input.PartOfIds.Contains(x.Id))
+                    .Select(x => x.Id)
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false)
+                );
+            if (unknownPartOfIds.Any())
+            {
+                errors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNKNOWN_PART_OF_COMPONENTS,
+                      $"There are no components with identifier(s) {string.Join(", ", unknownPartOfIds)}.",
+                      new[] { nameof(input), nameof(input.PartOfIds).FirstCharToLower() }
+                      )
+                );
+            }
+            var unknownConcretizationOfIds =
+                input.ConcretizationOfIds.Except(
+                    await context.Components.AsQueryable()
+                    .Where(x => input.ConcretizationOfIds.Contains(x.Id))
+                    .Select(x => x.Id)
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false)
+                );
+            if (unknownConcretizationOfIds.Any())
+            {
+                errors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNKNOWN_CONCRETIZATION_OF_COMPONENTS,
+                      $"There are no components with identifier(s) {string.Join(", ", unknownConcretizationOfIds)}.",
+                      new[] { nameof(input), nameof(input.ConcretizationOfIds).FirstCharToLower() }
+                      )
+                );
+            }
+            var unknownGeneralizationOfIds =
+                input.GeneralizationOfIds.Except(
+                    await context.Components.AsQueryable()
+                    .Where(x => input.GeneralizationOfIds.Contains(x.Id))
+                    .Select(x => x.Id)
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false)
+                );
+            if (unknownGeneralizationOfIds.Any())
+            {
+                errors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNKNOWN_GENERALIZATION_OF_COMPONENTS,
+                      $"There are no components with identifier(s) {string.Join(", ", unknownGeneralizationOfIds)}.",
+                      new[] { nameof(input), nameof(input.GeneralizationOfIds).FirstCharToLower() }
+                      )
+                );
+            }
+            var unknownVariantOfIds =
+                input.VariantOfIds.Except(
+                    await context.Components.AsQueryable()
+                    .Where(x => input.VariantOfIds.Contains(x.Id))
+                    .Select(x => x.Id)
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false)
+                );
+            if (unknownVariantOfIds.Any())
+            {
+                errors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNKNOWN_VARIANT_OF_COMPONENTS,
+                      $"There are no components with identifier(s) {string.Join(", ", unknownVariantOfIds)}.",
+                      new[] { nameof(input), nameof(input.VariantOfIds).FirstCharToLower() }
+                      )
+                );
+            }
+            if (errors.Count >= 1)
+            {
+                return new CreateComponentPayload(errors.AsReadOnly());
             }
             var component = new Data.Component(
                 name: input.Name,
