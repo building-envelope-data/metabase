@@ -122,13 +122,42 @@ type ChangeUserPasswordPayload {
 
 type Component implements Node {
   abbreviation: String
+  assembledOf: ComponentAssembledOfConnection!
   availability: OpenEndedDateTimeRange
   categories: [ComponentCategory!]!
+  concretizationOf: ComponentConcretizationOfConnection!
   description: String!
+  generalizationOf: ComponentGeneralizationOfConnection!
   id: ID!
   manufacturers(pending: Boolean! = false): ComponentManufacturerConnection!
   name: String!
+  partOf: ComponentPartOfConnection!
   uuid: UUID!
+  variantOf: ComponentVariantOfConnection!
+}
+
+type ComponentAssembledOfConnection {
+  edges: [ComponentAssembledOfEdge!]!
+}
+
+type ComponentAssembledOfEdge {
+  node: Component!
+}
+
+type ComponentConcretizationOfConnection {
+  edges: [ComponentConcretizationOfEdge!]!
+}
+
+type ComponentConcretizationOfEdge {
+  node: Component!
+}
+
+type ComponentGeneralizationOfConnection {
+  edges: [ComponentGeneralizationOfEdge!]!
+}
+
+type ComponentGeneralizationOfEdge {
+  node: Component!
 }
 
 type ComponentManufacturerConnection {
@@ -137,6 +166,22 @@ type ComponentManufacturerConnection {
 
 type ComponentManufacturerEdge {
   node: Institution!
+}
+
+type ComponentPartOfConnection {
+  edges: [ComponentPartOfEdge!]!
+}
+
+type ComponentPartOfEdge {
+  node: Component!
+}
+
+type ComponentVariantOfConnection {
+  edges: [ComponentVariantOfEdge!]!
+}
+
+type ComponentVariantOfEdge {
+  node: Component!
 }
 
 "A connection to a list of items."
@@ -932,7 +977,7 @@ type PhotovoltaicDataEdge {
 
 type Publication implements Reference {
   abstract: String
-  "arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
+  "The website arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
   arXiv: String
   authors: [String!]
   "The Digital Object Identifier (DOI) is a very important persistent identifier for publications. It MUST be defined here if it is available for a publication."
@@ -1359,12 +1404,17 @@ input ConfirmUserMethodDeveloperInput {
 
 input CreateComponentInput {
   abbreviation: String
+  assembledOfIds: [UUID!]!
   availability: OpenEndedDateTimeRangeInput
   categories: [ComponentCategory!]!
+  concretizationOfIds: [UUID!]!
   description: String!
   furtherManufacturerIds: [UUID!]!
+  generalizationOfIds: [UUID!]!
   manufacturerId: UUID!
   name: String!
+  partOfIds: [UUID!]!
+  variantOfIds: [UUID!]!
 }
 
 input CreateDataFormatInput {
@@ -1694,7 +1744,7 @@ input PublicationSortInput {
   section: SortEnumType
   "The Digital Object Identifier (DOI) is a very important persistent identifier for publications. It MUST be defined here if it is available for a publication."
   doi: SortEnumType
-  "arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
+  "The website arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
   arXiv: SortEnumType
   "A Uniform Resource Name (URN) can be used to define a publication. TODO: Improve the regex pattern to further restrict the string."
   urn: SortEnumType
@@ -1970,6 +2020,11 @@ enum CreateComponentErrorCode {
   UNKNOWN
   UNKNOWN_MANUFACTURER
   UNKNOWN_FURTHER_MANUFACTURERS
+  UNKNOWN_VARIANT_OF_COMPONENTS
+  UNKNOWN_GENERALIZATION_OF_COMPONENTS
+  UNKNOWN_CONCRETIZATION_OF_COMPONENTS
+  UNKNOWN_PART_OF_COMPONENTS
+  UNKNOWN_ASSEMBLED_OF_COMPONENTS
   UNAUTHORIZED
 }
 
