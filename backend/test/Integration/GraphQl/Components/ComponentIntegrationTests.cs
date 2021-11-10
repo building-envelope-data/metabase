@@ -19,7 +19,12 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                     Availability: null,
                     Categories: Array.Empty<Enumerations.ComponentCategory>(),
                     ManufacturerId: Guid.Empty,
-                    FurtherManufacturerIds: Array.Empty<Guid>()
+                    FurtherManufacturerIds: Array.Empty<Guid>(),
+                    AssembledOfIds: Array.Empty<Guid>(),
+                    PartOfIds: Array.Empty<Guid>(),
+                    ConcretizationOfIds: Array.Empty<Guid>(),
+                    GeneralizationOfIds: Array.Empty<Guid>(),
+                    VariantOfIds: Array.Empty<Guid>()
                  );
 
         internal static CreateComponentInput FromAndToRestrictedAvailabilityComponentInput { get; } = new(
@@ -35,7 +40,12 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                         Enumerations.ComponentCategory.UNIT,
                         },
                     ManufacturerId: Guid.Empty,
-                    FurtherManufacturerIds: Array.Empty<Guid>()
+                    FurtherManufacturerIds: Array.Empty<Guid>(),
+                    AssembledOfIds: Array.Empty<Guid>(),
+                    PartOfIds: Array.Empty<Guid>(),
+                    ConcretizationOfIds: Array.Empty<Guid>(),
+                    GeneralizationOfIds: Array.Empty<Guid>(),
+                    VariantOfIds: Array.Empty<Guid>()
                  );
 
         internal static CreateComponentInput ToRestrictedAvailabilityComponentInput { get; } = new(
@@ -50,7 +60,12 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                         Enumerations.ComponentCategory.UNIT,
                         },
                     ManufacturerId: Guid.Empty,
-                    FurtherManufacturerIds: Array.Empty<Guid>()
+                    FurtherManufacturerIds: Array.Empty<Guid>(),
+                    AssembledOfIds: Array.Empty<Guid>(),
+                    PartOfIds: Array.Empty<Guid>(),
+                    ConcretizationOfIds: Array.Empty<Guid>(),
+                    GeneralizationOfIds: Array.Empty<Guid>(),
+                    VariantOfIds: Array.Empty<Guid>()
                  );
 
         internal static CreateComponentInput FromRestrictedAvailabilityComponentInput { get; } = new(
@@ -67,7 +82,12 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                         Enumerations.ComponentCategory.UNIT,
                         },
                     ManufacturerId: Guid.Empty,
-                    FurtherManufacturerIds: Array.Empty<Guid>()
+                    FurtherManufacturerIds: Array.Empty<Guid>(),
+                    AssembledOfIds: Array.Empty<Guid>(),
+                    PartOfIds: Array.Empty<Guid>(),
+                    ConcretizationOfIds: Array.Empty<Guid>(),
+                    GeneralizationOfIds: Array.Empty<Guid>(),
+                    VariantOfIds: Array.Empty<Guid>()
                  );
 
         internal static IEnumerable<CreateComponentInput> ComponentInputs
