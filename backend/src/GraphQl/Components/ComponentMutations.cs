@@ -210,6 +210,57 @@ namespace Metabase.GraphQl.Components
                     );
                 }
             }
+            foreach (var componentId in input.AssembledOfIds.Distinct())
+            {
+                component.PartEdges.Add(
+                    new Data.ComponentAssembly
+                    {
+                        PartComponentId = componentId
+                    }
+                );
+            }
+            foreach (var componentId in input.PartOfIds.Distinct())
+            {
+                component.PartOfEdges.Add(
+                    new Data.ComponentAssembly
+                    {
+                        AssembledComponentId = componentId
+                    }
+                );
+            }
+            foreach (var componentId in input.ConcretizationOfIds.Distinct())
+            {
+                component.GeneralizationEdges.Add(
+                    new Data.ComponentConcretizationAndGeneralization
+                    {
+                        GeneralComponentId = componentId
+                    }
+                );
+            }
+            foreach (var componentId in input.GeneralizationOfIds.Distinct())
+            {
+                component.ConcretizationEdges.Add(
+                    new Data.ComponentConcretizationAndGeneralization
+                    {
+                        ConcreteComponentId = componentId
+                    }
+                );
+            }
+            foreach (var componentId in input.VariantOfIds.Distinct())
+            {
+                component.VariantOfEdges.Add(
+                    new Data.ComponentVariant
+                    {
+                        OfComponentId = componentId
+                    }
+                );
+                component.VariantEdges.Add(
+                    new Data.ComponentVariant
+                    {
+                        ToComponentId = componentId
+                    }
+                );
+            }
             context.Components.Add(component);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new CreateComponentPayload(component);
