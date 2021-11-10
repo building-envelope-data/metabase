@@ -10,6 +10,7 @@ import { handleFormErrors } from "../../lib/form";
 import * as moment from "moment";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
 import { SelectInstitutionId } from "../SelectInstitutionId";
+import { SelectComponentId } from "../SelectComponentId";
 
 const layout = {
   labelCol: { span: 8 },
@@ -54,6 +55,11 @@ export default function CreateComponent({
     availability,
     categories,
     furtherManufacturerIds,
+    assembledOfIds,
+    partOfIds,
+    concretizationOfIds,
+    generalizationOfIds,
+    variantOfIds,
   }: {
     name: string;
     abbreviation: string | null | undefined;
@@ -64,6 +70,11 @@ export default function CreateComponent({
       | undefined;
     categories: ComponentCategory[] | null | undefined;
     furtherManufacturerIds: Scalars["UUID"] | null | undefined;
+    assembledOfIds: Scalars["UUID"] | null | undefined;
+    partOfIds: Scalars["UUID"] | null | undefined;
+    concretizationOfIds: Scalars["UUID"] | null | undefined;
+    generalizationOfIds: Scalars["UUID"] | null | undefined;
+    variantOfIds: Scalars["UUID"] | null | undefined;
   }) => {
     const create = async () => {
       try {
@@ -78,6 +89,11 @@ export default function CreateComponent({
             categories: categories || [],
             manufacturerId: manufacturerId,
             furtherManufacturerIds: furtherManufacturerIds || [],
+            assembledOfIds: assembledOfIds || [],
+            partOfIds: partOfIds || [],
+            concretizationOfIds: concretizationOfIds || [],
+            generalizationOfIds: generalizationOfIds || [],
+            variantOfIds: variantOfIds || [],
           },
         });
         handleFormErrors(
@@ -159,6 +175,21 @@ export default function CreateComponent({
         </Form.Item>
         <Form.Item label="Further Manufacturers" name="furtherManufacturerIds">
           <SelectInstitutionId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Assembled Of" name="assembledOfIds">
+          <SelectComponentId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Part Of" name="partOfIds">
+          <SelectComponentId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Concretization Of" name="concretizationOfIds">
+          <SelectComponentId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Generalization Of" name="generalizationOfIds">
+          <SelectComponentId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Variant Of" name="variantOfIds">
+          <SelectComponentId mode="multiple" />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>
