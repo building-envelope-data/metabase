@@ -211,5 +211,26 @@ namespace Metabase.Authorization
                 .ConfigureAwait(false);
             return wrappedManagerRole?.Role;
         }
+
+        public static async Task<bool> IsVerifiedManufacturerOfComponents(
+            Guid institutionId,
+            Guid[] componentIds,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            if (componentIds.Length == 0)
+            {
+                return true;
+            }
+            return await context.ComponentManufacturers.AsQueryable()
+                .AnyAsync(x =>
+                    x.InstitutionId == institutionId &&
+                    componentIds.Contains(x.ComponentId) &&
+                    !x.Pending,
+                    cancellationToken
+                    )
+                .ConfigureAwait(false);
+        }
     }
 }

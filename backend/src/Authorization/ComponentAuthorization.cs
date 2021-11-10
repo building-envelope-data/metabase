@@ -24,5 +24,31 @@ namespace Metabase.Authorization
                 cancellationToken
             );
         }
+
+        public static async Task<bool> IsAuthorizedToAddAssociationFromNewComponentToExistingComponents(
+            ClaimsPrincipal claimsPrincipal,
+            Guid institutionId,
+            Guid[] existingComponentIds,
+            UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            return
+                await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+                    claimsPrincipal,
+                    institutionId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
+                &&
+                await CommonAuthorization.IsVerifiedManufacturerOfComponents(
+                    institutionId,
+                    existingComponentIds,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false);
+        }
     }
 }

@@ -48,6 +48,101 @@ namespace Metabase.GraphQl.Components
                     )
                 );
             }
+            var authorizationErrors = new List<CreateComponentError>();
+            if (!await ComponentAuthorization.IsAuthorizedToAddAssociationFromNewComponentToExistingComponents(
+                 claimsPrincipal,
+                 input.ManufacturerId,
+                 input.AssembledOfIds,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
+            {
+                authorizationErrors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to add associations to at least one of the components {string.Join(", ", input.AssembledOfIds)}.",
+                      new[] { nameof(input), nameof(input.AssembledOfIds).FirstCharToLower() }
+                    )
+                );
+            }
+            if (!await ComponentAuthorization.IsAuthorizedToAddAssociationFromNewComponentToExistingComponents(
+                 claimsPrincipal,
+                 input.ManufacturerId,
+                 input.PartOfIds,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
+            {
+                authorizationErrors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to add associations to at least one of the components {string.Join(", ", input.PartOfIds)}.",
+                      new[] { nameof(input), nameof(input.PartOfIds).FirstCharToLower() }
+                    )
+                );
+            }
+            if (!await ComponentAuthorization.IsAuthorizedToAddAssociationFromNewComponentToExistingComponents(
+                 claimsPrincipal,
+                 input.ManufacturerId,
+                 input.ConcretizationOfIds,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
+            {
+                authorizationErrors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to add associations to at least one of the components {string.Join(", ", input.ConcretizationOfIds)}.",
+                      new[] { nameof(input), nameof(input.ConcretizationOfIds).FirstCharToLower() }
+                    )
+                );
+            }
+            if (!await ComponentAuthorization.IsAuthorizedToAddAssociationFromNewComponentToExistingComponents(
+                 claimsPrincipal,
+                 input.ManufacturerId,
+                 input.GeneralizationOfIds,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
+            {
+                authorizationErrors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to add associations to at least one of the components {string.Join(", ", input.GeneralizationOfIds)}.",
+                      new[] { nameof(input), nameof(input.GeneralizationOfIds).FirstCharToLower() }
+                    )
+                );
+            }
+            if (!await ComponentAuthorization.IsAuthorizedToAddAssociationFromNewComponentToExistingComponents(
+                 claimsPrincipal,
+                 input.ManufacturerId,
+                 input.VariantOfIds,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
+            {
+                authorizationErrors.Add(
+                    new CreateComponentError(
+                      CreateComponentErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to add associations to at least one of the components {string.Join(", ", input.VariantOfIds)}.",
+                      new[] { nameof(input), nameof(input.VariantOfIds).FirstCharToLower() }
+                    )
+                );
+            }
+            if (authorizationErrors.Count >= 1)
+            {
+                return new CreateComponentPayload(authorizationErrors.AsReadOnly());
+            }
             var errors = new List<CreateComponentError>();
             if (!await context.Institutions.AsQueryable()
             .AnyAsync(
