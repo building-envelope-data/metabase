@@ -6,6 +6,11 @@ mutation createComponent(
   $categories: [ComponentCategory!]!
   $manufacturerId: UUID!
   $furtherManufacturerIds: [UUID!]!
+  $assembledOfIds: [UUID!]!
+  $partOfIds: [UUID!]!
+  $concretizationOfIds: [UUID!]!
+  $generalizationOfIds: [UUID!]!
+  $variantOfIds: [UUID!]!
 ) {
   createComponent(
     input: {
@@ -16,6 +21,11 @@ mutation createComponent(
       categories: $categories
       manufacturerId: $manufacturerId
       furtherManufacturerIds: $furtherManufacturerIds
+      assembledOfIds: $assembledOfIds
+      partOfIds: $partOfIds
+      concretizationOfIds: $concretizationOfIds
+      generalizationOfIds: $generalizationOfIds
+      variantOfIds: $variantOfIds
     }
   ) {
     component {

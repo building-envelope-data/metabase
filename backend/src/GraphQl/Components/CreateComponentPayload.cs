@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Metabase.GraphQl.Components
 {
     public sealed class CreateComponentPayload
@@ -14,6 +16,13 @@ namespace Metabase.GraphQl.Components
           CreateComponentError error
         )
         : base(error)
+        {
+        }
+
+        public CreateComponentPayload(
+          IReadOnlyCollection<CreateComponentError> errors
+        )
+        : base(errors)
         {
         }
     }

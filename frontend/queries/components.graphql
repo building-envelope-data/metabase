@@ -40,6 +40,51 @@ query Component($uuid: UUID!) {
         }
       }
     }
+    assembledOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    partOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    concretizationOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    generalizationOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    variantOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
   }
 }
 
@@ -51,6 +96,11 @@ mutation CreateComponent(
   $availability: OpenEndedDateTimeRangeInput
   $manufacturerId: UUID!
   $furtherManufacturerIds: [UUID!]!
+  $assembledOfIds: [UUID!]!
+  $partOfIds: [UUID!]!
+  $concretizationOfIds: [UUID!]!
+  $generalizationOfIds: [UUID!]!
+  $variantOfIds: [UUID!]!
 ) {
   createComponent(
     input: {
@@ -61,6 +111,11 @@ mutation CreateComponent(
       availability: $availability
       manufacturerId: $manufacturerId
       furtherManufacturerIds: $furtherManufacturerIds
+      assembledOfIds: $assembledOfIds
+      partOfIds: $partOfIds
+      concretizationOfIds: $concretizationOfIds
+      generalizationOfIds: $generalizationOfIds
+      variantOfIds: $variantOfIds
     }
   ) {
     component {
