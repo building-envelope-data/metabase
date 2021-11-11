@@ -22,7 +22,9 @@ namespace Metabase.Tests.Integration
 {
     [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
     public abstract class IntegrationTests
+        : IDisposable
     {
+        private bool _disposed = false;
         protected CustomWebApplicationFactory Factory { get; }
         protected CollectingEmailSender EmailSender { get => Factory.EmailSender; }
         protected HttpClient HttpClient { get; }
@@ -34,6 +36,30 @@ namespace Metabase.Tests.Integration
         {
             Factory = new CustomWebApplicationFactory();
             HttpClient = CreateHttpClient();
+        }
+
+        // https://docs.microsoft.com/en-us/dotnet/standard/managed-code
+        // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose
+        ~IntegrationTests() => Dispose(false);
+
+        public void Dispose()
+        {
+            // Dispose of unmanaged resources.
+            Dispose(true);
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    Factory.Dispose();
+                }
+                _disposed = true;
+            }
         }
 
         protected static HttpClient CreateHttpClient(
@@ -584,8 +610,8 @@ namespace Metabase.Tests.Integration
         protected static SnapshotFullName SnapshotFullNameHelper(
             Type testType,
             string keyName,
-            [CallerMemberName] string testMethod="",
-            [CallerFilePath] string testFilePath=""
+            [CallerMemberName] string testMethod = "",
+            [CallerFilePath] string testFilePath = ""
         )
         {
             string testName = $"{testType.Name}.{testMethod}_{keyName}.snap";

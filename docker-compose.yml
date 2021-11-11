@@ -11,6 +11,7 @@ services:
     # https://www.postgresql.org/docs/current/runtime-config.html
     command: [
       "-c", "max_connections=100"
+      # "-c", "log_statement=all"
     ]
     healthcheck:
       # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html

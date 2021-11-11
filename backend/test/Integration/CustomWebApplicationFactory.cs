@@ -18,6 +18,8 @@ namespace Metabase.Tests.Integration
     public sealed class CustomWebApplicationFactory
       : WebApplicationFactory<Startup>
     {
+        private bool _disposed = false;
+
         public CollectingEmailSender EmailSender { get; }
 
         public CustomWebApplicationFactory()
@@ -111,18 +113,26 @@ namespace Metabase.Tests.Integration
             ).ConfigureAwait(false);
         }
 
-        public new void Dispose()
+        // https://docs.microsoft.com/en-us/dotnet/standard/managed-code
+        // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose
+        ~CustomWebApplicationFactory() => Dispose(false);
+
+        protected override void Dispose(bool disposing)
         {
-            Do(
-                services =>
-                    {
-                        services
-                        .GetRequiredService<Data.ApplicationDbContext>()
-                        .Database
-                        .EnsureDeleted();
-                    }
-            );
-            base.Dispose();
+            if (!_disposed)
+            {
+                Do(
+                    services =>
+                        {
+                            services
+                            .GetRequiredService<Data.ApplicationDbContext>()
+                            .Database
+                            .EnsureDeleted();
+                        }
+                );
+                _disposed = true;
+            }
+            base.Dispose(disposing);
         }
     }
 }
