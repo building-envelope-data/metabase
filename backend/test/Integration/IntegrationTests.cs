@@ -57,6 +57,7 @@ namespace Metabase.Tests.Integration
                 if (disposing)
                 {
                     Factory.Dispose();
+                    HttpClient.Dispose();
                 }
                 _disposed = true;
             }
