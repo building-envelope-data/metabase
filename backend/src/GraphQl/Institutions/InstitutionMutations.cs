@@ -26,6 +26,8 @@ namespace Metabase.GraphQl.Institutions
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [ScopedService] UserManager<Data.User> userManager,
             [ScopedService] Data.ApplicationDbContext context,
+            [Service] Services.IEmailSender emailSender,
+            [Service] AppSettings appSettings,
             CancellationToken cancellationToken
             )
         {
@@ -126,6 +128,19 @@ namespace Metabase.GraphQl.Institutions
             }
             context.Institutions.Add(institution);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            var verifiers =
+                await userManager.GetUsersInRoleAsync(
+                    Data.Role.EnumToName(Enumerations.UserRole.VERIFIER)
+                ).ConfigureAwait(false);
+            await Task.WhenAll(
+                verifiers.Select(verifier =>
+                    emailSender.SendAsync(
+                        (verifier.Name, verifier.Email),
+                        $"New institution `{institution.Name}` in metabase awaits verification",
+                        $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID {institution.Id:D} on {appSettings.Host}/institutions Have a nice day! :-)"
+                    )
+                )
+            ).ConfigureAwait(false);
             return new CreateInstitutionPayload(institution);
         }
 
