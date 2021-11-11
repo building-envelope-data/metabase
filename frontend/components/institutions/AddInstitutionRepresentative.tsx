@@ -17,7 +17,7 @@ const tailLayout = {
 };
 
 export type AddInstitutionRepresentativeProps = {
-  institutionId: Scalars["UUID"];
+  institutionId: Scalars["Uuid"];
 };
 
 export default function AddInstitutionRepresentative({
@@ -46,7 +46,7 @@ export default function AddInstitutionRepresentative({
     userId,
     role,
   }: {
-    userId: Scalars["UUID"];
+    userId: Scalars["Uuid"];
     role: InstitutionRepresentativeRole;
   }) => {
     const add = async () => {

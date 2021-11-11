@@ -21,7 +21,7 @@ const tailLayout = {
 };
 
 export type CreateComponentProps = {
-  manufacturerId: Scalars["UUID"];
+  manufacturerId: Scalars["Uuid"];
 };
 
 export default function CreateComponent({
@@ -69,12 +69,12 @@ export default function CreateComponent({
       | null
       | undefined;
     categories: ComponentCategory[] | null | undefined;
-    furtherManufacturerIds: Scalars["UUID"] | null | undefined;
-    assembledOfIds: Scalars["UUID"] | null | undefined;
-    partOfIds: Scalars["UUID"] | null | undefined;
-    concretizationOfIds: Scalars["UUID"] | null | undefined;
-    generalizationOfIds: Scalars["UUID"] | null | undefined;
-    variantOfIds: Scalars["UUID"] | null | undefined;
+    furtherManufacturerIds: Scalars["Uuid"] | null | undefined;
+    assembledOfIds: Scalars["Uuid"] | null | undefined;
+    partOfIds: Scalars["Uuid"] | null | undefined;
+    concretizationOfIds: Scalars["Uuid"] | null | undefined;
+    generalizationOfIds: Scalars["Uuid"] | null | undefined;
+    variantOfIds: Scalars["Uuid"] | null | undefined;
   }) => {
     const create = async () => {
       try {

@@ -21,8 +21,8 @@ const tailLayout = {
 };
 
 export type CreateInstitutionProps = {
-  ownerIds?: Scalars["UUID"][];
-  managerId?: Scalars["UUID"];
+  ownerIds?: Scalars["Uuid"][];
+  managerId?: Scalars["Uuid"];
 };
 
 function redirectToLoginPage(router: NextRouter): void {

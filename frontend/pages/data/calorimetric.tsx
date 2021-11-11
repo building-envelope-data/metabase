@@ -112,7 +112,7 @@ function Page() {
       | {
           negator: Negator;
           comparator: UuidPropositionComparator;
-          value: Scalars["UUID"] | undefined;
+          value: Scalars["Uuid"] | undefined;
         }[]
       | undefined;
     gValues:

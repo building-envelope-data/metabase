@@ -29,7 +29,7 @@ export default function PendingInstitutions({}: PendingInstitutionsProps) {
   const [verifyInstitutionMutation] = useVerifyInstitutionMutation();
   const [verifyingInstitution, setVerifyingInstitution] = useState(false);
 
-  const verifyInstitution = async (institutionId: Scalars["UUID"]) => {
+  const verifyInstitution = async (institutionId: Scalars["Uuid"]) => {
     try {
       setVerifyingInstitution(true);
       const { errors, data } = await verifyInstitutionMutation({

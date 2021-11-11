@@ -38,14 +38,14 @@ type FormValues = {
     | undefined;
   standard: CreateStandardInput | null | undefined;
   publication: CreatePublicationInput | null | undefined;
-  calculationLocator: Scalars["URL"] | null | undefined;
+  calculationLocator: Scalars["Url"] | null | undefined;
   categories: MethodCategory[] | null | undefined;
-  institutionDeveloperIds: Scalars["UUID"][] | null | undefined;
-  userDeveloperIds: Scalars["UUID"][] | null | undefined;
+  institutionDeveloperIds: Scalars["Uuid"][] | null | undefined;
+  userDeveloperIds: Scalars["Uuid"][] | null | undefined;
 };
 
 export type CreateMethodProps = {
-  managerId: Scalars["UUID"];
+  managerId: Scalars["Uuid"];
 };
 
 export default function CreateMethod({ managerId }: CreateMethodProps) {

@@ -17,7 +17,7 @@ const tailLayout = {
 };
 
 export type AddUserRoleProps = {
-  userId: Scalars["UUID"];
+  userId: Scalars["Uuid"];
   roles: UserRole[];
 };
 

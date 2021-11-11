@@ -38,7 +38,7 @@ function getDeveloperHref(
 }
 
 export type MethodProps = {
-  methodId: Scalars["UUID"];
+  methodId: Scalars["Uuid"];
 };
 
 export default function Method({ methodId }: MethodProps) {

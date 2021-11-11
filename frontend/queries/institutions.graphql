@@ -20,9 +20,9 @@ mutation CreateInstitution(
   $name: String!
   $abbreviation: String
   $description: String!
-  $ownerIds: [UUID!]!
-  $managerId: UUID
-  $websiteLocator: URL
+  $ownerIds: [Uuid!]!
+  $managerId: Uuid
+  $websiteLocator: Url
 ) {
   createInstitution(
     input: {
@@ -46,11 +46,11 @@ mutation CreateInstitution(
 }
 
 mutation UpdateInstitution(
-  $institutionId: UUID!
+  $institutionId: Uuid!
   $name: String!
   $abbreviation: String
   $description: String!
-  $websiteLocator: URL
+  $websiteLocator: Url
 ) {
   updateInstitution(
     input: {
@@ -72,7 +72,7 @@ mutation UpdateInstitution(
   }
 }
 
-mutation VerifyInstitution($institutionId: UUID!) {
+mutation VerifyInstitution($institutionId: Uuid!) {
   verifyInstitution(input: { institutionId: $institutionId }) {
     institution {
       ...InstitutionPartial
@@ -85,7 +85,7 @@ mutation VerifyInstitution($institutionId: UUID!) {
   }
 }
 
-query Institution($uuid: UUID!) {
+query Institution($uuid: Uuid!) {
   institution(uuid: $uuid) {
     ...InstitutionPartial
     manufacturedComponents {
@@ -281,8 +281,8 @@ query Institution($uuid: UUID!) {
 }
 
 mutation AddInstitutionRepresentative(
-  $institutionId: UUID!
-  $userId: UUID!
+  $institutionId: Uuid!
+  $userId: Uuid!
   $role: InstitutionRepresentativeRole!
 ) {
   addInstitutionRepresentative(

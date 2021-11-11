@@ -67,7 +67,7 @@ query Methods {
   }
 }
 
-query Method($uuid: UUID!) {
+query Method($uuid: Uuid!) {
   method(uuid: $uuid) {
     ...MethodPartial
   }
@@ -80,11 +80,11 @@ mutation CreateMethod(
   $availability: OpenEndedDateTimeRangeInput
   $standard: CreateStandardInput
   $publication: CreatePublicationInput
-  $calculationLocator: URL
+  $calculationLocator: Url
   $categories: [MethodCategory!]!
-  $managerId: UUID!
-  $institutionDeveloperIds: [UUID!]!
-  $userDeveloperIds: [UUID!]!
+  $managerId: Uuid!
+  $institutionDeveloperIds: [Uuid!]!
+  $userDeveloperIds: [Uuid!]!
 ) {
   createMethod(
     input: {
