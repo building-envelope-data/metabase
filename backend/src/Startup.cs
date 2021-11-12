@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using HotChocolate.AspNetCore;
 using Metabase.Configuration;
 using Metabase.Data.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -183,7 +184,28 @@ namespace Metabase
             /* app.UseWebSockets(); */
             app.UseEndpoints(_ =>
             {
-                _.MapGraphQL();
+                _.MapGraphQL().WithOptions(
+                    // https://chillicream.com/docs/hotchocolate/server/middleware
+                    new GraphQLServerOptions
+                    {
+                        EnableSchemaRequests = true,
+                        EnableGetRequests = false,
+                        // AllowedGetOperations = AllowedGetOperations.Query
+                        EnableMultipartRequests = false,
+                        Tool = {
+                            DisableTelemetry = true,
+                            Enable = true, // _environment.IsDevelopment()
+                            IncludeCookies = false,
+                            GraphQLEndpoint = "/graphql",
+                            HttpMethod = DefaultHttpMethod.Post,
+                            HttpHeaders = new HeaderDictionary
+                            {
+                                { "Content-Type", "application/json" }
+                            },
+                            Title = "GraphQL"
+                        }
+                    }
+                );
                 _.MapControllers();
             });
         }
