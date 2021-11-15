@@ -43,7 +43,9 @@ namespace Metabase
             ConfigureRequestResponseServices(services);
             ConfigureSessionServices(services);
             services.AddHttpClient();
-            services.AddHealthChecks();
+            services
+                .AddHealthChecks()
+                .AddDbContextCheck<Data.ApplicationDbContext>();
             services.AddSingleton(_appSettings);
             services.AddSingleton(_environment);
             // services.AddDatabaseDeveloperPageExceptionFilter();
@@ -174,16 +176,15 @@ namespace Metabase
             app.UseSession();
             // app.UseResponseCompression(); // Done by Nginx
             // app.UseResponseCaching(); // Done by Nginx
-            app.UseHealthChecks(
-                "/health",
-                new HealthCheckOptions
-                {
-                    ResponseWriter = JsonResponseWriter
-                }
-                );
             /* app.UseWebSockets(); */
             app.UseEndpoints(_ =>
             {
+                _.MapHealthChecks("/health",
+                    new HealthCheckOptions
+                    {
+                        ResponseWriter = JsonResponseWriter
+                    }
+                );
                 _.MapGraphQL().WithOptions(
                     // https://chillicream.com/docs/hotchocolate/server/middleware
                     new GraphQLServerOptions
