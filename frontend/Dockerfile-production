@@ -20,6 +20,16 @@ COPY --from=build /app/next.config.js ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
 COPY --from=build /app/public ./public
+RUN \
+  apt-get update && \
+  apt-get install \
+    --yes \
+    --no-install-recommends \
+    wget && \
+  rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
 RUN npx --no-install next telemetry disable
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 --ingroup nodejs nextjs

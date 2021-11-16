@@ -43,7 +43,9 @@ namespace Metabase
             ConfigureRequestResponseServices(services);
             ConfigureSessionServices(services);
             services.AddHttpClient();
-            services.AddHealthChecks();
+            services
+                .AddHealthChecks()
+                .AddDbContextCheck<Data.ApplicationDbContext>();
             services.AddSingleton(_appSettings);
             services.AddSingleton(_environment);
             // services.AddDatabaseDeveloperPageExceptionFilter();
@@ -174,13 +176,6 @@ namespace Metabase
             app.UseSession();
             // app.UseResponseCompression(); // Done by Nginx
             // app.UseResponseCaching(); // Done by Nginx
-            app.UseHealthChecks(
-                "/health",
-                new HealthCheckOptions
-                {
-                    ResponseWriter = JsonResponseWriter
-                }
-                );
             /* app.UseWebSockets(); */
             app.UseEndpoints(_ =>
             {
@@ -207,6 +202,12 @@ namespace Metabase
                     }
                 );
                 _.MapControllers();
+                _.MapHealthChecks("/health",
+                    new HealthCheckOptions
+                    {
+                        ResponseWriter = JsonResponseWriter
+                    }
+                );
             });
         }
 
@@ -215,10 +216,7 @@ namespace Metabase
             context.Response.ContentType = "application/json";
             await JsonSerializer.SerializeAsync(
                 context.Response.Body,
-                new
-                {
-                    Status = report.Status.ToString()
-                },
+                report,
                 new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase

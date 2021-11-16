@@ -57,6 +57,11 @@ shellb : COMMAND = bash
 shellb : execb ## Enter shell in a running `backend` container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
 .PHONY : shellb
 
+list : ## List all containers with health status
+	${docker_compose} ps \
+		--all
+.PHONY : list
+
 createdb : ## Create database
 	${docker_compose} run \
 		--name create_${NAME}_database \
