@@ -154,6 +154,11 @@ createdb : ## Create databases
 		"
 .PHONY : createdb
 
+list : ## List all containers with health status
+	${docker_compose} ps \
+		--all
+.PHONY : list
+
 begin-maintenance : ## Begin maintenance
 	cp \
 		./nginx/html/maintenance.off.html \
