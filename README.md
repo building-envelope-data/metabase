@@ -1,5 +1,7 @@
 # Metabase
 
+The network of databases [buildingenvelopedata.org](https://www.buildingenvelopedata.org/) is based on [databases](https://github.com/ise621/database) and one metabase. This repository presents the source code of the metabase. Before deploying this repository, [machine](https://github.com/ise621/machine) can be used to set up the machine. Databases and metabase use this [API specification](https://github.com/ise621/building-envelope-data).
+
 ## Getting started
 
 ### On your Linux machine
