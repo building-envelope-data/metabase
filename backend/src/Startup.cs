@@ -179,12 +179,6 @@ namespace Metabase
             /* app.UseWebSockets(); */
             app.UseEndpoints(_ =>
             {
-                _.MapHealthChecks("/health",
-                    new HealthCheckOptions
-                    {
-                        ResponseWriter = JsonResponseWriter
-                    }
-                );
                 _.MapGraphQL().WithOptions(
                     // https://chillicream.com/docs/hotchocolate/server/middleware
                     new GraphQLServerOptions
@@ -208,6 +202,12 @@ namespace Metabase
                     }
                 );
                 _.MapControllers();
+                _.MapHealthChecks("/health",
+                    new HealthCheckOptions
+                    {
+                        ResponseWriter = JsonResponseWriter
+                    }
+                );
             });
         }
 
@@ -216,10 +216,6 @@ namespace Metabase
             context.Response.ContentType = "application/json";
             await JsonSerializer.SerializeAsync(
                 context.Response.Body,
-                // new
-                // {
-                //     Status = report.Status.ToString()
-                // },
                 report,
                 new JsonSerializerOptions
                 {
