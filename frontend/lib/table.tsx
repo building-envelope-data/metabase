@@ -543,7 +543,7 @@ export function getReferenceColumnProps<
 }
 
 export function getComponentUuidColumnProps<
-  RecordType extends { componentId: Scalars["UUID"] }
+  RecordType extends { componentId: Scalars["Uuid"] }
 >(
   onFilterTextChange: (
     key: keyof RecordType
