@@ -216,10 +216,11 @@ namespace Metabase
             context.Response.ContentType = "application/json";
             await JsonSerializer.SerializeAsync(
                 context.Response.Body,
-                new
-                {
-                    Status = report.Status.ToString()
-                },
+                // new
+                // {
+                //     Status = report.Status.ToString()
+                // },
+                report,
                 new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
