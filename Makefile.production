@@ -174,20 +174,6 @@ end-maintenance : ## End maintenance
 	rm ./nginx/html/maintenance.html
 .PHONY : end-maintenance
 
-# TODO Reboot when file `/var/run/reboot-required` exists
-# TODO Shall we use `apt` for system upgrades? See https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/ and https://www.redpill-linpro.com/sysadvent/2017/12/24/ansible-system-updates.html
-# TODO Shall we only run `apt-get upgrade` daily and only once in a while `apt-get dist-upgrade`?
-# TODO Run this command daily but __not__ within a cron job!
-upgrade-system : ## Upgrade system
-	make --file Makefile.production begin-maintenance
-	sudo apt-get --assume-yes update
-	sudo apt-get --assume-yes dist-upgrade
-	sudo apt-get --assume-yes auto-remove
-	sudo apt-get --assume-yes clean
-	sudo apt-get --assume-yes auto-clean
-	make --file Makefile.production end-maintenance
-.PHONY : upgrade-system
-
 deploy : DUMP_FILE = ./backup.gz
 deploy : begin-maintenance store-commit backup fetch-all checkout-target migrate deploy-services run-tests end-maintenance ## Deploy tag, branch, or commit `${TARGET}`, for example, `make --file Makefile.production TARGET=v1.0.0 deploy`
 .PHONY : deploy
