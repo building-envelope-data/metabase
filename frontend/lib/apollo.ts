@@ -35,6 +35,7 @@ function createIsomorphLink(context: ResolverContext = {}) {
     useGETForQueries: false, // Use `POST` for queries to avoid "414 Request-URI Too Large" errors
     credentials: "same-origin",
     headers: {
+      accept: 'application/json',
       cookie: context.req ? context.req.headers.cookie : null,
     },
   });
