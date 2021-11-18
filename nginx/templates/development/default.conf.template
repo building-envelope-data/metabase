@@ -126,6 +126,12 @@ server {
 
   error_page 503 @maintenance;
   location @maintenance {
+    internal;
+    add_header Retry-After 120 always;
+    default_type application/json;
+    if ($http_accept ~ application/json) {
+      return 503 "{\"errors\": [{\"code\": \"MAINTENANCE\", \"message\": \"We are under maintenance and will be back soon!\", \"path\": []}]}";
+    }
     rewrite ^(.*)$ /maintenance.html break;
   }
 }
