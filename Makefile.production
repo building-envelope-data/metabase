@@ -221,8 +221,9 @@ migrate : ## Migrate database (note that other PostgreSQL instances using the sa
 # one go so the maintenance page is only down very shortly.
 deploy-services : ## Deploy services
 	${docker_compose} pull
+	${docker_compose} build \
+		--pull
 	${docker_compose} up \
-		--build \
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \
