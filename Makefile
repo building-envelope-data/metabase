@@ -32,19 +32,25 @@ name : ## Print value of variable `${NAME}`
 # See https://docs.docker.com/develop/develop-images/build_enhancements/
 # and https://www.docker.com/blog/faster-builds-in-compose-thanks-to-buildkit-support/
 build : ## Build images
+	${docker_compose} pull
 	${docker_compose} build \
+		--pull \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
 show-backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
-	docker build --no-cache \
+	docker build \
+		--pull \
+		--no-cache \
 		--file Dockerfile-show-build-context \
 		./backend
 .PHONY : show-backend-build-context
 
 show-frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
-	docker build --no-cache \
+	docker build \
+		--pull \
+		--no-cache \
 		--file Dockerfile-show-build-context \
 		./frontend
 .PHONY : show-frontend-build-context
@@ -183,6 +189,7 @@ prepare-release : ## Prepare release
 # TODO Pass passwords in a more secure way!
 jwt-certificates : ## Create JWT encryption and signing certificates if necessary
 	docker build \
+		--pull \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user) \
 		--tag ${NAME}_bootstrap \
