@@ -9,15 +9,15 @@ namespace Metabase.GraphQl.DataX
     public sealed class FileMetaInformation
     {
         public IReadOnlyList<string> Path { get; }
-        public Guid FormatId { get; }
+        public Guid DataFormatId { get; }
 
         public FileMetaInformation(
           IReadOnlyList<string> path,
-          Guid formatId
+          Guid dataFormatId
         )
         {
             Path = path;
-            FormatId = formatId;
+            DataFormatId = dataFormatId;
         }
 
         public Task<Metabase.Data.DataFormat?> GetDataFormatAsync(
@@ -26,7 +26,7 @@ namespace Metabase.GraphQl.DataX
         )
         {
             return dataFormatById.LoadAsync(
-                FormatId,
+                DataFormatId,
                 cancellationToken
                 );
         }

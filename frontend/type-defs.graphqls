@@ -546,8 +546,8 @@ type GenerateUserTwoFactorRecoveryCodesPayload {
 
 type GetHttpsResource {
   dataFormat: DataFormat
+  dataFormatId: Uuid!
   description: String!
-  formatId: Uuid!
   hashValue: String!
   locator: Url!
 }
@@ -1273,12 +1273,10 @@ input BooleanOperationFilterInput {
 input CalorimetricDataPropositionInput {
   and: [CalorimetricDataPropositionInput!]
   componentId: UuidPropositionInput
-  dataFormatId: UuidPropositionInput
-  gValue: FloatPropositionInput
   gValues: FloatsPropositionInput
   not: CalorimetricDataPropositionInput
   or: [CalorimetricDataPropositionInput!]
-  uValue: FloatPropositionInput
+  resources: GetHttpsResourcesPropositionInput
   uValues: FloatsPropositionInput
 }
 
@@ -1512,27 +1510,18 @@ input DataFormatSortInput {
 
 input DataPropositionInput {
   and: [DataPropositionInput!]
-  cielabColor: CielabColorPropositionInput
   cielabColors: CielabColorsPropositionInput
-  colorRenderingIndex: FloatPropositionInput
   colorRenderingIndices: FloatsPropositionInput
   componentId: UuidPropositionInput
-  dataFormatId: UuidPropositionInput
-  gValue: FloatPropositionInput
   gValues: FloatsPropositionInput
-  infraredEmittance: FloatPropositionInput
   infraredEmittances: FloatsPropositionInput
-  nearnormalHemisphericalSolarReflectance: FloatPropositionInput
   nearnormalHemisphericalSolarReflectances: FloatsPropositionInput
-  nearnormalHemisphericalSolarTransmittance: FloatPropositionInput
   nearnormalHemisphericalSolarTransmittances: FloatsPropositionInput
-  nearnormalHemisphericalVisibleReflectance: FloatPropositionInput
   nearnormalHemisphericalVisibleReflectances: FloatsPropositionInput
-  nearnormalHemisphericalVisibleTransmittance: FloatPropositionInput
   nearnormalHemisphericalVisibleTransmittances: FloatsPropositionInput
   not: DataPropositionInput
   or: [DataPropositionInput!]
-  uValue: FloatPropositionInput
+  resources: GetHttpsResourcesPropositionInput
   uValues: FloatsPropositionInput
 }
 
@@ -1571,6 +1560,16 @@ input EnableUserTwoFactorAuthenticatorInput {
   verificationCode: String!
 }
 
+input FileMetaInformationPropositionInput {
+  dataFormatId: UuidPropositionInput
+}
+
+input FilesMetaInformationPropositionInput {
+  all: FileMetaInformationPropositionInput
+  none: FileMetaInformationPropositionInput
+  some: FileMetaInformationPropositionInput
+}
+
 input FloatPropositionInput {
   equalTo: Float
   greaterThanOrEqualTo: Float
@@ -1584,12 +1583,23 @@ input FloatsPropositionInput {
   some: FloatPropositionInput
 }
 
+input GetHttpsResourcePropositionInput {
+  archivedFilesMetaInformation: FilesMetaInformationPropositionInput
+  dataFormatId: UuidPropositionInput
+}
+
+input GetHttpsResourcesPropositionInput {
+  all: GetHttpsResourcePropositionInput
+  none: GetHttpsResourcePropositionInput
+  some: GetHttpsResourcePropositionInput
+}
+
 input HygrothermalDataPropositionInput {
   and: [HygrothermalDataPropositionInput!]
   componentId: UuidPropositionInput
-  dataFormatId: UuidPropositionInput
   not: HygrothermalDataPropositionInput
   or: [HygrothermalDataPropositionInput!]
+  resources: GetHttpsResourcesPropositionInput
 }
 
 input IReferenceSortInput {
@@ -1710,31 +1720,25 @@ input OpenEndedDateTimeRangeInput {
 
 input OpticalDataPropositionInput {
   and: [OpticalDataPropositionInput!]
-  cielabColor: CielabColorPropositionInput
   cielabColors: CielabColorsPropositionInput
-  colorRenderingIndex: FloatPropositionInput
   colorRenderingIndices: FloatsPropositionInput
   componentId: UuidPropositionInput
-  infraredEmittance: FloatPropositionInput
   infraredEmittances: FloatsPropositionInput
-  nearnormalHemisphericalSolarReflectance: FloatPropositionInput
   nearnormalHemisphericalSolarReflectances: FloatsPropositionInput
-  nearnormalHemisphericalSolarTransmittance: FloatPropositionInput
   nearnormalHemisphericalSolarTransmittances: FloatsPropositionInput
-  nearnormalHemisphericalVisibleReflectance: FloatPropositionInput
   nearnormalHemisphericalVisibleReflectances: FloatsPropositionInput
-  nearnormalHemisphericalVisibleTransmittance: FloatPropositionInput
   nearnormalHemisphericalVisibleTransmittances: FloatsPropositionInput
   not: OpticalDataPropositionInput
   or: [OpticalDataPropositionInput!]
+  resources: GetHttpsResourcesPropositionInput
 }
 
 input PhotovoltaicDataPropositionInput {
   and: [PhotovoltaicDataPropositionInput!]
   componentId: UuidPropositionInput
-  dataFormatId: UuidPropositionInput
   not: PhotovoltaicDataPropositionInput
   or: [PhotovoltaicDataPropositionInput!]
+  resources: GetHttpsResourcesPropositionInput
 }
 
 input PublicationSortInput {
@@ -2290,7 +2294,7 @@ directive @defer("Deferred when true." if: Boolean "If this argument label has a
 directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
 
 "The `@stream` directive may be provided for a field of `List` type so that the backend can leverage technology such as asynchronous iterators to provide a partial list in the initial response, and additional list items in subsequent responses. `@include` and `@skip` take precedence over `@stream`."
-directive @stream("Streamed when true." if: Boolean "The initial elements that shall be send down to the consumer." initialCount: Int! "If this argument label has a value other than null, it will be passed on to the result of this stream directive. This label is intended to give client applications a way to identify to which fragment a streamed result belongs to." label: String) on FIELD
+directive @stream("Streamed when true." if: Boolean "The initial elements that shall be send down to the consumer." initialCount: Int! = 0 "If this argument label has a value other than null, it will be passed on to the result of this stream directive. This label is intended to give client applications a way to identify to which fragment a streamed result belongs to." label: String) on FIELD
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
