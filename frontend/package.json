@@ -12,7 +12,7 @@
     "start": "next start -p 8080"
   },
   "dependencies": {
-    "@apollo/client": "^3.0",
+    "@apollo/client": "3.4.*",
     "antd": "^4.0",
     "dayjs": "^1.0",
     "graphql": "^16.0.1",
