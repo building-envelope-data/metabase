@@ -63,11 +63,11 @@ function Page() {
           , <Link href={paths.home}>buildingenvelopedata.org</Link> offers a
           general format for optical, calorimetric and photovoltaic data sets.
           It is defined by the JSON Schemas of the{" "}
-          <Typography.Link href="https://github.com/ise621/building-envelope-data">
+          <Typography.Link href="https://github.com/building-envelope-data/api">
             buildingenvelopedata.org API specification
           </Typography.Link>
           . Other data formats are as well available. The{" "}
-          <Typography.Link href="https://github.com/ise621/metabase">
+          <Typography.Link href="https://github.com/building-envelope-data/metabase">
             source code
           </Typography.Link>{" "}
           of the metabase is available at{" "}

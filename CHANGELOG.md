@@ -119,4 +119,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -
 -
 
-[Unreleased]: https://github.com/ise621/metabase/compare/main...develop
+[Unreleased]: https://github.com/building-envelope-data/metabase/compare/main...develop
