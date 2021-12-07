@@ -59,8 +59,14 @@ shellb : execb ## Enter shell in a running `backend` container (to test database
 
 list : ## List all containers with health status
 	${docker_compose} ps \
+		--no-trunc \
 		--all
 .PHONY : list
+
+list-services : ## List all services specified in the docker-compose file (used by Monit as configured in the `machine` project)
+	${docker_compose} config \
+		--services
+.PHONY : list-services
 
 createdb : ## Create database
 	${docker_compose} run \
