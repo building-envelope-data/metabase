@@ -106,6 +106,7 @@ function Page() {
 
   const onFinish = ({
     componentIds,
+    dataFormatIds,
     infraredEmittances,
     nearnormalHemisphericalSolarReflectances,
     nearnormalHemisphericalSolarTransmittances,
@@ -113,6 +114,13 @@ function Page() {
     nearnormalHemisphericalVisibleTransmittances,
   }: {
     componentIds:
+      | {
+          negator: Negator;
+          comparator: UuidPropositionComparator;
+          value: Scalars["Uuid"] | undefined;
+        }[]
+      | undefined;
+    dataFormatIds:
       | {
           negator: Negator;
           comparator: UuidPropositionComparator;
@@ -165,6 +173,19 @@ function Page() {
             propositions.push(
               negateIfNecessary(negator, {
                 componentId: { [comparator]: value },
+              })
+            );
+          }
+        }
+        if (dataFormatIds) {
+          for (let { negator, comparator, value } of dataFormatIds) {
+            propositions.push(
+              negateIfNecessary(negator, {
+                resources: {
+                  some: {
+                    dataFormatId: { [comparator]: value },
+                  },
+                },
               })
             );
           }
@@ -317,6 +338,7 @@ function Page() {
         onFinishFailed={onFinishFailed}
       >
         <UuidPropositionFormList name="componentIds" label="Component Id" />
+        <UuidPropositionFormList name="dataFormatIds" label="Data Format Id" />
         <FloatPropositionFormList
           name="infraredEmittances"
           label="Infrared emittance"
