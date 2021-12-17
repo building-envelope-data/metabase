@@ -17,10 +17,10 @@
   <ItemGroup>
     <!-- <PackageReference Include="AutoMapper" Version="10.1.1" /> -->
     <!-- <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" /> -->
-    <PackageReference Include="GraphQL.Client" Version="4.0.1" />
-    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="4.0.1" />
-    <PackageReference Include="HotChocolate.Types.Scalars" Version="12.3.2" />
-    <PackageReference Include="MailKit" Version="2.15.0" />
+    <PackageReference Include="GraphQL.Client" Version="4.0.2" />
+    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="4.0.2" />
+    <PackageReference Include="HotChocolate.Types.Scalars" Version="12.4.1" />
+    <PackageReference Include="MailKit" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.11">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -30,12 +30,12 @@
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
-    <PackageReference Include="HotChocolate" Version="12.3.2" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="12.3.2" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.3.2" />
-    <PackageReference Include="HotChocolate.Data" Version="12.3.2" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.3.2" />
+    <PackageReference Include="System.Linq.Async" Version="5.1.0" />
+    <PackageReference Include="HotChocolate" Version="12.4.1" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="12.4.1" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.4.1" />
+    <PackageReference Include="HotChocolate.Data" Version="12.4.1" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.11" />
