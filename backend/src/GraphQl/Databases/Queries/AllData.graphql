@@ -16,20 +16,20 @@ query AllData(
     last: $last
     before: $before
   ) {
-    # edges {
-    #   cursor
-    #   node {
-    #     ...DataFields
-    #   }
-    # }
+    edges {
+      cursor
+      node {
+        ...DataFields
+      }
+    }
     nodes {
       __typename
       ...DataFields
     }
-    # totalCount
-    # pageInfo {
-    #   ...PageInfoFields
-    # }
-    # timestamp
+    totalCount
+    pageInfo {
+      ...PageInfoFields
+    }
+    # TODO timestamp
   }
 }
