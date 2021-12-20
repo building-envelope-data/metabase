@@ -16,19 +16,19 @@ query AllHygrothermalData(
     last: $last
     before: $before
   ) {
-    # edges {
-    #   cursor
-    #   node {
-    #     ...HygrothermalDataFields
-    #   }
-    # }
+    edges {
+      cursor
+      node {
+        ...HygrothermalDataFields
+      }
+    }
     nodes {
       ...HygrothermalDataFields
     }
-    # totalCount
-    # pageInfo {
-    #   ...PageInfoFields
-    # }
-    # timestamp
+    totalCount
+    pageInfo {
+      ...PageInfoFields
+    }
+    # TODO timestamp
   }
 }

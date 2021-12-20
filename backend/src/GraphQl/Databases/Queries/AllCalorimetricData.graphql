@@ -16,19 +16,19 @@ query AllCalorimetricData(
     last: $last
     before: $before
   ) {
-    # edges {
-    #   cursor
-    #   node {
-    #     ...CalorimetricDataFields
-    #   }
-    # }
+    edges {
+      cursor
+      node {
+        ...CalorimetricDataFields
+      }
+    }
     nodes {
       ...CalorimetricDataFields
     }
-    # totalCount
-    # pageInfo {
-    #   ...PageInfoFields
-    # }
-    # timestamp
+    totalCount
+    pageInfo {
+      ...PageInfoFields
+    }
+    # TODO timestamp
   }
 }

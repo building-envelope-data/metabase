@@ -16,19 +16,19 @@ query AllPhotovoltaicData(
     last: $last
     before: $before
   ) {
-    # edges {
-    #   cursor
-    #   node {
-    #     ...PhotovoltaicDataFields
-    #   }
-    # }
+    edges {
+      cursor
+      node {
+        ...PhotovoltaicDataFields
+      }
+    }
     nodes {
       ...PhotovoltaicDataFields
     }
-    # totalCount
-    # pageInfo {
-    #   ...PageInfoFields
-    # }
-    # timestamp
+    totalCount
+    pageInfo {
+      ...PageInfoFields
+    }
+    # TODO timestamp
   }
 }

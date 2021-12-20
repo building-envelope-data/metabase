@@ -16,19 +16,19 @@ query AllOpticalData(
     last: $last
     before: $before
   ) {
-    # edges {
-    #   cursor
-    #   node {
-    #     ...OpticalDataFields
-    #   }
-    # }
+    edges {
+      cursor
+      node {
+        ...OpticalDataFields
+      }
+    }
     nodes {
       ...OpticalDataFields
     }
-    # totalCount
-    # pageInfo {
-    #   ...PageInfoFields
-    # }
-    # timestamp
+    totalCount
+    pageInfo {
+      ...PageInfoFields
+    }
+    # TODO timestamp
   }
 }
