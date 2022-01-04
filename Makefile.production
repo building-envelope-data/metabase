@@ -151,7 +151,14 @@ backup : ## Backup database and related data to directory with absolute path `${
 
 # Inspired by https://stackoverflow.com/questions/25785/delete-all-but-the-most-recent-x-files-in-bash/34862475#34862475
 prune-backups : ## Keep the most recent 7 backups, delete the rest
-	cd /app/data/backups && ls -t --indicator-style=slash | grep --invert-match '/$$' | tail --lines=+8 | xargs --delimiter='\n' --no-run-if-empty rm --
+	cd /app/data/backups && \
+		ls -t --indicator-style=slash \
+		| grep '/$$' \
+		| tail --lines=+8 \
+		| xargs \
+			--delimiter='\n' \
+			--no-run-if-empty \
+			rm --recursive --dir --
 .PHONY : prune-backups
 
 restore : ## Restore database and related data from directory with absolute path `${BACKUP_DIRECTORY}`, for example, `make --file Makefile.production BACKUP_DIRECTORY=/app/data/backups/2021-04-22_15_43_35/ restore`
