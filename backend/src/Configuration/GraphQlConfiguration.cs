@@ -29,7 +29,7 @@ namespace Metabase.Configuration
             .AddAuthorization()
             .AddApolloTracing(
                 HotChocolate.Execution.Options.TracingPreference.OnDemand
-            ) // TODO Do we want or need this?
+            )
             .AddGlobalObjectIdentification()
             .AddQueryFieldToMutationPayloads()
             .ModifyOptions(options =>
@@ -52,10 +52,9 @@ namespace Metabase.Configuration
                     /* options.UseComplexityMultipliers = ...; */
                 }
                 )
-                  // TODO Configure `https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Validation/Options/ValidationOptions.cs`. But how?
                   // Subscriptions
                   /* .AddInMemorySubscriptions() */
-                  // TODO Persisted queries
+                  // Persisted queries
                   /* .AddFileSystemQueryStorage("./persisted_queries") */
                   /* .UsePersistedQueryPipeline(); */
                   .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
