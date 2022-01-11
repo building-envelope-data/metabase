@@ -35,7 +35,6 @@ namespace Metabase.Configuration
             AppSettings appSettings
             )
         {
-            // TODO How can we use `SecureString` for passwords set via environment variables?
             var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx", appSettings.JsonWebToken.EncryptionCertificatePassword);
             var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
             ConfigureIdentityServices(services);
@@ -103,7 +102,6 @@ namespace Metabase.Configuration
                 _.LogoutPath = "/me/logout";
                 _.ReturnUrlParameter = "returnTo";
                 _.Events.OnValidatePrincipal = context =>
-                // TODO Is there any security risk associated with adding scopes as is done below?
                 {
                     // The metabase frontend uses application cookies for
                     // user authentication and is allowed to read data,
@@ -317,10 +315,7 @@ namespace Metabase.Configuration
                                .EnableTokenEndpointPassthrough()
                                .EnableUserinfoEndpointPassthrough()
                                .EnableVerificationEndpointPassthrough();
-                    if (true) // TODO `environment.IsEnvironment("test")` but what about server-side requests from next.js?
-                    {
-                        aspNetCoreBuilder.DisableTransportSecurityRequirement();
-                    }
+                    aspNetCoreBuilder.DisableTransportSecurityRequirement();
                     // Note: if you don't want to specify a client_id when sending
                     // a token or revocation request, uncomment the following line:
                     // _.AcceptAnonymousClients();
