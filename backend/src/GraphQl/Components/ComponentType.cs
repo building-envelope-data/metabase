@@ -21,7 +21,6 @@ namespace Metabase.GraphQl.Components
                         context.ArgumentValue<bool>(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower())
                         )
                     );
-            // TODO Use connections for concretization and generalization as is done above for manufacturers.
             descriptor
                 .Field(t => t.ManufacturerEdges).Ignore();
             descriptor
