@@ -4,12 +4,12 @@ query AllOpticalData(
   $locale: Locale
 ) {
   allOpticalData(where: $where, timestamp: $timestamp, locale: $locale) {
-    # edges {
-    #   cursor
-    #   node {
-    #     ...OpticalDataFields
-    #   }
-    # }
+    edges {
+      # cursor
+      node {
+        ...OpticalDataFields
+      }
+    }
     nodes {
       ...OpticalDataFields
     }

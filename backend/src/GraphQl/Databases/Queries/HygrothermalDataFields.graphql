@@ -1,3 +1,4 @@
 fragment HygrothermalDataFields on HygrothermalData {
+  id
   ...DataFields
 }

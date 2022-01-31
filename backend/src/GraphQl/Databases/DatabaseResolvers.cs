@@ -358,11 +358,16 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "PageInfoFields.graphql",
-                            database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/" ? "AllDataX.graphql" : "AllData.graphql"
-                        }
+                        database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
+                        ? new[] {
+                              "DataFields.graphql",
+                              "AllDataX.graphql"
+                          }
+                        : new[] {
+                              "DataFields.graphql",
+                              "PageInfoFields.graphql",
+                              "AllData.graphql"
+                          }
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -418,12 +423,18 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "OpticalDataFields.graphql",
-                            "PageInfoFields.graphql",
-                            database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/" ? "AllOpticalDataX.graphql" : "AllOpticalData.graphql"
-                        }
+                        database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
+                        ? new[] {
+                              "DataFields.graphql",
+                              "OpticalDataFields.graphql",
+                              "AllOpticalDataX.graphql"
+                          }
+                        : new[] {
+                              "DataFields.graphql",
+                              "OpticalDataFields.graphql",
+                              "PageInfoFields.graphql",
+                              "AllOpticalData.graphql"
+                          }
                     ).ConfigureAwait(false),
                     variables: new
                     {
