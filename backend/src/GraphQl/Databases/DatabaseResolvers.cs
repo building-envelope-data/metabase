@@ -426,7 +426,7 @@ namespace Metabase.GraphQl.Databases
                         database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
                         ? new[] {
                               "DataFields.graphql",
-                              "OpticalDataFieldsX.graphql",
+                              "OpticalDataFields.graphql",
                               "AllOpticalDataX.graphql"
                           }
                         : new[] {
