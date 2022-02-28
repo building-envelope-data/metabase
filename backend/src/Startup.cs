@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using HotChocolate.AspNetCore;
 using Metabase.Configuration;
 using Metabase.Data.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -41,7 +42,10 @@ namespace Metabase
             ConfigureMessageSenderServices(services);
             ConfigureRequestResponseServices(services);
             ConfigureSessionServices(services);
-            services.AddHealthChecks();
+            services.AddHttpClient();
+            services
+                .AddHealthChecks()
+                .AddDbContextCheck<Data.ApplicationDbContext>();
             services.AddSingleton(_appSettings);
             services.AddSingleton(_environment);
             // services.AddDatabaseDeveloperPageExceptionFilter();
@@ -70,10 +74,15 @@ namespace Metabase
             services.AddControllersWithViews();
         }
 
-        private static void ConfigureMessageSenderServices(IServiceCollection services)
+        private void ConfigureMessageSenderServices(IServiceCollection services)
         {
-            services.AddTransient<Services.IEmailSender, Services.MessageSender>();
-            services.AddTransient<Services.ISmsSender, Services.MessageSender>();
+            services.AddTransient<Services.IEmailSender>(serviceProvider =>
+                new Services.EmailSender(
+                    _appSettings.Email.SmtpHost,
+                    _appSettings.Email.SmtpPort,
+                    serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Services.EmailSender>>()
+                )
+            );
         }
 
         private static void ConfigureSessionServices(IServiceCollection services)
@@ -167,18 +176,38 @@ namespace Metabase
             app.UseSession();
             // app.UseResponseCompression(); // Done by Nginx
             // app.UseResponseCaching(); // Done by Nginx
-            app.UseHealthChecks(
-                "/health",
-                new HealthCheckOptions
-                {
-                    ResponseWriter = JsonResponseWriter
-                }
-                );
             /* app.UseWebSockets(); */
             app.UseEndpoints(_ =>
             {
-                _.MapGraphQL();
+                _.MapGraphQL().WithOptions(
+                    // https://chillicream.com/docs/hotchocolate/server/middleware
+                    new GraphQLServerOptions
+                    {
+                        EnableSchemaRequests = true,
+                        EnableGetRequests = false,
+                        // AllowedGetOperations = AllowedGetOperations.Query
+                        EnableMultipartRequests = false,
+                        Tool = {
+                            DisableTelemetry = true,
+                            Enable = true, // _environment.IsDevelopment()
+                            IncludeCookies = false,
+                            GraphQLEndpoint = "/graphql",
+                            HttpMethod = DefaultHttpMethod.Post,
+                            HttpHeaders = new HeaderDictionary
+                            {
+                                { "Content-Type", "application/json" }
+                            },
+                            Title = "GraphQL"
+                        }
+                    }
+                );
                 _.MapControllers();
+                _.MapHealthChecks("/health",
+                    new HealthCheckOptions
+                    {
+                        ResponseWriter = JsonResponseWriter
+                    }
+                );
             });
         }
 
@@ -187,10 +216,7 @@ namespace Metabase
             context.Response.ContentType = "application/json";
             await JsonSerializer.SerializeAsync(
                 context.Response.Body,
-                new
-                {
-                    Status = report.Status.ToString()
-                },
+                report,
                 new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase

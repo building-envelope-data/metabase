@@ -1,20 +1,24 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class RequestUserPasswordResetTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task ExistingAndConfirmedEmailAddress_RequestsUserPasswordReset()
         {
             // Arrange
+            var name = "John Doe";
             var email = "john.doe@ise.fraunhofer.de";
-            await RegisterAndConfirmUser(email: email).ConfigureAwait(false);
+            await RegisterAndConfirmUser(
+                name: name,
+                email: email
+                ).ConfigureAwait(false);
             EmailSender.Clear();
             // Act
             var response = await RequestUserPasswordReset(
@@ -23,13 +27,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Assert
             Snapshot.Match(response);
             EmailsShouldContainSingle(
-                address: email,
+                to: (name, email),
                 subject: "Reset password",
-                messageRegEx: @"^Please reset your password by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
+                bodyRegEx: @"^Please reset your password by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task UnknownEmailAddress_DoesNothing()
         {
             // Arrange
@@ -45,7 +49,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Emails.Should().BeEmpty();
         }
 
-        [Fact]
+        [Test]
         public async Task UnconfirmedEmailAddress_DoesNothing()
         {
             // Arrange

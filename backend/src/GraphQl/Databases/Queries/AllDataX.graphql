@@ -1,0 +1,22 @@
+query AllData(
+  $where: DataPropositionInput!
+  $timestamp: DateTime
+  $locale: Locale
+) {
+  allData(where: $where, timestamp: $timestamp, locale: $locale) {
+    edges {
+      # cursor
+      node {
+        ...DataFields
+      }
+    }
+    nodes {
+      ...DataFields
+    }
+    # totalCount
+    # pageInfo {
+    #   ...PageInfoFields
+    # }
+    # timestamp
+  }
+}

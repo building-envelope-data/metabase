@@ -1,13 +1,15 @@
 namespace Metabase.GraphQl.Components
 {
     public sealed class ComponentManufacturerConnection
-        : Connection<Data.Component, Data.ComponentManufacturer, ComponentManufacturersByComponentIdDataLoader, ComponentManufacturerEdge>
+        : ForkingConnection<Data.Component, Data.ComponentManufacturer, PendingComponentManufacturersByComponentIdDataLoader, ComponentManufacturersByComponentIdDataLoader, ComponentManufacturerEdge>
     {
         public ComponentManufacturerConnection(
-            Data.Component subject
+            Data.Component subject,
+            bool pending
         )
             : base(
                 subject,
+                pending,
                 x => new ComponentManufacturerEdge(x)
                 )
         {

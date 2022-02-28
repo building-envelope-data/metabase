@@ -29,7 +29,7 @@ namespace Metabase.Data
 
         [MinLength(1)]
         [RegularExpression("^(arXiv:)[0-z./]*$")]
-        [GraphQLDescription("arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication.")]
+        [GraphQLDescription("The website arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication.")]
         public string? ArXiv { get; private set; }
 
         [MinLength(1)]

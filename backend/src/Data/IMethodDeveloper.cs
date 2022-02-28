@@ -6,5 +6,6 @@ namespace Metabase.Data
     {
         public Guid MethodId { get; }
         public Method Method { get; }
+        public bool Pending { get; }
     }
 }

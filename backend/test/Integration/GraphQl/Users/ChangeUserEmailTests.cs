@@ -2,22 +2,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class ChangeUserEmailTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task ValidData_EmailsConfirmationCode()
         {
             // Arrange
+            var name = "John Doe";
             var email = "john.doe@ise.fraunhofer.de";
             var password = "aaaAAA123$!@";
             await RegisterAndConfirmAndLoginUser(
+                name: name,
                 email: email,
                 password: password
             ).ConfigureAwait(false);
@@ -39,13 +41,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 password: password
                 ).ConfigureAwait(false);
             EmailsShouldContainSingle(
-                address: newEmail,
+                to: (name, newEmail),
                 subject: "Confirm your email change",
-                messageRegEx: @"^Please confirm your email address change by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email-change\?currentEmail=john\.doe@ise\.fraunhofer\.de&newEmail=new.john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+\.$"
+                bodyRegEx: @"^Please confirm your email address change by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email-change\?currentEmail=john\.doe@ise\.fraunhofer\.de&newEmail=new.john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
@@ -72,7 +74,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task UnchangedEmail_IsUserError()
         {
             // Arrange
@@ -99,7 +101,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 ).ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public async Task InvalidEmail_IsUserError()
         {
             // Arrange

@@ -7,9 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v0.0.2] - 2021-04-30
-
-## [v0.0.1] - 2021-04-29
+## [v1.0.0] - 2022-02-28
 
 ### Added
 
@@ -123,14 +121,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -
 -
 
-## [0.0.0] - 2019-10-17
+[Unreleased]: https://github.com/building-envelope-data/metabase/compare/v1.0.0...HEAD
 
--   Put source code under version control
-
-[Unreleased]: https://github.com/ise621/metabase/compare/v0.0.2...HEAD
-
-[v0.0.2]: https://github.com/ise621/metabase/compare/v0.0.1...v0.0.2
-
-[v0.0.1]: https://github.com/ise621/metabase/compare/0.0.0...v0.0.1
-
-[0.0.0]: https://gitlab.cc-asp.fraunhofer.de/ise621/icon/tree/v0.0.0
+[v1.0.0]: https://github.com/building-envelope-data/metabase/compare/a3750ff76aeba9ed8a017adecb2c52273278b915...v1.0.0

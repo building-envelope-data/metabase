@@ -4,7 +4,7 @@ import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 
-function Index() {
+function Page() {
   const router = useRouter();
 
   const { loading, error, data } = useCurrentUserQuery();
@@ -12,15 +12,15 @@ function Index() {
   const shouldRedirect = !(loading || error || currentUser);
 
   useEffect(() => {
-    if (shouldRedirect) {
+    if (router.isReady && shouldRedirect) {
       router.push({
         pathname: paths.userLogin,
         query: { returnTo: paths.userCurrent },
       });
     }
-  }, [shouldRedirect]);
+  }, [router, shouldRedirect]);
 
   return <Layout></Layout>;
 }
 
-export default Index;
+export default Page;

@@ -2,14 +2,15 @@ import * as React from "react";
 import { DatePicker, Alert, Select, Form, Input, Button } from "antd";
 import {
   useCreateComponentMutation,
-  ComponentCategory,
-  Scalars,
   ComponentsDocument,
 } from "../../queries/components.graphql";
+import { ComponentCategory, Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import * as moment from "moment";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { SelectInstitutionId } from "../SelectInstitutionId";
+import { SelectComponentId } from "../SelectComponentId";
 
 const layout = {
   labelCol: { span: 8 },
@@ -23,9 +24,9 @@ export type CreateComponentProps = {
   manufacturerId: Scalars["Uuid"];
 };
 
-export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
+export default function CreateComponent({
   manufacturerId,
-}) => {
+}: CreateComponentProps) {
   const [createComponentMutation] = useCreateComponentMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -53,12 +54,27 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
     description,
     availability,
     categories,
+    furtherManufacturerIds,
+    assembledOfIds,
+    partOfIds,
+    concretizationOfIds,
+    generalizationOfIds,
+    variantOfIds,
   }: {
     name: string;
-    abbreviation: string;
+    abbreviation: string | null | undefined;
     description: string;
-    availability: [moment.Moment | null, moment.Moment | null] | null;
-    categories: ComponentCategory[];
+    availability:
+      | [moment.Moment | null | undefined, moment.Moment | null | undefined]
+      | null
+      | undefined;
+    categories: ComponentCategory[] | null | undefined;
+    furtherManufacturerIds: Scalars["Uuid"] | null | undefined;
+    assembledOfIds: Scalars["Uuid"] | null | undefined;
+    partOfIds: Scalars["Uuid"] | null | undefined;
+    concretizationOfIds: Scalars["Uuid"] | null | undefined;
+    generalizationOfIds: Scalars["Uuid"] | null | undefined;
+    variantOfIds: Scalars["Uuid"] | null | undefined;
   }) => {
     const create = async () => {
       try {
@@ -69,10 +85,15 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
             name: name,
             abbreviation: abbreviation,
             description: description,
-            availableFrom: availability?.[0],
-            availableTo: availability?.[1],
+            availability: { from: availability?.[0], to: availability?.[1] },
             categories: categories || [],
             manufacturerId: manufacturerId,
+            furtherManufacturerIds: furtherManufacturerIds || [],
+            assembledOfIds: assembledOfIds || [],
+            partOfIds: partOfIds || [],
+            concretizationOfIds: concretizationOfIds || [],
+            generalizationOfIds: generalizationOfIds || [],
+            variantOfIds: variantOfIds || [],
           },
         });
         handleFormErrors(
@@ -83,6 +104,9 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
           setGlobalErrorMessages,
           form
         );
+        if (!errors && !data?.createComponent?.errors) {
+          form.resetFields();
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);
@@ -107,7 +131,7 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
       <Form
         {...layout}
         form={form}
-        name="basic"
+        name="createComponent"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
@@ -140,13 +164,32 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
           <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
         </Form.Item>
         <Form.Item label="Categories" name="categories">
-          <Select mode="multiple" placeholder="Please select">
-            <Select.Option value={ComponentCategory.Layer}>Layer</Select.Option>
-            <Select.Option value={ComponentCategory.Unit}>Unit</Select.Option>
-            <Select.Option value={ComponentCategory.Material}>
-              Material
-            </Select.Option>
-          </Select>
+          <Select
+            mode="multiple"
+            placeholder="Please select"
+            options={Object.entries(ComponentCategory).map(([_key, value]) => ({
+              label: value,
+              value: value,
+            }))}
+          />
+        </Form.Item>
+        <Form.Item label="Further Manufacturers" name="furtherManufacturerIds">
+          <SelectInstitutionId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Assembled Of" name="assembledOfIds">
+          <SelectComponentId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Part Of" name="partOfIds">
+          <SelectComponentId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Concretization Of" name="concretizationOfIds">
+          <SelectComponentId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Generalization Of" name="generalizationOfIds">
+          <SelectComponentId mode="multiple" />
+        </Form.Item>
+        <Form.Item label="Variant Of" name="variantOfIds">
+          <SelectComponentId mode="multiple" />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>
@@ -156,6 +199,4 @@ export const CreateComponent: React.FunctionComponent<CreateComponentProps> = ({
       </Form>
     </>
   );
-};
-
-export default CreateComponent;
+}

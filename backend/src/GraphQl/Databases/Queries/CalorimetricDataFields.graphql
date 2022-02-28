@@ -1,0 +1,6 @@
+fragment CalorimetricDataFields on CalorimetricData {
+  id
+  ...DataFields
+  uValues
+  gValues
+}

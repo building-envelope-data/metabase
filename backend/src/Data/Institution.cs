@@ -32,6 +32,9 @@ namespace Metabase.Data
         public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } = new List<InstitutionMethodDeveloper>();
         public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
 
+        [InverseProperty(nameof(Method.Manager))]
+        public ICollection<Method> ManagedMethods { get; } = new List<Method>();
+
         [InverseProperty(nameof(DataFormat.Manager))]
         public ICollection<DataFormat> ManagedDataFormats { get; } = new List<DataFormat>();
 
@@ -40,6 +43,14 @@ namespace Metabase.Data
 
         [InverseProperty(nameof(Database.Operator))]
         public ICollection<Database> OperatedDatabases { get; } = new List<Database>();
+
+        public Guid? ManagerId { get; set; }
+
+        [InverseProperty(nameof(ManagedInstitutions))]
+        public Institution? Manager { get; set; }
+
+        [InverseProperty(nameof(Manager))]
+        public ICollection<Institution> ManagedInstitutions { get; } = new List<Institution>();
 
         public ICollection<InstitutionRepresentative> RepresentativeEdges { get; } = new List<InstitutionRepresentative>();
         public ICollection<User> Representatives { get; } = new List<User>();
@@ -73,8 +84,7 @@ namespace Metabase.Data
             string? abbreviation,
             string description,
             Uri? websiteLocator,
-            string? publicKey,
-            Enumerations.InstitutionState state
+            string? publicKey
         )
         {
             Name = name;
@@ -82,7 +92,11 @@ namespace Metabase.Data
             Description = description;
             WebsiteLocator = websiteLocator;
             PublicKey = publicKey;
-            State = state;
+        }
+
+        public void Verify()
+        {
+            State = Enumerations.InstitutionState.VERIFIED;
         }
     }
 }

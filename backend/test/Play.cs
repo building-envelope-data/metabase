@@ -1,12 +1,12 @@
 using System;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
-namespace Test
+namespace Metabase.Tests
 {
     public sealed class Play
     {
-        [Fact]
+        [Test]
         public async Task Do()
         {
             Console.WriteLine("Do play!");

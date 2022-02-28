@@ -40,12 +40,12 @@ namespace Metabase.GraphQl.DataFormats
                 return new CreateDataFormatPayload(
                     new CreateDataFormatError(
                       CreateDataFormatErrorCode.UNAUTHORIZED,
-                      "You are not authorized to create components for the institution.",
+                      "You are not authorized to create data formats for the institution.",
                       new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
                     )
                 );
             }
-            if (!await context.Institutions
+            if (!await context.Institutions.AsQueryable()
             .AnyAsync(
                 x => x.Id == input.ManagerId,
              cancellationToken: cancellationToken
@@ -56,7 +56,7 @@ namespace Metabase.GraphQl.DataFormats
                 return new CreateDataFormatPayload(
                     new CreateDataFormatError(
                         CreateDataFormatErrorCode.UNKNOWN_MANAGER,
-                        "Unknown manufacturer",
+                        "Unknown manager.",
                       new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
                     )
                 );

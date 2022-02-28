@@ -1,18 +1,28 @@
+fragment DatabasePartial on Database {
+  id
+  uuid
+  name
+  description
+  locator
+  operator {
+    node {
+      uuid
+      name
+    }
+  }
+}
+
 query Databases {
   databases {
     nodes {
-      id
-      uuid
-      name
-      description
-      locator
-      operator {
-        node {
-          uuid
-          name
-        }
-      }
+      ...DatabasePartial
     }
+  }
+}
+
+query Database($uuid: Uuid!) {
+  database(uuid: $uuid) {
+    ...DatabasePartial
   }
 }
 
@@ -31,9 +41,7 @@ mutation CreateDatabase(
     }
   ) {
     database {
-      name
-      description
-      locator
+      ...DatabasePartial
     }
     errors {
       code

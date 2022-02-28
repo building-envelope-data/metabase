@@ -3,15 +3,10 @@
 
 include .env
 
-name = metabase
-
-# Inspired by https://docs.docker.com/engine/reference/commandline/run/#add-entries-to-container-hosts-file---add-host
-docker_ip = $(shell ip -4 addr show scope global dev docker0 | grep inet | awk '{print $$2}' | cut -d / -f 1)
-
 docker_compose = \
 	docker-compose \
 		--file docker-compose.yml \
-		--project-name ${name}
+		--project-name ${NAME}
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
@@ -21,78 +16,70 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name : ## Print value of variable `name`
-	@echo ${name}
+name : ## Print value of variable `${NAME}`
+	@echo ${NAME}
 .PHONY : name
 
 # ----------------------------- #
 # Interface with Docker Compose #
 # ----------------------------- #
 
-# TODO Try `buildkit` by setting the environment variables
-# ```
-# COMPOSE_DOCKER_CLI_BUILD=1 \
-# DOCKER_BUILDKIT=1 \
-# ```
-# See https://docs.docker.com/develop/develop-images/build_enhancements/
-# and https://www.docker.com/blog/faster-builds-in-compose-thanks-to-buildkit-support/
 build : ## Build images
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} build \
+	${docker_compose} pull
+	${docker_compose} build \
+		--pull \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
 show-backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
-	docker build --no-cache \
+	docker build \
+		--pull \
+		--no-cache \
 		--file Dockerfile-show-build-context \
 		./backend
 .PHONY : show-backend-build-context
 
 show-frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
-	docker build --no-cache \
+	docker build \
+		--pull \
+		--no-cache \
 		--file Dockerfile-show-build-context \
 		./frontend
 .PHONY : show-frontend-build-context
 
 remove : ## Remove stopped containers
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} rm
+	${docker_compose} rm
 .PHONY : remove
 
 remove-data : ## Remove data volumes
 	docker volume rm \
-		${name}_data
+		${NAME}_data
 .PHONY : remove-data
 
 # TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
 up : build ## (Re)create, and start containers (after building images if necessary)
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} up \
+	${docker_compose} up \
 		--remove-orphans \
 		--detach
 .PHONY : up
 
 down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} down \
+	${docker_compose} down \
 		--remove-orphans
 .PHONY : down
 
 restart : ## Restart all stopped and running containers
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} restart
+	${docker_compose} restart
 .PHONY : restart
 
 logs : ## Follow logs
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} logs \
+	${docker_compose} logs \
 		--follow
 .PHONY : logs
 
 exec : up ## Execute the one-time command `${COMMAND}` against an existing `${CONTAINER}` container (after starting all containers if necessary)
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} exec \
+	${docker_compose} exec \
 		--user $(shell id --user):$(shell id --group) \
 		${CONTAINER} \
 		${COMMAND}
@@ -106,32 +93,46 @@ execb : CONTAINER = backend
 execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
 .PHONY : execb
 
-shellf : COMMAND = ash -c "make install && exec ash"
+run : up ## Run the one-time command `${COMMAND}` against a fresh `${CONTAINER}` container (after starting all containers if necessary)
+	${docker_compose} run \
+		--rm \
+		--user $(shell id --user):$(shell id --group) \
+		${CONTAINER} \
+		${COMMAND}
+.PHONY : run
+
+runf : CONTAINER = frontend
+runf : run ## Run the one-time command `${COMMAND}` against a fresh `frontend` container (after starting all containers if necessary)
+.PHONY : runf
+
+runb : CONTAINER = backend
+runb : run ## runute the one-time command `${COMMAND}` against a fresh `backend` container (after starting all containers if necessary)
+.PHONY : runb
+
+shellf : COMMAND = bash -c "make install && exec bash"
 shellf : execf ## Enter shell in an existing `frontend` container (after starting all containers if necessary)
 .PHONY : shellf
 
-shellb : COMMAND = ash
-shellb : execb ## Enter shell in an existing `backend` container (after starting all containers if necessary)
+shellb : COMMAND = bash
+shellb : runb ## Enter shell in a fresh `backend` container (after starting all containers if necessary)
 .PHONY : shellb
 
 shellb-examples : COMMAND = bash -c "cd ./examples && bash"
-shellb-examples : execb ## Enter Bourne-again shell, aka, bash, in an existing `backend` container (after starting all containers if necessary)
+shellb-examples : runb ## Enter Bourne-again shell, aka, bash, in an existing `backend` container (after starting all containers if necessary)
 .PHONY : shellb-examples
 
 # Executing with `--privileged` is necessary according to https://github.com/dotnet/diagnostics/blob/master/documentation/FAQ.md
 traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for example, `make CONTAINER_ID=c1b82eb6e03c trace-backend`
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} exec \
+	${docker_compose} exec \
 			--privileged \
 			backend \
-			ash -c " \
+			bash -c " \
 				make trace \
 				"
 .PHONY : traceb
 
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} exec \
+	${docker_compose} exec \
 		database \
 		psql \
 		--username postgres \
@@ -139,20 +140,23 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 .PHONY : psql
 
 shelld : up ## Enter shell in an existing `database` container (after starting all containers if necessary)
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} exec \
+	${docker_compose} exec \
 		database \
-		ash
+		bash
 .PHONY : shelld
 
 createdb : ## Create databases
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} exec \
+	${docker_compose} exec \
 		database \
 		bash -c " \
 			createdb --username postgres xbase_development ; \
 		"
 .PHONY : createdb
+
+list : ## List all containers with health status
+	${docker_compose} ps \
+		--all
+.PHONY : list
 
 begin-maintenance : ## Begin maintenance
 	cp \
@@ -165,8 +169,7 @@ end-maintenance : ## End maintenance
 .PHONY : begin-maintenance
 
 prepare-release : ## Prepare release
-	DOCKER_IP=${docker_ip} \
-		${docker_compose} run \
+	${docker_compose} run \
 		--user $(shell id --user):$(shell id --group) \
 		backend \
 		make prepare-release
@@ -179,16 +182,17 @@ prepare-release : ## Prepare release
 # TODO Pass passwords in a more secure way!
 jwt-certificates : ## Create JWT encryption and signing certificates if necessary
 	docker build \
+		--pull \
 		--build-arg GROUP_ID=$(shell id --group) \
 		--build-arg USER_ID=$(shell id --user) \
-		--tag ${name}_bootstrap \
+		--tag ${NAME}_bootstrap \
 		--file ./backend/Dockerfile-bootstrap \
 		./backend
 	docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/backend",target=/app \
-		${name}_bootstrap \
-		ash -cx " \
+		${NAME}_bootstrap \
+		bash -cx " \
 			dotnet-script \
 				create-certificates.csx \
 				-- \
@@ -210,7 +214,6 @@ ssl : ## Generate and trust certificate authority, and generate SSL certificates
 # X509v3 Extensions: See `man x509v3_config` and https://superuser.com/questions/738612/openssl-ca-keyusage-extension/1248085#1248085 and https://access.redhat.com/solutions/28965
 generate-certificate-authority : ## Generate certificate authority ECDSA private key and self-signed certificate
 	mkdir --parents ./ssl/
-	DOCKER_IP=${docker_ip} \
 		docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
@@ -318,8 +321,7 @@ trust-certificate-authority : ## Trust the authority's SSL certificate
 # Note that extensions are not transferred to certificate requests and vice versa as said on https://www.openssl.org/docs/man1.1.0/man1/x509.html#BUGS
 generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate signed by our certificate authority
 	mkdir --parents ./ssl/
-	DOCKER_IP=${docker_ip} \
-		docker run \
+	docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
 		nginx:1.19.9 \
@@ -403,9 +405,6 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 				exit 0 \
 			) || echo \"PFX file is invalid\" \
 			"
-	mkdir --parents ./backend/ssl
-	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx ./backend/src/jwt-encryption-certificate.pfx
-	cp ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx ./backend/src/jwt-signing-certificate.pfx
 .PHONY : generate-ssl-certificate
 
 fetch-ssl-certificate : ## Fetch the SSL certificate of the server

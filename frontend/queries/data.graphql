@@ -1,0 +1,163 @@
+fragment DataPartial on Data {
+  uuid
+  timestamp
+  componentId
+  name
+  description
+  appliedMethod {
+    methodId
+  }
+  resourceTree {
+    root {
+      value {
+        description
+        hashValue
+        locator
+        dataFormatId
+      }
+    }
+  }
+}
+
+query AllData($where: DataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allData(where: $where) {
+          nodes {
+            ...DataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasData($where: DataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasData(where: $where)
+      }
+    }
+  }
+}
+
+fragment CalorimetricDataPartial on CalorimetricData {
+  ...DataPartial
+  gValues
+  uValues
+}
+
+query AllCalorimetricData($where: CalorimetricDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allCalorimetricData(where: $where) {
+          nodes {
+            ...CalorimetricDataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasCalorimetricData($where: CalorimetricDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasCalorimetricData(where: $where)
+      }
+    }
+  }
+}
+
+fragment HygrothermalDataPartial on HygrothermalData {
+  ...DataPartial
+}
+
+query AllHygrothermalData($where: HygrothermalDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allHygrothermalData(where: $where) {
+          nodes {
+            ...HygrothermalDataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasHygrothermalData($where: HygrothermalDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasHygrothermalData(where: $where)
+      }
+    }
+  }
+}
+
+fragment OpticalDataPartial on OpticalData {
+  ...DataPartial
+  infraredEmittances
+  nearnormalHemisphericalSolarReflectances
+  nearnormalHemisphericalSolarTransmittances
+  nearnormalHemisphericalVisibleReflectances
+  nearnormalHemisphericalVisibleTransmittances
+}
+
+query AllOpticalData($where: OpticalDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allOpticalData(where: $where) {
+          nodes {
+            ...OpticalDataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasOpticalData($where: OpticalDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasOpticalData(where: $where)
+      }
+    }
+  }
+}
+
+fragment PhotovoltaicDataPartial on PhotovoltaicData {
+  ...DataPartial
+}
+
+query AllPhotovoltaicData($where: PhotovoltaicDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        allPhotovoltaicData(where: $where) {
+          nodes {
+            ...PhotovoltaicDataPartial
+          }
+        }
+      }
+    }
+  }
+}
+
+query HasPhotovoltaicData($where: PhotovoltaicDataPropositionInput) {
+  databases {
+    edges {
+      node {
+        hasPhotovoltaicData(where: $where)
+      }
+    }
+  }
+}

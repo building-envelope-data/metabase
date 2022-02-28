@@ -1,5 +1,5 @@
 query component(
-    $uuid: Uuid!
+    $uuid: UUID!
 ) {
     component(uuid: $uuid) {
         id

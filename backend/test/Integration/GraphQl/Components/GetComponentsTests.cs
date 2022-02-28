@@ -4,16 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Metabase.Tests.Integration.GraphQl.Institutions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Components
 {
-    [Collection(nameof(Data.Component))]
+    [TestFixture]
     public sealed class GetComponentsTests
       : ComponentIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task NoComponent_ReturnsEmptyList()
         {
             // Act
@@ -22,14 +22,14 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             Snapshot.Match(response);
         }
 
-        [Fact]
+        [Test]
         public async Task SingleComponent_IsReturned()
         {
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
+            var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationTests.OperativeInstitutionInput with
+                InstitutionIntegrationTests.PendingInstitutionInput with
                 {
                     OwnerIds = new[] { userId }
                 }
@@ -56,14 +56,14 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task MultipleComponents_AreReturned()
         {
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
-            var institutionId = await InstitutionIntegrationTests.CreateInstitutionReturningUuid(
+            var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
                 HttpClient,
-                InstitutionIntegrationTests.OperativeInstitutionInput with
+                InstitutionIntegrationTests.PendingInstitutionInput with
                 {
                     OwnerIds = new[] { userId }
                 }

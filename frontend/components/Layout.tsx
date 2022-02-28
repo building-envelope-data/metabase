@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { FunctionComponent, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
 import { Modal, Layout as AntLayout, Typography } from "antd";
@@ -9,43 +9,82 @@ import { useCookies } from "react-cookie";
 const navItems = [
   {
     path: paths.home,
-    label: `Home`,
+    label: "Home",
+    subitems: null,
   },
   {
-    path: paths.institutions,
-    label: `Institutions`,
-  },
-  {
-    path: paths.dataFormats,
-    label: `Data Formats`,
-  },
-  {
-    path: paths.methods,
-    label: `Methods`,
+    label: "Data",
+    subitems: [
+      {
+        path: paths.data,
+        label: "All Data",
+      },
+      {
+        path: paths.calorimetricData,
+        label: "Calorimetric Data",
+      },
+      {
+        path: paths.hygrothermalData,
+        label: "Hygrothermal Data",
+      },
+      {
+        path: paths.opticalData,
+        label: "Optical Data",
+      },
+      {
+        path: paths.photovoltaicData,
+        label: "Photovoltaic Data",
+      },
+    ],
   },
   {
     path: paths.components,
-    label: `Components`,
+    label: "Components",
+    subitems: null,
+  },
+  {
+    path: paths.institutions,
+    label: "Institutions",
+    subitems: null,
   },
   {
     path: paths.databases,
-    label: `Databases`,
+    label: "Databases",
+    subitems: null,
+  },
+  {
+    path: paths.dataFormats,
+    label: "Data Formats",
+    subitems: null,
+  },
+  {
+    path: paths.methods,
+    label: "Methods",
+    subitems: null,
   },
   {
     path: paths.users,
-    label: `Users`,
+    label: "Users",
+    subitems: null,
   },
 ];
 
-const Layout: FunctionComponent = ({ children }) => {
-  const appTitle = `Building Envelope Data`;
-  const cookieConsentName = "consent";
-  const cookieConsentValue = "yes";
+export type LayoutProps = {
+  children?: ReactNode;
+};
+
+const cookieConsentName = "consent";
+const cookieConsentValue = "yes";
+
+export default function Layout({ children }: LayoutProps) {
+  const appTitle = "Building Envelope Data";
 
   const [cookies, setCookie] = useCookies([cookieConsentName]);
+  const shouldShowCookieConsent =
+    cookies[cookieConsentName] != cookieConsentValue;
 
   useEffect(() => {
-    if (cookies[cookieConsentName] != cookieConsentValue) {
+    if (shouldShowCookieConsent) {
       Modal.info({
         title: "Cookie Consent",
         content: (
@@ -61,7 +100,7 @@ const Layout: FunctionComponent = ({ children }) => {
         },
       });
     }
-  }, []);
+  }, [shouldShowCookieConsent, setCookie]);
 
   return (
     <AntLayout>
@@ -81,6 +120,4 @@ const Layout: FunctionComponent = ({ children }) => {
       </AntLayout.Footer>
     </AntLayout>
   );
-};
-
-export default Layout;
+}

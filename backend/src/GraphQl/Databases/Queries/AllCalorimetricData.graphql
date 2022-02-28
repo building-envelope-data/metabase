@@ -1,0 +1,34 @@
+query AllCalorimetricData(
+  $where: CalorimetricDataPropositionInput
+  $timestamp: DateTime
+  $locale: Locale
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
+) {
+  allCalorimetricData(
+    where: $where
+    timestamp: $timestamp
+    locale: $locale
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+  ) {
+    edges {
+      cursor
+      node {
+        ...CalorimetricDataFields
+      }
+    }
+    nodes {
+      ...CalorimetricDataFields
+    }
+    totalCount
+    pageInfo {
+      ...PageInfoFields
+    }
+    # TODO timestamp
+  }
+}

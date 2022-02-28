@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System.IO;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Compact;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 
 namespace Metabase
@@ -25,7 +26,14 @@ namespace Metabase
             {
                 Log.Information("Starting web host");
                 var host = CreateHostBuilder(commandLineArguments).Build();
-                await CreateAndSeedDbIfNotExists(host).ConfigureAwait(false);
+                using var scope = host.Services.CreateScope();
+                var services = scope.ServiceProvider;
+                var webHostEnvironment = services.GetRequiredService<IWebHostEnvironment>();
+                if (webHostEnvironment.IsDevelopment())
+                {
+                    // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
+                    await CreateAndSeedDbIfNotExists(services).ConfigureAwait(false);
+                }
                 host.Run();
                 return 0;
             }
@@ -61,9 +69,10 @@ namespace Metabase
                 .Enrich.WithProperty("Environment", environment)
                 .WriteTo.Console()
                 .WriteTo.File(
-                    "./logs/seri.log",
+                    formatter: new CompactJsonFormatter(),
+                    path: "./logs/serilog.json",
                     fileSizeLimitBytes: 1073741824, // 1 GB
-                    retainedFileCountLimit: 31,
+                    retainedFileCountLimit: 7,
                     rollingInterval: RollingInterval.Day,
                     rollOnFileSizeLimit: true
                     );
@@ -74,12 +83,9 @@ namespace Metabase
         }
 
         public static async Task CreateAndSeedDbIfNotExists(
-            IHost host
+            IServiceProvider services
             )
         {
-            // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
-            using var scope = host.Services.CreateScope();
-            var services = scope.ServiceProvider;
             try
             {
                 using var dbContext =

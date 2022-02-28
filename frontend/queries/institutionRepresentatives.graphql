@@ -1,0 +1,14 @@
+mutation ConfirmInstitutionRepresentative(
+  $institutionId: Uuid!
+  $userId: Uuid!
+) {
+  confirmInstitutionRepresentative(
+    input: { institutionId: $institutionId, userId: $userId }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

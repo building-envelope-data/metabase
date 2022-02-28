@@ -3,7 +3,7 @@ version: '3.3'
 services:
   database: # https://hub.docker.com/_/postgres
     restart: always
-    image: postgres:13.2-alpine
+    image: postgres:13.5-bullseye
     # For possible command-line arguments see
     # https://www.postgresql.org/docs/current/app-postgres.html
     # and for possible configuration parameters like `max_connections` see
@@ -11,6 +11,12 @@ services:
     command: [
       "-c", "max_connections=100"
     ]
+    healthcheck:
+      # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html
+      test: ["CMD-SHELL", "pg_isready --username=postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
@@ -20,25 +26,60 @@ services:
       - data:/var/lib/postgresql/data
       - ./secrets:/run/secrets:ro
 
+  email: # https://hub.docker.com/r/rnwood/smtp4dev
+    restart: always
+    image: rnwood/smtp4dev:v3.1
+    # For all configuration options see
+    # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail --output /dev/null http://email:80 || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - emails:/smtp4dev
+    environment:
+      - ServerOptions__BasePath=/email
+      - ServerOptions__HostName=${HOST}
+      - ServerOptions__Database=database.db
+      - ServerOptions__NumberOfMessagesToKeep=100
+      - ServerOptions__NumberOfSessionsToKeep=100
+      - ServerOptions__TlsMode=None
+      - ServerOptions__TlsCertificate=
+      - RelayOptions__SmtpServer=${RELAY_SMTP_HOST}
+      - RelayOptions__SmtpPort=${RELAY_SMTP_PORT}
+      - RelayOptions__AllowedEmailsString=${RELAY_ALLOWED_EMAILS}
+
   backend:
     restart: always
     build:
       context: ./backend
       dockerfile: ./Dockerfile-production
     # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#command-line
+    # command: ["dotnet", "App.dll", "/Serilog:MinimumLevel:Default=Debug", "/Serilog:MinimumLevel:Microsoft=Debug", "/Serilog:MinimumLevel:Microsoft.Hosting.Lifetime=Debug", "/Serilog:MinimumLevel:Override:Microsoft=Debug", "/Serilog:MinimumLevel:Override:Microsoft.AspNetCore=Debug", "/Serilog:MinimumLevel:Override:System=Debug"]
     command: ["dotnet", "App.dll"]
+    healthcheck:
+      # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
+      test: ["CMD-SHELL", "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=production
       - XBASE_Host=https://${HOST}
       - XBASE_JsonWebToken__EncryptionCertificatePassword=${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD}
       - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
+      - XBASE_Email__SmtpHost=${SMTP_HOST}
+      - XBASE_Email__SmtpPort=${SMTP_PORT}
+      - XBASE_TestlabSolarFacadesHost=${TESTLAB_SOLAR_FACADES_HOST}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
     volumes:
       - backend_logs:/app/logs
       - ./secrets:/run/secrets:ro
     depends_on:
       - database
+      - email
 
   frontend:
     restart: always
@@ -46,6 +87,11 @@ services:
       context: ./frontend
       dockerfile: ./Dockerfile-production
     command: ["yarn", "start"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
     environment:
       - NODE_ENV=production
     depends_on:
@@ -53,11 +99,16 @@ services:
 
   nginx: # https://hub.docker.com/_/nginx
     restart: always
-    image: nginx:1.19.9-alpine
+    image: nginx:1.21
     command: [
       "nginx",
       "-g", "daemon off;"
       ]
+    healthcheck:
+      test: ["CMD-SHELL", "service nginx status || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
     ports:
       - ${HTTP_PORT}:80
     volumes:
@@ -67,7 +118,9 @@ services:
     depends_on:
       - frontend
       - backend
+      - email
 
 volumes:
   data:
+  emails:
   backend_logs:

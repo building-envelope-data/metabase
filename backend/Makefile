@@ -73,8 +73,8 @@ analyze : ## Analyze with Roslynator
 	dotnet tool run roslynator analyze
 .PHONY : analyze
 
-play : ## Run facts in `Test.Play` (semi-alternative to the buggy `dotnet script` REPL)
-	dotnet test --filter "FullyQualifiedName~Test.Play"
+play : ## Run tests in `Metabase.Tests.Play` (semi-alternative to the buggy `dotnet script` REPL)
+	dotnet test --filter "FullyQualifiedName~Metabase.Tests.Play"
 .PHONY : play
 
 # TODO Apply not only to `src` folder but ignore files and directories within .gitignore.
@@ -164,7 +164,10 @@ add-migration : ## Add migration with name `${NAME}`, for example, `make NAME=In
 .PHONY : add-migration
 
 migrate : ## Migrate database
-	dotnet ef database update
+	dotnet ef \
+		--project src/Metabase.csproj \
+		database \
+		update
 .PHONY : migrate
 
 prepare-release : find-latest-migration generate-migration-script switch-migrations ## Prepare release

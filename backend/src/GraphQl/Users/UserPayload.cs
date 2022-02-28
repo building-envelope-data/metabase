@@ -4,7 +4,7 @@ namespace Metabase.GraphQl.Users
 {
     public abstract class UserPayload<TUserError>
       : GraphQl.Payload
-      where TUserError : UserError
+      where TUserError : IUserError
     {
         public Data.User? User { get; }
         public IReadOnlyCollection<TUserError>? Errors { get; }

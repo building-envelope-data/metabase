@@ -1,0 +1,34 @@
+query AllOpticalData(
+  $where: OpticalDataPropositionInput
+  $timestamp: DateTime
+  $locale: Locale
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
+) {
+  allOpticalData(
+    where: $where
+    timestamp: $timestamp
+    locale: $locale
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+  ) {
+    edges {
+      cursor
+      node {
+        ...OpticalDataFields
+      }
+    }
+    nodes {
+      ...OpticalDataFields
+    }
+    totalCount
+    pageInfo {
+      ...PageInfoFields
+    }
+    # TODO timestamp
+  }
+}

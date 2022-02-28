@@ -3,14 +3,17 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Array = System.Array;
 
 // Note that `SignInManager` relies on cookies, see https://github.com/aspnet/Identity/issues/1421. For its source code see https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/SignInManager.cs
@@ -449,7 +452,7 @@ namespace Metabase.GraphQl.Users
             }
             // TODO The confirmation also confirms the registration/account. Should we use another email text then?
             await SendUserEmailConfirmation(
-                input.Email,
+                (user.Name, input.Email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender,
                 appSettings.Host
@@ -472,7 +475,7 @@ namespace Metabase.GraphQl.Users
             if (user is not null)
             {
                 await SendUserEmailConfirmation(
-                    input.Email,
+                    (user.Name, input.Email),
                     await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                     emailSender,
                     appSettings.Host
@@ -500,8 +503,8 @@ namespace Metabase.GraphQl.Users
                 var resetCode = EncodeToken(
                       await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
                       );
-                await emailSender.SendEmailAsync(
-                    input.Email,
+                await emailSender.SendAsync(
+                    (user.Name, input.Email),
                     "Reset password",
                     $"Please reset your password by clicking the link {appSettings.Host}/users/reset-password?resetCode={resetCode}."
                     ).ConfigureAwait(false);
@@ -595,6 +598,67 @@ namespace Metabase.GraphQl.Users
                 }
             }
             return new ResetUserPasswordPayload();
+        }
+
+        [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<DeleteUserPayload> DeleteUserAsync(
+            DeleteUserInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager
+            )
+        {
+            if (!await UserAuthorization.IsAuthorizedToDeleteUsers(
+                    claimsPrincipal,
+                    userManager
+                ).ConfigureAwait(false)
+            )
+            {
+                return new DeleteUserPayload(
+                    new DeleteUserError(
+                      DeleteUserErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to delete user with identifier {input.UserId}.",
+                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                      )
+                    );
+            }
+            var user =
+                await userManager.Users.SingleOrDefaultAsync(_ =>
+                    _.Id == input.UserId
+                ).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new DeleteUserPayload(
+                    new DeleteUserError(
+                      DeleteUserErrorCode.UNKNOWN_USER,
+                      $"Unable to load user with identifier {input.UserId}.",
+                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                      )
+                    );
+            }
+            var identityResult = await userManager.DeleteAsync(user).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<DeleteUserError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Add(
+                        // TODO Which errors can occur here?
+                        error.Code switch
+                        {
+                            _ =>
+                        new DeleteUserError(
+                            DeleteUserErrorCode.UNKNOWN,
+                            $"{error.Description} (error code `{error.Code}`)",
+                            new[] { nameof(input) }
+                            )
+                        }
+                    );
+                }
+                return new DeleteUserPayload(user, errors);
+            }
+            return new DeleteUserPayload(user);
         }
 
         ////////////////////
@@ -1073,6 +1137,7 @@ namespace Metabase.GraphQl.Users
             }
             // TODO Check validity of `input.NewEmail` (use error code `INVALID_EMAIL`)
             await SendChangeUserEmailConfirmation(
+                user.Name,
                 currentEmail,
                 input.NewEmail,
                 await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),
@@ -1105,7 +1170,7 @@ namespace Metabase.GraphQl.Users
                     );
             }
             await SendUserEmailConfirmation(
-                await userManager.GetEmailAsync(user).ConfigureAwait(false),
+                (user.Name, await userManager.GetEmailAsync(user).ConfigureAwait(false)),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender,
                 appSettings.Host
@@ -1310,22 +1375,141 @@ namespace Metabase.GraphQl.Users
             return new SetUserPasswordPayload(user);
         }
 
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<AddUserRolePayload> AddUserRoleAsync(
+            AddUserRoleInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager).ConfigureAwait(false))
+            {
+                return new AddUserRolePayload(
+                    new AddUserRoleError(
+                      AddUserRoleErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to add role {input.Role}.",
+                      Array.Empty<string>()
+                    )
+                );
+            }
+            var user = await context.Users.AsQueryable()
+                .SingleOrDefaultAsync(
+                    x => x.Id == input.UserId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new AddUserRolePayload(
+                    new AddUserRoleError(
+                      AddUserRoleErrorCode.UNKNOWN_USER,
+                      "Unknown user.",
+                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                      )
+                    );
+            }
+            var identityResult = await userManager.AddToRoleAsync(user, Data.Role.EnumToName(input.Role)).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<AddUserRoleError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Add(
+                        // TODO Which error codes occur here? When known, translate the properly into `AddUserRoleErrorCode`.
+                        error.Code switch
+                        {
+                            _ =>
+                                new AddUserRoleError(
+                                    AddUserRoleErrorCode.UNKNOWN,
+                                    $"{error.Description} (error code `{error.Code}`)",
+                                    new[] { nameof(input) }
+                                    )
+                        }
+                    );
+                }
+                return new AddUserRolePayload(user, errors);
+            }
+            return new AddUserRolePayload(user);
+        }
+
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public async Task<RemoveUserRolePayload> RemoveUserRoleAsync(
+            RemoveUserRoleInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager).ConfigureAwait(false))
+            {
+                return new RemoveUserRolePayload(
+                    new RemoveUserRoleError(
+                      RemoveUserRoleErrorCode.UNAUTHORIZED,
+                      $"You are not authorized to remove role {input.Role}.",
+                      Array.Empty<string>()
+                    )
+                );
+            }
+            var user = await context.Users.AsQueryable()
+                .SingleOrDefaultAsync(
+                    x => x.Id == input.UserId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new RemoveUserRolePayload(
+                    new RemoveUserRoleError(
+                      RemoveUserRoleErrorCode.UNKNOWN_USER,
+                      "Unknown user.",
+                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                      )
+                    );
+            }
+            var identityResult = await userManager.RemoveFromRoleAsync(user, Data.Role.EnumToName(input.Role)).ConfigureAwait(false);
+            if (!identityResult.Succeeded)
+            {
+                var errors = new List<RemoveUserRoleError>();
+                foreach (var error in identityResult.Errors)
+                {
+                    errors.Remove(
+                        // TODO Which error codes occur here? When known, translate the properly into `RemoveUserRoleErrorCode`.
+                        error.Code switch
+                        {
+                            _ =>
+                                new RemoveUserRoleError(
+                                    RemoveUserRoleErrorCode.UNKNOWN,
+                                    $"{error.Description} (error code `{error.Code}`)",
+                                    new[] { nameof(input) }
+                                    )
+                        }
+                    );
+                }
+                return new RemoveUserRolePayload(user, errors);
+            }
+            return new RemoveUserRolePayload(user);
+        }
+
         private static async Task SendUserEmailConfirmation(
-            string email,
+            (string name, string address) to,
             string confirmationToken,
             Services.IEmailSender emailSender,
             string host
             )
         {
             var confirmationCode = EncodeToken(confirmationToken);
-            await emailSender.SendEmailAsync(
-                email,
+            await emailSender.SendAsync(
+                to,
                 "Confirm your email",
-                $"Please confirm your email address by clicking the link {host}/users/confirm-email?email={email}&confirmationCode={confirmationCode}.")
+                $"Please confirm your email address by following the link {host}/users/confirm-email?email={to.address}&confirmationCode={confirmationCode}")
                 .ConfigureAwait(false);
         }
 
         private static async Task SendChangeUserEmailConfirmation(
+            string name,
             string currentEmail,
             string newEmail,
             string confirmationToken,
@@ -1334,8 +1518,8 @@ namespace Metabase.GraphQl.Users
         )
         {
             var confirmationCode = EncodeToken(confirmationToken);
-            await emailSender.SendEmailAsync(
-                newEmail,
+            await emailSender.SendAsync(
+                (name, newEmail),
                 "Confirm your email change",
                 $"Please confirm your email address change by clicking the link {host}/users/confirm-email-change?currentEmail={currentEmail}&newEmail={newEmail}&confirmationCode={confirmationCode}.")
                 .ConfigureAwait(false);

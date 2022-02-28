@@ -6,11 +6,28 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Identity;
+using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace Metabase.Data
 {
     public sealed class DbSeeder
     {
+        public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password, Enumerations.UserRole Role)> Users =
+            Role.AllEnum.Select(role => (
+                Role.EnumToName(role),
+                $"{Role.EnumToName(role).ToLower()}@buildingenvelopedata.org",
+                "abcABC123@",
+                role
+            )).ToList().AsReadOnly();
+
+        public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role) AdministratorUser =
+            Users.First(x => x.Role == Enumerations.UserRole.ADMINISTRATOR);
+
+        public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role) VerifierUser =
+            Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
+
         public static async Task DoAsync(
             IServiceProvider services
             )
@@ -19,8 +36,51 @@ namespace Metabase.Data
             logger.LogDebug("Seeding the database");
             var environment = services.GetRequiredService<IWebHostEnvironment>();
             var appSettings = services.GetRequiredService<AppSettings>();
+            await CreateRolesAsync(services, logger).ConfigureAwait(false);
+            await CreateUsersAsync(services, logger).ConfigureAwait(false);
             await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
             await RegisterScopesAsync(services, logger, appSettings).ConfigureAwait(false);
+        }
+
+        private static async Task CreateRolesAsync(
+            IServiceProvider services,
+            ILogger<DbSeeder> logger
+        )
+        {
+            var manager = services.GetRequiredService<RoleManager<Role>>();
+            foreach (var role in Role.AllEnum)
+            {
+                if (await manager.FindByNameAsync(Role.EnumToName(role)).ConfigureAwait(false) is null)
+                {
+                    logger.LogDebug($"Creating role {role}");
+                    await manager.CreateAsync(
+                        new Role(role)
+                        ).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private static async Task CreateUsersAsync(
+            IServiceProvider services,
+            ILogger<DbSeeder> logger
+        )
+        {
+            var manager = services.GetRequiredService<UserManager<User>>();
+            foreach (var (Name, EmailAddress, Password, Role) in Users)
+            {
+                if (await manager.FindByNameAsync(Name).ConfigureAwait(false) is null)
+                {
+                    logger.LogDebug($"Creating user {Name}");
+                    var user = new User(Name, EmailAddress, null, null);
+                    await manager.CreateAsync(
+                        user,
+                        Password
+                        ).ConfigureAwait(false);
+                    var confirmationToken = await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+                    await manager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
+                    await manager.AddToRoleAsync(user, Data.Role.EnumToName(Role)).ConfigureAwait(false);
+                }
+            }
         }
 
         private static async Task RegisterApplicationsAsync(
@@ -35,7 +95,7 @@ namespace Metabase.Data
             {
                 logger.LogDebug("Creating application client 'testlab-solar-facades'");
                 // TODO Do not hardcode URL or at least port in development environment.
-                var host = environment.IsProduction() ? "https://testlab-solar-facades.de" : "https://local.testlab-solar-facades.de:5051";
+                var host = appSettings.TestlabSolarFacadesHost;
                 await manager.CreateAsync(
                     new OpenIddictApplicationDescriptor
                     {

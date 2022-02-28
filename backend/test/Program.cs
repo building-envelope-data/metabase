@@ -1,14 +1,14 @@
+using NUnitLite;
+
 namespace Metabase.Tests
 {
-    public class Program
+    public static class Program
     {
-        public static int Main()
+        public static int Main(
+            string[] commandLineArguments
+        )
         {
-            return Xunit.ConsoleClient.Program.Main(
-                new[] {
-                    typeof(Program).Assembly.Location
-                }
-              );
+            return new AutoRun().Execute(commandLineArguments);
         }
     }
 }

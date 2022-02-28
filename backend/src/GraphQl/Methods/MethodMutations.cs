@@ -30,28 +30,42 @@ namespace Metabase.GraphQl.Methods
             CancellationToken cancellationToken
             )
         {
-            // TODO Authorization! In particular, which developers am I allowed to add?
-            // TODO What if there are no developers (for example because they are not registered). Do we need a manager as for data formats?
-            // if (!await MethodAuthorization.IsAuthorizedToCreateMethodForInstitution(
-            //      claimsPrincipal,
-            //      input.ManagerId,
-            //      userManager,
-            //      context,
-            //      cancellationToken
-            //      ).ConfigureAwait(false)
-            // )
-            // {
-            //     return new CreateMethodPayload(
-            //         new CreateMethodError(
-            //           CreateMethodErrorCode.UNAUTHORIZED,
-            //           "You are not authorized to create components for the institution.",
-            //           new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
-            //         )
-            //     );
-            // }
+            if (!await MethodAuthorization.IsAuthorizedToCreateMethodManagedByInstitution(
+                 claimsPrincipal,
+                 input.ManagerId,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
+            {
+                return new CreateMethodPayload(
+                    new CreateMethodError(
+                      CreateMethodErrorCode.UNAUTHORIZED,
+                      "You are not authorized to create methods for the institution.",
+                      new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
+                    )
+                );
+            }
+            if (!await context.Institutions.AsQueryable()
+            .AnyAsync(
+                x => x.Id == input.ManagerId,
+             cancellationToken: cancellationToken
+             )
+            .ConfigureAwait(false)
+            )
+            {
+                return new CreateMethodPayload(
+                    new CreateMethodError(
+                        CreateMethodErrorCode.UNKNOWN_MANAGER,
+                        "Unknown manager.",
+                      new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
+                    )
+                );
+            }
             var unknownInstitutionDeveloperIds =
                 input.InstitutionDeveloperIds.Except(
-                    await context.Users.AsQueryable()
+                    await context.Institutions.AsQueryable()
                     .Where(x => input.InstitutionDeveloperIds.Contains(x.Id))
                     .Select(x => x.Id)
                     .ToListAsync(cancellationToken)
@@ -118,6 +132,7 @@ namespace Metabase.GraphQl.Methods
                 categories: input.Categories
             )
             { // TODO The below is also used in `DataFormatMutations`. Put into helper!
+                ManagerId = input.ManagerId,
                 Standard =
                     input.Standard is null
                      ? null
@@ -150,7 +165,26 @@ namespace Metabase.GraphQl.Methods
                                 webAddress: input.Publication.WebAddress
                 )
             };
-            ;
+            foreach (var institutionDeveloperId in input.InstitutionDeveloperIds.Distinct())
+            {
+                method.InstitutionDeveloperEdges.Add(
+                    new Data.InstitutionMethodDeveloper
+                    {
+                        InstitutionId = institutionDeveloperId,
+                        Pending = institutionDeveloperId != input.ManagerId
+                    }
+                );
+            }
+            foreach (var userDeveloperId in input.UserDeveloperIds.Distinct())
+            {
+                method.UserDeveloperEdges.Add(
+                    new Data.UserMethodDeveloper
+                    {
+                        UserId = userDeveloperId,
+                        Pending = true
+                    }
+                );
+            }
             context.Methods.Add(method);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new CreateMethodPayload(method);

@@ -30,6 +30,11 @@ client_body_timeout   10;
 client_header_timeout 10;
 send_timeout          10;
 
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  '' close;
+}
+
 upstream backend {
   server backend:8080;
 }
@@ -38,23 +43,28 @@ upstream frontend {
   server frontend:8080;
 }
 
+upstream email {
+  server email:80;
+}
+
 server {
   listen                    *:80;
 
   add_header X-Frame-Options DENY;
   add_header X-Content-Type-Options nosniff; # Secure from MIME-type sniffing: https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#mime-type-sniffing
 
+  set $maintenance 0;
+  if (-f $document_root/maintenance.html) {
+    set $maintenance 1;
+  }
+  if ($internal != 1) {
+    set $maintenance "${maintenance}1";
+  }
+  if ($maintenance = 11) {
+    return 503;
+  }
+
   location / {
-    set $maintenance 0;
-    if (-f $document_root/maintenance.html) {
-      set $maintenance 1;
-    }
-    if ($internal != 1) {
-      set $maintenance "${maintenance}1";
-    }
-    if ($maintenance = 11) {
-      return 503;
-    }
     proxy_pass http://frontend;
     limit_req  zone=one burst=30 nodelay;
   }
@@ -79,8 +89,31 @@ server {
     limit_req  zone=one burst=1 nodelay;
   }
 
+  location /health {
+    proxy_pass http://backend;
+    limit_req  zone=one burst=20 nodelay;
+  }
+
+  location /email {
+    proxy_pass http://email;
+    limit_req  zone=one burst=20 nodelay;
+  }
+
+  location /email/hubs {
+    proxy_pass http://email;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    limit_req  zone=one burst=20 nodelay;
+  }
+
   error_page 503 @maintenance;
   location @maintenance {
+    internal;
+    add_header Retry-After 120 always;
+    default_type application/json;
+    if ($http_accept ~ application/json) {
+      return 503 "{\"errors\": [{\"code\": \"MAINTENANCE\", \"message\": \"We are under maintenance and will be back soon!\", \"path\": []}]}";
+    }
     rewrite ^(.*)$ /maintenance.html break;
   }
 }

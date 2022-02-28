@@ -1,0 +1,18 @@
+mutation verifyInstitution($institutionId: UUID!) {
+  verifyInstitution(input: { institutionId: $institutionId }) {
+    institution {
+      id
+      uuid
+      name
+      abbreviation
+      description
+      websiteLocator
+      state
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

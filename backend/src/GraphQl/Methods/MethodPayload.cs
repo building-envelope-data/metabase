@@ -4,7 +4,7 @@ namespace Metabase.GraphQl.Methods
 {
     public abstract class MethodPayload<TMethodError>
       : Payload
-      where TMethodError : UserError
+      where TMethodError : IUserError
     {
         public Data.Method? Method { get; }
         public IReadOnlyCollection<TMethodError>? Errors { get; }

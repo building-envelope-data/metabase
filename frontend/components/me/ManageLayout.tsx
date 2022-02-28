@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
-import { Skeleton, Layout as AntLayout, Menu } from "antd";
+import { Skeleton, Layout as AntLayout, Menu, Result } from "antd";
 import Layout from "../Layout";
 import paths from "../../paths";
 
@@ -25,7 +25,11 @@ const navItems = [
   },
 ];
 
-const ManageLayout: React.FunctionComponent = ({ children }) => {
+type ManageLayoutProps = {
+  children?: ReactNode;
+};
+
+export default function ManageLayout({ children }: ManageLayoutProps) {
   const router = useRouter();
 
   const { loading, error, data } = useCurrentUserQuery();
@@ -39,12 +43,24 @@ const ManageLayout: React.FunctionComponent = ({ children }) => {
         query: { returnTo: paths.userCurrent },
       });
     }
-  }, [shouldRedirect]);
+  }, [router, shouldRedirect]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <Skeleton active avatar title />
+      </Layout>
+    );
+  }
 
   if (!currentUser) {
     return (
       <Layout>
-        <Skeleton />
+        <Result
+          status="500"
+          title="500"
+          subTitle="Sorry, something went wrong."
+        />
       </Layout>
     );
   }
@@ -82,6 +98,4 @@ const ManageLayout: React.FunctionComponent = ({ children }) => {
       </AntLayout>
     </Layout>
   );
-};
-
-export default ManageLayout;
+}

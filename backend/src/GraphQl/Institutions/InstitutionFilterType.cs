@@ -15,6 +15,7 @@ namespace Metabase.GraphQl.Institutions
             descriptor.Field(x => x.Abbreviation);
             descriptor.Field(x => x.Description);
             descriptor.Field(x => x.WebsiteLocator);
+            descriptor.Field(x => x.State);
         }
     }
 }

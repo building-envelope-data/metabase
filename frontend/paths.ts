@@ -3,6 +3,9 @@ export default {
   legalNotice: "/legal-notice",
   dataProtectionInformation: "/data-protection-information",
   databases: "/databases",
+  database(uuid: string) {
+    return `/databases/${encodeURIComponent(uuid)}`;
+  },
   institutions: "/institutions",
   institution(uuid: string) {
     return `/institutions/${encodeURIComponent(uuid)}`;
@@ -15,6 +18,7 @@ export default {
   userCurrent: "me",
   me: {
     manage: {
+      home: "/me/manage",
       profile: "/me/manage/profile",
       email: "/me/manage/email",
       changePassword: "/me/manage/change-password",
@@ -44,5 +48,10 @@ export default {
   component(uuid: string) {
     return `/components/${encodeURIComponent(uuid)}`;
   },
+  data: "/data",
+  calorimetricData: "/data/calorimetric",
+  hygrothermalData: "/data/hygrothermal",
+  opticalData: "/data/optical",
+  photovoltaicData: "/data/photovoltaic",
   openIdConnect: "/openIdConnect",
 };

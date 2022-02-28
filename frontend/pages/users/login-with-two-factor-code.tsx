@@ -23,9 +23,8 @@ function LoginWithTwoFactorCode() {
   const returnTo = router.query.returnTo;
   const rememberMe = router.query.rememberMe;
   const apolloClient = initializeApollo();
-  const [
-    loginUserWithTwoFactorCodeMutation,
-  ] = useLoginUserWithTwoFactorCodeMutation();
+  const [loginUserWithTwoFactorCodeMutation] =
+    useLoginUserWithTwoFactorCodeMutation();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -128,7 +127,7 @@ function LoginWithTwoFactorCode() {
                 >
                   Login
                 </Button>
-                Don't have access to your authenticator device? You can{" "}
+                Don&apos;t have access to your authenticator device? You can{" "}
                 <Link
                   href={{
                     pathname: paths.userLoginWithRecoveryCode,

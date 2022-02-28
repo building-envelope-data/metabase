@@ -16,7 +16,7 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsAtLeastMaintainer(
+            return CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
                 claimsPrincipal,
                 institutionId,
                 userManager,

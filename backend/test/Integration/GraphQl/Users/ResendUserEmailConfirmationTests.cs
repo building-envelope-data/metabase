@@ -1,20 +1,24 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class ResendUserEmailConfirmationTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task ExistingEmailAddress_ResendsUserEmailConfirmation()
         {
             // Arrange
+            var name = "John Doe";
             var email = "john.doe@ise.fraunhofer.de";
-            await RegisterUser(email: email).ConfigureAwait(false);
+            await RegisterUser(
+                name: name,
+                email: email
+                ).ConfigureAwait(false);
             EmailSender.Clear();
             // Act
             var response = await ResendUserEmailConfirmation(
@@ -23,13 +27,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Assert
             Snapshot.Match(response);
             EmailsShouldContainSingle(
-                address: email,
+                to: (name, email),
                 subject: "Confirm your email",
-                messageRegEx: @"^Please confirm your email address by clicking the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+\.$"
+                bodyRegEx: @"^Please confirm your email address by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task UnknownEmailAddress_DoesNothing()
         {
             // Arrange

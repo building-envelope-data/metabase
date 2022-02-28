@@ -8,7 +8,6 @@ namespace Metabase.GraphQl.Institutions
           string? Abbreviation,
           string Description,
           Uri? WebsiteLocator,
-          string? PublicKey,
-          Enumerations.InstitutionState State
+          string? PublicKey
         );
 }

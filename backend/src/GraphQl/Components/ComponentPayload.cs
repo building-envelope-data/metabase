@@ -4,7 +4,7 @@ namespace Metabase.GraphQl.Components
 {
     public abstract class ComponentPayload<TComponentError>
       : Payload
-      where TComponentError : UserError
+      where TComponentError : IUserError
     {
         public Data.Component? Component { get; }
         public IReadOnlyCollection<TComponentError>? Errors { get; }

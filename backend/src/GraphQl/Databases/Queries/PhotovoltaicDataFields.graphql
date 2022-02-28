@@ -1,0 +1,4 @@
+fragment PhotovoltaicDataFields on PhotovoltaicData {
+  id
+  ...DataFields
+}

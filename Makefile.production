@@ -8,6 +8,8 @@ docker_compose = \
 		--file docker-compose.production.yml \
 		--project-name ${NAME}
 
+dump_archive_name = postgresql_dumpall.gz
+
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
 	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
@@ -16,7 +18,7 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name : ## Print value of variable `name`
+name : ## Print value of variable `${NAME}`
 	@echo ${NAME}
 .PHONY : name
 
@@ -53,30 +55,42 @@ exec : up ## Execute the one-time command `${COMMAND}` against an existing `${CO
 execb : CONTAINER = backend
 execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
 
-shellb : COMMAND = ash
+shellb : COMMAND = bash
 shellb : execb ## Enter shell in a running `backend` container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
 .PHONY : shellb
+
+list : ## List all containers with health status
+	${docker_compose} ps \
+		--no-trunc \
+		--all
+.PHONY : list
+
+list-services : ## List all services specified in the docker-compose file (used by Monit as configured in the `machine` project)
+	${docker_compose} config \
+		--services
+.PHONY : list-services
 
 createdb : ## Create database
 	${docker_compose} run \
 		--name create_${NAME}_database \
 		--detach \
 		database
+	while [ $$(docker inspect -f {{.State.Health.Status}} create_${NAME}_database) != "healthy" ]; do sleep 1; done
 	docker exec \
 		create_${NAME}_database \
 		createdb \
 			--username postgres \
 			xbase
 	docker container stop create_${NAME}_database
-	docker container rm create_${NAME}_database
+	docker container rm --volumes create_${NAME}_database
 .PHONY : createdb
 
 psql : ## Enter PostgreSQL interactive terminal in the running `database` service
 	${docker_compose} exec \
 		database \
 		psql \
-		--username postgres \
-		--dbname xbase
+		--username=postgres \
+		--dbname=xbase
 .PHONY : psql
 
 # TODO The entrypoint file of the PostgreSQL image uses the file refered to by `POSTGRES_PASSWORD_FILE` and this file needs to be accessible by `other`. Why? We do not want all people to be able to read secrets!
@@ -117,35 +131,53 @@ docker-stats : ## Show Docker run-time metrics
 
 # Backup with `pg_dumpall`: https://www.postgresql.org/docs/13/backup-dump.html#BACKUP-DUMP-ALL
 # Command `pg_dumpall`: https://www.postgresql.org/docs/13/app-pg-dumpall.html
-backup : ## Backup databases to file with path `${DUMP_FILE}`, for example, `make --file Makefile.production DUMP_FILE=/app/data/backups/dump_$(date +"%Y-%m-%d_%H_%M_%S").gz backup`
+backup : ## Backup database and related data to directory with absolute path `${BACKUP_DIRECTORY}`, for example, `make --file Makefile.production BACKUP_DIRECTORY=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S")/ backup`
+	mkdir --parents ${BACKUP_DIRECTORY}
 	${docker_compose} run \
 		--name backup_${NAME}_database \
 		--detach \
 		database
+	while [ $$(docker inspect -f {{.State.Health.Status}} backup_${NAME}_database) != "healthy" ]; do sleep 1; done
 	docker exec \
 		backup_${NAME}_database \
 		pg_dumpall \
 			--clean \
 			--username=postgres \
 		| gzip \
-		> ${DUMP_FILE}
+		> ${BACKUP_DIRECTORY}/${dump_archive_name}
 	docker container stop backup_${NAME}_database
-	docker container rm backup_${NAME}_database
+	docker container rm --volumes backup_${NAME}_database
 .PHONY : backup
 
-restore : ## Restore databases from file with path `${DUMP_FILE}`, for example, `make --file Makefile.production DUMP_FILE=/app/data/backups/dump_2021-04-22_15_43_35.gz restore`
+# Inspired by https://stackoverflow.com/questions/25785/delete-all-but-the-most-recent-x-files-in-bash/34862475#34862475
+prune-backups : ## Keep the most recent 7 backups, delete the rest
+	cd /app/data/backups && \
+		ls -t --indicator-style=slash \
+		| grep '/$$' \
+		| tail --lines=+8 \
+		| xargs \
+			--delimiter='\n' \
+			--no-run-if-empty \
+			rm --recursive --dir --
+.PHONY : prune-backups
+
+restore : ## Restore database and related data from directory with absolute path `${BACKUP_DIRECTORY}`, for example, `make --file Makefile.production BACKUP_DIRECTORY=/app/data/backups/2021-04-22_15_43_35/ restore`
 	${docker_compose} run \
 		--name restore_${NAME}_database \
 		--detach \
 		database
-	gunzip --stdout ${DUMP_FILE} \
+	while [ $$(docker inspect -f {{.State.Health.Status}} restore_${NAME}_database) != "healthy" ]; do sleep 1; done
+	gunzip --stdout ${BACKUP_DIRECTORY}/${dump_archive_name} \
 	| docker exec \
+		--interactive \
 		restore_${NAME}_database \
 		psql \
+			--echo-all \
+			--file=- \
 			--username=postgres \
-			postgres
+			--dbname=postgres
 	docker container stop restore_${NAME}_database
-	docker container rm restore_${NAME}_database
+	docker container rm --volumes restore_${NAME}_database
 .PHONY : restore
 
 begin-maintenance : ## Begin maintenance
@@ -158,27 +190,13 @@ end-maintenance : ## End maintenance
 	rm ./nginx/html/maintenance.html
 .PHONY : end-maintenance
 
-# TODO Reboot when file `/var/run/reboot-required` exists
-# TODO Shall we use `apt` for system upgrades? See https://www.cyberciti.biz/faq/ansible-apt-update-all-packages-on-ubuntu-debian-linux/ and https://www.redpill-linpro.com/sysadvent/2017/12/24/ansible-system-updates.html
-# TODO Shall we only run `apt-get upgrade` daily and only once in a while `apt-get dist-upgrade`?
-# TODO Run this command daily but __not__ within a cron job!
-upgrade-system : ## Upgrade system
-	make --file Makefile.production begin-maintenance
-	sudo apt-get --assume-yes update
-	sudo apt-get --assume-yes dist-upgrade
-	sudo apt-get --assume-yes auto-remove
-	sudo apt-get --assume-yes clean
-	sudo apt-get --assume-yes auto-clean
-	make --file Makefile.production end-maintenance
-.PHONY : upgrade-system
-
-deploy : DUMP_FILE = ./backup.gz
+deploy : BACKUP_DIRECTORY = $(shell pwd)/backup/
 deploy : begin-maintenance store-commit backup fetch-all checkout-target migrate deploy-services run-tests end-maintenance ## Deploy tag, branch, or commit `${TARGET}`, for example, `make --file Makefile.production TARGET=v1.0.0 deploy`
 .PHONY : deploy
 
 rollback : TARGET = $(shell cat ./commit)
-rollback : DUMP_FILE = ./backup.gz
-rollback : begin-maintenance checkout-target restore deploy-services run-tests end-maintenance ## Rollback deployment attempt (use commit hash stored in `./commit` and database backup stored in `./backup.gz`)
+rollback : BACKUP_DIRECTORY = $(shell pwd)/backup/
+rollback : begin-maintenance checkout-target restore deploy-services run-tests end-maintenance ## Rollback deployment attempt (use commit hash stored in `./commit` and database backup stored in `./backup/`)
 .PHONY : rollback
 
 store-commit : ## Store current commit
@@ -196,23 +214,32 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 
 migrate : FROM = $(file < ./backend/src/Migrations/previous)
 migrate : TO = $(file < ./backend/src/Migrations/current)
-migrate : ## Migrate database
+migrate : ## Migrate database (note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
+	${docker_compose} run \
+		--name migrate_${NAME}_database \
+		--detach \
+		database
+	while [ $$(docker inspect -f {{.State.Health.Status}} migrate_${NAME}_database) != "healthy" ]; do sleep 1; done
 	cat ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql \
-	| ${docker_compose} run \
-		--rm \
-		-T \
-		database \
+	| docker exec \
+		--interactive \
+		migrate_${NAME}_database \
 		psql \
+			--echo-all \
+			--file=- \
 			--username=postgres \
-			postgres
+			--dbname=xbase
+	docker container stop migrate_${NAME}_database
+	docker container rm --volumes migrate_${NAME}_database
 .PHONY : migrate
 
 # Note that NGINX is because of its dependencies taken down and up last and in
 # one go so the maintenance page is only down very shortly.
 deploy-services : ## Deploy services
 	${docker_compose} pull
+	${docker_compose} build \
+		--pull
 	${docker_compose} up \
-		--build \
 		--force-recreate \
 		--renew-anon-volumes \
 		--remove-orphans \

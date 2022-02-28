@@ -10,14 +10,16 @@ namespace Metabase.GraphQl.Components
     {
         public ComponentManufacturersByComponentIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
+                options,
                 dbContextFactory,
                 (dbContext, ids) =>
                     dbContext.ComponentManufacturers.AsQueryable().Where(x =>
-                        ids.Contains(x.ComponentId)
+                        !x.Pending && ids.Contains(x.ComponentId)
                     ),
                 x => x.ComponentId
                 )

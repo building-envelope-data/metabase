@@ -8,7 +8,7 @@ section_separator="---------------------------------------------------"
 paragraph_separator="- - - - - - - - - - - - - - - - - - - - - - - - - -"
 
 metabase_graphql_url="https://local.buildingenvelopedata.org:4041/graphql/"
-ise_graphql_url="https://local.testlab-solar-facades.de:4051/graphql/"
+ise_graphql_url="https://local.solarbuildingenvelopes.com:4051/graphql/"
 lbnl_graphql_url="https://local.lbnl.gov:4061/graphql/"
 
 function echo_error() {

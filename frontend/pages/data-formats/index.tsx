@@ -1,41 +1,44 @@
+import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
-import { Table, message } from "antd";
+import { Typography } from "antd";
 import { useDataFormatsQuery } from "../../queries/dataFormats.graphql";
+import { useEffect } from "react";
+import Link from "next/link";
+import paths from "../../paths";
+import { DataFormatTable } from "../../components/dataFormats/DataFormatTable";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
-function Index() {
+function Page() {
   const { loading, error, data } = useDataFormatsQuery();
 
-  if (error) {
-    message.error(error);
-  }
+  useEffect(() => {
+    if (error) {
+      messageApolloError(error);
+    }
+  }, [error]);
 
   return (
     <Layout>
-      <Table
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        <Link href={paths.data}>Data</Link> is shared as resources. Each
+        resource has one of the following data formats:
+      </Typography.Paragraph>
+      <DataFormatTable
         loading={loading}
-        columns={[
-          {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-          },
-          {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-          },
-          {
-            title: "Media Type",
-            dataIndex: "mediaType",
-            key: "mediaType",
-          },
-        ]}
-        dataSource={data?.dataFormats?.nodes || []}
+        dataFormats={data?.dataFormats?.nodes || []}
       />
+      <Typography.Paragraph style={{ maxWidth: 768 }}>
+        The{" "}
+        <Typography.Link
+          href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+        >
+          GraphQL endpoint
+        </Typography.Link>{" "}
+        provides all information about data formats.
+      </Typography.Paragraph>
     </Layout>
   );
 }
 
-export default Index;
+export default Page;

@@ -13,6 +13,59 @@ query Users {
   }
 }
 
+query User($uuid: Uuid!) {
+  user(uuid: $uuid) {
+    id
+    uuid
+    name
+    email
+    phoneNumber
+    websiteLocator
+    roles
+    rolesCurrentUserCanAdd
+    rolesCurrentUserCanRemove
+    canCurrentUserDeleteUser
+    developedMethods {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    pendingDevelopedMethods: developedMethods(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+      canCurrentUserConfirmEdge
+    }
+    representedInstitutions {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    pendingRepresentedInstitutions: representedInstitutions(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+      canCurrentUserConfirmEdge
+    }
+  }
+}
+
 mutation RegisterUser(
   $name: String!
   $email: String!
@@ -100,6 +153,36 @@ mutation ResetUserPassword(
       resetCode: $resetCode
     }
   ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteUser($userId: Uuid!) {
+  deleteUser(input: { userId: $userId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation AddUserRole($userId: Uuid!, $role: UserRole!) {
+  addUserRole(input: { userId: $userId, role: $role }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RemoveUserRole($userId: Uuid!, $role: UserRole!) {
+  removeUserRole(input: { userId: $userId, role: $role }) {
     errors {
       code
       message

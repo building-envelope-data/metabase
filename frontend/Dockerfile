@@ -1,7 +1,7 @@
 # Inspired by https://mherman.org/blog/dockerizing-a-react-app/
 
 # https://hub.docker.com/_/node
-FROM node:14.16.0-alpine3.13
+FROM node:16.13-bullseye-slim
 
 ARG GROUP_ID
 ARG USER_ID
@@ -17,12 +17,22 @@ ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
 
 # `ca-certificates` is needed to run `update-ca-certificates`
 # `openssl` is needed to debug SSL certificates
+# For best practices on using `apt-get` see
+# https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
 RUN \
-  apk add --no-cache \
+  apt-get update && \
+  apt-get install \
+    --yes \
+    --no-install-recommends \
     ca-certificates \
     dumb-init \
     make \
-    openssl
+    openssl \
+    wget && \
+  rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
 
 COPY \
   ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.crt \
@@ -51,6 +61,6 @@ COPY \
 COPY \
   --chown=node:node \
   ./yarn.lock ./
-RUN yarn install
+RUN yarn install --pure-lockfile
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]

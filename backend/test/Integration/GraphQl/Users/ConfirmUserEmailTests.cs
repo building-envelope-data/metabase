@@ -1,15 +1,15 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class ConfirmUserEmailTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task ValidDataWithConfirmationCodeFromRegistrationEmail_ConfirmsUserEmail()
         {
             // Arrange
@@ -30,7 +30,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task ValidDataWithConfirmationCodeFromResendUserEmailConfirmation_ConfirmsUserEmail()
         {
             // Arrange
@@ -55,7 +55,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task ValidDataWithConfirmationCodeFromResendUserEmailVerification_ConfirmsUserEmail()
         {
             // Arrange
@@ -78,7 +78,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task ResentUserEmailConfirmation_ContainsValidCode()
         {
             // Arrange
@@ -102,8 +102,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             );
         }
 
-
-        [Fact]
+        [Test]
         public async Task UnknownUser_IsUserError()
         {
             // Arrange
@@ -119,7 +118,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             Snapshot.Match(response);
         }
 
-        [Fact]
+        [Test]
         public async Task InvalidConfirmationCode_IsUserError()
         {
             // Arrange

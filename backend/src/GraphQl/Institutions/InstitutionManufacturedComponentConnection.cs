@@ -10,13 +10,15 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionManufacturedComponentConnection
-        : Connection<Data.Institution, Data.ComponentManufacturer, InstitutionManufacturedComponentsByInstitutionIdDataLoader, InstitutionManufacturedComponentEdge>
+        : ForkingConnection<Data.Institution, Data.ComponentManufacturer, PendingInstitutionManufacturedComponentsByInstitutionIdDataLoader, InstitutionManufacturedComponentsByInstitutionIdDataLoader, InstitutionManufacturedComponentEdge>
     {
         public InstitutionManufacturedComponentConnection(
-            Data.Institution institution
+            Data.Institution institution,
+            bool pending
         )
             : base(
                 institution,
+                pending,
                 x => new InstitutionManufacturedComponentEdge(x)
                 )
         {
@@ -32,6 +34,24 @@ namespace Metabase.GraphQl.Institutions
         )
         {
             return ComponentAuthorization.IsAuthorizedToCreateComponentForInstitution(
+                 claimsPrincipal,
+                 Subject.Id,
+                 userManager,
+                 context,
+                 cancellationToken
+                 );
+        }
+
+        [UseDbContext(typeof(Data.ApplicationDbContext))]
+        [UseUserManager]
+        public Task<bool> CanCurrentUserConfirmEdgeAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [ScopedService] UserManager<Data.User> userManager,
+            [ScopedService] Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return ComponentManufacturerAuthorization.IsAuthorizedToConfirm(
                  claimsPrincipal,
                  Subject.Id,
                  userManager,

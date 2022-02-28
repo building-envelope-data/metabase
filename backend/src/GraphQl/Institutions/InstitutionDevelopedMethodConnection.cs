@@ -10,13 +10,15 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionDevelopedMethodConnection
-        : Connection<Data.Institution, Data.InstitutionMethodDeveloper, InstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodEdge>
+        : ForkingConnection<Data.Institution, Data.InstitutionMethodDeveloper, PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodEdge>
     {
         public InstitutionDevelopedMethodConnection(
-            Data.Institution institution
+            Data.Institution institution,
+            bool pending
         )
             : base(
                 institution,
+                pending,
                 x => new InstitutionDevelopedMethodEdge(x)
                 )
         {
@@ -24,14 +26,14 @@ namespace Metabase.GraphQl.Institutions
 
         [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
-        public Task<bool> CanCurrentUserAddEdgeAsync(
+        public Task<bool> CanCurrentUserConfirmEdgeAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [ScopedService] UserManager<Data.User> userManager,
             [ScopedService] Data.ApplicationDbContext context,
             CancellationToken cancellationToken
         )
         {
-            return MethodAuthorization.IsAuthorizedToCreateMethodForInstitution(
+            return InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(
                  claimsPrincipal,
                  Subject.Id,
                  userManager,

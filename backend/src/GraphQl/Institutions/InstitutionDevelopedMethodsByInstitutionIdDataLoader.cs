@@ -10,14 +10,16 @@ namespace Metabase.GraphQl.Institutions
     {
         public InstitutionDevelopedMethodsByInstitutionIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
+                options,
                 dbContextFactory,
                 (dbContext, ids) =>
                     dbContext.InstitutionMethodDevelopers.AsQueryable().Where(x =>
-                        ids.Contains(x.InstitutionId)
+                        !x.Pending && ids.Contains(x.InstitutionId)
                     ),
                 x => x.InstitutionId
                 )

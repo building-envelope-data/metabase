@@ -4,7 +4,7 @@ namespace Metabase.GraphQl.Databases
 {
     public abstract class DatabasePayload<TDatabaseError>
       : Payload
-      where TDatabaseError : UserError
+      where TDatabaseError : IUserError
     {
         public Data.Database? Database { get; }
         public IReadOnlyCollection<TDatabaseError>? Errors { get; }

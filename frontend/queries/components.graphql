@@ -1,10 +1,89 @@
+fragment ComponentPartial on Component {
+  id
+  uuid
+  name
+  abbreviation
+  description
+  categories
+  availability {
+    from
+    to
+  }
+}
+
 query Components {
   components {
     nodes {
-      id
-      uuid
-      name
-      description
+      ...ComponentPartial
+    }
+  }
+}
+
+query Component($uuid: Uuid!) {
+  component(uuid: $uuid) {
+    id
+    uuid
+    name
+    abbreviation
+    description
+    categories
+    availability {
+      from
+      to
+    }
+    manufacturers {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    assembledOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    partOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    concretizationOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    generalizationOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+    }
+    variantOf {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
     }
   }
 }
@@ -14,9 +93,14 @@ mutation CreateComponent(
   $abbreviation: String
   $description: String!
   $categories: [ComponentCategory!]!
-  $availableFrom: DateTime
-  $availableTo: DateTime
+  $availability: OpenEndedDateTimeRangeInput
   $manufacturerId: Uuid!
+  $furtherManufacturerIds: [Uuid!]!
+  $assembledOfIds: [Uuid!]!
+  $partOfIds: [Uuid!]!
+  $concretizationOfIds: [Uuid!]!
+  $generalizationOfIds: [Uuid!]!
+  $variantOfIds: [Uuid!]!
 ) {
   createComponent(
     input: {
@@ -24,21 +108,18 @@ mutation CreateComponent(
       abbreviation: $abbreviation
       description: $description
       categories: $categories
-      availability: { from: $availableFrom, to: $availableTo }
+      availability: $availability
       manufacturerId: $manufacturerId
+      furtherManufacturerIds: $furtherManufacturerIds
+      assembledOfIds: $assembledOfIds
+      partOfIds: $partOfIds
+      concretizationOfIds: $concretizationOfIds
+      generalizationOfIds: $generalizationOfIds
+      variantOfIds: $variantOfIds
     }
   ) {
     component {
-      id
-      uuid
-      name
-      abbreviation
-      description
-      categories
-      availability {
-        from
-        to
-      }
+      ...ComponentPartial
     }
     errors {
       code

@@ -18,13 +18,13 @@ namespace Metabase.Tests.Integration
     public sealed class CustomWebApplicationFactory
       : WebApplicationFactory<Startup>
     {
+        private bool _disposed = false;
+
         public CollectingEmailSender EmailSender { get; }
-        public CollectingSmsSender SmsSender { get; }
 
         public CustomWebApplicationFactory()
         {
             EmailSender = new CollectingEmailSender();
-            SmsSender = new CollectingSmsSender();
             Do(
                 services =>
                     SetUpDatabase(services.GetRequiredService<Data.ApplicationDbContext>())
@@ -89,16 +89,6 @@ namespace Metabase.Tests.Integration
                         serviceCollection.Remove(emailSenderServiceDescriptor);
                     }
                     serviceCollection.AddTransient<Services.IEmailSender>(_ => EmailSender);
-                    // Configure `ISmsSender`
-                    var smsSenderServiceDescriptor =
-                    serviceCollection.SingleOrDefault(d =>
-                     d.ServiceType == typeof(Services.ISmsSender)
-                        );
-                    if (smsSenderServiceDescriptor is not null)
-                    {
-                        serviceCollection.Remove(smsSenderServiceDescriptor);
-                    }
-                    serviceCollection.AddTransient<Services.ISmsSender>(_ => SmsSender);
                 }
             );
         }
@@ -123,18 +113,26 @@ namespace Metabase.Tests.Integration
             ).ConfigureAwait(false);
         }
 
-        public new void Dispose()
+        // https://docs.microsoft.com/en-us/dotnet/standard/managed-code
+        // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose
+        ~CustomWebApplicationFactory() => Dispose(false);
+
+        protected override void Dispose(bool disposing)
         {
-            Do(
-                services =>
-                    {
-                        services
-                        .GetRequiredService<Data.ApplicationDbContext>()
-                        .Database
-                        .EnsureDeleted();
-                    }
-            );
-            base.Dispose();
+            if (!_disposed)
+            {
+                Do(
+                    services =>
+                        {
+                            services
+                            .GetRequiredService<Data.ApplicationDbContext>()
+                            .Database
+                            .EnsureDeleted();
+                        }
+                );
+                _disposed = true;
+            }
+            base.Dispose(disposing);
         }
     }
 }

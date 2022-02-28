@@ -23,23 +23,27 @@ namespace Metabase.Tests.Integration
             _emails.Clear();
         }
 
-        public Task SendEmailAsync(string address, string subject, string message)
+        public Task SendAsync(
+            (string name, string address) to,
+            string subject,
+            string body
+        )
         {
             _emails.Add(
                 new Email
                 (
-                    Address: address,
+                    To: to,
                     Subject: subject,
-                    Message: message
+                    Body: body
                  )
             );
             return Task.FromResult(0);
         }
 
         public record Email(
-            string Address,
+            (string name, string address) To,
             string Subject,
-            string Message
+            string Body
         );
     }
 }

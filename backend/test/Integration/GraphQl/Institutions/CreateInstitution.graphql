@@ -2,9 +2,9 @@ mutation createInstitution(
   $name: String!
   $abbreviation: String
   $description: String!
-  $ownerIds: [Uuid!]!
-  $websiteLocator: Url
-  $state: InstitutionState!
+  $ownerIds: [UUID!]!
+  $managerId: UUID
+  $websiteLocator: URL
 ) {
   createInstitution(
     input: {
@@ -12,8 +12,8 @@ mutation createInstitution(
       abbreviation: $abbreviation
       description: $description
       ownerIds: $ownerIds
+      managerId: $managerId
       websiteLocator: $websiteLocator
-      state: $state
     }
   ) {
     institution {
@@ -23,7 +23,6 @@ mutation createInstitution(
       abbreviation
       description
       websiteLocator
-      state
     }
     errors {
       code

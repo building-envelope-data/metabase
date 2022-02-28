@@ -1,0 +1,14 @@
+mutation ConfirmComponentManufacturer(
+  $componentId: Uuid!
+  $institutionId: Uuid!
+) {
+  confirmComponentManufacturer(
+    input: { componentId: $componentId, institutionId: $institutionId }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

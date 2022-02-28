@@ -1,61 +1,87 @@
-import { useCurrentUserQuery } from "../queries/currentUser.graphql";
 import Layout from "../components/Layout";
-import { Skeleton, Typography } from "antd";
+import { Typography } from "antd";
+import Link from "next/link";
+import paths from "../paths";
+import Image from "next/image";
+import overviewImage from "../public/overview.png";
 
-const Index = () => {
-  const { loading, error, data } = useCurrentUserQuery();
-  const currentUser = data?.currentUser;
-  // const shouldRedirect = !(loading || error || currentUser)
-
-  // useEffect(() => {
-  //   if (shouldRedirect) {
-  //     router.push('/login')
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [shouldRedirect])
-
-  if (loading) {
-    return (
-      <Layout>
-        <Skeleton />
-      </Layout>
-    );
-  }
-
-  if (error) {
-    return (
-      <Layout>
-        <p>{error.message}</p>
-      </Layout>
-    );
-  }
-
-  if (currentUser) {
-    return (
-      <Layout>
+function Page() {
+  return (
+    <Layout>
+      <div style={{ maxWidth: 768 }}>
         <Typography.Paragraph>
-          You're signed in as {currentUser.name}, your email address it{" "}
-          {currentUser.email}, and your UUID is {currentUser.uuid}.
+          <Link href={paths.home}>buildingenvelopedata.org</Link> offers you
+          access to a network of <Link href={paths.databases}>databases</Link>.
+          It contains detailed <Link href={paths.data}>optical data</Link> for
+          thousands of building envelope{" "}
+          <Link href={paths.components}>components</Link> and can be used for
+          example to calculate the energy performance of buildings. The{" "}
+          <Link href={paths.data}>data</Link> is ready to be used by software
+          companies and advanced engineering offices.
         </Typography.Paragraph>
-      </Layout>
-    );
-  }
+        <Typography.Paragraph>
+          This website offers an overview of the{" "}
+          <Link href={paths.components}>components</Link> for which{" "}
+          <Link href={paths.data}>data</Link> is available and the{" "}
+          <Link href={paths.databases}>databases</Link> of the network. It can
+          also be used to search for <Link href={paths.data}>data</Link> in all{" "}
+          <Link href={paths.databases}>databases</Link>. In order to identify{" "}
+          <Link href={paths.institutions}>institutions</Link>,{" "}
+          <Link href={paths.dataFormats}>data formats</Link> and{" "}
+          <Link href={paths.methods}>methods</Link> across the{" "}
+          <Link href={paths.databases}>databases</Link>, they are managed by a
+          metabase together with the{" "}
+          <Link href={paths.components}>components</Link> and{" "}
+          <Link href={paths.databases}>databases</Link>. This website is the
+          front end of the metabase.
+        </Typography.Paragraph>
+        <Typography.Paragraph>
+          The metabase can be queried through its{" "}
+          <Typography.Link
+            href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+          >
+            GraphQL endpoint
+          </Typography.Link>
+          . This is the most powerful way to query all{" "}
+          <Link href={paths.databases}>databases</Link>. It is well suited to be
+          used by software. The tabs of this website can offer only a part of
+          the functions of the{" "}
+          <Typography.Link
+            href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+          >
+            GraphQL endpoint
+          </Typography.Link>
+          .
+        </Typography.Paragraph>
+        <Typography.Paragraph>
+          With{" "}
+          <Typography.Link
+            href={paths.dataFormat("9ca9e8f5-94bf-4fdd-81e3-31a58d7ca708")}
+          >
+            BED-JSON
+          </Typography.Link>
+          , <Link href={paths.home}>buildingenvelopedata.org</Link> offers a
+          general format for optical, calorimetric and photovoltaic data sets.
+          It is defined by the JSON Schemas of the{" "}
+          <Typography.Link href="https://github.com/building-envelope-data/api">
+            buildingenvelopedata.org API specification
+          </Typography.Link>
+          . Other data formats are as well available. The{" "}
+          <Typography.Link href="https://github.com/building-envelope-data/metabase">
+            source code
+          </Typography.Link>{" "}
+          of the metabase is available at{" "}
+          <Typography.Link href="https://github.com">GitHub</Typography.Link>.
+        </Typography.Paragraph>
+        <Image
+          width={1619}
+          height={724}
+          src={overviewImage}
+          alt="Schematic depiction of how users like architects, planners, or engineers can use the metabase to find products and data in and across databases."
+        />
+      </div>
+    </Layout>
+  );
+}
 
-  return <Layout>You're not sigend in.</Layout>;
-};
-
-// export async function getStaticProps() {
-//   const apolloClient = initializeApollo()
-
-//   await apolloClient.query({
-//     query: CurrentUserDocument,
-//   })
-
-//   return {
-//     props: {
-//       initialApolloState: apolloClient.cache.extract(),
-//     },
-//   }
-// }
-
-export default Index;
+export default Page;

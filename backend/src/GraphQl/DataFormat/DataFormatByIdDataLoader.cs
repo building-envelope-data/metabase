@@ -1,5 +1,5 @@
 using GreenDonut;
-using Metabase.GraphQl.Entitys;
+using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.DataFormats
@@ -9,10 +9,12 @@ namespace Metabase.GraphQl.DataFormats
     {
         public DataFormatByIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
+                options,
                 dbContextFactory,
                 dbContext => dbContext.DataFormats
                 )

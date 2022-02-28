@@ -1,11 +1,12 @@
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
 import { useRegisterUserMutation } from "../../queries/users.graphql";
-import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
+import { Alert, Form, Input, Button, Row, Col, Card, Typography } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
+import Link from "next/link";
 
 const layout = {
   labelCol: { span: 8 },
@@ -87,6 +88,17 @@ function Register() {
       <Row justify="center">
         <Col>
           <Card title="Register">
+            <Typography.Paragraph style={{ maxWidth: 768 }}>
+              No account is needed to query the{" "}
+              <Link href={paths.data}>data</Link> for free! However, if you want
+              to change information about{" "}
+              <Link href={paths.institutions}>institutions</Link>,{" "}
+              <Link href={paths.dataFormats}>data formats</Link>,{" "}
+              <Link href={paths.methods}>methods</Link>,{" "}
+              <Link href={paths.components}>components</Link> or{" "}
+              <Link href={paths.databases}>databases</Link>, you can register
+              here.
+            </Typography.Paragraph>
             {/* TODO Display error messages in a list? */}
             {globalErrorMessages.length > 0 ? (
               <Alert type="error" message={globalErrorMessages.join(" ")} />
@@ -172,6 +184,15 @@ function Register() {
                 </Button>
               </Form.Item>
             </Form>
+            <Typography.Paragraph style={{ maxWidth: 768 }}>
+              With sufficient privileges, the{" "}
+              <Typography.Link
+                href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
+              >
+                GraphQL endpoint
+              </Typography.Link>{" "}
+              can also be used to register users.
+            </Typography.Paragraph>
           </Card>
         </Col>
       </Row>

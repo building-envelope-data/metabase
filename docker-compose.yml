@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   database: # https://hub.docker.com/_/postgres
-    image: postgres:13.2-alpine
+    image: postgres:13.5-bullseye
     # ports:
     #   - 5432:5432
     # For possible command-line arguments see
@@ -11,13 +11,47 @@ services:
     # https://www.postgresql.org/docs/current/runtime-config.html
     command: [
       "-c", "max_connections=100"
+      # "-c", "log_statement=all"
     ]
+    healthcheck:
+      # pg_isready: https://www.postgresql.org/docs/13/app-pg-isready.html
+      test: ["CMD-SHELL", "pg_isready --username=postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     volumes:
       - data:/var/lib/postgresql/data
+
+  email: # https://hub.docker.com/r/rnwood/smtp4dev
+    image: rnwood/smtp4dev:v3.1
+    # For all configuration options see
+    # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
+    # ports:
+      # Web interface
+      # - 4042:80
+      # SMTP server
+      # - 25:25
+      # Imap server
+      # - 143:143
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail --output /dev/null http://email:80 || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - emails:/smtp4dev
+    environment:
+      - ServerOptions__BasePath=/email
+      - ServerOptions__HostName=${HOST}
+      - ServerOptions__Database=database.db
+      - ServerOptions__NumberOfMessagesToKeep=100
+      - ServerOptions__NumberOfSessionsToKeep=100
+      - ServerOptions__TlsMode=None
+      - ServerOptions__TlsCertificate=
 
   backend:
     build:
@@ -32,13 +66,20 @@ services:
       "--project", "./src/Metabase.csproj",
       "--",
       "run",
-      "--no-launch-profile",
-      "--runtime", "linux-musl-x64"
+      "--no-launch-profile"
       ]
       # "--no-restore",
       # ["dotnet", "watch", "run", "--no-restore"]
+    healthcheck:
+      # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
+      test: ["CMD-SHELL", "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
     volumes:
       - ./backend:/app
+      - backend_vscode_server_extensions:/home/me/.vscode-server/extensions
+      - backend_vscode_server_insiders_extensions:/home/me/.vscode-server-insiders/extensions
       # - backend_node_modules:/app/node_modules
       # The following items make the engine create anonymous volumes for the
       # specified path with the effect that the service does not write
@@ -61,17 +102,21 @@ services:
       - XBASE_Host=https://${HOST}:${HTTPS_PORT}
       - XBASE_JsonWebToken__EncryptionCertificatePassword=${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD}
       - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
+      - XBASE_Email__SmtpHost=${SMTP_HOST}
+      - XBASE_Email__SmtpPort=${SMTP_PORT}
+      - XBASE_TestlabSolarFacadesHost=${TESTLAB_SOLAR_FACADES_HOST}:${TESTLAB_SOLAR_FACADES_HOST_HTTPS_PORT}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       # - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_CERTIFICATE_PASSWORD}
       # - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
     extra_hosts:
-      - ${HOST}:${DOCKER_IP}
-      # - ${ISE_HOST}:${DOCKER_IP}
-      # - ${LBNL_HOST}:${DOCKER_IP}
+      - ${HOST}:host-gateway
+      - ${TESTLAB_SOLAR_FACADES_HOST}:host-gateway
+      # - ${LBNL_HOST}:host-gateway
     depends_on:
       - database
+      - email
 
   frontend:
     build:
@@ -85,22 +130,32 @@ services:
     command: [
       "yarn", "dev"
       ]
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --output-document /dev/null http://frontend:8080 || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
     volumes:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
     extra_hosts:
-      - ${HOST}:${DOCKER_IP}
+      - ${HOST}:host-gateway
     environment:
       - NODE_ENV=development
     depends_on:
       - backend
 
   nginx: # https://hub.docker.com/_/nginx
-    image: nginx:1.19.9-alpine
+    image: nginx:1.21
     command: [
       "nginx-debug",
       "-g", "daemon off;"
       ] # run in debug mode
+    healthcheck:
+      test: ["CMD-SHELL", "service nginx status || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
     volumes:
       - ./ssl:/etc/nginx/ssl:ro
       - ./nginx/templates/development:/etc/nginx/templates:ro
@@ -118,8 +173,12 @@ services:
     depends_on:
       - frontend
       - backend
+      - email
 
 volumes:
   data:
+  emails:
   # backend_node_modules:
+  backend_vscode_server_extensions:
+  backend_vscode_server_insiders_extensions:
   frontend_node_modules:

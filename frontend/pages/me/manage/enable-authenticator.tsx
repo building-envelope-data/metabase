@@ -18,7 +18,7 @@ import paths from "../../../paths";
 import { handleFormErrors } from "../../../lib/form";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode.react";
-import recoveryCodesModal from "../../../lib/recoveryCodesModal";
+import { recoveryCodesModal } from "../../../lib/recoveryCodesModal";
 
 const layout = {
   labelCol: { span: 8 },
@@ -30,12 +30,10 @@ const tailLayout = {
 
 function Page() {
   const router = useRouter();
-  const [
-    generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation,
-  ] = useGenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
-  const [
-    enableUserTwoFactorAuthenticatorMutation,
-  ] = useEnableUserTwoFactorAuthenticatorMutation();
+  const [generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation] =
+    useGenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
+  const [enableUserTwoFactorAuthenticatorMutation] =
+    useEnableUserTwoFactorAuthenticatorMutation();
   const [sharedKey, setSharedKey] = useState<string | null | undefined>(
     undefined
   );
@@ -103,10 +101,8 @@ function Page() {
   useEffect(() => {
     const generate = async () => {
       if (router.isReady) {
-        const {
-          errors,
-          data,
-        } = await generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
+        const { errors, data } =
+          await generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
         if (errors) {
           message.error(errors);
         }
@@ -123,7 +119,7 @@ function Page() {
       }
     };
     generate();
-  }, []);
+  }, [router, generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation]);
 
   if (!sharedKey || !authenticatorUri) {
     return (

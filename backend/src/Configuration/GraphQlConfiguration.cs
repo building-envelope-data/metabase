@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Types;
 using HotChocolate.Data.Filters;
 using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
+using Microsoft.Extensions.Logging;
 
 namespace Metabase.Configuration
 {
@@ -27,8 +29,9 @@ namespace Metabase.Configuration
             .AddAuthorization()
             .AddApolloTracing(
                 HotChocolate.Execution.Options.TracingPreference.OnDemand
-            ) // TODO Do we want or need this?
-            .EnableRelaySupport()
+            )
+            .AddGlobalObjectIdentification()
+            .AddQueryFieldToMutationPayloads()
             .ModifyOptions(options =>
               {
                   // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Configuration/Contracts/ISchemaOptions.cs
@@ -49,13 +52,11 @@ namespace Metabase.Configuration
                     /* options.UseComplexityMultipliers = ...; */
                 }
                 )
-                  // TODO Configure `https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Validation/Options/ValidationOptions.cs`. But how?
                   // Subscriptions
                   /* .AddInMemorySubscriptions() */
-                  // TODO Persisted queries
+                  // Persisted queries
                   /* .AddFileSystemQueryStorage("./persisted_queries") */
                   /* .UsePersistedQueryPipeline(); */
-                  /* TODO services.AddDiagnosticObserver<GraphQl.DiagnosticObserver>(); */
                   .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
                   {
                       // HotChocolate uses the default cookie authentication
@@ -71,6 +72,11 @@ namespace Metabase.Configuration
                           httpContext.User = authenticateResult.Principal;
                       }
                   })
+                  .AddDiagnosticEventListener(_ =>
+                      new GraphQl.LoggingDiagnosticEventListener(
+                          _.GetApplicationService<ILogger<GraphQl.LoggingDiagnosticEventListener>>()
+                      )
+                  )
                   .AddQueryType(d => d.Name(nameof(GraphQl.Query)))
                       .AddType<GraphQl.Components.ComponentQueries>()
                       .AddType<GraphQl.DataFormats.DataFormatQueries>()
@@ -80,17 +86,32 @@ namespace Metabase.Configuration
                       .AddType<GraphQl.OpenIdConnect.OpendIdConnectQueries>()
                       .AddType<GraphQl.Users.UserQueries>()
                   .AddMutationType(d => d.Name(nameof(GraphQl.Mutation)))
+                      .AddType<GraphQl.ComponentManufacturers.ComponentManufacturerMutations>()
                       .AddType<GraphQl.Components.ComponentMutations>()
                       .AddType<GraphQl.DataFormats.DataFormatMutations>()
                       .AddType<GraphQl.Databases.DatabaseMutations>()
+                      .AddType<GraphQl.InstitutionMethodDevelopers.InstitutionMethodDeveloperMutations>()
+                      .AddType<GraphQl.InstitutionRepresentatives.InstitutionRepresentativeMutations>()
                       .AddType<GraphQl.Institutions.InstitutionMutations>()
                       .AddType<GraphQl.Methods.MethodMutations>()
+                      .AddType<GraphQl.UserMethodDevelopers.UserMethodDeveloperMutations>()
                       .AddType<GraphQl.Users.UserMutations>()
                   /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
                   /*     .AddType<ComponentSubscriptions>() */
+                  // Scalar Types
+                  .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
+                  .AddType(new UrlType("Url"))
                   // Object Types
                   .AddType<GraphQl.Components.ComponentType>()
                   .AddType<GraphQl.DataFormats.DataFormatType>()
+                  .AddType<GraphQl.DataX.CalorimetricData>()
+                  .AddType<GraphQl.DataX.DataApproval>()
+                  .AddType<GraphQl.DataX.GetHttpsResourceTreeNonRootVertex>()
+                  .AddType<GraphQl.DataX.GetHttpsResourceTreeRoot>()
+                  .AddType<GraphQl.DataX.HygrothermalData>()
+                  .AddType<GraphQl.DataX.OpticalData>()
+                  .AddType<GraphQl.DataX.PhotovoltaicData>()
+                  .AddType<GraphQl.DataX.ResponseApproval>()
                   .AddType<GraphQl.Databases.DatabaseType>()
                   .AddType<GraphQl.Institutions.InstitutionType>()
                   .AddType<GraphQl.Methods.MethodType>()
@@ -127,8 +148,8 @@ namespace Metabase.Configuration
                   .SetPagingOptions(
                       new PagingOptions
                       {
-                          // MaxPageSize = ...,
-                          // DefaultPageSize = ...,
+                          MaxPageSize = int.MaxValue,
+                          DefaultPageSize = int.MaxValue,
                           IncludeTotalCount = true
                       }
                   );

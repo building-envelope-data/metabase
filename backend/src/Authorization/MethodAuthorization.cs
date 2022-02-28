@@ -8,7 +8,7 @@ namespace Metabase.Authorization
 {
     public static class MethodAuthorization
     {
-        public static Task<bool> IsAuthorizedToCreateMethodForInstitution(
+        public static Task<bool> IsAuthorizedToCreateMethodManagedByInstitution(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,
@@ -16,7 +16,7 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsAtLeastMaintainer(
+            return CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
                 claimsPrincipal,
                 institutionId,
                 userManager,

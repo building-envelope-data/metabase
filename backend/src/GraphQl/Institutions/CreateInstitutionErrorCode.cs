@@ -3,7 +3,9 @@ namespace Metabase.GraphQl.Institutions
     public enum CreateInstitutionErrorCode
     {
         UNKNOWN,
-        NO_OWNER,
-        UNKNOWN_OWNERS
+        NEITHER_OWNER_NOR_MANAGER,
+        UNKNOWN_OWNERS,
+        UNKNOWN_MANAGER,
+        UNAUTHORIZED
     }
 }

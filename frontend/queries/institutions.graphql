@@ -8,34 +8,11 @@ fragment InstitutionPartial on Institution {
   state
 }
 
-# query Institutions(
-#     $after: String
-#     $before: String
-#     $first: Int
-#     $last: Int
-# ) {
-#   institutions(
-#       after: $after,
-#       before: $before,
-#       first: $first,
-#       last: $last
-#   ) {
-#     nodes {
-#         ...InstitutionPartial
-#       }
-#     pageInfo {
-#         endCursor
-#         startCursor
-#     }
-#     totalCount
-#   }
-# }
-query Institutions {
-  institutions {
+query Institutions($state: InstitutionState! = VERIFIED) {
+  institutions(where: { state: { eq: $state } }) {
     nodes {
       ...InstitutionPartial
     }
-    totalCount
   }
 }
 
@@ -44,8 +21,8 @@ mutation CreateInstitution(
   $abbreviation: String
   $description: String!
   $ownerIds: [Uuid!]!
+  $managerId: Uuid
   $websiteLocator: Url
-  $state: InstitutionState!
 ) {
   createInstitution(
     input: {
@@ -53,8 +30,8 @@ mutation CreateInstitution(
       abbreviation: $abbreviation
       description: $description
       ownerIds: $ownerIds
+      managerId: $managerId
       websiteLocator: $websiteLocator
-      state: $state
     }
   ) {
     institution {
@@ -74,7 +51,6 @@ mutation UpdateInstitution(
   $abbreviation: String
   $description: String!
   $websiteLocator: Url
-  $state: InstitutionState!
 ) {
   updateInstitution(
     input: {
@@ -83,9 +59,21 @@ mutation UpdateInstitution(
       abbreviation: $abbreviation
       description: $description
       websiteLocator: $websiteLocator
-      state: $state
     }
   ) {
+    institution {
+      ...InstitutionPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation VerifyInstitution($institutionId: Uuid!) {
+  verifyInstitution(input: { institutionId: $institutionId }) {
     institution {
       ...InstitutionPartial
     }
@@ -117,6 +105,16 @@ query Institution($uuid: Uuid!) {
       }
       canCurrentUserAddEdge
     }
+    pendingManufacturedComponents: manufacturedComponents(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+      canCurrentUserConfirmEdge
+    }
     operatedDatabases {
       edges {
         node {
@@ -125,6 +123,13 @@ query Institution($uuid: Uuid!) {
           name
           description
           locator
+          operator {
+            node {
+              id
+              uuid
+              name
+            }
+          }
         }
       }
       canCurrentUserAddEdge
@@ -136,8 +141,26 @@ query Institution($uuid: Uuid!) {
           uuid
           name
         }
+        role
       }
       canCurrentUserAddEdge
+    }
+    pendingRepresentatives: representatives(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+        role
+      }
+    }
+    manager {
+      node {
+        id
+        uuid
+        name
+      }
     }
     managedDataFormats {
       edges {
@@ -145,8 +168,82 @@ query Institution($uuid: Uuid!) {
           id
           uuid
           name
+          extension
           description
           mediaType
+          schemaLocator
+          reference {
+            abstract
+            section
+            title
+            ... on Standard {
+              locator
+              numeration {
+                mainNumber
+                prefix
+                suffix
+              }
+              standardizers
+              year
+            }
+            ... on Publication {
+              arXiv
+              authors
+              doi
+              urn
+              webAddress
+            }
+          }
+          manager {
+            node {
+              id
+              uuid
+              name
+            }
+          }
+        }
+      }
+      canCurrentUserAddEdge
+    }
+    managedMethods {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+          validity {
+            from
+            to
+          }
+          availability {
+            from
+            to
+          }
+          reference {
+            abstract
+            section
+            title
+            ... on Standard {
+              locator
+              numeration {
+                mainNumber
+                prefix
+                suffix
+              }
+              standardizers
+              year
+            }
+            ... on Publication {
+              arXiv
+              authors
+              doi
+              urn
+              webAddress
+            }
+          }
+          calculationLocator
+          categories
         }
       }
       canCurrentUserAddEdge
@@ -157,7 +254,25 @@ query Institution($uuid: Uuid!) {
           id
           uuid
           name
-          description
+        }
+      }
+    }
+    pendingDevelopedMethods: developedMethods(pending: true) {
+      edges {
+        node {
+          id
+          uuid
+          name
+        }
+      }
+      canCurrentUserConfirmEdge
+    }
+    managedInstitutions {
+      edges {
+        node {
+          id
+          uuid
+          name
         }
       }
       canCurrentUserAddEdge

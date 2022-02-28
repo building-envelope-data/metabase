@@ -14,6 +14,7 @@ namespace Metabase.GraphQl.Methods
           CreatePublicationInput? Publication,
           Uri? CalculationLocator,
           Enumerations.MethodCategory[] Categories,
+          Guid ManagerId,
           Guid[] InstitutionDeveloperIds,
           Guid[] UserDeveloperIds
         );

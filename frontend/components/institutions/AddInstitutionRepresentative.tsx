@@ -1,14 +1,12 @@
 import * as React from "react";
 import { Select, Alert, Form, Button } from "antd";
-import {
-  useAddInstitutionRepresentativeMutation,
-  InstitutionRepresentativeRole,
-  Scalars,
-} from "../../queries/institutions.graphql";
+import { useAddInstitutionRepresentativeMutation } from "../../queries/institutions.graphql";
+import { InstitutionRepresentativeRole } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
-import { useUsersQuery } from "../../queries/users.graphql";
+import { SelectUserId } from "../SelectUserId";
 
 const layout = {
   labelCol: { span: 8 },
@@ -22,29 +20,27 @@ export type AddInstitutionRepresentativeProps = {
   institutionId: Scalars["Uuid"];
 };
 
-export const AddInstitutionRepresentative: React.FunctionComponent<AddInstitutionRepresentativeProps> = ({
+export default function AddInstitutionRepresentative({
   institutionId,
-}) => {
-  const [
-    addInstitutionRepresentativeMutation,
-  ] = useAddInstitutionRepresentativeMutation({
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: InstitutionDocument,
-        variables: {
-          uuid: institutionId,
+}: AddInstitutionRepresentativeProps) {
+  const [addInstitutionRepresentativeMutation] =
+    useAddInstitutionRepresentativeMutation({
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: InstitutionDocument,
+          variables: {
+            uuid: institutionId,
+          },
         },
-      },
-    ],
-  });
+      ],
+    });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
   const [form] = Form.useForm();
   const [adding, setAdding] = useState(false);
-  const usersQuery = useUsersQuery();
 
   const onFinish = ({
     userId,
@@ -72,6 +68,9 @@ export const AddInstitutionRepresentative: React.FunctionComponent<AddInstitutio
           setGlobalErrorMessages,
           form
         );
+        if (!errors && !data?.addInstitutionRepresentative?.errors) {
+          form.resetFields();
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);
@@ -96,7 +95,7 @@ export const AddInstitutionRepresentative: React.FunctionComponent<AddInstitutio
       <Form
         {...layout}
         form={form}
-        name="basic"
+        name="addInstitutionRepresentative"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
@@ -109,11 +108,7 @@ export const AddInstitutionRepresentative: React.FunctionComponent<AddInstitutio
             },
           ]}
         >
-          <Select placeholder="Please select">
-            {usersQuery.data?.users?.nodes?.map((user) => (
-              <Select.Option value={user.uuid}>{user.name}</Select.Option>
-            ))}
-          </Select>
+          <SelectUserId />
         </Form.Item>
         <Form.Item
           label="Role"
@@ -124,17 +119,12 @@ export const AddInstitutionRepresentative: React.FunctionComponent<AddInstitutio
             },
           ]}
         >
-          <Select placeholder="Please select">
-            <Select.Option value={InstitutionRepresentativeRole.Owner}>
-              Owner
-            </Select.Option>
-            <Select.Option value={InstitutionRepresentativeRole.Maintainer}>
-              Maintainer
-            </Select.Option>
-            <Select.Option value={InstitutionRepresentativeRole.Assistant}>
-              Assistant
-            </Select.Option>
-          </Select>
+          <Select
+            placeholder="Please select"
+            options={Object.entries(InstitutionRepresentativeRole).map(
+              ([_key, value]) => ({ label: value, value: value })
+            )}
+          />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={adding}>
@@ -144,6 +134,4 @@ export const AddInstitutionRepresentative: React.FunctionComponent<AddInstitutio
       </Form>
     </>
   );
-};
-
-export default AddInstitutionRepresentative;
+}

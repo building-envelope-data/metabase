@@ -1,15 +1,19 @@
+import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
-import { Table, message, Typography } from "antd";
+import { Table, Typography } from "antd";
 import { useOpenIdConnectQuery } from "../../queries/openIdConnect.graphql";
+import { useEffect } from "react";
 
 // TODO Load and display scopes.
 
-function Index() {
+function Page() {
   const { loading, error, data } = useOpenIdConnectQuery();
 
-  if (error) {
-    message.error(error);
-  }
+  useEffect(() => {
+    if (error) {
+      messageApolloError(error);
+    }
+  }, [error]);
 
   return (
     <Layout>
@@ -86,7 +90,7 @@ function Index() {
           //     title: "authorizations",
           //     dataIndex: "authorizations",
           //     key: "authorizations",
-          //     render: (authorizations) => (
+          //     render: (_value, record, _index) => (
           //     ),
           //   },
         ]}
@@ -140,7 +144,7 @@ function Index() {
           //     title: "tokens",
           //     dataIndex: "tokens",
           //     key: "tokens",
-          //     render: (tokens) => (
+          //     render: (_value, record, _index) => (
           //     ),
           //   },
         ]}
@@ -264,4 +268,4 @@ function Index() {
   );
 }
 
-export default Index;
+export default Page;

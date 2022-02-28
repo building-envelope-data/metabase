@@ -1,0 +1,9 @@
+mutation ConfirmUserMethodDeveloper($methodId: Uuid!, $userId: Uuid!) {
+  confirmUserMethodDeveloper(input: { methodId: $methodId, userId: $userId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

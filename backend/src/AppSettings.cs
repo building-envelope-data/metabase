@@ -7,6 +7,9 @@ namespace Metabase
         public string Host { get; set; }
         = "";
 
+        public string TestlabSolarFacadesHost { get; set; }
+        = "";
+
         public LoggingSettings Logging { get; set; }
         = new LoggingSettings();
 
@@ -26,6 +29,18 @@ namespace Metabase
 
             public string SigningCertificatePassword { get; set; }
             = "";
+        }
+
+        public EmailSettings Email { get; set; }
+        = new EmailSettings();
+
+        public sealed class EmailSettings
+        {
+            public string SmtpHost { get; set; }
+            = "";
+
+            public int SmtpPort { get; set; }
+            = 0;
         }
 
         public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }

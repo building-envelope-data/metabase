@@ -1,0 +1,22 @@
+query AllOpticalData(
+  $where: OpticalDataPropositionInput!
+  $timestamp: DateTime
+  $locale: Locale
+) {
+  allOpticalData(where: $where, timestamp: $timestamp, locale: $locale) {
+    edges {
+      # cursor
+      node {
+        ...OpticalDataFields
+      }
+    }
+    nodes {
+      ...OpticalDataFields
+    }
+    # totalCount
+    # pageInfo {
+    #   ...PageInfoFields
+    # }
+    # timestamp
+  }
+}

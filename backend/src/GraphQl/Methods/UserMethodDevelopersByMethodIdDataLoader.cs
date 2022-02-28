@@ -10,14 +10,16 @@ namespace Metabase.GraphQl.Methods
     {
         public UserMethodDevelopersByMethodIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
+                options,
                 dbContextFactory,
                 (dbContext, ids) =>
                     dbContext.UserMethodDevelopers.AsQueryable().Where(x =>
-                        ids.Contains(x.MethodId)
+                        !x.Pending && ids.Contains(x.MethodId)
                     ),
                 x => x.MethodId
                 )

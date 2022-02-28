@@ -4,48 +4,50 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Metabase.GraphQl.Institutions;
 using Snapshooter;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Institutions
 {
-    [Collection(nameof(Data.Institution))]
+    [TestFixture]
     public sealed class CreateInstitutionTests
       : InstitutionIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task AnonymousUser_IsAuthenticationError()
         {
             // Act
             var response =
                 await UnsuccessfullyQueryGraphQlContentAsString(
                     File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-                    variables: OperativeInstitutionInput
+                    variables: PendingInstitutionInput
                 ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }
 
-        [Fact]
+        [Test]
         public async Task AnonymousUser_CannotCreateInstitution()
         {
             // Act
             await UnsuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-                variables: OperativeInstitutionInput
+                variables: PendingInstitutionInput
                 ).ConfigureAwait(false);
             var response = await GetInstitutions().ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }
 
+        [TestCaseSource(nameof(EnumerateInstitutionInputs))]
         [Theory]
-        [MemberData(nameof(EnumerateInstitutionInputs))]
         public async Task LoggedInUser_IsSuccess(
             string key,
             CreateInstitutionInput input
         )
         {
+            SnapshotFullName testName = SnapshotFullNameHelper(typeof(CreateInstitutionTests), key);
+
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
@@ -58,7 +60,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             // Assert
             Snapshot.Match(
                 response,
-                SnapshotNameExtension.Create(key),
+                testName,
                 matchOptions => matchOptions
                 .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.createInstitution.institution.id").Should().NotBeNullOrWhiteSpace()
@@ -68,14 +70,16 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
                  )
                 );
         }
-
+        
+        [TestCaseSource(nameof(EnumerateInstitutionInputs))]
         [Theory]
-        [MemberData(nameof(EnumerateInstitutionInputs))]
         public async Task LoggedInUser_CreatesInstitution(
             string key,
             CreateInstitutionInput input
         )
         {
+            SnapshotFullName testName = SnapshotFullNameHelper(typeof(CreateInstitutionTests), key);
+
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             // Act
@@ -89,7 +93,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             // Assert
             Snapshot.Match(
                 response,
-                SnapshotNameExtension.Create(key),
+                testName,
                 matchOptions => matchOptions
                 .Assert(fieldOptions =>
                  fieldOptions.Field<string>("data.institutions.edges[*].node.id").Should().Be(institutionId)

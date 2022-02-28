@@ -14,12 +14,20 @@ help : ## Print this help
 # ------------------------------------------------ #
 
 install : ## Install packages (without touching the lockfile)
-	yarn install --frozen-lockfile
+	yarn install --pure-lockfile
 .PHONY : install
 
 upgrade : ## Upgrade packages
 	yarn upgrade
 .PHONY : upgrade
+
+outdated : ## Show outdated packages
+	yarn outdated
+.PHONY : outdated
+
+lint : ## Lint code
+	next lint
+.PHONY : lint
 
 update-schema : ## Update GraphQl schema
 	wget \

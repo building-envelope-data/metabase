@@ -2,9 +2,9 @@ import * as React from "react";
 import { Alert, Form, Input, Button } from "antd";
 import {
   useCreateDatabaseMutation,
-  Scalars,
   DatabasesDocument,
 } from "../../queries/databases.graphql";
+import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
@@ -21,9 +21,7 @@ export type CreateDatabaseProps = {
   operatorId: Scalars["Uuid"];
 };
 
-export const CreateDatabase: React.FunctionComponent<CreateDatabaseProps> = ({
-  operatorId,
-}) => {
+export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
   const [createDatabaseMutation] = useCreateDatabaseMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
@@ -74,6 +72,9 @@ export const CreateDatabase: React.FunctionComponent<CreateDatabaseProps> = ({
           setGlobalErrorMessages,
           form
         );
+        if (!errors && !data?.createDatabase?.errors) {
+          form.resetFields();
+        }
       } catch (error) {
         // TODO Handle properly.
         console.log("Failed:", error);
@@ -98,7 +99,7 @@ export const CreateDatabase: React.FunctionComponent<CreateDatabaseProps> = ({
       <Form
         {...layout}
         form={form}
-        name="basic"
+        name="createDatabase"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
@@ -146,6 +147,4 @@ export const CreateDatabase: React.FunctionComponent<CreateDatabaseProps> = ({
       </Form>
     </>
   );
-};
-
-export default CreateDatabase;
+}

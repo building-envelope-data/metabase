@@ -2,16 +2,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.Xunit;
-using Xunit;
+using Snapshooter.NUnit;
+using NUnit.Framework;
 
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
-    [Collection(nameof(Data.User))]
+    [TestFixture]
     public sealed class DeletePersonalUserDataTests
       : UserIntegrationTests
     {
-        [Fact]
+        [Test]
         public async Task CorrectPassword_IsSuccess()
         {
             // Arrange
@@ -34,7 +34,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task CorrectPassword_DeletesPersonalUserData()
         {
             // Arrange
@@ -54,7 +54,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             Snapshot.Match(response);
         }
 
-        [Fact]
+        [Test]
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
@@ -76,7 +76,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             Snapshot.Match(response);
         }
 
-        [Fact]
+        [Test]
         public async Task NonLoggedInUser_DoesNotDeletePersonalUserData()
         {
             // Arrange
@@ -109,7 +109,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task MissingPassword_IsUserError()
         {
             // Arrange
@@ -132,7 +132,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task MissingPassword_DoesNotDeletePersonalUserData()
         {
             // Arrange
@@ -157,7 +157,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task IncorrectPassword_IsUserError()
         {
             // Arrange
@@ -180,7 +180,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 );
         }
 
-        [Fact]
+        [Test]
         public async Task IncorrectPassword_DoesNotDeletePersonalUserData()
         {
             // Arrange

@@ -9,19 +9,24 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using FluentAssertions;
 using IdentityModel.Client;
 using Json.Path;
 using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
+using NUnit.Framework;
+using Snapshooter;
 
 namespace Metabase.Tests.Integration
 {
+    [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
     public abstract class IntegrationTests
+        : IDisposable
     {
+        private bool _disposed = false;
         protected CustomWebApplicationFactory Factory { get; }
         protected CollectingEmailSender EmailSender { get => Factory.EmailSender; }
-        protected CollectingSmsSender SmsSender { get => Factory.SmsSender; }
         protected HttpClient HttpClient { get; }
         public const string DefaultName = "John Doe";
         public const string DefaultEmail = "john.doe@ise.fraunhofer.de";
@@ -33,26 +38,65 @@ namespace Metabase.Tests.Integration
             HttpClient = CreateHttpClient();
         }
 
-        protected HttpClient CreateHttpClient(bool allowAutoRedirect = true)
+        // https://docs.microsoft.com/en-us/dotnet/standard/managed-code
+        // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose
+        ~IntegrationTests() => Dispose(false);
+
+        public void Dispose()
         {
-            return Factory.CreateClient(
-            new WebApplicationFactoryClientOptions
+            // Dispose of unmanaged resources.
+            Dispose(true);
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
             {
-                AllowAutoRedirect = allowAutoRedirect,
-                BaseAddress = new Uri("http://localhost"),
-                HandleCookies = true,
-                MaxAutomaticRedirections = 3,
+                if (disposing)
+                {
+                    Factory.Dispose();
+                    HttpClient.Dispose();
+                }
+                _disposed = true;
             }
+        }
+
+        protected static HttpClient CreateHttpClient(
+            CustomWebApplicationFactory factory,
+            bool allowAutoRedirect = true
+            )
+        {
+            return factory.CreateClient(
+                new WebApplicationFactoryClientOptions
+                {
+                    AllowAutoRedirect = allowAutoRedirect,
+                    BaseAddress = new Uri("http://localhost"),
+                    HandleCookies = true,
+                    MaxAutomaticRedirections = 3,
+                }
             );
         }
 
-        protected async Task<TokenResponse> RequestAuthToken(
+        protected HttpClient CreateHttpClient(
+            bool allowAutoRedirect = true
+            )
+        {
+            return CreateHttpClient(
+                Factory,
+                allowAutoRedirect
+            );
+        }
+
+        protected static async Task<TokenResponse> RequestAuthToken(
+            HttpClient httpClient,
             string emailAddress,
             string password
             )
         {
             var response =
-              await HttpClient.RequestPasswordTokenAsync(
+              await httpClient.RequestPasswordTokenAsync(
                 new PasswordTokenRequest
                 {
                     Address = "http://localhost/connect/token",
@@ -71,23 +115,87 @@ namespace Metabase.Tests.Integration
             return response;
         }
 
-        protected async Task LoginUser(
+        protected Task<TokenResponse> RequestAuthToken(
+            string emailAddress,
+            string password
+            )
+        {
+            return RequestAuthToken(
+                HttpClient,
+                emailAddress,
+                password
+            );
+        }
+
+        protected static async Task LoginUser(
+            HttpClient httpClient,
             string email = DefaultEmail,
             string password = DefaultPassword
             )
         {
             var tokenResponse =
               await RequestAuthToken(
+                  httpClient,
                   emailAddress: email,
                   password: password
                   )
               .ConfigureAwait(false);
-            HttpClient.SetBearerToken(tokenResponse.AccessToken);
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+        }
+
+        protected Task LoginUser(
+            string email = DefaultEmail,
+            string password = DefaultPassword
+            )
+        {
+            return LoginUser(
+                HttpClient,
+                email,
+                password
+            );
+        }
+
+        protected static void LogoutUser(
+            HttpClient httpClient
+        )
+        {
+            httpClient.SetBearerToken(null);
         }
 
         protected void LogoutUser()
         {
-            HttpClient.SetBearerToken(null);
+            LogoutUser(HttpClient);
+        }
+
+        protected static async Task<TResult> AsUser<TResult>(
+            HttpClient httpClient,
+            string email,
+            string password,
+            Func<HttpClient, Task<TResult>> task
+        )
+        {
+            // This is fragile as it uses the fact that at the moment of this
+            // writing, `LoginUser` calls `SetBearerToken` which sets
+            // `httpClient.DefaultRequestHeaders.Authorization`. Thus, by
+            // remembering and restoring this value the original user is kept
+            // logged-in. For details see
+            // https://github.com/IdentityModel/IdentityModel/blob/main/src/Client/Extensions/AuthorizationHeaderExtensions.cs
+            var originalAuthorizationRequestHeader = httpClient.DefaultRequestHeaders.Authorization;
+            try
+            {
+                await LoginUser(
+                    httpClient,
+                    email,
+                    password
+                ).ConfigureAwait(false);
+                var result = await task(httpClient).ConfigureAwait(false);
+                LogoutUser(httpClient);
+                return result;
+            }
+            finally
+            {
+                httpClient.DefaultRequestHeaders.Authorization = originalAuthorizationRequestHeader;
+            }
         }
 
         protected async Task<string> RegisterUser(
@@ -137,7 +245,7 @@ namespace Metabase.Tests.Integration
         protected string ExtractConfirmationCodeFromEmail()
         {
             return Regex.Match(
-                EmailSender.Emails.Single().Message,
+                EmailSender.Emails.Single().Body,
                 @"confirmationCode=(?<confirmationCode>\w+)"
                 )
                 .Groups["confirmationCode"]
@@ -149,7 +257,7 @@ namespace Metabase.Tests.Integration
         protected string ExtractResetCodeFromEmail()
         {
             return Regex.Match(
-                EmailSender.Emails.Single().Message,
+                EmailSender.Emails.Single().Body,
                 @"resetCode=(?<resetCode>\w+)"
                 )
                 .Groups["resetCode"]
@@ -174,12 +282,14 @@ namespace Metabase.Tests.Integration
         }
 
         protected async Task<Guid> RegisterAndConfirmUser(
+            string name = DefaultName,
             string email = DefaultEmail,
             string password = DefaultPassword
         )
         {
             var uuid =
                 await RegisterUserReturningUuid(
+                    name: name,
                     email: email,
                     password: password
                     ).ConfigureAwait(false);
@@ -191,28 +301,15 @@ namespace Metabase.Tests.Integration
             return uuid;
         }
 
-        // protected async Task RegisterAndLoginUser(
-        //     string email,
-        //     string password
-        // )
-        // {
-        //     await RegisterUser(
-        //             email: email,
-        //             password: password
-        //             ).ConfigureAwait(false);
-        //     await LoginUser(
-        //         email: email,
-        //         password: password
-        //     ).ConfigureAwait(false);
-        // }
-
         protected async Task<Guid> RegisterAndConfirmAndLoginUser(
+            string name = DefaultName,
             string email = DefaultEmail,
             string password = DefaultPassword
         )
         {
             var uuid =
                 await RegisterAndConfirmUser(
+                    name: name,
                     email: email,
                     password: password
                     ).ConfigureAwait(false);
@@ -474,27 +571,16 @@ namespace Metabase.Tests.Integration
         }
 
         protected void EmailsShouldContainSingle(
-            string address,
+            (string name, string address) to,
             string subject,
-            string messageRegEx
+            string bodyRegEx
         )
         {
             EmailSender.Emails.Should().ContainSingle();
             var email = EmailSender.Emails.First();
-            email.Address.Should().Be(address);
+            email.To.Should().Be(to);
             email.Subject.Should().Be(subject);
-            email.Message.Should().MatchRegex(messageRegEx);
-        }
-
-        protected void SmsesShouldContainSingle(
-            string number,
-            string messageRegEx
-        )
-        {
-            SmsSender.Smses.Should().ContainSingle();
-            var sms = SmsSender.Smses.First();
-            sms.Number.Should().Be(number);
-            sms.Message.Should().MatchRegex(messageRegEx);
+            email.Body.Should().MatchRegex(bodyRegEx);
         }
 
         private static HttpContent MakeJsonHttpContent<TContent>(
@@ -516,6 +602,24 @@ namespace Metabase.Tests.Integration
             result.Headers.ContentType =
               new MediaTypeHeaderValue("application/json");
             return result;
+        }
+
+        // With NUnit using async Snapshooter is not able to calculate
+        // the necessary Fullname, due to reasons mentioned in
+        // https://stackoverflow.com/questions/22598323/movenext-instead-of-actual-method-task-name
+        // The workaround with optional parameters is inspired by the same source.
+        protected static SnapshotFullName SnapshotFullNameHelper(
+            Type testType,
+            string keyName,
+            [CallerMemberName] string testMethod = "",
+            [CallerFilePath] string testFilePath = ""
+        )
+        {
+            string testName = $"{testType.Name}.{testMethod}_{keyName}.snap";
+            string testDirectory =
+                Path.GetDirectoryName(testFilePath)
+                ?? throw new Exception($"The path '{testFilePath}' denotes a root directory or is `null`.");
+            return new SnapshotFullName(testName, testDirectory);
         }
 
         private sealed class GraphQlRequest

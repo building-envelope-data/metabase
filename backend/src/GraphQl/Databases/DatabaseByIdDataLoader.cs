@@ -1,5 +1,5 @@
 using GreenDonut;
-using Metabase.GraphQl.Entitys;
+using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Databases
@@ -9,10 +9,12 @@ namespace Metabase.GraphQl.Databases
     {
         public DatabaseByIdDataLoader(
             IBatchScheduler batchScheduler,
+            DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
             )
             : base(
                 batchScheduler,
+                options,
                 dbContextFactory,
                 dbContext => dbContext.Databases
                 )

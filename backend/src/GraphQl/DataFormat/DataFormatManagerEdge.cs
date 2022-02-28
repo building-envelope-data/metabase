@@ -1,4 +1,3 @@
-using HotChocolate.Types;
 using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.DataFormats

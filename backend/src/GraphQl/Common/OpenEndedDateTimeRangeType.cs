@@ -19,7 +19,7 @@ namespace Metabase.GraphQl.Common
             descriptor
               .Field("from")
               .Type<DateTimeType>()
-              .Resolver(context =>
+              .Resolve(context =>
                   {
                       var range = context.Parent<NpgsqlRange<DateTime>>();
                       return range.LowerBoundInfinite
@@ -31,7 +31,7 @@ namespace Metabase.GraphQl.Common
             descriptor
               .Field("to")
               .Type<DateTimeType>()
-              .Resolver(context =>
+              .Resolve(context =>
                   {
                       var range = context.Parent<NpgsqlRange<DateTime>>();
                       return range.UpperBoundInfinite
