@@ -93,8 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Updated cached schemata in commit [ffb52beeefea6fa841e927b7da4d6d85d31658ca](https://github.com/building-envelope-data/metabase/commit/ffb52beeefea6fa841e927b7da4d6d85d31658ca)
--
+- Update cached schemata in commit [ffb52beeefea6fa841e927b7da4d6d85d31658ca](https://github.com/building-envelope-data/metabase/commit/ffb52beeefea6fa841e927b7da4d6d85d31658ca)
+- Correct wording regarding following links to match the one expected by regular expressions in tests [#114](https://github.com/building-envelope-data/metabase/pull/114)
 -
 -
 -

@@ -506,7 +506,7 @@ namespace Metabase.GraphQl.Users
                 await emailSender.SendAsync(
                     (user.Name, input.Email),
                     "Reset password",
-                    $"Please reset your password by clicking the link {appSettings.Host}/users/reset-password?resetCode={resetCode}."
+                    $"Please reset your password by following the link {appSettings.Host}/users/reset-password?resetCode={resetCode}."
                     ).ConfigureAwait(false);
             }
             return new RequestUserPasswordResetPayload();
@@ -1521,7 +1521,7 @@ namespace Metabase.GraphQl.Users
             await emailSender.SendAsync(
                 (name, newEmail),
                 "Confirm your email change",
-                $"Please confirm your email address change by clicking the link {host}/users/confirm-email-change?currentEmail={currentEmail}&newEmail={newEmail}&confirmationCode={confirmationCode}.")
+                $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={currentEmail}&newEmail={newEmail}&confirmationCode={confirmationCode}")
                 .ConfigureAwait(false);
         }
 
