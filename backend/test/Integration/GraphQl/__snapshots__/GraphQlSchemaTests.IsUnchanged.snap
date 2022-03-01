@@ -62,13 +62,19 @@ type CalorimetricData implements Data {
   appliedMethod: AppliedMethod!
   component: Component
   componentId: Uuid!
+  createdAt: DateTime!
+  creatorId: Uuid!
   description: String
   gValues: [Float!]!
+  id: String!
+  locale: String!
   name: String
   resourceTree: GetHttpsResourceTree!
+  resources: [GetHttpsResource!]!
   timestamp: DateTime!
   uValues: [Float!]!
   uuid: Uuid!
+  warnings: [String!]!
 }
 
 type CalorimetricDataConnection {
@@ -571,11 +577,17 @@ type HygrothermalData implements Data {
   appliedMethod: AppliedMethod!
   component: Component
   componentId: Uuid!
+  createdAt: DateTime!
+  creatorId: Uuid!
   description: String
+  id: String!
+  locale: String!
   name: String
   resourceTree: GetHttpsResourceTree!
+  resources: [GetHttpsResource!]!
   timestamp: DateTime!
   uuid: Uuid!
+  warnings: [String!]!
 }
 
 type HygrothermalDataConnection {
@@ -916,16 +928,22 @@ type OpticalData implements Data {
   appliedMethod: AppliedMethod!
   component: Component
   componentId: Uuid!
+  createdAt: DateTime!
+  creatorId: Uuid!
   description: String
+  id: String!
   infraredEmittances: [Float!]!
+  locale: String!
   name: String
   nearnormalHemisphericalSolarReflectances: [Float!]!
   nearnormalHemisphericalSolarTransmittances: [Float!]!
   nearnormalHemisphericalVisibleReflectances: [Float!]!
   nearnormalHemisphericalVisibleTransmittances: [Float!]!
   resourceTree: GetHttpsResourceTree!
+  resources: [GetHttpsResource!]!
   timestamp: DateTime!
   uuid: Uuid!
+  warnings: [String!]!
 }
 
 type OpticalDataConnection {
@@ -956,11 +974,17 @@ type PhotovoltaicData implements Data {
   appliedMethod: AppliedMethod!
   component: Component
   componentId: Uuid!
+  createdAt: DateTime!
+  creatorId: Uuid!
   description: String
+  id: String!
+  locale: String!
   name: String
   resourceTree: GetHttpsResourceTree!
+  resources: [GetHttpsResource!]!
   timestamp: DateTime!
   uuid: Uuid!
+  warnings: [String!]!
 }
 
 type PhotovoltaicDataConnection {
