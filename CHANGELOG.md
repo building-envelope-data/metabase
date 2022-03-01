@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v1.0.0] - 2022-02-28
-
 ### Added
 
 -
@@ -95,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Updated cached schemata in commit [ffb52beeefea6fa841e927b7da4d6d85d31658ca](https://github.com/building-envelope-data/metabase/commit/ffb52beeefea6fa841e927b7da4d6d85d31658ca)
 -
 -
 -
@@ -119,8 +118,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -
 -
 -
--
+
+## [v1.0.0] - 2022-02-28
 
 [Unreleased]: https://github.com/building-envelope-data/metabase/compare/v1.0.0...HEAD
 
-[v1.0.0]: https://github.com/building-envelope-data/metabase/compare/a3750ff76aeba9ed8a017adecb2c52273278b915...v1.0.0
+[v1.0.0]: https://github.com/building-envelope-data/metabase/compare/5e4c6579bc7b596502c0bc9318cf24435bed2c80...v1.0.0
