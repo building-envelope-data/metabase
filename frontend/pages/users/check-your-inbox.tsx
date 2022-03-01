@@ -6,7 +6,7 @@ function CheckYourInbox() {
     <Layout>
       <Card title="Check your inbox!">
         <Typography.Paragraph>
-          Confirm your email address by clicking the confirmation link in your
+          Confirm your email address by following the confirmation link in your
           inbox.
         </Typography.Paragraph>
       </Card>

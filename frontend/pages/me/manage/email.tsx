@@ -127,7 +127,7 @@ function Page() {
         Your current email address is {currentUser.email}.
         {!currentUser.isEmailConfirmed && (
           <>
-            Please confirm it by clicking the confirmation link in the
+            Please confirm it by following the confirmation link in the
             confirmation email you received. If you didn&apos;t receive a
             confirmation email, click the following button to resend it:{" "}
             <Button onClick={resendUserEmailVerification} loading={resending}>
