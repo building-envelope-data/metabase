@@ -4,13 +4,13 @@ mutation createComponent(
   $description: String!
   $availability: OpenEndedDateTimeRangeInput
   $categories: [ComponentCategory!]!
-  $manufacturerId: UUID!
-  $furtherManufacturerIds: [UUID!]!
-  $assembledOfIds: [UUID!]!
-  $partOfIds: [UUID!]!
-  $concretizationOfIds: [UUID!]!
-  $generalizationOfIds: [UUID!]!
-  $variantOfIds: [UUID!]!
+  $manufacturerId: Uuid!
+  $furtherManufacturerIds: [Uuid!]!
+  $assembledOfIds: [Uuid!]!
+  $partOfIds: [Uuid!]!
+  $concretizationOfIds: [Uuid!]!
+  $generalizationOfIds: [Uuid!]!
+  $variantOfIds: [Uuid!]!
 ) {
   createComponent(
     input: {
