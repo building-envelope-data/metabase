@@ -193,10 +193,6 @@ namespace Metabase
                             IncludeCookies = false,
                             GraphQLEndpoint = "/graphql",
                             HttpMethod = DefaultHttpMethod.Post,
-                            HttpHeaders = new HeaderDictionary
-                            {
-                                { "Content-Type", "application/json" }
-                            },
                             Title = "GraphQL"
                         }
                     }
