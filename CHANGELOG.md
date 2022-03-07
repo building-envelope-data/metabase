@@ -95,7 +95,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update cached schemata in commit [ffb52beeefea6fa841e927b7da4d6d85d31658ca](https://github.com/building-envelope-data/metabase/commit/ffb52beeefea6fa841e927b7da4d6d85d31658ca)
 - Correct wording regarding following links to match the one expected by regular expressions in tests [#114](https://github.com/building-envelope-data/metabase/pull/114)
--
+- Remove explicit content-type as it results in requests from banana cake pop responding with 404 in commit [4d8d2eb5101785d78fb0cc1579ee901b694147ad](https://github.com/building-envelope-data/metabase/commit/4d8d2eb5101785d78fb0cc1579ee901b694147ad)
 -
 -
 -
