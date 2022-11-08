@@ -22,8 +22,14 @@ name : ## Print value of variable `${NAME}`
 	@echo ${NAME}
 .PHONY : name
 
-build : ## Build images
-	${docker_compose} build
+pull : ## Pull images
+	${docker_compose} pull
+.PHONY : pull
+
+build : pull ## Build images
+	${docker_compose} build \
+		--pull \
+		--no-cache
 .PHONY : build
 
 up : ## (Re)create and start containers

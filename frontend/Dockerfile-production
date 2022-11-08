@@ -1,11 +1,25 @@
 # Inspired by https://nextjs.org/docs/deployment#docker-image
 
 FROM node:16.13-bullseye-slim AS dependencies
+RUN \
+  apt-get update && \
+  apt-get upgrade && \
+  rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
 WORKDIR /app
 COPY ./package.json ./yarn.lock ./
 RUN yarn install --pure-lockfile
 
 FROM node:16.13-bullseye-slim AS build
+RUN \
+  apt-get update && \
+  apt-get upgrade && \
+  rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
 WORKDIR /app
 COPY ./ ./
 COPY --from=dependencies /app/node_modules ./node_modules
@@ -22,6 +36,7 @@ COPY --from=build /app/package.json ./
 COPY --from=build /app/public ./public
 RUN \
   apt-get update && \
+  apt-get upgrade && \
   apt-get install \
     --yes \
     --no-install-recommends \
