@@ -1,7 +1,7 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:5.0-bullseye-slim-amd64
+FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim-amd64
 
 ARG GROUP_ID
 ARG USER_ID
@@ -285,6 +285,9 @@ RUN \
     ./test/obj && \
   mkdir --parents \
     ${HOME}/.vscode-server/extensions \
-    ${HOME}/.vscode-server-insiders/extensions
+    ${HOME}/.vscode-server-insiders/extensions && \
+  mkdir --parents \
+    ${HOME}/.nuget \
+    ${HOME}/.dotnet
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
