@@ -42,7 +42,12 @@ namespace Metabase.Data.Extensions
             {
             }
 
-            public override long GetServiceProviderHashCode()
+            public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
+            {
+                return true;
+            }
+
+            public override int GetServiceProviderHashCode()
             {
                 return 0;
             }
@@ -51,7 +56,7 @@ namespace Metabase.Data.Extensions
                 IDictionary<string, string> debugInfo
                 )
             {
-                debugInfo[$"Infrastructure.Data:${nameof(SchemaNameOptionsExtension.SchemaName)}"]
+                debugInfo[$"Metabase.Data.Extensions:${nameof(SchemaNameOptionsExtension.SchemaName)}"]
                   = Extension.SchemaName;
             }
         }

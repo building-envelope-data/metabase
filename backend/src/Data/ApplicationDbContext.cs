@@ -15,17 +15,6 @@ namespace Metabase.Data
     {
         static ApplicationDbContext()
         {
-            RegisterEnumerations();
-        }
-
-        private static void RegisterEnumerations()
-        {
-            // https://www.npgsql.org/efcore/mapping/enum.html#mapping-your-enum
-            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.ComponentCategory>();
-            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionRepresentativeRole>();
-            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionState>();
-            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.MethodCategory>();
-            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.Standardizer>();
         }
 
         private static void CreateEnumerations(ModelBuilder builder)
@@ -52,7 +41,8 @@ namespace Metabase.Data
               .HasDefaultValueSql("gen_random_uuid()");
             // https://www.npgsql.org/efcore/modeling/concurrency.html#the-postgresql-xmin-system-column
             builder
-              .UseXminAsConcurrencyToken();
+              .Property(e => e.Version)
+              .IsRowVersion();
             return builder;
         }
 

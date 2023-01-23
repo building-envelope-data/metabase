@@ -6,6 +6,6 @@ namespace Metabase.Data
     {
         public Guid Id { get; }
 
-        public uint xmin { get; } // https://www.npgsql.org/efcore/modeling/concurrency.html
+        public uint Version { get; } // https://www.npgsql.org/efcore/modeling/concurrency.html
     }
 }

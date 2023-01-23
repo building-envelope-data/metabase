@@ -11,7 +11,7 @@ namespace Metabase.Data
         // [NotMapped]
         // public Guid Uuid { get => Id; }
 
-        public uint xmin { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
+        public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
 
         protected Entity(
             )
