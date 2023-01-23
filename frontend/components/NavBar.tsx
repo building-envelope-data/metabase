@@ -30,6 +30,7 @@ export default function NavBar({ items }: NavBarProps) {
   const apolloClient = initializeApollo();
   const [logoutUserMutation] = useLogoutUserMutation();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const logout = async () => {
     try {
@@ -39,8 +40,8 @@ export default function NavBar({ items }: NavBarProps) {
         console.log(errors); // TODO What to do?
       } else if (data?.logoutUser?.errors) {
         // TODO Is this how we want to display errors?
-        message.error(
-          data?.logoutUser?.errors.map((error) => error.message).join(" ")
+        messageApi.error(
+          data?.logoutUser?.errors.map((error) => error.message)
         );
       } else {
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
@@ -54,6 +55,8 @@ export default function NavBar({ items }: NavBarProps) {
   };
 
   return (
+    <>
+    {contextHolder}
     <Menu mode="horizontal" selectedKeys={[router.pathname]} theme="dark">
       {items.map((item) =>
         item.subitems === null ? (
@@ -109,5 +112,6 @@ export default function NavBar({ items }: NavBarProps) {
         </>
       )}
     </Menu>
+    </>
   );
 }

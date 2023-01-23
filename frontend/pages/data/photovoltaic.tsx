@@ -2,7 +2,6 @@ import Layout from "../../components/Layout";
 import { Table, message, Form, Button, Alert, Typography } from "antd";
 import { useAllPhotovoltaicDataQuery } from "../../queries/data.graphql";
 import {
-  PhotovoltaicData,
   Scalars,
   PhotovoltaicDataPropositionInput,
 } from "../../__generated__/__types__";
@@ -72,13 +71,39 @@ const conjunct = (
 //   return { or: propositions };
 // };
 
+type PartialPhotovoltaicData = {
+            __typename?: 'PhotovoltaicData';
+            uuid: any;
+            timestamp: any;
+            componentId: any;
+            name?: string | null | undefined;
+            description?: string | null | undefined;
+            appliedMethod: {
+              __typename?: 'AppliedMethod';
+              methodId: any;
+            };
+            resourceTree: {
+              __typename?: 'GetHttpsResourceTree';
+              root: {
+                __typename?: 'GetHttpsResourceTreeRoot';
+                value: {
+                  __typename?: 'GetHttpsResource';
+                  description: string;
+                  hashValue: string;
+                  locator: any;
+                  dataFormatId: any;
+                };
+              };
+            };
+          }
+
 function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [data, setData] = useState<PhotovoltaicData[]>([]);
+  const [data, setData] = useState<PartialPhotovoltaicData[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
@@ -156,7 +181,7 @@ function Page() {
           data?.databases?.edges?.map(
             (edge) => edge?.node?.allPhotovoltaicData?.nodes || []
           ) || [];
-        const flatData = ([] as PhotovoltaicData[]).concat(...nestedData);
+        const flatData = ([] as PartialPhotovoltaicData[]).concat(...nestedData);
         setData(flatData);
       } catch (error) {
         // TODO Handle properly.

@@ -4,11 +4,11 @@ import {
   Tag,
   Skeleton,
   Result,
-  PageHeader,
   Descriptions,
   Typography,
   List,
 } from "antd";
+import { PageHeader } from "@ant-design/pro-layout"
 import { useEffect } from "react";
 import Link from "next/link";
 import paths from "../../paths";

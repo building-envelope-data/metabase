@@ -37,7 +37,7 @@ export function FloatPropositionFormList({
                   {...restField}
                   key={`negator${key}`}
                   name={[name, "negator"]}
-                  fieldKey={[fieldKey, "negator"]}
+                  fieldKey={[fieldKey ?? -1, "negator"]}
                   noStyle
                   initialValue={Negator.Is}
                 >
@@ -53,7 +53,7 @@ export function FloatPropositionFormList({
                   {...restField}
                   key={`comparator${key}`}
                   name={[name, "comparator"]}
-                  fieldKey={[fieldKey, "comparator"]}
+                  fieldKey={[fieldKey ?? -1, "comparator"]}
                   noStyle
                   initialValue={FloatPropositionComparator.EqualTo}
                 >
@@ -83,7 +83,7 @@ export function FloatPropositionFormList({
                   {...restField}
                   key={`value${key}`}
                   name={[name, "value"]}
-                  fieldKey={[fieldKey, "value"]}
+                  fieldKey={[fieldKey ?? -1, "value"]}
                   noStyle
                 >
                   <InputNumber

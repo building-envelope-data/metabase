@@ -41,6 +41,7 @@ function Page() {
     string | null | undefined
   >(undefined);
 
+  const [messageApi, contextHolder] = message.useMessage();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -104,7 +105,7 @@ function Page() {
         const { errors, data } =
           await generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
         if (errors) {
-          message.error(errors);
+          messageApi.error(errors.map(error => error.message));
         }
         if (data) {
           setSharedKey(
@@ -119,7 +120,7 @@ function Page() {
       }
     };
     generate();
-  }, [router, generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation]);
+  }, [router, generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation, messageApi]);
 
   if (!sharedKey || !authenticatorUri) {
     return (
@@ -130,6 +131,8 @@ function Page() {
   }
 
   return (
+    <>
+    {contextHolder}
     <ManageLayout>
       <Typography.Title level={3}>Configure</Typography.Title>
       <Typography.Paragraph>
@@ -195,6 +198,7 @@ function Page() {
         </List>
       </List>
     </ManageLayout>
+</>
   );
 }
 

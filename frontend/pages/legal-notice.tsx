@@ -10,6 +10,7 @@ function Page() {
   // Inspired by https://www.robinwieruch.de/react-hooks-fetch-data
   const [data, setData] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,32 +20,38 @@ function Page() {
         if (result.ok) {
           setData(await result.text());
         } else {
-          message.error(errorMessage);
+          messageApi.error(errorMessage);
         }
       } catch (error) {
         console.log(error);
-        message.error(errorMessage);
+        messageApi.error(errorMessage);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [messageApi]);
 
   if (loading) {
     return (
+      <>
+      {contextHolder}
       <Layout>
         <Skeleton />
       </Layout>
+</>
     );
   }
 
   if (!data) {
     return (
+      <>
+      {contextHolder}
       <Layout>
         You can view the legal notice under{" "}
         <Typography.Link href={url}>{url}</Typography.Link>
       </Layout>
+      </>
     );
   }
 

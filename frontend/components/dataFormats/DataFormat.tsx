@@ -1,6 +1,7 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useDataFormatQuery } from "../../queries/dataFormats.graphql";
-import { Skeleton, Result, PageHeader, Descriptions, Typography } from "antd";
+import { Skeleton, Result, Descriptions, Typography } from "antd";
+import { PageHeader } from "@ant-design/pro-layout"
 import { useEffect } from "react";
 import paths from "../../paths";
 import { Reference } from "../Reference";

@@ -1,5 +1,4 @@
 import {
-  PageHeader,
   Divider,
   List,
   Typography,
@@ -10,6 +9,7 @@ import {
   Descriptions,
   Tag,
 } from "antd";
+import { PageHeader } from "@ant-design/pro-layout"
 import {
   InstitutionDocument,
   useInstitutionQuery,

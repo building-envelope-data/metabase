@@ -16,6 +16,7 @@ import { InstitutionDocument } from "../../queries/institutions.graphql";
 import { SelectInstitutionId } from "../SelectInstitutionId";
 import { SelectUserId } from "../SelectUserId";
 import { ReferenceForm } from "../ReferenceForm";
+import * as dayjs from 'dayjs';
 
 const layout = {
   labelCol: { span: 8 },
@@ -29,11 +30,11 @@ type FormValues = {
   name: string;
   description: string;
   validity:
-    | [moment.Moment | null | undefined, moment.Moment | null | undefined]
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
     | null
     | undefined;
   availability:
-    | [moment.Moment | null | undefined, moment.Moment | null | undefined]
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
     | null
     | undefined;
   standard: CreateStandardInput | null | undefined;

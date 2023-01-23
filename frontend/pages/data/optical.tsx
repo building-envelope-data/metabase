@@ -10,7 +10,6 @@ import {
 } from "antd";
 import { useAllOpticalDataQuery } from "../../queries/data.graphql";
 import {
-  OpticalData,
   Scalars,
   OpticalDataPropositionInput,
 } from "../../__generated__/__types__";
@@ -85,13 +84,44 @@ const conjunct = (
 //   return { or: propositions };
 // };
 
+type PartialOpticalData = {
+            __typename?: 'OpticalData';
+            infraredEmittances: Array<number>;
+            nearnormalHemisphericalSolarReflectances: Array<number>;
+            nearnormalHemisphericalSolarTransmittances: Array<number>;
+            nearnormalHemisphericalVisibleReflectances: Array<number>;
+            nearnormalHemisphericalVisibleTransmittances: Array<number>;
+            uuid: any;
+            timestamp: any;
+            componentId: any;
+            name?: string | null | undefined;
+            description?: string | null | undefined;
+            appliedMethod: {
+              __typename?: 'AppliedMethod';
+              methodId: any;
+            };
+            resourceTree: {
+              __typename?: 'GetHttpsResourceTree';
+              root: {
+                __typename?: 'GetHttpsResourceTreeRoot';
+                value: {
+                  __typename?: 'GetHttpsResource';
+                  description: string;
+                  hashValue: string;
+                  locator: any;
+                  dataFormatId: any;
+                };
+              };
+            };
+          }
+
 function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [data, setData] = useState<OpticalData[]>([]);
+  const [data, setData] = useState<PartialOpticalData[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
@@ -302,7 +332,7 @@ function Page() {
           data?.databases?.edges?.map(
             (edge) => edge?.node?.allOpticalData?.nodes || []
           ) || [];
-        const flatData = ([] as OpticalData[]).concat(...nestedData);
+        const flatData = ([] as PartialOpticalData[]).concat(...nestedData);
         setData(flatData);
       } catch (error) {
         // TODO Handle properly.
@@ -428,7 +458,7 @@ function Page() {
                   label="Infrared Emittances"
                 >
                   {record.infraredEmittances
-                    .map((x) => x.toLocaleString("en"))
+                    .map((x) => x.toLocaleString())
                     .join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -436,7 +466,7 @@ function Page() {
                   label="Nearnormal Hemispherical Solar Reflectances"
                 >
                   {record.nearnormalHemisphericalSolarReflectances
-                    .map((x) => x.toLocaleString("en"))
+                    .map((x) => x.toLocaleString())
                     .join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -444,7 +474,7 @@ function Page() {
                   label="Nearnormal Hemispherical Solar Transmittances"
                 >
                   {record.nearnormalHemisphericalSolarTransmittances
-                    .map((x) => x.toLocaleString("en"))
+                    .map((x) => x.toLocaleString())
                     .join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -452,7 +482,7 @@ function Page() {
                   label="Nearnormal Hemispherical Visible Reflectances"
                 >
                   {record.nearnormalHemisphericalVisibleReflectances
-                    .map((x) => x.toLocaleString("en"))
+                    .map((x) => x.toLocaleString())
                     .join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -460,7 +490,7 @@ function Page() {
                   label="Nearnormal Hemispherical Visible Transmittances"
                 >
                   {record.nearnormalHemisphericalVisibleTransmittances
-                    .map((x) => x.toLocaleString("en"))
+                    .map((x) => x.toLocaleString())
                     .join(", ")}
                 </Descriptions.Item>
               </Descriptions>
