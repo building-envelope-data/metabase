@@ -27,7 +27,6 @@ namespace Metabase.GraphQl.Databases
                 IncludeFields = false,
                 IgnoreReadOnlyProperties = false,
                 IgnoreReadOnlyFields = true,
-                IgnoreNullValues = false,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             }; //.SetupImmutableConverter();
 
@@ -45,7 +44,6 @@ namespace Metabase.GraphQl.Databases
                 IncludeFields = false,
                 IgnoreReadOnlyProperties = false,
                 IgnoreReadOnlyFields = true,
-                IgnoreNullValues = false,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             }; //.SetupImmutableConverter();
 

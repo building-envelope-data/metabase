@@ -52,8 +52,9 @@ namespace Metabase.Data
         {
             // https://stackoverflow.com/questions/19902756/asp-net-identity-dbcontext-confusion/35722688#35722688
             builder.Entity<User>()
-              .UseXminAsConcurrencyToken()
-              .ToTable("user");
+              .ToTable("user")
+              .Property(e => e.Version)
+              .IsRowVersion();
             builder.Entity<Role>().ToTable("role");
             builder.Entity<UserClaim>().ToTable("user_claim");
             builder.Entity<UserRole>().ToTable("user_role");
