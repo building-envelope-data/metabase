@@ -17,6 +17,7 @@ using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 using NUnit.Framework;
 using Snapshooter;
+using System.Text.Json.Nodes;
 
 namespace Metabase.Tests.Integration
 {
@@ -546,13 +547,13 @@ namespace Metabase.Tests.Integration
         {
             var pathResult =
                 JsonPath.Parse(jsonPath).Evaluate(
-                    jsonElement
+                    JsonObject.Create(jsonElement)
                 );
             if (pathResult.Error is not null)
             {
                 throw new Exception(pathResult.Error);
             }
-            return pathResult.Matches?.Single()?.Value.GetString()
+            return pathResult.Matches?.Single()?.Value?.GetValue<string>()
             ?? throw new Exception("String is null");
         }
 
