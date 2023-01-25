@@ -13,7 +13,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidDataWithConfirmationCodeFromRegistrationEmail_ConfirmsUserEmail()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
+            const string email = "john.doe@ise.fraunhofer.de";
             await RegisterUser(email: email).ConfigureAwait(false);
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act
@@ -34,7 +34,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidDataWithConfirmationCodeFromResendUserEmailConfirmation_ConfirmsUserEmail()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
+            const string email = "john.doe@ise.fraunhofer.de";
             await RegisterUser(email: email).ConfigureAwait(false);
             EmailSender.Clear();
             await ResendUserEmailConfirmation(
@@ -59,7 +59,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidDataWithConfirmationCodeFromResendUserEmailVerification_ConfirmsUserEmail()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
+            const string email = "john.doe@ise.fraunhofer.de";
             await RegisterAndConfirmAndLoginUser(email: email).ConfigureAwait(false);
             EmailSender.Clear();
             await ResendUserEmailVerification().ConfigureAwait(false);
@@ -82,7 +82,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ResentUserEmailConfirmation_ContainsValidCode()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
+            const string email = "john.doe@ise.fraunhofer.de";
             await RegisterUser(email: email).ConfigureAwait(false);
             EmailSender.Clear();
             // Act
@@ -106,7 +106,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task UnknownUser_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
+            const string email = "john.doe@ise.fraunhofer.de";
             await RegisterUser(email: email).ConfigureAwait(false);
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act
@@ -121,7 +121,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task InvalidConfirmationCode_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
+            const string email = "john.doe@ise.fraunhofer.de";
             await RegisterUser(email: email).ConfigureAwait(false);
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act

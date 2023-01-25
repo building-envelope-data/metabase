@@ -28,13 +28,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidData_ResetsUserPassword()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
                 ).ConfigureAwait(false);
-            var newPassword = "new" + password;
+            const string newPassword = "new" + password;
             // Act
             var response = await ResetUserPassword(
                 email: email,
@@ -53,8 +53,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task InvalidResetCode_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
@@ -77,8 +77,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordConfirmationMismatch_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
@@ -87,9 +87,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var response = await ResetUserPassword(
                 email: email,
                 password: "new" + password,
-                passwordConfirmation: "other" + password,
-                resetCode: resetCode
-                ).ConfigureAwait(false);
+                resetCode: resetCode,
+                passwordConfirmation: "other" + password).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             await LoginUser(
@@ -102,8 +101,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordRequiresDigit_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
@@ -126,8 +125,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordRequiresLower_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
@@ -150,8 +149,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordRequiresNonAlphanumeric_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
@@ -174,8 +173,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordRequiresUpper_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
@@ -198,8 +197,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task PasswordTooShort_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password

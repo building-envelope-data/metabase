@@ -15,8 +15,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task CorrectPassword_IsSuccess()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             await RegisterAndConfirmAndLoginUser(
                 email: email,
                 password: password
@@ -38,8 +38,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task CorrectPassword_DeletesPersonalUserData()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var userId =
                 await RegisterAndConfirmAndLoginUser(
                     email: email,
@@ -58,8 +58,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             await RegisterAndConfirmUser(
                 email: email,
                 password: password
@@ -80,8 +80,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task NonLoggedInUser_DoesNotDeletePersonalUserData()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var userId =
                 await RegisterAndConfirmUser(
                     email: email,
@@ -113,8 +113,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task MissingPassword_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             await RegisterAndConfirmAndLoginUser(
                 email: email,
                 password: password
@@ -136,8 +136,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task MissingPassword_DoesNotDeletePersonalUserData()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var userId =
                 await RegisterAndConfirmAndLoginUser(
                     email: email,
@@ -161,8 +161,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task IncorrectPassword_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             await RegisterAndConfirmAndLoginUser(
                 email: email,
                 password: password
@@ -184,8 +184,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task IncorrectPassword_DoesNotDeletePersonalUserData()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             var userId =
                 await RegisterAndConfirmAndLoginUser(
                     email: email,
