@@ -48,5 +48,4 @@ namespace Metabase.GraphQl.DataX
         public IReadOnlyList<double> GValues { get; }
         public IReadOnlyList<double> UValues { get; }
     }
-
 }

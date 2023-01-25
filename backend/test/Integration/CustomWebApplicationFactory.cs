@@ -43,22 +43,22 @@ namespace Metabase.Tests.Integration
             await what(scope.ServiceProvider).ConfigureAwait(false);
         }
 
-        private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
-        {
-            using var scope = Services.CreateScope();
-            return what(scope.ServiceProvider);
-        }
+        // private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
+        // {
+        //     using var scope = Services.CreateScope();
+        //     return what(scope.ServiceProvider);
+        // }
 
-        private AppSettings AppSettings
-        {
-            get
-            {
-                return Get(
-                        services =>
-                            services.GetRequiredService<AppSettings>()
-                    );
-            }
-        }
+        // private AppSettings AppSettings
+        // {
+        //     get
+        //     {
+        //         return Get(
+        //                 services =>
+        //                     services.GetRequiredService<AppSettings>()
+        //             );
+        //     }
+        // }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {

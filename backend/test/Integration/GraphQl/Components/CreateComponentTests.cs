@@ -48,7 +48,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         )
         {
             SnapshotFullName testName = SnapshotFullNameHelper(typeof(CreateComponentTests), key);
- 
+
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
             var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
@@ -87,7 +87,6 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         )
         {
             SnapshotFullName testName = SnapshotFullNameHelper(typeof(CreateComponentTests), key);
- 
 
             // Arrange
             var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);

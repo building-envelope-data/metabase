@@ -18,9 +18,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act
             var response = await ConfirmUserEmail(
-                email: email,
                 confirmationCode: confirmationCode
-                ).ConfigureAwait(false);
+,
+                email: email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
@@ -43,9 +43,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act
             var response = await ConfirmUserEmail(
-                email: email,
                 confirmationCode: confirmationCode
-                ).ConfigureAwait(false);
+,
+                email: email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
@@ -66,9 +66,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act
             var response = await ConfirmUserEmail(
-                email: email,
                 confirmationCode: confirmationCode
-                ).ConfigureAwait(false);
+,
+                email: email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
@@ -90,9 +90,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 email
                 ).ConfigureAwait(false);
             var response = await ConfirmUserEmail(
-                email: email,
                 confirmationCode: ExtractConfirmationCodeFromEmail()
-            ).ConfigureAwait(false);
+,
+                email: email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
@@ -111,9 +111,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act
             var response = await ConfirmUserEmail(
-                email: "unknown." + email,
-                confirmationCode: confirmationCode
-                ).ConfigureAwait(false);
+                confirmationCode: confirmationCode,
+                email: "unknown." + email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }
@@ -127,9 +126,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act
             var response = await ConfirmUserEmail(
-                email: email,
-                confirmationCode: "invalid" + confirmationCode
-                ).ConfigureAwait(false);
+                confirmationCode: "invalid" + confirmationCode,
+                email: email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }

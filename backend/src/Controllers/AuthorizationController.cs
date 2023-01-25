@@ -101,9 +101,7 @@ namespace Metabase.Controllers
             // Automatically create a permanent authorization to avoid requiring explicit consent
             // for future authorization or token requests containing the same scopes.
             var authorization = authorizations.LastOrDefault();
-            if (authorization is null)
-            {
-                authorization = await _authorizationManager.CreateAsync(
+            authorization ??= await _authorizationManager.CreateAsync(
                     principal: principal,
                     subject: await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
                     client: applicationId,
@@ -111,7 +109,6 @@ namespace Metabase.Controllers
                     scopes: principal.GetScopes()
                     )
                     .ConfigureAwait(false);
-            }
             principal.SetAuthorizationId(
                 await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false)
             );

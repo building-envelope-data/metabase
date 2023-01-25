@@ -70,7 +70,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
                  )
                 );
         }
-        
+
         [TestCaseSource(nameof(EnumerateInstitutionInputs))]
         [Theory]
         public async Task LoggedInUser_CreatesInstitution(

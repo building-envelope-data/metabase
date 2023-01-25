@@ -10,7 +10,7 @@ namespace Metabase.GraphQl.OpenIdConnect
             IObjectTypeDescriptor<OpenIddictEntityFrameworkCoreApplication> descriptor
             )
         {
-            var suffixedName = nameof(OpenIdConnectApplicationType);
+            const string suffixedName = nameof(OpenIdConnectApplicationType);
             descriptor.Name(suffixedName.Remove(suffixedName.Length - "Type".Length));
         }
     }
