@@ -15,6 +15,17 @@ namespace Metabase.Data
     {
         static ApplicationDbContext()
         {
+            RegisterEnumerations();
+        }
+
+        private static void RegisterEnumerations()
+        {
+            // https://www.npgsql.org/efcore/mapping/enum.html#mapping-your-enum
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.ComponentCategory>();
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionRepresentativeRole>();
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionState>();
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.MethodCategory>();
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.Standardizer>();
         }
 
         private static void CreateEnumerations(ModelBuilder builder)

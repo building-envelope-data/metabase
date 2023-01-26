@@ -107,11 +107,14 @@ namespace Metabase
             services.AddPooledDbContextFactory<Data.ApplicationDbContext>(options =>
                 {
                     var dataSourceBuilder = new NpgsqlDataSourceBuilder(_appSettings.Database.ConnectionString);
-                    dataSourceBuilder.MapEnum<Enumerations.ComponentCategory>();
-                    dataSourceBuilder.MapEnum<Enumerations.InstitutionRepresentativeRole>();
-                    dataSourceBuilder.MapEnum<Enumerations.InstitutionState>();
-                    dataSourceBuilder.MapEnum<Enumerations.MethodCategory>();
-                    dataSourceBuilder.MapEnum<Enumerations.Standardizer>();
+                    // Enumerations registered as below are not picked up by
+                    // the tool `dotnet ef` when creating migrations. We thus
+                    // register enumerations in `ApplicationDbContext`.
+                    // dataSourceBuilder.MapEnum<Enumerations.ComponentCategory>();
+                    // dataSourceBuilder.MapEnum<Enumerations.InstitutionRepresentativeRole>();
+                    // dataSourceBuilder.MapEnum<Enumerations.InstitutionState>();
+                    // dataSourceBuilder.MapEnum<Enumerations.MethodCategory>();
+                    // dataSourceBuilder.MapEnum<Enumerations.Standardizer>();
                     options
                     .UseNpgsql(dataSourceBuilder.Build() /*, optionsBuilder => optionsBuilder.UseNodaTime() */)
                     .UseSchemaName(_appSettings.Database.SchemaName)
