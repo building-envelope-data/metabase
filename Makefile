@@ -46,6 +46,7 @@ backend-build-context : ## Show the build context configured by `./backend/.dock
 		docker build \
 			--pull \
 			--no-cache \
+			--progress plain \
 			--file Dockerfile-show-build-context \
 			./backend
 .PHONY : backend-build-context
@@ -55,6 +56,7 @@ frontend-build-context : ## Show the build context configured by `./frontend/.do
 		docker build \
 			--pull \
 			--no-cache \
+			--progress plain \
 			--file Dockerfile-show-build-context \
 			./frontend
 .PHONY : frontend-build-context
