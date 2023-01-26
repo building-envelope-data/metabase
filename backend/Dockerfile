@@ -1,3 +1,8 @@
+# syntax=docker/dockerfile:1.4
+# The above line fixes the Dockerfile frontend used by BuildKit. For details
+# see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
+# Available versions are listed on https://hub.docker.com/r/docker/dockerfile
+
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk

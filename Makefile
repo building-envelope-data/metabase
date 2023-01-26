@@ -4,7 +4,7 @@
 include .env
 
 docker_compose = \
-	docker-compose \
+	docker compose \
 		--file docker-compose.yml \
 		--project-name ${NAME}
 
@@ -16,7 +16,7 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name : ## Print value of variable `${NAME}`
+name : ## Print value of variable `NAME`
 	@echo ${NAME}
 .PHONY : name
 
@@ -24,29 +24,40 @@ name : ## Print value of variable `${NAME}`
 # Interface with Docker Compose #
 # ----------------------------- #
 
-build : ## Build images
-	${docker_compose} pull
-	${docker_compose} build \
-		--pull \
-		--build-arg GROUP_ID=$(shell id --group) \
-		--build-arg USER_ID=$(shell id --user)
+pull : ## Pull images
+	COMPOSE_DOCKER_CLI_BUILD=1 \
+		DOCKER_BUILDKIT=1 \
+			${docker_compose} pull
+.PHONY : pull
+
+# To debug errors during build add `--progress plain \` to get additional
+# output.
+build : pull ## Build images
+	COMPOSE_DOCKER_CLI_BUILD=1 \
+		DOCKER_BUILDKIT=1 \
+			${docker_compose} build \
+				--pull \
+				--build-arg GROUP_ID=$(shell id --group) \
+				--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
-show-backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
-	docker build \
-		--pull \
-		--no-cache \
-		--file Dockerfile-show-build-context \
-		./backend
-.PHONY : show-backend-build-context
+backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
+	DOCKER_BUILDKIT=1 \
+		docker build \
+			--pull \
+			--no-cache \
+			--file Dockerfile-show-build-context \
+			./backend
+.PHONY : backend-build-context
 
-show-frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
-	docker build \
-		--pull \
-		--no-cache \
-		--file Dockerfile-show-build-context \
-		./frontend
-.PHONY : show-frontend-build-context
+frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
+	DOCKER_BUILDKIT=1 \
+		docker build \
+			--pull \
+			--no-cache \
+			--file Dockerfile-show-build-context \
+			./frontend
+.PHONY : frontend-build-context
 
 remove : ## Remove stopped containers
 	${docker_compose} rm
@@ -57,7 +68,7 @@ remove-data : ## Remove data volumes
 		${NAME}_data
 .PHONY : remove-data
 
-# TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
+# TODO `docker compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
 up : build ## (Re)create, and start containers (after building images if necessary)
 	${docker_compose} up \
 		--remove-orphans \
@@ -145,6 +156,11 @@ shelld : up ## Enter shell in an existing `database` container (after starting a
 		bash
 .PHONY : shelld
 
+list : ## List all containers with health status
+	${docker_compose} ps \
+		--all
+.PHONY : list
+
 createdb : ## Create databases
 	${docker_compose} exec \
 		database \
@@ -152,11 +168,6 @@ createdb : ## Create databases
 			createdb --username postgres xbase_development ; \
 		"
 .PHONY : createdb
-
-list : ## List all containers with health status
-	${docker_compose} ps \
-		--all
-.PHONY : list
 
 begin-maintenance : ## Begin maintenance
 	cp \
@@ -217,7 +228,7 @@ generate-certificate-authority : ## Generate certificate authority ECDSA private
 		docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
-		nginx:1.19.9 \
+		nginx:1.23 \
 		bash -cx " \
 			echo \"# Generate the elliptic curve (EC) private key '/ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
@@ -324,7 +335,7 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 	docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
-		nginx:1.19.9 \
+		nginx:1.23 \
 		bash -cx " \
 			echo \"# Generate the elliptic curve (EC) private key '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
