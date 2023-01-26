@@ -158,6 +158,7 @@ shelld : up ## Enter shell in an existing `database` container (after starting a
 
 list : ## List all containers with health status
 	${docker_compose} ps \
+		--no-trunc \
 		--all
 .PHONY : list
 
