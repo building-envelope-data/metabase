@@ -1,0 +1,3 @@
+[submodule "dotnet-certificate-tool"]
+	path = backend/dotnet-certificate-tool
+	url = git@github.com:building-envelope-data/dotnet-certificate-tool.git

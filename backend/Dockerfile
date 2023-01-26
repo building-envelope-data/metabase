@@ -1,7 +1,7 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim-amd64
+FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim-amd64
 
 ARG GROUP_ID
 ARG USER_ID
@@ -259,12 +259,31 @@ COPY \
   --chown=me:us \
   ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
   ./ssl/
+# Once certificate tool supports .NET 7 simply use:
+# ```
+# RUN \
+#   dotnet tool run \
+#     certificate-tool add \
+#       --file ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
+#       --store-name Root \
+#       --password ${CERTIFICATE_AUTHORITY_PASSWORD}
+# ```
+# Instead of:
+COPY \
+  --chown=me:us \
+  ./dotnet-certificate-tool ./dotnet-certificate-tool
 RUN \
-  dotnet tool run \
-    certificate-tool add \
-      --file ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
-      --store-name Root \
-      --password ${CERTIFICATE_AUTHORITY_PASSWORD}
+  dotnet publish \
+    --configuration Release \
+    --framework net7.0 \
+    --output ./dotnet-certificate-tool/release \
+    ./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
+  dotnet tool restore \
+    --tool-manifest ./dotnet-tools.json \
+    --add-source ./dotnet-certificate-tool/src/nupkg && \
+  rm -rf ./dotnet-certificate-tool
+# And remove the sub-module as was done before in
+# https://github.com/building-envelope-data/metabase/commit/fbdd10f775e2289f9977b6c4a31ee6a5ff0b6ff9
 
 # COPY \
 #   --chown=me:us \

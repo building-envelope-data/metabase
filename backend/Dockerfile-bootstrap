@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim-amd64
+FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim-amd64
 
 ARG GROUP_ID
 ARG USER_ID

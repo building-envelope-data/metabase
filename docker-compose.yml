@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   database: # https://hub.docker.com/_/postgres
-    image: postgres:13.5-bullseye
+    image: postgres:13.9-bullseye
     # ports:
     #   - 5432:5432
     # For possible command-line arguments see
@@ -146,7 +146,7 @@ services:
       - backend
 
   nginx: # https://hub.docker.com/_/nginx
-    image: nginx:1.21
+    image: nginx:1.23
     command: [
       "nginx-debug",
       "-g", "daemon off;"
