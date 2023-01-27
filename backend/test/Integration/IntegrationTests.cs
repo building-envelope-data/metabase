@@ -22,9 +22,16 @@ using System.Text.Json.Nodes;
 namespace Metabase.Tests.Integration
 {
     [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
-    public abstract class IntegrationTests
+    public abstract partial class IntegrationTests
         : IDisposable
     {
+
+        [GeneratedRegex("confirmationCode=(?<confirmationCode>\\w+)")]
+        private static partial Regex ConfirmationCodeRegex();
+
+        [GeneratedRegex("resetCode=(?<resetCode>\\w+)")]
+        private static partial Regex ResetCodeRegex();
+
         private bool _disposed = false;
         protected CustomWebApplicationFactory Factory { get; }
         protected CollectingEmailSender EmailSender { get => Factory.EmailSender; }
@@ -245,10 +252,8 @@ namespace Metabase.Tests.Integration
 
         protected string ExtractConfirmationCodeFromEmail()
         {
-            return Regex.Match(
-                EmailSender.Emails.Single().Body,
-                @"confirmationCode=(?<confirmationCode>\w+)"
-                )
+            return ConfirmationCodeRegex()
+                .Match(EmailSender.Emails.Single().Body)
                 .Groups["confirmationCode"]
                 .Captures
                 .Single()
@@ -257,10 +262,8 @@ namespace Metabase.Tests.Integration
 
         protected string ExtractResetCodeFromEmail()
         {
-            return Regex.Match(
-                EmailSender.Emails.Single().Body,
-                @"resetCode=(?<resetCode>\w+)"
-                )
+            return ResetCodeRegex()
+                .Match(EmailSender.Emails.Single().Body)
                 .Groups["resetCode"]
                 .Captures
                 .Single()
