@@ -13,14 +13,22 @@ namespace Metabase.Data
     public sealed class ApplicationDbContext
       : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
     {
+        [Obsolete]
         static ApplicationDbContext()
         {
             RegisterEnumerations();
         }
 
+        [Obsolete]
         private static void RegisterEnumerations()
         {
             // https://www.npgsql.org/efcore/mapping/enum.html#mapping-your-enum
+            // Mapping enums like this is marked as obsolete. The preferred way
+            // is described in
+            // https://www.npgsql.org/doc/release-notes/7.0.html#managing-type-mappings-at-the-connection-level-is-no-longer-supported
+            // I tried to go the new way in `Startup#ConfigureDatabaseServices`.
+            // The problem was though that the tool `dotnet ef` did not pick up
+            // the registered enumerations.
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.ComponentCategory>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionRepresentativeRole>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionState>();
