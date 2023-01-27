@@ -39,7 +39,7 @@ namespace Metabase.GraphQl
             Exception exception
             )
         {
-            _logger.LogError(exception, $"During execution of the query {context.Request.Query} the exception {exception} occurred.");
+            _logger.LogError(exception, "During execution of the query {Query} the exception {Exception} occurred.", context.Request.Query, exception);
         }
 
         public override void ResolverError(
@@ -47,17 +47,17 @@ namespace Metabase.GraphQl
             IError error
             )
         {
-            _logger.LogError(error.Exception, $"During execution of the operation {context.Operation} the error {ConvertErrorToString(error)} occurred.");
+            _logger.LogError(error.Exception, "During execution of the operation {Operation} the error {Error} occurred.", context.Operation, ConvertErrorToString(error));
         }
 
         public override void SubscriptionEventError(SubscriptionEventContext context, Exception exception)
         {
-            _logger.LogError(exception, $"During execution of the subscription operation {context.Subscription.Operation.Print()} the exception {exception} occurred.");
+            _logger.LogError(exception, "During execution of the subscription operation {Operation} the exception {Exception} occurred.", context.Subscription.Operation.Print(), exception);
         }
 
         public override void SubscriptionTransportError(ISubscription subscription, Exception exception)
         {
-            _logger.LogError(exception, $"During execution of the subscription operation {subscription.Operation.Print()} the exception {exception} occurred.");
+            _logger.LogError(exception, "During execution of the subscription operation {Operation} the exception {Exception} occurred.", subscription.Operation.Print(), exception);
         }
 
         public override void SyntaxError(
@@ -65,7 +65,7 @@ namespace Metabase.GraphQl
             IError error
             )
         {
-            _logger.LogError(error.Exception, $"During execution of the query {context.Request.Query} the error {ConvertErrorToString(error)} occurred.");
+            _logger.LogError(error.Exception, "During execution of the query {Query} the error {Error} occurred.", context.Request.Query, ConvertErrorToString(error));
         }
 
         public override void TaskError(
@@ -73,7 +73,7 @@ namespace Metabase.GraphQl
             IError error
             )
         {
-            _logger.LogError(error.Exception, $"During execution of the task {task} the error {ConvertErrorToString(error)} occurred.");
+            _logger.LogError(error.Exception, "During execution of the task {Task} the error {Error} occurred.", task, ConvertErrorToString(error));
         }
 
         public override void ValidationErrors(
@@ -83,7 +83,7 @@ namespace Metabase.GraphQl
         {
             foreach (var error in errors)
             {
-                _logger.LogError(error.Exception, $"During execution of the query {context.Request.Query} the error {ConvertErrorToString(error)} occurred.");
+                _logger.LogError(error.Exception, "During execution of the query {Query} the error {Error} occurred.", context.Request.Query, ConvertErrorToString(error));
             }
         }
 
