@@ -34,7 +34,7 @@ namespace Metabase
             )
         {
             _environment = environment;
-            _appSettings = configuration.Get<AppSettings>();
+            _appSettings = configuration.Get<AppSettings>() ?? throw new Exception("Failed to get application settings from configuration.");
         }
 
         public void ConfigureServices(IServiceCollection services)

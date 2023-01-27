@@ -181,8 +181,12 @@ namespace Metabase.Controllers
             }
 
             // Retrieve the profile of the logged in user.
-            var user = await _userManager.GetUserAsync(result.Principal).ConfigureAwait(false) ??
-                throw new InvalidOperationException("The user details cannot be retrieved.");
+            var user = (
+                result.Principal is null
+                ? null
+                : await _userManager.GetUserAsync(result.Principal).ConfigureAwait(false)
+                )
+                ?? throw new InvalidOperationException("The user details cannot be retrieved.");
 
             // Retrieve the application details from the database.
             var application = (
@@ -472,7 +476,7 @@ namespace Metabase.Controllers
 
             if (request.IsPasswordGrantType())
             {
-                var user = await _userManager.FindByNameAsync(request.Username).ConfigureAwait(false);
+                var user = request.Username is null ? null : await _userManager.FindByNameAsync(request.Username).ConfigureAwait(false);
                 if (user is null)
                 {
                     return Forbid(
@@ -485,8 +489,8 @@ namespace Metabase.Controllers
                 }
 
                 // Validate the username/password parameters and ensure the account is not locked out.
-                var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true).ConfigureAwait(false);
-                if (!result.Succeeded)
+                var result = request.Password is null ? null : await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true).ConfigureAwait(false);
+                if (result is null || !result.Succeeded)
                 {
                     return Forbid(
                         properties: new AuthenticationProperties(new Dictionary<string, string?>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -45,7 +46,7 @@ namespace Metabase.GraphQl.Users
                 return new ConfirmUserEmailPayload(
                     new ConfirmUserEmailError(
                       ConfirmUserEmailErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with email address {input.Email}.",
+                      $"Failed to load user with email address {input.Email}.",
                       new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
                       )
                     );
@@ -98,7 +99,7 @@ namespace Metabase.GraphQl.Users
                 return new ConfirmUserEmailChangePayload(
                     new ConfirmUserEmailChangeError(
                       ConfirmUserEmailChangeErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with email address {input.CurrentEmail}.",
+                      $"Failed to load user with email address {input.CurrentEmail}.",
                       new[] { nameof(input), nameof(input.CurrentEmail).FirstCharToLower() }
                       )
                     );
@@ -216,6 +217,16 @@ namespace Metabase.GraphQl.Users
             }
             // TODO Only load the user if requested in the GraphQl query. Use resolver in payload and just pass email address.
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+            if (user is null)
+            {
+                return new LoginUserPayload(
+                    new LoginUserError(
+                      LoginUserErrorCode.UNKNOWN,
+                      "Failed to fetch user.",
+                      new[] { nameof(input) }
+                      )
+                    );
+            }
             if (signInResult.RequiresTwoFactor)
             {
                 return new LoginUserPayload(user, requiresTwoFactor: true);
@@ -238,7 +249,7 @@ namespace Metabase.GraphQl.Users
                 return new LoginUserWithTwoFactorCodePayload(
                     new LoginUserWithTwoFactorCodeError(
                       LoginUserWithTwoFactorCodeErrorCode.UNKNOWN_USER,
-                      "Unable to load two-factor authentication user.",
+                      "Failed to load two-factor authentication user.",
                       Array.Empty<string>()
                       )
                     );
@@ -301,7 +312,7 @@ namespace Metabase.GraphQl.Users
                 return new LoginUserWithRecoveryCodePayload(
                     new LoginUserWithRecoveryCodeError(
                       LoginUserWithRecoveryCodeErrorCode.UNKNOWN_USER,
-                      "Unable to load two-factor authentication user.",
+                      "Failed to load two-factor authentication user.",
                       Array.Empty<string>()
                       )
                     );
@@ -632,7 +643,7 @@ namespace Metabase.GraphQl.Users
                 return new DeleteUserPayload(
                     new DeleteUserError(
                       DeleteUserErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {input.UserId}.",
+                      $"Failed to load user with identifier {input.UserId}.",
                       new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
                       )
                     );
@@ -696,7 +707,7 @@ namespace Metabase.GraphQl.Users
                 return new ChangeUserPasswordPayload(
                     new ChangeUserPasswordError(
                       ChangeUserPasswordErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
@@ -796,7 +807,7 @@ namespace Metabase.GraphQl.Users
                 return new DeletePersonalUserDataPayload(
                     new DeletePersonalUserDataError(
                       DeletePersonalUserDataErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
@@ -866,7 +877,7 @@ namespace Metabase.GraphQl.Users
                 return new DisableUserTwoFactorAuthenticationPayload(
                     new DisableUserTwoFactorAuthenticationError(
                       DisableUserTwoFactorAuthenticationErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
@@ -902,7 +913,7 @@ namespace Metabase.GraphQl.Users
                 return new ForgetUserTwoFactorAuthenticationClientPayload(
                     new ForgetUserTwoFactorAuthenticationClientError(
                       ForgetUserTwoFactorAuthenticationClientErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
@@ -927,17 +938,52 @@ namespace Metabase.GraphQl.Users
                 return new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
                       GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
             }
-            var (sharedKey, authenticatorUri) = await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false);
-            return new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
-                user,
-                sharedKey,
-                authenticatorUri
-                );
+            return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false) switch
+            {
+                LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
+                    new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
+                        user,
+                        sharedKey,
+                        authenticatorUri
+                        ),
+                LoadSharedKeyAndQrCodeUriPayload.ResettingAuthenticatorKeyFailure =>
+                    new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
+                        new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
+                          GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.RESETTING_AUTHENTICATOR_KEY_FAILED,
+                          $"Failed to reset authenticator key.",
+                          Array.Empty<string>()
+                          )
+                        ),
+                LoadSharedKeyAndQrCodeUriPayload.GettingAuthenticatorKeyFailure =>
+                    new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
+                        new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
+                          GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.GETTING_AUTHENTICATOR_KEY_FAILED,
+                          $"Failed to get authenticator key.",
+                          Array.Empty<string>()
+                          )
+                        ),
+                LoadSharedKeyAndQrCodeUriPayload.GettingEmailFailure =>
+                    new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
+                        new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
+                          GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.GETTING_EMAIL_FAILED,
+                          $"Failed to get email.",
+                          Array.Empty<string>()
+                          )
+                        ),
+                _ =>
+                    new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
+                        new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
+                          GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.UNKNOWN,
+                          $"Failed to load shared key and QR code URI.",
+                          Array.Empty<string>()
+                          )
+                        )
+            };
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.EnableAuthenticator.cs.cshtml
@@ -957,7 +1003,7 @@ namespace Metabase.GraphQl.Users
                 return new EnableUserTwoFactorAuthenticatorPayload(
                     new EnableUserTwoFactorAuthenticatorError(
                       EnableUserTwoFactorAuthenticatorErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
@@ -975,34 +1021,68 @@ namespace Metabase.GraphQl.Users
                     .ConfigureAwait(false);
             if (!isTokenValid)
             {
-                var (sharedKey, authenticatorUri) = await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false);
-                return new EnableUserTwoFactorAuthenticatorPayload(
-                    new EnableUserTwoFactorAuthenticatorError(
-                      EnableUserTwoFactorAuthenticatorErrorCode.INVALID_VERIFICATION_CODE,
-                      "Verification code is invalid.",
-                      new[] { nameof(input), nameof(input.VerificationCode).FirstCharToLower() }
-                      ),
-                    sharedKey,
-                    authenticatorUri
-                    );
+                return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false) switch
+                {
+                    LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
+                        new EnableUserTwoFactorAuthenticatorPayload(
+                            new EnableUserTwoFactorAuthenticatorError(
+                              EnableUserTwoFactorAuthenticatorErrorCode.INVALID_VERIFICATION_CODE,
+                              "Verification code is invalid.",
+                              new[] { nameof(input), nameof(input.VerificationCode).FirstCharToLower() }
+                              ),
+                            sharedKey,
+                            authenticatorUri
+                            ),
+                    _ =>
+                        new EnableUserTwoFactorAuthenticatorPayload(
+                            new EnableUserTwoFactorAuthenticatorError(
+                              EnableUserTwoFactorAuthenticatorErrorCode.INVALID_VERIFICATION_CODE,
+                              "Verification code is invalid.",
+                              new[] { nameof(input), nameof(input.VerificationCode).FirstCharToLower() }
+                              )
+                            )
+                };
             }
             var enableResult = await userManager.SetTwoFactorEnabledAsync(user, true).ConfigureAwait(false);
             if (!enableResult.Succeeded)
             {
-                var (sharedKey, authenticatorUri) = await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false);
-                return new EnableUserTwoFactorAuthenticatorPayload(
-                    new EnableUserTwoFactorAuthenticatorError(
-                      EnableUserTwoFactorAuthenticatorErrorCode.ENABLING_FAILED,
-                      "Unknown error enabling.",
-                      Array.Empty<string>()
-                      ),
-                    sharedKey,
-                    authenticatorUri
-                    );
+                return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false) switch
+                {
+                    LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
+                        new EnableUserTwoFactorAuthenticatorPayload(
+                            new EnableUserTwoFactorAuthenticatorError(
+                              EnableUserTwoFactorAuthenticatorErrorCode.ENABLING_FAILED,
+                              "Unknown error enabling.",
+                              Array.Empty<string>()
+                              ),
+                            sharedKey,
+                            authenticatorUri
+                            ),
+                    _ =>
+                        new EnableUserTwoFactorAuthenticatorPayload(
+                            new EnableUserTwoFactorAuthenticatorError(
+                              EnableUserTwoFactorAuthenticatorErrorCode.ENABLING_FAILED,
+                              "Unknown error enabling.",
+                              Array.Empty<string>()
+                              )
+                            )
+                };
             }
             if (await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false) == 0)
             {
                 var recoveryCodes = await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
+                if (recoveryCodes is null)
+                {
+                    return new EnableUserTwoFactorAuthenticatorPayload(user, Array.Empty<string>());
+                    // TODO Inform user that recovery code generation failed and the he/she has none left.
+                    // return new EnableUserTwoFactorAuthenticatorPayload(
+                    //     new EnableUserTwoFactorAuthenticatorError(
+                    //       EnableUserTwoFactorAuthenticatorErrorCode.GENERATING_RECOVERY_CODES_FAILED,
+                    //       "Generating recovery codes failed.",
+                    //       Array.Empty<string>()
+                    //       )
+                    //     );
+                }
                 return new EnableUserTwoFactorAuthenticatorPayload(user, recoveryCodes.ToList().AsReadOnly());
             }
             else
@@ -1011,19 +1091,42 @@ namespace Metabase.GraphQl.Users
             }
         }
 
-        private static async Task<(string sharedKey, string authenticatorUri)> LoadSharedKeyAndQrCodeUriAsync(UserManager<Data.User> userManager, UrlEncoder urlEncoder, Data.User user)
+        public abstract record LoadSharedKeyAndQrCodeUriPayload
+        {
+            public record Success(string SharedKey, string AuthenticatorUri) : LoadSharedKeyAndQrCodeUriPayload;
+
+            public record ResettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
+            public record GettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
+            public record GettingEmailFailure() : LoadSharedKeyAndQrCodeUriPayload;
+
+            private LoadSharedKeyAndQrCodeUriPayload() { }
+        }
+
+        private static async Task<LoadSharedKeyAndQrCodeUriPayload> LoadSharedKeyAndQrCodeUriAsync(UserManager<Data.User> userManager, UrlEncoder urlEncoder, Data.User user)
         {
             // Load the authenticator key & QR code URI to display on the form
             var unformattedKey = await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
             if (string.IsNullOrEmpty(unformattedKey))
             {
-                await userManager.ResetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+                var identityResult = await userManager.ResetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+                if (!identityResult.Succeeded)
+                {
+                    return new LoadSharedKeyAndQrCodeUriPayload.ResettingAuthenticatorKeyFailure();
+                }
                 unformattedKey = await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+                if (string.IsNullOrEmpty(unformattedKey))
+                {
+                    return new LoadSharedKeyAndQrCodeUriPayload.GettingAuthenticatorKeyFailure();
+                }
             }
             var sharedKey = FormatKey(unformattedKey);
             var email = await userManager.GetEmailAsync(user).ConfigureAwait(false);
+            if (email is null)
+            {
+                return new LoadSharedKeyAndQrCodeUriPayload.GettingEmailFailure();
+            }
             var authenticatorUri = GenerateQrCodeUri(urlEncoder, email, unformattedKey);
-            return (sharedKey, authenticatorUri);
+            return new LoadSharedKeyAndQrCodeUriPayload.Success(sharedKey, authenticatorUri);
         }
 
         private static string FormatKey(string unformattedKey)
@@ -1069,7 +1172,7 @@ namespace Metabase.GraphQl.Users
                 return new ResetUserTwoFactorAuthenticatorPayload(
                     new ResetUserTwoFactorAuthenticatorError(
                       ResetUserTwoFactorAuthenticatorErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
@@ -1118,12 +1221,22 @@ namespace Metabase.GraphQl.Users
                 return new ChangeUserEmailPayload(
                     new ChangeUserEmailError(
                       ChangeUserEmailErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
             }
             var currentEmail = await userManager.GetEmailAsync(user).ConfigureAwait(false);
+            if (currentEmail is null)
+            {
+                return new ChangeUserEmailPayload(
+                    new ChangeUserEmailError(
+                      ChangeUserEmailErrorCode.UNKNOWN_CURRENT_EMAIL,
+                      $"Failed to load current email address.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
             if (currentEmail == input.NewEmail)
             {
                 return new ChangeUserEmailPayload(
@@ -1164,13 +1277,24 @@ namespace Metabase.GraphQl.Users
                 return new ResendUserEmailVerificationPayload(
                     new ResendUserEmailVerificationError(
                       ResendUserEmailVerificationErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
+            var email = await userManager.GetEmailAsync(user).ConfigureAwait(false);
+            if (email is null)
+            {
+                return new ResendUserEmailVerificationPayload(
+                    new ResendUserEmailVerificationError(
+                      ResendUserEmailVerificationErrorCode.UNKNOWN_EMAIL,
+                      $"Failed to load email address.",
                       Array.Empty<string>()
                       )
                     );
             }
             await SendUserEmailConfirmation(
-                (user.Name, await userManager.GetEmailAsync(user).ConfigureAwait(false)),
+                (user.Name, email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender,
                 appSettings.Host
@@ -1193,7 +1317,7 @@ namespace Metabase.GraphQl.Users
                 return new GenerateUserTwoFactorRecoveryCodesPayload(
                     new GenerateUserTwoFactorRecoveryCodesError(
                       GenerateUserTwoFactorRecoveryCodesErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
@@ -1209,9 +1333,21 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
+            var recoveryCodes = await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
+            if (recoveryCodes is null)
+            {
+                return new GenerateUserTwoFactorRecoveryCodesPayload(
+                    user,
+                    new GenerateUserTwoFactorRecoveryCodesError(
+                      GenerateUserTwoFactorRecoveryCodesErrorCode.CODE_GENERATION_FAILED,
+                      "Code generation failed.",
+                      Array.Empty<string>()
+                      )
+                    );
+            }
             return new GenerateUserTwoFactorRecoveryCodesPayload(
                 user,
-                (await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false)).ToList().AsReadOnly()
+                recoveryCodes.ToList().AsReadOnly()
                 );
         }
 
@@ -1233,7 +1369,7 @@ namespace Metabase.GraphQl.Users
                 return new SetUserPhoneNumberPayload(
                     new SetUserPhoneNumberError(
                       SetUserPhoneNumberErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );
@@ -1293,7 +1429,7 @@ namespace Metabase.GraphQl.Users
                 return new SetUserPasswordPayload(
                     new SetUserPasswordError(
                       SetUserPasswordErrorCode.UNKNOWN_USER,
-                      $"Unable to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
                       Array.Empty<string>()
                       )
                     );

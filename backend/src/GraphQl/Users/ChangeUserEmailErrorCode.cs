@@ -5,6 +5,6 @@ namespace Metabase.GraphQl.Users
         UNKNOWN,
         UNKNOWN_USER,
         UNCHANGED_EMAIL,
-        INVALID_EMAIL
+        UNKNOWN_CURRENT_EMAIL
     }
 }
