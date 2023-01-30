@@ -72,10 +72,9 @@ namespace Metabase
                     formatter: new CompactJsonFormatter(),
                     path: "./logs/serilog.json",
                     fileSizeLimitBytes: 1073741824, // 1 GB
-                    retainedFileCountLimit: 7,
                     rollingInterval: RollingInterval.Day,
-                    rollOnFileSizeLimit: true
-                    );
+                    rollOnFileSizeLimit: true,
+                    retainedFileCountLimit: 7);
             if (environment != "production")
             {
                 configuration.WriteTo.Debug();

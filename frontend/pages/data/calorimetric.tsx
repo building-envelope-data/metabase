@@ -10,7 +10,6 @@ import {
 } from "antd";
 import { useAllCalorimetricDataQuery } from "../../queries/data.graphql";
 import {
-  CalorimetricData,
   Scalars,
   CalorimetricDataPropositionInput,
 } from "../../__generated__/__types__";
@@ -84,13 +83,40 @@ const conjunct = (
 //   return { or: propositions };
 // };
 
+type PartialCalorimetricData = { __typename?: 'CalorimetricData';
+            gValues: Array<number>;
+            uValues: Array<number>;
+            uuid: any;
+            timestamp: any;
+            componentId: any;
+            name?: string | null | undefined;
+            description?: string | null | undefined;
+            appliedMethod: {
+              __typename?: 'AppliedMethod';
+              methodId: any;
+            };
+            resourceTree: {
+              __typename?: 'GetHttpsResourceTree';
+              root: {
+                __typename?: 'GetHttpsResourceTreeRoot';
+                value: {
+                  __typename?: 'GetHttpsResource';
+                  description: string;
+                  hashValue: string;
+                  locator: any;
+                  dataFormatId: any;
+                };
+              };
+            };
+          }
+
 function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [data, setData] = useState<CalorimetricData[]>([]);
+  const [data, setData] = useState<PartialCalorimetricData[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
@@ -211,12 +237,11 @@ function Page() {
             error.graphQLErrors.map((error) => error.message).join(" ")
           );
         }
-        // TODO Casting to `CalorimetricData` is wrong and error prone!
         const nestedData =
           data?.databases?.edges?.map(
             (edge) => edge?.node?.allCalorimetricData?.nodes || []
           ) || [];
-        const flatData = ([] as CalorimetricData[]).concat(...nestedData);
+        const flatData = ([] as PartialCalorimetricData[]).concat(...nestedData);
         setData(flatData);
       } catch (error) {
         // TODO Handle properly.
@@ -315,10 +340,10 @@ function Page() {
             render: (_text, record, _index) => (
               <Descriptions column={1}>
                 <Descriptions.Item key="gValues" label="g Values">
-                  {record.gValues.map((x) => x.toLocaleString("en")).join(", ")}
+                  {record.gValues.map((x) => x.toLocaleString()).join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item key="uValues" label="u Values">
-                  {record.uValues.map((x) => x.toLocaleString("en")).join(", ")}
+                  {record.uValues.map((x) => x.toLocaleString()).join(", ")}
                 </Descriptions.Item>
               </Descriptions>
             ),

@@ -1,7 +1,12 @@
+# syntax=docker/dockerfile:1.4
+# The above line fixes the Dockerfile frontend used by BuildKit. For details
+# see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
+# Available versions are listed on https://hub.docker.com/r/docker/dockerfile
+
 # Inspired by https://mherman.org/blog/dockerizing-a-react-app/
 
 # https://hub.docker.com/_/node
-FROM node:16.13-bullseye-slim
+FROM node:18.13-bullseye-slim
 
 ARG GROUP_ID
 ARG USER_ID
@@ -46,7 +51,7 @@ RUN \
   chown \
     node:node \
     ${HOME}/app && \
-  ln -s ${HOME}/app /app
+  ln --symbolic ${HOME}/app /app
 
 #############
 # As `node` #
@@ -61,6 +66,8 @@ COPY \
 COPY \
   --chown=node:node \
   ./yarn.lock ./
-RUN yarn install --pure-lockfile
+RUN \
+  yarn install \
+    --pure-lockfile
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]

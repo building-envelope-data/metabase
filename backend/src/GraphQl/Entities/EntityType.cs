@@ -30,7 +30,7 @@ namespace Metabase.GraphQl
                   );
             // TODO Do we want to expose this, require it as input, and use it to discover concurrent writes?
             descriptor
-              .Field(t => t.xmin)
+              .Field(t => t.Version)
               .Type<NonNullType<NonNegativeIntType>>()
               .Name("version")
               .Ignore();

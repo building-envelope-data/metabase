@@ -30,7 +30,7 @@ namespace Metabase.Services
             string body
         )
         {
-            _logger.LogDebug($"About to send email to `{to}` with subject `{subject}` and body `{body}`");
+            _logger.LogDebug("About to send email to `{to}` with subject `{subject}` and body `{body}`", to, subject, body);
             var message = new MimeMessage();
             message.From.Add(
                 new MailboxAddress(

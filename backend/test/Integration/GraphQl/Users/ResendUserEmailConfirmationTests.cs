@@ -13,8 +13,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ExistingEmailAddress_ResendsUserEmailConfirmation()
         {
             // Arrange
-            var name = "John Doe";
-            var email = "john.doe@ise.fraunhofer.de";
+            const string name = "John Doe";
+            const string email = "john.doe@ise.fraunhofer.de";
             await RegisterUser(
                 name: name,
                 email: email
@@ -37,7 +37,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task UnknownEmailAddress_DoesNothing()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
+            const string email = "john.doe@ise.fraunhofer.de";
             await RegisterUser(email: email).ConfigureAwait(false);
             EmailSender.Clear();
             // Act

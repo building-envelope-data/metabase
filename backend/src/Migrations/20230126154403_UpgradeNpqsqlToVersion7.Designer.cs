@@ -9,26 +9,30 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
 
+#nullable disable
+
 namespace Metabase.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210715150119_AddManagerRelationToInstitution")]
-    partial class AddManagerRelationToInstitution
+    [Migration("20230126154403_UpgradeNpqsqlToVersion7")]
+    partial class UpgradeNpqsqlToVersion7
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("metabase")
-                .HasPostgresEnum("component_category", new[] { "material", "layer", "unit" })
-                .HasPostgresEnum("institution_representative_role", new[] { "owner", "assistant" })
-                .HasPostgresEnum("institution_state", new[] { "unknown", "operative", "inoperative" })
-                .HasPostgresEnum("method_category", new[] { "measurement", "calculation" })
-                .HasPostgresEnum("standardizer", new[] { "aerc", "agi", "ashrae", "breeam", "bs", "bsi", "cen", "cie", "dgnb", "din", "dvwg", "iec", "ies", "ift", "iso", "jis", "leed", "nfrc", "riba", "ul", "unece", "vdi", "vff", "well" })
-                .HasPostgresExtension("pgcrypto")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.7")
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "public", "component_category", new[] { "material", "layer", "unit" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "public", "institution_representative_role", new[] { "owner", "assistant" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "public", "institution_state", new[] { "pending", "verified" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "public", "method_category", new[] { "measurement", "calculation" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "public", "standardizer", new[] { "aerc", "agi", "ashrae", "breeam", "bs", "bsi", "cen", "cie", "dgnb", "din", "dvwg", "iec", "ies", "ift", "iso", "jis", "leed", "nfrc", "riba", "ul", "unece", "vdi", "vff", "well" });
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pgcrypto");
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Metabase.Data.Component", b =>
                 {
@@ -41,7 +45,7 @@ namespace Metabase.Migrations
                         .HasColumnType("text");
 
                     b.Property<NpgsqlRange<DateTime>?>("Availability")
-                        .HasColumnType("tsrange");
+                        .HasColumnType("tstzrange");
 
                     b.Property<ComponentCategory[]>("Categories")
                         .IsRequired()
@@ -55,14 +59,30 @@ namespace Metabase.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<uint>("xmin")
+                    b.Property<uint>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
-                    b.ToTable("component");
+                    b.ToTable("component", "metabase");
+                });
+
+            modelBuilder.Entity("Metabase.Data.ComponentAssembly", b =>
+                {
+                    b.Property<Guid>("AssembledComponentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PartComponentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("AssembledComponentId", "PartComponentId");
+
+                    b.HasIndex("PartComponentId");
+
+                    b.ToTable("component_assembly", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.ComponentConcretizationAndGeneralization", b =>
@@ -73,17 +93,11 @@ namespace Metabase.Migrations
                     b.Property<Guid>("ConcreteComponentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<long>("xmin")
-                        .HasColumnType("bigint");
-
                     b.HasKey("GeneralComponentId", "ConcreteComponentId");
 
                     b.HasIndex("ConcreteComponentId");
 
-                    b.ToTable("component_concretization_and_generalization");
+                    b.ToTable("component_concretization_and_generalization", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.ComponentManufacturer", b =>
@@ -94,11 +108,29 @@ namespace Metabase.Migrations
                     b.Property<Guid>("InstitutionId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Pending")
+                        .HasColumnType("boolean");
+
                     b.HasKey("ComponentId", "InstitutionId");
 
                     b.HasIndex("InstitutionId");
 
-                    b.ToTable("component_manufacturer");
+                    b.ToTable("component_manufacturer", "metabase");
+                });
+
+            modelBuilder.Entity("Metabase.Data.ComponentVariant", b =>
+                {
+                    b.Property<Guid>("OfComponentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ToComponentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("OfComponentId", "ToComponentId");
+
+                    b.HasIndex("ToComponentId");
+
+                    b.ToTable("component_variant", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.DataFormat", b =>
@@ -129,16 +161,17 @@ namespace Metabase.Migrations
                     b.Property<string>("SchemaLocator")
                         .HasColumnType("text");
 
-                    b.Property<uint>("xmin")
+                    b.Property<uint>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("data_format");
+                    b.ToTable("data_format", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.Database", b =>
@@ -163,16 +196,17 @@ namespace Metabase.Migrations
                     b.Property<Guid>("OperatorId")
                         .HasColumnType("uuid");
 
-                    b.Property<uint>("xmin")
+                    b.Property<uint>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OperatorId");
 
-                    b.ToTable("database");
+                    b.ToTable("database", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.Institution", b =>
@@ -202,19 +236,20 @@ namespace Metabase.Migrations
                     b.Property<InstitutionState>("State")
                         .HasColumnType("institution_state");
 
-                    b.Property<string>("WebsiteLocator")
-                        .HasColumnType("text");
-
-                    b.Property<uint>("xmin")
+                    b.Property<uint>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("WebsiteLocator")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("institution");
+                    b.ToTable("institution", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.InstitutionMethodDeveloper", b =>
@@ -232,7 +267,7 @@ namespace Metabase.Migrations
 
                     b.HasIndex("MethodId");
 
-                    b.ToTable("institution_method_developer");
+                    b.ToTable("institution_method_developer", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.InstitutionRepresentative", b =>
@@ -253,7 +288,7 @@ namespace Metabase.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("institution_representative");
+                    b.ToTable("institution_representative", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.Method", b =>
@@ -264,7 +299,7 @@ namespace Metabase.Migrations
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<NpgsqlRange<DateTime>?>("Availability")
-                        .HasColumnType("tsrange");
+                        .HasColumnType("tstzrange");
 
                     b.Property<string>("CalculationLocator")
                         .HasColumnType("text");
@@ -285,18 +320,19 @@ namespace Metabase.Migrations
                         .HasColumnType("text");
 
                     b.Property<NpgsqlRange<DateTime>?>("Validity")
-                        .HasColumnType("tsrange");
+                        .HasColumnType("tstzrange");
 
-                    b.Property<uint>("xmin")
+                    b.Property<uint>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("method");
+                    b.ToTable("method", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.Role", b =>
@@ -323,15 +359,16 @@ namespace Metabase.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("role");
+                    b.ToTable("role", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.RoleClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -346,7 +383,7 @@ namespace Metabase.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("role_claim");
+                    b.ToTable("role_claim", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.User", b =>
@@ -409,13 +446,14 @@ namespace Metabase.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.Property<string>("WebsiteLocator")
-                        .HasColumnType("text");
-
-                    b.Property<uint>("xmin")
+                    b.Property<uint>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid");
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("WebsiteLocator")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -426,15 +464,16 @@ namespace Metabase.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("user");
+                    b.ToTable("user", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.UserClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -449,7 +488,7 @@ namespace Metabase.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("user_claim");
+                    b.ToTable("user_claim", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.UserLogin", b =>
@@ -470,7 +509,7 @@ namespace Metabase.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("user_login");
+                    b.ToTable("user_login", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.UserMethodDeveloper", b =>
@@ -488,7 +527,7 @@ namespace Metabase.Migrations
 
                     b.HasIndex("MethodId");
 
-                    b.ToTable("user_method_developer");
+                    b.ToTable("user_method_developer", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.UserRole", b =>
@@ -503,7 +542,7 @@ namespace Metabase.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("user_role");
+                    b.ToTable("user_role", "metabase");
                 });
 
             modelBuilder.Entity("Metabase.Data.UserToken", b =>
@@ -522,7 +561,7 @@ namespace Metabase.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("user_token");
+                    b.ToTable("user_token", "metabase");
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication", b =>
@@ -577,7 +616,7 @@ namespace Metabase.Migrations
                     b.HasIndex("ClientId")
                         .IsUnique();
 
-                    b.ToTable("OpenIddictApplications");
+                    b.ToTable("OpenIddictApplications", "metabase");
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreAuthorization", b =>
@@ -595,7 +634,7 @@ namespace Metabase.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Properties")
                         .HasColumnType("text");
@@ -619,7 +658,7 @@ namespace Metabase.Migrations
 
                     b.HasIndex("ApplicationId", "Status", "Subject", "Type");
 
-                    b.ToTable("OpenIddictAuthorizations");
+                    b.ToTable("OpenIddictAuthorizations", "metabase");
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreScope", b =>
@@ -660,7 +699,7 @@ namespace Metabase.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("OpenIddictScopes");
+                    b.ToTable("OpenIddictScopes", "metabase");
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreToken", b =>
@@ -681,10 +720,10 @@ namespace Metabase.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Payload")
                         .HasColumnType("text");
@@ -693,7 +732,7 @@ namespace Metabase.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("RedemptionDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ReferenceId")
                         .HasMaxLength(100)
@@ -720,19 +759,38 @@ namespace Metabase.Migrations
 
                     b.HasIndex("ApplicationId", "Status", "Subject", "Type");
 
-                    b.ToTable("OpenIddictTokens");
+                    b.ToTable("OpenIddictTokens", "metabase");
+                });
+
+            modelBuilder.Entity("Metabase.Data.ComponentAssembly", b =>
+                {
+                    b.HasOne("Metabase.Data.Component", "AssembledComponent")
+                        .WithMany("PartEdges")
+                        .HasForeignKey("AssembledComponentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Metabase.Data.Component", "PartComponent")
+                        .WithMany("PartOfEdges")
+                        .HasForeignKey("PartComponentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssembledComponent");
+
+                    b.Navigation("PartComponent");
                 });
 
             modelBuilder.Entity("Metabase.Data.ComponentConcretizationAndGeneralization", b =>
                 {
                     b.HasOne("Metabase.Data.Component", "ConcreteComponent")
-                        .WithMany("ConcretizationEdges")
+                        .WithMany("GeneralizationEdges")
                         .HasForeignKey("ConcreteComponentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Metabase.Data.Component", "GeneralComponent")
-                        .WithMany("GeneralizationEdges")
+                        .WithMany("ConcretizationEdges")
                         .HasForeignKey("GeneralComponentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -759,6 +817,25 @@ namespace Metabase.Migrations
                     b.Navigation("Component");
 
                     b.Navigation("Institution");
+                });
+
+            modelBuilder.Entity("Metabase.Data.ComponentVariant", b =>
+                {
+                    b.HasOne("Metabase.Data.Component", "OfComponent")
+                        .WithMany("VariantEdges")
+                        .HasForeignKey("OfComponentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Metabase.Data.Component", "ToComponent")
+                        .WithMany("VariantOfEdges")
+                        .HasForeignKey("ToComponentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OfComponent");
+
+                    b.Navigation("ToComponent");
                 });
 
             modelBuilder.Entity("Metabase.Data.DataFormat", b =>
@@ -800,7 +877,7 @@ namespace Metabase.Migrations
 
                             b1.HasKey("DataFormatId");
 
-                            b1.ToTable("data_format");
+                            b1.ToTable("data_format", "metabase");
 
                             b1.WithOwner()
                                 .HasForeignKey("DataFormatId");
@@ -825,7 +902,6 @@ namespace Metabase.Migrations
                                 .HasColumnType("standardizer[]");
 
                             b1.Property<string>("Title")
-                                .IsRequired()
                                 .HasColumnType("text");
 
                             b1.Property<int?>("Year")
@@ -833,7 +909,7 @@ namespace Metabase.Migrations
 
                             b1.HasKey("DataFormatId");
 
-                            b1.ToTable("data_format");
+                            b1.ToTable("data_format", "metabase");
 
                             b1.WithOwner()
                                 .HasForeignKey("DataFormatId");
@@ -855,7 +931,7 @@ namespace Metabase.Migrations
 
                                     b2.HasKey("StandardDataFormatId");
 
-                                    b2.ToTable("data_format");
+                                    b2.ToTable("data_format", "metabase");
 
                                     b2.WithOwner()
                                         .HasForeignKey("StandardDataFormatId");
@@ -969,7 +1045,7 @@ namespace Metabase.Migrations
 
                             b1.HasKey("MethodId");
 
-                            b1.ToTable("method");
+                            b1.ToTable("method", "metabase");
 
                             b1.WithOwner()
                                 .HasForeignKey("MethodId");
@@ -994,7 +1070,6 @@ namespace Metabase.Migrations
                                 .HasColumnType("standardizer[]");
 
                             b1.Property<string>("Title")
-                                .IsRequired()
                                 .HasColumnType("text");
 
                             b1.Property<int?>("Year")
@@ -1002,7 +1077,7 @@ namespace Metabase.Migrations
 
                             b1.HasKey("MethodId");
 
-                            b1.ToTable("method");
+                            b1.ToTable("method", "metabase");
 
                             b1.WithOwner()
                                 .HasForeignKey("MethodId");
@@ -1024,7 +1099,7 @@ namespace Metabase.Migrations
 
                                     b2.HasKey("StandardMethodId");
 
-                                    b2.ToTable("method");
+                                    b2.ToTable("method", "metabase");
 
                                     b2.WithOwner()
                                         .HasForeignKey("StandardMethodId");
@@ -1142,6 +1217,14 @@ namespace Metabase.Migrations
                     b.Navigation("GeneralizationEdges");
 
                     b.Navigation("ManufacturerEdges");
+
+                    b.Navigation("PartEdges");
+
+                    b.Navigation("PartOfEdges");
+
+                    b.Navigation("VariantEdges");
+
+                    b.Navigation("VariantOfEdges");
                 });
 
             modelBuilder.Entity("Metabase.Data.Institution", b =>

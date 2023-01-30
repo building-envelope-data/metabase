@@ -5,7 +5,7 @@ using HotChocolate;
 using Microsoft.AspNetCore.Identity;
 using Guid = System.Guid;
 
-// TODO Make `User`, `Role`, ... subtype `Entity` and use `xmin` to catch update conflicts. Add interface `IEntity`.
+// TODO Make `User`, `Role`, ... subtype `Entity` and use `Version` to catch update conflicts. Add interface `IEntity`.
 namespace Metabase.Data
 {
     public sealed class User
@@ -34,7 +34,7 @@ namespace Metabase.Data
 
         public ICollection<Institution> RepresentedInstitutions { get; } = new List<Institution>();
 
-        public uint xmin { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
+        public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
 
 #nullable disable
         public User()

@@ -13,7 +13,7 @@ namespace Metabase.GraphQl.Common
         {
             descriptor.BindFieldsExplicitly();
 
-            var suffixedName = nameof(OpenEndedDateTimeRangeType);
+            const string suffixedName = nameof(OpenEndedDateTimeRangeType);
             descriptor.Name(suffixedName.Remove(suffixedName.Length - "Type".Length));
 
             descriptor

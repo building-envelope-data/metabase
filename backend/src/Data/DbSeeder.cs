@@ -52,7 +52,7 @@ namespace Metabase.Data
             {
                 if (await manager.FindByNameAsync(Role.EnumToName(role)).ConfigureAwait(false) is null)
                 {
-                    logger.LogDebug($"Creating role {role}");
+                    logger.LogDebug("Creating role {role}", role);
                     await manager.CreateAsync(
                         new Role(role)
                         ).ConfigureAwait(false);
@@ -70,7 +70,7 @@ namespace Metabase.Data
             {
                 if (await manager.FindByNameAsync(Name).ConfigureAwait(false) is null)
                 {
-                    logger.LogDebug($"Creating user {Name}");
+                    logger.LogDebug("Creating user {Name}", Name);
                     var user = new User(Name, EmailAddress, null, null);
                     await manager.CreateAsync(
                         user,
@@ -156,7 +156,7 @@ namespace Metabase.Data
             var manager = services.GetRequiredService<IOpenIddictScopeManager>();
             if (await manager.FindByNameAsync(Configuration.AuthConfiguration.ReadApiScope).ConfigureAwait(false) is null)
             {
-                logger.LogDebug($"Creating scope '{Configuration.AuthConfiguration.ReadApiScope}'");
+                logger.LogDebug("Creating scope '{Scope}'", Configuration.AuthConfiguration.ReadApiScope);
                 await manager.CreateAsync(
                     new OpenIddictScopeDescriptor
                     {
@@ -175,7 +175,7 @@ namespace Metabase.Data
             }
             if (await manager.FindByNameAsync(Configuration.AuthConfiguration.WriteApiScope).ConfigureAwait(false) is null)
             {
-                logger.LogDebug($"Creating scope '{Configuration.AuthConfiguration.WriteApiScope}'");
+                logger.LogDebug("Creating scope '{Scope}'", Configuration.AuthConfiguration.WriteApiScope);
                 await manager.CreateAsync(
                     new OpenIddictScopeDescriptor
                     {

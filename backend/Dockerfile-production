@@ -1,3 +1,8 @@
+# syntax=docker/dockerfile:1.4
+# The above line fixes the Dockerfile frontend used by BuildKit. For details
+# see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
+# Available versions are listed on https://hub.docker.com/r/docker/dockerfile
+
 # Inspired by
 # https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 # and
@@ -8,7 +13,7 @@
 #########
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:5.0-bullseye-slim-amd64 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim-amd64 AS build
 
 RUN \
   apt-get update && \
@@ -36,7 +41,7 @@ RUN \
 ###########
 
 # https://hub.docker.com/_/microsoft-dotnet-aspnet
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-bullseye-slim-amd64
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim-amd64
 
 RUN \
   apt-get update && \
@@ -58,7 +63,7 @@ COPY \
   ./
 
 RUN \
-  ln --symbolic Metabase.dll App.dll
+  ln --symbolic ./Metabase.dll ./App.dll
 
 # See: https://github.com/dotnet/announcements/issues/20
 # Uncomment to enable globalization APIs
@@ -66,3 +71,5 @@ RUN \
 #RUN apt-get install icu-libs
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
+
+ENV SHELL=/bin/bash

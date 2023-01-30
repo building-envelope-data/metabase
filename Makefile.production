@@ -4,7 +4,7 @@
 include .env
 
 docker_compose = \
-	docker-compose \
+	docker compose \
 		--file docker-compose.production.yml \
 		--project-name ${NAME}
 
@@ -18,18 +18,22 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name : ## Print value of variable `${NAME}`
+name : ## Print value of variable `NAME`
 	@echo ${NAME}
 .PHONY : name
 
 pull : ## Pull images
-	${docker_compose} pull
+	COMPOSE_DOCKER_CLI_BUILD=1 \
+		DOCKER_BUILDKIT=1 \
+			${docker_compose} pull
 .PHONY : pull
 
 build : pull ## Build images
-	${docker_compose} build \
-		--pull \
-		--no-cache
+	COMPOSE_DOCKER_CLI_BUILD=1 \
+		DOCKER_BUILDKIT=1 \
+			${docker_compose} build \
+				--pull \
+				--no-cache
 .PHONY : build
 
 up : ## (Re)create and start containers

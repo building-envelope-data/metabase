@@ -1,4 +1,4 @@
-import { Input, Space, Button } from "antd";
+import { Input, Space, Button, InputRef } from "antd";
 import { FilterFilled } from "@ant-design/icons";
 import {
   FilterConfirmProps,
@@ -49,7 +49,7 @@ export function getFreeTextFilterProps<RecordType>(
     }
   };
 
-  let searchInput: Input | null = null;
+  let searchInput: InputRef | null = null;
 
   return {
     filterDropdown: ({
@@ -98,7 +98,7 @@ export function getFreeTextFilterProps<RecordType>(
       const field = getField(record);
       return field ? doesFieldIncludeFilterValue(field, value) : false;
     },
-    onFilterDropdownVisibleChange: (visible: boolean) => {
+    onFilterDropdownOpenChange: (visible: boolean) => {
       if (visible) {
         setTimeout(() => searchInput?.select(), 100);
       }

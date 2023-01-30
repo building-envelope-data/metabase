@@ -15,8 +15,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidDataOfRegisteredAndConfirmedUser_LogsInUser()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = "aaaAAA123$!@";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = "aaaAAA123$!@";
             await RegisterAndConfirmUser(email: email, password: password).ConfigureAwait(false);
             // Act
             var response = await SuccessfullyQueryGraphQlContentAsString(

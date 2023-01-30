@@ -7,7 +7,7 @@ import {
 import { ComponentCategory, Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import * as moment from "moment";
+import * as dayjs from 'dayjs';
 import { InstitutionDocument } from "../../queries/institutions.graphql";
 import { SelectInstitutionId } from "../SelectInstitutionId";
 import { SelectComponentId } from "../SelectComponentId";
@@ -65,7 +65,7 @@ export default function CreateComponent({
     abbreviation: string | null | undefined;
     description: string;
     availability:
-      | [moment.Moment | null | undefined, moment.Moment | null | undefined]
+      | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
       | null
       | undefined;
     categories: ComponentCategory[] | null | undefined;

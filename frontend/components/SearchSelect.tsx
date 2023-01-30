@@ -21,13 +21,13 @@ export function SearchSelect<ValueType extends string>({
       options={options}
       optionFilterProp="label"
       filterOption={(input, option) =>
-        option?.label?.toLocaleString("en").includes(input) || false
+        option?.label?.toLocaleString().includes(input) || false
       }
       filterSort={(optionA, optionB) =>
         optionA.label != null && optionB.label != null
           ? optionA.label
-              .toLocaleString("en")
-              .localeCompare(optionB.label.toLocaleString("en"), "en")
+              .toLocaleString()
+              .localeCompare(optionB.label.toLocaleString(), "en")
           : 0
       }
       value={value}

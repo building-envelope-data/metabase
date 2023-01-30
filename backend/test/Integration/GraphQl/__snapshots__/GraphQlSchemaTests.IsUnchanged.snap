@@ -1390,7 +1390,7 @@ input ComponentSortInput {
   description: SortEnumType
   availability: SortEnumType
   id: SortEnumType
-  xmin: SortEnumType
+  version: SortEnumType
 }
 
 input ConfirmComponentManufacturerInput {
@@ -1529,7 +1529,7 @@ input DataFormatSortInput {
   managerId: SortEnumType
   manager: InstitutionSortInput
   id: SortEnumType
-  xmin: SortEnumType
+  version: SortEnumType
 }
 
 input DataPropositionInput {
@@ -1565,7 +1565,7 @@ input DatabaseSortInput {
   operatorId: SortEnumType
   operator: InstitutionSortInput
   id: SortEnumType
-  xmin: SortEnumType
+  version: SortEnumType
 }
 
 input DeleteInstitutionInput {
@@ -1653,7 +1653,7 @@ input InstitutionSortInput {
   managerId: SortEnumType
   manager: InstitutionSortInput
   id: SortEnumType
-  xmin: SortEnumType
+  version: SortEnumType
 }
 
 input InstitutionStateOperationFilterInput {
@@ -1728,7 +1728,7 @@ input MethodSortInput {
   managerId: SortEnumType
   manager: InstitutionSortInput
   id: SortEnumType
-  xmin: SortEnumType
+  version: SortEnumType
 }
 
 input NumerationSortInput {
@@ -1920,7 +1920,7 @@ input UserSortInput {
   name: SortEnumType
   postalAddress: SortEnumType
   websiteLocator: UriSortInput
-  xmin: SortEnumType
+  version: SortEnumType
   id: SortEnumType
   userName: SortEnumType
   normalizedUserName: SortEnumType

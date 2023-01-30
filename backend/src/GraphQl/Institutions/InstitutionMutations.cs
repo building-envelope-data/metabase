@@ -136,11 +136,13 @@ namespace Metabase.GraphQl.Institutions
                     ).ConfigureAwait(false);
                 await Task.WhenAll(
                     verifiers.Select(verifier =>
-                        emailSender.SendAsync(
-                            (verifier.Name, verifier.Email),
-                            $"New institution `{institution.Name}` in metabase awaits verification",
-                            $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID {institution.Id:D} on {appSettings.Host}/institutions Have a nice day! :-)"
-                        )
+                        verifier.Email is null
+                        ? Task.CompletedTask
+                        : emailSender.SendAsync(
+                              (verifier.Name, verifier.Email),
+                              $"New institution `{institution.Name}` in metabase awaits verification",
+                              $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID {institution.Id:D} on {appSettings.Host}/institutions Have a nice day! :-)"
+                          )
                     )
                 ).ConfigureAwait(false);
             }

@@ -17,13 +17,21 @@ using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 using NUnit.Framework;
 using Snapshooter;
+using System.Text.Json.Nodes;
 
 namespace Metabase.Tests.Integration
 {
     [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
-    public abstract class IntegrationTests
+    public abstract partial class IntegrationTests
         : IDisposable
     {
+
+        [GeneratedRegex("confirmationCode=(?<confirmationCode>\\w+)")]
+        private static partial Regex ConfirmationCodeRegex();
+
+        [GeneratedRegex("resetCode=(?<resetCode>\\w+)")]
+        private static partial Regex ResetCodeRegex();
+
         private bool _disposed = false;
         protected CustomWebApplicationFactory Factory { get; }
         protected CollectingEmailSender EmailSender { get => Factory.EmailSender; }
@@ -244,10 +252,8 @@ namespace Metabase.Tests.Integration
 
         protected string ExtractConfirmationCodeFromEmail()
         {
-            return Regex.Match(
-                EmailSender.Emails.Single().Body,
-                @"confirmationCode=(?<confirmationCode>\w+)"
-                )
+            return ConfirmationCodeRegex()
+                .Match(EmailSender.Emails.Single().Body)
                 .Groups["confirmationCode"]
                 .Captures
                 .Single()
@@ -256,10 +262,8 @@ namespace Metabase.Tests.Integration
 
         protected string ExtractResetCodeFromEmail()
         {
-            return Regex.Match(
-                EmailSender.Emails.Single().Body,
-                @"resetCode=(?<resetCode>\w+)"
-                )
+            return ResetCodeRegex()
+                .Match(EmailSender.Emails.Single().Body)
                 .Groups["resetCode"]
                 .Captures
                 .Single()
@@ -546,13 +550,13 @@ namespace Metabase.Tests.Integration
         {
             var pathResult =
                 JsonPath.Parse(jsonPath).Evaluate(
-                    jsonElement
+                    JsonObject.Create(jsonElement)
                 );
             if (pathResult.Error is not null)
             {
                 throw new Exception(pathResult.Error);
             }
-            return pathResult.Matches?.Single()?.Value.GetString()
+            return pathResult.Matches?.Single()?.Value?.GetValue<string>()
             ?? throw new Exception("String is null");
         }
 

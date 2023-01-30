@@ -31,8 +31,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidData_ConfirmsUserEmailChange()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var newEmail = "new." + email;
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string newEmail = "new." + email;
             var confirmationCode = await Arrange(
                 email: email,
                 newEmail: newEmail
@@ -56,8 +56,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task UnknownUser_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var newEmail = "new." + email;
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string newEmail = "new." + email;
             var confirmationCode = await Arrange(
                 email: email,
                 newEmail: newEmail
@@ -76,8 +76,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task DuplicateEmail_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var newEmail = "new." + email;
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string newEmail = "new." + email;
             var confirmationCode = await Arrange(
                 email: email,
                 newEmail: newEmail
@@ -100,8 +100,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task DifferentNewEmail_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var newEmail = "new." + email;
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string newEmail = "new." + email;
             var confirmationCode = await Arrange(
                 email: email,
                 newEmail: newEmail
@@ -120,8 +120,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task InvalidConfirmationCode_IsUserError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var newEmail = "new." + email;
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string newEmail = "new." + email;
             var confirmationCode = await Arrange(
                 email: email,
                 newEmail: newEmail

@@ -14,8 +14,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task ValidData_RegistersUser()
         {
             // Act
-            var name = "John Doe";
-            var email = "john.doe@ise.fraunhofer.de";
+            const string name = "John Doe";
+            const string email = "john.doe@ise.fraunhofer.de";
             var response = await RegisterUser(
                 email: email,
                 password: "aaaAAA123$!@"

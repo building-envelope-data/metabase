@@ -13,14 +13,22 @@ namespace Metabase.Data
     public sealed class ApplicationDbContext
       : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
     {
+        [Obsolete]
         static ApplicationDbContext()
         {
             RegisterEnumerations();
         }
 
+        [Obsolete]
         private static void RegisterEnumerations()
         {
             // https://www.npgsql.org/efcore/mapping/enum.html#mapping-your-enum
+            // Mapping enums like this is marked as obsolete. The preferred way
+            // is described in
+            // https://www.npgsql.org/doc/release-notes/7.0.html#managing-type-mappings-at-the-connection-level-is-no-longer-supported
+            // I tried to go the new way in `Startup#ConfigureDatabaseServices`.
+            // The problem was though that the tool `dotnet ef` did not pick up
+            // the registered enumerations.
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.ComponentCategory>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionRepresentativeRole>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionState>();
@@ -52,7 +60,8 @@ namespace Metabase.Data
               .HasDefaultValueSql("gen_random_uuid()");
             // https://www.npgsql.org/efcore/modeling/concurrency.html#the-postgresql-xmin-system-column
             builder
-              .UseXminAsConcurrencyToken();
+              .Property(e => e.Version)
+              .IsRowVersion();
             return builder;
         }
 
@@ -62,8 +71,9 @@ namespace Metabase.Data
         {
             // https://stackoverflow.com/questions/19902756/asp-net-identity-dbcontext-confusion/35722688#35722688
             builder.Entity<User>()
-              .UseXminAsConcurrencyToken()
-              .ToTable("user");
+              .ToTable("user")
+              .Property(e => e.Version)
+              .IsRowVersion();
             builder.Entity<Role>().ToTable("role");
             builder.Entity<UserClaim>().ToTable("user_claim");
             builder.Entity<UserRole>().ToTable("user_role");

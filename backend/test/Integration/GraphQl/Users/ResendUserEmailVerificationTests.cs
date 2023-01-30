@@ -14,9 +14,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task LoggedInUser_ResendsUserEmailVerification()
         {
             // Arrange
-            var name = "John Doe";
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = DefaultPassword;
+            const string name = "John Doe";
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = DefaultPassword;
             await RegisterAndConfirmAndLoginUser(
                 name: name,
                 email: email,
@@ -43,8 +43,8 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
-            var email = "john.doe@ise.fraunhofer.de";
-            var password = DefaultPassword;
+            const string email = "john.doe@ise.fraunhofer.de";
+            const string password = DefaultPassword;
             await RegisterAndConfirmUser(
                 email: email,
                 password: password

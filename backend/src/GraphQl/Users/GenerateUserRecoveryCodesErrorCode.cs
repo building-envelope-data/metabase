@@ -5,5 +5,6 @@ namespace Metabase.GraphQl.Users
         UNKNOWN,
         UNKNOWN_USER,
         TWO_FACTOR_AUTHENTICATION_DISABLED,
+        CODE_GENERATION_FAILED
     }
 }
