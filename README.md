@@ -44,13 +44,13 @@ If you have a question for which you don't find the answer in this repository, p
 
 In another shell
 
-1. Drop into `ash` with the working directory `/app`, which is mounted to the
+1. Drop into `bash` with the working directory `/app`, which is mounted to the
    host's `./backend` directory, inside a fresh Docker container based on
    `./backend/Dockerfile` by running `make shellb`. If necessary, the Docker
    image is (re)built automatically, which takes a while the first time.
-2. List all backend GNU Make targets by running `make help`.
-3. For example, update packages and tools by running `make update`.
-4. Drop out of the container by running `exit` or pressing `Ctrl-D`.
+1. List all backend GNU Make targets by running `make help`.
+1. For example, update packages and tools by running `make update`.
+1. Drop out of the container by running `exit` or pressing `Ctrl-D`.
 
 The same works for frontend containers by running `make shellf`.
 
