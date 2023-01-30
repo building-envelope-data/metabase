@@ -51,7 +51,7 @@ RUN \
   chown \
     node:node \
     ${HOME}/app && \
-  ln -s ${HOME}/app /app
+  ln --symbolic ${HOME}/app /app
 
 #############
 # As `node` #
@@ -66,6 +66,8 @@ COPY \
 COPY \
   --chown=node:node \
   ./yarn.lock ./
-RUN yarn install --pure-lockfile
+RUN \
+  yarn install \
+    --pure-lockfile
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]

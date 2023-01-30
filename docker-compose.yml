@@ -80,11 +80,11 @@ services:
       - ./backend:/app
       - backend_vscode_server_extensions:/home/me/.vscode-server/extensions
       - backend_vscode_server_insiders_extensions:/home/me/.vscode-server-insiders/extensions
-      # - backend_node_modules:/app/node_modules
       # The following items make the engine create anonymous volumes for the
       # specified path with the effect that the service does not write
       # temporary files into the corresponding directory on the host file
       # system that was bound by the `/app` binding.
+      # - /app/node_modules
       - /app/src/bin
       - /app/src/obj
       - /app/test/bin
@@ -137,7 +137,11 @@ services:
       retries: 3
     volumes:
       - ./frontend:/app
-      - frontend_node_modules:/app/node_modules
+      # The following items make the engine create anonymous volumes for the
+      # specified path with the effect that the service does not write
+      # temporary files into the corresponding directory on the host file
+      # system that was bound by the `/app` binding.
+      - /app/node_modules
     extra_hosts:
       - ${HOST}:host-gateway
     environment:
@@ -178,7 +182,5 @@ services:
 volumes:
   data:
   emails:
-  # backend_node_modules:
   backend_vscode_server_extensions:
   backend_vscode_server_insiders_extensions:
-  frontend_node_modules:
