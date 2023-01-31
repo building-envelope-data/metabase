@@ -458,7 +458,7 @@ function Page() {
                   label="Infrared Emittances"
                 >
                   {record.infraredEmittances
-                    .map((x) => x.toLocaleString())
+                    .map((x) => x.toLocaleString("en"))
                     .join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -466,7 +466,7 @@ function Page() {
                   label="Nearnormal Hemispherical Solar Reflectances"
                 >
                   {record.nearnormalHemisphericalSolarReflectances
-                    .map((x) => x.toLocaleString())
+                    .map((x) => x.toLocaleString("en"))
                     .join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -474,7 +474,7 @@ function Page() {
                   label="Nearnormal Hemispherical Solar Transmittances"
                 >
                   {record.nearnormalHemisphericalSolarTransmittances
-                    .map((x) => x.toLocaleString())
+                    .map((x) => x.toLocaleString("en"))
                     .join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -482,7 +482,7 @@ function Page() {
                   label="Nearnormal Hemispherical Visible Reflectances"
                 >
                   {record.nearnormalHemisphericalVisibleReflectances
-                    .map((x) => x.toLocaleString())
+                    .map((x) => x.toLocaleString("en"))
                     .join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -490,7 +490,7 @@ function Page() {
                   label="Nearnormal Hemispherical Visible Transmittances"
                 >
                   {record.nearnormalHemisphericalVisibleTransmittances
-                    .map((x) => x.toLocaleString())
+                    .map((x) => x.toLocaleString("en"))
                     .join(", ")}
                 </Descriptions.Item>
               </Descriptions>

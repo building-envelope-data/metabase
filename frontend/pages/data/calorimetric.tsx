@@ -340,10 +340,10 @@ function Page() {
             render: (_text, record, _index) => (
               <Descriptions column={1}>
                 <Descriptions.Item key="gValues" label="g Values">
-                  {record.gValues.map((x) => x.toLocaleString()).join(", ")}
+                  {record.gValues.map((x) => x.toLocaleString("en")).join(", ")}
                 </Descriptions.Item>
                 <Descriptions.Item key="uValues" label="u Values">
-                  {record.uValues.map((x) => x.toLocaleString()).join(", ")}
+                  {record.uValues.map((x) => x.toLocaleString("en")).join(", ")}
                 </Descriptions.Item>
               </Descriptions>
             ),
