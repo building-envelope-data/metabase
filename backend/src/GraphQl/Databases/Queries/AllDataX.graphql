@@ -7,10 +7,12 @@ query AllData(
     edges {
       # cursor
       node {
+        __typename
         ...DataFields
       }
     }
     nodes {
+      __typename
       ...DataFields
     }
     # totalCount

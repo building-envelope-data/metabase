@@ -19,6 +19,7 @@ query AllData(
     edges {
       cursor
       node {
+        __typename
         ...DataFields
       }
     }
