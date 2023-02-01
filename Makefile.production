@@ -141,7 +141,7 @@ docker-stats : ## Show Docker run-time metrics
 
 # Backup with `pg_dumpall`: https://www.postgresql.org/docs/13/backup-dump.html#BACKUP-DUMP-ALL
 # Command `pg_dumpall`: https://www.postgresql.org/docs/13/app-pg-dumpall.html
-backup : ## Backup database and related data to directory with absolute path `${BACKUP_DIRECTORY}`, for example, `make --file Makefile.production BACKUP_DIRECTORY=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S")/ backup`
+backup : ## Backup database and related data to directory with absolute path `${BACKUP_DIRECTORY}`, for example, `make --file Makefile.production BACKUP_DIRECTORY=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S") backup`
 	mkdir --parents ${BACKUP_DIRECTORY}
 	${docker_compose} run \
 		--name backup_${NAME}_database \
@@ -200,12 +200,12 @@ end-maintenance : ## End maintenance
 	rm ./nginx/html/maintenance.html
 .PHONY : end-maintenance
 
-deploy : BACKUP_DIRECTORY = $(shell pwd)/backup/
+deploy : BACKUP_DIRECTORY = $(shell pwd)/backup
 deploy : begin-maintenance store-commit backup fetch-all checkout-target migrate deploy-services run-tests end-maintenance ## Deploy tag, branch, or commit `${TARGET}`, for example, `make --file Makefile.production TARGET=v1.0.0 deploy`
 .PHONY : deploy
 
 rollback : TARGET = $(shell cat ./commit)
-rollback : BACKUP_DIRECTORY = $(shell pwd)/backup/
+rollback : BACKUP_DIRECTORY = $(shell pwd)/backup
 rollback : begin-maintenance checkout-target restore deploy-services run-tests end-maintenance ## Rollback deployment attempt (use commit hash stored in `./commit` and database backup stored in `./backup/`)
 .PHONY : rollback
 
