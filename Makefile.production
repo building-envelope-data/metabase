@@ -210,7 +210,10 @@ rollback : begin-maintenance checkout-target restore deploy-services run-tests e
 .PHONY : rollback
 
 store-commit : ## Store current commit
-	$(shell git rev-parse --verify HEAD > commit)
+	git rev-parse \
+		--verify \
+		HEAD \
+	> commit
 .PHONY : store-commit
 
 fetch-all : ## Fetch all
