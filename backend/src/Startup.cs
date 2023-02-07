@@ -222,16 +222,14 @@ namespace Metabase
         private static Task WriteJsonResponse(HttpContext context, HealthReport healthReport)
         {
             context.Response.ContentType = "application/json; charset=utf-8";
-
             var options = new JsonWriterOptions { Indented = true };
-
             using var memoryStream = new MemoryStream();
             using (var jsonWriter = new Utf8JsonWriter(memoryStream, options))
             {
                 jsonWriter.WriteStartObject();
                 jsonWriter.WriteString("status", healthReport.Status.ToString());
+                jsonWriter.WriteString("duration", healthReport.TotalDuration.ToString());
                 jsonWriter.WriteStartObject("results");
-
                 foreach (var healthReportEntry in healthReport.Entries)
                 {
                     jsonWriter.WriteStartObject(healthReportEntry.Key);
@@ -239,24 +237,50 @@ namespace Metabase
                         healthReportEntry.Value.Status.ToString());
                     jsonWriter.WriteString("description",
                         healthReportEntry.Value.Description);
+                    jsonWriter.WriteString("duration",
+                        healthReportEntry.Value.Duration.ToString());
+                    jsonWriter.WriteStartArray("tags");
+                    foreach (var tag in healthReportEntry.Value.Tags)
+                    {
+                        jsonWriter.WriteStringValue(tag);
+                    }
+                    jsonWriter.WriteEndArray();
+                    var exception = healthReportEntry.Value.Exception;
+                    if (exception is not null)
+                    {
+                        jsonWriter.WriteStartObject("exception");
+                        jsonWriter.WriteString("message", exception.Message);
+                        if (exception.StackTrace is not null)
+                        {
+                            jsonWriter.WriteString("stackTrace", exception.StackTrace);
+                        }
+                        if (exception.InnerException is not null)
+                        {
+                            jsonWriter.WriteString("innerException", exception.InnerException.ToString());
+                        }
+                        if (exception.Source is not null)
+                        {
+                            jsonWriter.WriteString("source", exception.Source);
+                        }
+                        if (exception.TargetSite is not null)
+                        {
+                            jsonWriter.WriteString("targetSite", exception.TargetSite.ToString());
+                        }
+                        jsonWriter.WriteEndObject();
+                    }
                     jsonWriter.WriteStartObject("data");
-
                     foreach (var item in healthReportEntry.Value.Data)
                     {
                         jsonWriter.WritePropertyName(item.Key);
-
                         JsonSerializer.Serialize(jsonWriter, item.Value,
                             item.Value?.GetType() ?? typeof(object));
                     }
-
                     jsonWriter.WriteEndObject();
                     jsonWriter.WriteEndObject();
                 }
-
                 jsonWriter.WriteEndObject();
                 jsonWriter.WriteEndObject();
             }
-
             return context.Response.WriteAsync(
                 Encoding.UTF8.GetString(memoryStream.ToArray()));
         }
