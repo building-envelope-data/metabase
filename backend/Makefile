@@ -53,6 +53,17 @@ assets : ## Build assets
 	npm run all
 .PHONY : assets
 
+# For usage information see https://github.com/tomchavakis/nuget-license#usage
+# or run `dotnet tool run dotnet-project-licenses -- --help`
+licenses : ## Print licenses
+	dotnet tool run \
+		dotnet-project-licenses \
+			-i ./Metabase.sln
+			# --json
+			# --allowed-license-types ...
+			# --forbidden-license-types ...
+.PHONY : licenses
+
 # https://github.com/dotnet/diagnostics/blob/master/documentation/dotnet-trace-instructions.md#using-dotnet-trace
 trace : ## Trace the dotnet process `Metabase`
 	dotnet tool run \

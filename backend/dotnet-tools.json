@@ -67,6 +67,12 @@
       "commands": [
         "jb"
       ]
+    },
+    "dotnet-project-licenses": {
+      "version": "2.6.0",
+      "commands": [
+        "dotnet-project-licenses"
+      ]
     }
   }
 }

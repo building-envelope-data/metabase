@@ -29,6 +29,15 @@ lint : ## Lint code
 	next lint
 .PHONY : lint
 
+licenses : ## Print licenses
+	yarn run \
+		license-checker \
+			--unknown \
+			--direct \
+			--summary
+			# --failOn
+			# --onlyAllow
+
 update-schema : ## Update GraphQl schema
 	wget \
 		--output-document ./type-defs.graphqls \
