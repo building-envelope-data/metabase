@@ -59,6 +59,10 @@ The same works for frontend containers by running `make shellf`.
 
 ## Deployment
 
+For information on using Docker in production see
+[Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)
+and the pages following it.
+
 ### Setting up a Debian production machine
 
 1. Use the sibling project [machine](https://github.com/building-envelope-data/machine) and its
@@ -114,18 +118,40 @@ The same works for frontend containers by running `make shellf`.
    figure out what went wrong, apply the necessary fixes to the codebase,
    create a new release, and try to deploy that release instead.
 1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
-   running `cd ./machine && make deploy && cd ..` and test whether everything
-   works as expected and if that is the case, repeat all stages but this one in
-   the directory `/app/production` (instead of `/app/staging`). Note that in
-   the staging environment sent emails can be viewed in the web browser under
+   running `cd /app/machine && make deploy` and test whether everything works
+   as expected and if that is the case, repeat all stages but this one in the
+   directory `/app/production` (instead of `/app/staging`). Note that in the
+   staging environment sent emails can be viewed in the web browser under
    `https://staging.buildingenvelopedata.org/email/` and emails to addresses in
    the variable `RELAY_ALLOWED_EMAILS` in the `.env` file are delivered to the
    respective inboxes (the variable's value is a comma separated list of email
    addresses).
 
-For information on using Docker in production see
-[Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)
-and the pages following it.
+### Troubleshooting
+
+The file `Makefile.production` contains GNU Make targets to manage Docker
+containers like `up`, `down`, and `logs`, to drop into shells inside running
+Docker containers like `shellb` for the backend service and `shellf` for the
+frontend service and `psql` for the databse service, and to list information
+about Docker like `list-services`, `docker-stats`, and `daemon-logs`.
+
+And the file contains GNU Make targets to deploy a new release or rollback it
+back as mentioned above. These targets depend on several smaller targets like
+`begin-maintenance` and `end-maintenance` to begin or end displaying
+maintenance information to end users that try to interact with the website, and
+`backup` to backup all data before deploying a new version, `migrate` to
+migrate the database, and `run-tests` to run tests.
+
+If for some reason the website displays the maintenance page without
+maintenance happening at the moment, then drop into a shell on the production
+machine, check all logs for information on what happened, fix issues if
+necessary, and end maintenance. It could for example happen that a cron job
+set-up by [machine](https://github.com/building-envelope-data/machine) begins
+maintenance, fails to do its actual job, and does not end maintenance
+afterwards. Whether failing to do its job is a problem for the inner workings
+of the website needs to be decided by some developer. If it for example backing
+up the database fails because the machine is out of memory at the time of doing
+the backup, the website itself should still working.
 
 ## Original Idea
 
