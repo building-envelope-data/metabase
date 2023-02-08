@@ -24,6 +24,9 @@ If you have a question for which you don't find the answer in this repository, p
 1. Clone the source code by running
    `git clone git@github.com:building-envelope-data/metabase.git` and navigate
    into the new directory `metabase` by running `cd metabase`.
+1. Initialize, fetch, and checkout possibly-nested submodules by running
+   `git submodule update --init --recursive`. An alternative would have been
+   passing `--recurse-submodules` to `git clone` above.
 1. Prepare your environment by running `cp .env.sample .env`,
    `cp frontend/.env.local.sample frontend/.env.local`, and adding the line
    `127.0.0.1 local.buildingenvelopedata.org` to your `/etc/hosts` file.
