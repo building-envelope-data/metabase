@@ -74,10 +74,9 @@ function Page() {
           <Typography.Link href="https://github.com">GitHub</Typography.Link>.
         </Typography.Paragraph>
         <Image
-          width={1619}
-          height={724}
           src={overviewImage}
           alt="Schematic depiction of how users like architects, planners, or engineers can use the metabase to find products and data in and across databases."
+          style={{ maxWidth: "100%", height: "auto" }}
         />
       </div>
     </Layout>
