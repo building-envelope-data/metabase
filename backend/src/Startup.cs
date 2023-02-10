@@ -7,6 +7,7 @@ using HotChocolate.AspNetCore;
 using Metabase.Configuration;
 using Metabase.Data.Extensions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -45,6 +46,9 @@ namespace Metabase
             ConfigureMessageSenderServices(services);
             ConfigureRequestResponseServices(services);
             ConfigureSessionServices(services);
+            services
+                .AddDataProtection()
+                .PersistKeysToDbContext<Data.ApplicationDbContext>();
             services.AddHttpClient();
             services
                 .AddHealthChecks()

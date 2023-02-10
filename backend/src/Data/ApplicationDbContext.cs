@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Npgsql;
 using SchemaNameOptionsExtension = Metabase.Data.Extensions.SchemaNameOptionsExtension;
 
@@ -11,7 +12,7 @@ namespace Metabase.Data
     // [Authentication and authorization for SPAs](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-3.0)
     // [Customize Identity Model](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-3.0)
     public sealed class ApplicationDbContext
-      : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
+      : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>, IDataProtectionKeyContext
     {
         [Obsolete]
         static ApplicationDbContext()
@@ -241,6 +242,7 @@ namespace Metabase.Data
         public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
         public DbSet<Method> Methods { get; private set; } = default!;
         public DbSet<UserMethodDeveloper> UserMethodDevelopers { get; private set; } = default!;
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
 
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options
