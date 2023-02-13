@@ -122,7 +122,7 @@ runb : CONTAINER = backend
 runb : run ## runute the one-time command `${COMMAND}` against a fresh `backend` container (after starting all containers if necessary)
 .PHONY : runb
 
-shellf : COMMAND = bash -c "make install && exec bash"
+shellf : COMMAND = bash
 shellf : execf ## Enter shell in an existing `frontend` container (after starting all containers if necessary)
 .PHONY : shellf
 
