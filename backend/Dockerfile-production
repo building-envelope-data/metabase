@@ -17,7 +17,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim-amd64 AS build
 
 RUN \
   apt-get update && \
-  apt-get upgrade && \
+  apt-get upgrade --assume-yes && \
   rm \
     --recursive \
     --force \
@@ -45,9 +45,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim-amd64
 
 RUN \
   apt-get update && \
-  apt-get upgrade && \
+  apt-get upgrade --assume-yes && \
   apt-get install \
-    --yes \
+    --assume-yes \
     --no-install-recommends \
     curl && \
   rm \
