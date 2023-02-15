@@ -27,7 +27,7 @@ ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
 RUN \
   apt-get update && \
   apt-get install \
-    --yes \
+    --assume-yes \
     --no-install-recommends \
     ca-certificates \
     dumb-init \

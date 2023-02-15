@@ -40,7 +40,7 @@ RUN \
 RUN \
   apt-get update && \
   apt-get install \
-    --yes \
+    --assume-yes \
     --no-install-recommends \
     curl \
     dumb-init \
@@ -59,7 +59,7 @@ RUN \
 RUN \
   apt-get update && \
   apt-get install \
-    --yes \
+    --assume-yes \
     --no-install-recommends \
     bash \
     jq \
