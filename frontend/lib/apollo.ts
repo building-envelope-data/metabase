@@ -34,10 +34,12 @@ function createIsomorphLink(context: ResolverContext = {}) {
         : `${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`,
     useGETForQueries: false, // Use `POST` for queries to avoid "414 Request-URI Too Large" errors
     credentials: "same-origin",
-    headers: {
-      accept: 'application/json',
-      cookie: context.req ? context.req.headers.cookie : null,
-    },
+    headers: context.req?.headers?.cookie
+      ? {
+          accept: "application/json",
+          cookie: context.req.headers.cookie,
+        }
+      : { accept: "application/json" },
   });
 }
 
