@@ -6,9 +6,8 @@ import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 
 function Page() {
-  const [
-    requestUserPasswordResetMutation,
-  ] = useRequestUserPasswordResetMutation();
+  const [requestUserPasswordResetMutation] =
+    useRequestUserPasswordResetMutation();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );

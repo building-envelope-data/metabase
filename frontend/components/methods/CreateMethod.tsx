@@ -16,7 +16,7 @@ import { InstitutionDocument } from "../../queries/institutions.graphql";
 import { SelectInstitutionId } from "../SelectInstitutionId";
 import { SelectUserId } from "../SelectUserId";
 import { ReferenceForm } from "../ReferenceForm";
-import * as dayjs from 'dayjs';
+import * as dayjs from "dayjs";
 
 const layout = {
   labelCol: { span: 8 },

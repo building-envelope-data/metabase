@@ -68,7 +68,13 @@ export function UuidPropositionFormList({
                   fieldKey={[fieldKey ?? -1, "value"]}
                   noStyle
                 >
-                  <Input style={{ float: "none", display: "inline-block", width: "60%" }} />
+                  <Input
+                    style={{
+                      float: "none",
+                      display: "inline-block",
+                      width: "60%",
+                    }}
+                  />
                 </Form.Item>
                 <MinusCircleOutlined
                   style={{ width: "10%" }}

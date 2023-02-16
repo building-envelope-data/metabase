@@ -199,28 +199,28 @@ function Page() {
         loading={filtering}
         columns={[
           {
-            ...getUuidColumnProps<typeof data[0]>(
+            ...getUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
               (_uuid) => "/" // TODO Link somewhere useful!
             ),
           },
           {
-            ...getNameColumnProps<typeof data[0]>(onFilterTextChange, (x) =>
+            ...getNameColumnProps<(typeof data)[0]>(onFilterTextChange, (x) =>
               filterText.get(x)
             ),
           },
           {
-            ...getDescriptionColumnProps<typeof data[0]>(
+            ...getDescriptionColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getTimestampColumnProps<typeof data[0]>(),
+            ...getTimestampColumnProps<(typeof data)[0]>(),
           },
           {
-            ...getComponentUuidColumnProps<typeof data[0]>(
+            ...getComponentUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
@@ -236,13 +236,13 @@ function Page() {
           //   ),
           // },
           {
-            ...getAppliedMethodColumnProps<typeof data[0]>(
+            ...getAppliedMethodColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getResourceTreeColumnProps<typeof data[0]>(
+            ...getResourceTreeColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),

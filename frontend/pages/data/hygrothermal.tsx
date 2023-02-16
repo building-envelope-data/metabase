@@ -72,30 +72,30 @@ const conjunct = (
 // };
 
 type PartialHygrothermalData = {
-            __typename?: 'HygrothermalData';
-            uuid: any;
-            timestamp: any;
-            componentId: any;
-            name?: string | null | undefined;
-            description?: string | null | undefined;
-            appliedMethod: {
-              __typename?: 'AppliedMethod';
-              methodId: any;
-            };
-            resourceTree: {
-              __typename?: 'GetHttpsResourceTree';
-              root: {
-                __typename?: 'GetHttpsResourceTreeRoot';
-                value: {
-                  __typename?: 'GetHttpsResource';
-                  description: string;
-                  hashValue: string;
-                  locator: any;
-                  dataFormatId: any;
-                };
-              };
-            };
-          }
+  __typename?: "HygrothermalData";
+  uuid: any;
+  timestamp: any;
+  componentId: any;
+  name?: string | null | undefined;
+  description?: string | null | undefined;
+  appliedMethod: {
+    __typename?: "AppliedMethod";
+    methodId: any;
+  };
+  resourceTree: {
+    __typename?: "GetHttpsResourceTree";
+    root: {
+      __typename?: "GetHttpsResourceTreeRoot";
+      value: {
+        __typename?: "GetHttpsResource";
+        description: string;
+        hashValue: string;
+        locator: any;
+        dataFormatId: any;
+      };
+    };
+  };
+};
 
 function Page() {
   const [form] = Form.useForm();
@@ -180,7 +180,9 @@ function Page() {
           data?.databases?.edges?.map(
             (edge) => edge?.node?.allHygrothermalData?.nodes || []
           ) || [];
-        const flatData = ([] as PartialHygrothermalData[]).concat(...nestedData);
+        const flatData = ([] as PartialHygrothermalData[]).concat(
+          ...nestedData
+        );
         setData(flatData);
       } catch (error) {
         // TODO Handle properly.
@@ -223,28 +225,28 @@ function Page() {
         loading={filtering}
         columns={[
           {
-            ...getUuidColumnProps<typeof data[0]>(
+            ...getUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
               (_uuid) => "/" // TODO Link somewhere useful!
             ),
           },
           {
-            ...getNameColumnProps<typeof data[0]>(onFilterTextChange, (x) =>
+            ...getNameColumnProps<(typeof data)[0]>(onFilterTextChange, (x) =>
               filterText.get(x)
             ),
           },
           {
-            ...getDescriptionColumnProps<typeof data[0]>(
+            ...getDescriptionColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getTimestampColumnProps<typeof data[0]>(),
+            ...getTimestampColumnProps<(typeof data)[0]>(),
           },
           {
-            ...getComponentUuidColumnProps<typeof data[0]>(
+            ...getComponentUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
@@ -260,13 +262,13 @@ function Page() {
           //   ),
           // },
           {
-            ...getAppliedMethodColumnProps<typeof data[0]>(
+            ...getAppliedMethodColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getResourceTreeColumnProps<typeof data[0]>(
+            ...getResourceTreeColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),

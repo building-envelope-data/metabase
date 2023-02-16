@@ -38,26 +38,26 @@ export function DataFormatTable({
       loading={loading}
       columns={[
         {
-          ...getUuidColumnProps<typeof dataFormats[0]>(
+          ...getUuidColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x),
             paths.dataFormat
           ),
         },
         {
-          ...getNameColumnProps<typeof dataFormats[0]>(
+          ...getNameColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x)
           ),
         },
         {
-          ...getDescriptionColumnProps<typeof dataFormats[0]>(
+          ...getDescriptionColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x)
           ),
         },
         {
-          ...getFilterableStringColumnProps<typeof dataFormats[0]>(
+          ...getFilterableStringColumnProps<(typeof dataFormats)[0]>(
             "Media Type",
             "mediaType",
             (record) => record.mediaType,
@@ -66,7 +66,7 @@ export function DataFormatTable({
           ),
         },
         {
-          ...getFilterableStringColumnProps<typeof dataFormats[0]>(
+          ...getFilterableStringColumnProps<(typeof dataFormats)[0]>(
             "Extension",
             "extension",
             (record) => record.extension,
@@ -76,7 +76,7 @@ export function DataFormatTable({
         },
         {
           ...getExternallyLinkedFilterableLocatorColumnProps<
-            typeof dataFormats[0]
+            (typeof dataFormats)[0]
           >(
             "Schema",
             "schemaLocator",
@@ -86,7 +86,7 @@ export function DataFormatTable({
           ),
         },
         {
-          ...getReferenceColumnProps<typeof dataFormats[0]>(
+          ...getReferenceColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x)
           ),

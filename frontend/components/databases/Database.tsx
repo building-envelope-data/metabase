@@ -1,7 +1,7 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useDatabaseQuery } from "../../queries/databases.graphql";
 import { Skeleton, Result, Descriptions, Typography } from "antd";
-import { PageHeader } from "@ant-design/pro-layout"
+import { PageHeader } from "@ant-design/pro-layout";
 import { useEffect } from "react";
 import Link from "next/link";
 import paths from "../../paths";

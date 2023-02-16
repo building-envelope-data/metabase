@@ -41,25 +41,27 @@ function Page() {
         loading={loading}
         columns={[
           {
-            ...getUuidColumnProps<typeof nodes[0]>(
+            ...getUuidColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
               paths.database
             ),
           },
           {
-            ...getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+            ...getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
               filterText.get(x)
             ),
           },
           {
-            ...getDescriptionColumnProps<typeof nodes[0]>(
+            ...getDescriptionColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getExternallyLinkedFilterableLocatorColumnProps<typeof nodes[0]>(
+            ...getExternallyLinkedFilterableLocatorColumnProps<
+              (typeof nodes)[0]
+            >(
               "Locator",
               "locator",
               (record) => record.locator,
@@ -68,7 +70,9 @@ function Page() {
             ),
           },
           {
-            ...getInternallyLinkedFilterableStringColumnProps<typeof nodes[0]>(
+            ...getInternallyLinkedFilterableStringColumnProps<
+              (typeof nodes)[0]
+            >(
               "Operator",
               "operator",
               (record) => record.operator.node.name,

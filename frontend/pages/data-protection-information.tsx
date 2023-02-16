@@ -35,22 +35,23 @@ function Page() {
   if (loading) {
     return (
       <>
-      {contextHolder}
-      <Layout>
-        <Skeleton />
-      </Layout>
-</>
+        {contextHolder}
+        <Layout>
+          <Skeleton />
+        </Layout>
+      </>
     );
   }
 
   if (!data) {
     return (
       <>
-      {contextHolder}
-      <Layout>
-        You can view the data protection information under{" "}
-        <Typography.Link href={url}>{url}</Typography.Link>
-      </Layout></>
+        {contextHolder}
+        <Layout>
+          You can view the data protection information under{" "}
+          <Typography.Link href={url}>{url}</Typography.Link>
+        </Layout>
+      </>
     );
   }
 

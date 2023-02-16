@@ -9,7 +9,7 @@ import {
   List,
   Result,
 } from "antd";
-import { PageHeader } from "@ant-design/pro-layout"
+import { PageHeader } from "@ant-design/pro-layout";
 import { SyncOutlined } from "@ant-design/icons";
 import {
   UsersDocument,

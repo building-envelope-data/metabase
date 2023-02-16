@@ -11,9 +11,8 @@ function LoginWithRecoveryCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
   const apolloClient = initializeApollo();
-  const [
-    loginUserWithRecoveryCodeMutation,
-  ] = useLoginUserWithRecoveryCodeMutation();
+  const [loginUserWithRecoveryCodeMutation] =
+    useLoginUserWithRecoveryCodeMutation();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );

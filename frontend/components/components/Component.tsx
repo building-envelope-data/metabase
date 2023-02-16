@@ -1,7 +1,7 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useComponentQuery } from "../../queries/components.graphql";
 import { Skeleton, Result, Descriptions, Tag, List } from "antd";
-import { PageHeader } from "@ant-design/pro-layout"
+import { PageHeader } from "@ant-design/pro-layout";
 import { useEffect } from "react";
 import paths from "../../paths";
 import Link from "next/link";

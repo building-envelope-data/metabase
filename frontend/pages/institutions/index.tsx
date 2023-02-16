@@ -48,31 +48,33 @@ function Page() {
         loading={loading}
         columns={[
           {
-            ...getUuidColumnProps<typeof nodes[0]>(
+            ...getUuidColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
               paths.institution
             ),
           },
           {
-            ...getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+            ...getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
               filterText.get(x)
             ),
           },
           {
-            ...getAbbreviationColumnProps<typeof nodes[0]>(
+            ...getAbbreviationColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getDescriptionColumnProps<typeof nodes[0]>(
+            ...getDescriptionColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getExternallyLinkedFilterableLocatorColumnProps<typeof nodes[0]>(
+            ...getExternallyLinkedFilterableLocatorColumnProps<
+              (typeof nodes)[0]
+            >(
               "Website",
               "websiteLocator",
               (record) => record.websiteLocator,

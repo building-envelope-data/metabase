@@ -9,7 +9,7 @@ import {
   Descriptions,
   Tag,
 } from "antd";
-import { PageHeader } from "@ant-design/pro-layout"
+import { PageHeader } from "@ant-design/pro-layout";
 import {
   InstitutionDocument,
   useInstitutionQuery,

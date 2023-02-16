@@ -28,24 +28,24 @@ export function ComponentTable({ loading, components }: ComponentTableProps) {
     <Table
       loading={loading}
       columns={[
-        getUuidColumnProps<typeof components[0]>(
+        getUuidColumnProps<(typeof components)[0]>(
           onFilterTextChange,
           (x) => filterText.get(x),
           paths.component
         ),
-        getNameColumnProps<typeof components[0]>(onFilterTextChange, (x) =>
+        getNameColumnProps<(typeof components)[0]>(onFilterTextChange, (x) =>
           filterText.get(x)
         ),
-        getAbbreviationColumnProps<typeof components[0]>(
+        getAbbreviationColumnProps<(typeof components)[0]>(
           onFilterTextChange,
           (x) => filterText.get(x)
         ),
-        getDescriptionColumnProps<typeof components[0]>(
+        getDescriptionColumnProps<(typeof components)[0]>(
           onFilterTextChange,
           (x) => filterText.get(x)
         ),
         getFilterableEnumListColumnProps<
-          typeof components[0],
+          (typeof components)[0],
           ComponentCategory
         >(
           "Categories",
