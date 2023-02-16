@@ -29,6 +29,11 @@ lint : ## Lint code
 	next lint
 .PHONY : lint
 
+format : ## Format the code
+	yarn run \
+		prettier --write .
+.PHONY : format
+
 licenses : ## Print licenses
 	yarn run \
 		license-checker \
