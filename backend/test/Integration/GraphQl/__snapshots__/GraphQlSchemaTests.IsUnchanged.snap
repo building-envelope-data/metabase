@@ -1978,7 +1978,7 @@ enum ChangeUserEmailErrorCode {
   UNKNOWN
   UNKNOWN_USER
   UNCHANGED_EMAIL
-  INVALID_EMAIL
+  UNKNOWN_CURRENT_EMAIL
 }
 
 enum ChangeUserPasswordErrorCode {
@@ -2125,12 +2125,16 @@ enum ForgetUserTwoFactorAuthenticationClientErrorCode {
 enum GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode {
   UNKNOWN
   UNKNOWN_USER
+  RESETTING_AUTHENTICATOR_KEY_FAILED
+  GETTING_AUTHENTICATOR_KEY_FAILED
+  GETTING_EMAIL_FAILED
 }
 
 enum GenerateUserTwoFactorRecoveryCodesErrorCode {
   UNKNOWN
   UNKNOWN_USER
   TWO_FACTOR_AUTHENTICATION_DISABLED
+  CODE_GENERATION_FAILED
 }
 
 enum InstitutionRepresentativeRole {
@@ -2214,6 +2218,7 @@ enum ResendUserEmailConfirmationErrorCode {
 enum ResendUserEmailVerificationErrorCode {
   UNKNOWN
   UNKNOWN_USER
+  UNKNOWN_EMAIL
 }
 
 enum ResetUserPasswordErrorCode {
