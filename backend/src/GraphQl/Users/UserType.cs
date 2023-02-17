@@ -127,6 +127,7 @@ namespace Metabase.GraphQl.Users
               .Field(t => t.Name);
             descriptor
               .Field(t => t.Email)
+              .Type<EmailAddressType>()
               .Resolve(context =>
                 Authorize(context, user => user.Email)
               )
@@ -143,6 +144,7 @@ namespace Metabase.GraphQl.Users
               .UseUserManager();
             descriptor
               .Field(t => t.PhoneNumber)
+              .Type<PhoneNumberType>()
               .Resolve(context =>
                 Authorize(context, user => user.PhoneNumber)
               )
