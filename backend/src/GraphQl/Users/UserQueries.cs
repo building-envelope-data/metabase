@@ -17,19 +17,18 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<Data.User?> GetCurrentUserAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
         {
             return await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UsePaging]
         /* TODO [UseProjection] // fails without an explicit error message in the logs */
         /* TODO [UseFiltering(typeof(UserFilterType))] // wait for https://github.com/ChilliCream/hotchocolate/issues/2672 and https://github.com/ChilliCream/hotchocolate/issues/2666 */
         [UseSorting]
         public IQueryable<Data.User> GetUsers(
-            [ScopedService] Data.ApplicationDbContext context
+            Data.ApplicationDbContext context
             )
         {
             return context.Users;

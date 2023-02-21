@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.AspNetCore.Authorization;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -17,14 +17,13 @@ namespace Metabase.GraphQl.Databases
     [ExtendObjectType(nameof(Mutation))]
     public sealed class DatabaseMutations
     {
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateDatabasePayload> CreateDatabaseAsync(
             CreateDatabaseInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {

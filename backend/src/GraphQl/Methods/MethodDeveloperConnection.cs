@@ -21,10 +21,10 @@ namespace Metabase.GraphQl.Methods
         }
 
         public async Task<IEnumerable<MethodDeveloperEdge>> GetEdgesAsync(
-            [DataLoader] InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
-            [DataLoader] UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
-            [DataLoader] PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
-            [DataLoader] PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
+            InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
+            UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
+            PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
+            PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
             CancellationToken cancellationToken
             )
         {

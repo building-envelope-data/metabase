@@ -19,13 +19,12 @@ namespace Metabase.GraphQl.OpenIdConnect
     public sealed class OpendIdConnectQueries
     {
         // TODO In all queries, instead of returning nothing, report as authentication error to client.
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<IList<OpenIddictEntityFrameworkCoreApplication>> GetOpenIdConnectApplications(
             [Service] OpenIddictApplicationManager<OpenIddictEntityFrameworkCoreApplication> manager,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            // [ScopedService] Data.ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            // Data.ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
             CancellationToken cancellationToken
             )
         {
@@ -37,13 +36,12 @@ namespace Metabase.GraphQl.OpenIdConnect
             return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<IList<OpenIddictEntityFrameworkCoreScope>> GetOpenIdConnectScopes(
             [Service] OpenIddictScopeManager<OpenIddictEntityFrameworkCoreScope> manager,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            // [ScopedService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            // Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
             CancellationToken cancellationToken
             )
         {
@@ -54,12 +52,11 @@ namespace Metabase.GraphQl.OpenIdConnect
             return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<IList<OpenIddictEntityFrameworkCoreToken>> GetOpenIdConnectTokens(
             [Service] OpenIddictTokenManager<OpenIddictEntityFrameworkCoreToken> manager,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             // [TokendService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
             CancellationToken cancellationToken
             )
@@ -71,12 +68,11 @@ namespace Metabase.GraphQl.OpenIdConnect
             return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<IList<OpenIddictEntityFrameworkCoreAuthorization>> GetOpenIdConnectAuthorizations(
             [Service] OpenIddictAuthorizationManager<OpenIddictEntityFrameworkCoreAuthorization> manager,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             // [AuthorizationdService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
             CancellationToken cancellationToken
             )

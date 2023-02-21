@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -33,8 +32,8 @@ namespace Metabase.GraphQl.Users
                 var services = context.Service<IServiceProvider>();
                 var userManager = new UserManager<Data.User>(
                     new UserStore<Data.User, Data.Role, Data.ApplicationDbContext, Guid, Data.UserClaim, Data.UserRole, Data.UserLogin, Data.UserToken, Data.RoleClaim>(
-                      context.GetLocalValue<Data.ApplicationDbContext>(GetServiceName<Data.ApplicationDbContext>())
-                      ?? throw new InvalidOperationException("Add attribute `[UseDbContext(typeof(Data.ApplicationDbContext))]` before attribute `[UseUserManager]`.")
+                      context.Service<Data.ApplicationDbContext>()
+                      ?? throw new InvalidOperationException("Application database context is null.")
                       ),
                     services.GetRequiredService<IOptions<IdentityOptions>>(),
                     services.GetRequiredService<IPasswordHasher<Data.User>>(),
@@ -52,12 +51,12 @@ namespace Metabase.GraphQl.Users
                     );
                 try
                 {
-                    context.SetLocalValue(userManagerServiceName, userManager);
+                    context.SetLocalState(userManagerServiceName, userManager);
                     await next(context).ConfigureAwait(false);
                 }
                 finally
                 {
-                    context.RemoveLocalValue(userManagerServiceName);
+                    context.RemoveLocalState(userManagerServiceName);
                     userManager.Dispose();
                 }
             });
@@ -73,7 +72,7 @@ namespace Metabase.GraphQl.Users
             {
                 var services = context.Service<IServiceProvider>();
                 var signInManager = new SignInManager<Data.User>(
-                    context.GetLocalValue<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+                    context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
                     ?? throw new InvalidOperationException("Add attribute `[UseUserManager]` before attribute `[UseSignInManager]`."),
                     services.GetRequiredService<IHttpContextAccessor>(),
                     services.GetRequiredService<IUserClaimsPrincipalFactory<Data.User>>(),
@@ -84,12 +83,12 @@ namespace Metabase.GraphQl.Users
                     );
                 try
                 {
-                    context.SetLocalValue(signInManagerServiceName, signInManager);
+                    context.SetLocalState(signInManagerServiceName, signInManager);
                     await next(context).ConfigureAwait(false);
                 }
                 finally
                 {
-                    context.RemoveLocalValue(signInManagerServiceName);
+                    context.RemoveLocalState(signInManagerServiceName);
                 }
             });
         }
