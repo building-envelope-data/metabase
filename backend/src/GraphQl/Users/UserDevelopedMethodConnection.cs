@@ -22,11 +22,10 @@ namespace Metabase.GraphQl.Users
         {
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public Task<bool> CanCurrentUserConfirmEdgeAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
         )
         {
             return UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(

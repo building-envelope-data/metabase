@@ -1,10 +1,12 @@
+using System.Text.Json;
+
 namespace Metabase.GraphQl.DataX
 {
     public sealed class NamedMethodArgument
     {
         public NamedMethodArgument(
         string name,
-        object value
+        JsonElement value
         )
         {
             Name = name;
@@ -12,6 +14,6 @@ namespace Metabase.GraphQl.DataX
         }
 
         public string Name { get; }
-        public object Value { get; }
+        public JsonElement Value { get; }
     }
 }

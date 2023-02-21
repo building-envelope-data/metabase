@@ -20,6 +20,8 @@ namespace Metabase.Configuration
             )
         {
             services.AddGraphQLServer()
+            // Services https://chillicream.com/docs/hotchocolate/v13/server/dependency-injection#registerservice
+            .RegisterDbContext<Data.ApplicationDbContext>()
             // Types
             .AddType<GraphQl.Common.OpenEndedDateTimeRangeType>()
             // Extensions
@@ -101,6 +103,7 @@ namespace Metabase.Configuration
                   // Scalar Types
                   .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
                   .AddType(new UrlType("Url"))
+                  .AddType(new JsonType("Any", BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
                   // Object Types
                   .AddType<GraphQl.Components.ComponentType>()
                   .AddType<GraphQl.DataFormats.DataFormatType>()

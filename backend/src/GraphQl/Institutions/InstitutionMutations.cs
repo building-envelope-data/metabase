@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.AspNetCore.Authorization;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -18,14 +18,13 @@ namespace Metabase.GraphQl.Institutions
     [ExtendObjectType(nameof(Mutation))]
     public sealed class InstitutionMutations
     {
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateInstitutionPayload> CreateInstitutionAsync(
             CreateInstitutionInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             [Service] Services.IEmailSender emailSender,
             [Service] AppSettings appSettings,
             CancellationToken cancellationToken
@@ -165,14 +164,13 @@ namespace Metabase.GraphQl.Institutions
             return Enumerations.InstitutionState.PENDING;
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<VerifyInstitutionPayload> VerifyInstitutionAsync(
             VerifyInstitutionInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
@@ -210,14 +208,13 @@ namespace Metabase.GraphQl.Institutions
             return new VerifyInstitutionPayload(institution);
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<UpdateInstitutionPayload> UpdateInstitutionAsync(
             UpdateInstitutionInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
@@ -264,14 +261,13 @@ namespace Metabase.GraphQl.Institutions
             return new UpdateInstitutionPayload(institution);
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<DeleteInstitutionPayload> DeleteInstitutionAsync(
             DeleteInstitutionInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {

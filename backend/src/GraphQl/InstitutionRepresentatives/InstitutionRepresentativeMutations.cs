@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.AspNetCore.Authorization;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -19,14 +19,13 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
     [ExtendObjectType(nameof(Mutation))]
     public sealed class InstitutionRepresentativeMutations
     {
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentativeAsync(
             AddInstitutionRepresentativeInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
@@ -109,14 +108,13 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
             return new AddInstitutionRepresentativePayload(institutionRepresentative);
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<RemoveInstitutionRepresentativePayload> RemoveInstitutionRepresentativeAsync(
             RemoveInstitutionRepresentativeInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
@@ -210,14 +208,13 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
             return new RemoveInstitutionRepresentativePayload(institutionRepresentative);
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<ChangeInstitutionRepresentativeRolePayload> ChangeInstitutionRepresentativeRoleAsync(
             ChangeInstitutionRepresentativeRoleInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
@@ -312,14 +309,13 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
             return new ChangeInstitutionRepresentativeRolePayload(institutionRepresentative);
         }
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<ConfirmInstitutionRepresentativePayload> ConfirmInstitutionRepresentativeAsync(
             ConfirmInstitutionRepresentativeInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {

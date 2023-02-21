@@ -37,7 +37,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
         }
 
         public Task<Data.Institution> GetInstitution(
-            [DataLoader] InstitutionByIdDataLoader byId,
+            InstitutionByIdDataLoader byId,
             CancellationToken cancellationToken
             )
         {
@@ -45,7 +45,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
         }
 
         public Task<Data.User> GetUser(
-            [DataLoader] UserByIdDataLoader byId,
+            UserByIdDataLoader byId,
             CancellationToken cancellationToken
             )
         {

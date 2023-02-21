@@ -7,7 +7,7 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.AspNetCore.Authorization;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -37,7 +37,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<ConfirmUserEmailPayload> ConfirmUserEmailAsync(
             ConfirmUserEmailInput input,
-            [ScopedService] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
         {
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -88,8 +88,8 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<ConfirmUserEmailChangePayload> ConfirmUserEmailChangeAsync(
             ConfirmUserEmailChangeInput input,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             // TODO This public endpoint can be used to test whether there is a user for the given email address. Is this a problem? In other endpoints like `ResetUserPasswordAsync` do not do that on purpose. Why exactly?
@@ -174,8 +174,8 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<LoginUserPayload> LoginUserAsync(
             LoginUserInput input,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             var signInResult = await signInManager.PasswordSignInAsync(
@@ -240,7 +240,7 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<LoginUserWithTwoFactorCodePayload> LoginUserWithTwoFactorCodeAsync(
             LoginUserWithTwoFactorCodeInput input,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
@@ -303,7 +303,7 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<LoginUserWithRecoveryCodePayload> LoginUserWithRecoveryCodeAsync(
             LoginUserWithRecoveryCodeInput input,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
@@ -362,7 +362,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<RegisterUserPayload> RegisterUserAsync(
             RegisterUserInput input,
-            [ScopedService] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
             [Service] AppSettings appSettings
             )
@@ -476,7 +476,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<ResendUserEmailConfirmationPayload> ResendUserEmailConfirmationAsync(
             ResendUserEmailConfirmationInput input,
-            [ScopedService] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
             [Service] AppSettings appSettings
             )
@@ -500,7 +500,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<RequestUserPasswordResetPayload> RequestUserPasswordResetAsync(
             RequestUserPasswordResetInput input,
-            [ScopedService] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
             [Service] AppSettings appSettings
             )
@@ -528,7 +528,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<ResetUserPasswordPayload> ResetUserPasswordAsync(
             ResetUserPasswordInput input,
-            [ScopedService] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
         {
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -617,7 +617,7 @@ namespace Metabase.GraphQl.Users
         public async Task<DeleteUserPayload> DeleteUserAsync(
             DeleteUserInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
         {
             if (!await UserAuthorization.IsAuthorizedToDeleteUsers(
@@ -682,7 +682,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         [UseSignInManager]
         public async Task<LogoutUserPayload> LogoutUserAsync(
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             await signInManager.SignOutAsync().ConfigureAwait(false);
@@ -697,8 +697,8 @@ namespace Metabase.GraphQl.Users
         public async Task<ChangeUserPasswordPayload> ChangeUserPasswordAsync(
             ChangeUserPasswordInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -797,8 +797,8 @@ namespace Metabase.GraphQl.Users
         public async Task<DeletePersonalUserDataPayload> DeletePersonalUserDataAsync(
             DeletePersonalUserDataInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -868,7 +868,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<DisableUserTwoFactorAuthenticationPayload> DisableUserTwoFactorAuthenticationAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -903,8 +903,8 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<ForgetUserTwoFactorAuthenticationClientPayload> ForgetUserTwoFactorAuthenticationClientAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -928,7 +928,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload> GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] UrlEncoder urlEncoder
             )
         {
@@ -993,7 +993,7 @@ namespace Metabase.GraphQl.Users
         public async Task<EnableUserTwoFactorAuthenticatorPayload> EnableUserTwoFactorAuthenticatorAsync(
             EnableUserTwoFactorAuthenticatorInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] UrlEncoder urlEncoder
             )
         {
@@ -1162,8 +1162,8 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<ResetUserTwoFactorAuthenticatorPayload> ResetUserTwoFactorAuthenticatorAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1210,7 +1210,7 @@ namespace Metabase.GraphQl.Users
         public async Task<ChangeUserEmailPayload> ChangeUserEmailAsync(
             ChangeUserEmailInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
             [Service] AppSettings appSettings
             )
@@ -1266,7 +1266,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<ResendUserEmailVerificationPayload> ResendUserEmailVerificationAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
             [Service] AppSettings appSettings
             )
@@ -1308,7 +1308,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<GenerateUserTwoFactorRecoveryCodesPayload> GenerateUserTwoFactorRecoveryCodesAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1359,8 +1359,8 @@ namespace Metabase.GraphQl.Users
         public async Task<SetUserPhoneNumberPayload> SetUserPhoneNumberAsync(
             SetUserPhoneNumberInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1419,8 +1419,8 @@ namespace Metabase.GraphQl.Users
         public async Task<SetUserPasswordPayload> SetUserPasswordAsync(
             SetUserPasswordInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1516,8 +1516,8 @@ namespace Metabase.GraphQl.Users
         public async Task<AddUserRolePayload> AddUserRoleAsync(
             AddUserRoleInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
@@ -1575,8 +1575,8 @@ namespace Metabase.GraphQl.Users
         public async Task<RemoveUserRolePayload> RemoveUserRoleAsync(
             RemoveUserRoleInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {

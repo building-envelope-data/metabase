@@ -24,7 +24,7 @@ namespace Metabase.GraphQl.DataX
 
         public IReadOnlyList<TData> Nodes { get; }
 
-        [GraphQLType(typeof(NonNegativeIntType))]
+        [GraphQLType<NonNegativeIntType>]
         public uint TotalCount { get; }
 
         // public PageInfo PageInfo { get; } // TODO Resolve clash with `PageInfo` provided by `HotChocolate` 

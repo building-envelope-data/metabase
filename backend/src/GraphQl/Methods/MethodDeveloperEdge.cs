@@ -27,8 +27,8 @@ namespace Metabase.GraphQl.Methods
         }
 
         public async Task<Data.IStakeholder> GetNodeAsync(
-            [DataLoader] InstitutionByIdDataLoader institutionById,
-            [DataLoader] UserByIdDataLoader userById,
+            InstitutionByIdDataLoader institutionById,
+            UserByIdDataLoader userById,
             CancellationToken cancellationToken
             )
         {

@@ -52,12 +52,12 @@ namespace Metabase.GraphQl
 
         public override void SubscriptionEventError(SubscriptionEventContext context, Exception exception)
         {
-            _logger.LogError(exception, "During execution of the subscription operation {Operation} the exception {Exception} occurred.", context.Subscription.Operation.Print(), exception);
+            _logger.LogError(exception, "During execution of the subscription operation {Operation} the exception {Exception} occurred.", context.Subscription.Operation, exception);
         }
 
         public override void SubscriptionTransportError(ISubscription subscription, Exception exception)
         {
-            _logger.LogError(exception, "During execution of the subscription operation {Operation} the exception {Exception} occurred.", subscription.Operation.Print(), exception);
+            _logger.LogError(exception, "During execution of the subscription operation {Operation} the exception {Exception} occurred.", subscription.Operation, exception);
         }
 
         public override void SyntaxError(
