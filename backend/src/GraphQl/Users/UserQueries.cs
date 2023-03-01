@@ -13,7 +13,6 @@ namespace Metabase.GraphQl.Users
     [ExtendObjectType(nameof(Query))]
     public sealed class UserQueries
     {
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
         [UseUserManager]
         public async Task<Data.User?> GetCurrentUserAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
