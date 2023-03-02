@@ -232,5 +232,22 @@ namespace Metabase.Authorization
                     )
                 .ConfigureAwait(false);
         }
+
+        public static async Task<bool> IsVerifiedManufacturerOfComponent(
+            Guid institutionId,
+            Guid componentId,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return await context.ComponentManufacturers.AsQueryable()
+                .AnyAsync(x =>
+                    x.InstitutionId == institutionId &&
+                    x.ComponentId == componentId &&
+                    !x.Pending,
+                    cancellationToken
+                    )
+                .ConfigureAwait(false);
+        }
     }
 }

@@ -43,23 +43,6 @@ namespace Metabase.Authorization
             );
         }
 
-        public static Task<bool> IsAuthorizedToManageRepresentatives(
-            ClaimsPrincipal claimsPrincipal,
-            Guid institutionId,
-            UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
-            CancellationToken cancellationToken
-            )
-        {
-            return CommonAuthorization.IsOwnerOfVerifiedInstitution(
-                claimsPrincipal,
-                institutionId,
-                userManager,
-                context,
-                cancellationToken
-            );
-        }
-
         public static Task<bool> IsAuthorizedToCreateInstitutionManagedByInstitution(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,

@@ -22,6 +22,7 @@ namespace Metabase.Configuration
             services.AddGraphQLServer()
             // Services https://chillicream.com/docs/hotchocolate/v13/server/dependency-injection#registerservice
             .RegisterDbContext<Data.ApplicationDbContext>()
+            .AddMutationConventions(new MutationConventionOptions { ApplyToAllMutations = false })
             // Types
             .AddType<GraphQl.Common.OpenEndedDateTimeRangeType>()
             // Extensions
@@ -88,6 +89,7 @@ namespace Metabase.Configuration
                       .AddType<GraphQl.OpenIdConnect.OpendIdConnectQueries>()
                       .AddType<GraphQl.Users.UserQueries>()
                   .AddMutationType(d => d.Name(nameof(GraphQl.Mutation)))
+                      .AddType<GraphQl.ComponentAssemblies.ComponentAssemblyMutations>()
                       .AddType<GraphQl.ComponentManufacturers.ComponentManufacturerMutations>()
                       .AddType<GraphQl.Components.ComponentMutations>()
                       .AddType<GraphQl.DataFormats.DataFormatMutations>()

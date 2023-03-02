@@ -28,6 +28,19 @@ interface Stakeholder {
   name: String!
 }
 
+type AddComponentAssemblyError {
+  code: AddComponentAssemblyErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddComponentAssemblyPayload {
+  componentAssembledOfEdge: ComponentAssembledOfEdge
+  componentPartOfEdge: ComponentPartOfEdge
+  errors: [AddComponentAssemblyError!]
+  query: Query!
+}
+
 type AddInstitutionRepresentativeError {
   code: AddInstitutionRepresentativeErrorCode!
   message: String!
@@ -143,6 +156,8 @@ type Component implements Node {
 }
 
 type ComponentAssembledOfConnection {
+  canCurrentUserAddEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   edges: [ComponentAssembledOfEdge!]!
 }
 
@@ -175,6 +190,8 @@ type ComponentManufacturerEdge {
 }
 
 type ComponentPartOfConnection {
+  canCurrentUserAddEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   edges: [ComponentPartOfEdge!]!
 }
 
@@ -813,6 +830,7 @@ type MethodsEdge {
 }
 
 type Mutation {
+  addComponentAssembly(input: AddComponentAssemblyInput!): AddComponentAssemblyPayload! @authorize(policy: "Write")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload!
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "Write")
@@ -842,6 +860,7 @@ type Mutation {
   loginUserWithTwoFactorCode(input: LoginUserWithTwoFactorCodeInput!): LoginUserWithTwoFactorCodePayload!
   logoutUser: LogoutUserPayload! @authorize(policy: "ManageUser")
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
+  removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload! @authorize(policy: "Write")
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(policy: "Write")
   removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
@@ -1055,6 +1074,19 @@ type RegisterUserPayload {
   errors: [RegisterUserError!]
   query: Query!
   user: User
+}
+
+type RemoveComponentAssemblyError {
+  code: RemoveComponentAssemblyErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveComponentAssemblyPayload {
+  assembledComponent: Component!
+  errors: [RemoveComponentAssemblyError!]
+  partComponent: Component!
+  query: Query!
 }
 
 type RemoveInstitutionRepresentativeError {
@@ -1283,6 +1315,11 @@ type VerifyInstitutionPayload {
   errors: [VerifyInstitutionError!]
   institution: Institution
   query: Query!
+}
+
+input AddComponentAssemblyInput {
+  assembledComponentId: Uuid!
+  partComponentId: Uuid!
 }
 
 input AddInstitutionRepresentativeInput {
@@ -1752,6 +1789,11 @@ input RegisterUserInput {
   passwordConfirmation: String!
 }
 
+input RemoveComponentAssemblyInput {
+  assembledComponentId: Uuid!
+  partComponentId: Uuid!
+}
+
 input RemoveInstitutionRepresentativeInput {
   institutionId: Uuid!
   userId: Uuid!
@@ -1905,6 +1947,14 @@ input UuidPropositionInput {
 
 input VerifyInstitutionInput {
   institutionId: Uuid!
+}
+
+enum AddComponentAssemblyErrorCode {
+  UNKNOWN
+  UNKNOWN_ASSEMBLED_COMPONENT
+  UNKNOWN_PART_COMPONENT
+  UNKNOWN_ASSEMBLY
+  UNAUTHORIZED
 }
 
 enum AddInstitutionRepresentativeErrorCode {
@@ -2152,6 +2202,14 @@ enum RegisterUserErrorCode {
   PASSWORD_REQUIRES_UPPER
   PASSWORD_TOO_SHORT
   NULL_OR_EMPTY_EMAIL
+}
+
+enum RemoveComponentAssemblyErrorCode {
+  UNKNOWN
+  UNKNOWN_ASSEMBLED_COMPONENT
+  UNKNOWN_PART_COMPONENT
+  UNKNOWN_ASSEMBLY
+  UNAUTHORIZED
 }
 
 enum RemoveInstitutionRepresentativeErrorCode {

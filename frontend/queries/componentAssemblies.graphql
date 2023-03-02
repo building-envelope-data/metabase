@@ -1,0 +1,35 @@
+mutation AddComponentAssembly(
+  $assembledComponentId: Uuid!
+  $partComponentId: Uuid!
+) {
+  addComponentAssembly(
+    input: {
+      assembledComponentId: $assembledComponentId
+      partComponentId: $partComponentId
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RemoveComponentAssembly(
+  $assembledComponentId: Uuid!
+  $partComponentId: Uuid!
+) {
+  removeComponentAssembly(
+    input: {
+      assembledComponentId: $assembledComponentId
+      partComponentId: $partComponentId
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
