@@ -47,9 +47,9 @@ query Component($uuid: Uuid!) {
           uuid
           name
         }
+        canCurrentUserRemoveEdge
       }
       canCurrentUserAddEdge
-      canCurrentUserRemoveEdge
     }
     partOf {
       edges {
@@ -58,9 +58,9 @@ query Component($uuid: Uuid!) {
           uuid
           name
         }
+        canCurrentUserRemoveEdge
       }
       canCurrentUserAddEdge
-      canCurrentUserRemoveEdge
     }
     concretizationOf {
       edges {

@@ -8,7 +8,7 @@ namespace Metabase.Authorization
 {
     public static class ComponentAuthorization
     {
-        public static Task<bool> IsAuthorizedToCreateComponentForInstitution(
+        public static async Task<bool> IsAuthorizedToCreateComponentForInstitution(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,
@@ -16,13 +16,14 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                claimsPrincipal,
-                institutionId,
-                userManager,
-                context,
-                cancellationToken
-            );
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null) &&
+                await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+                    user,
+                    institutionId,
+                    context,
+                    cancellationToken
+                );
         }
 
         public static async Task<bool> IsAuthorizedToAddAssociationFromNewComponentToExistingComponents(
@@ -34,11 +35,13 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return
+                (user is not null)
+                &&
                 await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                    claimsPrincipal,
+                    user,
                     institutionId,
-                    userManager,
                     context,
                     cancellationToken
                 ).ConfigureAwait(false)

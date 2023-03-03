@@ -9,7 +9,7 @@ namespace Metabase.Authorization
 {
     public static class InstitutionAuthorization
     {
-        public static Task<bool> IsAuthorizedToUpdateInstitution(
+        internal static async Task<bool> IsAuthorizedToUpdateInstitution(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,
@@ -17,16 +17,17 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsAtLeastAssistant(
-                claimsPrincipal,
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+            && await CommonAuthorization.IsAtLeastAssistant(
+                user,
                 institutionId,
-                userManager,
                 context,
                 cancellationToken
             );
         }
 
-        public static Task<bool> IsAuthorizedToDeleteInstitution(
+        internal static async Task<bool> IsAuthorizedToDeleteInstitution(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,
@@ -34,16 +35,17 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsOwner(
-                claimsPrincipal,
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+            && await CommonAuthorization.IsOwner(
+                user,
                 institutionId,
-                userManager,
                 context,
                 cancellationToken
             );
         }
 
-        public static Task<bool> IsAuthorizedToCreateInstitutionManagedByInstitution(
+        internal static async Task<bool> IsAuthorizedToCreateInstitutionManagedByInstitution(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,
@@ -51,22 +53,25 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
         )
         {
-            return CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                claimsPrincipal,
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+            && await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+                user,
                 institutionId,
-                userManager,
                 context,
                 cancellationToken
             );
         }
 
-        internal static Task<bool> IsAuthorizedToVerifyInstitution(
+        internal static async Task<bool> IsAuthorizedToVerifyInstitution(
             ClaimsPrincipal claimsPrincipal,
             UserManager<Data.User> userManager
             )
         {
-            return CommonAuthorization.IsVerifier(
-                claimsPrincipal,
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+            && await CommonAuthorization.IsVerifier(
+                user,
                 userManager
             );
         }

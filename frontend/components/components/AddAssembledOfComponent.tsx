@@ -95,7 +95,7 @@ export default function AddAssembledOfComponent({
         onFinishFailed={onFinishFailed}
       >
         <Form.Item
-          label="Part"
+          label="Assembly"
           name="assembledComponentId"
           rules={[
             {

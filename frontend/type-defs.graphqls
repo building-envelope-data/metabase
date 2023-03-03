@@ -157,11 +157,11 @@ type Component implements Node {
 
 type ComponentAssembledOfConnection {
   canCurrentUserAddEdge: Boolean!
-  canCurrentUserRemoveEdge: Boolean!
   edges: [ComponentAssembledOfEdge!]!
 }
 
 type ComponentAssembledOfEdge {
+  canCurrentUserRemoveEdge: Boolean!
   node: Component!
 }
 
@@ -191,11 +191,11 @@ type ComponentManufacturerEdge {
 
 type ComponentPartOfConnection {
   canCurrentUserAddEdge: Boolean!
-  canCurrentUserRemoveEdge: Boolean!
   edges: [ComponentPartOfEdge!]!
 }
 
 type ComponentPartOfEdge {
+  canCurrentUserRemoveEdge: Boolean!
   node: Component!
 }
 

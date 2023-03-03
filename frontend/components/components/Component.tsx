@@ -4,10 +4,7 @@ import {
   ComponentsDocument,
   useComponentQuery,
 } from "../../queries/components.graphql";
-import {
-  useAddComponentAssemblyMutation,
-  useRemoveComponentAssemblyMutation,
-} from "../../queries/componentAssemblies.graphql";
+import { useRemoveComponentAssemblyMutation } from "../../queries/componentAssemblies.graphql";
 import {
   Skeleton,
   Result,
@@ -149,13 +146,14 @@ export default function Component({ componentId }: ComponentProps) {
             </List>
           )}
         </Descriptions.Item>
-        {component.assembledOf.edges.length >= 1 && (
+        {(component.assembledOf.edges.length >= 1 ||
+          component.assembledOf.canCurrentUserAddEdge) && (
           <Descriptions.Item label="Assembled Of">
             <List size="small">
               {component.assembledOf.edges.map((x) => (
                 <List.Item key={x.node.uuid}>
                   <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-                  {component.assembledOf.canCurrentUserRemoveEdge && (
+                  {x.canCurrentUserRemoveEdge && (
                     <Button
                       onClick={() =>
                         removeComponentAssembly(component.uuid, x.node.uuid)
@@ -169,17 +167,18 @@ export default function Component({ componentId }: ComponentProps) {
               ))}
             </List>
             {component.assembledOf.canCurrentUserAddEdge && (
-              <AddPartOfComponent assembledComponentId={component.id} />
+              <AddPartOfComponent assembledComponentId={component.uuid} />
             )}
           </Descriptions.Item>
         )}
-        {component.partOf.edges.length >= 1 && (
+        {(component.partOf.edges.length >= 1 ||
+          component.partOf.canCurrentUserAddEdge) && (
           <Descriptions.Item label="Part Of">
             <List size="small">
               {component.partOf.edges.map((x) => (
                 <List.Item key={x.node.uuid}>
                   <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-                  {component.partOf.canCurrentUserRemoveEdge && (
+                  {x.canCurrentUserRemoveEdge && (
                     <Button
                       onClick={() =>
                         removeComponentAssembly(x.node.uuid, component.uuid)
@@ -193,7 +192,7 @@ export default function Component({ componentId }: ComponentProps) {
               ))}
             </List>
             {component.partOf.canCurrentUserAddEdge && (
-              <AddAssembledOfComponent partComponentId={component.id} />
+              <AddAssembledOfComponent partComponentId={component.uuid} />
             )}
           </Descriptions.Item>
         )}

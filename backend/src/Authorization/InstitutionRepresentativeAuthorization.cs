@@ -8,7 +8,7 @@ namespace Metabase.Authorization
 {
     public static class InstitutionRepresentativeAuthorization
     {
-        public static Task<bool> IsAuthorizedToManage(
+        public static async Task<bool> IsAuthorizedToManage(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,
@@ -16,25 +16,27 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsOwnerOfVerifiedInstitution(
-                claimsPrincipal,
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+            && await CommonAuthorization.IsOwnerOfVerifiedInstitution(
+                user,
                 institutionId,
-                userManager,
                 context,
                 cancellationToken
             );
         }
 
-        public static Task<bool> IsAuthorizedToConfirm(
+        public static async Task<bool> IsAuthorizedToConfirm(
             ClaimsPrincipal claimsPrincipal,
             Guid userId,
             UserManager<Data.User> userManager
             )
         {
-            return CommonAuthorization.IsSame(
-                claimsPrincipal,
-                userId,
-                userManager
+            var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (loggedInUser is not null)
+            && CommonAuthorization.IsSame(
+                loggedInUser,
+                userId
             );
         }
     }

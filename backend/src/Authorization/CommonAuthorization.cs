@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -10,13 +9,11 @@ namespace Metabase.Authorization
 {
     public static class CommonAuthorization
     {
-        public static async Task<bool> IsSame(
-            ClaimsPrincipal claimsPrincipal,
-            Guid userId,
-            UserManager<Data.User> userManager
+        public static bool IsSame(
+            Data.User user,
+            Guid userId
         )
         {
-            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
                 return false;
@@ -25,36 +22,35 @@ namespace Metabase.Authorization
         }
 
         public static Task<bool> IsAdministrator(
-            ClaimsPrincipal claimsPrincipal,
+            Data.User user,
             UserManager<Data.User> userManager
         )
         {
             return IsInRole(
-                claimsPrincipal,
+                user,
                 Enumerations.UserRole.ADMINISTRATOR,
                 userManager
             );
         }
 
         public static Task<bool> IsVerifier(
-            ClaimsPrincipal claimsPrincipal,
+            Data.User user,
             UserManager<Data.User> userManager
         )
         {
             return IsInRole(
-                claimsPrincipal,
+                user,
                 Enumerations.UserRole.VERIFIER,
                 userManager
             );
         }
 
         private static async Task<bool> IsInRole(
-            ClaimsPrincipal claimsPrincipal,
+            Data.User user,
             Enumerations.UserRole role,
             UserManager<Data.User> userManager
         )
         {
-            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
                 return false;
@@ -80,17 +76,15 @@ namespace Metabase.Authorization
         }
 
         public static async Task<bool> IsOwner(
-            ClaimsPrincipal claimsPrincipal,
+            Data.User user,
             Guid institutionId,
-            UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
         )
         {
             return await FetchRole(
-                claimsPrincipal,
+                user,
                 institutionId,
-                userManager,
                 context,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -98,23 +92,22 @@ namespace Metabase.Authorization
         }
 
         public static async Task<bool> IsOwnerOfVerifiedInstitution(
-            ClaimsPrincipal claimsPrincipal,
+            Data.User user,
             Guid institutionId,
-            UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
         )
         {
             return
+                (user is not null) &&
                 (await IsVerified(
                     institutionId,
                     context,
                     cancellationToken
                 ).ConfigureAwait(false)) &&
                 (await IsOwner(
-                    claimsPrincipal,
+                    user,
                     institutionId,
-                    userManager,
                     context,
                     cancellationToken
                 ).ConfigureAwait(false)
@@ -122,18 +115,16 @@ namespace Metabase.Authorization
         }
 
         public static async Task<bool> IsAtLeastAssistant(
-            ClaimsPrincipal claimsPrincipal,
+            Data.User user,
             Guid institutionId,
-            UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
         )
         {
             var role =
                 await FetchRole(
-                claimsPrincipal,
+                user,
                 institutionId,
-                userManager,
                 context,
                 cancellationToken
             ).ConfigureAwait(false);
@@ -143,23 +134,22 @@ namespace Metabase.Authorization
         }
 
         public static async Task<bool> IsAtLeastAssistantOfVerifiedInstitution(
-            ClaimsPrincipal claimsPrincipal,
+            Data.User user,
             Guid institutionId,
-            UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
         )
         {
             return
+                (user is not null) &&
                 (await IsVerified(
                     institutionId,
                     context,
                     cancellationToken
                 ).ConfigureAwait(false)) &&
                 (await IsAtLeastAssistant(
-                    claimsPrincipal,
+                    user,
                     institutionId,
-                    userManager,
                     context,
                     cancellationToken
                 ).ConfigureAwait(false)
@@ -167,14 +157,12 @@ namespace Metabase.Authorization
         }
 
         private static async Task<Enumerations.InstitutionRepresentativeRole?> FetchRole(
-            ClaimsPrincipal claimsPrincipal,
+            Data.User user,
             Guid institutionId,
-            UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
         )
         {
-            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
                 return null;

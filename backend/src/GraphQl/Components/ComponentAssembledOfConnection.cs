@@ -29,24 +29,7 @@ namespace Metabase.GraphQl.Components
             CancellationToken cancellationToken
         )
         {
-            return ComponentAssemblyAuthorization.IsAuthorizedToManage(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
-        }
-
-        [UseUserManager]
-        public Task<bool> CanCurrentUserRemoveEdgeAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
-            CancellationToken cancellationToken
-        )
-        {
-            return ComponentAssemblyAuthorization.IsAuthorizedToManage(
+            return ComponentAssemblyAuthorization.IsAuthorizedToAdd(
                  claimsPrincipal,
                  Subject.Id,
                  userManager,

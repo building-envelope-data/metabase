@@ -10,7 +10,7 @@ namespace Metabase.Authorization
 {
     public static class ComponentAssemblyAuthorization
     {
-        public static async Task<bool> IsAuthorizedToManage(
+        public static async Task<bool> IsAuthorizedToAdd(
             ClaimsPrincipal claimsPrincipal,
             Guid componentId,
             UserManager<Data.User> userManager,
@@ -18,13 +18,15 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-                claimsPrincipal,
-                componentId,
-                userManager,
-                context,
-                cancellationToken
-            );
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+                &&
+                await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                    user,
+                    componentId,
+                    context,
+                    cancellationToken
+                );
         }
 
         public static async Task<bool> IsAuthorizedToManage(
@@ -36,25 +38,27 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-                claimsPrincipal,
-                assembledComponentId,
-                userManager,
-                context,
-                cancellationToken
-            ) && await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-                claimsPrincipal,
-                partComponentId,
-                userManager,
-                context,
-                cancellationToken
-            );
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+                &&
+                await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                    user,
+                    assembledComponentId,
+                    context,
+                    cancellationToken
+                )
+                &&
+                await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                    user,
+                    partComponentId,
+                    context,
+                    cancellationToken
+                );
         }
 
         private static async Task<bool> IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-            ClaimsPrincipal claimsPrincipal,
+            Data.User user,
             Guid componentId,
-            UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
         )
@@ -68,9 +72,8 @@ namespace Metabase.Authorization
             foreach (var manufacturerId in manufacturerIds)
             {
                 if (await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                        claimsPrincipal,
+                        user,
                         manufacturerId,
-                        userManager,
                         context,
                         cancellationToken
                     ).ConfigureAwait(false)
