@@ -146,90 +146,114 @@ export default function Component({ componentId }: ComponentProps) {
             </List>
           )}
         </Descriptions.Item>
-        {(component.assembledOf.edges.length >= 1 ||
-          component.assembledOf.canCurrentUserAddEdge) && (
-          <Descriptions.Item label="Assembled Of">
-            <List size="small">
-              {component.assembledOf.edges.map((x) => (
-                <List.Item key={x.node.uuid}>
-                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-                  {x.canCurrentUserRemoveEdge && (
-                    <Button
-                      onClick={() =>
-                        removeComponentAssembly(component.uuid, x.node.uuid)
-                      }
-                      loading={removingComponentAssembly}
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </List.Item>
-              ))}
-            </List>
-            {component.assembledOf.canCurrentUserAddEdge && (
-              <AddPartOfComponent assembledComponentId={component.uuid} />
-            )}
-          </Descriptions.Item>
-        )}
-        {(component.partOf.edges.length >= 1 ||
-          component.partOf.canCurrentUserAddEdge) && (
-          <Descriptions.Item label="Part Of">
-            <List size="small">
-              {component.partOf.edges.map((x) => (
-                <List.Item key={x.node.uuid}>
-                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-                  {x.canCurrentUserRemoveEdge && (
-                    <Button
-                      onClick={() =>
-                        removeComponentAssembly(x.node.uuid, component.uuid)
-                      }
-                      loading={removingComponentAssembly}
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </List.Item>
-              ))}
-            </List>
-            {component.partOf.canCurrentUserAddEdge && (
-              <AddAssembledOfComponent partComponentId={component.uuid} />
-            )}
-          </Descriptions.Item>
-        )}
-        {component.concretizationOf.edges.length >= 1 && (
-          <Descriptions.Item label="Concretization Of">
-            <List size="small">
-              {component.concretizationOf.edges.map((x) => (
-                <List.Item key={x.node.uuid}>
-                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-                </List.Item>
-              ))}
-            </List>
-          </Descriptions.Item>
-        )}
-        {component.generalizationOf.edges.length >= 1 && (
-          <Descriptions.Item label="Generalization Of">
-            <List size="small">
-              {component.generalizationOf.edges.map((x) => (
-                <List.Item key={x.node.uuid}>
-                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-                </List.Item>
-              ))}
-            </List>
-          </Descriptions.Item>
-        )}
-        {component.variantOf.edges.length >= 1 && (
-          <Descriptions.Item label="Variant Of">
-            <List size="small">
-              {component.variantOf.edges.map((x) => (
-                <List.Item key={x.node.uuid}>
-                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
-                </List.Item>
-              ))}
-            </List>
-          </Descriptions.Item>
-        )}
       </Descriptions>
+      {(component.assembledOf.edges.length >= 1 ||
+        component.assembledOf.canCurrentUserAddEdge) && (
+        <List
+          header="Assembled Of"
+          bordered={true}
+          size="small"
+          footer={
+            component.assembledOf.canCurrentUserAddEdge && (
+              <AddPartOfComponent assembledComponentId={component.uuid} />
+            )
+          }
+        >
+          {component.assembledOf.edges.map((x) => (
+            <List.Item
+              key={x.node.uuid}
+              actions={
+                !x.canCurrentUserRemoveEdge
+                  ? []
+                  : [
+                      <Button
+                        onClick={() =>
+                          removeComponentAssembly(component.uuid, x.node.uuid)
+                        }
+                        loading={removingComponentAssembly}
+                      >
+                        Remove
+                      </Button>,
+                    ]
+              }
+            >
+              <List.Item.Meta
+                title={
+                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+                }
+                description={x.node.description}
+              />
+            </List.Item>
+          ))}
+        </List>
+      )}
+      {(component.partOf.edges.length >= 1 ||
+        component.partOf.canCurrentUserAddEdge) && (
+        <List
+          header="Part Of"
+          bordered={true}
+          size="small"
+          footer={
+            component.partOf.canCurrentUserAddEdge && (
+              <AddAssembledOfComponent partComponentId={component.uuid} />
+            )
+          }
+        >
+          {component.partOf.edges.map((x) => (
+            <List.Item
+              key={x.node.uuid}
+              actions={
+                !x.canCurrentUserRemoveEdge
+                  ? []
+                  : [
+                      <Button
+                        onClick={() =>
+                          removeComponentAssembly(x.node.uuid, component.uuid)
+                        }
+                        loading={removingComponentAssembly}
+                      >
+                        Remove
+                      </Button>,
+                    ]
+              }
+            >
+              <List.Item.Meta
+                title={
+                  <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+                }
+                description={x.node.description}
+              />
+            </List.Item>
+          ))}
+        </List>
+      )}
+      {component.concretizationOf.edges.length >= 1 && (
+        <List header="Concretization Of" bordered={true} size="small">
+          {component.concretizationOf.edges.map((x) => (
+            <List.Item key={x.node.uuid}>
+              <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+            </List.Item>
+          ))}
+        </List>
+      )}
+      {component.generalizationOf.edges.length >= 1 && (
+        <List header="Generalization Of" bordered={true} size="small">
+          {component.generalizationOf.edges.map((x) => (
+            <List.Item key={x.node.uuid}>
+              <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+            </List.Item>
+          ))}
+        </List>
+      )}
+      {component.variantOf.edges.length >= 1 && (
+        <List header="Variant Of" bordered={true} size="small">
+          {component.variantOf.edges.map((x) => (
+            <List.Item key={x.node.uuid}>
+              <Link href={paths.component(x.node.uuid)}>{x.node.name}</Link>
+            </List.Item>
+          ))}
+        </List>
+      )}
     </PageHeader>
   );
 }
