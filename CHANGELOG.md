@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Upgrade packages to latest compatible versions in backend and frontend [#141](https://github.com/building-envelope-data/metabase/pull/141)
+- Upgrade packages to latest compatible versions in backend and frontend [#151](https://github.com/building-envelope-data/metabase/pull/151), [#143](https://github.com/building-envelope-data/metabase/pull/143), and [#141](https://github.com/building-envelope-data/metabase/pull/141)
 -
 -
 -
