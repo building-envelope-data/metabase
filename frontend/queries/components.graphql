@@ -95,7 +95,9 @@ query Component($uuid: Uuid!) {
           uuid
           name
         }
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
   }
 }

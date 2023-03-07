@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.Authorization
 {
-    public static class ComponentAssemblyAuthorization
+    public static class ComponentVariantAuthorization
     {
         public static async Task<bool> IsAuthorizedToAdd(
             ClaimsPrincipal claimsPrincipal,
@@ -29,8 +29,8 @@ namespace Metabase.Authorization
 
         public static async Task<bool> IsAuthorizedToManage(
             ClaimsPrincipal claimsPrincipal,
-            Guid assembledComponentId,
-            Guid partComponentId,
+            Guid ofComponentId,
+            Guid toComponentId,
             UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -41,14 +41,14 @@ namespace Metabase.Authorization
                 &&
                 await ComponentReflexiveAssociationAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
                     user,
-                    assembledComponentId,
+                    ofComponentId,
                     context,
                     cancellationToken
                 )
                 &&
                 await ComponentReflexiveAssociationAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
                     user,
-                    partComponentId,
+                    toComponentId,
                     context,
                     cancellationToken
                 );

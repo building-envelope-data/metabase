@@ -5,16 +5,16 @@ namespace Metabase.GraphQl.ComponentAssemblies
 {
     public sealed class AddComponentAssemblyPayload
     {
-        public ComponentAssembledOfEdge? ComponentAssembledOfEdge { get; }
-        public ComponentPartOfEdge? ComponentPartOfEdge { get; }
+        public ComponentAssembledOfEdge? AssembledOfEdge { get; }
+        public ComponentPartOfEdge? PartOfEdge { get; }
         public IReadOnlyCollection<AddComponentAssemblyError>? Errors { get; }
 
         public AddComponentAssemblyPayload(
             Data.ComponentAssembly componentAssembly
             )
         {
-            ComponentAssembledOfEdge = new ComponentAssembledOfEdge(componentAssembly);
-            ComponentPartOfEdge = new ComponentPartOfEdge(componentAssembly);
+            AssembledOfEdge = new ComponentAssembledOfEdge(componentAssembly);
+            PartOfEdge = new ComponentPartOfEdge(componentAssembly);
         }
 
         public AddComponentAssemblyPayload(
