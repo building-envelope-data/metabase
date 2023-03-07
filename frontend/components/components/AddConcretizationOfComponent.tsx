@@ -96,7 +96,7 @@ export default function AddConcretizationOfComponent({
         onFinishFailed={onFinishFailed}
       >
         <Form.Item
-          label="Concrete"
+          label="Concretization"
           name="concreteComponentId"
           rules={[
             {

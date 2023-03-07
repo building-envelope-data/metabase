@@ -76,6 +76,7 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
         canCurrentUserRemoveEdge
       }
@@ -87,6 +88,7 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
         canCurrentUserRemoveEdge
       }
@@ -98,6 +100,7 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
         canCurrentUserRemoveEdge
       }

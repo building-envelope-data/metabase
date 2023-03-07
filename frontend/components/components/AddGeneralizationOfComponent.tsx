@@ -96,7 +96,7 @@ export default function AddAssembledOfComponent({
         onFinishFailed={onFinishFailed}
       >
         <Form.Item
-          label="General"
+          label="Generalization"
           name="generalComponentId"
           rules={[
             {

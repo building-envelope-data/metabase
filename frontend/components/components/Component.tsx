@@ -446,9 +446,14 @@ export default function Component({ componentId }: ComponentProps) {
                         : []
                     )}
                   >
-                    <Link href={paths.component(x.node.uuid)}>
-                      {x.node.name}
-                    </Link>
+                    <List.Item.Meta
+                      title={
+                        <Link href={paths.component(x.node.uuid)}>
+                          {x.node.name}
+                        </Link>
+                      }
+                      description={x.node.description}
+                    />
                   </List.Item>
                 ))}
               </List>
@@ -491,9 +496,14 @@ export default function Component({ componentId }: ComponentProps) {
                         : []
                     )}
                   >
-                    <Link href={paths.component(x.node.uuid)}>
-                      {x.node.name}
-                    </Link>
+                    <List.Item.Meta
+                      title={
+                        <Link href={paths.component(x.node.uuid)}>
+                          {x.node.name}
+                        </Link>
+                      }
+                      description={x.node.description}
+                    />
                   </List.Item>
                 ))}
               </List>
@@ -536,9 +546,14 @@ export default function Component({ componentId }: ComponentProps) {
                         : []
                     )}
                   >
-                    <Link href={paths.component(x.node.uuid)}>
-                      {x.node.name}
-                    </Link>
+                    <List.Item.Meta
+                      title={
+                        <Link href={paths.component(x.node.uuid)}>
+                          {x.node.name}
+                        </Link>
+                      }
+                      description={x.node.description}
+                    />
                   </List.Item>
                 ))}
               </List>
