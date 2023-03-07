@@ -46,8 +46,14 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        index
+        primeSurface
+        canCurrentUserUpdateEdge
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
     partOf {
       edges {
@@ -55,8 +61,14 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        index
+        primeSurface
+        canCurrentUserUpdateEdge
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
     concretizationOf {
       edges {

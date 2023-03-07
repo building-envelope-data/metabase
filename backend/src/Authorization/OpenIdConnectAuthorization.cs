@@ -6,13 +6,15 @@ namespace Metabase.Authorization
 {
     public static class OpenIdConnectAuthorization
     {
-        public static Task<bool> IsAuthorizedToView(
+        public static async Task<bool> IsAuthorizedToView(
             ClaimsPrincipal claimsPrincipal,
             UserManager<Data.User> userManager
             )
         {
-            return CommonAuthorization.IsAdministrator(
-                claimsPrincipal,
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+            && await CommonAuthorization.IsAdministrator(
+                user,
                 userManager
             );
         }

@@ -20,7 +20,7 @@ namespace Metabase.GraphQl.Components
                 (dbContext, ids) =>
                     dbContext.ComponentAssemblies.AsQueryable().Where(x =>
                         ids.Contains(x.AssembledComponentId)
-                    ),
+                    ).OrderBy(x => x.Index),
                 x => x.AssembledComponentId
                 )
         {

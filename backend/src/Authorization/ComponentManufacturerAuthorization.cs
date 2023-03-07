@@ -8,7 +8,7 @@ namespace Metabase.Authorization
 {
     public static class ComponentManufacturerAuthorization
     {
-        public static Task<bool> IsAuthorizedToConfirm(
+        public static async Task<bool> IsAuthorizedToConfirm(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,
@@ -16,13 +16,15 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                claimsPrincipal,
-                institutionId,
-                userManager,
-                context,
-                cancellationToken
-            );
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+                &&
+                await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+                    user,
+                    institutionId,
+                    context,
+                    cancellationToken
+                );
         }
     }
 }

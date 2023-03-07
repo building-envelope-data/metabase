@@ -1,0 +1,61 @@
+mutation AddComponentAssembly(
+  $assembledComponentId: Uuid!
+  $partComponentId: Uuid!
+  $index: Byte
+  $primeSurface: PrimeSurface
+) {
+  addComponentAssembly(
+    input: {
+      assembledComponentId: $assembledComponentId
+      partComponentId: $partComponentId
+      index: $index
+      primeSurface: $primeSurface
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateComponentAssembly(
+  $assembledComponentId: Uuid!
+  $partComponentId: Uuid!
+  $newIndex: Byte
+  $newPrimeSurface: PrimeSurface
+) {
+  updateComponentAssembly(
+    input: {
+      assembledComponentId: $assembledComponentId
+      partComponentId: $partComponentId
+      newIndex: $newIndex
+      newPrimeSurface: $newPrimeSurface
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RemoveComponentAssembly(
+  $assembledComponentId: Uuid!
+  $partComponentId: Uuid!
+) {
+  removeComponentAssembly(
+    input: {
+      assembledComponentId: $assembledComponentId
+      partComponentId: $partComponentId
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

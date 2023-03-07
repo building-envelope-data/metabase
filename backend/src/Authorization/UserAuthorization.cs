@@ -7,12 +7,14 @@ namespace Metabase.Authorization
 {
     public static class UserAuthorization
     {
-        public static Task<bool> IsAuthorizedToDeleteUsers(
+        public static async Task<bool> IsAuthorizedToDeleteUsers(
             ClaimsPrincipal claimsPrincipal,
             UserManager<Data.User> userManager
         )
         {
-            return CommonAuthorization.IsAdministrator(claimsPrincipal, userManager);
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+            && await CommonAuthorization.IsAdministrator(user, userManager);
         }
 
         public static async Task<bool> IsAuthorizedToManageUser(
@@ -46,16 +48,21 @@ namespace Metabase.Authorization
             UserManager<Data.User> userManager
         )
         {
-            if (await CommonAuthorization.IsAdministrator(claimsPrincipal, userManager).ConfigureAwait(false))
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            if (user is null)
+            {
+                return false;
+            }
+            if (await CommonAuthorization.IsAdministrator(user, userManager).ConfigureAwait(false))
             {
                 return true;
             }
             return role switch
             {
                 Enumerations.UserRole.ADMINISTRATOR =>
-                    await CommonAuthorization.IsAdministrator(claimsPrincipal, userManager).ConfigureAwait(false),
+                    await CommonAuthorization.IsAdministrator(user, userManager).ConfigureAwait(false),
                 Enumerations.UserRole.VERIFIER =>
-                    await CommonAuthorization.IsVerifier(claimsPrincipal, userManager).ConfigureAwait(false),
+                    await CommonAuthorization.IsVerifier(user, userManager).ConfigureAwait(false),
                 _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown role `{role}.`")
             };
         }

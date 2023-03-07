@@ -28,6 +28,19 @@ interface Stakeholder {
   name: String!
 }
 
+type AddComponentAssemblyError {
+  code: AddComponentAssemblyErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddComponentAssemblyPayload {
+  componentAssembledOfEdge: ComponentAssembledOfEdge
+  componentPartOfEdge: ComponentPartOfEdge
+  errors: [AddComponentAssemblyError!]
+  query: Query!
+}
+
 type AddInstitutionRepresentativeError {
   code: AddInstitutionRepresentativeErrorCode!
   message: String!
@@ -143,11 +156,16 @@ type Component implements Node {
 }
 
 type ComponentAssembledOfConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [ComponentAssembledOfEdge!]!
 }
 
 type ComponentAssembledOfEdge {
+  canCurrentUserRemoveEdge: Boolean!
+  canCurrentUserUpdateEdge: Boolean!
+  index: Byte
   node: Component!
+  primeSurface: PrimeSurface
 }
 
 type ComponentConcretizationOfConnection {
@@ -175,11 +193,16 @@ type ComponentManufacturerEdge {
 }
 
 type ComponentPartOfConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [ComponentPartOfEdge!]!
 }
 
 type ComponentPartOfEdge {
+  canCurrentUserRemoveEdge: Boolean!
+  canCurrentUserUpdateEdge: Boolean!
+  index: Byte
   node: Component!
+  primeSurface: PrimeSurface
 }
 
 type ComponentVariantOfConnection {
@@ -813,6 +836,7 @@ type MethodsEdge {
 }
 
 type Mutation {
+  addComponentAssembly(input: AddComponentAssemblyInput!): AddComponentAssemblyPayload! @authorize(policy: "Write")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload!
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "Write")
@@ -842,6 +866,7 @@ type Mutation {
   loginUserWithTwoFactorCode(input: LoginUserWithTwoFactorCodeInput!): LoginUserWithTwoFactorCodePayload!
   logoutUser: LogoutUserPayload! @authorize(policy: "ManageUser")
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
+  removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload! @authorize(policy: "Write")
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(policy: "Write")
   removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
@@ -851,6 +876,7 @@ type Mutation {
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser")
+  updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "Write")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(policy: "Write")
   verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(policy: "Write")
 }
@@ -1057,6 +1083,19 @@ type RegisterUserPayload {
   user: User
 }
 
+type RemoveComponentAssemblyError {
+  code: RemoveComponentAssemblyErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveComponentAssemblyPayload {
+  assembledComponent: Component!
+  errors: [RemoveComponentAssemblyError!]
+  partComponent: Component!
+  query: Query!
+}
+
 type RemoveInstitutionRepresentativeError {
   code: RemoveInstitutionRepresentativeErrorCode!
   message: String!
@@ -1198,6 +1237,19 @@ type TwoFactorAuthentication {
   recoveryCodesLeftCount: Int!
 }
 
+type UpdateComponentAssemblyError {
+  code: UpdateComponentAssemblyErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateComponentAssemblyPayload {
+  componentAssembledOfEdge: ComponentAssembledOfEdge
+  componentPartOfEdge: ComponentPartOfEdge
+  errors: [UpdateComponentAssemblyError!]
+  query: Query!
+}
+
 type UpdateInstitutionError {
   code: UpdateInstitutionErrorCode!
   message: String!
@@ -1283,6 +1335,13 @@ type VerifyInstitutionPayload {
   errors: [VerifyInstitutionError!]
   institution: Institution
   query: Query!
+}
+
+input AddComponentAssemblyInput {
+  assembledComponentId: Uuid!
+  index: Byte
+  partComponentId: Uuid!
+  primeSurface: PrimeSurface
 }
 
 input AddInstitutionRepresentativeInput {
@@ -1752,6 +1811,11 @@ input RegisterUserInput {
   passwordConfirmation: String!
 }
 
+input RemoveComponentAssemblyInput {
+  assembledComponentId: Uuid!
+  partComponentId: Uuid!
+}
+
 input RemoveInstitutionRepresentativeInput {
   institutionId: Uuid!
   userId: Uuid!
@@ -1811,6 +1875,13 @@ input StringOperationFilterInput {
   nstartsWith: String
   endsWith: String
   nendsWith: String
+}
+
+input UpdateComponentAssemblyInput {
+  assembledComponentId: Uuid!
+  newIndex: Byte
+  newPrimeSurface: PrimeSurface
+  partComponentId: Uuid!
 }
 
 input UpdateInstitutionInput {
@@ -1905,6 +1976,14 @@ input UuidPropositionInput {
 
 input VerifyInstitutionInput {
   institutionId: Uuid!
+}
+
+enum AddComponentAssemblyErrorCode {
+  UNKNOWN
+  UNKNOWN_ASSEMBLED_COMPONENT
+  UNKNOWN_PART_COMPONENT
+  UNKNOWN_ASSEMBLY
+  UNAUTHORIZED
 }
 
 enum AddInstitutionRepresentativeErrorCode {
@@ -2141,6 +2220,11 @@ enum MethodCategory {
   CALCULATION
 }
 
+enum PrimeSurface {
+  INSIDE
+  OUTSIDE
+}
+
 enum RegisterUserErrorCode {
   UNKNOWN
   PASSWORD_CONFIRMATION_MISMATCH
@@ -2152,6 +2236,14 @@ enum RegisterUserErrorCode {
   PASSWORD_REQUIRES_UPPER
   PASSWORD_TOO_SHORT
   NULL_OR_EMPTY_EMAIL
+}
+
+enum RemoveComponentAssemblyErrorCode {
+  UNKNOWN
+  UNKNOWN_ASSEMBLED_COMPONENT
+  UNKNOWN_PART_COMPONENT
+  UNKNOWN_ASSEMBLY
+  UNAUTHORIZED
 }
 
 enum RemoveInstitutionRepresentativeErrorCode {
@@ -2251,6 +2343,14 @@ enum Standardizer {
   WELL
 }
 
+enum UpdateComponentAssemblyErrorCode {
+  UNKNOWN
+  UNKNOWN_ASSEMBLED_COMPONENT
+  UNKNOWN_PART_COMPONENT
+  UNKNOWN_ASSEMBLY
+  UNAUTHORIZED
+}
+
 enum UpdateInstitutionErrorCode {
   UNKNOWN
   UNAUTHORIZED
@@ -2274,6 +2374,9 @@ directive @authorize("Defines when when the authorize directive shall be applied
 directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
 
 scalar Any
+
+"The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255."
+scalar Byte
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")

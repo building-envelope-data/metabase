@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Authorization;
-using HotChocolate.Data;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Extensions;

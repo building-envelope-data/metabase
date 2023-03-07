@@ -8,7 +8,7 @@ namespace Metabase.Authorization
 {
     public static class MethodAuthorization
     {
-        public static Task<bool> IsAuthorizedToCreateMethodManagedByInstitution(
+        public static async Task<bool> IsAuthorizedToCreateMethodManagedByInstitution(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,
@@ -16,10 +16,11 @@ namespace Metabase.Authorization
             CancellationToken cancellationToken
             )
         {
-            return CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                claimsPrincipal,
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null)
+            && await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+                user,
                 institutionId,
-                userManager,
                 context,
                 cancellationToken
             );
