@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Make component assemblies manageable [#152](https://github.com/building-envelope-data/metabase/pull/152)
--
+- Make variant and concretization associations manageable [#153](https://github.com/building-envelope-data/metabase/pull/153)
 -
 -
 -
