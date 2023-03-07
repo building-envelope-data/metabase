@@ -317,8 +317,10 @@ export default function Component({ componentId }: ComponentProps) {
                             {x.node.name}
                           </Link>
                           <div>
-                            <Tag color="purple">{x.index}</Tag>
-                            <Tag color="volcano">{x.primeSurface}</Tag>
+                            <Tag color="purple">Layer {x.index}</Tag>
+                            <Tag color="volcano">
+                              Prime Surface {x.primeSurface}
+                            </Tag>
                           </div>
                         </Space>
                       }
@@ -391,8 +393,10 @@ export default function Component({ componentId }: ComponentProps) {
                             {x.node.name}
                           </Link>
                           <div>
-                            <Tag color="purple">{x.index}</Tag>
-                            <Tag color="volcano">{x.primeSurface}</Tag>
+                            <Tag color="purple">Layer {x.index}</Tag>
+                            <Tag color="volcano">
+                              Prime Surface {x.primeSurface}
+                            </Tag>
                           </div>
                         </Space>
                       }
