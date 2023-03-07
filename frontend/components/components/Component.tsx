@@ -28,6 +28,9 @@ import AddPartOfComponent from "./AddPartOfComponent";
 import AddAssembledOfComponent from "./AddAssembledOfComponent";
 import UpdateComponentAssembly from "./UpdateComponentAssembly";
 import AddVariantOfComponent from "./AddVariantOfComponent";
+import AddConcretizationOfComponent from "./AddConcretizationOfComponent";
+import AddGeneralizationOfComponent from "./AddGeneralizationOfComponent";
+import { useRemoveComponentGeneralizationMutation } from "../../queries/componentGeneralizations.graphql";
 
 export type ComponentProps = {
   componentId: Scalars["Uuid"];
@@ -141,6 +144,55 @@ export default function Component({ componentId }: ComponentProps) {
       }
     } finally {
       setRemovingComponentVariant(false);
+    }
+  };
+
+  const [removeComponentGeneralizationMutation] =
+    useRemoveComponentGeneralizationMutation();
+  const [removingComponentGeneralization, setRemovingComponentGeneralization] =
+    useState(false);
+
+  const removeComponentGeneralization = async (
+    generalComponentId: Scalars["Uuid"],
+    concreteComponentId: Scalars["Uuid"]
+  ) => {
+    try {
+      setRemovingComponentGeneralization(true);
+      const { errors, data } = await removeComponentGeneralizationMutation({
+        variables: {
+          generalComponentId: generalComponentId,
+          concreteComponentId: concreteComponentId,
+        },
+        refetchQueries: [
+          {
+            query: ComponentsDocument,
+          },
+          {
+            query: ComponentDocument,
+            variables: {
+              uuid: generalComponentId,
+            },
+          },
+          {
+            query: ComponentDocument,
+            variables: {
+              uuid: concreteComponentId,
+            },
+          },
+        ],
+      });
+      if (errors) {
+        console.log(errors); // TODO What to do?
+      } else if (data?.removeComponentGeneralization?.errors) {
+        // TODO Is this how we want to display errors?
+        message.error(
+          data?.removeComponentGeneralization?.errors
+            .map((error) => error.message)
+            .join(" ")
+        );
+      }
+    } finally {
+      setRemovingComponentGeneralization(false);
     }
   };
 
@@ -354,10 +406,42 @@ export default function Component({ componentId }: ComponentProps) {
         </Row>
         <Row gutter={[16, 16]}>
           <Col flex={1}>
-            {component.concretizationOf.edges.length >= 1 && (
-              <List header="Concretization Of" bordered={true} size="small">
+            {(component.concretizationOf.edges.length >= 1 ||
+              component.concretizationOf.canCurrentUserAddEdge) && (
+              <List
+                header="Concretization Of"
+                bordered={true}
+                size="small"
+                footer={
+                  component.concretizationOf.canCurrentUserAddEdge && (
+                    <AddGeneralizationOfComponent
+                      concreteComponentId={component.uuid}
+                    />
+                  )
+                }
+              >
                 {component.concretizationOf.edges.map((x) => (
-                  <List.Item key={x.node.uuid}>
+                  <List.Item
+                    key={x.node.uuid}
+                    actions={([] as ReactNode[]).concat(
+                      x.canCurrentUserRemoveEdge
+                        ? [
+                            <Button
+                              key="remove"
+                              onClick={() =>
+                                removeComponentGeneralization(
+                                  x.node.uuid,
+                                  component.uuid
+                                )
+                              }
+                              loading={removingComponentGeneralization}
+                            >
+                              Remove
+                            </Button>,
+                          ]
+                        : []
+                    )}
+                  >
                     <Link href={paths.component(x.node.uuid)}>
                       {x.node.name}
                     </Link>
@@ -367,10 +451,42 @@ export default function Component({ componentId }: ComponentProps) {
             )}
           </Col>
           <Col flex={1}>
-            {component.generalizationOf.edges.length >= 1 && (
-              <List header="Generalization Of" bordered={true} size="small">
+            {(component.generalizationOf.edges.length >= 1 ||
+              component.generalizationOf.canCurrentUserAddEdge) && (
+              <List
+                header="Generalization Of"
+                bordered={true}
+                size="small"
+                footer={
+                  component.generalizationOf.canCurrentUserAddEdge && (
+                    <AddConcretizationOfComponent
+                      generalComponentId={component.uuid}
+                    />
+                  )
+                }
+              >
                 {component.generalizationOf.edges.map((x) => (
-                  <List.Item key={x.node.uuid}>
+                  <List.Item
+                    key={x.node.uuid}
+                    actions={([] as ReactNode[]).concat(
+                      x.canCurrentUserRemoveEdge
+                        ? [
+                            <Button
+                              key="remove"
+                              onClick={() =>
+                                removeComponentGeneralization(
+                                  component.uuid,
+                                  x.node.uuid
+                                )
+                              }
+                              loading={removingComponentGeneralization}
+                            >
+                              Remove
+                            </Button>,
+                          ]
+                        : []
+                    )}
+                  >
                     <Link href={paths.component(x.node.uuid)}>
                       {x.node.name}
                     </Link>

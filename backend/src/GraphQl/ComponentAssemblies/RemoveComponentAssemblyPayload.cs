@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,16 +7,14 @@ namespace Metabase.GraphQl.ComponentAssemblies
 {
     public sealed class RemoveComponentAssemblyPayload
     {
-        private readonly Guid _assembledComponentId;
-        private readonly Guid _partComponentId;
+        private readonly Data.ComponentAssembly? _association;
         public IReadOnlyCollection<RemoveComponentAssemblyError>? Errors { get; }
 
         public RemoveComponentAssemblyPayload(
             Data.ComponentAssembly componentAssembly
             )
         {
-            _assembledComponentId = componentAssembly.AssembledComponentId;
-            _partComponentId = componentAssembly.PartComponentId;
+            _association = componentAssembly;
         }
 
         public RemoveComponentAssemblyPayload(
@@ -34,20 +31,28 @@ namespace Metabase.GraphQl.ComponentAssemblies
         {
         }
 
-        public Task<Data.Component> GetAssembledComponentAsync(
+        public async Task<Data.Component?> GetAssembledComponentAsync(
             ComponentByIdDataLoader byId,
             CancellationToken cancellationToken
             )
         {
-            return byId.LoadAsync(_assembledComponentId, cancellationToken)!;
+            if (_association is null)
+            {
+                return null;
+            }
+            return await byId.LoadAsync(_association.AssembledComponentId, cancellationToken)!;
         }
 
-        public Task<Data.Component> GetPartComponentAsync(
+        public async Task<Data.Component?> GetPartComponentAsync(
             ComponentByIdDataLoader byId,
             CancellationToken cancellationToken
             )
         {
-            return byId.LoadAsync(_partComponentId, cancellationToken)!;
+            if (_association is null)
+            {
+                return null;
+            }
+            return await byId.LoadAsync(_association.PartComponentId, cancellationToken)!;
         }
     }
 }

@@ -8,8 +8,8 @@ namespace Metabase.GraphQl.ComponentVariants
 {
     public sealed class RemoveComponentVariantPayload
     {
-        private readonly Guid _oneComponentId;
-        private readonly Guid _otherComponentId;
+        private readonly Guid? _oneComponentId;
+        private readonly Guid? _otherComponentId;
         public IReadOnlyCollection<RemoveComponentVariantError>? Errors { get; }
 
         public RemoveComponentVariantPayload(
@@ -35,20 +35,28 @@ namespace Metabase.GraphQl.ComponentVariants
         {
         }
 
-        public Task<Data.Component> GetOneComponentAsync(
+        public async Task<Data.Component?> GetOneComponentAsync(
             ComponentByIdDataLoader byId,
             CancellationToken cancellationToken
             )
         {
-            return byId.LoadAsync(_oneComponentId, cancellationToken)!;
+            if (_oneComponentId is null)
+            {
+                return null;
+            }
+            return await byId.LoadAsync(_oneComponentId.GetValueOrDefault(), cancellationToken)!;
         }
 
-        public Task<Data.Component> GetOtherComponentAsync(
+        public async Task<Data.Component?> GetOtherComponentAsync(
             ComponentByIdDataLoader byId,
             CancellationToken cancellationToken
             )
         {
-            return byId.LoadAsync(_otherComponentId, cancellationToken)!;
+            if (_otherComponentId is null)
+            {
+                return null;
+            }
+            return await byId.LoadAsync(_otherComponentId.GetValueOrDefault(), cancellationToken)!;
         }
     }
 }

@@ -90,6 +90,7 @@ namespace Metabase.Configuration
                       .AddType<GraphQl.Users.UserQueries>()
                   .AddMutationType(d => d.Name(nameof(GraphQl.Mutation)))
                       .AddType<GraphQl.ComponentAssemblies.ComponentAssemblyMutations>()
+                      .AddType<GraphQl.ComponentGeneralizations.ComponentGeneralizationMutations>()
                       .AddType<GraphQl.ComponentManufacturers.ComponentManufacturerMutations>()
                       .AddType<GraphQl.ComponentVariants.ComponentVariantMutations>()
                       .AddType<GraphQl.Components.ComponentMutations>()

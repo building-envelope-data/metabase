@@ -41,6 +41,19 @@ type AddComponentAssemblyPayload {
   query: Query!
 }
 
+type AddComponentGeneralizationError {
+  code: AddComponentGeneralizationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddComponentGeneralizationPayload {
+  concretizationOfEdge: ComponentConcretizationOfEdge
+  errors: [AddComponentGeneralizationError!]
+  generalizationOfEdge: ComponentGeneralizationOfEdge
+  query: Query!
+}
+
 type AddComponentVariantError {
   code: AddComponentVariantErrorCode!
   message: String!
@@ -182,18 +195,22 @@ type ComponentAssembledOfEdge {
 }
 
 type ComponentConcretizationOfConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [ComponentConcretizationOfEdge!]!
 }
 
 type ComponentConcretizationOfEdge {
+  canCurrentUserRemoveEdge: Boolean!
   node: Component!
 }
 
 type ComponentGeneralizationOfConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [ComponentGeneralizationOfEdge!]!
 }
 
 type ComponentGeneralizationOfEdge {
+  canCurrentUserRemoveEdge: Boolean!
   node: Component!
 }
 
@@ -852,6 +869,7 @@ type MethodsEdge {
 
 type Mutation {
   addComponentAssembly(input: AddComponentAssemblyInput!): AddComponentAssemblyPayload! @authorize(policy: "Write")
+  addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload! @authorize(policy: "Write")
   addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload! @authorize(policy: "Write")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload!
@@ -883,6 +901,7 @@ type Mutation {
   logoutUser: LogoutUserPayload! @authorize(policy: "ManageUser")
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
   removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload! @authorize(policy: "Write")
+  removeComponentGeneralization(input: RemoveComponentGeneralizationInput!): RemoveComponentGeneralizationPayload! @authorize(policy: "Write")
   removeComponentVariant(input: RemoveComponentVariantInput!): RemoveComponentVariantPayload! @authorize(policy: "Write")
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(policy: "Write")
   removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
@@ -1107,9 +1126,22 @@ type RemoveComponentAssemblyError {
 }
 
 type RemoveComponentAssemblyPayload {
-  assembledComponent: Component!
+  assembledComponent: Component
   errors: [RemoveComponentAssemblyError!]
-  partComponent: Component!
+  partComponent: Component
+  query: Query!
+}
+
+type RemoveComponentGeneralizationError {
+  code: RemoveComponentGeneralizationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveComponentGeneralizationPayload {
+  concreteComponent: Component
+  errors: [RemoveComponentGeneralizationError!]
+  generalComponent: Component
   query: Query!
 }
 
@@ -1121,8 +1153,8 @@ type RemoveComponentVariantError {
 
 type RemoveComponentVariantPayload {
   errors: [RemoveComponentVariantError!]
-  oneComponent: Component!
-  otherComponent: Component!
+  oneComponent: Component
+  otherComponent: Component
   query: Query!
 }
 
@@ -1372,6 +1404,11 @@ input AddComponentAssemblyInput {
   index: Byte
   partComponentId: Uuid!
   primeSurface: PrimeSurface
+}
+
+input AddComponentGeneralizationInput {
+  concreteComponentId: Uuid!
+  generalComponentId: Uuid!
 }
 
 input AddComponentVariantInput {
@@ -1851,6 +1888,11 @@ input RemoveComponentAssemblyInput {
   partComponentId: Uuid!
 }
 
+input RemoveComponentGeneralizationInput {
+  concreteComponentId: Uuid!
+  generalComponentId: Uuid!
+}
+
 input RemoveComponentVariantInput {
   oneComponentId: Uuid!
   otherComponentId: Uuid!
@@ -2022,6 +2064,14 @@ enum AddComponentAssemblyErrorCode {
   UNKNOWN
   UNKNOWN_ASSEMBLED_COMPONENT
   UNKNOWN_PART_COMPONENT
+  DUPLICATE
+  UNAUTHORIZED
+}
+
+enum AddComponentGeneralizationErrorCode {
+  UNKNOWN
+  UNKNOWN_GENERAL_COMPONENT
+  UNKNOWN_CONCRETE_COMPONENT
   DUPLICATE
   UNAUTHORIZED
 }
@@ -2291,6 +2341,14 @@ enum RemoveComponentAssemblyErrorCode {
   UNKNOWN_ASSEMBLED_COMPONENT
   UNKNOWN_PART_COMPONENT
   UNKNOWN_ASSEMBLY
+  UNAUTHORIZED
+}
+
+enum RemoveComponentGeneralizationErrorCode {
+  UNKNOWN
+  UNKNOWN_GENERAL_COMPONENT
+  UNKNOWN_CONCRETE_COMPONENT
+  UNKNOWN_GENERALIZATION
   UNAUTHORIZED
 }
 
