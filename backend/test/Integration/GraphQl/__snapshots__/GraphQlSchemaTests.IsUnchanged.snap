@@ -35,10 +35,36 @@ type AddComponentAssemblyError {
 }
 
 type AddComponentAssemblyPayload {
-  componentAssembledOfEdge: ComponentAssembledOfEdge
-  componentPartOfEdge: ComponentPartOfEdge
+  assembledOfEdge: ComponentAssembledOfEdge
   errors: [AddComponentAssemblyError!]
+  partOfEdge: ComponentPartOfEdge
   query: Query!
+}
+
+type AddComponentGeneralizationError {
+  code: AddComponentGeneralizationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddComponentGeneralizationPayload {
+  concretizationOfEdge: ComponentConcretizationOfEdge
+  errors: [AddComponentGeneralizationError!]
+  generalizationOfEdge: ComponentGeneralizationOfEdge
+  query: Query!
+}
+
+type AddComponentVariantError {
+  code: AddComponentVariantErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddComponentVariantPayload {
+  errors: [AddComponentVariantError!]
+  query: Query!
+  reverseVariantOfEdge: ComponentVariantOfEdge
+  variantOfEdge: ComponentVariantOfEdge
 }
 
 type AddInstitutionRepresentativeError {
@@ -169,18 +195,22 @@ type ComponentAssembledOfEdge {
 }
 
 type ComponentConcretizationOfConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [ComponentConcretizationOfEdge!]!
 }
 
 type ComponentConcretizationOfEdge {
+  canCurrentUserRemoveEdge: Boolean!
   node: Component!
 }
 
 type ComponentGeneralizationOfConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [ComponentGeneralizationOfEdge!]!
 }
 
 type ComponentGeneralizationOfEdge {
+  canCurrentUserRemoveEdge: Boolean!
   node: Component!
 }
 
@@ -206,10 +236,12 @@ type ComponentPartOfEdge {
 }
 
 type ComponentVariantOfConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [ComponentVariantOfEdge!]!
 }
 
 type ComponentVariantOfEdge {
+  canCurrentUserRemoveEdge: Boolean!
   node: Component!
 }
 
@@ -837,6 +869,8 @@ type MethodsEdge {
 
 type Mutation {
   addComponentAssembly(input: AddComponentAssemblyInput!): AddComponentAssemblyPayload! @authorize(policy: "Write")
+  addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload! @authorize(policy: "Write")
+  addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload! @authorize(policy: "Write")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload!
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "Write")
@@ -867,6 +901,8 @@ type Mutation {
   logoutUser: LogoutUserPayload! @authorize(policy: "ManageUser")
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
   removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload! @authorize(policy: "Write")
+  removeComponentGeneralization(input: RemoveComponentGeneralizationInput!): RemoveComponentGeneralizationPayload! @authorize(policy: "Write")
+  removeComponentVariant(input: RemoveComponentVariantInput!): RemoveComponentVariantPayload! @authorize(policy: "Write")
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(policy: "Write")
   removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
@@ -1090,9 +1126,35 @@ type RemoveComponentAssemblyError {
 }
 
 type RemoveComponentAssemblyPayload {
-  assembledComponent: Component!
+  assembledComponent: Component
   errors: [RemoveComponentAssemblyError!]
-  partComponent: Component!
+  partComponent: Component
+  query: Query!
+}
+
+type RemoveComponentGeneralizationError {
+  code: RemoveComponentGeneralizationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveComponentGeneralizationPayload {
+  concreteComponent: Component
+  errors: [RemoveComponentGeneralizationError!]
+  generalComponent: Component
+  query: Query!
+}
+
+type RemoveComponentVariantError {
+  code: RemoveComponentVariantErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveComponentVariantPayload {
+  errors: [RemoveComponentVariantError!]
+  oneComponent: Component
+  otherComponent: Component
   query: Query!
 }
 
@@ -1244,9 +1306,9 @@ type UpdateComponentAssemblyError {
 }
 
 type UpdateComponentAssemblyPayload {
-  componentAssembledOfEdge: ComponentAssembledOfEdge
-  componentPartOfEdge: ComponentPartOfEdge
+  assembledOfEdge: ComponentAssembledOfEdge
   errors: [UpdateComponentAssemblyError!]
+  partOfEdge: ComponentPartOfEdge
   query: Query!
 }
 
@@ -1342,6 +1404,16 @@ input AddComponentAssemblyInput {
   index: Byte
   partComponentId: Uuid!
   primeSurface: PrimeSurface
+}
+
+input AddComponentGeneralizationInput {
+  concreteComponentId: Uuid!
+  generalComponentId: Uuid!
+}
+
+input AddComponentVariantInput {
+  oneComponentId: Uuid!
+  otherComponentId: Uuid!
 }
 
 input AddInstitutionRepresentativeInput {
@@ -1816,6 +1888,16 @@ input RemoveComponentAssemblyInput {
   partComponentId: Uuid!
 }
 
+input RemoveComponentGeneralizationInput {
+  concreteComponentId: Uuid!
+  generalComponentId: Uuid!
+}
+
+input RemoveComponentVariantInput {
+  oneComponentId: Uuid!
+  otherComponentId: Uuid!
+}
+
 input RemoveInstitutionRepresentativeInput {
   institutionId: Uuid!
   userId: Uuid!
@@ -1982,7 +2064,23 @@ enum AddComponentAssemblyErrorCode {
   UNKNOWN
   UNKNOWN_ASSEMBLED_COMPONENT
   UNKNOWN_PART_COMPONENT
-  UNKNOWN_ASSEMBLY
+  DUPLICATE
+  UNAUTHORIZED
+}
+
+enum AddComponentGeneralizationErrorCode {
+  UNKNOWN
+  UNKNOWN_GENERAL_COMPONENT
+  UNKNOWN_CONCRETE_COMPONENT
+  DUPLICATE
+  UNAUTHORIZED
+}
+
+enum AddComponentVariantErrorCode {
+  UNKNOWN
+  UNKNOWN_ONE_COMPONENT
+  UNKNOWN_OTHER_COMPONENT
+  DUPLICATE
   UNAUTHORIZED
 }
 
@@ -2243,6 +2341,22 @@ enum RemoveComponentAssemblyErrorCode {
   UNKNOWN_ASSEMBLED_COMPONENT
   UNKNOWN_PART_COMPONENT
   UNKNOWN_ASSEMBLY
+  UNAUTHORIZED
+}
+
+enum RemoveComponentGeneralizationErrorCode {
+  UNKNOWN
+  UNKNOWN_GENERAL_COMPONENT
+  UNKNOWN_CONCRETE_COMPONENT
+  UNKNOWN_GENERALIZATION
+  UNAUTHORIZED
+}
+
+enum RemoveComponentVariantErrorCode {
+  UNKNOWN
+  UNKNOWN_ONE_COMPONENT
+  UNKNOWN_OTHER_COMPONENT
+  UNKNOWN_VARIANT
   UNAUTHORIZED
 }
 

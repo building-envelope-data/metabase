@@ -76,8 +76,11 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
     generalizationOf {
       edges {
@@ -85,8 +88,11 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
     variantOf {
       edges {
@@ -94,8 +100,11 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
   }
 }

@@ -40,7 +40,7 @@ namespace Metabase.GraphQl.ComponentAssemblies
                 return new AddComponentAssemblyPayload(
                     new AddComponentAssemblyError(
                       AddComponentAssemblyErrorCode.UNAUTHORIZED,
-                      "You are not authorized to remove the component assembly.",
+                      "You are not authorized to add the component assembly.",
                       new[] { nameof(input) }
                     )
                 );
@@ -89,7 +89,7 @@ namespace Metabase.GraphQl.ComponentAssemblies
             {
                 return new AddComponentAssemblyPayload(
                     new AddComponentAssemblyError(
-                      AddComponentAssemblyErrorCode.UNKNOWN_ASSEMBLY,
+                      AddComponentAssemblyErrorCode.DUPLICATE,
                       "Component assembly already exists.",
                       new[] { nameof(input) }
                       )

@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Alert, Form, Button, InputNumber, Select } from "antd";
-import { useAddComponentAssemblyMutation } from "../../queries/componentAssemblies.graphql";
-import { PrimeSurface, Scalars } from "../../__generated__/__types__";
+import { Alert, Form, Button } from "antd";
+import { useAddComponentVariantMutation } from "../../queries/componentVariants.graphql";
+import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { ComponentDocument } from "../../queries/components.graphql";
@@ -15,21 +15,21 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-export type AddAssembledOfComponentProps = {
-  partComponentId: Scalars["Uuid"];
+export type AddVariantOfComponentProps = {
+  componentId: Scalars["Uuid"];
 };
 
-export default function AddAssembledOfComponent({
-  partComponentId,
-}: AddAssembledOfComponentProps) {
-  const [addComponentAssemblyMutation] = useAddComponentAssemblyMutation({
+export default function AddVariantOfComponent({
+  componentId: componentId,
+}: AddVariantOfComponentProps) {
+  const [addComponentVariantMutation] = useAddComponentVariantMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
       {
         query: ComponentDocument,
         variables: {
-          uuid: partComponentId,
+          uuid: componentId,
         },
       },
     ],
@@ -41,35 +41,29 @@ export default function AddAssembledOfComponent({
   const [adding, setAdding] = useState(false);
 
   const onFinish = ({
-    assembledComponentId,
-    index,
-    primeSurface,
+    variantComponentId,
   }: {
-    assembledComponentId: Scalars["Uuid"];
-    index: Scalars["Byte"] | null | undefined;
-    primeSurface: PrimeSurface | null | undefined;
+    variantComponentId: Scalars["Uuid"];
   }) => {
     const add = async () => {
       try {
         setAdding(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addComponentAssemblyMutation({
+        const { errors, data } = await addComponentVariantMutation({
           variables: {
-            partComponentId: partComponentId,
-            assembledComponentId: assembledComponentId,
-            index: index,
-            primeSurface: primeSurface,
+            oneComponentId: componentId,
+            otherComponentId: variantComponentId,
           },
         });
         handleFormErrors(
           errors,
-          data?.addComponentAssembly?.errors?.map((x) => {
+          data?.addComponentVariant?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.addComponentAssembly?.errors) {
+        if (!errors && !data?.addComponentVariant?.errors) {
           form.resetFields();
         }
       } catch (error) {
@@ -96,13 +90,13 @@ export default function AddAssembledOfComponent({
       <Form
         {...layout}
         form={form}
-        name="addAssembledComponent"
+        name="addComponentVariant"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
         <Form.Item
-          label="Assembly"
-          name="assembledComponentId"
+          label="Variant"
+          name="variantComponentId"
           rules={[
             {
               required: true,
@@ -110,19 +104,6 @@ export default function AddAssembledOfComponent({
           ]}
         >
           <SelectComponentId />
-        </Form.Item>
-        <Form.Item label="Index" name="index">
-          <InputNumber min={1} max={255} />
-        </Form.Item>
-        <Form.Item label="Prime Surface" name="primeSurface">
-          <Select
-            allowClear={true}
-            placeholder="Please select"
-            options={Object.entries(PrimeSurface).map(([_key, value]) => ({
-              label: value,
-              value: value,
-            }))}
-          />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={adding}>

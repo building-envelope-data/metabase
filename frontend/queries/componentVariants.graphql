@@ -1,0 +1,32 @@
+mutation AddComponentVariant($oneComponentId: Uuid!, $otherComponentId: Uuid!) {
+  addComponentVariant(
+    input: {
+      oneComponentId: $oneComponentId
+      otherComponentId: $otherComponentId
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RemoveComponentVariant(
+  $oneComponentId: Uuid!
+  $otherComponentId: Uuid!
+) {
+  removeComponentVariant(
+    input: {
+      oneComponentId: $oneComponentId
+      otherComponentId: $otherComponentId
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

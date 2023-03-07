@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.Authorization
 {
-    public static class ComponentAssemblyAuthorization
+    public static class ComponentGeneralizationAuthorization
     {
         public static async Task<bool> IsAuthorizedToAdd(
             ClaimsPrincipal claimsPrincipal,

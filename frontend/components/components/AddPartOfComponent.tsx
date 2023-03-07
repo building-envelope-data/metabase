@@ -96,7 +96,7 @@ export default function AddPartOfComponent({
       <Form
         {...layout}
         form={form}
-        name="addComponentAssembly"
+        name="addPartComponent"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
