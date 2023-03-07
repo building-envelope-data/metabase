@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Alert, Form, Button } from "antd";
+import { Alert, Form, Button, InputNumber, Select } from "antd";
 import { useAddComponentAssemblyMutation } from "../../queries/componentAssemblies.graphql";
-import { Scalars } from "../../__generated__/__types__";
+import { PrimeSurface, Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { ComponentDocument } from "../../queries/components.graphql";
@@ -42,8 +42,12 @@ export default function AddAssembledOfComponent({
 
   const onFinish = ({
     assembledComponentId,
+    index,
+    primeSurface,
   }: {
     assembledComponentId: Scalars["Uuid"];
+    index: Scalars["Byte"] | null | undefined;
+    primeSurface: PrimeSurface | null | undefined;
   }) => {
     const add = async () => {
       try {
@@ -53,6 +57,8 @@ export default function AddAssembledOfComponent({
           variables: {
             partComponentId: partComponentId,
             assembledComponentId: assembledComponentId,
+            index: index,
+            primeSurface: primeSurface,
           },
         });
         handleFormErrors(
@@ -104,6 +110,19 @@ export default function AddAssembledOfComponent({
           ]}
         >
           <SelectComponentId />
+        </Form.Item>
+        <Form.Item label="Index" name="index">
+          <InputNumber min={1} max={255} />
+        </Form.Item>
+        <Form.Item label="Prime Surface" name="primeSurface">
+          <Select
+            allowClear={true}
+            placeholder="Please select"
+            options={Object.entries(PrimeSurface).map(([_key, value]) => ({
+              label: value,
+              value: value,
+            }))}
+          />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={adding}>

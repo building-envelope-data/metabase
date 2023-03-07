@@ -3,10 +3,10 @@ using Metabase.Enumerations;
 
 namespace Metabase.GraphQl.ComponentAssemblies
 {
-    public record AddComponentAssemblyInput(
+    public record UpdateComponentAssemblyInput(
           Guid AssembledComponentId,
           Guid PartComponentId,
-          byte? Index,
-          PrimeSurface? PrimeSurface
+          byte? NewIndex,
+          PrimeSurface? NewPrimeSurface
         );
 }

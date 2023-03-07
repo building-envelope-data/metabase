@@ -48,6 +48,9 @@ query Component($uuid: Uuid!) {
           name
           description
         }
+        index
+        primeSurface
+        canCurrentUserUpdateEdge
         canCurrentUserRemoveEdge
       }
       canCurrentUserAddEdge
@@ -60,6 +63,9 @@ query Component($uuid: Uuid!) {
           name
           description
         }
+        index
+        primeSurface
+        canCurrentUserUpdateEdge
         canCurrentUserRemoveEdge
       }
       canCurrentUserAddEdge

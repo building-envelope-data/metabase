@@ -1,6 +1,6 @@
 using System;
+using Metabase.Enumerations;
 
-// TODO Make sure that association is transitive!
 namespace Metabase.Data
 {
     public sealed class ComponentAssembly
@@ -10,5 +10,8 @@ namespace Metabase.Data
 
         public Guid PartComponentId { get; set; }
         public Component PartComponent { get; set; } = default!;
+
+        public byte? Index { get; set; }
+        public PrimeSurface? PrimeSurface { get; set; }
     }
 }

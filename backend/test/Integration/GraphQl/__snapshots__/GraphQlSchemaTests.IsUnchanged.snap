@@ -162,7 +162,10 @@ type ComponentAssembledOfConnection {
 
 type ComponentAssembledOfEdge {
   canCurrentUserRemoveEdge: Boolean!
+  canCurrentUserUpdateEdge: Boolean!
+  index: Byte
   node: Component!
+  primeSurface: PrimeSurface
 }
 
 type ComponentConcretizationOfConnection {
@@ -196,7 +199,10 @@ type ComponentPartOfConnection {
 
 type ComponentPartOfEdge {
   canCurrentUserRemoveEdge: Boolean!
+  canCurrentUserUpdateEdge: Boolean!
+  index: Byte
   node: Component!
+  primeSurface: PrimeSurface
 }
 
 type ComponentVariantOfConnection {
@@ -870,6 +876,7 @@ type Mutation {
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser")
+  updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "Write")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(policy: "Write")
   verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(policy: "Write")
 }
@@ -1230,6 +1237,19 @@ type TwoFactorAuthentication {
   recoveryCodesLeftCount: Int!
 }
 
+type UpdateComponentAssemblyError {
+  code: UpdateComponentAssemblyErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateComponentAssemblyPayload {
+  componentAssembledOfEdge: ComponentAssembledOfEdge
+  componentPartOfEdge: ComponentPartOfEdge
+  errors: [UpdateComponentAssemblyError!]
+  query: Query!
+}
+
 type UpdateInstitutionError {
   code: UpdateInstitutionErrorCode!
   message: String!
@@ -1319,7 +1339,9 @@ type VerifyInstitutionPayload {
 
 input AddComponentAssemblyInput {
   assembledComponentId: Uuid!
+  index: Byte
   partComponentId: Uuid!
+  primeSurface: PrimeSurface
 }
 
 input AddInstitutionRepresentativeInput {
@@ -1855,6 +1877,13 @@ input StringOperationFilterInput {
   nendsWith: String
 }
 
+input UpdateComponentAssemblyInput {
+  assembledComponentId: Uuid!
+  newIndex: Byte
+  newPrimeSurface: PrimeSurface
+  partComponentId: Uuid!
+}
+
 input UpdateInstitutionInput {
   abbreviation: String
   description: String!
@@ -2191,6 +2220,11 @@ enum MethodCategory {
   CALCULATION
 }
 
+enum PrimeSurface {
+  INSIDE
+  OUTSIDE
+}
+
 enum RegisterUserErrorCode {
   UNKNOWN
   PASSWORD_CONFIRMATION_MISMATCH
@@ -2309,6 +2343,14 @@ enum Standardizer {
   WELL
 }
 
+enum UpdateComponentAssemblyErrorCode {
+  UNKNOWN
+  UNKNOWN_ASSEMBLED_COMPONENT
+  UNKNOWN_PART_COMPONENT
+  UNKNOWN_ASSEMBLY
+  UNAUTHORIZED
+}
+
 enum UpdateInstitutionErrorCode {
   UNKNOWN
   UNAUTHORIZED
@@ -2332,6 +2374,9 @@ directive @authorize("Defines when when the authorize directive shall be applied
 directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
 
 scalar Any
+
+"The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255."
+scalar Byte
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")

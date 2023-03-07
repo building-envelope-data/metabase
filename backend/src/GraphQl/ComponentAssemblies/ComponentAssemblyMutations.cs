@@ -98,11 +98,99 @@ namespace Metabase.GraphQl.ComponentAssemblies
             var componentAssembly = new Data.ComponentAssembly
             {
                 AssembledComponentId = input.AssembledComponentId,
-                PartComponentId = input.PartComponentId
+                PartComponentId = input.PartComponentId,
+                Index = input.Index,
+                PrimeSurface = input.PrimeSurface
             };
             context.ComponentAssemblies.Add(componentAssembly);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new AddComponentAssemblyPayload(componentAssembly);
+        }
+
+        [UseUserManager]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+        public async Task<UpdateComponentAssemblyPayload> UpdateComponentAssemblyAsync(
+            UpdateComponentAssemblyInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await ComponentAssemblyAuthorization.IsAuthorizedToManage(
+                 claimsPrincipal,
+                 input.PartComponentId,
+                 input.AssembledComponentId,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
+            {
+                return new UpdateComponentAssemblyPayload(
+                    new UpdateComponentAssemblyError(
+                      UpdateComponentAssemblyErrorCode.UNAUTHORIZED,
+                      "You are not authorized to update the component assembly.",
+                      new[] { nameof(input) }
+                    )
+                );
+            }
+            var errors = new List<UpdateComponentAssemblyError>();
+            if (!await context.Components.AsQueryable()
+                .Where(c => c.Id == input.AssembledComponentId)
+                .AnyAsync(cancellationToken)
+                .ConfigureAwait(false)
+            )
+            {
+                errors.Add(
+                    new UpdateComponentAssemblyError(
+                      UpdateComponentAssemblyErrorCode.UNKNOWN_ASSEMBLED_COMPONENT,
+                      "Unknown assembled component.",
+                      new[] { nameof(input), nameof(input.AssembledComponentId).FirstCharToLower() }
+                      )
+                );
+            }
+            if (!await context.Components.AsQueryable()
+                .Where(c => c.Id == input.PartComponentId)
+                .AnyAsync(cancellationToken)
+                .ConfigureAwait(false)
+            )
+            {
+                errors.Add(
+                    new UpdateComponentAssemblyError(
+                      UpdateComponentAssemblyErrorCode.UNKNOWN_PART_COMPONENT,
+                      "Unknown part component.",
+                      new[] { nameof(input), nameof(input.PartComponentId).FirstCharToLower() }
+                      )
+                      );
+            }
+            if (errors.Count is not 0)
+            {
+                return new UpdateComponentAssemblyPayload(errors.AsReadOnly());
+            }
+            var componentAssembly =
+                await context.ComponentAssemblies.AsQueryable()
+                .Where(a =>
+                    a.AssembledComponentId == input.AssembledComponentId
+                    && a.PartComponentId == input.PartComponentId
+                )
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+            if (componentAssembly is null)
+            {
+                return new UpdateComponentAssemblyPayload(
+                    new UpdateComponentAssemblyError(
+                      UpdateComponentAssemblyErrorCode.UNKNOWN_ASSEMBLY,
+                      "Unknown assembly.",
+                      new[] { nameof(input) }
+                      )
+                      );
+            }
+            componentAssembly.Index = input.NewIndex;
+            componentAssembly.PrimeSurface = input.NewPrimeSurface;
+            context.ComponentAssemblies.Update(componentAssembly);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return new UpdateComponentAssemblyPayload(componentAssembly);
         }
 
         [UseUserManager]

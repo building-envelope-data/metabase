@@ -34,6 +34,7 @@ namespace Metabase.Data
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionRepresentativeRole>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionState>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.MethodCategory>();
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.PrimeSurface>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.Standardizer>();
         }
 
@@ -45,6 +46,7 @@ namespace Metabase.Data
             builder.HasPostgresEnum<Enumerations.InstitutionRepresentativeRole>("public");
             builder.HasPostgresEnum<Enumerations.InstitutionState>("public");
             builder.HasPostgresEnum<Enumerations.MethodCategory>("public");
+            builder.HasPostgresEnum<Enumerations.PrimeSurface>("public");
             builder.HasPostgresEnum<Enumerations.Standardizer>("public");
         }
 
