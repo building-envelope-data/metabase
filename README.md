@@ -186,6 +186,7 @@ We may add some error detection and correction capabilities by, for example, gen
 
 ## ...
 
+- [Designing GraphQL Mutations](https://www.apollographql.com/blog/graphql/basics/designing-graphql-mutations/)
 - [Updating Enum Values in PostgreSQL - The Safe and Easy Way](https://blog.yo1.dog/updating-enum-values-in-postgresql-the-safe-and-easy-way/)
 - [C# Coding Standards](https://www.dofactory.com/reference/csharp-coding-standards)
 - [Should You Use The Same Dockerfile For Dev, Staging And Production Builds?](https://vsupalov.com/same-dockerfile-dev-staging-production/)
