@@ -45,7 +45,7 @@ namespace Metabase.Authorization
             );
         }
 
-        internal static async Task<bool> IsAuthorizedToCreateInstitutionManagedByInstitution(
+        internal static async Task<bool> IsAuthorizedToCreateInstitution(
             ClaimsPrincipal claimsPrincipal,
             Guid institutionId,
             UserManager<Data.User> userManager,

@@ -29,7 +29,7 @@ namespace Metabase.GraphQl.Institutions
             CancellationToken cancellationToken
             )
         {
-            if (input.ManagerId is not null && !await InstitutionAuthorization.IsAuthorizedToCreateInstitutionManagedByInstitution(
+            if (input.ManagerId is not null && !await InstitutionAuthorization.IsAuthorizedToCreateInstitution(
                  claimsPrincipal,
                  input.ManagerId ?? Guid.Empty,
                  userManager,
@@ -41,7 +41,7 @@ namespace Metabase.GraphQl.Institutions
                 return new CreateInstitutionPayload(
                     new CreateInstitutionError(
                       CreateInstitutionErrorCode.UNAUTHORIZED,
-                      "You are not authorized to create components for the institution.",
+                      "You are not authorized to create institutions.",
                       new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
                     )
                 );

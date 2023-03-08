@@ -1,10 +1,8 @@
-using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Authorization;
-using HotChocolate.Data;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Extensions;
@@ -39,7 +37,7 @@ namespace Metabase.GraphQl.Databases
                 return new CreateDatabasePayload(
                     new CreateDatabaseError(
                       CreateDatabaseErrorCode.UNAUTHORIZED,
-                      "You are not authorized to create components for the institution.",
+                      "You are not authorized to create databases for the institution.",
                       new[] { nameof(input), nameof(input.OperatorId).FirstCharToLower() }
                     )
                 );
