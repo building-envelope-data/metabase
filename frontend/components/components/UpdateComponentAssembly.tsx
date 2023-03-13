@@ -23,19 +23,19 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-export type UpdatePartOfComponentProps = {
+export type UpdateComponentAssemblyProps = {
   assembledComponent: { uuid: Scalars["Uuid"]; name: string };
   partComponent: { uuid: Scalars["Uuid"]; name: string };
   index: Scalars["Byte"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 };
 
-export default function UpdatePartOfComponent({
+export default function UpdateComponentAssembly({
   assembledComponent,
   partComponent,
   index,
   primeSurface,
-}: UpdatePartOfComponentProps) {
+}: UpdateComponentAssemblyProps) {
   const [open, setOpen] = useState(false);
   const [updateComponentAssemblyMutation] = useUpdateComponentAssemblyMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates

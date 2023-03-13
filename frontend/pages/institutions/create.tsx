@@ -14,7 +14,7 @@ function redirectToLoginPage(router: NextRouter): void {
   });
 }
 
-function Create() {
+function Page() {
   const router = useRouter();
 
   const { loading, data, error } = useCurrentUserQuery();
@@ -55,4 +55,4 @@ function Create() {
   );
 }
 
-export default Create;
+export default Page;
