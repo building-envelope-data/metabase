@@ -34,6 +34,7 @@ import DatabaseTable from "../databases/DatabaseTable";
 import MethodTable from "../methods/MethodTable";
 import { messageApolloError } from "../../lib/apollo";
 import UpdateInstitution from "./UpdateInstitution";
+import DeleteInstitution from "./DeleteInstitution";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -182,6 +183,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             description={institution.description}
             websiteLocator={institution.websiteLocator}
           />,
+          <DeleteInstitution institutionId={institution.uuid} />,
         ]}
         backIcon={false}
       >
