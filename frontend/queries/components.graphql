@@ -31,13 +31,26 @@ query Component($uuid: Uuid!) {
       from
       to
     }
-    manufacturers {
+    manufacturers(pending: false) {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+        }
+        canCurrentUserRemoveEdge
+      }
+      canCurrentUserAddEdge
+    }
+    pendingManufacturers: manufacturers(pending: true) {
       edges {
         node {
           id
           uuid
           name
         }
+        canCurrentUserRemoveEdge
       }
     }
     assembledOf {
@@ -137,6 +150,35 @@ mutation CreateComponent(
       concretizationOfIds: $concretizationOfIds
       generalizationOfIds: $generalizationOfIds
       variantOfIds: $variantOfIds
+    }
+  ) {
+    component {
+      ...ComponentPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateComponent(
+  $componentId: Uuid!
+  $name: String!
+  $abbreviation: String
+  $description: String!
+  $categories: [ComponentCategory!]!
+  $availability: OpenEndedDateTimeRangeInput
+) {
+  updateComponent(
+    input: {
+      componentId: $componentId
+      name: $name
+      abbreviation: $abbreviation
+      description: $description
+      categories: $categories
+      availability: $availability
     }
   ) {
     component {

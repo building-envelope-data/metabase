@@ -1,11 +1,11 @@
 import * as React from "react";
 import { Alert, Form, Button } from "antd";
-import { useAddComponentVariantMutation } from "../../queries/componentVariants.graphql";
+import { useAddComponentManufacturerMutation } from "../../queries/componentManufacturers.graphql";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { ComponentDocument } from "../../queries/components.graphql";
-import { SelectComponentId } from "../SelectComponentId";
+import { SelectInstitutionId } from "../SelectInstitutionId";
 
 const layout = {
   labelCol: { span: 8 },
@@ -15,55 +15,52 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-export type AddVariantOfComponentProps = {
+export type AddComponentManufacturerProps = {
   componentId: Scalars["Uuid"];
 };
 
-export default function AddVariantOfComponent({
+export default function AddComponentManufacturer({
   componentId,
-}: AddVariantOfComponentProps) {
-  const [addComponentVariantMutation] = useAddComponentVariantMutation({
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ComponentDocument,
-        variables: {
-          uuid: componentId,
+}: AddComponentManufacturerProps) {
+  const [addComponentManufacturerMutation] =
+    useAddComponentManufacturerMutation({
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: ComponentDocument,
+          variables: {
+            uuid: componentId,
+          },
         },
-      },
-    ],
-  });
+      ],
+    });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
   const [form] = Form.useForm();
   const [adding, setAdding] = useState(false);
 
-  const onFinish = ({
-    variantComponentId,
-  }: {
-    variantComponentId: Scalars["Uuid"];
-  }) => {
+  const onFinish = ({ institutionId }: { institutionId: Scalars["Uuid"] }) => {
     const add = async () => {
       try {
         setAdding(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addComponentVariantMutation({
+        const { errors, data } = await addComponentManufacturerMutation({
           variables: {
-            oneComponentId: componentId,
-            otherComponentId: variantComponentId,
+            componentId: componentId,
+            institutionId: institutionId,
           },
         });
         handleFormErrors(
           errors,
-          data?.addComponentVariant?.errors?.map((x) => {
+          data?.addComponentManufacturer?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.addComponentVariant?.errors) {
+        if (!errors && !data?.addComponentManufacturer?.errors) {
           form.resetFields();
         }
       } catch (error) {
@@ -90,20 +87,20 @@ export default function AddVariantOfComponent({
       <Form
         {...layout}
         form={form}
-        name="addComponentVariant"
+        name="addComponentManufacturer"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
         <Form.Item
-          label="Variant"
-          name="variantComponentId"
+          label="Institution"
+          name="institutionId"
           rules={[
             {
               required: true,
             },
           ]}
         >
-          <SelectComponentId />
+          <SelectInstitutionId />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={adding}>

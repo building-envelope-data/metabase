@@ -303,7 +303,6 @@ namespace Metabase.GraphQl.Institutions
                       );
             }
             context.Institutions.Remove(institution);
-            // TODO What happens when there are associations involving this institution?
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new DeleteInstitutionPayload();
         }

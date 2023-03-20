@@ -7,7 +7,7 @@ import {
 import { ComponentCategory, Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
 import { SelectInstitutionId } from "../SelectInstitutionId";
 import { SelectComponentId } from "../SelectComponentId";

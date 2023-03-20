@@ -53,5 +53,23 @@ namespace Metabase.Authorization
                     cancellationToken
                 ).ConfigureAwait(false);
         }
+
+        public static async Task<bool> IsAuthorizedToUpdate(
+            ClaimsPrincipal claimsPrincipal,
+            Guid componentId,
+            UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null) &&
+                await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                    user,
+                    componentId,
+                    context,
+                    cancellationToken
+                );
+        }
     }
 }

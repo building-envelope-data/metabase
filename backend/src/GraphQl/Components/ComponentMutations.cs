@@ -359,5 +359,64 @@ namespace Metabase.GraphQl.Components
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new CreateComponentPayload(component);
         }
+
+        [UseUserManager]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+        public async Task<UpdateComponentPayload> UpdateComponentAsync(
+            UpdateComponentInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await ComponentAuthorization.IsAuthorizedToUpdate(
+                 claimsPrincipal,
+                 input.ComponentId,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+               )
+            {
+                return new UpdateComponentPayload(
+                    new UpdateComponentError(
+                      UpdateComponentErrorCode.UNAUTHORIZED,
+                      "You are not authorized to update the component.",
+                      Array.Empty<string>()
+                      )
+                      );
+            }
+            var component =
+                await context.Components.AsQueryable()
+                .Where(i => i.Id == input.ComponentId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+            if (component is null)
+            {
+                return new UpdateComponentPayload(
+                    new UpdateComponentError(
+                      UpdateComponentErrorCode.UNKNOWN_COMPONENT,
+                      "Unknown component.",
+                      new[] { nameof(input), nameof(input.ComponentId).FirstCharToLower() }
+                      )
+                      );
+            }
+            component.Update(
+                name: input.Name,
+                abbreviation: input.Abbreviation,
+                description: input.Description,
+                availability:
+                 input.Availability is not null
+                 ? new NpgsqlRange<DateTime>(
+                   input.Availability.From.GetValueOrDefault(), true, input.Availability.From is null,
+                   input.Availability.To.GetValueOrDefault(), true, input.Availability.To is null
+                   )
+                 : null,
+                categories: input.Categories
+            );
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return new UpdateComponentPayload(component);
+        }
     }
 }

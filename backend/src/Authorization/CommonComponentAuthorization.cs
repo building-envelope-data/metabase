@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Authorization
 {
-    public static class ComponentReflexiveAssociationAuthorization
+    public static class CommonComponentAuthorization
     {
         internal static async Task<bool> IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
             Data.User user,

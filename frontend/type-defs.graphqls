@@ -54,6 +54,19 @@ type AddComponentGeneralizationPayload {
   query: Query!
 }
 
+type AddComponentManufacturerError {
+  code: AddComponentManufacturerErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddComponentManufacturerPayload {
+  componentManufacturerEdge: ComponentManufacturerEdge
+  errors: [AddComponentManufacturerError!]
+  manufacturedComponentEdge: InstitutionManufacturedComponentEdge
+  query: Query!
+}
+
 type AddComponentVariantError {
   code: AddComponentVariantErrorCode!
   message: String!
@@ -215,10 +228,13 @@ type ComponentGeneralizationOfEdge {
 }
 
 type ComponentManufacturerConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [ComponentManufacturerEdge!]!
 }
 
 type ComponentManufacturerEdge {
+  canCurrentUserConfirmEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   node: Institution!
 }
 
@@ -870,6 +886,7 @@ type MethodsEdge {
 type Mutation {
   addComponentAssembly(input: AddComponentAssemblyInput!): AddComponentAssemblyPayload! @authorize(policy: "Write")
   addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload! @authorize(policy: "Write")
+  addComponentManufacturer(input: AddComponentManufacturerInput!): AddComponentManufacturerPayload! @authorize(policy: "Write")
   addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload! @authorize(policy: "Write")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload!
@@ -902,6 +919,7 @@ type Mutation {
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
   removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload! @authorize(policy: "Write")
   removeComponentGeneralization(input: RemoveComponentGeneralizationInput!): RemoveComponentGeneralizationPayload! @authorize(policy: "Write")
+  removeComponentManufacturer(input: RemoveComponentManufacturerInput!): RemoveComponentManufacturerPayload! @authorize(policy: "Write")
   removeComponentVariant(input: RemoveComponentVariantInput!): RemoveComponentVariantPayload! @authorize(policy: "Write")
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(policy: "Write")
   removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
@@ -912,6 +930,7 @@ type Mutation {
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser")
+  updateComponent(input: UpdateComponentInput!): UpdateComponentPayload! @authorize(policy: "Write")
   updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "Write")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(policy: "Write")
   verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(policy: "Write")
@@ -1145,6 +1164,19 @@ type RemoveComponentGeneralizationPayload {
   query: Query!
 }
 
+type RemoveComponentManufacturerError {
+  code: RemoveComponentManufacturerErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveComponentManufacturerPayload {
+  component: Component
+  errors: [RemoveComponentManufacturerError!]
+  institution: Institution
+  query: Query!
+}
+
 type RemoveComponentVariantError {
   code: RemoveComponentVariantErrorCode!
   message: String!
@@ -1166,9 +1198,9 @@ type RemoveInstitutionRepresentativeError {
 
 type RemoveInstitutionRepresentativePayload {
   errors: [RemoveInstitutionRepresentativeError!]
-  institution: Institution!
+  institution: Institution
   query: Query!
-  user: User!
+  user: User
 }
 
 type RemoveUserRoleError {
@@ -1312,6 +1344,18 @@ type UpdateComponentAssemblyPayload {
   query: Query!
 }
 
+type UpdateComponentError {
+  code: UpdateComponentErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateComponentPayload {
+  component: Component
+  errors: [UpdateComponentError!]
+  query: Query!
+}
+
 type UpdateInstitutionError {
   code: UpdateInstitutionErrorCode!
   message: String!
@@ -1409,6 +1453,11 @@ input AddComponentAssemblyInput {
 input AddComponentGeneralizationInput {
   concreteComponentId: Uuid!
   generalComponentId: Uuid!
+}
+
+input AddComponentManufacturerInput {
+  componentId: Uuid!
+  institutionId: Uuid!
 }
 
 input AddComponentVariantInput {
@@ -1893,6 +1942,11 @@ input RemoveComponentGeneralizationInput {
   generalComponentId: Uuid!
 }
 
+input RemoveComponentManufacturerInput {
+  componentId: Uuid!
+  institutionId: Uuid!
+}
+
 input RemoveComponentVariantInput {
   oneComponentId: Uuid!
   otherComponentId: Uuid!
@@ -1964,6 +2018,15 @@ input UpdateComponentAssemblyInput {
   newIndex: Byte
   newPrimeSurface: PrimeSurface
   partComponentId: Uuid!
+}
+
+input UpdateComponentInput {
+  abbreviation: String
+  availability: OpenEndedDateTimeRangeInput
+  categories: [ComponentCategory!]!
+  componentId: Uuid!
+  description: String!
+  name: String!
 }
 
 input UpdateInstitutionInput {
@@ -2074,6 +2137,14 @@ enum AddComponentGeneralizationErrorCode {
   UNKNOWN_CONCRETE_COMPONENT
   DUPLICATE
   UNAUTHORIZED
+}
+
+enum AddComponentManufacturerErrorCode {
+  UNKNOWN
+  UNKNOWN_COMPONENT
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  DUPLICATE
 }
 
 enum AddComponentVariantErrorCode {
@@ -2352,6 +2423,14 @@ enum RemoveComponentGeneralizationErrorCode {
   UNAUTHORIZED
 }
 
+enum RemoveComponentManufacturerErrorCode {
+  UNKNOWN
+  UNKNOWN_COMPONENT
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  UNKNOWN_MANUFACTURER
+}
+
 enum RemoveComponentVariantErrorCode {
   UNKNOWN
   UNKNOWN_ONE_COMPONENT
@@ -2463,6 +2542,19 @@ enum UpdateComponentAssemblyErrorCode {
   UNKNOWN_PART_COMPONENT
   UNKNOWN_ASSEMBLY
   UNAUTHORIZED
+}
+
+enum UpdateComponentErrorCode {
+  UNKNOWN
+  UNKNOWN_MANUFACTURER
+  UNKNOWN_FURTHER_MANUFACTURERS
+  UNKNOWN_VARIANT_OF_COMPONENTS
+  UNKNOWN_GENERALIZATION_OF_COMPONENTS
+  UNKNOWN_CONCRETIZATION_OF_COMPONENTS
+  UNKNOWN_PART_OF_COMPONENTS
+  UNKNOWN_ASSEMBLED_OF_COMPONENTS
+  UNAUTHORIZED
+  UNKNOWN_COMPONENT
 }
 
 enum UpdateInstitutionErrorCode {

@@ -1,11 +1,16 @@
 import {
-  InstitutionsDocument,
-  useUpdateInstitutionMutation,
-} from "../../queries/institutions.graphql";
-import { Alert, Form, Input, Button, Modal } from "antd";
+  ComponentsDocument,
+  useUpdateComponentMutation,
+} from "../../queries/components.graphql";
+import dayjs from "dayjs";
+import { Alert, Form, Input, Button, Modal, DatePicker, Select } from "antd";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { Scalars } from "../../__generated__/__types__";
+import {
+  ComponentCategory,
+  OpenEndedDateTimeRange,
+  Scalars,
+} from "../../__generated__/__types__";
 
 const layout = {
   labelCol: { span: 8 },
@@ -15,28 +20,30 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-export type UpdateInstitutionProps = {
-  institutionId: Scalars["Uuid"];
+export type UpdateComponentProps = {
+  componentId: Scalars["Uuid"];
   name: string;
   abbreviation: string | null | undefined;
   description: string;
-  websiteLocator: string;
+  availability: OpenEndedDateTimeRange | null | undefined;
+  categories: ComponentCategory[] | null | undefined;
 };
 
-export default function UpdateInstitution({
-  institutionId,
+export default function UpdateComponent({
+  componentId,
   name,
   abbreviation,
   description,
-  websiteLocator,
-}: UpdateInstitutionProps) {
+  availability,
+  categories,
+}: UpdateComponentProps) {
   const [open, setOpen] = useState(false);
-  const [updateInstitutionMutation] = useUpdateInstitutionMutation({
+  const [updateComponentMutation] = useUpdateComponentMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
       {
-        query: InstitutionsDocument,
+        query: ComponentsDocument,
       },
     ],
   });
@@ -50,29 +57,38 @@ export default function UpdateInstitution({
     newName,
     newAbbreviation,
     newDescription,
-    newWebsiteLocator,
+    newAvailability,
+    newCategories,
   }: {
     newName: string;
     newAbbreviation: string | null | undefined;
     newDescription: string;
-    newWebsiteLocator: string;
+    newAvailability:
+      | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+      | null
+      | undefined;
+    newCategories: ComponentCategory[] | null | undefined;
   }) => {
     const update = async () => {
       try {
         setUpdating(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await updateInstitutionMutation({
+        const { errors, data } = await updateComponentMutation({
           variables: {
-            institutionId: institutionId,
+            componentId: componentId,
             name: newName,
             abbreviation: newAbbreviation,
             description: newDescription,
-            websiteLocator: newWebsiteLocator,
+            availability: {
+              from: newAvailability?.[0],
+              to: newAvailability?.[1],
+            },
+            categories: newCategories || [],
           },
         });
         handleFormErrors(
           errors,
-          data?.updateInstitution?.errors?.map((x) => {
+          data?.updateComponent?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
@@ -80,8 +96,8 @@ export default function UpdateInstitution({
         );
         if (
           !errors &&
-          !data?.updateInstitution?.errors &&
-          data?.updateInstitution?.institution
+          !data?.updateComponent?.errors &&
+          data?.updateComponent?.component
         ) {
           setOpen(false);
         }
@@ -104,7 +120,7 @@ export default function UpdateInstitution({
       <Button onClick={() => setOpen(true)}>Edit</Button>
       <Modal
         open={open}
-        title="Edit Institution"
+        title="Edit Component"
         // onOk={handleOk}
         onCancel={() => setOpen(false)}
         footer={false}
@@ -154,16 +170,30 @@ export default function UpdateInstitution({
             <Input />
           </Form.Item>
           <Form.Item
-            label="Website"
-            name="newWebsiteLocator"
-            rules={[
-              {
-                type: "url",
-              },
+            label="Availability"
+            name="newAvailability"
+            initialValue={[
+              availability?.from == null ? null : dayjs(availability.from),
+              availability?.to == null ? null : dayjs(availability.to),
             ]}
-            initialValue={websiteLocator}
           >
-            <Input />
+            <DatePicker.RangePicker allowEmpty={[true, true]} showTime />
+          </Form.Item>
+          <Form.Item
+            label="Categories"
+            name="newCategories"
+            initialValue={categories}
+          >
+            <Select
+              mode="multiple"
+              placeholder="Please select"
+              options={Object.entries(ComponentCategory).map(
+                ([_key, value]) => ({
+                  label: value,
+                  value: value,
+                })
+              )}
+            />
           </Form.Item>
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={updating}>

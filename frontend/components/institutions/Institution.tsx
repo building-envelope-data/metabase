@@ -177,13 +177,17 @@ export default function Institution({ institutionId }: InstitutionProps) {
         ]}
         extra={[
           <UpdateInstitution
+            key="updateInstitution"
             institutionId={institution.uuid}
             name={institution.name}
             abbreviation={institution.abbreviation}
             description={institution.description}
             websiteLocator={institution.websiteLocator}
           />,
-          <DeleteInstitution institutionId={institution.uuid} />,
+          <DeleteInstitution
+            key="deleteInstitution"
+            institutionId={institution.uuid}
+          />,
         ]}
         backIcon={false}
       >
