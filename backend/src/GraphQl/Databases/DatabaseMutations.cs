@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,6 +70,57 @@ namespace Metabase.GraphQl.Databases
             context.Databases.Add(database);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new CreateDatabasePayload(database);
+        }
+
+        [UseUserManager]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+        public async Task<UpdateDatabasePayload> UpdateDatabaseAsync(
+            UpdateDatabaseInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await DatabaseAuthorization.IsAuthorizedToUpdate(
+                 claimsPrincipal,
+                 input.DatabaseId,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
+            {
+                return new UpdateDatabasePayload(
+                    new UpdateDatabaseError(
+                      UpdateDatabaseErrorCode.UNAUTHORIZED,
+                      "You are not authorized to update the database.",
+                      new[] { nameof(input) }
+                    )
+                );
+            }
+            var database =
+                await context.Databases.AsQueryable()
+                .Where(i => i.Id == input.DatabaseId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+            if (database is null)
+            {
+                return new UpdateDatabasePayload(
+                    new UpdateDatabaseError(
+                      UpdateDatabaseErrorCode.UNKNOWN_DATABASE,
+                      "Unknown database.",
+                      new[] { nameof(input), nameof(input.DatabaseId).FirstCharToLower() }
+                      )
+                      );
+            }
+            database.Update(
+                name: input.Name,
+                description: input.Description,
+                locator: input.Locator
+            );
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return new UpdateDatabasePayload(database);
         }
     }
 }

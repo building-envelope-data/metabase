@@ -932,6 +932,7 @@ type Mutation {
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser")
   updateComponent(input: UpdateComponentInput!): UpdateComponentPayload! @authorize(policy: "Write")
   updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "Write")
+  updateDatabase(input: UpdateDatabaseInput!): UpdateDatabasePayload! @authorize(policy: "Write")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(policy: "Write")
   verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(policy: "Write")
 }
@@ -1353,6 +1354,18 @@ type UpdateComponentError {
 type UpdateComponentPayload {
   component: Component
   errors: [UpdateComponentError!]
+  query: Query!
+}
+
+type UpdateDatabaseError {
+  code: UpdateDatabaseErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateDatabasePayload {
+  database: Database
+  errors: [UpdateDatabaseError!]
   query: Query!
 }
 
@@ -2023,6 +2036,13 @@ input UpdateComponentInput {
   name: String!
 }
 
+input UpdateDatabaseInput {
+  databaseId: Uuid!
+  description: String!
+  locator: Url!
+  name: String!
+}
+
 input UpdateInstitutionInput {
   abbreviation: String
   description: String!
@@ -2544,6 +2564,12 @@ enum UpdateComponentErrorCode {
   UNKNOWN_ASSEMBLED_OF_COMPONENTS
   UNAUTHORIZED
   UNKNOWN_COMPONENT
+}
+
+enum UpdateDatabaseErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_DATABASE
 }
 
 enum UpdateInstitutionErrorCode {

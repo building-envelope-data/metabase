@@ -50,3 +50,28 @@ mutation CreateDatabase(
     }
   }
 }
+
+mutation UpdateDatabase(
+  $databaseId: Uuid!
+  $name: String!
+  $description: String!
+  $locator: Url!
+) {
+  updateDatabase(
+    input: {
+      databaseId: $databaseId
+      name: $name
+      description: $description
+      locator: $locator
+    }
+  ) {
+    database {
+      ...DatabasePartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

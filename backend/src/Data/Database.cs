@@ -41,5 +41,16 @@ namespace Metabase.Data
             Description = description;
             Locator = locator;
         }
+
+        public void Update(
+            string name,
+            string description,
+            Uri locator
+        )
+        {
+            Name = name;
+            Description = description;
+            Locator = locator;
+        }
     }
 }

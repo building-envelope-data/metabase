@@ -72,7 +72,11 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.createDatabase?.errors) {
+        if (
+          !errors &&
+          !data?.createDatabase?.errors &&
+          data?.createDatabase?.database
+        ) {
           form.resetFields();
         }
       } catch (error) {
