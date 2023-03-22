@@ -1488,7 +1488,7 @@ input CalorimetricDataPropositionInput {
 
 input ChangeInstitutionRepresentativeRoleInput {
   institutionId: Uuid!
-  newRole: InstitutionRepresentativeRole!
+  role: InstitutionRepresentativeRole!
   userId: Uuid!
 }
 
@@ -2009,9 +2009,9 @@ input StringOperationFilterInput {
 
 input UpdateComponentAssemblyInput {
   assembledComponentId: Uuid!
-  newIndex: Byte
-  newPrimeSurface: PrimeSurface
+  index: Byte
   partComponentId: Uuid!
+  primeSurface: PrimeSurface
 }
 
 input UpdateComponentInput {
@@ -2417,6 +2417,7 @@ enum RemoveComponentManufacturerErrorCode {
   UNKNOWN_INSTITUTION
   UNAUTHORIZED
   UNKNOWN_MANUFACTURER
+  LAST_MANUFACTURER
 }
 
 enum RemoveComponentVariantErrorCode {

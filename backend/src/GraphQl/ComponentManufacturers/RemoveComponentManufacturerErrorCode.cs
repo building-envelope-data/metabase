@@ -7,5 +7,6 @@ namespace Metabase.GraphQl.ComponentManufacturers
         UNKNOWN_INSTITUTION,
         UNAUTHORIZED,
         UNKNOWN_MANUFACTURER,
+        LAST_MANUFACTURER,
     }
 }

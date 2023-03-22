@@ -76,8 +76,8 @@ export default function UpdateComponentAssembly({
           variables: {
             assembledComponentId: assembledComponent.uuid,
             partComponentId: partComponent.uuid,
-            newIndex: newIndex,
-            newPrimeSurface: newPrimeSurface,
+            index: newIndex,
+            primeSurface: newPrimeSurface,
           },
         });
         handleFormErrors(

@@ -267,6 +267,23 @@ namespace Metabase.GraphQl.ComponentManufacturers
                       )
                       );
             }
+            if (!await context.ComponentManufacturers.AsQueryable()
+                .Where(a =>
+                    a.ComponentId == input.ComponentId
+                    && a.InstitutionId != input.InstitutionId
+                    && !a.Pending
+                    )
+                .AnyAsync(cancellationToken)
+                .ConfigureAwait(false))
+            {
+                return new RemoveComponentManufacturerPayload(
+                    new RemoveComponentManufacturerError(
+                      RemoveComponentManufacturerErrorCode.LAST_MANUFACTURER,
+                      "Cannot remove last manufacturer.",
+                      new[] { nameof(input) }
+                      )
+                      );
+            }
             context.ComponentManufacturers.Remove(componentManufacturer);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new RemoveComponentManufacturerPayload(componentManufacturer);
