@@ -933,7 +933,9 @@ type Mutation {
   updateComponent(input: UpdateComponentInput!): UpdateComponentPayload! @authorize(policy: "Write")
   updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "Write")
   updateDatabase(input: UpdateDatabaseInput!): UpdateDatabasePayload! @authorize(policy: "Write")
+  updateDataFormat(input: UpdateDataFormatInput!): UpdateDataFormatPayload! @authorize(policy: "Write")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(policy: "Write")
+  updateMethod(input: UpdateMethodInput!): UpdateMethodPayload! @authorize(policy: "Write")
   verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(policy: "Write")
 }
 
@@ -1357,6 +1359,18 @@ type UpdateComponentPayload {
   query: Query!
 }
 
+type UpdateDataFormatError {
+  code: UpdateDataFormatErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateDataFormatPayload {
+  dataFormat: DataFormat
+  errors: [UpdateDataFormatError!]
+  query: Query!
+}
+
 type UpdateDatabaseError {
   code: UpdateDatabaseErrorCode!
   message: String!
@@ -1378,6 +1392,18 @@ type UpdateInstitutionError {
 type UpdateInstitutionPayload {
   errors: [UpdateInstitutionError!]
   institution: Institution
+  query: Query!
+}
+
+type UpdateMethodError {
+  code: UpdateMethodErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateMethodPayload {
+  errors: [UpdateMethodError!]
+  method: Method
   query: Query!
 }
 
@@ -2036,6 +2062,17 @@ input UpdateComponentInput {
   name: String!
 }
 
+input UpdateDataFormatInput {
+  dataFormatId: Uuid!
+  description: String!
+  extension: String
+  mediaType: String!
+  name: String!
+  publication: UpdatePublicationInput
+  schemaLocator: Url
+  standard: UpdateStandardInput
+}
+
 input UpdateDatabaseInput {
   databaseId: Uuid!
   description: String!
@@ -2050,6 +2087,45 @@ input UpdateInstitutionInput {
   name: String!
   publicKey: String
   websiteLocator: Url
+}
+
+input UpdateMethodInput {
+  availability: OpenEndedDateTimeRangeInput
+  calculationLocator: Url
+  categories: [MethodCategory!]!
+  description: String!
+  methodId: Uuid!
+  name: String!
+  publication: UpdatePublicationInput
+  standard: UpdateStandardInput
+  validity: OpenEndedDateTimeRangeInput
+}
+
+input UpdateNumerationInput {
+  mainNumber: String!
+  prefix: String
+  suffix: String
+}
+
+input UpdatePublicationInput {
+  abstract: String
+  arXiv: String
+  authors: [String!]
+  doi: String
+  section: String
+  title: String
+  urn: String
+  webAddress: Url
+}
+
+input UpdateStandardInput {
+  abstract: String
+  locator: Url
+  numeration: UpdateNumerationInput!
+  section: String
+  standardizers: [Standardizer!]!
+  title: String
+  year: Int
 }
 
 input UriSortInput {
@@ -2566,6 +2642,13 @@ enum UpdateComponentErrorCode {
   UNKNOWN_COMPONENT
 }
 
+enum UpdateDataFormatErrorCode {
+  UNKNOWN
+  TWO_REFERENCES
+  UNAUTHORIZED
+  UNKNOWN_DATA_FORMAT
+}
+
 enum UpdateDatabaseErrorCode {
   UNKNOWN
   UNAUTHORIZED
@@ -2576,6 +2659,13 @@ enum UpdateInstitutionErrorCode {
   UNKNOWN
   UNAUTHORIZED
   UNKNOWN_INSTITUTION
+}
+
+enum UpdateMethodErrorCode {
+  UNKNOWN
+  TWO_REFERENCES
+  UNAUTHORIZED
+  UNKNOWN_METHOD
 }
 
 enum UserRole {

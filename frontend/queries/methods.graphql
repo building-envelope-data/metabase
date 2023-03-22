@@ -111,3 +111,38 @@ mutation CreateMethod(
     }
   }
 }
+
+mutation UpdateMethod(
+  $methodId: Uuid!
+  $name: String!
+  $description: String!
+  $validity: OpenEndedDateTimeRangeInput
+  $availability: OpenEndedDateTimeRangeInput
+  $standard: UpdateStandardInput
+  $publication: UpdatePublicationInput
+  $calculationLocator: Url
+  $categories: [MethodCategory!]!
+) {
+  updateMethod(
+    input: {
+      methodId: $methodId
+      name: $name
+      description: $description
+      validity: $validity
+      availability: $availability
+      standard: $standard
+      publication: $publication
+      calculationLocator: $calculationLocator
+      categories: $categories
+    }
+  ) {
+    method {
+      ...MethodPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

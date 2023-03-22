@@ -7,6 +7,16 @@ namespace Metabase.GraphQl.Common
     public sealed class OpenEndedDateTimeRangeType
       : ObjectType<NpgsqlRange<DateTime>>
     {
+        public static NpgsqlRange<DateTime> FromInput(
+            OpenEndedDateTimeRangeInput input
+        )
+        {
+            return new NpgsqlRange<DateTime>(
+              input.From.GetValueOrDefault(), true, input.From is null,
+              input.To.GetValueOrDefault(), true, input.To is null
+              );
+        }
+
         protected override void Configure(
             IObjectTypeDescriptor<NpgsqlRange<DateTime>> descriptor
             )

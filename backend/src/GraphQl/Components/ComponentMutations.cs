@@ -8,10 +8,10 @@ using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Extensions;
+using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NpgsqlTypes;
 using DateTime = System.DateTime;
 
 namespace Metabase.GraphQl.Components
@@ -67,12 +67,9 @@ namespace Metabase.GraphQl.Components
                 abbreviation: input.Abbreviation,
                 description: input.Description,
                 availability:
-                 input.Availability is not null
-                 ? new NpgsqlRange<DateTime>(
-                   input.Availability.From.GetValueOrDefault(), true, input.Availability.From is null,
-                   input.Availability.To.GetValueOrDefault(), true, input.Availability.To is null
-                   )
-                 : null,
+                 input.Availability is null
+                 ? null
+                 : OpenEndedDateTimeRangeType.FromInput(input.Availability),
                 categories: input.Categories
             );
             component.ManufacturerEdges.Add(
@@ -134,12 +131,9 @@ namespace Metabase.GraphQl.Components
                 abbreviation: input.Abbreviation,
                 description: input.Description,
                 availability:
-                 input.Availability is not null
-                 ? new NpgsqlRange<DateTime>(
-                   input.Availability.From.GetValueOrDefault(), true, input.Availability.From is null,
-                   input.Availability.To.GetValueOrDefault(), true, input.Availability.To is null
-                   )
-                 : null,
+                 input.Availability is null
+                 ? null
+                 : OpenEndedDateTimeRangeType.FromInput(input.Availability),
                 categories: input.Categories
             );
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

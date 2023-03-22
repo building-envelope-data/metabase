@@ -64,5 +64,20 @@ namespace Metabase.Data
             MediaType = mediaType;
             SchemaLocator = schemaLocator;
         }
+
+        public void Update(
+            string name,
+            string? extension,
+            string description,
+            string mediaType,
+            Uri? schemaLocator
+            )
+        {
+            Name = name;
+            Extension = extension;
+            Description = description;
+            MediaType = mediaType;
+            SchemaLocator = schemaLocator;
+        }
     }
 }
