@@ -1578,17 +1578,11 @@ input ConfirmUserMethodDeveloperInput {
 
 input CreateComponentInput {
   abbreviation: String
-  assembledOfIds: [Uuid!]!
   availability: OpenEndedDateTimeRangeInput
   categories: [ComponentCategory!]!
-  concretizationOfIds: [Uuid!]!
   description: String!
-  furtherManufacturerIds: [Uuid!]!
-  generalizationOfIds: [Uuid!]!
   manufacturerId: Uuid!
   name: String!
-  partOfIds: [Uuid!]!
-  variantOfIds: [Uuid!]!
 }
 
 input CreateDataFormatInput {
@@ -2257,12 +2251,6 @@ enum ConfirmUserMethodDeveloperErrorCode {
 enum CreateComponentErrorCode {
   UNKNOWN
   UNKNOWN_MANUFACTURER
-  UNKNOWN_FURTHER_MANUFACTURERS
-  UNKNOWN_VARIANT_OF_COMPONENTS
-  UNKNOWN_GENERALIZATION_OF_COMPONENTS
-  UNKNOWN_CONCRETIZATION_OF_COMPONENTS
-  UNKNOWN_PART_OF_COMPONENTS
-  UNKNOWN_ASSEMBLED_OF_COMPONENTS
   UNAUTHORIZED
 }
 
