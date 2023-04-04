@@ -70,6 +70,7 @@ query Methods {
 query Method($uuid: Uuid!) {
   method(uuid: $uuid) {
     ...MethodPartial
+    canCurrentUserUpdateNode
   }
 }
 

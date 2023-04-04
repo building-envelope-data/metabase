@@ -2,12 +2,13 @@ import { Scalars } from "../../__generated__/__types__";
 import { useMethodQuery } from "../../queries/methods.graphql";
 import { Tag, Skeleton, Result, Descriptions, Typography, List } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import Link from "next/link";
 import paths from "../../paths";
 import { Reference } from "../Reference";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
 import { messageApolloError } from "../../lib/apollo";
+import UpdateMethod from "./UpdateMethod";
 
 function getDeveloperHref(
   node:
@@ -71,6 +72,24 @@ export default function Method({ methodId }: MethodProps) {
           {x}
         </Tag>
       ))}
+      extra={
+        method.canCurrentUserUpdateNode
+          ? [
+              <UpdateMethod
+                key="updateMethod"
+                methodId={method.uuid}
+                name={method.name}
+                description={method.description}
+                validity={method.validity}
+                availability={method.availability}
+                reference={method.reference}
+                calculationLocator={method.calculationLocator}
+                categories={method.categories}
+                managerId={method.manager.node.uuid}
+              />,
+            ]
+          : []
+      }
       backIcon={false}
     >
       <Descriptions size="small" column={1}>

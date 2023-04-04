@@ -441,6 +441,7 @@ type DataEdge {
 }
 
 type DataFormat implements Node {
+  canCurrentUserUpdateNode: Boolean!
   description: String!
   extension: String
   id: ID!
@@ -844,6 +845,7 @@ type LogoutUserPayload {
 type Method implements Node {
   availability: OpenEndedDateTimeRange
   calculationLocator: Url
+  canCurrentUserUpdateNode: Boolean!
   categories: [MethodCategory!]!
   description: String!
   developers(pending: Boolean! = false): MethodDeveloperConnection!

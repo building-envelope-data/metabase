@@ -1,4 +1,11 @@
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
 using HotChocolate.Types;
+using Metabase.Authorization;
+using Metabase.GraphQl.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.DataFormats
 {
@@ -27,6 +34,24 @@ namespace Metabase.GraphQl.DataFormats
             descriptor
                 .Field(t => t.ManagerId)
                 .Ignore();
+            descriptor
+              .Field("canCurrentUserUpdateNode")
+              .ResolveWith<DataFormatResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+              .UseUserManager();
+        }
+
+        private sealed class DataFormatResolvers
+        {
+                public Task<bool> GetCanCurrentUserUpdateNodeAsync(
+                  [Parent] Data.DataFormat dataFormat,
+                  [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+                  [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+                  Data.ApplicationDbContext context,
+                  CancellationToken cancellationToken
+                )
+                {
+                    return DataFormatAuthorization.IsAuthorizedToUpdate(claimsPrincipal, dataFormat.Id, userManager, context, cancellationToken);
+                }
         }
     }
 }
