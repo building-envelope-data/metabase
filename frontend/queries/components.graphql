@@ -119,6 +119,7 @@ query Component($uuid: Uuid!) {
       }
       canCurrentUserAddEdge
     }
+    canCurrentUserUpdateNode
   }
 }
 

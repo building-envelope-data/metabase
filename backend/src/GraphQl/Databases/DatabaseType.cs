@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using HotChocolate.Types;
+using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Databases
 {
@@ -97,6 +98,10 @@ namespace Metabase.GraphQl.Databases
                 "hasPhotovoltaicData",
                 _ => _.GetHasPhotovoltaicDataAsync(default!, default, default, default, default)
             );
+            descriptor
+              .Field("canCurrentUserUpdateNode")
+              .ResolveWith<DatabaseResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+              .UseUserManager();
         }
 
         private static void ConfigureDataField(

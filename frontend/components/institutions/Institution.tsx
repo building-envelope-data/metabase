@@ -23,7 +23,7 @@ import CreateDatabase from "../databases/CreateDatabase";
 import AddInstitutionRepresentative from "./AddInstitutionRepresentative";
 import Link from "next/link";
 import paths from "../../paths";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useConfirmInstitutionMethodDeveloperMutation } from "../../queries/institutionMethodDevelopers.graphql";
 import { MethodDocument } from "../../queries/methods.graphql";
 import { useConfirmComponentManufacturerMutation } from "../../queries/componentManufacturers.graphql";
@@ -175,20 +175,31 @@ export default function Institution({ institutionId }: InstitutionProps) {
             {institution.state}
           </Tag>,
         ]}
-        extra={[
-          <UpdateInstitution
-            key="updateInstitution"
-            institutionId={institution.uuid}
-            name={institution.name}
-            abbreviation={institution.abbreviation}
-            description={institution.description}
-            websiteLocator={institution.websiteLocator}
-          />,
-          <DeleteInstitution
-            key="deleteInstitution"
-            institutionId={institution.uuid}
-          />,
-        ]}
+        extra={([] as ReactNode[])
+          .concat(
+            institution.canCurrentUserUpdateNode
+              ? [
+                  <UpdateInstitution
+                    key="updateInstitution"
+                    institutionId={institution.uuid}
+                    name={institution.name}
+                    abbreviation={institution.abbreviation}
+                    description={institution.description}
+                    websiteLocator={institution.websiteLocator}
+                  />,
+                ]
+              : []
+          )
+          .concat(
+            institution.canCurrentUserDeleteNode
+              ? [
+                  <DeleteInstitution
+                    key="deleteInstitution"
+                    institutionId={institution.uuid}
+                  />,
+                ]
+              : []
+          )}
         backIcon={false}
       >
         <Descriptions size="small" column={1}>

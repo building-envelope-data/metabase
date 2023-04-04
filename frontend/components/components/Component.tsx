@@ -277,17 +277,21 @@ export default function Component({ componentId }: ComponentProps) {
             {x}
           </Tag>
         ))}
-        extra={[
-          <UpdateComponent
-            key="updateComponent"
-            componentId={component.uuid}
-            name={component.name}
-            abbreviation={component.abbreviation}
-            description={component.description}
-            availability={component.availability}
-            categories={component.categories}
-          />,
-        ]}
+        extra={
+          component.canCurrentUserUpdateNode
+            ? [
+                <UpdateComponent
+                  key="updateComponent"
+                  componentId={component.uuid}
+                  name={component.name}
+                  abbreviation={component.abbreviation}
+                  description={component.description}
+                  availability={component.availability}
+                  categories={component.categories}
+                />,
+              ]
+            : []
+        }
         backIcon={false}
       >
         <Descriptions size="small" column={1}>

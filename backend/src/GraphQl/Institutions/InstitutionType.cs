@@ -1,5 +1,12 @@
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Extensions;
+using Metabase.GraphQl.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Institutions
 {
@@ -96,6 +103,39 @@ namespace Metabase.GraphQl.Institutions
             descriptor
                 .Field(t => t.RepresentativeEdges)
                 .Ignore();
+            descriptor
+              .Field("canCurrentUserUpdateNode")
+              .ResolveWith<InstitutionResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+              .UseUserManager();
+            descriptor
+              .Field("canCurrentUserDeleteNode")
+              .ResolveWith<InstitutionResolvers>(x => x.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!, default!))
+              .UseUserManager();
+        }
+
+        private sealed class InstitutionResolvers
+        {
+                public Task<bool> GetCanCurrentUserUpdateNodeAsync(
+                  [Parent] Data.Institution institution,
+                  [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+                  [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+                  Data.ApplicationDbContext context,
+                  CancellationToken cancellationToken
+                )
+                {
+                    return InstitutionAuthorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, userManager, context, cancellationToken);
+                }
+
+                public Task<bool> GetCanCurrentUserDeleteNodeAsync(
+                  [Parent] Data.Institution institution,
+                  [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+                  [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+                  Data.ApplicationDbContext context,
+                  CancellationToken cancellationToken
+                )
+                {
+                    return InstitutionAuthorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id, userManager, context, cancellationToken);
+                }
         }
     }
 }

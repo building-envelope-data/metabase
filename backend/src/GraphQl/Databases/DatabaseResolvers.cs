@@ -11,6 +11,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using HotChocolate;
 using System.Collections.Generic;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Metabase.Authorization;
 
 namespace Metabase.GraphQl.Databases
 {
@@ -57,6 +60,17 @@ namespace Metabase.GraphQl.Databases
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+        }
+
+        public Task<bool> GetCanCurrentUserUpdateNodeAsync(
+          [Parent] Data.Institution database,
+          [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+          [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+          Data.ApplicationDbContext context,
+          CancellationToken cancellationToken
+        )
+        {
+            return DatabaseAuthorization.IsAuthorizedToUpdate(claimsPrincipal, database.Id, userManager, context, cancellationToken);
         }
 
         private sealed class DataData

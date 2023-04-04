@@ -98,6 +98,8 @@ mutation DeleteInstitution($institutionId: Uuid!) {
 query Institution($uuid: Uuid!) {
   institution(uuid: $uuid) {
     ...InstitutionPartial
+    canCurrentUserUpdateNode
+    canCurrentUserDeleteNode
     manufacturedComponents {
       edges {
         node {

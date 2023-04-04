@@ -23,6 +23,7 @@ query Databases {
 query Database($uuid: Uuid!) {
   database(uuid: $uuid) {
     ...DatabasePartial
+    canCurrentUserUpdateNode
   }
 }
 

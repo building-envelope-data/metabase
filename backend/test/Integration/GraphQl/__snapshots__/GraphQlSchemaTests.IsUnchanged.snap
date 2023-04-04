@@ -182,6 +182,7 @@ type Component implements Node {
   abbreviation: String
   assembledOf: ComponentAssembledOfConnection!
   availability: OpenEndedDateTimeRange
+  canCurrentUserUpdateNode: Boolean!
   categories: [ComponentCategory!]!
   concretizationOf: ComponentConcretizationOfConnection!
   description: String!
@@ -482,6 +483,7 @@ type Database implements Node {
   allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput): OpticalDataConnection
   allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection
   calorimetricData(id: Uuid! locale: String timestamp: DateTime): CalorimetricData
+  canCurrentUserUpdateNode: Boolean!
   data(id: Uuid! locale: String timestamp: DateTime): Data
   description: String!
   hasCalorimetricData(locale: String timestamp: DateTime where: CalorimetricDataPropositionInput): Boolean
@@ -678,6 +680,8 @@ type HygrothermalDataEdge {
 
 type Institution implements Node & Stakeholder {
   abbreviation: String
+  canCurrentUserDeleteNode: Boolean!
+  canCurrentUserUpdateNode: Boolean!
   description: String!
   developedMethods(pending: Boolean! = false): InstitutionDevelopedMethodConnection!
   id: ID!
