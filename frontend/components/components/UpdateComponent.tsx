@@ -20,6 +20,17 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  newName: string;
+  newAbbreviation: string | null | undefined;
+  newDescription: string;
+  newAvailability:
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
+  newCategories: ComponentCategory[] | null | undefined;
+};
+
 export type UpdateComponentProps = {
   componentId: Scalars["Uuid"];
   name: string;
@@ -50,7 +61,7 @@ export default function UpdateComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
 
   const onFinish = ({
@@ -59,16 +70,7 @@ export default function UpdateComponent({
     newDescription,
     newAvailability,
     newCategories,
-  }: {
-    newName: string;
-    newAbbreviation: string | null | undefined;
-    newDescription: string;
-    newAvailability:
-      | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-      | null
-      | undefined;
-    newCategories: ComponentCategory[] | null | undefined;
-  }) => {
+  }: FormValues) => {
     const update = async () => {
       try {
         setUpdating(true);

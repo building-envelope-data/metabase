@@ -17,6 +17,12 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  newName: string;
+  newDescription: string;
+  newLocator: Scalars["Url"];
+};
+
 export type UpdateDatabaseProps = {
   databaseId: Scalars["Uuid"];
   name: string;
@@ -49,18 +55,10 @@ export default function UpdateDatabase({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
 
-  const onFinish = ({
-    newName,
-    newDescription,
-    newLocator,
-  }: {
-    newName: string;
-    newDescription: string;
-    newLocator: Scalars["Url"];
-  }) => {
+  const onFinish = ({ newName, newDescription, newLocator }: FormValues) => {
     const update = async () => {
       try {
         setUpdating(true);

@@ -15,6 +15,13 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  newName: string;
+  newAbbreviation: string | null | undefined;
+  newDescription: string;
+  newWebsiteLocator: string;
+};
+
 export type UpdateInstitutionProps = {
   institutionId: Scalars["Uuid"];
   name: string;
@@ -43,7 +50,7 @@ export default function UpdateInstitution({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
 
   const onFinish = ({
@@ -51,12 +58,7 @@ export default function UpdateInstitution({
     newAbbreviation,
     newDescription,
     newWebsiteLocator,
-  }: {
-    newName: string;
-    newAbbreviation: string | null | undefined;
-    newDescription: string;
-    newWebsiteLocator: string;
-  }) => {
+  }: FormValues) => {
     const update = async () => {
       try {
         setUpdating(true);

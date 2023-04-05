@@ -15,6 +15,8 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = { institutionId: Scalars["Uuid"] };
+
 export type AddComponentManufacturerProps = {
   componentId: Scalars["Uuid"];
 };
@@ -38,10 +40,10 @@ export default function AddComponentManufacturer({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ institutionId }: { institutionId: Scalars["Uuid"] }) => {
+  const onFinish = ({ institutionId }: FormValues) => {
     const add = async () => {
       try {
         setAdding(true);

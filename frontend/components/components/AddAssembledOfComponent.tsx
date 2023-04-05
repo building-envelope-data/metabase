@@ -15,6 +15,12 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  assembledComponentId: Scalars["Uuid"];
+  index: Scalars["Byte"] | null | undefined;
+  primeSurface: PrimeSurface | null | undefined;
+};
+
 export type AddAssembledOfComponentProps = {
   partComponentId: Scalars["Uuid"];
 };
@@ -37,18 +43,14 @@ export default function AddAssembledOfComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
 
   const onFinish = ({
     assembledComponentId,
     index,
     primeSurface,
-  }: {
-    assembledComponentId: Scalars["Uuid"];
-    index: Scalars["Byte"] | null | undefined;
-    primeSurface: PrimeSurface | null | undefined;
-  }) => {
+  }: FormValues) => {
     const add = async () => {
       try {
         setAdding(true);

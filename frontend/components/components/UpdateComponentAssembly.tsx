@@ -23,6 +23,11 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  newIndex: Scalars["Byte"] | null | undefined;
+  newPrimeSurface: PrimeSurface | null | undefined;
+};
+
 export type UpdateComponentAssemblyProps = {
   assembledComponent: { uuid: Scalars["Uuid"]; name: string };
   partComponent: { uuid: Scalars["Uuid"]; name: string };
@@ -58,16 +63,10 @@ export default function UpdateComponentAssembly({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
 
-  const onFinish = ({
-    newIndex,
-    newPrimeSurface,
-  }: {
-    newIndex: Scalars["Byte"] | null | undefined;
-    newPrimeSurface: PrimeSurface | null | undefined;
-  }) => {
+  const onFinish = ({ newIndex, newPrimeSurface }: FormValues) => {
     const update = async () => {
       try {
         setUpdating(true);

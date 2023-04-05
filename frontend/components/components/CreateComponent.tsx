@@ -18,6 +18,17 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  name: string;
+  abbreviation: string | null | undefined;
+  description: string;
+  availability:
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
+  categories: ComponentCategory[] | null | undefined;
+};
+
 export type CreateComponentProps = {
   manufacturerId: Scalars["Uuid"];
 };
@@ -43,7 +54,7 @@ export default function CreateComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
 
   const onFinish = ({
@@ -52,16 +63,7 @@ export default function CreateComponent({
     description,
     availability,
     categories,
-  }: {
-    name: string;
-    abbreviation: string | null | undefined;
-    description: string;
-    availability:
-      | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-      | null
-      | undefined;
-    categories: ComponentCategory[] | null | undefined;
-  }) => {
+  }: FormValues) => {
     const create = async () => {
       try {
         setCreating(true);

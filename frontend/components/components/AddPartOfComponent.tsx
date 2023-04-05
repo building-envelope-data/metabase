@@ -15,6 +15,12 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  partComponentId: Scalars["Uuid"];
+  index: Scalars["Byte"] | null | undefined;
+  primeSurface: PrimeSurface | null | undefined;
+};
+
 export type AddPartOfComponentProps = {
   assembledComponentId: Scalars["Uuid"];
 };
@@ -37,18 +43,10 @@ export default function AddPartOfComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
 
-  const onFinish = ({
-    partComponentId,
-    index,
-    primeSurface,
-  }: {
-    partComponentId: Scalars["Uuid"];
-    index: Scalars["Byte"] | null | undefined;
-    primeSurface: PrimeSurface | null | undefined;
-  }) => {
+  const onFinish = ({ partComponentId, index, primeSurface }: FormValues) => {
     const add = async () => {
       try {
         setAdding(true);

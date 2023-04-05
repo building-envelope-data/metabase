@@ -15,6 +15,10 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  generalComponentId: Scalars["Uuid"];
+};
+
 export type AddAssembledOfComponentProps = {
   concreteComponentId: Scalars["Uuid"];
 };
@@ -38,14 +42,10 @@ export default function AddAssembledOfComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
 
-  const onFinish = ({
-    generalComponentId,
-  }: {
-    generalComponentId: Scalars["Uuid"];
-  }) => {
+  const onFinish = ({ generalComponentId }: FormValues) => {
     const add = async () => {
       try {
         setAdding(true);
