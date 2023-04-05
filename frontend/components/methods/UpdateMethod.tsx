@@ -19,7 +19,8 @@ import {
   MethodCategory,
   Scalars,
   OpenEndedDateTimeRange,
-  Reference,
+  Publication,
+  Standard,
 } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
@@ -58,7 +59,7 @@ export type UpdateMethodProps = {
   description: string;
   validity: OpenEndedDateTimeRange | null | undefined;
   availability: OpenEndedDateTimeRange | null | undefined;
-  reference: Reference | null | undefined;
+  reference: Publication | Standard | null | undefined;
   calculationLocator: Scalars["Url"] | null | undefined;
   categories: MethodCategory[] | null | undefined;
   managerId: Scalars["Uuid"];
@@ -140,7 +141,7 @@ export default function UpdateMethod({
           form
         );
         if (!errors && !data?.updateMethod?.errors) {
-          form.resetFields();
+          setOpen(false);
         }
       } catch (error) {
         // TODO Handle properly.
@@ -246,7 +247,7 @@ export default function UpdateMethod({
             />
           </Form.Item>
           <Divider />
-          <ReferenceForm form={form} />
+          <ReferenceForm form={form} initialValue={reference} />
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={updating}>
               Update

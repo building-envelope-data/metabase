@@ -8,7 +8,8 @@ import {
   UpdatePublicationInput,
   UpdateStandardInput,
   Scalars,
-  Reference,
+  Publication,
+  Standard,
 } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
@@ -40,7 +41,7 @@ export type UpdateDataFormatProps = {
   description: string;
   mediaType: string;
   schemaLocator: Scalars["Url"] | null | undefined;
-  reference: Reference | null | undefined;
+  reference: Publication | Standard | null | undefined;
   managerId: Scalars["Uuid"];
 };
 
@@ -110,7 +111,7 @@ export default function UpdateDataFormat({
           form
         );
         if (!errors && !data?.updateDataFormat?.errors) {
-          form.resetFields();
+          setOpen(false);
         }
       } catch (error) {
         // TODO Handle properly.
@@ -212,7 +213,7 @@ export default function UpdateDataFormat({
             <Input />
           </Form.Item>
           <Divider />
-          <ReferenceForm form={form} />
+          <ReferenceForm form={form} initialValue={reference} />
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={updating}>
               Update
