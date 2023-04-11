@@ -195,13 +195,14 @@ prepare-release : ## Prepare release
 
 # TODO Pass passwords in a more secure way!
 jwt-certificates : ## Create JWT encryption and signing certificates if necessary
-	docker build \
-		--pull \
-		--build-arg GROUP_ID=$(shell id --group) \
-		--build-arg USER_ID=$(shell id --user) \
-		--tag ${NAME}_bootstrap \
-		--file ./backend/Dockerfile-bootstrap \
-		./backend
+	DOCKER_BUILDKIT=1 \
+		docker build \
+			--pull \
+			--build-arg GROUP_ID=$(shell id --group) \
+			--build-arg USER_ID=$(shell id --user) \
+			--tag ${NAME}_bootstrap \
+			--file ./backend/Dockerfile-bootstrap \
+			./backend
 	docker run \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/backend",target=/app \
