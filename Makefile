@@ -204,6 +204,7 @@ jwt-certificates : ## Create JWT encryption and signing certificates if necessar
 			--file ./backend/Dockerfile-bootstrap \
 			./backend
 	docker run \
+		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/backend",target=/app \
 		${NAME}_bootstrap \
@@ -230,6 +231,7 @@ ssl : ## Generate and trust certificate authority, and generate SSL certificates
 generate-certificate-authority : ## Generate certificate authority ECDSA private key and self-signed certificate
 	mkdir --parents ./ssl/
 		docker run \
+		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
 		nginx:1.23 \
@@ -337,6 +339,7 @@ trust-certificate-authority : ## Trust the authority's SSL certificate
 generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate signed by our certificate authority
 	mkdir --parents ./ssl/
 	docker run \
+		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
 		nginx:1.23 \
