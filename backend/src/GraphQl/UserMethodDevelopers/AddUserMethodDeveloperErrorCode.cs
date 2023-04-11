@@ -5,6 +5,7 @@ namespace Metabase.GraphQl.UserMethodDevelopers
         UNKNOWN,
         UNKNOWN_METHOD,
         UNKNOWN_USER,
-        UNAUTHORIZED
+        UNAUTHORIZED,
+        DUPLICATE
     }
 }

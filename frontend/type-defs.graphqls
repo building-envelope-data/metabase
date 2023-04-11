@@ -80,6 +80,19 @@ type AddComponentVariantPayload {
   variantOfEdge: ComponentVariantOfEdge
 }
 
+type AddInstitutionMethodDeveloperError {
+  code: AddInstitutionMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddInstitutionMethodDeveloperPayload {
+  developedMethodEdge: InstitutionDevelopedMethodEdge
+  errors: [AddInstitutionMethodDeveloperError!]
+  methodDeveloperEdge: InstitutionMethodDeveloperEdge
+  query: Query!
+}
+
 type AddInstitutionRepresentativeError {
   code: AddInstitutionRepresentativeErrorCode!
   message: String!
@@ -91,6 +104,19 @@ type AddInstitutionRepresentativePayload {
   institutionRepresentativeEdge: InstitutionRepresentativeEdge
   query: Query!
   representedInstitutionEdge: UserRepresentedInstitutionEdge
+}
+
+type AddUserMethodDeveloperError {
+  code: AddUserMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddUserMethodDeveloperPayload {
+  developedMethodEdge: UserDevelopedMethodEdge
+  errors: [AddUserMethodDeveloperError!]
+  methodDeveloperEdge: UserMethodDeveloperEdge
+  query: Query!
 }
 
 type AddUserRoleError {
@@ -751,6 +777,8 @@ type InstitutionManufacturedComponentEdge {
 }
 
 type InstitutionMethodDeveloperEdge {
+  canCurrentUserConfirmEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   node: Institution!
 }
 
@@ -858,10 +886,14 @@ type Method implements Node {
 }
 
 type MethodDeveloperConnection {
+  canCurrentUserAddInstitutionEdge: Boolean!
+  canCurrentUserAddUserEdge: Boolean!
   edges: [MethodDeveloperEdge!]!
 }
 
 type MethodDeveloperEdge {
+  canCurrentUserConfirmEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   node: Stakeholder!
 }
 
@@ -894,7 +926,9 @@ type Mutation {
   addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload! @authorize(policy: "Write")
   addComponentManufacturer(input: AddComponentManufacturerInput!): AddComponentManufacturerPayload! @authorize(policy: "Write")
   addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload! @authorize(policy: "Write")
+  addInstitutionMethodDeveloper(input: AddInstitutionMethodDeveloperInput!): AddInstitutionMethodDeveloperPayload! @authorize(policy: "Write")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write")
+  addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload! @authorize(policy: "Write")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload!
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "Write")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(policy: "ManageUser")
@@ -927,7 +961,9 @@ type Mutation {
   removeComponentGeneralization(input: RemoveComponentGeneralizationInput!): RemoveComponentGeneralizationPayload! @authorize(policy: "Write")
   removeComponentManufacturer(input: RemoveComponentManufacturerInput!): RemoveComponentManufacturerPayload! @authorize(policy: "Write")
   removeComponentVariant(input: RemoveComponentVariantInput!): RemoveComponentVariantPayload! @authorize(policy: "Write")
+  removeInstitutionMethodDeveloper(input: RemoveInstitutionMethodDeveloperInput!): RemoveInstitutionMethodDeveloperPayload! @authorize(policy: "Write")
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(policy: "Write")
+  removeUserMethodDeveloper(input: RemoveUserMethodDeveloperInput!): RemoveUserMethodDeveloperPayload! @authorize(policy: "Write")
   removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
   resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
@@ -1199,6 +1235,19 @@ type RemoveComponentVariantPayload {
   query: Query!
 }
 
+type RemoveInstitutionMethodDeveloperError {
+  code: RemoveInstitutionMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveInstitutionMethodDeveloperPayload {
+  developedMethodEdge: InstitutionDevelopedMethodEdge
+  errors: [RemoveInstitutionMethodDeveloperError!]
+  methodDeveloperEdge: InstitutionMethodDeveloperEdge
+  query: Query!
+}
+
 type RemoveInstitutionRepresentativeError {
   code: RemoveInstitutionRepresentativeErrorCode!
   message: String!
@@ -1210,6 +1259,19 @@ type RemoveInstitutionRepresentativePayload {
   institution: Institution
   query: Query!
   user: User
+}
+
+type RemoveUserMethodDeveloperError {
+  code: RemoveUserMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveUserMethodDeveloperPayload {
+  developedMethodEdge: UserDevelopedMethodEdge
+  errors: [RemoveUserMethodDeveloperError!]
+  methodDeveloperEdge: UserMethodDeveloperEdge
+  query: Query!
 }
 
 type RemoveUserRoleError {
@@ -1443,6 +1505,8 @@ type UserDevelopedMethodEdge {
 }
 
 type UserMethodDeveloperEdge {
+  canCurrentUserConfirmEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   node: User!
 }
 
@@ -1510,9 +1574,19 @@ input AddComponentVariantInput {
   otherComponentId: Uuid!
 }
 
+input AddInstitutionMethodDeveloperInput {
+  institutionId: Uuid!
+  methodId: Uuid!
+}
+
 input AddInstitutionRepresentativeInput {
   institutionId: Uuid!
   role: InstitutionRepresentativeRole!
+  userId: Uuid!
+}
+
+input AddUserMethodDeveloperInput {
+  methodId: Uuid!
   userId: Uuid!
 }
 
@@ -1991,8 +2065,18 @@ input RemoveComponentVariantInput {
   otherComponentId: Uuid!
 }
 
+input RemoveInstitutionMethodDeveloperInput {
+  institutionId: Uuid!
+  methodId: Uuid!
+}
+
 input RemoveInstitutionRepresentativeInput {
   institutionId: Uuid!
+  userId: Uuid!
+}
+
+input RemoveUserMethodDeveloperInput {
+  methodId: Uuid!
   userId: Uuid!
 }
 
@@ -2251,12 +2335,28 @@ enum AddComponentVariantErrorCode {
   UNAUTHORIZED
 }
 
+enum AddInstitutionMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  DUPLICATE
+}
+
 enum AddInstitutionRepresentativeErrorCode {
   UNKNOWN
   UNKNOWN_INSTITUTION
   UNKNOWN_USER
   DUPLICATE
   UNAUTHORIZED
+}
+
+enum AddUserMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_USER
+  UNAUTHORIZED
+  DUPLICATE
 }
 
 enum AddUserRoleErrorCode {
@@ -2530,6 +2630,14 @@ enum RemoveComponentVariantErrorCode {
   UNAUTHORIZED
 }
 
+enum RemoveInstitutionMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  UNKNOWN_DEVELOPER
+}
+
 enum RemoveInstitutionRepresentativeErrorCode {
   UNKNOWN
   LAST_OWNER
@@ -2537,6 +2645,14 @@ enum RemoveInstitutionRepresentativeErrorCode {
   UNKNOWN_INSTITUTION
   UNKNOWN_REPRESENTATIVE
   UNKNOWN_USER
+}
+
+enum RemoveUserMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_USER
+  UNAUTHORIZED
+  UNKNOWN_DEVELOPER
 }
 
 enum RemoveUserRoleErrorCode {

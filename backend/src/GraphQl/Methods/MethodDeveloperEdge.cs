@@ -1,9 +1,11 @@
 using System;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Methods
 {
@@ -39,6 +41,44 @@ namespace Metabase.GraphQl.Methods
             if (_userMethodDeveloperEdge is not null)
             {
                 return await _userMethodDeveloperEdge.GetNodeAsync(userById, cancellationToken).ConfigureAwait(false);
+            }
+            throw new Exception("Impossible!");
+        }
+
+        [UseUserManager]
+        public async Task<bool> CanCurrentUserConfirmEdgeAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            if (_institutionMethodDeveloperEdge is not null)
+            {
+                return await _institutionMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager, context, cancellationToken).ConfigureAwait(false);
+            }
+            if (_userMethodDeveloperEdge is not null)
+            {
+                return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager).ConfigureAwait(false);
+            }
+            throw new Exception("Impossible!");
+        }
+
+        [UseUserManager]
+        public async Task<bool> CanCurrentUserRemoveEdgeAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            if (_institutionMethodDeveloperEdge is not null)
+            {
+                return await _institutionMethodDeveloperEdge.CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken).ConfigureAwait(false);
+            }
+            if (_userMethodDeveloperEdge is not null)
+            {
+                return await _userMethodDeveloperEdge.CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken).ConfigureAwait(false);
             }
             throw new Exception("Impossible!");
         }

@@ -5,6 +5,7 @@ namespace Metabase.GraphQl.InstitutionMethodDevelopers
         UNKNOWN,
         UNKNOWN_METHOD,
         UNKNOWN_INSTITUTION,
-        UNAUTHORIZED
+        UNAUTHORIZED,
+        DUPLICATE
     }
 }

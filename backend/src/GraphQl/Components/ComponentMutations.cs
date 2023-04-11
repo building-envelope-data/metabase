@@ -12,7 +12,6 @@ using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using DateTime = System.DateTime;
 
 namespace Metabase.GraphQl.Components
 {

@@ -100,7 +100,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
                 InstitutionId = input.InstitutionId,
                 UserId = input.UserId,
                 Role = input.Role,
-                Pending = true
+                Pending = !await InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId, userManager).ConfigureAwait(false)
             };
             context.InstitutionRepresentatives.Add(institutionRepresentative);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

@@ -42,12 +42,35 @@ fragment MethodPartial on Method {
         ... on Institution {
           id
           uuid
+          description
         }
         ... on User {
           id
           uuid
         }
       }
+      canCurrentUserConfirmEdge
+      canCurrentUserRemoveEdge
+    }
+    canCurrentUserAddInstitutionEdge
+    canCurrentUserAddUserEdge
+  }
+  pendingDevelopers: developers(pending: true) {
+    edges {
+      node {
+        name
+        ... on Institution {
+          id
+          uuid
+          description
+        }
+        ... on User {
+          id
+          uuid
+        }
+      }
+      canCurrentUserConfirmEdge
+      canCurrentUserRemoveEdge
     }
   }
   manager {

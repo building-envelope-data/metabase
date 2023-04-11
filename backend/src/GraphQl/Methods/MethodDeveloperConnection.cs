@@ -2,7 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using HotChocolate;
+using Metabase.Authorization;
+using Metabase.GraphQl.Users;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace Metabase.GraphQl.Methods
 {
@@ -49,6 +54,40 @@ namespace Metabase.GraphQl.Methods
                 )
                 .Select(e => new MethodDeveloperEdge(e))
                 );
+        }
+
+        [UseUserManager]
+        public Task<bool> CanCurrentUserAddInstitutionEdgeAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return InstitutionMethodDeveloperAuthorization.IsAuthorizedToAdd(
+                 claimsPrincipal,
+                 _subject.Id,
+                 userManager,
+                 context,
+                 cancellationToken
+                 );
+        }
+
+        [UseUserManager]
+        public Task<bool> CanCurrentUserAddUserEdgeAsync(
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return UserMethodDeveloperAuthorization.IsAuthorizedToAdd(
+                 claimsPrincipal,
+                 _subject.Id,
+                 userManager,
+                 context,
+                 cancellationToken
+                 );
         }
     }
 

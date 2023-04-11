@@ -120,7 +120,7 @@ namespace Metabase.GraphQl.Institutions
                     {
                         UserId = ownerId,
                         Role = Enumerations.InstitutionRepresentativeRole.OWNER,
-                        Pending = ownerId != user.Id
+                        Pending = !await InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId, userManager).ConfigureAwait(false)
                     }
                 );
             }

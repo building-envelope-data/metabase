@@ -11,7 +11,6 @@ using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using DateTime = System.DateTime;
 
 namespace Metabase.GraphQl.Methods
 {
@@ -163,17 +162,18 @@ namespace Metabase.GraphQl.Methods
                     new Data.InstitutionMethodDeveloper
                     {
                         InstitutionId = institutionDeveloperId,
-                        Pending = institutionDeveloperId != input.ManagerId
+                        Pending = !await InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, institutionDeveloperId, userManager, context, cancellationToken).ConfigureAwait(false)
                     }
                 );
             }
+            var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             foreach (var userDeveloperId in input.UserDeveloperIds.Distinct())
             {
                 method.UserDeveloperEdges.Add(
                     new Data.UserMethodDeveloper
                     {
                         UserId = userDeveloperId,
-                        Pending = true
+                        Pending = !await UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, userDeveloperId, userManager).ConfigureAwait(false)
                     }
                 );
             }

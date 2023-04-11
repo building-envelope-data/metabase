@@ -99,7 +99,7 @@ namespace Metabase.GraphQl.ComponentManufacturers
             {
                 ComponentId = input.ComponentId,
                 InstitutionId = input.InstitutionId,
-                Pending = true
+                Pending = !await ComponentManufacturerAuthorization.IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, userManager, context, cancellationToken).ConfigureAwait(false)
             };
             context.ComponentManufacturers.Add(componentManufacturer);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
