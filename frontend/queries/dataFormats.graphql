@@ -48,6 +48,7 @@ query DataFormats {
 query DataFormat($uuid: Uuid!) {
   dataFormat(uuid: $uuid) {
     ...DataFormatPartial
+    canCurrentUserUpdateNode
   }
 }
 
@@ -71,6 +72,39 @@ mutation CreateDataFormat(
       standard: $standard
       publication: $publication
       managerId: $managerId
+    }
+  ) {
+    dataFormat {
+      ...DataFormatPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateDataFormat(
+  $dataFormatId: Uuid!
+  $name: String!
+  $extension: String
+  $description: String!
+  $mediaType: String!
+  $schemaLocator: Url
+  $standard: UpdateStandardInput
+  $publication: UpdatePublicationInput
+) {
+  updateDataFormat(
+    input: {
+      dataFormatId: $dataFormatId
+      name: $name
+      extension: $extension
+      description: $description
+      mediaType: $mediaType
+      schemaLocator: $schemaLocator
+      standard: $standard
+      publication: $publication
     }
   ) {
     dataFormat {

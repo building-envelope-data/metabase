@@ -23,19 +23,24 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-export type UpdatePartOfComponentProps = {
+type FormValues = {
+  newIndex: Scalars["Byte"] | null | undefined;
+  newPrimeSurface: PrimeSurface | null | undefined;
+};
+
+export type UpdateComponentAssemblyProps = {
   assembledComponent: { uuid: Scalars["Uuid"]; name: string };
   partComponent: { uuid: Scalars["Uuid"]; name: string };
   index: Scalars["Byte"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 };
 
-export default function UpdatePartOfComponent({
+export default function UpdateComponentAssembly({
   assembledComponent,
   partComponent,
   index,
   primeSurface,
-}: UpdatePartOfComponentProps) {
+}: UpdateComponentAssemblyProps) {
   const [open, setOpen] = useState(false);
   const [updateComponentAssemblyMutation] = useUpdateComponentAssemblyMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -58,16 +63,10 @@ export default function UpdatePartOfComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
 
-  const onFinish = ({
-    newIndex,
-    newPrimeSurface,
-  }: {
-    newIndex: Scalars["Byte"] | null | undefined;
-    newPrimeSurface: PrimeSurface | null | undefined;
-  }) => {
+  const onFinish = ({ newIndex, newPrimeSurface }: FormValues) => {
     const update = async () => {
       try {
         setUpdating(true);
@@ -76,8 +75,8 @@ export default function UpdatePartOfComponent({
           variables: {
             assembledComponentId: assembledComponent.uuid,
             partComponentId: partComponent.uuid,
-            newIndex: newIndex,
-            newPrimeSurface: newPrimeSurface,
+            index: newIndex,
+            primeSurface: newPrimeSurface,
           },
         });
         handleFormErrors(

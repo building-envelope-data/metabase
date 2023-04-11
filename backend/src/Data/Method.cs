@@ -78,7 +78,23 @@ namespace Metabase.Data
             NpgsqlRange<DateTime>? availability,
             Uri? calculationLocator,
             Enumerations.MethodCategory[] categories
+            )
+        {
+            Name = name;
+            Description = description;
+            Validity = validity;
+            Availability = availability;
+            CalculationLocator = calculationLocator;
+            Categories = categories;
+        }
 
+        public void Update(
+            string name,
+            string description,
+            NpgsqlRange<DateTime>? validity,
+            NpgsqlRange<DateTime>? availability,
+            Uri? calculationLocator,
+            Enumerations.MethodCategory[] categories
             )
         {
             Name = name;

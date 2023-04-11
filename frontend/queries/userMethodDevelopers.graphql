@@ -1,5 +1,25 @@
+mutation AddUserMethodDeveloper($methodId: Uuid!, $userId: Uuid!) {
+  addUserMethodDeveloper(input: { methodId: $methodId, userId: $userId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 mutation ConfirmUserMethodDeveloper($methodId: Uuid!, $userId: Uuid!) {
   confirmUserMethodDeveloper(input: { methodId: $methodId, userId: $userId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RemoveUserMethodDeveloper($methodId: Uuid!, $userId: Uuid!) {
+  removeUserMethodDeveloper(input: { methodId: $methodId, userId: $userId }) {
     errors {
       code
       message

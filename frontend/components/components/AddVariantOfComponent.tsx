@@ -15,12 +15,16 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  variantComponentId: Scalars["Uuid"];
+};
+
 export type AddVariantOfComponentProps = {
   componentId: Scalars["Uuid"];
 };
 
 export default function AddVariantOfComponent({
-  componentId: componentId,
+  componentId,
 }: AddVariantOfComponentProps) {
   const [addComponentVariantMutation] = useAddComponentVariantMutation({
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -37,14 +41,10 @@ export default function AddVariantOfComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
 
-  const onFinish = ({
-    variantComponentId,
-  }: {
-    variantComponentId: Scalars["Uuid"];
-  }) => {
+  const onFinish = ({ variantComponentId }: FormValues) => {
     const add = async () => {
       try {
         setAdding(true);

@@ -23,15 +23,15 @@ mutation AddComponentAssembly(
 mutation UpdateComponentAssembly(
   $assembledComponentId: Uuid!
   $partComponentId: Uuid!
-  $newIndex: Byte
-  $newPrimeSurface: PrimeSurface
+  $index: Byte
+  $primeSurface: PrimeSurface
 ) {
   updateComponentAssembly(
     input: {
       assembledComponentId: $assembledComponentId
       partComponentId: $partComponentId
-      newIndex: $newIndex
-      newPrimeSurface: $newPrimeSurface
+      index: $index
+      primeSurface: $primeSurface
     }
   ) {
     errors {

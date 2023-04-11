@@ -1,10 +1,9 @@
-using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Authorization;
-using HotChocolate.Data;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Extensions;
@@ -116,6 +115,102 @@ namespace Metabase.GraphQl.DataFormats
             context.DataFormats.Add(dataFormat);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new CreateDataFormatPayload(dataFormat);
+        }
+
+        [UseUserManager]
+        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+        public async Task<UpdateDataFormatPayload> UpdateDataFormatAsync(
+            UpdateDataFormatInput input,
+            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            if (!await DataFormatAuthorization.IsAuthorizedToUpdate(
+                 claimsPrincipal,
+                 input.DataFormatId,
+                 userManager,
+                 context,
+                 cancellationToken
+                 ).ConfigureAwait(false)
+            )
+            {
+                return new UpdateDataFormatPayload(
+                    new UpdateDataFormatError(
+                      UpdateDataFormatErrorCode.UNAUTHORIZED,
+                      "You are not authorized to the update data format.",
+                      new[] { nameof(input) }
+                    )
+                );
+            }
+            if (input.Standard is not null &&
+                input.Publication is not null
+                )
+            {
+                return new UpdateDataFormatPayload(
+                    new UpdateDataFormatError(
+                        UpdateDataFormatErrorCode.TWO_REFERENCES,
+                        "Specify either a standard or a publication as reference.",
+                      new[] { nameof(input), nameof(input.Publication).FirstCharToLower() }
+                    )
+                );
+            }
+            var dataFormat =
+                await context.DataFormats.AsQueryable()
+                .Where(i => i.Id == input.DataFormatId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+            if (dataFormat is null)
+            {
+                return new UpdateDataFormatPayload(
+                    new UpdateDataFormatError(
+                      UpdateDataFormatErrorCode.UNKNOWN_DATA_FORMAT,
+                      "Unknown data format.",
+                      new[] { nameof(input), nameof(input.DataFormatId).FirstCharToLower() }
+                      )
+                      );
+            }
+            dataFormat.Update(
+                name: input.Name,
+                extension: input.Extension,
+                description: input.Description,
+                mediaType: input.MediaType,
+                schemaLocator: input.SchemaLocator
+            );
+            dataFormat.Standard =
+                    input.Standard is null
+                     ? null
+                     : new Data.Standard(
+                          title: input.Standard.Title,
+                          @abstract: input.Standard.Abstract,
+                          section: input.Standard.Section,
+                          year: input.Standard.Year,
+                          standardizers: input.Standard.Standardizers,
+                          locator: input.Standard.Locator
+                    )
+                     {
+                         Numeration = new Data.Numeration(
+                            prefix: input.Standard.Numeration.Prefix,
+                            mainNumber: input.Standard.Numeration.MainNumber,
+                            suffix: input.Standard.Numeration.Suffix
+                    )
+                     };
+            dataFormat.Publication =
+                    input.Publication is null
+                    ? null
+                    : new Data.Publication(
+                                title: input.Publication.Title,
+                                @abstract: input.Publication.Abstract,
+                                section: input.Publication.Section,
+                                authors: input.Publication.Authors,
+                                doi: input.Publication.Doi,
+                                arXiv: input.Publication.ArXiv,
+                                urn: input.Publication.Urn,
+                                webAddress: input.Publication.WebAddress
+                );
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return new UpdateDataFormatPayload(dataFormat);
         }
     }
 }

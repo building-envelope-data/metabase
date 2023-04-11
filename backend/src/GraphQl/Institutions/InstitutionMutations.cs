@@ -29,7 +29,7 @@ namespace Metabase.GraphQl.Institutions
             CancellationToken cancellationToken
             )
         {
-            if (input.ManagerId is not null && !await InstitutionAuthorization.IsAuthorizedToCreateInstitution(
+            if (input.ManagerId is not null && !await InstitutionAuthorization.IsAuthorizedToCreateInstitutionManagedByInstitution(
                  claimsPrincipal,
                  input.ManagerId ?? Guid.Empty,
                  userManager,
@@ -120,7 +120,7 @@ namespace Metabase.GraphQl.Institutions
                     {
                         UserId = ownerId,
                         Role = Enumerations.InstitutionRepresentativeRole.OWNER,
-                        Pending = ownerId != user.Id
+                        Pending = !await InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId, userManager).ConfigureAwait(false)
                     }
                 );
             }

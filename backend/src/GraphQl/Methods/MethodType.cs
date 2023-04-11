@@ -1,6 +1,12 @@
-using HotChocolate.Resolvers;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
+using Metabase.GraphQl.Users;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Extensions;
+using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Methods
 {
@@ -51,6 +57,24 @@ namespace Metabase.GraphQl.Methods
             descriptor
             .Field(t => t.UserDeveloperEdges)
             .Ignore();
+            descriptor
+              .Field("canCurrentUserUpdateNode")
+              .ResolveWith<MethodResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+              .UseUserManager();
+        }
+
+        private sealed class MethodResolvers
+        {
+                public Task<bool> GetCanCurrentUserUpdateNodeAsync(
+                  [Parent] Data.Method method,
+                  [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+                  [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+                  Data.ApplicationDbContext context,
+                  CancellationToken cancellationToken
+                )
+                {
+                    return MethodAuthorization.IsAuthorizedToUpdate(claimsPrincipal, method.Id, userManager, context, cancellationToken);
+                }
         }
     }
 }

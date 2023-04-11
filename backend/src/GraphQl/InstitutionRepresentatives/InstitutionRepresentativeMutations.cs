@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Authorization;
-using HotChocolate.Data;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Extensions;
@@ -101,7 +100,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
                 InstitutionId = input.InstitutionId,
                 UserId = input.UserId,
                 Role = input.Role,
-                Pending = true
+                Pending = !await InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId, userManager).ConfigureAwait(false)
             };
             context.InstitutionRepresentatives.Add(institutionRepresentative);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -286,7 +285,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
                       )
                 );
             }
-            if (input.NewRole != Enumerations.InstitutionRepresentativeRole.OWNER
+            if (input.Role != Enumerations.InstitutionRepresentativeRole.OWNER
                 && institutionRepresentative.Role == Enumerations.InstitutionRepresentativeRole.OWNER
                 && !await ExistsOtherInstitutionOwner(
                         institutionRepresentative.InstitutionId,
@@ -304,7 +303,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
                       )
                 );
             }
-            institutionRepresentative.Role = input.NewRole;
+            institutionRepresentative.Role = input.Role;
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new ChangeInstitutionRepresentativeRolePayload(institutionRepresentative);
         }

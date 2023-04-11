@@ -54,6 +54,19 @@ type AddComponentGeneralizationPayload {
   query: Query!
 }
 
+type AddComponentManufacturerError {
+  code: AddComponentManufacturerErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddComponentManufacturerPayload {
+  componentManufacturerEdge: ComponentManufacturerEdge
+  errors: [AddComponentManufacturerError!]
+  manufacturedComponentEdge: InstitutionManufacturedComponentEdge
+  query: Query!
+}
+
 type AddComponentVariantError {
   code: AddComponentVariantErrorCode!
   message: String!
@@ -67,6 +80,19 @@ type AddComponentVariantPayload {
   variantOfEdge: ComponentVariantOfEdge
 }
 
+type AddInstitutionMethodDeveloperError {
+  code: AddInstitutionMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddInstitutionMethodDeveloperPayload {
+  developedMethodEdge: InstitutionDevelopedMethodEdge
+  errors: [AddInstitutionMethodDeveloperError!]
+  methodDeveloperEdge: InstitutionMethodDeveloperEdge
+  query: Query!
+}
+
 type AddInstitutionRepresentativeError {
   code: AddInstitutionRepresentativeErrorCode!
   message: String!
@@ -78,6 +104,19 @@ type AddInstitutionRepresentativePayload {
   institutionRepresentativeEdge: InstitutionRepresentativeEdge
   query: Query!
   representedInstitutionEdge: UserRepresentedInstitutionEdge
+}
+
+type AddUserMethodDeveloperError {
+  code: AddUserMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddUserMethodDeveloperPayload {
+  developedMethodEdge: UserDevelopedMethodEdge
+  errors: [AddUserMethodDeveloperError!]
+  methodDeveloperEdge: UserMethodDeveloperEdge
+  query: Query!
 }
 
 type AddUserRoleError {
@@ -169,6 +208,7 @@ type Component implements Node {
   abbreviation: String
   assembledOf: ComponentAssembledOfConnection!
   availability: OpenEndedDateTimeRange
+  canCurrentUserUpdateNode: Boolean!
   categories: [ComponentCategory!]!
   concretizationOf: ComponentConcretizationOfConnection!
   description: String!
@@ -215,10 +255,13 @@ type ComponentGeneralizationOfEdge {
 }
 
 type ComponentManufacturerConnection {
+  canCurrentUserAddEdge: Boolean!
   edges: [ComponentManufacturerEdge!]!
 }
 
 type ComponentManufacturerEdge {
+  canCurrentUserConfirmEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   node: Institution!
 }
 
@@ -424,6 +467,7 @@ type DataEdge {
 }
 
 type DataFormat implements Node {
+  canCurrentUserUpdateNode: Boolean!
   description: String!
   extension: String
   id: ID!
@@ -466,6 +510,7 @@ type Database implements Node {
   allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput): OpticalDataConnection
   allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection
   calorimetricData(id: Uuid! locale: String timestamp: DateTime): CalorimetricData
+  canCurrentUserUpdateNode: Boolean!
   data(id: Uuid! locale: String timestamp: DateTime): Data
   description: String!
   hasCalorimetricData(locale: String timestamp: DateTime where: CalorimetricDataPropositionInput): Boolean
@@ -662,6 +707,8 @@ type HygrothermalDataEdge {
 
 type Institution implements Node & Stakeholder {
   abbreviation: String
+  canCurrentUserDeleteNode: Boolean!
+  canCurrentUserUpdateNode: Boolean!
   description: String!
   developedMethods(pending: Boolean! = false): InstitutionDevelopedMethodConnection!
   id: ID!
@@ -730,6 +777,8 @@ type InstitutionManufacturedComponentEdge {
 }
 
 type InstitutionMethodDeveloperEdge {
+  canCurrentUserConfirmEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   node: Institution!
 }
 
@@ -824,6 +873,7 @@ type LogoutUserPayload {
 type Method implements Node {
   availability: OpenEndedDateTimeRange
   calculationLocator: Url
+  canCurrentUserUpdateNode: Boolean!
   categories: [MethodCategory!]!
   description: String!
   developers(pending: Boolean! = false): MethodDeveloperConnection!
@@ -836,10 +886,14 @@ type Method implements Node {
 }
 
 type MethodDeveloperConnection {
+  canCurrentUserAddInstitutionEdge: Boolean!
+  canCurrentUserAddUserEdge: Boolean!
   edges: [MethodDeveloperEdge!]!
 }
 
 type MethodDeveloperEdge {
+  canCurrentUserConfirmEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   node: Stakeholder!
 }
 
@@ -870,8 +924,11 @@ type MethodsEdge {
 type Mutation {
   addComponentAssembly(input: AddComponentAssemblyInput!): AddComponentAssemblyPayload! @authorize(policy: "Write")
   addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload! @authorize(policy: "Write")
+  addComponentManufacturer(input: AddComponentManufacturerInput!): AddComponentManufacturerPayload! @authorize(policy: "Write")
   addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload! @authorize(policy: "Write")
+  addInstitutionMethodDeveloper(input: AddInstitutionMethodDeveloperInput!): AddInstitutionMethodDeveloperPayload! @authorize(policy: "Write")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write")
+  addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload! @authorize(policy: "Write")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload!
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "Write")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(policy: "ManageUser")
@@ -902,8 +959,11 @@ type Mutation {
   registerUser(input: RegisterUserInput!): RegisterUserPayload!
   removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload! @authorize(policy: "Write")
   removeComponentGeneralization(input: RemoveComponentGeneralizationInput!): RemoveComponentGeneralizationPayload! @authorize(policy: "Write")
+  removeComponentManufacturer(input: RemoveComponentManufacturerInput!): RemoveComponentManufacturerPayload! @authorize(policy: "Write")
   removeComponentVariant(input: RemoveComponentVariantInput!): RemoveComponentVariantPayload! @authorize(policy: "Write")
+  removeInstitutionMethodDeveloper(input: RemoveInstitutionMethodDeveloperInput!): RemoveInstitutionMethodDeveloperPayload! @authorize(policy: "Write")
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(policy: "Write")
+  removeUserMethodDeveloper(input: RemoveUserMethodDeveloperInput!): RemoveUserMethodDeveloperPayload! @authorize(policy: "Write")
   removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload!
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
   resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
@@ -912,8 +972,12 @@ type Mutation {
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser")
+  updateComponent(input: UpdateComponentInput!): UpdateComponentPayload! @authorize(policy: "Write")
   updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "Write")
+  updateDatabase(input: UpdateDatabaseInput!): UpdateDatabasePayload! @authorize(policy: "Write")
+  updateDataFormat(input: UpdateDataFormatInput!): UpdateDataFormatPayload! @authorize(policy: "Write")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(policy: "Write")
+  updateMethod(input: UpdateMethodInput!): UpdateMethodPayload! @authorize(policy: "Write")
   verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(policy: "Write")
 }
 
@@ -1145,6 +1209,19 @@ type RemoveComponentGeneralizationPayload {
   query: Query!
 }
 
+type RemoveComponentManufacturerError {
+  code: RemoveComponentManufacturerErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveComponentManufacturerPayload {
+  component: Component
+  errors: [RemoveComponentManufacturerError!]
+  institution: Institution
+  query: Query!
+}
+
 type RemoveComponentVariantError {
   code: RemoveComponentVariantErrorCode!
   message: String!
@@ -1158,6 +1235,19 @@ type RemoveComponentVariantPayload {
   query: Query!
 }
 
+type RemoveInstitutionMethodDeveloperError {
+  code: RemoveInstitutionMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveInstitutionMethodDeveloperPayload {
+  developedMethodEdge: InstitutionDevelopedMethodEdge
+  errors: [RemoveInstitutionMethodDeveloperError!]
+  methodDeveloperEdge: InstitutionMethodDeveloperEdge
+  query: Query!
+}
+
 type RemoveInstitutionRepresentativeError {
   code: RemoveInstitutionRepresentativeErrorCode!
   message: String!
@@ -1166,9 +1256,22 @@ type RemoveInstitutionRepresentativeError {
 
 type RemoveInstitutionRepresentativePayload {
   errors: [RemoveInstitutionRepresentativeError!]
-  institution: Institution!
+  institution: Institution
   query: Query!
-  user: User!
+  user: User
+}
+
+type RemoveUserMethodDeveloperError {
+  code: RemoveUserMethodDeveloperErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RemoveUserMethodDeveloperPayload {
+  developedMethodEdge: UserDevelopedMethodEdge
+  errors: [RemoveUserMethodDeveloperError!]
+  methodDeveloperEdge: UserMethodDeveloperEdge
+  query: Query!
 }
 
 type RemoveUserRoleError {
@@ -1312,6 +1415,42 @@ type UpdateComponentAssemblyPayload {
   query: Query!
 }
 
+type UpdateComponentError {
+  code: UpdateComponentErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateComponentPayload {
+  component: Component
+  errors: [UpdateComponentError!]
+  query: Query!
+}
+
+type UpdateDataFormatError {
+  code: UpdateDataFormatErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateDataFormatPayload {
+  dataFormat: DataFormat
+  errors: [UpdateDataFormatError!]
+  query: Query!
+}
+
+type UpdateDatabaseError {
+  code: UpdateDatabaseErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateDatabasePayload {
+  database: Database
+  errors: [UpdateDatabaseError!]
+  query: Query!
+}
+
 type UpdateInstitutionError {
   code: UpdateInstitutionErrorCode!
   message: String!
@@ -1321,6 +1460,18 @@ type UpdateInstitutionError {
 type UpdateInstitutionPayload {
   errors: [UpdateInstitutionError!]
   institution: Institution
+  query: Query!
+}
+
+type UpdateMethodError {
+  code: UpdateMethodErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateMethodPayload {
+  errors: [UpdateMethodError!]
+  method: Method
   query: Query!
 }
 
@@ -1354,6 +1505,8 @@ type UserDevelopedMethodEdge {
 }
 
 type UserMethodDeveloperEdge {
+  canCurrentUserConfirmEdge: Boolean!
+  canCurrentUserRemoveEdge: Boolean!
   node: User!
 }
 
@@ -1411,14 +1564,29 @@ input AddComponentGeneralizationInput {
   generalComponentId: Uuid!
 }
 
+input AddComponentManufacturerInput {
+  componentId: Uuid!
+  institutionId: Uuid!
+}
+
 input AddComponentVariantInput {
   oneComponentId: Uuid!
   otherComponentId: Uuid!
 }
 
+input AddInstitutionMethodDeveloperInput {
+  institutionId: Uuid!
+  methodId: Uuid!
+}
+
 input AddInstitutionRepresentativeInput {
   institutionId: Uuid!
   role: InstitutionRepresentativeRole!
+  userId: Uuid!
+}
+
+input AddUserMethodDeveloperInput {
+  methodId: Uuid!
   userId: Uuid!
 }
 
@@ -1439,7 +1607,7 @@ input CalorimetricDataPropositionInput {
 
 input ChangeInstitutionRepresentativeRoleInput {
   institutionId: Uuid!
-  newRole: InstitutionRepresentativeRole!
+  role: InstitutionRepresentativeRole!
   userId: Uuid!
 }
 
@@ -1529,17 +1697,11 @@ input ConfirmUserMethodDeveloperInput {
 
 input CreateComponentInput {
   abbreviation: String
-  assembledOfIds: [Uuid!]!
   availability: OpenEndedDateTimeRangeInput
   categories: [ComponentCategory!]!
-  concretizationOfIds: [Uuid!]!
   description: String!
-  furtherManufacturerIds: [Uuid!]!
-  generalizationOfIds: [Uuid!]!
   manufacturerId: Uuid!
   name: String!
-  partOfIds: [Uuid!]!
-  variantOfIds: [Uuid!]!
 }
 
 input CreateDataFormatInput {
@@ -1893,13 +2055,28 @@ input RemoveComponentGeneralizationInput {
   generalComponentId: Uuid!
 }
 
+input RemoveComponentManufacturerInput {
+  componentId: Uuid!
+  institutionId: Uuid!
+}
+
 input RemoveComponentVariantInput {
   oneComponentId: Uuid!
   otherComponentId: Uuid!
 }
 
+input RemoveInstitutionMethodDeveloperInput {
+  institutionId: Uuid!
+  methodId: Uuid!
+}
+
 input RemoveInstitutionRepresentativeInput {
   institutionId: Uuid!
+  userId: Uuid!
+}
+
+input RemoveUserMethodDeveloperInput {
+  methodId: Uuid!
   userId: Uuid!
 }
 
@@ -1961,9 +2138,36 @@ input StringOperationFilterInput {
 
 input UpdateComponentAssemblyInput {
   assembledComponentId: Uuid!
-  newIndex: Byte
-  newPrimeSurface: PrimeSurface
+  index: Byte
   partComponentId: Uuid!
+  primeSurface: PrimeSurface
+}
+
+input UpdateComponentInput {
+  abbreviation: String
+  availability: OpenEndedDateTimeRangeInput
+  categories: [ComponentCategory!]!
+  componentId: Uuid!
+  description: String!
+  name: String!
+}
+
+input UpdateDataFormatInput {
+  dataFormatId: Uuid!
+  description: String!
+  extension: String
+  mediaType: String!
+  name: String!
+  publication: UpdatePublicationInput
+  schemaLocator: Url
+  standard: UpdateStandardInput
+}
+
+input UpdateDatabaseInput {
+  databaseId: Uuid!
+  description: String!
+  locator: Url!
+  name: String!
 }
 
 input UpdateInstitutionInput {
@@ -1973,6 +2177,45 @@ input UpdateInstitutionInput {
   name: String!
   publicKey: String
   websiteLocator: Url
+}
+
+input UpdateMethodInput {
+  availability: OpenEndedDateTimeRangeInput
+  calculationLocator: Url
+  categories: [MethodCategory!]!
+  description: String!
+  methodId: Uuid!
+  name: String!
+  publication: UpdatePublicationInput
+  standard: UpdateStandardInput
+  validity: OpenEndedDateTimeRangeInput
+}
+
+input UpdateNumerationInput {
+  mainNumber: String!
+  prefix: String
+  suffix: String
+}
+
+input UpdatePublicationInput {
+  abstract: String
+  arXiv: String
+  authors: [String!]
+  doi: String
+  section: String
+  title: String
+  urn: String
+  webAddress: Url
+}
+
+input UpdateStandardInput {
+  abstract: String
+  locator: Url
+  numeration: UpdateNumerationInput!
+  section: String
+  standardizers: [Standardizer!]!
+  title: String
+  year: Int
 }
 
 input UriSortInput {
@@ -2076,6 +2319,14 @@ enum AddComponentGeneralizationErrorCode {
   UNAUTHORIZED
 }
 
+enum AddComponentManufacturerErrorCode {
+  UNKNOWN
+  UNKNOWN_COMPONENT
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  DUPLICATE
+}
+
 enum AddComponentVariantErrorCode {
   UNKNOWN
   UNKNOWN_ONE_COMPONENT
@@ -2084,12 +2335,28 @@ enum AddComponentVariantErrorCode {
   UNAUTHORIZED
 }
 
+enum AddInstitutionMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  DUPLICATE
+}
+
 enum AddInstitutionRepresentativeErrorCode {
   UNKNOWN
   UNKNOWN_INSTITUTION
   UNKNOWN_USER
   DUPLICATE
   UNAUTHORIZED
+}
+
+enum AddUserMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_USER
+  UNAUTHORIZED
+  DUPLICATE
 }
 
 enum AddUserRoleErrorCode {
@@ -2186,12 +2453,6 @@ enum ConfirmUserMethodDeveloperErrorCode {
 enum CreateComponentErrorCode {
   UNKNOWN
   UNKNOWN_MANUFACTURER
-  UNKNOWN_FURTHER_MANUFACTURERS
-  UNKNOWN_VARIANT_OF_COMPONENTS
-  UNKNOWN_GENERALIZATION_OF_COMPONENTS
-  UNKNOWN_CONCRETIZATION_OF_COMPONENTS
-  UNKNOWN_PART_OF_COMPONENTS
-  UNKNOWN_ASSEMBLED_OF_COMPONENTS
   UNAUTHORIZED
 }
 
@@ -2352,12 +2613,29 @@ enum RemoveComponentGeneralizationErrorCode {
   UNAUTHORIZED
 }
 
+enum RemoveComponentManufacturerErrorCode {
+  UNKNOWN
+  UNKNOWN_COMPONENT
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  UNKNOWN_MANUFACTURER
+  LAST_MANUFACTURER
+}
+
 enum RemoveComponentVariantErrorCode {
   UNKNOWN
   UNKNOWN_ONE_COMPONENT
   UNKNOWN_OTHER_COMPONENT
   UNKNOWN_VARIANT
   UNAUTHORIZED
+}
+
+enum RemoveInstitutionMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+  UNKNOWN_DEVELOPER
 }
 
 enum RemoveInstitutionRepresentativeErrorCode {
@@ -2367,6 +2645,14 @@ enum RemoveInstitutionRepresentativeErrorCode {
   UNKNOWN_INSTITUTION
   UNKNOWN_REPRESENTATIVE
   UNKNOWN_USER
+}
+
+enum RemoveUserMethodDeveloperErrorCode {
+  UNKNOWN
+  UNKNOWN_METHOD
+  UNKNOWN_USER
+  UNAUTHORIZED
+  UNKNOWN_DEVELOPER
 }
 
 enum RemoveUserRoleErrorCode {
@@ -2465,10 +2751,43 @@ enum UpdateComponentAssemblyErrorCode {
   UNAUTHORIZED
 }
 
+enum UpdateComponentErrorCode {
+  UNKNOWN
+  UNKNOWN_MANUFACTURER
+  UNKNOWN_FURTHER_MANUFACTURERS
+  UNKNOWN_VARIANT_OF_COMPONENTS
+  UNKNOWN_GENERALIZATION_OF_COMPONENTS
+  UNKNOWN_CONCRETIZATION_OF_COMPONENTS
+  UNKNOWN_PART_OF_COMPONENTS
+  UNKNOWN_ASSEMBLED_OF_COMPONENTS
+  UNAUTHORIZED
+  UNKNOWN_COMPONENT
+}
+
+enum UpdateDataFormatErrorCode {
+  UNKNOWN
+  TWO_REFERENCES
+  UNAUTHORIZED
+  UNKNOWN_DATA_FORMAT
+}
+
+enum UpdateDatabaseErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_DATABASE
+}
+
 enum UpdateInstitutionErrorCode {
   UNKNOWN
   UNAUTHORIZED
   UNKNOWN_INSTITUTION
+}
+
+enum UpdateMethodErrorCode {
+  UNKNOWN
+  TWO_REFERENCES
+  UNAUTHORIZED
+  UNKNOWN_METHOD
 }
 
 enum UserRole {

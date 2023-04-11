@@ -1,16 +1,38 @@
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { InputNumber, Select, Form, Input, Button, FormInstance } from "antd";
 import { useState } from "react";
-import { Standardizer } from "../__generated__/__types__";
+import {
+  Standardizer,
+  Standard,
+  Publication,
+} from "../__generated__/__types__";
 
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-enum Reference {
+enum ReferenceKind {
   None = "None",
   Standard = "Standard",
   Publication = "Publication",
+}
+
+function referenceToKind(
+  reference: Publication | Standard | null | undefined
+): ReferenceKind {
+  switch (reference?.__typename) {
+    case null:
+      return ReferenceKind.None;
+    case "Standard":
+      return ReferenceKind.Standard;
+    case "Publication":
+      return ReferenceKind.Publication;
+    default:
+      // TODO Why does this not work? For a working example see https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking
+      // const _exhaustiveCheck: never = reference;
+      // return _exhaustiveCheck;
+      return ReferenceKind.None;
+  }
 }
 
 // interface HasStandardAndPublication {
@@ -20,25 +42,38 @@ enum Reference {
 
 export type ReferenceFormProps<Values> = {
   form: FormInstance<Values>;
+  initialValue?: Standard | Publication | null;
 };
 
 // TODO Why does the following not work? export function ReferenceForm<Values extends HasStandardAndPublication>({form}: ReferenceFormProps<Values>) {
-export function ReferenceForm({ form }: ReferenceFormProps<any>) {
-  const [selectedReferenceOption, setSelectedReferenceOption] = useState(
-    Reference.None
-  );
+export function ReferenceForm({ form, initialValue }: ReferenceFormProps<any>) {
+  const initialKind = referenceToKind(initialValue);
+  const [selectedReferenceOption, setSelectedReferenceOption] =
+    useState(initialKind);
+  if (initialValue?.__typename == "Publication") {
+    form.setFieldsValue({ publication: initialValue });
+  }
+  if (initialValue?.__typename == "Standard") {
+    form.setFieldsValue({ standard: initialValue });
+  }
 
-  const onReferenceChange = (value: Reference) => {
+  const onReferenceChange = (value: ReferenceKind) => {
     switch (value) {
-      case Reference.None:
+      case ReferenceKind.None:
         form.setFieldsValue({ standard: null });
         form.setFieldsValue({ publication: null });
         break;
-      case Reference.Publication:
+      case ReferenceKind.Publication:
         form.setFieldsValue({ standard: null });
+        if (initialValue?.__typename == "Publication") {
+          form.setFieldsValue({ publication: initialValue });
+        }
         break;
-      case Reference.Standard:
+      case ReferenceKind.Standard:
         form.setFieldsValue({ publication: null });
+        if (initialValue?.__typename == "Standard") {
+          form.setFieldsValue({ standard: initialValue });
+        }
         break;
       default:
         console.error("Impossible!");
@@ -48,21 +83,17 @@ export function ReferenceForm({ form }: ReferenceFormProps<any>) {
 
   return (
     <>
-      <Form.Item
-        label="Reference"
-        name="reference"
-        initialValue={Reference.None}
-      >
+      <Form.Item label="Reference" name="reference" initialValue={initialKind}>
         <Select
           options={[
-            { label: "None", value: Reference.None },
-            { label: "Standard", value: Reference.Standard },
-            { label: "Publication", value: Reference.Publication },
+            { label: "None", value: ReferenceKind.None },
+            { label: "Standard", value: ReferenceKind.Standard },
+            { label: "Publication", value: ReferenceKind.Publication },
           ]}
           onChange={onReferenceChange}
         />
       </Form.Item>
-      {selectedReferenceOption === Reference.Publication && (
+      {selectedReferenceOption === ReferenceKind.Publication && (
         <>
           <Form.Item label="Title" name={["publication", "title"]}>
             <Input />
@@ -128,7 +159,7 @@ export function ReferenceForm({ form }: ReferenceFormProps<any>) {
           </Form.List>
         </>
       )}
-      {selectedReferenceOption === Reference.Standard && (
+      {selectedReferenceOption === ReferenceKind.Standard && (
         <>
           <Form.Item label="Title" name={["standard", "title"]}>
             <Input />
@@ -174,11 +205,7 @@ export function ReferenceForm({ form }: ReferenceFormProps<any>) {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            label="Standardizers"
-            name={["standard", "standardizers"]}
-            initialValue={[]}
-          >
+          <Form.Item label="Standardizers" name={["standard", "standardizers"]}>
             <Select
               mode="multiple"
               placeholder="Please select"

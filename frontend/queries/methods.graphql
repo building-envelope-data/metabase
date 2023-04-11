@@ -42,12 +42,35 @@ fragment MethodPartial on Method {
         ... on Institution {
           id
           uuid
+          description
         }
         ... on User {
           id
           uuid
         }
       }
+      canCurrentUserConfirmEdge
+      canCurrentUserRemoveEdge
+    }
+    canCurrentUserAddInstitutionEdge
+    canCurrentUserAddUserEdge
+  }
+  pendingDevelopers: developers(pending: true) {
+    edges {
+      node {
+        name
+        ... on Institution {
+          id
+          uuid
+          description
+        }
+        ... on User {
+          id
+          uuid
+        }
+      }
+      canCurrentUserConfirmEdge
+      canCurrentUserRemoveEdge
     }
   }
   manager {
@@ -70,6 +93,7 @@ query Methods {
 query Method($uuid: Uuid!) {
   method(uuid: $uuid) {
     ...MethodPartial
+    canCurrentUserUpdateNode
   }
 }
 
@@ -99,6 +123,41 @@ mutation CreateMethod(
       managerId: $managerId
       institutionDeveloperIds: $institutionDeveloperIds
       userDeveloperIds: $userDeveloperIds
+    }
+  ) {
+    method {
+      ...MethodPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateMethod(
+  $methodId: Uuid!
+  $name: String!
+  $description: String!
+  $validity: OpenEndedDateTimeRangeInput
+  $availability: OpenEndedDateTimeRangeInput
+  $standard: UpdateStandardInput
+  $publication: UpdatePublicationInput
+  $calculationLocator: Url
+  $categories: [MethodCategory!]!
+) {
+  updateMethod(
+    input: {
+      methodId: $methodId
+      name: $name
+      description: $description
+      validity: $validity
+      availability: $availability
+      standard: $standard
+      publication: $publication
+      calculationLocator: $calculationLocator
+      categories: $categories
     }
   ) {
     method {

@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import paths from "../../paths";
 import { messageApolloError } from "../../lib/apollo";
+import UpdateDatabase from "./UpdateDatabase";
 
 export type DatabaseProps = {
   databaseId: Scalars["Uuid"];
@@ -43,6 +44,15 @@ export default function Database({ databaseId }: DatabaseProps) {
     <PageHeader
       title={database.name}
       subTitle={database.description}
+      extra={[
+        <UpdateDatabase
+          key="updateDatabase"
+          databaseId={database.uuid}
+          name={database.name}
+          description={database.description}
+          locator={database.locator}
+        />,
+      ]}
       backIcon={false}
     >
       <Descriptions size="small" column={1}>

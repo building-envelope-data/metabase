@@ -1,8 +1,38 @@
+mutation AddInstitutionMethodDeveloper(
+  $methodId: Uuid!
+  $institutionId: Uuid!
+) {
+  addInstitutionMethodDeveloper(
+    input: { methodId: $methodId, institutionId: $institutionId }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 mutation ConfirmInstitutionMethodDeveloper(
   $methodId: Uuid!
   $institutionId: Uuid!
 ) {
   confirmInstitutionMethodDeveloper(
+    input: { methodId: $methodId, institutionId: $institutionId }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RemoveInstitutionMethodDeveloper(
+  $methodId: Uuid!
+  $institutionId: Uuid!
+) {
+  removeInstitutionMethodDeveloper(
     input: { methodId: $methodId, institutionId: $institutionId }
   ) {
     errors {

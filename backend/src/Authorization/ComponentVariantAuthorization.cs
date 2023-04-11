@@ -19,7 +19,7 @@ namespace Metabase.Authorization
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null)
                 &&
-                await ComponentReflexiveAssociationAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
                     user,
                     componentId,
                     context,
@@ -39,14 +39,14 @@ namespace Metabase.Authorization
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null)
                 &&
-                await ComponentReflexiveAssociationAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
                     user,
                     ofComponentId,
                     context,
                     cancellationToken
                 )
                 &&
-                await ComponentReflexiveAssociationAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
                     user,
                     toComponentId,
                     context,

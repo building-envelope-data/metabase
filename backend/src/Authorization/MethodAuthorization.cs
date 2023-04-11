@@ -25,5 +25,23 @@ namespace Metabase.Authorization
                 cancellationToken
             );
         }
+
+        public static async Task<bool> IsAuthorizedToUpdate(
+            ClaimsPrincipal claimsPrincipal,
+            Guid methodId,
+            UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null) &&
+                await CommonMethodAuthorization.IsAtLeastAssistantOfVerifiedMethodManager(
+                    user,
+                    methodId,
+                    context,
+                    cancellationToken
+                );
+        }
     }
 }

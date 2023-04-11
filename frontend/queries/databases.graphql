@@ -23,6 +23,7 @@ query Databases {
 query Database($uuid: Uuid!) {
   database(uuid: $uuid) {
     ...DatabasePartial
+    canCurrentUserUpdateNode
   }
 }
 
@@ -38,6 +39,31 @@ mutation CreateDatabase(
       description: $description
       locator: $locator
       operatorId: $operatorId
+    }
+  ) {
+    database {
+      ...DatabasePartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateDatabase(
+  $databaseId: Uuid!
+  $name: String!
+  $description: String!
+  $locator: Url!
+) {
+  updateDatabase(
+    input: {
+      databaseId: $databaseId
+      name: $name
+      description: $description
+      locator: $locator
     }
   ) {
     database {

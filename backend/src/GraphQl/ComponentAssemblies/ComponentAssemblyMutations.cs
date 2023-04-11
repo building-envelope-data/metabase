@@ -186,8 +186,8 @@ namespace Metabase.GraphQl.ComponentAssemblies
                       )
                       );
             }
-            componentAssembly.Index = input.NewIndex;
-            componentAssembly.PrimeSurface = input.NewPrimeSurface;
+            componentAssembly.Index = input.Index;
+            componentAssembly.PrimeSurface = input.PrimeSurface;
             context.ComponentAssemblies.Update(componentAssembly);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new UpdateComponentAssemblyPayload(componentAssembly);

@@ -16,6 +16,11 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  userId: Scalars["Uuid"];
+  role: InstitutionRepresentativeRole;
+};
+
 export type AddInstitutionRepresentativeProps = {
   institutionId: Scalars["Uuid"];
 };
@@ -39,16 +44,10 @@ export default function AddInstitutionRepresentative({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
 
-  const onFinish = ({
-    userId,
-    role,
-  }: {
-    userId: Scalars["Uuid"];
-    role: InstitutionRepresentativeRole;
-  }) => {
+  const onFinish = ({ userId, role }: FormValues) => {
     const add = async () => {
       try {
         setAdding(true);

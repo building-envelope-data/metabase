@@ -15,6 +15,10 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  concreteComponentId: Scalars["Uuid"];
+};
+
 export type AddConcretizationOfComponentProps = {
   generalComponentId: Scalars["Uuid"];
 };
@@ -38,14 +42,10 @@ export default function AddConcretizationOfComponent({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
 
-  const onFinish = ({
-    concreteComponentId,
-  }: {
-    concreteComponentId: Scalars["Uuid"];
-  }) => {
+  const onFinish = ({ concreteComponentId }: FormValues) => {
     const add = async () => {
       try {
         setAdding(true);

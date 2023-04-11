@@ -85,9 +85,21 @@ mutation VerifyInstitution($institutionId: Uuid!) {
   }
 }
 
+mutation DeleteInstitution($institutionId: Uuid!) {
+  deleteInstitution(input: { institutionId: $institutionId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 query Institution($uuid: Uuid!) {
   institution(uuid: $uuid) {
     ...InstitutionPartial
+    canCurrentUserUpdateNode
+    canCurrentUserDeleteNode
     manufacturedComponents {
       edges {
         node {

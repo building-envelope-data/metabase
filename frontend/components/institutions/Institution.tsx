@@ -23,7 +23,7 @@ import CreateDatabase from "../databases/CreateDatabase";
 import AddInstitutionRepresentative from "./AddInstitutionRepresentative";
 import Link from "next/link";
 import paths from "../../paths";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useConfirmInstitutionMethodDeveloperMutation } from "../../queries/institutionMethodDevelopers.graphql";
 import { MethodDocument } from "../../queries/methods.graphql";
 import { useConfirmComponentManufacturerMutation } from "../../queries/componentManufacturers.graphql";
@@ -33,6 +33,8 @@ import { ComponentTable } from "../components/ComponentTable";
 import DatabaseTable from "../databases/DatabaseTable";
 import MethodTable from "../methods/MethodTable";
 import { messageApolloError } from "../../lib/apollo";
+import UpdateInstitution from "./UpdateInstitution";
+import DeleteInstitution from "./DeleteInstitution";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -157,33 +159,60 @@ export default function Institution({ institutionId }: InstitutionProps) {
   }
 
   return (
-    <PageHeader
-      title={[
-        institution.name,
-        institution.abbreviation == null
-          ? null
-          : `(${institution.abbreviation})`,
-      ]
-        .filter((x) => x != null)
-        .join(" ")}
-      subTitle={institution.description}
-      tags={[
-        <Tag key={institution.state} color="magenta">
-          {institution.state}
-        </Tag>,
-      ]}
-      backIcon={false}
-    >
-      <Descriptions size="small" column={1}>
-        <Descriptions.Item label="UUID">{institution.uuid}</Descriptions.Item>
-        {institution.websiteLocator && (
-          <Descriptions.Item label="Website">
-            <Typography.Link href={institution.websiteLocator}>
-              {institution.websiteLocator}
-            </Typography.Link>
-          </Descriptions.Item>
-        )}
-      </Descriptions>
+    <>
+      <PageHeader
+        title={[
+          institution.name,
+          institution.abbreviation == null
+            ? null
+            : `(${institution.abbreviation})`,
+        ]
+          .filter((x) => x != null)
+          .join(" ")}
+        subTitle={institution.description}
+        tags={[
+          <Tag key={institution.state} color="magenta">
+            {institution.state}
+          </Tag>,
+        ]}
+        extra={([] as ReactNode[])
+          .concat(
+            institution.canCurrentUserUpdateNode
+              ? [
+                  <UpdateInstitution
+                    key="updateInstitution"
+                    institutionId={institution.uuid}
+                    name={institution.name}
+                    abbreviation={institution.abbreviation}
+                    description={institution.description}
+                    websiteLocator={institution.websiteLocator}
+                  />,
+                ]
+              : []
+          )
+          .concat(
+            institution.canCurrentUserDeleteNode
+              ? [
+                  <DeleteInstitution
+                    key="deleteInstitution"
+                    institutionId={institution.uuid}
+                  />,
+                ]
+              : []
+          )}
+        backIcon={false}
+      >
+        <Descriptions size="small" column={1}>
+          <Descriptions.Item label="UUID">{institution.uuid}</Descriptions.Item>
+          {institution.websiteLocator && (
+            <Descriptions.Item label="Website">
+              <Typography.Link href={institution.websiteLocator}>
+                {institution.websiteLocator}
+              </Typography.Link>
+            </Descriptions.Item>
+          )}
+        </Descriptions>
+      </PageHeader>
       <Divider />
       <Typography.Title level={2}>Manufactured Components</Typography.Title>
       <ComponentTable
@@ -327,6 +356,6 @@ export default function Institution({ institutionId }: InstitutionProps) {
           </Link>
         </>
       )}
-    </PageHeader>
+    </>
   );
 }
