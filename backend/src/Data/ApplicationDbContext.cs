@@ -95,11 +95,13 @@ namespace Metabase.Data
                 j => j
                 .HasOne(e => e.PartComponent)
                 .WithMany(c => c.PartOfEdges)
-                .HasForeignKey(e => e.PartComponentId),
+                .HasForeignKey(e => e.PartComponentId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .HasOne(e => e.AssembledComponent)
                 .WithMany(c => c.PartEdges)
-                .HasForeignKey(e => e.AssembledComponentId),
+                .HasForeignKey(e => e.AssembledComponentId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .ToTable("component_assembly")
                 .HasKey(a => new { a.AssembledComponentId, a.PartComponentId })
@@ -116,11 +118,13 @@ namespace Metabase.Data
                 j => j
                 .HasOne(e => e.ConcreteComponent)
                 .WithMany(c => c.GeneralizationEdges)
-                .HasForeignKey(e => e.ConcreteComponentId),
+                .HasForeignKey(e => e.ConcreteComponentId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .HasOne(e => e.GeneralComponent)
                 .WithMany(c => c.ConcretizationEdges)
-                .HasForeignKey(e => e.GeneralComponentId),
+                .HasForeignKey(e => e.GeneralComponentId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .ToTable("component_concretization_and_generalization")
                 .HasKey(a => new { a.GeneralComponentId, a.ConcreteComponentId })
@@ -137,11 +141,13 @@ namespace Metabase.Data
                 j => j
                 .HasOne(e => e.ToComponent)
                 .WithMany(c => c.VariantOfEdges)
-                .HasForeignKey(e => e.ToComponentId),
+                .HasForeignKey(e => e.ToComponentId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .HasOne(e => e.OfComponent)
                 .WithMany(c => c.VariantEdges)
-                .HasForeignKey(e => e.OfComponentId),
+                .HasForeignKey(e => e.OfComponentId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .ToTable("component_variant")
                 .HasKey(a => new { a.OfComponentId, a.ToComponentId })
@@ -158,11 +164,13 @@ namespace Metabase.Data
                 j => j
                 .HasOne(e => e.Institution)
                 .WithMany(i => i.ManufacturedComponentEdges)
-                .HasForeignKey(e => e.InstitutionId),
+                .HasForeignKey(e => e.InstitutionId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .HasOne(e => e.Component)
                 .WithMany(c => c.ManufacturerEdges)
-                .HasForeignKey(e => e.ComponentId),
+                .HasForeignKey(e => e.ComponentId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .ToTable("component_manufacturer")
                 .HasKey(a => new { a.ComponentId, a.InstitutionId })
@@ -178,11 +186,13 @@ namespace Metabase.Data
                 j => j
                 .HasOne(e => e.Institution)
                 .WithMany(i => i.DevelopedMethodEdges)
-                .HasForeignKey(e => e.InstitutionId),
+                .HasForeignKey(e => e.InstitutionId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .HasOne(e => e.Method)
                 .WithMany(m => m.InstitutionDeveloperEdges)
-                .HasForeignKey(e => e.MethodId),
+                .HasForeignKey(e => e.MethodId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .ToTable("institution_method_developer")
                 .HasKey(a => new { a.InstitutionId, a.MethodId })
@@ -198,15 +208,26 @@ namespace Metabase.Data
                 j => j
                 .HasOne(e => e.User)
                 .WithMany(u => u.RepresentedInstitutionEdges)
-                .HasForeignKey(e => e.UserId),
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .HasOne(e => e.Institution)
                 .WithMany(i => i.RepresentativeEdges)
-                .HasForeignKey(e => e.InstitutionId),
+                .HasForeignKey(e => e.InstitutionId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .ToTable("institution_representative")
                 .HasKey(a => new { a.InstitutionId, a.UserId })
               );
+        }
+
+        private static void ConfigureDatabaseOperator(ModelBuilder builder)
+        {
+          builder.Entity<Institution>()
+            .HasMany(i => i.OperatedDatabases)
+            .WithOne(i => i.Operator)
+            .HasForeignKey(i => i.OperatorId)
+            .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureUserMethodDeveloper(ModelBuilder builder)
@@ -218,15 +239,44 @@ namespace Metabase.Data
                 j => j
                 .HasOne(e => e.User)
                 .WithMany(i => i.DevelopedMethodEdges)
-                .HasForeignKey(e => e.UserId),
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .HasOne(e => e.Method)
                 .WithMany(m => m.UserDeveloperEdges)
-                .HasForeignKey(e => e.MethodId),
+                .HasForeignKey(e => e.MethodId)
+                .OnDelete(DeleteBehavior.Cascade),
                 j => j
                 .ToTable("user_method_developer")
                 .HasKey(a => new { a.UserId, a.MethodId })
               );
+        }
+
+        private static void ConfigureInstitutionManager(ModelBuilder builder)
+        {
+          builder.Entity<Institution>()
+            .HasMany(i => i.ManagedInstitutions)
+            .WithOne(i => i.Manager)
+            .HasForeignKey(i => i.ManagerId)
+            .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private static void ConfigureDataFormatManager(ModelBuilder builder)
+        {
+          builder.Entity<Institution>()
+            .HasMany(i => i.ManagedDataFormats)
+            .WithOne(i => i.Manager)
+            .HasForeignKey(i => i.ManagerId)
+            .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private static void ConfigureMethodManager(ModelBuilder builder)
+        {
+          builder.Entity<Institution>()
+            .HasMany(i => i.ManagedMethods)
+            .WithOne(i => i.Manager)
+            .HasForeignKey(i => i.ManagerId)
+            .OnDelete(DeleteBehavior.Restrict);
         }
 
         private readonly string _schemaName;
@@ -269,6 +319,7 @@ namespace Metabase.Data
             ConfigureComponentAssembly(builder);
             ConfigureComponentConcretizationAndGeneralization(builder);
             ConfigureComponentManufacturer(builder);
+            ConfigureComponentVariant(builder);
             ConfigureEntity(
                 builder.Entity<Database>()
                 )
@@ -283,12 +334,15 @@ namespace Metabase.Data
               .ToTable("institution");
             ConfigureInstitutionMethodDeveloper(builder);
             ConfigureInstitutionRepresentative(builder);
+            ConfigureDatabaseOperator(builder);
             ConfigureEntity(
                 builder.Entity<Method>()
                 )
               .ToTable("method");
             ConfigureUserMethodDeveloper(builder);
-            ConfigureComponentVariant(builder);
+            ConfigureInstitutionManager(builder);
+            ConfigureDataFormatManager(builder);
+            ConfigureMethodManager(builder);
         }
     }
 }
