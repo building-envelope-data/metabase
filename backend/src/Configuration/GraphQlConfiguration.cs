@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
 using Microsoft.Extensions.Logging;
+using HotChocolate.Data;
 
 namespace Metabase.Configuration
 {
@@ -19,9 +20,12 @@ namespace Metabase.Configuration
             IWebHostEnvironment environment
             )
         {
-            services.AddGraphQLServer()
-            // Services https://chillicream.com/docs/hotchocolate/v13/server/dependency-injection#registerservice
-            .RegisterDbContext<Data.ApplicationDbContext>()
+            services
+            .AddMemoryCache()
+            .AddSha256DocumentHashProvider(HotChocolate.Language.HashFormat.Hex)
+            .AddGraphQLServer()
+            // Services https://chillicream.com/docs/hotchocolate/v13/integrations/entity-framework#registerdbcontext
+            .RegisterDbContext<Data.ApplicationDbContext>(DbContextKind.Pooled)
             .AddMutationConventions(new MutationConventionOptions { ApplyToAllMutations = false })
             // Types
             .AddType<GraphQl.Common.OpenEndedDateTimeRangeType>()
@@ -159,7 +163,9 @@ namespace Metabase.Configuration
                           DefaultPageSize = int.MaxValue,
                           IncludeTotalCount = true
                       }
-                  );
+                  )
+                  .UseAutomaticPersistedQueryPipeline()
+                  .AddInMemoryQueryStorage();
         }
     }
 }
