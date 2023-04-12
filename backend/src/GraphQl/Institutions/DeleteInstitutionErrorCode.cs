@@ -4,6 +4,7 @@ namespace Metabase.GraphQl.Institutions
     {
         UNKNOWN,
         UNKNOWN_INSTITUTION,
-        UNAUTHORIZED
+        UNAUTHORIZED,
+        MANAGING
     }
 }

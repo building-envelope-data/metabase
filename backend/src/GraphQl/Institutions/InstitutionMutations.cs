@@ -302,6 +302,51 @@ namespace Metabase.GraphQl.Institutions
                       )
                       );
             }
+            if (
+                await context
+                .Entry(institution)
+                .Collection(i => i.ManagedDataFormats)
+                .Query()
+                .AnyAsync(cancellationToken)
+                .ConfigureAwait(false)
+                ||
+                await context
+                .Entry(institution)
+                .Collection(i => i.ManagedInstitutions)
+                .Query()
+                .AnyAsync(cancellationToken)
+                .ConfigureAwait(false)
+                ||
+                await context
+                .Entry(institution)
+                .Collection(i => i.ManagedMethods)
+                .Query()
+                .AnyAsync(cancellationToken)
+                .ConfigureAwait(false)
+                ||
+                await context
+                .Entry(institution)
+                .Collection(i => i.OperatedDatabases)
+                .Query()
+                .AnyAsync(cancellationToken)
+                .ConfigureAwait(false)
+                ||
+                await context
+                .Entry(institution)
+                .Collection(i => i.ManufacturedComponents)
+                .Query()
+                .AnyAsync(cancellationToken)
+                .ConfigureAwait(false)
+                )
+            {
+                return new DeleteInstitutionPayload(
+                    new DeleteInstitutionError(
+                      DeleteInstitutionErrorCode.MANAGING,
+                      "The institution manages or is associated to other entities.",
+                      new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                      )
+                      );
+            }
             context.Institutions.Remove(institution);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new DeleteInstitutionPayload();
