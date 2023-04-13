@@ -84,7 +84,6 @@ namespace Metabase.Configuration
                       )
                   )
                   // Scalar Types
-                  // TODO Use `MyUuidType` and `MyUrlType` instead because they properly define `@specifiedBy`. This fails though at the moment because if we use those, then the schema contains four scalars `URL`, `Url`, `UUID`, and `Uuid` and the upper-case variant is used for fields of type `Uri` and `Guid`.
                   .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
                   .AddType(new UrlType("Url"))
                   .AddType(new JsonType("Any", bind: BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
