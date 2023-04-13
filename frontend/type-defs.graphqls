@@ -2490,6 +2490,7 @@ enum DeleteInstitutionErrorCode {
   UNKNOWN
   UNKNOWN_INSTITUTION
   UNAUTHORIZED
+  MANAGING
 }
 
 enum DeletePersonalUserDataErrorCode {
