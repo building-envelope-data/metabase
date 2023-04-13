@@ -1,3 +1,4 @@
+using System;
 using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Data.Filters;
@@ -21,14 +22,12 @@ namespace Metabase.Configuration
             )
         {
             services
-            .AddMemoryCache()
-            .AddSha256DocumentHashProvider(HotChocolate.Language.HashFormat.Hex)
+            .AddMemoryCache() // Needed by the automatic persisted query pipeline
+            .AddSha256DocumentHashProvider(HotChocolate.Language.HashFormat.Hex) // Needed by the automatic persisted query pipeline
             .AddGraphQLServer()
             // Services https://chillicream.com/docs/hotchocolate/v13/integrations/entity-framework#registerdbcontext
             .RegisterDbContext<Data.ApplicationDbContext>(DbContextKind.Pooled)
             .AddMutationConventions(new MutationConventionOptions { ApplyToAllMutations = false })
-            // Types
-            .AddType<GraphQl.Common.OpenEndedDateTimeRangeType>()
             // Extensions
             .AddProjections()
             .AddFiltering()
@@ -46,7 +45,7 @@ namespace Metabase.Configuration
                   options.UseXmlDocumentation = false;
                   options.SortFieldsByName = true;
                   options.RemoveUnreachableTypes = false;
-                  options.DefaultBindingBehavior = HotChocolate.Types.BindingBehavior.Implicit;
+                  options.DefaultBindingBehavior = BindingBehavior.Implicit;
                   /* options.FieldMiddleware = ... */
               }
               )
@@ -84,6 +83,13 @@ namespace Metabase.Configuration
                           _.GetApplicationService<ILogger<GraphQl.LoggingDiagnosticEventListener>>()
                       )
                   )
+                  // Scalar Types
+                  // TODO Use `MyUuidType` and `MyUrlType` instead because they properly define `@specifiedBy`. This fails though at the moment because if we use those, then the schema contains four scalars `URL`, `Url`, `UUID`, and `Uuid` and the upper-case variant is used for fields of type `Uri` and `Guid`.
+                  .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
+                  .AddType(new UrlType("Url"))
+                  .AddType(new JsonType("Any", bind: BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
+                  // .BindRuntimeType<Guid, MyUuidType>()
+                  // Query Types
                   .AddQueryType(d => d.Name(nameof(GraphQl.Query)))
                       .AddType<GraphQl.Components.ComponentQueries>()
                       .AddType<GraphQl.DataFormats.DataFormatQueries>()
@@ -92,6 +98,7 @@ namespace Metabase.Configuration
                       .AddType<GraphQl.Methods.MethodQueries>()
                       .AddType<GraphQl.OpenIdConnect.OpendIdConnectQueries>()
                       .AddType<GraphQl.Users.UserQueries>()
+                  // Mutation Types
                   .AddMutationType(d => d.Name(nameof(GraphQl.Mutation)))
                       .AddType<GraphQl.ComponentAssemblies.ComponentAssemblyMutations>()
                       .AddType<GraphQl.ComponentGeneralizations.ComponentGeneralizationMutations>()
@@ -108,11 +115,8 @@ namespace Metabase.Configuration
                       .AddType<GraphQl.Users.UserMutations>()
                   /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
                   /*     .AddType<ComponentSubscriptions>() */
-                  // Scalar Types
-                  .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
-                  .AddType(new UrlType("Url"))
-                  .AddType(new JsonType("Any", BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
                   // Object Types
+                  .AddType<GraphQl.Common.OpenEndedDateTimeRangeType>()
                   .AddType<GraphQl.Components.ComponentType>()
                   .AddType<GraphQl.DataFormats.DataFormatType>()
                   .AddType<GraphQl.DataX.CalorimetricData>()
@@ -165,7 +169,38 @@ namespace Metabase.Configuration
                       }
                   )
                   .UseAutomaticPersistedQueryPipeline()
-                  .AddInMemoryQueryStorage();
+                  .AddInMemoryQueryStorage(); // Needed by the automatic persisted query pipeline
+        }
+
+        private sealed class MyUuidType : UuidType
+        {
+            private const string _specifiedBy = "https://tools.ietf.org/html/rfc4122";
+
+            public MyUuidType(
+                string name,
+                string? description = null,
+                char defaultFormat = '\0',
+                bool enforceFormat = false,
+                BindingBehavior bind = BindingBehavior.Explicit
+            )
+                : base(name, description: description, defaultFormat: defaultFormat, enforceFormat: enforceFormat, bind: bind)
+            {
+                SpecifiedBy = new Uri(_specifiedBy);
+            }
+        }
+
+        private sealed class MyUrlType : UrlType
+        {
+            private const string _specifiedBy = "https://tools.ietf.org/html/rfc3986";
+
+            public MyUrlType(
+                string name,
+                string? description = null,
+                BindingBehavior bind = BindingBehavior.Explicit)
+                : base(name, description: description, bind: bind)
+            {
+                SpecifiedBy = new Uri(_specifiedBy);
+            }
         }
     }
 }
