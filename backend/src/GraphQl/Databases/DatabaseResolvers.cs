@@ -861,6 +861,7 @@ namespace Metabase.GraphQl.Databases
                     resolverContext.ReportError(
                         ErrorBuilder.New()
                         .SetCode("HTTP_STATUS_CODE_IS_NOT_OK")
+                        .SetPath(resolverContext.Path)
                         .SetMessage($"Failed with status code {httpResponseMessage.StatusCode} to query the database {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}.")
                         .Build()
                     );
@@ -883,6 +884,7 @@ namespace Metabase.GraphQl.Databases
                     resolverContext.ReportError(
                         ErrorBuilder.New()
                         .SetCode("DESERIALIZATION_FAILED")
+                        .SetPath(resolverContext.Path)
                         .SetMessage($"Failed to deserialize the GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, SerializerOptions)}.")
                         .Build()
                     );
@@ -916,6 +918,7 @@ namespace Metabase.GraphQl.Databases
                 resolverContext.ReportError(
                     ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
+                    .SetPath(resolverContext.Path)
                     .SetMessage($"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}.")
                     .SetException(e)
                     .Build()
@@ -928,7 +931,7 @@ namespace Metabase.GraphQl.Databases
                 resolverContext.ReportError(
                     ErrorBuilder.New()
                     .SetCode("DESERIALIZATION_FAILED")
-                    .SetPath(e.Path?.Split('.'))
+                    .SetPath(resolverContext.Path.ToList().Concat(e.Path?.Split('.') ?? Array.Empty<string>()).ToList()) // TODO Splitting the path at '.' is wrong in general.
                     .SetMessage($"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
                     .SetException(e)
                     .Build()
@@ -941,6 +944,7 @@ namespace Metabase.GraphQl.Databases
                 resolverContext.ReportError(
                     ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
+                    .SetPath(resolverContext.Path)
                     .SetMessage($"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)} or failed to deserialize the response.")
                     .SetException(e)
                     .Build()
