@@ -10,10 +10,10 @@ using System.Text.Json.Serialization;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using HotChocolate;
-using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Metabase.Authorization;
+using HotChocolate.Resolvers;
 
 namespace Metabase.GraphQl.Databases
 {
@@ -83,6 +83,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
         {
@@ -103,6 +104,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "Data"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.Data;
@@ -118,6 +120,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
         {
@@ -139,6 +142,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "OpticalData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.OpticalData;
@@ -154,6 +158,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
         {
@@ -175,6 +180,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HygrothermalData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.HygrothermalData;
@@ -190,6 +196,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
         {
@@ -211,6 +218,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "CalorimetricData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.CalorimetricData;
@@ -226,6 +234,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
         {
@@ -247,6 +256,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "PhotovoltaicData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.PhotovoltaicData;
@@ -363,6 +373,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -393,6 +404,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.AllData;
@@ -428,6 +440,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -460,6 +473,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllOpticalData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.AllOpticalData;
@@ -489,6 +503,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -515,6 +530,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllHygrothermalData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.AllHygrothermalData;
@@ -534,6 +550,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -560,6 +577,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllCalorimetricData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.AllCalorimetricData;
@@ -579,6 +597,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -605,6 +624,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllPhotovoltaicData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.AllPhotovoltaicData;
@@ -620,6 +640,7 @@ namespace Metabase.GraphQl.Databases
             DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -639,6 +660,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.HasData;
@@ -654,6 +676,7 @@ namespace Metabase.GraphQl.Databases
             DataX.OpticalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -673,6 +696,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasOpticalData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.HasOpticalData;
@@ -688,6 +712,7 @@ namespace Metabase.GraphQl.Databases
             DataX.CalorimetricDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -707,6 +732,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasCalorimetricData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.HasCalorimetricData;
@@ -722,6 +748,7 @@ namespace Metabase.GraphQl.Databases
             DataX.HygrothermalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -741,6 +768,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasHygrothermalData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.HasHygrothermalData;
@@ -756,6 +784,7 @@ namespace Metabase.GraphQl.Databases
             DataX.PhotovoltaicDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
         {
@@ -775,6 +804,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasPhotovoltaicData"
                 ),
+                resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
             )?.HasPhotovoltaicData;
@@ -799,6 +829,7 @@ namespace Metabase.GraphQl.Databases
           QueryDatabase<TGraphQlResponse>(
             Data.Database database,
             GraphQL.GraphQLRequest request,
+            IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
           where TGraphQlResponse : class
@@ -827,6 +858,12 @@ namespace Metabase.GraphQl.Databases
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
                     _logger.LogWarning("Failed with status code {StatusCode} to query the database {Locator} for {Json}.", httpResponseMessage.StatusCode, database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
+                    resolverContext.ReportError(
+                        ErrorBuilder.New()
+                        .SetCode("HTTP_STATUS_CODE_IS_NOT_OK")
+                        .SetMessage($"Failed with status code {httpResponseMessage.StatusCode} to query the database {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}.")
+                        .Build()
+                    );
                     return null;
                 }
                 // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
@@ -842,28 +879,73 @@ namespace Metabase.GraphQl.Databases
                     ).ConfigureAwait(false);
                 if (deserializedGraphQlResponse is null)
                 {
-                    _logger.LogWarning("Failed to deserialize the GraphQL response received from the database {Locator} for {Request}.", database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
+                    _logger.LogWarning("Failed to deserialize the GraphQL response received from the database {Locator} for the request {Request}.", database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
+                    resolverContext.ReportError(
+                        ErrorBuilder.New()
+                        .SetCode("DESERIALIZATION_FAILED")
+                        .SetMessage($"Failed to deserialize the GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, SerializerOptions)}.")
+                        .Build()
+                    );
+                    return null;
                 }
-                if (deserializedGraphQlResponse?.Errors?.Length >= 1)
+                if (deserializedGraphQlResponse.Errors?.Length >= 1)
                 {
-                    _logger.LogWarning("Failed with errors {Errors} to query the database {Locator} for {Request}", JsonSerializer.Serialize(deserializedGraphQlResponse?.Errors), database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
+                    _logger.LogWarning("Failed with errors {Errors} to query the database {Locator} for {Request}", JsonSerializer.Serialize(deserializedGraphQlResponse.Errors), database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
+                    foreach (var error in deserializedGraphQlResponse.Errors)
+                    {
+                        var errorBuilder = ErrorBuilder.New()
+                            .SetCode("DATABASE_QUERY_ERROR")
+                            .SetMessage($"The GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, SerializerOptions)} reported the error {error.Message}.")
+                            .SetPath(error.Path);
+                        if (error.Extensions is not null)
+                        {
+                            foreach (var (key, value) in error.Extensions)
+                            {
+                                errorBuilder.SetExtension(key, value);
+                            }
+                        }
+                        // TODO Add `error.Locations` to `errorBuilder`.
+                        resolverContext.ReportError(errorBuilder.Build());
+                    }
                 }
-                return deserializedGraphQlResponse?.Data;
+                return deserializedGraphQlResponse.Data;
             }
             catch (HttpRequestException e)
             {
                 _logger.LogError(e, "Failed with status code {StatusCode} to request {Locator} for {Request}.", e.StatusCode, database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
-                throw;
+                resolverContext.ReportError(
+                    ErrorBuilder.New()
+                    .SetCode("DATABASE_REQUEST_FAILED")
+                    .SetMessage($"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}.")
+                    .SetException(e)
+                    .Build()
+                );
+                return null;
             }
             catch (JsonException e)
             {
                 _logger.LogError(e, "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.", database.Locator, JsonSerializer.Serialize(request, SerializerOptions), e.BytePositionInLine, e.LineNumber, e.Message, e.Path);
-                throw;
+                resolverContext.ReportError(
+                    ErrorBuilder.New()
+                    .SetCode("DESERIALIZATION_FAILED")
+                    .SetPath(e.Path?.Split('.'))
+                    .SetMessage($"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
+                    .SetException(e)
+                    .Build()
+                );
+                return null;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to request {Locator} for {Request} or failed to deserialize the response.", database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
-                throw;
+                resolverContext.ReportError(
+                    ErrorBuilder.New()
+                    .SetCode("DATABASE_REQUEST_FAILED")
+                    .SetMessage($"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)} or failed to deserialize the response.")
+                    .SetException(e)
+                    .Build()
+                );
+                return null;
             }
         }
 
