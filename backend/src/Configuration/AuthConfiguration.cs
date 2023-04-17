@@ -107,24 +107,27 @@ namespace Metabase.Configuration
                     // user authentication and is allowed to read data,
                     // write data, and manage users. The corresponding
                     // policies use scopes, so we need to add them.
-                    var identity = new ClaimsIdentity();
-                    foreach (
-                        var claim in
-                            new[] {
-                                ReadApiScope,
-                                WriteApiScope,
-                                ManageUserApiScope
-                            }
-                    )
+                    if (context?.Principal is not null)
                     {
-                        identity.AddClaim(
-                            new Claim(
-                                OpenIddictConstants.Claims.Private.Scope,
-                                claim
-                                )
-                            );
+                        var identity = new ClaimsIdentity();
+                        foreach (
+                            var claim in
+                                new[] {
+                                    ReadApiScope,
+                                    WriteApiScope,
+                                    ManageUserApiScope
+                                }
+                        )
+                        {
+                            identity.AddClaim(
+                                new Claim(
+                                    OpenIddictConstants.Claims.Private.Scope,
+                                    claim
+                                    )
+                                );
+                        }
+                        context.Principal.AddIdentity(identity);
                     }
-                    context?.Principal?.AddIdentity(identity);
                     return Task.CompletedTask;
                 };
             }
