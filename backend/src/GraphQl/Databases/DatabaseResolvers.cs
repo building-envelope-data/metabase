@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using GraphQL.Client.Serializer.SystemTextJson;
 using System;
+using IdentityModel.Client;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Net.Http;
@@ -14,11 +15,15 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Metabase.Authorization;
 using HotChocolate.Resolvers;
+using Microsoft.AspNetCore.Http;
+using static IdentityModel.OidcConstants;
 
 namespace Metabase.GraphQl.Databases
 {
     public class DatabaseResolvers
     {
+        public const string DATABASE_HTTP_CLIENT = "Database";
+
         private static readonly JsonSerializerOptions NonDataSerializerOptions =
             new()
             {
@@ -63,7 +68,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public Task<bool> GetCanCurrentUserUpdateNodeAsync(
-          [Parent] Data.Institution database,
+          [Parent] Data.Database database,
           [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
           [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
           Data.ApplicationDbContext context,
@@ -83,6 +88,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
@@ -104,6 +110,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "Data"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -120,6 +127,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
@@ -142,6 +150,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "OpticalData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -158,6 +167,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
@@ -180,6 +190,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HygrothermalData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -196,6 +207,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
@@ -218,6 +230,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "CalorimetricData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -234,6 +247,7 @@ namespace Metabase.GraphQl.Databases
             Guid id,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
         )
@@ -256,6 +270,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "PhotovoltaicData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -373,6 +388,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -404,6 +420,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -440,6 +457,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -473,6 +491,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllOpticalData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -503,6 +522,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -530,6 +550,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllHygrothermalData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -550,6 +571,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -577,6 +599,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllCalorimetricData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -597,6 +620,7 @@ namespace Metabase.GraphQl.Databases
             string? after,
             uint? last,
             string? before,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -624,6 +648,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "AllPhotovoltaicData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -640,6 +665,7 @@ namespace Metabase.GraphQl.Databases
             DataX.DataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -660,6 +686,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -676,6 +703,7 @@ namespace Metabase.GraphQl.Databases
             DataX.OpticalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -696,6 +724,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasOpticalData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -712,6 +741,7 @@ namespace Metabase.GraphQl.Databases
             DataX.CalorimetricDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -732,6 +762,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasCalorimetricData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -748,6 +779,7 @@ namespace Metabase.GraphQl.Databases
             DataX.HygrothermalDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -768,6 +800,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasHygrothermalData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -784,6 +817,7 @@ namespace Metabase.GraphQl.Databases
             DataX.PhotovoltaicDataPropositionInput? where,
             DateTime? timestamp,
             string? locale,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -804,6 +838,7 @@ namespace Metabase.GraphQl.Databases
                     },
                     operationName: "HasPhotovoltaicData"
                 ),
+                httpContextAccessor,
                 resolverContext,
                 cancellationToken
             ).ConfigureAwait(false)
@@ -829,6 +864,7 @@ namespace Metabase.GraphQl.Databases
           QueryDatabase<TGraphQlResponse>(
             Data.Database database,
             GraphQL.GraphQLRequest request,
+            [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -847,7 +883,19 @@ namespace Metabase.GraphQl.Databases
                 //    .ConfigureAwait(false)
                 //    )
                 //   .AsGraphQLHttpResponse();
-                var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient(DATABASE_HTTP_CLIENT);
+                // An alternative to get the bearer token could look something like
+                // `httpContextAccessor.HttpContext.GetTokenAsync(AuthenticationSchemes.AuthorizationHeaderBearer)`
+                var bearerToken = httpContextAccessor.HttpContext?.Request?.Headers?.Authorization
+                    .FirstOrDefault(
+                        x => x is not null
+                         && x.TrimStart().StartsWith(AuthenticationSchemes.AuthorizationHeaderBearer, StringComparison.Ordinal))
+                    ?.Trim()
+                    ?.Replace($"{AuthenticationSchemes.AuthorizationHeaderBearer} ", "");
+                if (bearerToken is not null)
+                {
+                    httpClient.SetBearerToken(bearerToken);
+                }
                 // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
                 var httpResponseMessage =
                     await httpClient.PostAsync(
