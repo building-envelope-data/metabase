@@ -141,6 +141,7 @@ type CalorimetricData implements Data {
   component: Component
   componentId: Uuid!
   createdAt: DateTime!
+  creator: Institution
   creatorId: Uuid!
   description: String
   gValues: [Float!]!
@@ -681,6 +682,7 @@ type HygrothermalData implements Data {
   component: Component
   componentId: Uuid!
   createdAt: DateTime!
+  creator: Institution
   creatorId: Uuid!
   description: String
   id: String!
@@ -1061,6 +1063,7 @@ type OpticalData implements Data {
   component: Component
   componentId: Uuid!
   createdAt: DateTime!
+  creator: Institution
   creatorId: Uuid!
   description: String
   id: String!
@@ -1107,6 +1110,7 @@ type PhotovoltaicData implements Data {
   component: Component
   componentId: Uuid!
   createdAt: DateTime!
+  creator: Institution
   creatorId: Uuid!
   description: String
   id: String!

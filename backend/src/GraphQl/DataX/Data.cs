@@ -90,7 +90,7 @@ namespace Metabase.GraphQl.DataX
                 );
         }
 
-        public Task<Metabase.Data.Institution?> GetInstitutionAsync(
+        public Task<Metabase.Data.Institution?> GetCreatorAsync(
                 InstitutionByIdDataLoader institutionById,
                 CancellationToken cancellationToken
         )
