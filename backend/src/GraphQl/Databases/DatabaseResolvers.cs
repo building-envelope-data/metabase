@@ -66,7 +66,7 @@ namespace Metabase.GraphQl.Databases
         }
 
         public Task<bool> GetCanCurrentUserUpdateNodeAsync(
-          [Parent] Data.Institution database,
+          [Parent] Data.Database database,
           [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
           [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
           Data.ApplicationDbContext context,
