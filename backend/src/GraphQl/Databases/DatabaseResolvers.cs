@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Identity;
 using Metabase.Authorization;
 using HotChocolate.Resolvers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication;
 using static IdentityModel.OidcConstants;
 
 namespace Metabase.GraphQl.Databases

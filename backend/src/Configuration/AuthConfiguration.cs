@@ -11,10 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Reflection;
-using System.Security;
 using System.IO;
 
 namespace Metabase.Configuration

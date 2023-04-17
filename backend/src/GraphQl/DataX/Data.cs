@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Metabase.GraphQl.Components;
 using System.Collections.Generic;
+using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.DataX
 {
@@ -89,15 +90,15 @@ namespace Metabase.GraphQl.DataX
                 );
         }
 
-        // public Task<Metabase.Data.Institution?> GetInstitutionAsync(
-        //         InstitutionByIdDataLoader institutionById,
-        //         CancellationToken cancellationToken
-        // )
-        // {
-        //     return institutionById.LoadAsync(
-        //         CreatorId,
-        //         cancellationToken
-        //         );
-        // }
+        public Task<Metabase.Data.Institution?> GetInstitutionAsync(
+                InstitutionByIdDataLoader institutionById,
+                CancellationToken cancellationToken
+        )
+        {
+            return institutionById.LoadAsync(
+                CreatorId,
+                cancellationToken
+                );
+        }
     }
 }
