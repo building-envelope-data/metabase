@@ -22,6 +22,8 @@ namespace Metabase.GraphQl.Databases
 {
     public class DatabaseResolvers
     {
+        public const string DATABASE_HTTP_CLIENT = "Database";
+
         private static readonly JsonSerializerOptions NonDataSerializerOptions =
             new()
             {
@@ -881,7 +883,7 @@ namespace Metabase.GraphQl.Databases
                 //    .ConfigureAwait(false)
                 //    )
                 //   .AsGraphQLHttpResponse();
-                var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient(DATABASE_HTTP_CLIENT);
                 // An alternative to get the bearer token could look something like
                 // `httpContextAccessor.HttpContext.GetTokenAsync(AuthenticationSchemes.AuthorizationHeaderBearer)`
                 var bearerToken = httpContextAccessor.HttpContext?.Request?.Headers?.Authorization

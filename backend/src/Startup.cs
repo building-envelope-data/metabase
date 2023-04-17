@@ -1,11 +1,14 @@
 using System;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using HotChocolate.AspNetCore;
 using Metabase.Configuration;
 using Metabase.Data.Extensions;
+using Metabase.GraphQl.Databases;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -49,7 +52,7 @@ namespace Metabase
             services
                 .AddDataProtection()
                 .PersistKeysToDbContext<Data.ApplicationDbContext>();
-            services.AddHttpClient();
+            ConfigureHttpClientServices(services);
             services.AddHttpContextAccessor();
             services
                 .AddHealthChecks()
@@ -148,6 +151,22 @@ namespace Metabase
                 },
                 ServiceLifetime.Transient
                 );
+        }
+
+        private void ConfigureHttpClientServices(IServiceCollection services)
+        {
+            services.AddHttpClient();
+            var httpClientBuilder = services.AddHttpClient(DatabaseResolvers.DATABASE_HTTP_CLIENT);
+            if (!_environment.IsProduction())
+            {
+                httpClientBuilder.ConfigurePrimaryHttpMessageHandler(_ =>
+                    new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    }
+                );
+            }
+
         }
 
         public void Configure(IApplicationBuilder app)
