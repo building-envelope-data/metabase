@@ -1,12 +1,25 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
 
 namespace Metabase.Data
 {
     public sealed class Database
       : Data.Entity
     {
+        // Inspired by https://jonathancrozier.com/blog/how-to-generate-a-cryptographically-secure-random-string-in-dot-net-with-c-sharp
+        private static string CreateSecureRandomString(int count = 64) =>
+            Convert.ToBase64String(RandomNumberGenerator.GetBytes(count));
+
+        // private static string CreateSha512Hash(string value)
+        // {
+        //     using var sha512 = SHA512.Create();
+        //     var bytes = Encoding.UTF8.GetBytes(value);
+        //     var hashValue = sha512.ComputeHash(bytes);
+        //     return Convert.ToBase64String(hashValue);
+        // }
+
         [Required]
         [MinLength(1)]
         public string Name { get; private set; }
@@ -18,6 +31,12 @@ namespace Metabase.Data
         [Required]
         [Url]
         public Uri Locator { get; private set; }
+
+        public bool Verified { get; private set; }
+
+        [Required]
+        [MinLength(32)]
+        public string VerificationCode { get; private set; }
 
         public Guid OperatorId { get; set; }
 
@@ -40,6 +59,8 @@ namespace Metabase.Data
             Name = name;
             Description = description;
             Locator = locator;
+            Verified = false;
+            VerificationCode = CreateSecureRandomString();
         }
 
         public void Update(
@@ -51,6 +72,17 @@ namespace Metabase.Data
             Name = name;
             Description = description;
             Locator = locator;
+        }
+
+        public void Verify()
+        {
+            Verified = true;
+        }
+
+        // Refute
+        public void RevokeVerification()
+        {
+            Verified = false;
         }
     }
 }

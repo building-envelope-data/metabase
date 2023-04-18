@@ -1,60 +1,21 @@
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using GraphQL.Client.Serializer.SystemTextJson;
 using System;
-using IdentityModel.Client;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using HotChocolate;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using Metabase.Authorization;
+using HotChocolate;
 using HotChocolate.Resolvers;
 using Microsoft.AspNetCore.Http;
-using static IdentityModel.OidcConstants;
+using Metabase.Authorization;
 
 namespace Metabase.GraphQl.Databases
 {
-    public class DatabaseResolvers
+    public sealed class DatabaseResolvers
     {
-        public const string DATABASE_HTTP_CLIENT = "Database";
-
-        private static readonly JsonSerializerOptions NonDataSerializerOptions =
-            new()
-            {
-                Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false), },
-                NumberHandling = JsonNumberHandling.Strict,
-                PropertyNameCaseInsensitive = false,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                ReadCommentHandling = JsonCommentHandling.Disallow,
-                IncludeFields = false,
-                IgnoreReadOnlyProperties = false,
-                IgnoreReadOnlyFields = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            }; //.SetupImmutableConverter();
-
-        private static readonly JsonSerializerOptions SerializerOptions =
-            new()
-            {
-                Converters = {
-                        new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
-                        new DataConverterWithTypeDiscriminatorProperty(NonDataSerializerOptions)
-                        },
-                NumberHandling = JsonNumberHandling.Strict,
-                PropertyNameCaseInsensitive = false,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                ReadCommentHandling = JsonCommentHandling.Disallow,
-                IncludeFields = false,
-                IgnoreReadOnlyProperties = false,
-                IgnoreReadOnlyFields = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            }; //.SetupImmutableConverter();
-
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<DatabaseResolvers> _logger;
 
@@ -96,7 +57,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<DataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "DataFields.graphql",
                             "Data.graphql"
@@ -135,7 +96,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<OpticalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "DataFields.graphql",
                             "OpticalDataFields.graphql",
@@ -175,7 +136,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<HygrothermalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "DataFields.graphql",
                             "HygrothermalDataFields.graphql",
@@ -215,7 +176,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<CalorimetricDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "DataFields.graphql",
                             "CalorimetricDataFields.graphql",
@@ -255,7 +216,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<PhotovoltaicDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "DataFields.graphql",
                             "PhotovoltaicDataFields.graphql",
@@ -282,103 +243,6 @@ namespace Metabase.GraphQl.Databases
             public DataX.DataConnection AllData { get; set; } = default!;
         }
 
-        // Inspired by https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#support-polymorphic-deserialization
-        // and https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#an-alternative-way-to-do-polymorphic-deserialization
-        public class DataConverterWithTypeDiscriminatorProperty : JsonConverter<DataX.IData>
-        {
-            private const string DISCRIMINATOR_PROPERTY_NAME = "__typename";
-
-            // type discriminators
-            private const string CALORIMETRIC_DATA = "CalorimetricData";
-            private const string HYGROTHERMAL_DATA = "HygrothermalData";
-            private const string OPTICAL_DATA = "OpticalData";
-            private const string PHOTOVOLTAIC_DATA = "PhotovoltaicData";
-
-            private readonly JsonSerializerOptions _options;
-
-            public DataConverterWithTypeDiscriminatorProperty(
-                JsonSerializerOptions options
-            )
-            {
-                _options = options;
-            }
-
-            public override bool CanConvert(Type typeToConvert) =>
-                // typeof(DataX.IData).IsAssignableFrom(typeToConvert);
-                typeof(DataX.IData).IsEquivalentTo(typeToConvert);
-
-            public override DataX.IData Read(
-                ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            {
-                var readerClone = reader; // clones `reader` because it is a struct!
-                if (readerClone.TokenType != JsonTokenType.StartObject)
-                {
-                    throw new JsonException($"Token is not a start object but {readerClone.TokenType}.");
-                }
-                readerClone.Read();
-                if (readerClone.TokenType != JsonTokenType.PropertyName)
-                {
-                    throw new JsonException($"Token is not a property but {readerClone.TokenType}.");
-                }
-                var propertyName = readerClone.GetString();
-                if (propertyName != DISCRIMINATOR_PROPERTY_NAME)
-                {
-                    throw new JsonException($"Property is not discriminator property but {propertyName}.");
-                }
-                readerClone.Read();
-                if (readerClone.TokenType != JsonTokenType.String)
-                {
-                    throw new JsonException($"Token is not a string but {readerClone.TokenType}.");
-                }
-                var typeDiscriminator = readerClone.GetString();
-                // Note that you can't pass in the original options instance
-                // that registers the converter to `Deserialize` as told on
-                // https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#an-alternative-way-to-do-polymorphic-deserialization
-                return typeDiscriminator switch
-                {
-                    CALORIMETRIC_DATA => JsonSerializer.Deserialize<DataX.CalorimetricData>(ref reader, _options) ?? throw new JsonException("Could not deserialize calorimetric data."),
-                    HYGROTHERMAL_DATA => JsonSerializer.Deserialize<DataX.HygrothermalData>(ref reader, _options) ?? throw new JsonException("Could not deserialize hygrothermal data."),
-                    OPTICAL_DATA => JsonSerializer.Deserialize<DataX.OpticalData>(ref reader, _options) ?? throw new JsonException("Could not deserialize optical data."),
-                    PHOTOVOLTAIC_DATA => JsonSerializer.Deserialize<DataX.PhotovoltaicData>(ref reader, _options) ?? throw new JsonException("Could not deserialize photovoltaic data."),
-                    _ => throw new JsonException($"Type discriminator has unknown value {typeDiscriminator}.")
-                };
-            }
-
-            public override void Write(
-                Utf8JsonWriter writer, DataX.IData data, JsonSerializerOptions options)
-            {
-                try
-                {
-                    writer.WriteStartObject();
-                    if (data is DataX.CalorimetricData calorimetricData)
-                    {
-                        writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, CALORIMETRIC_DATA);
-                        throw new JsonException("Unsupported!");
-                    }
-                    else if (data is DataX.HygrothermalData hygrothermalData)
-                    {
-                        writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, HYGROTHERMAL_DATA);
-                        throw new JsonException("Unsupported!");
-                    }
-                    else if (data is DataX.OpticalData opticalData)
-                    {
-                        writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, OPTICAL_DATA);
-                        throw new JsonException("Unsupported!");
-                    }
-                    else if (data is DataX.PhotovoltaicData photovoltaicData)
-                    {
-                        writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, PHOTOVOLTAIC_DATA);
-                        throw new JsonException("Unsupported!");
-                    }
-                    throw new JsonException("Unsupported!");
-                }
-                finally
-                {
-                    writer.WriteEndObject();
-                }
-            }
-        }
-
         public async Task<DataX.DataConnection?> GetAllDataAsync(
             [Parent] Data.Database database,
             DataX.DataPropositionInput? where,
@@ -396,7 +260,7 @@ namespace Metabase.GraphQl.Databases
             var dataConnection = (await QueryDatabase<AllDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
                         ? new[] {
                               "DataFields.graphql",
@@ -465,7 +329,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<AllOpticalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
                         ? new[] {
                               "DataFields.graphql",
@@ -530,7 +394,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<AllHygrothermalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "DataFields.graphql",
                             "HygrothermalDataFields.graphql",
@@ -579,7 +443,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<AllCalorimetricDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "DataFields.graphql",
                             "CalorimetricDataFields.graphql",
@@ -628,7 +492,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<AllPhotovoltaicDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "DataFields.graphql",
                             "PhotovoltaicDataFields.graphql",
@@ -673,7 +537,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<HasDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "HasData.graphql"
                         }
@@ -711,7 +575,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<HasOpticalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "HasOpticalData.graphql"
                         }
@@ -749,7 +613,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<HasCalorimetricDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "HasCalorimetricData.graphql"
                         }
@@ -787,7 +651,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<HasHygrothermalDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "HasHygrothermalData.graphql"
                         }
@@ -825,7 +689,7 @@ namespace Metabase.GraphQl.Databases
             return (await QueryDatabase<HasPhotovoltaicDataData>(
                 database,
                 new GraphQL.GraphQLRequest(
-                    query: await ConstructQuery(
+                    query: await QueryingDatabases.ConstructQuery(
                         new[] {
                             "HasPhotovoltaicData.graphql"
                         }
@@ -845,26 +709,12 @@ namespace Metabase.GraphQl.Databases
             )?.HasPhotovoltaicData;
         }
 
-        private static async Task<string> ConstructQuery(
-            string[] fileNames
-        )
-        {
-            return string.Join(
-                Environment.NewLine,
-                await Task.WhenAll(
-                    fileNames.Select(fileName =>
-                        File.ReadAllTextAsync($"GraphQl/Databases/Queries/{fileName}")
-                    )
-                ).ConfigureAwait(false)
-            );
-        }
-
         private async
           Task<TGraphQlResponse?>
           QueryDatabase<TGraphQlResponse>(
             Data.Database database,
             GraphQL.GraphQLRequest request,
-            [Service] IHttpContextAccessor httpContextAccessor,
+            IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
             )
@@ -872,80 +722,22 @@ namespace Metabase.GraphQl.Databases
         {
             try
             {
-                // https://github.com/graphql-dotnet/graphql-client/blob/47b4abfbfda507a91b5c62a18a9789bd3a8079c7/src/GraphQL.Client/GraphQLHttpResponse.cs
-                // var response =
-                //   (
-                //    await CreateGraphQlClient(database)
-                //    .SendQueryAsync<TGraphQlResponse>(
-                //      request,
-                //      cancellationToken
-                //      )
-                //    .ConfigureAwait(false)
-                //    )
-                //   .AsGraphQLHttpResponse();
-                var httpClient = _httpClientFactory.CreateClient(DATABASE_HTTP_CLIENT);
-                // An alternative to get the bearer token could look something like
-                // `httpContextAccessor.HttpContext.GetTokenAsync(AuthenticationSchemes.AuthorizationHeaderBearer)`
-                var bearerToken = httpContextAccessor.HttpContext?.Request?.Headers?.Authorization
-                    .FirstOrDefault(
-                        x => x is not null
-                         && x.TrimStart().StartsWith(AuthenticationSchemes.AuthorizationHeaderBearer, StringComparison.Ordinal))
-                    ?.Trim()
-                    ?.Replace($"{AuthenticationSchemes.AuthorizationHeaderBearer} ", "");
-                if (bearerToken is not null)
-                {
-                    httpClient.SetBearerToken(bearerToken);
-                }
-                // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
-                var httpResponseMessage =
-                    await httpClient.PostAsync(
-                        database.Locator,
-                        MakeJsonHttpContent(request),
-                        cancellationToken
-                    ).ConfigureAwait(false);
-                if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    _logger.LogWarning("Failed with status code {StatusCode} to query the database {Locator} for {Json}.", httpResponseMessage.StatusCode, database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
-                    resolverContext.ReportError(
-                        ErrorBuilder.New()
-                        .SetCode("HTTP_STATUS_CODE_IS_NOT_OK")
-                        .SetPath(resolverContext.Path)
-                        .SetMessage($"Failed with status code {httpResponseMessage.StatusCode} to query the database {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}.")
-                        .Build()
-                    );
-                    return null;
-                }
-                // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
-                using var graphQlResponseStream =
-                    await httpResponseMessage.Content
-                    .ReadAsStreamAsync(cancellationToken)
-                    .ConfigureAwait(false);
                 var deserializedGraphQlResponse =
-                    await JsonSerializer.DeserializeAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>(
-                        graphQlResponseStream,
-                        SerializerOptions,
+                    await QueryingDatabases.QueryDatabase<TGraphQlResponse>(
+                        database,
+                        request,
+                        _httpClientFactory,
+                        httpContextAccessor,
                         cancellationToken
-                    ).ConfigureAwait(false);
-                if (deserializedGraphQlResponse is null)
-                {
-                    _logger.LogWarning("Failed to deserialize the GraphQL response received from the database {Locator} for the request {Request}.", database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
-                    resolverContext.ReportError(
-                        ErrorBuilder.New()
-                        .SetCode("DESERIALIZATION_FAILED")
-                        .SetPath(resolverContext.Path)
-                        .SetMessage($"Failed to deserialize the GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, SerializerOptions)}.")
-                        .Build()
                     );
-                    return null;
-                }
                 if (deserializedGraphQlResponse.Errors?.Length >= 1)
                 {
-                    _logger.LogWarning("Failed with errors {Errors} to query the database {Locator} for {Request}", JsonSerializer.Serialize(deserializedGraphQlResponse.Errors), database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
+                    _logger.LogWarning("Failed with errors {Errors} to query the database {Locator} for {Request}", JsonSerializer.Serialize(deserializedGraphQlResponse.Errors), database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
                     foreach (var error in deserializedGraphQlResponse.Errors)
                     {
                         var errorBuilder = ErrorBuilder.New()
                             .SetCode("DATABASE_QUERY_ERROR")
-                            .SetMessage($"The GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, SerializerOptions)} reported the error {error.Message}.")
+                            .SetMessage($"The GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)} reported the error {error.Message}.")
                             .SetPath(error.Path);
                         if (error.Extensions is not null)
                         {
@@ -962,12 +754,12 @@ namespace Metabase.GraphQl.Databases
             }
             catch (HttpRequestException e)
             {
-                _logger.LogError(e, "Failed with status code {StatusCode} to request {Locator} for {Request}.", e.StatusCode, database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
+                _logger.LogError(e, "Failed with status code {StatusCode} to request {Locator} for {Request}.", e.StatusCode, database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
                 resolverContext.ReportError(
                     ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
                     .SetPath(resolverContext.Path)
-                    .SetMessage($"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}.")
+                    .SetMessage($"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)}.")
                     .SetException(e)
                     .Build()
                 );
@@ -975,12 +767,12 @@ namespace Metabase.GraphQl.Databases
             }
             catch (JsonException e)
             {
-                _logger.LogError(e, "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.", database.Locator, JsonSerializer.Serialize(request, SerializerOptions), e.BytePositionInLine, e.LineNumber, e.Message, e.Path);
+                _logger.LogError(e, "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.", database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions), e.BytePositionInLine, e.LineNumber, e.Message, e.Path);
                 resolverContext.ReportError(
                     ErrorBuilder.New()
                     .SetCode("DESERIALIZATION_FAILED")
                     .SetPath(resolverContext.Path.ToList().Concat(e.Path?.Split('.') ?? Array.Empty<string>()).ToList()) // TODO Splitting the path at '.' is wrong in general.
-                    .SetMessage($"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
+                    .SetMessage($"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
                     .SetException(e)
                     .Build()
                 );
@@ -988,45 +780,17 @@ namespace Metabase.GraphQl.Databases
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to request {Locator} for {Request} or failed to deserialize the response.", database.Locator, JsonSerializer.Serialize(request, SerializerOptions));
+                _logger.LogError(e, "Failed to request {Locator} for {Request} or failed to deserialize the response.", database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
                 resolverContext.ReportError(
                     ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
                     .SetPath(resolverContext.Path)
-                    .SetMessage($"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, SerializerOptions)} or failed to deserialize the response.")
+                    .SetMessage($"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)} or failed to deserialize the response.")
                     .SetException(e)
                     .Build()
                 );
                 return null;
             }
-        }
-
-        // private GraphQLHttpClient CreateGraphQlClient(
-        //     Data.Database database
-        //     )
-        // {
-        //     return new GraphQLHttpClient(
-        //         new GraphQLHttpClientOptions { EndPoint = database.Locator },
-        //         new SystemTextJsonSerializer(SerializerOptions),
-        //         _httpClientFactory.CreateClient()
-        //         );
-        // }
-
-        private static HttpContent MakeJsonHttpContent<TContent>(
-            TContent content
-            )
-        {
-            // For some reason using `JsonContent.Create<TContent>(content, null, SerializerOptions)` results in status code `BadRequest`.
-            var result =
-              new ByteArrayContent(
-                JsonSerializer.SerializeToUtf8Bytes(
-                  content,
-                  SerializerOptions
-                  )
-                );
-            result.Headers.ContentType =
-              new MediaTypeHeaderValue("application/json");
-            return result;
         }
     }
 }
