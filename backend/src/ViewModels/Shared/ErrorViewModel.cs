@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Metabase.ViewModels.Shared
 {
-    public class ErrorViewModel
+    public sealed class ErrorViewModel
     {
         [Display(Name = "Error")]
         public string? Error { get; set; }
