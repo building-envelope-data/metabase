@@ -8,8 +8,16 @@ fragment InstitutionPartial on Institution {
   state
 }
 
-query Institutions($state: InstitutionState! = VERIFIED) {
-  institutions(where: { state: { eq: $state } }) {
+query Institutions {
+  institutions {
+    nodes {
+      ...InstitutionPartial
+    }
+  }
+}
+
+query PendingInstitutions {
+  pendingInstitutions {
     nodes {
       ...InstitutionPartial
     }

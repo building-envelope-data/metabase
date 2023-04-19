@@ -512,6 +512,7 @@ type Database implements Node {
   allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection
   calorimetricData(id: Uuid! locale: String timestamp: DateTime): CalorimetricData
   canCurrentUserUpdateNode: Boolean!
+  canCurrentUserVerifyNode: Boolean!
   data(id: Uuid! locale: String timestamp: DateTime): Data
   description: String!
   hasCalorimetricData(locale: String timestamp: DateTime where: CalorimetricDataPropositionInput): Boolean
@@ -527,6 +528,8 @@ type Database implements Node {
   opticalData(id: Uuid! locale: String timestamp: DateTime): OpticalData
   photovoltaicData(id: Uuid! locale: String timestamp: DateTime): PhotovoltaicData
   uuid: Uuid!
+  verificationCode: String!
+  verificationState: DatabaseVerificationState!
 }
 
 type DatabaseOperatorEdge {
@@ -808,7 +811,7 @@ type InstitutionsConnection {
   "A list of edges."
   edges: [InstitutionsEdge!]
   "A flattened list of the nodes."
-  nodes: [Institution]
+  nodes: [Institution!]
   "Information to aid in pagination."
   pageInfo: PageInfo!
   "Identifies the total count of items in the connection."
@@ -820,7 +823,7 @@ type InstitutionsEdge {
   "A cursor for use in pagination."
   cursor: String!
   "The item at the end of the edge."
-  node: Institution
+  node: Institution!
 }
 
 type LoginUserError {
@@ -980,6 +983,7 @@ type Mutation {
   updateDataFormat(input: UpdateDataFormatInput!): UpdateDataFormatPayload! @authorize(policy: "Write")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(policy: "Write")
   updateMethod(input: UpdateMethodInput!): UpdateMethodPayload! @authorize(policy: "Write")
+  verifyDatabase(input: VerifyDatabaseInput!): VerifyDatabasePayload! @authorize(policy: "Write")
   verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(policy: "Write")
 }
 
@@ -1105,6 +1109,46 @@ type PageInfo {
   startCursor: String
 }
 
+"A connection to a list of items."
+type PendingDatabasesConnection {
+  "A list of edges."
+  edges: [PendingDatabasesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Database!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "Identifies the total count of items in the connection."
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type PendingDatabasesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Database!
+}
+
+"A connection to a list of items."
+type PendingInstitutionsConnection {
+  "A list of edges."
+  edges: [PendingInstitutionsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Institution!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "Identifies the total count of items in the connection."
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type PendingInstitutionsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Institution!
+}
+
 type PhotovoltaicData implements Data {
   appliedMethod: AppliedMethod!
   component: Component
@@ -1171,6 +1215,8 @@ type Query {
   openIdConnectAuthorizations: [OpenIdConnectAuthorization!]!
   openIdConnectScopes: [OpenIdConnectScope!]!
   openIdConnectTokens: [OpenIdConnectToken!]!
+  pendingDatabases("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DatabaseSortInput!] where: DatabaseFilterInput): PendingDatabasesConnection
+  pendingInstitutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionSortInput!] where: InstitutionFilterInput): PendingInstitutionsConnection
   user(uuid: Uuid!): User
   users("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [UserSortInput!]): UsersConnection
 }
@@ -1544,6 +1590,18 @@ type UsersEdge {
   node: User!
 }
 
+type VerifyDatabaseError {
+  code: VerifyDatabaseErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type VerifyDatabasePayload {
+  database: Database
+  errors: [VerifyDatabaseError!]
+  query: Query!
+}
+
 type VerifyInstitutionError {
   code: VerifyInstitutionErrorCode!
   message: String!
@@ -1831,6 +1889,8 @@ input DatabaseSortInput {
   name: SortEnumType
   description: SortEnumType
   locator: UriSortInput
+  verificationState: SortEnumType
+  verificationCode: SortEnumType
   operatorId: SortEnumType
   operator: InstitutionSortInput
   id: SortEnumType
@@ -2303,6 +2363,10 @@ input UuidPropositionInput {
   equalTo: Uuid
 }
 
+input VerifyDatabaseInput {
+  databaseId: Uuid!
+}
+
 input VerifyInstitutionInput {
   institutionId: Uuid!
 }
@@ -2488,6 +2552,11 @@ enum CreateMethodErrorCode {
   UNKNOWN_INSTITUTION_DEVELOPERS
   UNKNOWN_USER_DEVELOPERS
   UNAUTHORIZED
+}
+
+enum DatabaseVerificationState {
+  PENDING
+  VERIFIED
 }
 
 enum DeleteInstitutionErrorCode {
@@ -2798,6 +2867,15 @@ enum UpdateMethodErrorCode {
 enum UserRole {
   ADMINISTRATOR
   VERIFIER
+}
+
+enum VerifyDatabaseErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_DATABASE
+  WRONG_VERIFICATION_CODE
+  REQUEST_FAILED
+  DESERIALIZATION_FAILED
 }
 
 enum VerifyInstitutionErrorCode {

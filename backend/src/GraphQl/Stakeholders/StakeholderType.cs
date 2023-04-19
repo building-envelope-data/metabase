@@ -2,7 +2,7 @@ using HotChocolate.Types;
 
 namespace Metabase.GraphQl.Stakeholders
 {
-    public class StakeholderType
+    public sealed class StakeholderType
         : InterfaceType<Data.IStakeholder>
     {
         protected override void Configure(IInterfaceTypeDescriptor<Data.IStakeholder> descriptor)

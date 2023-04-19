@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import {
   InstitutionDocument,
   InstitutionsDocument,
-  useInstitutionsQuery,
+  PendingInstitutionsDocument,
+  usePendingInstitutionsQuery,
   useVerifyInstitutionMutation,
 } from "../../queries/institutions.graphql";
-import { InstitutionState, Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/__types__";
 import Link from "next/link";
 import paths from "../../paths";
 import { messageApolloError } from "../../lib/apollo";
@@ -14,11 +15,7 @@ import { messageApolloError } from "../../lib/apollo";
 export type PendingInstitutionsProps = {};
 
 export default function PendingInstitutions({}: PendingInstitutionsProps) {
-  const { data, loading, error } = useInstitutionsQuery({
-    variables: {
-      state: InstitutionState.Pending,
-    },
-  });
+  const { data, loading, error } = usePendingInstitutionsQuery();
 
   useEffect(() => {
     if (error) {
@@ -41,10 +38,7 @@ export default function PendingInstitutions({}: PendingInstitutionsProps) {
             query: InstitutionsDocument,
           },
           {
-            query: InstitutionsDocument,
-            variables: {
-              state: InstitutionState.Pending,
-            },
+            query: PendingInstitutionsDocument,
           },
           {
             query: InstitutionDocument,
@@ -73,7 +67,7 @@ export default function PendingInstitutions({}: PendingInstitutionsProps) {
     <List
       size="small"
       loading={loading}
-      dataSource={data?.institutions?.nodes || []}
+      dataSource={data?.pendingInstitutions?.nodes || []}
       renderItem={(item) => (
         <List.Item>
           <Link href={paths.institution(item?.uuid)}>{item?.name}</Link>

@@ -46,6 +46,24 @@ namespace Metabase.Authorization
                 );
         }
 
+        public static async Task<bool> IsAuthorizedToVerify(
+            ClaimsPrincipal claimsPrincipal,
+            Guid databaseId,
+            UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
+            )
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+            return (user is not null) &&
+                await IsAtLeastAssistantOfVerifiedDatabaseOperator(
+                    user,
+                    databaseId,
+                    context,
+                    cancellationToken
+                );
+        }
+
         private static async Task<bool> IsAtLeastAssistantOfVerifiedDatabaseOperator(
             Data.User user,
             Guid databaseId,

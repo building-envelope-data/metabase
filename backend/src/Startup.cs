@@ -156,7 +156,7 @@ namespace Metabase
         private void ConfigureHttpClientServices(IServiceCollection services)
         {
             services.AddHttpClient();
-            var httpClientBuilder = services.AddHttpClient(DatabaseResolvers.DATABASE_HTTP_CLIENT);
+            var httpClientBuilder = services.AddHttpClient(QueryingDatabases.DATABASE_HTTP_CLIENT);
             if (!_environment.IsProduction())
             {
                 httpClientBuilder.ConfigurePrimaryHttpMessageHandler(_ =>

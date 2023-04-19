@@ -1,10 +1,12 @@
 import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
-import { Table, Typography } from "antd";
+import { Divider, Table, Typography } from "antd";
 import { useDatabasesQuery } from "../../queries/databases.graphql";
 import { useEffect, useState } from "react";
+import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
 import { setMapValue } from "../../lib/freeTextFilter";
+import PendingDatabases from "../../components/databases/PendingDatabases";
 import {
   getExternallyLinkedFilterableLocatorColumnProps,
   getNameColumnProps,
@@ -13,6 +15,7 @@ import {
   getUuidColumnProps,
 } from "../../lib/table";
 import Link from "next/link";
+import { UserRole } from "../../__generated__/__types__";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -22,6 +25,8 @@ function Page() {
 
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
   const onFilterTextChange = setMapValue(filterText, setFilterText);
+
+  const currentUser = useCurrentUserQuery()?.data?.currentUser;
 
   useEffect(() => {
     if (error) {
@@ -84,6 +89,14 @@ function Page() {
         ]}
         dataSource={data?.databases?.nodes || []}
       />
+      {currentUser && currentUser?.roles?.includes(UserRole.Administrator) && (
+        <>
+          <Divider />
+          <Typography.Title level={2}>Pending Databases</Typography.Title>
+          <PendingDatabases />
+          <Divider />
+        </>
+      )}
       <Typography.Paragraph style={{ maxWidth: 768 }}>
         The{" "}
         <Typography.Link

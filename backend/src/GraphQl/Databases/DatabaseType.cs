@@ -102,6 +102,10 @@ namespace Metabase.GraphQl.Databases
               .Field("canCurrentUserUpdateNode")
               .ResolveWith<DatabaseResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
               .UseUserManager();
+            descriptor
+              .Field("canCurrentUserVerifyNode")
+              .ResolveWith<DatabaseResolvers>(x => x.GetCanCurrentUserVerifyNodeAsync(default!, default!, default!, default!, default!))
+              .UseUserManager();
         }
 
         private static void ConfigureDataField(
