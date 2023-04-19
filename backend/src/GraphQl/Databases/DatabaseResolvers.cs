@@ -39,6 +39,17 @@ namespace Metabase.GraphQl.Databases
             return DatabaseAuthorization.IsAuthorizedToUpdate(claimsPrincipal, database.Id, userManager, context, cancellationToken);
         }
 
+        public Task<bool> GetCanCurrentUserVerifyNodeAsync(
+          [Parent] Data.Database database,
+          [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+          [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+          Data.ApplicationDbContext context,
+          CancellationToken cancellationToken
+        )
+        {
+            return DatabaseAuthorization.IsAuthorizedToVerify(claimsPrincipal, database.Id, userManager, context, cancellationToken);
+        }
+
         private sealed class DataData
         {
             public DataX.Data Data { get; set; } = default!;

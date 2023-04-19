@@ -32,7 +32,8 @@ namespace Metabase.Data
         [Url]
         public Uri Locator { get; private set; }
 
-        public bool Verified { get; private set; }
+        [Required]
+        public Enumerations.DatabaseVerificationState VerificationState { get; private set; }
 
         [Required]
         [MinLength(32)]
@@ -59,7 +60,7 @@ namespace Metabase.Data
             Name = name;
             Description = description;
             Locator = locator;
-            Verified = false;
+            VerificationState = Enumerations.DatabaseVerificationState.PENDING;
             VerificationCode = CreateSecureRandomString();
         }
 
@@ -76,13 +77,13 @@ namespace Metabase.Data
 
         public void Verify()
         {
-            Verified = true;
+            VerificationState = Enumerations.DatabaseVerificationState.VERIFIED;
         }
 
         // Refute
         public void RevokeVerification()
         {
-            Verified = false;
+            VerificationState = Enumerations.DatabaseVerificationState.PENDING;
         }
     }
 }

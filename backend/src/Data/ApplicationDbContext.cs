@@ -31,6 +31,7 @@ namespace Metabase.Data
             // The problem was though that the tool `dotnet ef` did not pick up
             // the registered enumerations.
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.ComponentCategory>();
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.DatabaseVerificationState>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionRepresentativeRole>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.InstitutionState>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<Enumerations.MethodCategory>();
@@ -43,6 +44,7 @@ namespace Metabase.Data
             // https://www.npgsql.org/efcore/mapping/enum.html#creating-your-database-enum
             // Create enumerations in public schema because that is where `NpgsqlConnection.GlobalTypeMapper.MapEnum` expects them to be by default.
             builder.HasPostgresEnum<Enumerations.ComponentCategory>("public");
+            builder.HasPostgresEnum<Enumerations.DatabaseVerificationState>("public");
             builder.HasPostgresEnum<Enumerations.InstitutionRepresentativeRole>("public");
             builder.HasPostgresEnum<Enumerations.InstitutionState>("public");
             builder.HasPostgresEnum<Enumerations.MethodCategory>("public");
