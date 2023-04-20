@@ -215,7 +215,7 @@ jwt-certificates : ## Create JWT encryption and signing certificates if necessar
 				${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD} \
 				${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD} \
 		"
-.PHONY : certificates
+.PHONY : jwt-certificates
 
 # For an introduction to how HTTPS works see https://howhttps.works
 ssl : ## Generate and trust certificate authority, and generate SSL certificates
