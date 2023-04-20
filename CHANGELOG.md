@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Make component assemblies manageable [#152](https://github.com/building-envelope-data/metabase/pull/152)
 - Make variant and concretization associations manageable [#153](https://github.com/building-envelope-data/metabase/pull/153)
--
--
--
--
--
+- Make most entities and relations manageable [#155](https://github.com/building-envelope-data/metabase/pull/155)
+- Forward bearer tokens to databases [#158](https://github.com/building-envelope-data/metabase/pull/158)
+- Require verification of registered databases [#160](https://github.com/building-envelope-data/metabase/pull/160)
+- Forward GraphQL errors returned when querying databases for data [bf6d16099cb3f9681883d9a6f20eada4185044c7](https://github.com/building-envelope-data/metabase/commit/bf6d16099cb3f9681883d9a6f20eada4185044c7)
+- Enable automatic persisted queries [94277dfc336af87f279a549b38567dd9c13de233](https://github.com/building-envelope-data/metabase/commit/94277dfc336af87f279a549b38567dd9c13de233)
 -
 -
 -
@@ -38,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgrade packages to latest compatible versions in backend and frontend [#151](https://github.com/building-envelope-data/metabase/pull/151), [#143](https://github.com/building-envelope-data/metabase/pull/143), and [#141](https://github.com/building-envelope-data/metabase/pull/141)
--
+- Make forms type-safe [88259910da5490be845fe79dab066e868ee841c1](https://github.com/building-envelope-data/metabase/commit/88259910da5490be845fe79dab066e868ee841c1)
 -
 -
 -
