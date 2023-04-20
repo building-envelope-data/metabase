@@ -132,9 +132,9 @@ postgres_passwords : postgres_password ## Generate PostgreSQL passwords file who
 # Command `pg_dumpall`: https://www.postgresql.org/docs/13/app-pg-dumpall.html
 backup : CONTAINER_NAME = backup_${NAME}_database
 backup : ## Backup database and related data to directory with absolute path `${BACKUP_DIRECTORY}`, for example, `make --file Makefile.production BACKUP_DIRECTORY=/app/data/backups/$(date +"%Y-%m-%d_%H_%M_%S") backup`
+	mkdir --parents ${BACKUP_DIRECTORY}
 	-docker container stop ${CONTAINER_NAME}
 	-docker container rm --volumes ${CONTAINER_NAME}
-	mkdir --parents ${BACKUP_DIRECTORY}
 	${docker_compose} run \
 		--name ${CONTAINER_NAME} \
 		--detach \
