@@ -105,9 +105,19 @@ WORKDIR /app
 COPY \
   --chown=me:us \
   ./dotnet-tools.json ./
+COPY \
+  --chown=me:us \
+  ./dotnet-certificate-tool ./dotnet-certificate-tool
 RUN \
+  dotnet build \
+    ./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
+  dotnet pack \
+    ./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
   dotnet tool restore \
-    --tool-manifest ./dotnet-tools.json
+    --tool-manifest ./dotnet-tools.json \
+    --add-source ./dotnet-certificate-tool/src/nupkg && \
+  rm --recursive --force \
+    ./dotnet-certificate-tool
 
 RUN \
   mkdir ./src && \
@@ -264,31 +274,12 @@ COPY \
   --chown=me:us \
   ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
   ./ssl/
-# Once certificate tool supports .NET 7 simply use:
-# ```
-# RUN \
-#   dotnet tool run \
-#     certificate-tool add \
-#       --file ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
-#       --store-name Root \
-#       --password ${CERTIFICATE_AUTHORITY_PASSWORD}
-# ```
-# Instead of:
-COPY \
-  --chown=me:us \
-  ./dotnet-certificate-tool ./dotnet-certificate-tool
 RUN \
-  dotnet publish \
-    --configuration Release \
-    --framework net7.0 \
-    --output ./dotnet-certificate-tool/release \
-    ./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
-  dotnet tool restore \
-    --tool-manifest ./dotnet-tools.json \
-    --add-source ./dotnet-certificate-tool/src/nupkg && \
-  rm -rf ./dotnet-certificate-tool
-# And remove the sub-module as was done before in
-# https://github.com/building-envelope-data/metabase/commit/fbdd10f775e2289f9977b6c4a31ee6a5ff0b6ff9
+  dotnet tool run \
+    certificate-tool add \
+      --file ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.pfx \
+      --store-name Root \
+      --password ${CERTIFICATE_AUTHORITY_PASSWORD}
 
 # COPY \
 #   --chown=me:us \

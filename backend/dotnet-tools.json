@@ -73,6 +73,12 @@
       "commands": [
         "dotnet-project-licenses"
       ]
+    },
+    "dotnet-certificate-tool": {
+      "version": "3.0.0",
+      "commands": [
+        "certificate-tool"
+      ]
     }
   }
 }

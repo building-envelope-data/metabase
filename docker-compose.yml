@@ -85,6 +85,7 @@ services:
       # temporary files into the corresponding directory on the host file
       # system that was bound by the `/app` binding.
       # - /app/node_modules
+      - /app/src/logs
       - /app/src/bin
       - /app/src/obj
       - /app/test/bin
