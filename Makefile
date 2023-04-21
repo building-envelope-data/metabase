@@ -434,3 +434,11 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 fetch-ssl-certificate : ## Fetch the SSL certificate of the server
 	openssl s_client ${HOST}:${HTTPS_PORT}
 .PHONY : fetch-ssl-certificate
+
+ssl-certificate : ## Print the SSL certificate
+	openssl x509 -text -noout -in ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
+.PHONY : ssl-certificate
+
+certificate-authority : ## View the certificate authority
+	openssl x509 -text -noout -in ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.crt
+.PHONY : certificate-authority
