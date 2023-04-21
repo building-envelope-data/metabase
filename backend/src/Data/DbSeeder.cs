@@ -108,13 +108,13 @@ namespace Metabase.Data
                         {
                             [CultureInfo.GetCultureInfo("de-DE")] = "Testlab-Solar-Facades-Klient-Anwendung"
                         },
-                        PostLogoutRedirectUris =
-                        {
-                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"{host}/users/login")
-                        },
                         RedirectUris =
                         {
-                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"{host}/api/auth/callback/metabase")
+                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"{host}/connect/callback/login/metabase")
+                        },
+                        PostLogoutRedirectUris =
+                        {
+                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"{host}/connect/callback/logout/metabase")
                         },
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
