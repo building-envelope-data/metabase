@@ -6,9 +6,9 @@
   "license": "MIT",
   "scripts": {
     "codegen": "graphql-let && graphql-codegen --config codegen.yml",
-    "dev": "yarn codegen && next -p 8080",
+    "dev": "yarn codegen && NODE_OPTIONS='--use-openssl-ca' next -p 8080",
     "build": "yarn codegen && next build",
-    "test": "yarn codegen && jest",
+    "test": "yarn codegen && NODE_OPTIONS='--use-openssl-ca' jest",
     "start": "next start -p 8080"
   },
   "dependencies": {
