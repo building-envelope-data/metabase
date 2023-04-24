@@ -156,17 +156,17 @@ namespace Metabase
         private void ConfigureHttpClientServices(IServiceCollection services)
         {
             services.AddHttpClient();
-            var httpClientBuilder = services.AddHttpClient(QueryingDatabases.DATABASE_HTTP_CLIENT);
-            if (!_environment.IsProduction())
-            {
-                httpClientBuilder.ConfigurePrimaryHttpMessageHandler(_ =>
-                    new HttpClientHandler
-                    {
-                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                    }
-                );
-            }
-
+            services.AddHttpClient(QueryingDatabases.DATABASE_HTTP_CLIENT);
+            // var httpClientBuilder = services.AddHttpClient(QueryingDatabases.DATABASE_HTTP_CLIENT);
+            // if (!_environment.IsProduction())
+            // {
+            //     httpClientBuilder.ConfigurePrimaryHttpMessageHandler(_ =>
+            //         new HttpClientHandler
+            //         {
+            //             ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            //         }
+            //     );
+            // }
         }
 
         public void Configure(IApplicationBuilder app)
