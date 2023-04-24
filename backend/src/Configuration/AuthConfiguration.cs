@@ -274,16 +274,16 @@ namespace Metabase.Configuration
             // Register the OpenIddict server components.
             .AddServer(_ =>
                 {
-                    _.SetAuthorizationEndpointUris("/connect/authorize")
-                               .SetDeviceEndpointUris("/connect/device")
-                               .SetLogoutEndpointUris("/connect/logout")
-                               .SetIntrospectionEndpointUris("/connect/introspect")
+                    _.SetAuthorizationEndpointUris("connect/authorize")
+                               .SetDeviceEndpointUris("connect/device")
+                               .SetLogoutEndpointUris("connect/logout")
+                               .SetIntrospectionEndpointUris("connect/introspect")
                                // .SetRevocationEndpointUris("")
                                // .SetCryptographyEndpointUris("")
                                // .SetConfigurationEndpointUris("")
-                               .SetTokenEndpointUris("/connect/token")
-                               .SetUserinfoEndpointUris("/connect/userinfo")
-                               .SetVerificationEndpointUris("/connect/verify");
+                               .SetTokenEndpointUris("connect/token")
+                               .SetUserinfoEndpointUris("connect/userinfo")
+                               .SetVerificationEndpointUris("connect/verify");
                     _.RegisterScopes(
                         OpenIddictConstants.Scopes.Email,
                         OpenIddictConstants.Scopes.Profile,
@@ -307,15 +307,15 @@ namespace Metabase.Configuration
                     // Force client applications to use Proof Key for Code Exchange (PKCE).
                     _.RequireProofKeyForCodeExchange();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
-                    var aspNetCoreBuilder =
-                        _.UseAspNetCore()
-                               .EnableStatusCodePagesIntegration()
-                               .EnableAuthorizationEndpointPassthrough()
-                               .EnableLogoutEndpointPassthrough()
-                               .EnableTokenEndpointPassthrough()
-                               .EnableUserinfoEndpointPassthrough()
-                               .EnableVerificationEndpointPassthrough();
-                    aspNetCoreBuilder.DisableTransportSecurityRequirement();
+                    _.UseAspNetCore()
+                     .EnableStatusCodePagesIntegration()
+                     .EnableAuthorizationEndpointPassthrough()
+                     .EnableLogoutEndpointPassthrough()
+                     .EnableTokenEndpointPassthrough()
+                     .EnableUserinfoEndpointPassthrough()
+                     .EnableVerificationEndpointPassthrough();
+                    //.DisableTransportSecurityRequirement();
+                    // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending
                     // a token or revocation request, uncomment the following line:
                     // _.AcceptAnonymousClients();
@@ -368,6 +368,7 @@ namespace Metabase.Configuration
                      _.UseLocalServer();
                      // Register the ASP.NET Core host.
                      _.UseAspNetCore();
+                     // _.UseDataProtection();
                      // Note: the validation handler uses OpenID Connect discovery
                      // to retrieve the address of the introspection endpoint.
                      //options.SetIssuer("http://localhost:12345/");
