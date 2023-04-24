@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -153,7 +151,7 @@ namespace Metabase
                 );
         }
 
-        private void ConfigureHttpClientServices(IServiceCollection services)
+        private static void ConfigureHttpClientServices(IServiceCollection services)
         {
             services.AddHttpClient();
             services.AddHttpClient(QueryingDatabases.DATABASE_HTTP_CLIENT);
