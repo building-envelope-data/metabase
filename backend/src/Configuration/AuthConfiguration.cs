@@ -314,7 +314,8 @@ namespace Metabase.Configuration
                      .EnableTokenEndpointPassthrough()
                      .EnableUserinfoEndpointPassthrough()
                      .EnableVerificationEndpointPassthrough();
-                    //.DisableTransportSecurityRequirement();
+                    // .EnableStatusCodePagesIntegration();
+                    // .DisableTransportSecurityRequirement();
                     // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending
                     // a token or revocation request, uncomment the following line:
