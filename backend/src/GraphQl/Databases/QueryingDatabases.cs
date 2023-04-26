@@ -186,7 +186,7 @@ namespace Metabase.GraphQl.Databases
             //    .ConfigureAwait(false)
             //    )
             //   .AsGraphQLHttpResponse();
-            var httpClient = httpClientFactory.CreateClient(DATABASE_HTTP_CLIENT);
+            using var httpClient = httpClientFactory.CreateClient(DATABASE_HTTP_CLIENT);
             // An alternative to get the bearer token could look something like
             // `httpContextAccessor.HttpContext.GetTokenAsync(AuthenticationSchemes.AuthorizationHeaderBearer)`
             var bearerTokenPrefix = $"{IdentityModel.OidcConstants.AuthenticationSchemes.AuthorizationHeaderBearer} ";
@@ -201,10 +201,11 @@ namespace Metabase.GraphQl.Databases
                 httpClient.SetBearerToken(bearerToken);
             }
             // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
-            var httpResponseMessage =
+            using var jsonHttpContent = MakeJsonHttpContent(request);
+            using var httpResponseMessage =
                 await httpClient.PostAsync(
                     database.Locator,
-                    MakeJsonHttpContent(request),
+                    jsonHttpContent,
                     cancellationToken
                 ).ConfigureAwait(false);
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
