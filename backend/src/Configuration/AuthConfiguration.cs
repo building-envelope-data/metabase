@@ -301,10 +301,11 @@ namespace Metabase.Configuration
                         _.AllowPasswordFlow();
                     }
                     // Register the signing and encryption credentials.
-                    // See https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
+                    // See https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#registering-a-certificate-recommended-for-production-ready-scenarios
+                    // and https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
                     _.AddEncryptionCertificate(encryptionCertificate)
                     .AddSigningCertificate(signingCertificate);
-                    // Force client applications to use Proof Key for Code Exchange (PKCE).
+                    // Force client applications to use Proof Key for Code Exchange (PKCE): https://documentation.openiddict.com/configuration/proof-key-for-code-exchange.html#enabling-pkce-enforcement-at-the-global-level
                     _.RequireProofKeyForCodeExchange();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                     _.UseAspNetCore()
@@ -365,11 +366,13 @@ namespace Metabase.Configuration
                  {
                      // Configure the audience accepted by this resource server.
                      _.AddAudiences(appSettings.Host);
-                     // Import the configuration from the local OpenIddict server instance.
+                     // Import the configuration from the local OpenIddict server instance: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-the-optionsuselocalserver-integration
+                     // Alternatively, OpenId Connect discovery can be used: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-openid-connect-discovery-asymmetric-signing-keys-only
                      _.UseLocalServer();
                      // Register the ASP.NET Core host.
                      _.UseAspNetCore();
-                     // _.UseDataProtection();
+                     // Enable token entry validation: https://documentation.openiddict.com/configuration/token-storage.html#enabling-token-entry-validation-at-the-api-level
+                     _.EnableTokenEntryValidation();
                      // Note: the validation handler uses OpenID Connect discovery
                      // to retrieve the address of the introspection endpoint.
                      //options.SetIssuer("http://localhost:12345/");
