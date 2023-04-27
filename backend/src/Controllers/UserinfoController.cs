@@ -46,11 +46,22 @@ namespace Metabase.Controllers
                 [Claims.Subject] = await _userManager.GetUserIdAsync(user).ConfigureAwait(false)
             };
 
+            // var audience = User.GetClaim(Claims.Audience);
+            // if (audience is not null)
+            // {
+            //     claims[Claims.Audience] = audience;
+            // }
+
             if (User.HasScope(Scopes.Email))
             {
                 var email = await _userManager.GetEmailAsync(user).ConfigureAwait(false);
                 if (email is not null) claims[Claims.Email] = email;
                 claims[Claims.EmailVerified] = await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false);
+            }
+
+            if (User.HasScope(Scopes.Profile))
+            {
+                claims[Claims.Name] = user.Name;
             }
 
             if (User.HasScope(Scopes.Phone))
