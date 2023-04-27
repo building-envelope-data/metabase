@@ -575,6 +575,8 @@ namespace Metabase.Controllers
 
             switch (claim.Type)
             {
+                // https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+                // Note that the information for the respective scopes can also be fetched from the userinfo endpoint.
                 case Claims.Name:
                     yield return Destinations.AccessToken;
 
