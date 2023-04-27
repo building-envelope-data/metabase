@@ -365,7 +365,7 @@ namespace Metabase.Configuration
               .AddValidation(_ =>
                  {
                      // Configure the audience accepted by this resource server.
-                     _.AddAudiences(appSettings.Host);
+                     // _.AddAudiences(appSettings.Host);
                      // Import the configuration from the local OpenIddict server instance: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-the-optionsuselocalserver-integration
                      // Alternatively, OpenId Connect discovery can be used: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-openid-connect-discovery-asymmetric-signing-keys-only
                      _.UseLocalServer();
