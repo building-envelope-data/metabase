@@ -135,6 +135,9 @@ namespace Metabase.Configuration
             IServiceCollection services
             )
         {
+            // Dot not use the single authentication scheme as the default scheme
+            // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-7.0#defaultscheme
+            AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.SuppressAutoDefaultScheme", isEnabled: true);
             // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/
             services.AddAuthentication();
             services.AddAuthorization(_ =>
