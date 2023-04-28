@@ -142,12 +142,6 @@ namespace Metabase.Configuration
             services.AddAuthentication();
             services.AddAuthorization(_ =>
             {
-                // _.AddPolicy(JwtBearerAuthenticatedPolicy, policy =>
-                // {
-                //     policy.AuthenticationSchemes = new[] { JwtBearerDefaults.AuthenticationScheme }; // For cookies it would be `IdentityConstants.ApplicationScheme`
-                //     policy.RequireAuthenticatedUser();
-                // }
-                // );
                 foreach (var (policyName, scope) in new[] {
                      (ReadPolicy, ReadApiScope),
                      (WritePolicy, WriteApiScope),
