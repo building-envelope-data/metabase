@@ -249,7 +249,9 @@ namespace Metabase.Configuration
                                .SetUserinfoEndpointUris("connect/userinfo")
                                .SetVerificationEndpointUris("connect/verify");
                     _.RegisterScopes(
+                        OpenIddictConstants.Scopes.Address,
                         OpenIddictConstants.Scopes.Email,
+                        OpenIddictConstants.Scopes.Phone,
                         OpenIddictConstants.Scopes.Profile,
                         OpenIddictConstants.Scopes.Roles,
                         ReadApiScope,

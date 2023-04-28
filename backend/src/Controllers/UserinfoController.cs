@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +15,8 @@ namespace Metabase.Controllers
     // Inspired by https://github.com/openiddict/openiddict-samples/blob/dev/samples/Velusia/Velusia.Server/Controllers/UserinfoController.cs
     public sealed class UserinfoController : Controller
     {
+        private readonly record struct Address(string Formatted);
+
         private readonly UserManager<Data.User> _userManager;
 
         public UserinfoController(UserManager<Data.User> userManager)
@@ -53,6 +56,18 @@ namespace Metabase.Controllers
                 // Note: the "sub" claim is a mandatory claim and must be included in the JSON response.
                 [Claims.Subject] = await _userManager.GetUserIdAsync(user).ConfigureAwait(false)
             };
+            if (User.HasScope(Scopes.Address))
+            {
+                // https://openid.net/specs/openid-connect-basic-1_0.html#AddressClaim
+                if (user.PostalAddress is not null)
+                {
+                    // Alternatively, we could use the [raw string literal](https://devblogs.microsoft.com/dotnet/csharp-11-preview-updates/#raw-string-literals)
+                    // $$"""{ "formatted": "{{user.PostalAddress}}" }""";
+                    claims[Claims.Address] = JsonSerializer.Serialize(
+                        new Address(user.PostalAddress)
+                    );
+                }
+            }
             if (User.HasScope(Scopes.Email))
             {
                 var email = await _userManager.GetEmailAsync(user).ConfigureAwait(false);
@@ -67,7 +82,10 @@ namespace Metabase.Controllers
             }
             if (User.HasScope(Scopes.Profile))
             {
+                // https://openid.net/specs/openid-connect-basic-1_0.html#Scopes
                 claims[Claims.Name] = user.Name;
+                // claims[Claims.UpdatedAt] = ...;
+                if (user.WebsiteLocator is not null) claims[Claims.Website] = user.WebsiteLocator;
             }
             if (User.HasScope(Scopes.Roles))
             {
