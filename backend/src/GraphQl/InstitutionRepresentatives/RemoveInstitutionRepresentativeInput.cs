@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives
 {
-    public record RemoveInstitutionRepresentativeInput(
+    public sealed record RemoveInstitutionRepresentativeInput(
           Guid InstitutionId,
           Guid UserId
         );

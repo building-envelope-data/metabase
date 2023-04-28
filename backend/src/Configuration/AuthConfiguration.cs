@@ -1,5 +1,4 @@
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
@@ -18,7 +16,7 @@ namespace Metabase.Configuration
 {
     public abstract class AuthConfiguration
     {
-        // public const string JwtBearerAuthenticatedPolicy = "JwtBearerAuthenticated";
+        public const string Audience = "metabase";
         public const string ReadPolicy = "Read";
         public const string WritePolicy = "Write";
         public const string ManageUserPolicy = "ManageUser";
@@ -35,7 +33,7 @@ namespace Metabase.Configuration
             var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx", appSettings.JsonWebToken.EncryptionCertificatePassword);
             var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
             ConfigureIdentityServices(services);
-            ConfigureAuthenticiationAndAuthorizationServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
+            ConfigureAuthenticiationAndAuthorizationServices(services);
             ConfigureTaskScheduling(services, environment);
             ConfigureOpenIddictServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
         }
@@ -91,7 +89,7 @@ namespace Metabase.Configuration
                     _.ClaimsIdentity.RoleClaimType = OpenIddictConstants.Claims.Role;
                 })
               .AddEntityFrameworkStores<Data.ApplicationDbContext>()
-              .AddDefaultTokenProviders();
+              .AddDefaultTokenProviders(); // used to generate tokens for reset passwords, change email and change telephone number operations, and for two factor authentication token generation
             services.ConfigureApplicationCookie(_ =>
             {
                 _.AccessDeniedPath = "/unauthorized";
@@ -132,50 +130,16 @@ namespace Metabase.Configuration
         }
 
         private static void ConfigureAuthenticiationAndAuthorizationServices(
-            IServiceCollection services,
-            IWebHostEnvironment environment,
-            AppSettings appSettings,
-            X509Certificate2 encryptionCertificate,
-            X509Certificate2 signingCertificate
+            IServiceCollection services
             )
         {
-            // https://openiddict.github.io/openiddict-documentation/configuration/token-setup-and-validation.html#jwt-validation
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
+            // Dot not use the single authentication scheme as the default scheme
+            // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-7.0#defaultscheme
+            AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.SuppressAutoDefaultScheme", isEnabled: true);
             // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/
-            services.AddAuthentication()
-              .AddJwtBearer(_ =>
-                  {
-                      _.Audience = appSettings.Host;
-                      _.RequireHttpsMetadata = !environment.IsEnvironment("test");
-                      _.IncludeErrorDetails = true;
-                      _.SaveToken = true;
-                      _.TokenValidationParameters = new TokenValidationParameters()
-                      {
-                          NameClaimType = OpenIddictConstants.Claims.Subject,
-                          RoleClaimType = OpenIddictConstants.Claims.Role,
-                          ValidateIssuer = true,
-                          ValidIssuer = environment.IsEnvironment("test") ? "http://localhost/" : appSettings.Host,
-                          RequireAudience = true,
-                          ValidateAudience = true,
-                          ValidAudience = appSettings.Host,
-                          RequireExpirationTime = true,
-                          ValidateLifetime = true,
-                          ValidateIssuerSigningKey = true,
-                          RequireSignedTokens = true,
-                          TokenDecryptionKey = new X509SecurityKey(encryptionCertificate),
-                          IssuerSigningKey = new X509SecurityKey(signingCertificate)
-                      };
-                      // _.Events.OnAuthenticationFailed = _ =>
-                  });
+            services.AddAuthentication();
             services.AddAuthorization(_ =>
             {
-                // _.AddPolicy(JwtBearerAuthenticatedPolicy, policy =>
-                // {
-                //     policy.AuthenticationSchemes = new[] { JwtBearerDefaults.AuthenticationScheme }; // For cookies it would be `IdentityConstants.ApplicationScheme`
-                //     policy.RequireAuthenticatedUser();
-                // }
-                // );
                 foreach (var (policyName, scope) in new[] {
                      (ReadPolicy, ReadApiScope),
                      (WritePolicy, WriteApiScope),
@@ -285,7 +249,9 @@ namespace Metabase.Configuration
                                .SetUserinfoEndpointUris("connect/userinfo")
                                .SetVerificationEndpointUris("connect/verify");
                     _.RegisterScopes(
+                        OpenIddictConstants.Scopes.Address,
                         OpenIddictConstants.Scopes.Email,
+                        OpenIddictConstants.Scopes.Phone,
                         OpenIddictConstants.Scopes.Profile,
                         OpenIddictConstants.Scopes.Roles,
                         ReadApiScope,
@@ -364,8 +330,9 @@ namespace Metabase.Configuration
               // Register the OpenIddict validation components.
               .AddValidation(_ =>
                  {
+                     _.SetIssuer(appSettings.Host);
                      // Configure the audience accepted by this resource server.
-                     // _.AddAudiences(appSettings.Host);
+                     _.AddAudiences(Audience);
                      // Import the configuration from the local OpenIddict server instance: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-the-optionsuselocalserver-integration
                      // Alternatively, OpenId Connect discovery can be used: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-openid-connect-discovery-asymmetric-signing-keys-only
                      _.UseLocalServer();

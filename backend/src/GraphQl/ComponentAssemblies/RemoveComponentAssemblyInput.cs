@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.ComponentAssemblies
 {
-    public record RemoveComponentAssemblyInput(
+    public sealed record RemoveComponentAssemblyInput(
           Guid AssembledComponentId,
           Guid PartComponentId
         );

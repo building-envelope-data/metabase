@@ -1075,11 +1075,11 @@ namespace Metabase.GraphQl.Users
 
         public abstract record LoadSharedKeyAndQrCodeUriPayload
         {
-            public record Success(string SharedKey, string AuthenticatorUri) : LoadSharedKeyAndQrCodeUriPayload;
+            public sealed record Success(string SharedKey, string AuthenticatorUri) : LoadSharedKeyAndQrCodeUriPayload;
 
-            public record ResettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
-            public record GettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
-            public record GettingEmailFailure() : LoadSharedKeyAndQrCodeUriPayload;
+            public sealed record ResettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
+            public sealed record GettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
+            public sealed record GettingEmailFailure() : LoadSharedKeyAndQrCodeUriPayload;
 
             private LoadSharedKeyAndQrCodeUriPayload() { }
         }

@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Institutions
 {
-    public record DeleteInstitutionInput(
+    public sealed record DeleteInstitutionInput(
           Guid InstitutionId
         );
 }

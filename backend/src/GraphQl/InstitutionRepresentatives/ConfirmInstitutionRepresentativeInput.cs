@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives
 {
-    public record ConfirmInstitutionRepresentativeInput(
+    public sealed record ConfirmInstitutionRepresentativeInput(
           Guid InstitutionId,
           Guid UserId
         );

@@ -5,7 +5,7 @@ using Metabase.GraphQl.Standards;
 
 namespace Metabase.GraphQl.Methods
 {
-    public record UpdateMethodInput(
+    public sealed record UpdateMethodInput(
           Guid MethodId,
           string Name,
           string Description,

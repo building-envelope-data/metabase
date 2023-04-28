@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.DataX
 {
-    public record FileMetaInformationPropositionInput(
+    public sealed record FileMetaInformationPropositionInput(
         UuidPropositionInput? DataFormatId
     );
 }

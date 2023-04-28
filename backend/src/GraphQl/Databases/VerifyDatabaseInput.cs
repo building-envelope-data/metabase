@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Databases
 {
-    public record VerifyDatabaseInput(
+    public sealed record VerifyDatabaseInput(
           Guid DatabaseId
         );
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.DataX
 {
-    public record CalorimetricDataPropositionInput(
+    public sealed record CalorimetricDataPropositionInput(
         UuidPropositionInput? ComponentId,
         IReadOnlyList<CalorimetricDataPropositionInput>? And,
         CalorimetricDataPropositionInput? Not,

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.DataX
 {
-    public record DataPropositionInput(
+    public sealed record DataPropositionInput(
         UuidPropositionInput? ComponentId,
         IReadOnlyList<DataPropositionInput>? And,
         DataPropositionInput? Not,

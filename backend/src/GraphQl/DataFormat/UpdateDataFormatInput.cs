@@ -4,7 +4,7 @@ using Metabase.GraphQl.Standards;
 
 namespace Metabase.GraphQl.DataFormats
 {
-    public record UpdateDataFormatInput(
+    public sealed record UpdateDataFormatInput(
             Guid DataFormatId,
             string Name,
             string? Extension,

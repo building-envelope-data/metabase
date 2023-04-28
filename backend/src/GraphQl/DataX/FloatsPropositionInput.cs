@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.DataX
 {
-    public record FloatsPropositionInput(
+    public sealed record FloatsPropositionInput(
         FloatPropositionInput? All,
         FloatPropositionInput? None,
         FloatPropositionInput? Some

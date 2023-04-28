@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.DataX
 {
-    public record FilesMetaInformationPropositionInput(
+    public sealed record FilesMetaInformationPropositionInput(
         FileMetaInformationPropositionInput? All,
         FileMetaInformationPropositionInput? None,
         FileMetaInformationPropositionInput? Some

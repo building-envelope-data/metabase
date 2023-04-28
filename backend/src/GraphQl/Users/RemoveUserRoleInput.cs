@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Users
 {
-    public record RemoveUserRoleInput(
+    public sealed record RemoveUserRoleInput(
           Guid UserId,
           Enumerations.UserRole Role
         );

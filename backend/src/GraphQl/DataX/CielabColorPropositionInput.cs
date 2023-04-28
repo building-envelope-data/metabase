@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.DataX
 {
-    public record CielabColorPropositionInput(
+    public sealed record CielabColorPropositionInput(
         FloatPropositionInput? LStar,
         FloatPropositionInput? AStar,
         FloatPropositionInput? BStar

@@ -2,7 +2,6 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.Data;
 using Metabase.Authorization;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;

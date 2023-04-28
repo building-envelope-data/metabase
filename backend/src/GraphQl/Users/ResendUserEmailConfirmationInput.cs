@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.Users
 {
-    public record ResendUserEmailConfirmationInput(
+    public sealed record ResendUserEmailConfirmationInput(
           string Email
         );
 }

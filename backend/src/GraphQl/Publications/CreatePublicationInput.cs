@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Publications
 {
-    public record CreatePublicationInput(
+    public sealed record CreatePublicationInput(
             string? Title,
             string? Abstract,
             string? Section,

@@ -4,7 +4,7 @@ using Metabase.GraphQl.Standards;
 
 namespace Metabase.GraphQl.DataFormats
 {
-    public record CreateDataFormatInput(
+    public sealed record CreateDataFormatInput(
             string Name,
             string? Extension,
             string Description,

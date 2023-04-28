@@ -3,7 +3,7 @@ using Metabase.Enumerations;
 
 namespace Metabase.GraphQl.ComponentAssemblies
 {
-    public record AddComponentAssemblyInput(
+    public sealed record AddComponentAssemblyInput(
           Guid AssembledComponentId,
           Guid PartComponentId,
           byte? Index,

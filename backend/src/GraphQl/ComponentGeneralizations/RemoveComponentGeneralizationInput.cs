@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.ComponentGeneralizations
 {
-    public record RemoveComponentGeneralizationInput(
+    public sealed record RemoveComponentGeneralizationInput(
           Guid GeneralComponentId,
           Guid ConcreteComponentId
         );

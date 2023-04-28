@@ -2,7 +2,7 @@ using Guid = System.Guid;
 
 namespace Metabase.GraphQl.Users
 {
-    public record ConfirmUserEmailInput(
+    public sealed record ConfirmUserEmailInput(
           string Email,
           string ConfirmationCode
         );

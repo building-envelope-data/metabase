@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.Users
 {
-    public record ResetUserPasswordInput(
+    public sealed record ResetUserPasswordInput(
           string Email,
           string Password,
           string PasswordConfirmation,

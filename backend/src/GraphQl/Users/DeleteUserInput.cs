@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Users
 {
-    public record DeleteUserInput(
+    public sealed record DeleteUserInput(
           Guid UserId
         );
 }

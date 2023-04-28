@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Metabase.ViewModels.Authorization
 {
-    public record AuthorizeViewModel
+    public sealed record AuthorizeViewModel
     {
         [Display(Name = "Application")]
         public string? ApplicationName { get; init; }
