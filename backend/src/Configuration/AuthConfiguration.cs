@@ -91,7 +91,7 @@ namespace Metabase.Configuration
                     _.ClaimsIdentity.RoleClaimType = OpenIddictConstants.Claims.Role;
                 })
               .AddEntityFrameworkStores<Data.ApplicationDbContext>()
-              .AddDefaultTokenProviders();
+              .AddDefaultTokenProviders(); // used to generate tokens for reset passwords, change email and change telephone number operations, and for two factor authentication token generation
             services.ConfigureApplicationCookie(_ =>
             {
                 _.AccessDeniedPath = "/unauthorized";
