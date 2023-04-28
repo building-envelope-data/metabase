@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Users
 {
-    public record AddUserRoleInput(
+    public sealed record AddUserRoleInput(
           Guid UserId,
           Enumerations.UserRole Role
         );

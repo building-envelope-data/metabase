@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Institutions
 {
-    public record UpdateInstitutionInput(
+    public sealed record UpdateInstitutionInput(
           Guid InstitutionId,
           string Name,
           string? Abbreviation,

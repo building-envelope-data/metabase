@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.ComponentVariants
 {
-    public record RemoveComponentVariantInput(
+    public sealed record RemoveComponentVariantInput(
           Guid OneComponentId,
           Guid OtherComponentId
         );

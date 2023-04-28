@@ -5,7 +5,7 @@ using Metabase.GraphQl.Standards;
 
 namespace Metabase.GraphQl.Methods
 {
-    public record CreateMethodInput(
+    public sealed record CreateMethodInput(
           string Name,
           string Description,
           OpenEndedDateTimeRangeInput? Validity,

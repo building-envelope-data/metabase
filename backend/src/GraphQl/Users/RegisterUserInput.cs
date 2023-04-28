@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.Users
 {
-    public record RegisterUserInput(
+    public sealed record RegisterUserInput(
           string Name,
           string Email,
           string Password,

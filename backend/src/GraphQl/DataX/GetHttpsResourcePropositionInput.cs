@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.DataX
 {
-    public record GetHttpsResourcePropositionInput(
+    public sealed record GetHttpsResourcePropositionInput(
         UuidPropositionInput? DataFormatId,
         FilesMetaInformationPropositionInput? ArchivedFilesMetaInformation
     );

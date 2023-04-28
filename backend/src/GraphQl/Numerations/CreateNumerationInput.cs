@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.Numerations
 {
-    public record CreateNumerationInput(
+    public sealed record CreateNumerationInput(
             string? Prefix,
             string MainNumber,
             string? Suffix

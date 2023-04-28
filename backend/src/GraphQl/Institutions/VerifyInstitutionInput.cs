@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Institutions
 {
-    public record VerifyInstitutionInput(
+    public sealed record VerifyInstitutionInput(
           Guid InstitutionId
         );
 }

@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.Users
 {
-    public record SetUserPhoneNumberInput(
+    public sealed record SetUserPhoneNumberInput(
           string PhoneNumber
         );
 }

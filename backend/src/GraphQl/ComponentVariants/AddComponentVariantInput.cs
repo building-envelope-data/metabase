@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.ComponentVariants
 {
-    public record AddComponentVariantInput(
+    public sealed record AddComponentVariantInput(
           Guid OneComponentId,
           Guid OtherComponentId
         );

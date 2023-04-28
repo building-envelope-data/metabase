@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.UserMethodDevelopers
 {
-    public record AddUserMethodDeveloperInput(
+    public sealed record AddUserMethodDeveloperInput(
           Guid MethodId,
           Guid UserId
         );

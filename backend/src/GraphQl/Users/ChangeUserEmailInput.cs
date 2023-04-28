@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.Users
 {
-    public record ChangeUserEmailInput(
+    public sealed record ChangeUserEmailInput(
           string NewEmail
         );
 }

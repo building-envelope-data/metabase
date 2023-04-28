@@ -3,7 +3,7 @@ using Metabase.GraphQl.Numerations;
 
 namespace Metabase.GraphQl.Standards
 {
-    public record UpdateStandardInput(
+    public sealed record UpdateStandardInput(
           string? Title,
           string? Abstract,
           string? Section,

@@ -5,7 +5,7 @@ using OpenIddict.Abstractions;
 
 namespace Metabase.ViewModels.Authorization
 {
-    public record VerifyViewModel
+    public sealed record VerifyViewModel
     {
         [Display(Name = "Application")]
         public string? ApplicationName { get; init; }

@@ -1,6 +1,6 @@
 namespace Metabase.GraphQl.DataX
 {
-    public record FloatPropositionInput(
+    public sealed record FloatPropositionInput(
         double? EqualTo,
         double? GreaterThanOrEqualTo,
         ClosedIntervalInput? InClosedInterval,

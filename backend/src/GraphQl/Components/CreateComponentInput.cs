@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Components
 {
-    public record CreateComponentInput(
+    public sealed record CreateComponentInput(
           string Name,
           string? Abbreviation,
           string Description,

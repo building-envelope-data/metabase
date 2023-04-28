@@ -40,7 +40,7 @@ namespace Metabase.Tests.Integration
             return Task.FromResult(0);
         }
 
-        public record Email(
+        public sealed record Email(
             (string name, string address) To,
             string Subject,
             string Body

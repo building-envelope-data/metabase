@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.ComponentManufacturers
 {
-    public record ConfirmComponentManufacturerInput(
+    public sealed record ConfirmComponentManufacturerInput(
           Guid ComponentId,
           Guid InstitutionId
         );

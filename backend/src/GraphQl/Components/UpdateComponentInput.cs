@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.Components
 {
-    public record UpdateComponentInput(
+    public sealed record UpdateComponentInput(
           Guid ComponentId,
           string Name,
           string? Abbreviation,

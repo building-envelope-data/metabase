@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.Institutions
 {
-    public record CreateInstitutionInput(
+    public sealed record CreateInstitutionInput(
           string Name,
           string? Abbreviation,
           string Description,

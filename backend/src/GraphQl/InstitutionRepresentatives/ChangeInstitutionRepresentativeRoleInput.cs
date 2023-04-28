@@ -2,7 +2,7 @@ using System;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives
 {
-    public record ChangeInstitutionRepresentativeRoleInput(
+    public sealed record ChangeInstitutionRepresentativeRoleInput(
           Guid InstitutionId,
           Guid UserId,
           Enumerations.InstitutionRepresentativeRole Role
