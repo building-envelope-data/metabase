@@ -35,7 +35,7 @@ namespace Metabase.Configuration
             var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx", appSettings.JsonWebToken.EncryptionCertificatePassword);
             var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
             ConfigureIdentityServices(services);
-            ConfigureAuthenticiationAndAuthorizationServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
+            ConfigureAuthenticiationAndAuthorizationServices(services);
             ConfigureTaskScheduling(services, environment);
             ConfigureOpenIddictServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
         }
@@ -132,42 +132,11 @@ namespace Metabase.Configuration
         }
 
         private static void ConfigureAuthenticiationAndAuthorizationServices(
-            IServiceCollection services,
-            IWebHostEnvironment environment,
-            AppSettings appSettings,
-            X509Certificate2 encryptionCertificate,
-            X509Certificate2 signingCertificate
+            IServiceCollection services
             )
         {
-            // https://openiddict.github.io/openiddict-documentation/configuration/token-setup-and-validation.html#jwt-validation
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
             // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/
-            services.AddAuthentication()
-              .AddJwtBearer(_ =>
-                  {
-                      _.Audience = appSettings.Host;
-                      _.RequireHttpsMetadata = !environment.IsEnvironment("test");
-                      _.IncludeErrorDetails = true;
-                      _.SaveToken = true;
-                      _.TokenValidationParameters = new TokenValidationParameters()
-                      {
-                          NameClaimType = OpenIddictConstants.Claims.Subject,
-                          RoleClaimType = OpenIddictConstants.Claims.Role,
-                          ValidateIssuer = true,
-                          ValidIssuer = environment.IsEnvironment("test") ? "http://localhost/" : appSettings.Host,
-                          RequireAudience = true,
-                          ValidateAudience = true,
-                          ValidAudience = appSettings.Host,
-                          RequireExpirationTime = true,
-                          ValidateLifetime = true,
-                          ValidateIssuerSigningKey = true,
-                          RequireSignedTokens = true,
-                          TokenDecryptionKey = new X509SecurityKey(encryptionCertificate),
-                          IssuerSigningKey = new X509SecurityKey(signingCertificate)
-                      };
-                      // _.Events.OnAuthenticationFailed = _ =>
-                  });
+            services.AddAuthentication();
             services.AddAuthorization(_ =>
             {
                 // _.AddPolicy(JwtBearerAuthenticatedPolicy, policy =>
