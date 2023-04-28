@@ -16,7 +16,7 @@ namespace Metabase.Configuration
 {
     public abstract class AuthConfiguration
     {
-        // public const string JwtBearerAuthenticatedPolicy = "JwtBearerAuthenticated";
+        public const string Audience = "metabase";
         public const string ReadPolicy = "Read";
         public const string WritePolicy = "Write";
         public const string ManageUserPolicy = "ManageUser";
@@ -330,8 +330,9 @@ namespace Metabase.Configuration
               // Register the OpenIddict validation components.
               .AddValidation(_ =>
                  {
+                     _.SetIssuer(appSettings.Host);
                      // Configure the audience accepted by this resource server.
-                     // _.AddAudiences(appSettings.Host);
+                     _.AddAudiences(Audience);
                      // Import the configuration from the local OpenIddict server instance: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-the-optionsuselocalserver-integration
                      // Alternatively, OpenId Connect discovery can be used: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-openid-connect-discovery-asymmetric-signing-keys-only
                      _.UseLocalServer();

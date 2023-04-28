@@ -170,7 +170,7 @@ namespace Metabase.Data
                         Name = Configuration.AuthConfiguration.ReadApiScope,
                         Resources =
                         {
-                            appSettings.Host
+                            Configuration.AuthConfiguration.Audience
                         }
                     }
                 ).ConfigureAwait(false);
@@ -189,7 +189,7 @@ namespace Metabase.Data
                         Name = Configuration.AuthConfiguration.WriteApiScope,
                         Resources =
                         {
-                            appSettings.Host
+                            Configuration.AuthConfiguration.Audience
                         }
                     }
                 ).ConfigureAwait(false);
