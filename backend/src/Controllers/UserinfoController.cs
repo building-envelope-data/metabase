@@ -13,6 +13,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 namespace Metabase.Controllers
 {
     // Inspired by https://github.com/openiddict/openiddict-samples/blob/dev/samples/Velusia/Velusia.Server/Controllers/UserinfoController.cs
+    // Keep in sync with `PersonalUserDataController`.
     public sealed class UserinfoController : Controller
     {
         private readonly record struct Address(string Formatted);

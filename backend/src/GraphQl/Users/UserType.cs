@@ -146,6 +146,7 @@ namespace Metabase.GraphQl.Users
         {
             descriptor.BindFieldsExplicitly();
             base.Configure(descriptor);
+            // Keep authorization scopes in sync with `UserinfoController`.
             descriptor
               .Field(t => t.Name)
               // .Type<NonNullType<StringType>>()
