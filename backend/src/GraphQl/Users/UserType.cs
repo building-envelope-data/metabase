@@ -8,6 +8,7 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
 using Metabase.Extensions;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
@@ -147,6 +148,7 @@ namespace Metabase.GraphQl.Users
             base.Configure(descriptor);
             descriptor
               .Field(t => t.Name)
+              // TODO Protect full name.
               // .Resolve(context =>
               //   Authorize(context, user => user.Name, Scopes.Profile)
               // )
@@ -203,7 +205,8 @@ namespace Metabase.GraphQl.Users
                 AuthorizeAsync<bool>(
                   context,
                   async (user, userManager) =>
-                    await userManager.HasPasswordAsync(user).ConfigureAwait(false)
+                    await userManager.HasPasswordAsync(user).ConfigureAwait(false),
+                  AuthConfiguration.UserApiScope
                   )
               )
               .UseUserManager();
@@ -263,6 +266,10 @@ namespace Metabase.GraphQl.Users
               [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
             {
+                if (!claimsPrincipal.HasScope(AuthConfiguration.UserApiScope))
+                {
+                    return null;
+                }
                 if (!await UserAuthorization.IsAuthorizedToManageUser(
                   claimsPrincipal,
                   user.Id,
