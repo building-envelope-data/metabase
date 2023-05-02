@@ -14,12 +14,18 @@ namespace Metabase.Data
           IStakeholder
     {
         [GraphQLDescription("Full name")]
+        [ProtectedPersonalData]
+        [PersonalData]
         public string Name { get; private set; }
 
         [MinLength(1)]
+        [ProtectedPersonalData]
+        [PersonalData]
         public string? PostalAddress { get; private set; }
 
         [Url]
+        [ProtectedPersonalData]
+        [PersonalData]
         public Uri? WebsiteLocator { get; private set; }
 
         // public ICollection<UserClaim> Claims { get; } = new List<UserClaim>();

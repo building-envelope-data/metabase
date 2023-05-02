@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade packages to latest compatible versions in backend and frontend [#151](https://github.com/building-envelope-data/metabase/pull/151), [#143](https://github.com/building-envelope-data/metabase/pull/143), and [#141](https://github.com/building-envelope-data/metabase/pull/141)
 - Make forms type-safe [88259910da5490be845fe79dab066e868ee841c1](https://github.com/building-envelope-data/metabase/commit/88259910da5490be845fe79dab066e868ee841c1)
 - Clean-up authentication and authorization set-up [#161](https://github.com/building-envelope-data/metabase/pull/161)
--
+- Protect personal user data and login/registration mutations with client-specific scopes [#162](https://github.com/building-envelope-data/metabase/pull/162)
 -
 -
 -

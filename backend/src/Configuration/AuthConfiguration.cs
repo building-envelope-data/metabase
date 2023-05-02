@@ -19,9 +19,11 @@ namespace Metabase.Configuration
         public const string Audience = "metabase";
         public const string ReadPolicy = "Read";
         public const string WritePolicy = "Write";
+        public const string UserPolicy = "User";
         public const string ManageUserPolicy = "ManageUser";
         public static string ReadApiScope { get; } = "api:read";
         public static string WriteApiScope { get; } = "api:write";
+        public static string UserApiScope { get; } = "api:user:manage";
         public static string ManageUserApiScope { get; } = "api:user:manage";
 
         public static void ConfigureServices(
@@ -98,18 +100,33 @@ namespace Metabase.Configuration
                 _.ReturnUrlParameter = "returnTo";
                 _.Events.OnValidatePrincipal = context =>
                 {
-                    // The metabase frontend uses application cookies for
-                    // user authentication and is allowed to read data,
-                    // write data, and manage users. The corresponding
-                    // policies use scopes, so we need to add them.
                     if (context?.Principal is not null)
                     {
                         var identity = new ClaimsIdentity();
+                        // The metabase frontend uses application cookies for
+                        // user authentication and is allowed to show user data
+                        // for all standard scopes. The corresponding
+                        // authorization logic in `UserType` uses
+                        // `ClaimsPrincipal.HasScope`.
+                        identity.SetScopes(
+                            new[] {
+                                OpenIddictConstants.Scopes.Address,
+                                OpenIddictConstants.Scopes.Email,
+                                OpenIddictConstants.Scopes.Phone,
+                                OpenIddictConstants.Scopes.Profile,
+                                OpenIddictConstants.Scopes.Roles
+                            }
+                        );
+                        // The metabase frontend uses application cookies for user
+                        // authentication and is allowed to read data, write data,
+                        // and manage users. The corresponding policies `*Policy`
+                        // use scopes, so we need to add them.
                         foreach (
                             var claim in
                                 new[] {
                                     ReadApiScope,
                                     WriteApiScope,
+                                    UserApiScope,
                                     ManageUserApiScope
                                 }
                         )
@@ -143,6 +160,7 @@ namespace Metabase.Configuration
                 foreach (var (policyName, scope) in new[] {
                      (ReadPolicy, ReadApiScope),
                      (WritePolicy, WriteApiScope),
+                     (UserPolicy, UserApiScope),
                      (ManageUserPolicy, ManageUserApiScope)
                      }
                    )
