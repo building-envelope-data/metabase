@@ -1536,8 +1536,9 @@ type User implements Node & Stakeholder {
   "Full name"
   name: String!
   phoneNumber: String
+  postalAddress: String
   representedInstitutions(pending: Boolean! = false): UserRepresentedInstitutionConnection!
-  roles: [UserRole!]!
+  roles: [UserRole!]
   rolesCurrentUserCanAdd: [UserRole!]!
   rolesCurrentUserCanRemove: [UserRole!]!
   twoFactorAuthentication: TwoFactorAuthentication

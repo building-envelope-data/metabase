@@ -98,13 +98,27 @@ namespace Metabase.Configuration
                 _.ReturnUrlParameter = "returnTo";
                 _.Events.OnValidatePrincipal = context =>
                 {
-                    // The metabase frontend uses application cookies for
-                    // user authentication and is allowed to read data,
-                    // write data, and manage users. The corresponding
-                    // policies use scopes, so we need to add them.
                     if (context?.Principal is not null)
                     {
                         var identity = new ClaimsIdentity();
+                        // The metabase frontend uses application cookies for
+                        // user authentication and is allowed to show user data
+                        // for all standard scopes. The corresponding
+                        // authorization logic in `UserType` uses
+                        // `ClaimsPrincipal.HasScope`.
+                        identity.SetScopes(
+                            new[] {
+                                OpenIddictConstants.Scopes.Address,
+                                OpenIddictConstants.Scopes.Email,
+                                OpenIddictConstants.Scopes.Phone,
+                                OpenIddictConstants.Scopes.Profile,
+                                OpenIddictConstants.Scopes.Roles
+                            }
+                        );
+                        // The metabase frontend uses application cookies for user
+                        // authentication and is allowed to read data, write data,
+                        // and manage users. The corresponding policies `*Policy`
+                        // use scopes, so we need to add them.
                         foreach (
                             var claim in
                                 new[] {
