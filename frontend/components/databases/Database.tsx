@@ -98,13 +98,14 @@ export default function Database({ databaseId }: DatabaseProps) {
       {database.canCurrentUserVerifyNode &&
         database.verificationState == DatabaseVerificationState.Pending && (
           <Typography.Paragraph>
-            Have your database's GraphQL endpoint return the verification code "
-            {database.verificationCode}" (without the quotation marks), when
-            queried for the GraphQL query "verificationCode". Then, press the
-            "Verify" button above to make the metabase assert that the
-            verification codes match which proves that you control the GraphQL
-            endpoint {database.locator}. Verified databases are publicly listed
-            and included in data searches.
+            Have your database&apos;s GraphQL endpoint return the verification
+            code &ldquo;
+            {database.verificationCode}&rdquo; (without the quotation marks),
+            when queried for the GraphQL query &ldquo;verificationCode&rdquo;.
+            Then, press the &ldquo;Verify&rdquo; button above to make the
+            metabase assert that the verification codes match which proves that
+            you control the GraphQL endpoint {database.locator}. Verified
+            databases are publicly listed and included in data searches.
           </Typography.Paragraph>
         )}
     </>

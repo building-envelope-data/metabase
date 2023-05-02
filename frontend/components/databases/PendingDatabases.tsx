@@ -11,7 +11,6 @@ import { Scalars } from "../../__generated__/__types__";
 import Link from "next/link";
 import paths from "../../paths";
 import { messageApolloError } from "../../lib/apollo";
-import Database from "./Database";
 
 export type PendingDatabasesProps = {};
 
