@@ -148,10 +148,16 @@ namespace Metabase.GraphQl.Users
             base.Configure(descriptor);
             descriptor
               .Field(t => t.Name)
-              // TODO Protect full name.
-              // .Resolve(context =>
-              //   Authorize(context, user => user.Name, Scopes.Profile)
-              // )
+              // .Type<NonNullType<StringType>>()
+              .Resolve(async context =>
+                // Instead of returning `null`, we return a string because
+                // otherwise the corresponding GraphQL field would need to be
+                // nullable and because the type `User` implements
+                // `IStakeholder`, the stakeholder name would also need to be
+                // nullable.
+                await Authorize(context, user => user.Name, Scopes.Profile) ??
+                "<redacted>"
+              )
               .UseUserManager();
             descriptor
               .Field(t => t.Email)
