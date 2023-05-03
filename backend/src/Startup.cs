@@ -193,7 +193,7 @@ namespace Metabase
             // app.UseHttpsRedirection(); // Done by NGINX
             app.UseSerilogRequestLogging();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+            app.UseCookiePolicy(); // [SameSite cookies](https://learn.microsoft.com/en-us/aspnet/core/security/samesite)
             app.UseRouting();
             // TODO Do we really want this? See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0
             app.UseRequestLocalization(_ =>
