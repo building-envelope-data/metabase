@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
 import { Modal, Layout as AntLayout, Typography } from "antd";
@@ -82,6 +82,8 @@ export default function Layout({ children }: LayoutProps) {
   const [cookies, setCookie] = useCookies([cookieConsentName]);
   const shouldShowCookieConsent =
     cookies[cookieConsentName] != cookieConsentValue;
+  const [isLoadingAntiforgeryToken, setLoadingAntiforgeryToken] =
+    useState(false);
 
   useEffect(() => {
     if (shouldShowCookieConsent) {
@@ -101,6 +103,13 @@ export default function Layout({ children }: LayoutProps) {
       });
     }
   }, [shouldShowCookieConsent, setCookie]);
+
+  useEffect(() => {
+    setLoadingAntiforgeryToken(true);
+    fetch("/antiforgery/token").then((_) => {
+      setLoadingAntiforgeryToken(false);
+    });
+  }, []);
 
   return (
     <AntLayout>

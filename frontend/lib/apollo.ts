@@ -20,7 +20,31 @@ export type ResolverContext = {
   res?: ServerResponse;
 };
 
+function getCookie(name: string, cookies: string): string | null {
+  return (
+    cookies
+      .split(";")
+      .map((cookie) => cookie.trim())
+      .filter((cookie) => {
+        return cookie.substring(0, name.length + 1) === `${name}=`;
+      })
+      .map((cookie) => {
+        return decodeURIComponent(cookie.substring(name.length + 1));
+      })[0] || null
+  );
+}
+
 function createIsomorphLink(context: ResolverContext = {}) {
+  var headers: Record<string, string> = {};
+  headers["accept"] = "application/json";
+  var cookie = context.req?.headers?.cookie;
+  if (cookie) {
+    headers["cookie"] = cookie;
+  }
+  if (typeof window !== "undefined") {
+    var antiforgeryToken = getCookie("XSRF-TOKEN", document.cookie);
+    if (antiforgeryToken) headers["X-XSRF-TOKEN"] = antiforgeryToken;
+  }
   return createPersistedQueryLink({
     sha256,
     useGETForHashedQueries: false,
@@ -40,12 +64,7 @@ function createIsomorphLink(context: ResolverContext = {}) {
           : `${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`,
       useGETForQueries: false, // Use `POST` for queries to avoid "414 Request-URI Too Large" errors
       credentials: "same-origin",
-      headers: context.req?.headers?.cookie
-        ? {
-            accept: "application/json",
-            cookie: context.req.headers.cookie,
-          }
-        : { accept: "application/json" },
+      headers: headers,
     })
   );
 }

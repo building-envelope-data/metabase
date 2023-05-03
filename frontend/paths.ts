@@ -1,5 +1,6 @@
 export default {
   home: "/",
+  antiforgeryToken: "/antiforgery/token",
   legalNotice: "/legal-notice",
   dataProtectionInformation: "/data-protection-information",
   databases: "/databases",

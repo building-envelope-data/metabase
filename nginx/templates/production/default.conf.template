@@ -82,6 +82,11 @@ server {
     limit_req  zone=one burst=10 nodelay;
   }
 
+  location /antiforgery {
+    proxy_pass http://backend;
+    limit_req  zone=one burst=10 nodelay;
+  }
+
   location /.well-known {
     proxy_pass http://backend;
     limit_req  zone=one burst=1 nodelay;

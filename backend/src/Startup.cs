@@ -49,6 +49,10 @@ namespace Metabase
             ConfigureMessageSenderServices(services);
             ConfigureRequestResponseServices(services);
             ConfigureSessionServices(services);
+            services.AddAntiforgery(_ =>
+            {
+                _.HeaderName = "X-XSRF-TOKEN";
+            });
             services
                 .AddDataProtection()
                 .PersistKeysToDbContext<Data.ApplicationDbContext>();
