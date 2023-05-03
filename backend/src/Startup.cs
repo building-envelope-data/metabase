@@ -27,6 +27,8 @@ namespace Metabase
 {
     public sealed class Startup
     {
+        private const string GraphQlCorsPolicy = "GraphQlCorsPolicy";
+
         private readonly IWebHostEnvironment _environment;
         private readonly AppSettings _appSettings;
 
@@ -73,11 +75,13 @@ namespace Metabase
             }
             );
             services.AddCors(_ =>
-                _.AddDefaultPolicy(policy =>
-                    policy
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
+                _.AddPolicy(
+                    name: GraphQlCorsPolicy,
+                    policy =>
+                        policy
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
                     )
                 );
             services.AddControllersWithViews();
@@ -212,7 +216,8 @@ namespace Metabase
             /* app.UseWebSockets(); */
             app.UseEndpoints(_ =>
             {
-                _.MapGraphQL().WithOptions(
+                _.MapGraphQL()
+                .WithOptions(
                     // https://chillicream.com/docs/hotchocolate/server/middleware
                     new GraphQLServerOptions
                     {
@@ -229,7 +234,8 @@ namespace Metabase
                             Title = "GraphQL"
                         }
                     }
-                );
+                )
+                .RequireCors(GraphQlCorsPolicy);
                 _.MapControllers();
                 _.MapHealthChecks("/health",
                     new HealthCheckOptions
