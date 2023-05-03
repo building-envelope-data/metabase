@@ -18,6 +18,7 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import paths from "../../paths";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
+import { isLocalUrl } from "../../lib/url";
 
 function Login() {
   const router = useRouter();
@@ -68,7 +69,7 @@ function Login() {
           } else if (data?.loginUser?.user) {
             await apolloClient.resetStore();
             await router.push(
-              typeof returnTo === "string" ? returnTo : paths.home
+              typeof returnTo === "string" && isLocalUrl(returnTo) ? returnTo : paths.home
             );
           }
         }
