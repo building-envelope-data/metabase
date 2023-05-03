@@ -213,7 +213,7 @@ namespace Metabase.GraphQl.Users
                   context,
                   async (user, userManager) =>
                     await userManager.HasPasswordAsync(user).ConfigureAwait(false),
-                  AuthConfiguration.UserApiScope
+                  AuthConfiguration.ManageUserApiScope
                   )
               )
               .UseUserManager();
@@ -273,7 +273,7 @@ namespace Metabase.GraphQl.Users
               [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
             {
-                if (!claimsPrincipal.HasScope(AuthConfiguration.UserApiScope))
+                if (!claimsPrincipal.HasScope(AuthConfiguration.ManageUserApiScope))
                 {
                     return null;
                 }

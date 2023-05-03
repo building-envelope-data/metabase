@@ -31,7 +31,6 @@ namespace Metabase.GraphQl.Users
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ConfirmEmail.cs.cshtml
         // and https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.RegisterConfirmation.cs.cshtml
         // Despite its name, it is also used to confirm registrations. TODO Should we add another mutation for that?
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<ConfirmUserEmailPayload> ConfirmUserEmailAsync(
             ConfirmUserEmailInput input,
@@ -81,7 +80,6 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ConfirmEmailChange.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         [UseSignInManager]
         public async Task<ConfirmUserEmailChangePayload> ConfirmUserEmailChangeAsync(
@@ -167,7 +165,6 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Login.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         [UseSignInManager]
         public async Task<LoginUserPayload> LoginUserAsync(
@@ -233,7 +230,6 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWith2fa.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         [UseSignInManager]
         public async Task<LoginUserWithTwoFactorCodePayload> LoginUserWithTwoFactorCodeAsync(
@@ -296,7 +292,6 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWithRecoveryCode.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         [UseSignInManager]
         public async Task<LoginUserWithRecoveryCodePayload> LoginUserWithRecoveryCodeAsync(
@@ -356,7 +351,6 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Register.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<RegisterUserPayload> RegisterUserAsync(
             RegisterUserInput input,
@@ -470,7 +464,6 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResendEmailConfirmation.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<ResendUserEmailConfirmationPayload> ResendUserEmailConfirmationAsync(
             ResendUserEmailConfirmationInput input,
@@ -494,7 +487,6 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ForgotPassword.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<RequestUserPasswordResetPayload> RequestUserPasswordResetAsync(
             RequestUserPasswordResetInput input,
@@ -522,7 +514,6 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResetPassword.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<ResetUserPasswordPayload> ResetUserPasswordAsync(
             ResetUserPasswordInput input,

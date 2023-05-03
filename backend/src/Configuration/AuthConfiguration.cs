@@ -19,11 +19,9 @@ namespace Metabase.Configuration
         public const string Audience = "metabase";
         public const string ReadPolicy = "Read";
         public const string WritePolicy = "Write";
-        public const string UserPolicy = "User";
         public const string ManageUserPolicy = "ManageUser";
         public static string ReadApiScope { get; } = "api:read";
         public static string WriteApiScope { get; } = "api:write";
-        public static string UserApiScope { get; } = "api:user:manage";
         public static string ManageUserApiScope { get; } = "api:user:manage";
 
         public static void ConfigureServices(
@@ -126,7 +124,6 @@ namespace Metabase.Configuration
                                 new[] {
                                     ReadApiScope,
                                     WriteApiScope,
-                                    UserApiScope,
                                     ManageUserApiScope
                                 }
                         )
@@ -160,7 +157,6 @@ namespace Metabase.Configuration
                 foreach (var (policyName, scope) in new[] {
                      (ReadPolicy, ReadApiScope),
                      (WritePolicy, WriteApiScope),
-                     (UserPolicy, UserApiScope),
                      (ManageUserPolicy, ManageUserApiScope)
                      }
                    )
