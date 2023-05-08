@@ -246,6 +246,13 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
+            // We could set
+            // HttpContext.User = await _signInManager.CreateUserPrincipalAsync(user);
+            // and add tokens as cookies as is done in the antiforgery
+            // controller (XSRF). However, the GraphQL endpoint allows CORS
+            // whereas the antiforgery controller does not making the latter
+            // more secure because the antiforgery token should only be
+            // requestable from the same domain.
             if (signInResult.RequiresTwoFactor)
             {
                 return new LoginUserPayload(user, requiresTwoFactor: true);

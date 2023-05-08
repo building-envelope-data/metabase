@@ -16,6 +16,7 @@ function Logout() {
         await logoutUserMutation();
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         await apolloClient.resetStore();
+        await fetch(paths.antiforgeryToken);
         await router.push(paths.userLogin);
       }
     };

@@ -82,8 +82,7 @@ export default function Layout({ children }: LayoutProps) {
   const [cookies, setCookie] = useCookies([cookieConsentName]);
   const shouldShowCookieConsent =
     cookies[cookieConsentName] != cookieConsentValue;
-  const [isLoadingAntiforgeryToken, setLoadingAntiforgeryToken] =
-    useState(false);
+  const [loadedAntiforgeryToken, setLoadedAntiforgeryToken] = useState(false);
 
   useEffect(() => {
     if (shouldShowCookieConsent) {
@@ -105,11 +104,14 @@ export default function Layout({ children }: LayoutProps) {
   }, [shouldShowCookieConsent, setCookie]);
 
   useEffect(() => {
-    setLoadingAntiforgeryToken(true);
-    fetch("/antiforgery/token").then((_) => {
-      setLoadingAntiforgeryToken(false);
+    fetch(paths.antiforgeryToken).then((_) => {
+      setLoadedAntiforgeryToken(true);
     });
   }, []);
+
+  if (!loadedAntiforgeryToken) {
+    return null;
+  }
 
   return (
     <AntLayout>

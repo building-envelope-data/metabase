@@ -63,8 +63,11 @@ function LoginWithTwoFactorCode() {
           data?.loginUserWithTwoFactorCode?.user
         ) {
           await apolloClient.resetStore();
+          await fetch(paths.antiforgeryToken);
           await router.push(
-            typeof returnTo === "string" && isLocalUrl(returnTo) ? returnTo : paths.home
+            typeof returnTo === "string" && isLocalUrl(returnTo)
+              ? returnTo
+              : paths.home
           );
         }
       } catch (error) {
