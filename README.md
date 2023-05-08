@@ -154,6 +154,42 @@ of the website needs to be decided by some developer. If it for example backing
 up the database fails because the machine is out of memory at the time of doing
 the backup, the website itself should still working.
 
+If the database container restarts indefinitely and its logs say
+
+```
+LOG:  invalid resource manager ID in primary checkpoint record
+PANIC:  could not locate a valid checkpoint record
+```
+
+then the database is corrupt. For example, the write-ahead log (WAL) may be
+corrupt because the database was not shut down cleanly. One solution is to
+restore the database from a backup by running
+
+```
+make --file Makefile.production BACKUP_DIRECTORY=/app/data/backups/20XX-XX-XX_XX_XX_XX/ restore
+```
+
+where the `X`s need to be replaced by proper values. Another solution is to
+reset the transaction log by entering the database container with
+
+```
+docker compose --file docker-compose.production.yml --project-name metabase_production run database bash
+```
+
+and dry-running
+
+```
+gosu postgres pg_resetwal --dry-run /var/lib/postgresql/data
+```
+
+and, depending on the output, also running
+
+```
+gosu postgres pg_resetwal /var/lib/postgresql/data
+```
+
+Note that both solutions may cause data to be lost.
+
 ## Original Idea
 
 The product identifier service should provide the following endpoints:
