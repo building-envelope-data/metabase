@@ -11,6 +11,7 @@ using OpenIddict.Validation.AspNetCore;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
 using Microsoft.Extensions.Logging;
 using HotChocolate.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Metabase.Configuration
 {
@@ -65,17 +66,31 @@ namespace Metabase.Configuration
                   /* .UsePersistedQueryPipeline(); */
                   .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
                   {
-                      // HotChocolate uses the default cookie authentication
-                      // scheme `IdentityConstants.ApplicationScheme` by
-                      // default. We want it to use the JavaScript Web Token
+                      // HotChocolate uses the default authentication scheme,
+                      // which we set to `null` in `AuthConfiguration` to force
+                      // users to be explicit about what scheme to use when
+                      // making it easier to grasp the various authentication
+                      // flows. We want it to either use the cookie
+                      // authentication scheme or the JavaScript Web Token
                       // (JWT), aka, Access Token, provided as `Authorization`
                       // HTTP header with the prefix `Bearer` as issued by
-                      // OpenIddict though. This Access Token includes Scopes
-                      // and Claims.
-                      var authenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
-                      if (authenticateResult.Succeeded && authenticateResult.Principal is not null)
+                      // OpenIddict. This Access Token includes Scopes and
+                      // Claims. The cookie scheme is needed by the Web frontend
+                      // (in which case the metabase acts as OpenId Connect
+                      // Client) and the JWT scheme by other clients.
+                      var cookieAuthenticateResult = await httpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
+                      if (cookieAuthenticateResult.Succeeded && cookieAuthenticateResult.Principal is not null)
                       {
-                          httpContext.User = authenticateResult.Principal;
+                          httpContext.User = cookieAuthenticateResult.Principal;
+                      }
+                      else
+                      {
+                          // TODO Is what we want really what the code below does? Or is it but OpenIddict cookie auth with the option to get a token from the cookie?
+                          var jwtAuthenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
+                          if (jwtAuthenticateResult.Succeeded && jwtAuthenticateResult.Principal is not null)
+                          {
+                              httpContext.User = jwtAuthenticateResult.Principal;
+                          }
                       }
                   })
                   .AddDiagnosticEventListener(_ =>

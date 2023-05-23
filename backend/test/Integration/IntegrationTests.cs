@@ -108,7 +108,7 @@ namespace Metabase.Tests.Integration
                 new PasswordTokenRequest
                 {
                     Address = "http://localhost/connect/token",
-                    ClientId = "testlab-solar-facades",
+                    ClientId = "metabase",
                     ClientSecret = "secret",
                     Scope = "api:read api:write api:user:manage",
                     UserName = emailAddress,

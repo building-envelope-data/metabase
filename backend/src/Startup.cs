@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
+using OpenIddict.Validation.AspNetCore;
 using Serilog;
 
 // TODO Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth
@@ -38,7 +39,7 @@ namespace Metabase
             )
         {
             _environment = environment;
-            _appSettings = configuration.Get<AppSettings>() ?? throw new Exception("Failed to get application settings from configuration.");
+            _appSettings = configuration.Get<AppSettings>() ?? throw new InvalidOperationException("Failed to get application settings from configuration.");
         }
 
         public void ConfigureServices(IServiceCollection services)
