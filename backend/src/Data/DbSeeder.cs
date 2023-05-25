@@ -124,9 +124,9 @@ namespace Metabase.Data
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
                             // OpenIddictConstants.Permissions.Endpoints.Device,
-                            // OpenIddictConstants.Permissions.Endpoints.Introspection,
+                            OpenIddictConstants.Permissions.Endpoints.Introspection,
                             OpenIddictConstants.Permissions.Endpoints.Logout,
-                            // OpenIddictConstants.Permissions.Endpoints.Revocation,
+                            OpenIddictConstants.Permissions.Endpoints.Revocation,
                             OpenIddictConstants.Permissions.Endpoints.Token,
                             environment.IsEnvironment("test") ? OpenIddictConstants.Permissions.GrantTypes.Password : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                             // OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
@@ -177,9 +177,9 @@ namespace Metabase.Data
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
                             // OpenIddictConstants.Permissions.Endpoints.Device,
-                            // OpenIddictConstants.Permissions.Endpoints.Introspection,
+                            OpenIddictConstants.Permissions.Endpoints.Introspection,
                             OpenIddictConstants.Permissions.Endpoints.Logout,
-                            // OpenIddictConstants.Permissions.Endpoints.Revocation,
+                            OpenIddictConstants.Permissions.Endpoints.Revocation,
                             OpenIddictConstants.Permissions.Endpoints.Token,
                             OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                             // OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
