@@ -34,6 +34,10 @@ function getCookie(name: string, cookies: string): string | null {
   );
 }
 
+export function getXsrfToken(): string | null {
+  return getCookie("XSRF-TOKEN", document.cookie);
+}
+
 function createIsomorphLink(context: ResolverContext = {}) {
   var headers: Record<string, string> = {};
   headers["accept"] = "application/json";
@@ -42,7 +46,7 @@ function createIsomorphLink(context: ResolverContext = {}) {
     headers["cookie"] = cookie;
   }
   if (typeof window !== "undefined") {
-    var antiforgeryToken = getCookie("XSRF-TOKEN", document.cookie);
+    var antiforgeryToken = getXsrfToken();
     if (antiforgeryToken) headers["X-XSRF-TOKEN"] = antiforgeryToken;
   }
   return createPersistedQueryLink({

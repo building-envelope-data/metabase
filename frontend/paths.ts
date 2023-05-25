@@ -30,6 +30,8 @@ export default {
     },
   },
   personalUserData: "/personal-user-data",
+  openIdConnectClientLogin: "/connect/client/login",
+  openIdConnectClientLogout: "/connect/client/logout",
   userLogin: "/users/login",
   userRegister: "/users/register",
   userConfirmEmail: "/users/confirm-email",
