@@ -11,6 +11,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using OpenIddict.Client.AspNetCore;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Metabase.GraphQl.Databases
 {
@@ -164,6 +167,35 @@ namespace Metabase.GraphQl.Databases
             );
         }
 
+        private static async Task<string?> ExtractBearerToken(
+                IHttpContextAccessor httpContextAccessor
+                )
+        {
+            if (httpContextAccessor.HttpContext is null)
+            {
+                return null;
+            }
+            // Extract bearer token stored in cookie (used by Metabase Web
+            // frontend)
+            var cookieBearerToken = await httpContextAccessor.HttpContext.GetTokenAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken
+            ).ConfigureAwait(false);
+            if (cookieBearerToken is not null)
+            {
+                return cookieBearerToken;
+            }
+            // Extract bearer token given in authorization header (used by
+            // third-party frontends)
+            var bearerTokenPrefix = $"{IdentityModel.OidcConstants.AuthenticationSchemes.AuthorizationHeaderBearer} ";
+            return httpContextAccessor.HttpContext.Request?.Headers?.Authorization
+                .FirstOrDefault(
+                    x => x is not null
+                     && x.TrimStart().StartsWith(bearerTokenPrefix, StringComparison.Ordinal))
+                ?.TrimStart()
+                ?.Replace(bearerTokenPrefix, "");
+        }
+
         public static async
           Task<GraphQL.GraphQLResponse<TGraphQlResponse>>
           QueryDatabase<TGraphQlResponse>(
@@ -187,15 +219,7 @@ namespace Metabase.GraphQl.Databases
             //    )
             //   .AsGraphQLHttpResponse();
             using var httpClient = httpClientFactory.CreateClient(DATABASE_HTTP_CLIENT);
-            // An alternative to get the bearer token could look something like
-            // `httpContextAccessor.HttpContext.GetTokenAsync(AuthenticationSchemes.AuthorizationHeaderBearer)`
-            var bearerTokenPrefix = $"{IdentityModel.OidcConstants.AuthenticationSchemes.AuthorizationHeaderBearer} ";
-            var bearerToken = httpContextAccessor.HttpContext?.Request?.Headers?.Authorization
-                .FirstOrDefault(
-                    x => x is not null
-                     && x.TrimStart().StartsWith(bearerTokenPrefix, StringComparison.Ordinal))
-                ?.TrimStart()
-                ?.Replace(bearerTokenPrefix, "");
+            var bearerToken = await ExtractBearerToken(httpContextAccessor).ConfigureAwait(false);
             if (bearerToken is not null)
             {
                 httpClient.SetBearerToken(bearerToken);
