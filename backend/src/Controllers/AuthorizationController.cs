@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Metabase.ViewModels.Authorization;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -467,6 +468,13 @@ namespace Metabase.Controllers
             // when the user agent is redirected from the external identity provider
             // after a successful authentication flow (e.g Google or Facebook).
             await _signInManager.SignOutAsync().ConfigureAwait(false);
+            // And remove the local authentication cookie.
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
+            // Note that the `Identity.Application` cookie deleted by the
+            // `SignInManager.SignOutAsync` and the `Cookies` cookie deleted by
+            // the `HttpContext.SignOutAsync` should for our purposes always
+            // stay in sync, that is, either both do not exist or they do exist
+            // and hold authentication information for the same user.
 
             // Returning a SignOutResult will ask OpenIddict to redirect the user agent
             // to the post_logout_redirect_uri specified by the client application or to
