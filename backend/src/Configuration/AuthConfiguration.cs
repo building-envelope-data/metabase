@@ -375,6 +375,8 @@ namespace Metabase.Configuration
                      _.UseAspNetCore();
                      // Enable token entry validation: https://documentation.openiddict.com/configuration/token-storage.html#enabling-token-entry-validation-at-the-api-level
                      _.EnableTokenEntryValidation();
+                     // Enable authorization entry validation: https://documentation.openiddict.com/configuration/authorization-storage.html#enabling-authorization-entry-validation-at-the-api-level
+                     _.EnableAuthorizationEntryValidation();
                      // Note: the validation handler uses OpenID Connect discovery
                      // to retrieve the address of the introspection endpoint.
                      //options.SetIssuer("http://localhost:12345/");
