@@ -15,10 +15,8 @@ query CurrentUser {
   }
 }
 
-mutation LoginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
-  loginUser(
-    input: { email: $email, password: $password, rememberMe: $rememberMe }
-  ) {
+mutation LoginUser($email: String!, $password: String!) {
+  loginUser(input: { email: $email, password: $password }) {
     requiresTwoFactor
     user {
       ...CurrentUserPartial
@@ -33,13 +31,11 @@ mutation LoginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
 
 mutation LoginUserWithTwoFactorCode(
   $authenticatorCode: String!
-  $rememberMe: Boolean!
   $rememberMachine: Boolean!
 ) {
   loginUserWithTwoFactorCode(
     input: {
       authenticatorCode: $authenticatorCode
-      rememberMe: $rememberMe
       rememberMachine: $rememberMachine
     }
   ) {

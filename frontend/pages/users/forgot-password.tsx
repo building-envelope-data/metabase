@@ -1,11 +1,16 @@
 import { useRequestUserPasswordResetMutation } from "../../queries/users.graphql";
-import { Alert, Form, Input, Button, Row, Col, Card, message } from "antd";
-import Layout from "../../components/Layout";
+import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
+import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import { UserOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
+import Link from "next/link";
+import paths from "../../paths";
+import { useRouter } from "next/router";
 
 function Page() {
+  const router = useRouter();
+  const returnTo = router.query.returnTo;
   const [requestUserPasswordResetMutation] =
     useRequestUserPasswordResetMutation();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -32,7 +37,10 @@ function Page() {
           form
         );
         if (!errors && !data?.requestUserPasswordReset?.errors) {
-          message.success("Please check your email to reset your password.");
+          await router.push({
+            pathname: paths.userCheckYourInboxAfterPasswordResetRequest,
+            query: returnTo ? { returnTo: returnTo } : {},
+          });
         }
       } catch (error) {
         // TODO Handle properly.
@@ -49,10 +57,10 @@ function Page() {
   };
 
   return (
-    <Layout>
+    <SingleSignOnLayout>
       <Row justify="center">
         <Col>
-          <Card title="Login">
+          <Card title="Forgot Password">
             {/* Display error messages in a list? */}
             {globalErrorMessages.length > 0 ? (
               <Alert type="error" message={globalErrorMessages.join(" ")} />
@@ -87,14 +95,23 @@ function Page() {
                   loading={requesting}
                   style={{ width: "100%" }}
                 >
-                  Login
+                  Reset Password
                 </Button>
+                Or{" "}
+                <Link
+                  href={{
+                    pathname: paths.userLogin,
+                    query: returnTo ? { returnTo: returnTo } : null,
+                  }}
+                >
+                  Login instead!
+                </Link>
               </Form.Item>
             </Form>
           </Card>
         </Col>
       </Row>
-    </Layout>
+    </SingleSignOnLayout>
   );
 }
 

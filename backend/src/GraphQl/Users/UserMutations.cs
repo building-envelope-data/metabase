@@ -200,7 +200,7 @@ namespace Metabase.GraphQl.Users
             var signInResult = await signInManager.PasswordSignInAsync(
                 input.Email,
                 input.Password,
-                isPersistent: input.RememberMe,
+                isPersistent: false,
                 lockoutOnFailure: true
                 ).ConfigureAwait(false);
             // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinresult?view=aspnetcore-5.0
@@ -289,7 +289,7 @@ namespace Metabase.GraphQl.Users
             var signInResult =
                 await signInManager.TwoFactorAuthenticatorSignInAsync(
                     authenticatorCode,
-                    isPersistent: input.RememberMe,
+                    isPersistent: false,
                     rememberClient: input.RememberMachine
                 ).ConfigureAwait(false);
             if (signInResult.IsLockedOut)

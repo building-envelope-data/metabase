@@ -38,7 +38,10 @@ export default {
   userForgotPassword: "/users/forgot-password",
   userLoginWithTwoFactorCode: "/users/login-with-two-factor-code",
   userLoginWithRecoveryCode: "/users/login-with-recovery-code",
-  userCheckYourInbox: "/users/check-your-inbox",
+  userCheckYourInboxAfterRegistration:
+    "/users/check-your-inbox-after-registration",
+  userCheckYourInboxAfterPasswordResetRequest:
+    "/users/check-your-inbox-after-password-reset-request",
   dataFormats: "/data-formats",
   dataFormat(uuid: string) {
     return `/data-formats/${encodeURIComponent(uuid)}`;

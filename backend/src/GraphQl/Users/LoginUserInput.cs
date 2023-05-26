@@ -2,7 +2,6 @@ namespace Metabase.GraphQl.Users
 {
     public sealed record LoginUserInput(
           string Email,
-          string Password,
-          bool RememberMe
+          string Password
         );
 }

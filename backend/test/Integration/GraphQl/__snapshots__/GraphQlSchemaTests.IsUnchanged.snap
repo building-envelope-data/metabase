@@ -941,8 +941,8 @@ type Mutation {
   confirmComponentManufacturer(input: ConfirmComponentManufacturerInput!): ConfirmComponentManufacturerPayload! @authorize(policy: "Write")
   confirmInstitutionMethodDeveloper(input: ConfirmInstitutionMethodDeveloperInput!): ConfirmInstitutionMethodDeveloperPayload! @authorize(policy: "Write")
   confirmInstitutionRepresentative(input: ConfirmInstitutionRepresentativeInput!): ConfirmInstitutionRepresentativePayload! @authorize(policy: "Write")
-  confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload! @authorize(policy: "User")
-  confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload! @authorize(policy: "User")
+  confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload!
+  confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload!
   confirmUserMethodDeveloper(input: ConfirmUserMethodDeveloperInput!): ConfirmUserMethodDeveloperPayload! @authorize(policy: "Write")
   createComponent(input: CreateComponentInput!): CreateComponentPayload! @authorize(policy: "Write")
   createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload! @authorize(policy: "Write")
@@ -957,11 +957,11 @@ type Mutation {
   forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload! @authorize(policy: "ManageUser")
   generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload! @authorize(policy: "ManageUser")
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(policy: "ManageUser")
-  loginUser(input: LoginUserInput!): LoginUserPayload! @authorize(policy: "User")
-  loginUserWithRecoveryCode(input: LoginUserWithRecoveryCodeInput!): LoginUserWithRecoveryCodePayload! @authorize(policy: "User")
-  loginUserWithTwoFactorCode(input: LoginUserWithTwoFactorCodeInput!): LoginUserWithTwoFactorCodePayload! @authorize(policy: "User")
+  loginUser(input: LoginUserInput!): LoginUserPayload!
+  loginUserWithRecoveryCode(input: LoginUserWithRecoveryCodeInput!): LoginUserWithRecoveryCodePayload!
+  loginUserWithTwoFactorCode(input: LoginUserWithTwoFactorCodeInput!): LoginUserWithTwoFactorCodePayload!
   logoutUser: LogoutUserPayload! @authorize(policy: "ManageUser")
-  registerUser(input: RegisterUserInput!): RegisterUserPayload! @authorize(policy: "User")
+  registerUser(input: RegisterUserInput!): RegisterUserPayload!
   removeComponentAssembly(input: RemoveComponentAssemblyInput!): RemoveComponentAssemblyPayload! @authorize(policy: "Write")
   removeComponentGeneralization(input: RemoveComponentGeneralizationInput!): RemoveComponentGeneralizationPayload! @authorize(policy: "Write")
   removeComponentManufacturer(input: RemoveComponentManufacturerInput!): RemoveComponentManufacturerPayload! @authorize(policy: "Write")
@@ -970,10 +970,10 @@ type Mutation {
   removeInstitutionRepresentative(input: RemoveInstitutionRepresentativeInput!): RemoveInstitutionRepresentativePayload! @authorize(policy: "Write")
   removeUserMethodDeveloper(input: RemoveUserMethodDeveloperInput!): RemoveUserMethodDeveloperPayload! @authorize(policy: "Write")
   removeUserRole(input: RemoveUserRoleInput!): RemoveUserRolePayload! @authorize(policy: "ManageUser")
-  requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload! @authorize(policy: "User")
-  resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload! @authorize(policy: "User")
+  requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload!
+  resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload!
   resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(policy: "ManageUser")
-  resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload! @authorize(policy: "User")
+  resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload!
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser")
@@ -2010,7 +2010,6 @@ input ListMethodCategoryOperationFilterInput {
 input LoginUserInput {
   email: String!
   password: String!
-  rememberMe: Boolean!
 }
 
 input LoginUserWithRecoveryCodeInput {
@@ -2020,7 +2019,6 @@ input LoginUserWithRecoveryCodeInput {
 input LoginUserWithTwoFactorCodeInput {
   authenticatorCode: String!
   rememberMachine: Boolean!
-  rememberMe: Boolean!
 }
 
 input MethodCategoryOperationFilterInput {
