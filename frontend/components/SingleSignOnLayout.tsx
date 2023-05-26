@@ -15,7 +15,7 @@ const cookieConsentValue = "yes";
 export default function SingleSignOnLayout({
   children,
 }: SingleSignOnLayoutProps) {
-  const appTitle = "Single-Sign On &bull; Building Envelope Data";
+  const appTitle = "Single-Sign On • Building Envelope Data";
 
   const [cookies, setCookie] = useCookies([cookieConsentName]);
   const shouldShowCookieConsent =
