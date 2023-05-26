@@ -79,6 +79,7 @@ namespace Metabase.Configuration
                       // Tokens, provided as `Authorization` HTTP header with
                       // the prefix `Bearer` as issued by OpenIddict. This
                       // Access Token includes Scopes and Claims.
+                      // Keep in sync with the corresponding logic in `AntiforgeryController`.
                       var cookieAuthenticateResult = await httpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
                       if (cookieAuthenticateResult.Succeeded && cookieAuthenticateResult.Principal is not null)
                       {

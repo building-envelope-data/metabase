@@ -1,5 +1,8 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,8 +21,14 @@ namespace Metabase.Controllers
 
         [HttpGet("~/antiforgery/token")]
         // [Authorize]
-        public IActionResult Token()
+        public async Task<IActionResult> Token()
         {
+            // Keep in sync with the corresponding logic in `GraphQlConfiguration`.
+            var cookieAuthenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
+            if (cookieAuthenticateResult.Succeeded && cookieAuthenticateResult.Principal is not null)
+            {
+                HttpContext.User = cookieAuthenticateResult.Principal;
+            }
             var tokens = _antiforgeryService.GetAndStoreTokens(HttpContext);
             HttpContext.Response.Cookies.Append(
                 CookieKey,
