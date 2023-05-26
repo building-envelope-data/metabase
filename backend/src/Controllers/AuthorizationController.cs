@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Metabase.ViewModels.Authorization;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -122,6 +121,16 @@ namespace Metabase.Controllers
         }
 
         #region Authorization code, implicit and hybrid flows
+
+        public async Task<IActionResult> DoSignIn(
+            ClaimsPrincipal claimsPrincipal
+        )
+        {
+            // Remove the `Identity.Application` cookie as it was only needed to authenticate the user.
+            await _signInManager.SignOutAsync().ConfigureAwait(false);
+            // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
+            return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        }
 
         [HttpGet("~/connect/authorize")]
         [HttpPost("~/connect/authorize")]
@@ -253,7 +262,7 @@ namespace Metabase.Controllers
                         )
                         .ConfigureAwait(false);
                     // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
-                    return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                    return await DoSignIn(principal).ConfigureAwait(false);
 
                 // At this point, no authorization was found in the database and an error must be returned
                 // if the client application specified prompt=none in the authorization request.
@@ -286,7 +295,6 @@ namespace Metabase.Controllers
         //    at Microsoft.AspNetCore.Antiforgery.DefaultAntiforgery.ValidateTokens(HttpContext httpContext, AntiforgeryTokenSet antiforgeryTokenSet)
         //    at Microsoft.AspNetCore.Antiforgery.DefaultAntiforgery.ValidateRequestAsync(HttpContext httpContext)
         //    at Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.ValidateAntiforgeryTokenAuthorizationFilter.OnAuthorizationAsync(AuthorizationFilterContext context)
-
         public async Task<IActionResult> Accept()
         {
             var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -351,15 +359,20 @@ namespace Metabase.Controllers
                 )
                 .ConfigureAwait(false);
 
-            // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
-            return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            return await DoSignIn(principal).ConfigureAwait(false);
         }
 
         [Authorize(AuthenticationSchemes = IdentityConstantsApplicationScheme), FormValueRequired("submit.Deny")]
         [HttpPost("~/connect/authorize"), ValidateAntiForgeryToken]
         // Notify OpenIddict that the authorization grant has been denied by the resource owner
         // to redirect the user agent to the client application using the appropriate response_mode.
-        public IActionResult Deny() => Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        public async Task<IActionResult> Deny()
+        {
+            // Remove the `Identity.Application` cookie as it was only needed to authenticate the user.
+            await _signInManager.SignOutAsync().ConfigureAwait(false);
+            return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        } 
+
         #endregion
 
         #region Device flow
@@ -432,7 +445,7 @@ namespace Metabase.Controllers
                     // redirect the user to after validating the authorization demand.
                     RedirectUri = "/"
                 };
-                return SignIn(principal, properties, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                return await DoSignIn(principal).ConfigureAwait(false);
             }
 
             // Redisplay the form when the user code is not valid.
@@ -446,14 +459,21 @@ namespace Metabase.Controllers
         [Authorize(AuthenticationSchemes = IdentityConstantsApplicationScheme), FormValueRequired("submit.Deny")]
         [HttpPost("~/connect/verify"), ValidateAntiForgeryToken]
         // Notify OpenIddict that the authorization grant has been denied by the resource owner.
-        public IActionResult VerifyDeny() => Forbid(
-            properties: new AuthenticationProperties()
-            {
-                // This property points to the address OpenIddict will automatically
-                // redirect the user to after rejecting the authorization demand.
-                RedirectUri = "/"
-            },
-            authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        public async Task<IActionResult> VerifyDeny()
+        {
+            // Remove the `Identity.Application` cookie as it was only needed to authenticate the user.
+            await _signInManager.SignOutAsync().ConfigureAwait(false);
+            return Forbid(
+                properties: new AuthenticationProperties()
+                {
+                    // This property points to the address OpenIddict will automatically
+                    // redirect the user to after rejecting the authorization demand.
+                    RedirectUri = "/"
+                },
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+            );
+        }
+
         #endregion
 
         #region Logout support for interactive flows like code and implicit
@@ -468,13 +488,6 @@ namespace Metabase.Controllers
             // when the user agent is redirected from the external identity provider
             // after a successful authentication flow (e.g Google or Facebook).
             await _signInManager.SignOutAsync().ConfigureAwait(false);
-            // And remove the local authentication cookie.
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
-            // Note that the `Identity.Application` cookie deleted by the
-            // `SignInManager.SignOutAsync` and the `Cookies` cookie deleted by
-            // the `HttpContext.SignOutAsync` should for our purposes always
-            // stay in sync, that is, either both do not exist or they do exist
-            // and hold authentication information for the same user.
 
             // Returning a SignOutResult will ask OpenIddict to redirect the user agent
             // to the post_logout_redirect_uri specified by the client application or to
