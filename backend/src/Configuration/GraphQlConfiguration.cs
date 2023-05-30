@@ -12,6 +12,7 @@ using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceColl
 using Microsoft.Extensions.Logging;
 using HotChocolate.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Metabase.Authorization;
 
 namespace Metabase.Configuration
 {
@@ -64,34 +65,21 @@ namespace Metabase.Configuration
                   // Persisted queries
                   /* .AddFileSystemQueryStorage("./persisted_queries") */
                   /* .UsePersistedQueryPipeline(); */
+                  // HotChocolate uses the default authentication scheme,
+                  // which we set to `null` in `AuthConfiguration` to force
+                  // users to be explicit about what scheme to use when
+                  // making it easier to grasp the various authentication
+                  // flows.
                   .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
                   {
-                      // HotChocolate uses the default authentication scheme,
-                      // which we set to `null` in `AuthConfiguration` to force
-                      // users to be explicit about what scheme to use when
-                      // making it easier to grasp the various authentication
-                      // flows. For the Web frontend, the metabase acts as
-                      // OpenId Connect Client and uses the cookie scheme for
-                      // authentication. For third-party frontends, the
-                      // metabase acts as resource server and uses
-                      // authorization header bearer tokens for authentication,
-                      // that is JavaScript Web Tokens (JWT), aka, Access
-                      // Tokens, provided as `Authorization` HTTP header with
-                      // the prefix `Bearer` as issued by OpenIddict. This
-                      // Access Token includes Scopes and Claims.
-                      // Keep in sync with the corresponding logic in `AntiforgeryController`.
-                      var cookieAuthenticateResult = await httpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
-                      if (cookieAuthenticateResult.Succeeded && cookieAuthenticateResult.Principal is not null)
+                      try
                       {
-                          httpContext.User = cookieAuthenticateResult.Principal;
+                          await HttpContextAuthentication.Authenticate(httpContext);
                       }
-                      else
+                      catch (Exception e)
                       {
-                          var jwtAuthenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
-                          if (jwtAuthenticateResult.Succeeded && jwtAuthenticateResult.Principal is not null)
-                          {
-                              httpContext.User = jwtAuthenticateResult.Principal;
-                          }
+                          // TODO Log to a `ILogger<GraphQlConfiguration>` instead.
+                          Console.WriteLine(e);
                       }
                   })
                   .AddDiagnosticEventListener(_ =>

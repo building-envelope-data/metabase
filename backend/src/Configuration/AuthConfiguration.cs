@@ -11,7 +11,6 @@ using System.Reflection;
 using System.IO;
 using OpenIddict.Client;
 using Metabase.Data;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -20,6 +19,12 @@ namespace Metabase.Configuration
 {
     public abstract class AuthConfiguration
     {
+        // `IdentityConstants.ApplicationScheme` is not a constant but only
+        // read-only. It can thus not be used in the `Authorize` attribute. See the corresponding issue
+        // https://github.com/dotnet/aspnetcore/issues/20122 and un-merged pull request
+        // https://github.com/dotnet/aspnetcore/pull/21343/files
+        public const string IdentityConstantsApplicationScheme = "Identity.Application";
+
         public const string Audience = "metabase";
         public const string ReadPolicy = "Read";
         public const string WritePolicy = "Write";
@@ -110,8 +115,7 @@ namespace Metabase.Configuration
             // authentication server through the authentication scheme
             // `IdentityConstants.ApplicationScheme`, that is,
             // "Identity.Application". See also the constant
-            // `IdentityConstantsApplicationScheme` in
-            // `AuthorizationController`.
+            // `IdentityConstantsApplicationScheme`.
             services.ConfigureApplicationCookie(_ =>
             {
                 _.AccessDeniedPath = "/unauthorized";
