@@ -46,6 +46,18 @@ namespace Metabase.Controllers
             _userManager = userManager;
         }
 
+        private async Task<AuthenticateResult> AuthenticateAsync(
+            string scheme
+        )
+        {
+            var result = await HttpContext.AuthenticateAsync(scheme).ConfigureAwait(false);
+            if (result.Principal is not null)
+            {
+                HttpContext.User = result.Principal;
+            }
+            return result;
+        }
+
         private Task<ClaimsPrincipal> CreateUserPrincipalAsync(
             Data.User user,
             ImmutableArray<string> scopes
@@ -138,7 +150,7 @@ namespace Metabase.Controllers
             // Retrieve the user principal stored in the authentication cookie.
             // If a max_age parameter was provided, ensure that the cookie is not too old.
             // If the user principal can't be extracted or the cookie is too old, redirect the user to the login page.
-            var result = await HttpContext.AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme).ConfigureAwait(false);
+            var result = await AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme).ConfigureAwait(false);
             if (result?.Succeeded != true || (
                     request.MaxAge != null
                     && result.Properties?.IssuedUtc != null
@@ -380,7 +392,7 @@ namespace Metabase.Controllers
             }
 
             // Retrieve the claims principal associated with the user code.
-            var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
+            var result = await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
             if (result.Succeeded)
             {
                 var clientId = result.Principal?.GetClaim(Claims.ClientId);
@@ -418,7 +430,7 @@ namespace Metabase.Controllers
                 throw new InvalidOperationException("The user details cannot be retrieved.");
 
             // Retrieve the claims principal associated with the user code.
-            var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
+            var result = await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
             if (result.Succeeded)
             {
                 // Note: in this sample, the granted scopes match the requested scope
@@ -540,7 +552,7 @@ namespace Metabase.Controllers
             else if (request.IsAuthorizationCodeGrantType() || request.IsDeviceCodeGrantType() || request.IsRefreshTokenGrantType())
             {
                 // Retrieve the claims principal stored in the authorization code/device code/refresh token.
-                var principal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false)).Principal;
+                var principal = (await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false)).Principal;
                 if (principal is null)
                 {
                     return Forbid(
