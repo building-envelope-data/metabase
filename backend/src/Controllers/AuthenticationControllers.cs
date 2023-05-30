@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -51,7 +52,7 @@ namespace Metabase.Controllers
         }
 
         [HttpPost("~/connect/client/logout")]
-        [ValidateAntiForgeryToken]
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme), ValidateAntiForgeryToken]
         public async Task<ActionResult> LogOut(string? returnUrl)
         {
             // Retrieve the identity stored in the local authentication cookie. If it's not available,
