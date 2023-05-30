@@ -71,6 +71,7 @@ mutation RegisterUser(
   $email: String!
   $password: String!
   $passwordConfirmation: String!
+  $returnTo: Url
 ) {
   registerUser(
     input: {
@@ -78,6 +79,7 @@ mutation RegisterUser(
       email: $email
       password: $password
       passwordConfirmation: $passwordConfirmation
+      returnTo: $returnTo
     }
   ) {
     user {

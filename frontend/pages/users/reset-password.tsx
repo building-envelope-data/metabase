@@ -16,7 +16,7 @@ const tailSingleSignOnLayout = {
 
 function Page() {
   const router = useRouter();
-  const { resetCode } = router.query;
+  const { resetCode, returnTo } = router.query;
   const [resetUserPasswordMutation] = useResetUserPasswordMutation();
 
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -57,7 +57,10 @@ function Page() {
           );
           if (!errors && !data?.resetUserPassword?.errors) {
             message.success("Your password was reset.");
-            await router.push(paths.userLogin);
+            await router.push({
+              pathname: paths.userLogin,
+              query: returnTo ? { returnTo: returnTo } : {},
+            });
           }
         } catch (error) {
           // TODO Handle properly.

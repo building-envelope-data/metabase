@@ -26,6 +26,7 @@ function Page() {
         const { errors, data } = await requestUserPasswordResetMutation({
           variables: {
             email: email,
+            returnTo: returnTo,
           },
         });
         handleFormErrors(

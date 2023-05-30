@@ -49,6 +49,7 @@ function Register() {
             email: email,
             password: password,
             passwordConfirmation: passwordConfirmation,
+            returnTo: returnTo,
           },
         });
         handleFormErrors(

@@ -2106,6 +2106,7 @@ input RegisterUserInput {
   name: String!
   password: String!
   passwordConfirmation: String!
+  returnTo: Url
 }
 
 input RemoveComponentAssemblyInput {
@@ -2150,6 +2151,7 @@ input RemoveUserRoleInput {
 
 input RequestUserPasswordResetInput {
   email: String!
+  returnTo: Url
 }
 
 input ResendUserEmailConfirmationInput {

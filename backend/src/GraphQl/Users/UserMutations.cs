@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -393,6 +394,7 @@ namespace Metabase.GraphQl.Users
             RegisterUserInput input,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
+            [Service] UrlEncoder urlEncoder,
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
@@ -498,7 +500,9 @@ namespace Metabase.GraphQl.Users
                 (user.Name, input.Email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender,
-                appSettings.Host
+                appSettings.Host,
+                input.ReturnTo,
+                urlEncoder
                 ).ConfigureAwait(false);
             return new RegisterUserPayload(user);
         }
@@ -509,6 +513,7 @@ namespace Metabase.GraphQl.Users
             ResendUserEmailConfirmationInput input,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
+            [Service] UrlEncoder urlEncoder,
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
@@ -523,7 +528,9 @@ namespace Metabase.GraphQl.Users
                     (user.Name, input.Email),
                     await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                     emailSender,
-                    appSettings.Host
+                    appSettings.Host,
+                    null,
+                    urlEncoder
                     ).ConfigureAwait(false);
             }
             return new ResendUserEmailConfirmationPayload();
@@ -535,6 +542,7 @@ namespace Metabase.GraphQl.Users
             RequestUserPasswordResetInput input,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
+            [Service] UrlEncoder urlEncoder,
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
@@ -553,7 +561,7 @@ namespace Metabase.GraphQl.Users
                 await emailSender.SendAsync(
                     (user.Name, input.Email),
                     "Reset password",
-                    $"Please reset your password by following the link {appSettings.Host}/users/reset-password?resetCode={resetCode}."
+                    $"Please reset your password by following the link {appSettings.Host}/users/reset-password?resetCode={resetCode}" + (input.ReturnTo is null ? "" : $"&returnTo={urlEncoder.Encode(input.ReturnTo.OriginalString)}")
                     ).ConfigureAwait(false);
             }
             return new RequestUserPasswordResetPayload();
@@ -1267,6 +1275,7 @@ namespace Metabase.GraphQl.Users
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
+            [Service] UrlEncoder urlEncoder,
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
@@ -1313,7 +1322,8 @@ namespace Metabase.GraphQl.Users
                 input.NewEmail,
                 await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),
                 emailSender,
-                appSettings.Host
+                appSettings.Host,
+                urlEncoder
                 ).ConfigureAwait(false);
             return new ChangeUserEmailPayload(user);
         }
@@ -1325,6 +1335,7 @@ namespace Metabase.GraphQl.Users
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
+            [Service] UrlEncoder urlEncoder,
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
@@ -1357,7 +1368,9 @@ namespace Metabase.GraphQl.Users
                 (user.Name, email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender,
-                appSettings.Host
+                appSettings.Host,
+                null,
+                urlEncoder
                 ).ConfigureAwait(false);
             return new ResendUserEmailVerificationPayload(user);
         }
@@ -1705,14 +1718,16 @@ namespace Metabase.GraphQl.Users
             (string name, string address) to,
             string confirmationToken,
             Services.IEmailSender emailSender,
-            string host
+            string host,
+            Uri? returnTo,
+            UrlEncoder urlEncoder
             )
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendAsync(
                 to,
                 "Confirm your email",
-                $"Please confirm your email address by following the link {host}/users/confirm-email?email={to.address}&confirmationCode={confirmationCode}")
+                $"Please confirm your email address by following the link {host}/users/confirm-email?email={urlEncoder.Encode(to.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}" + (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}"))
                 .ConfigureAwait(false);
         }
 
@@ -1722,14 +1737,15 @@ namespace Metabase.GraphQl.Users
             string newEmail,
             string confirmationToken,
             Services.IEmailSender emailSender,
-            string host
+            string host,
+            UrlEncoder urlEncoder
         )
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendAsync(
                 (name, newEmail),
                 "Confirm your email change",
-                $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={currentEmail}&newEmail={newEmail}&confirmationCode={confirmationCode}")
+                $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={urlEncoder.Encode(currentEmail)}&newEmail={urlEncoder.Encode(newEmail)}&confirmationCode={confirmationCode}")
                 .ConfigureAwait(false);
         }
 

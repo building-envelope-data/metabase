@@ -482,7 +482,7 @@ namespace Metabase.Controllers
         [HttpGet("~/connect/logout")]
         public IActionResult Logout() => View();
 
-        [Authorize(AuthenticationSchemes = AuthConfiguration.IdentityConstantsApplicationScheme)]
+        // [Authorize(AuthenticationSchemes = AuthConfiguration.IdentityConstantsApplicationScheme)]
         [ActionName(nameof(Logout)), HttpPost("~/connect/logout"), ValidateAntiForgeryToken]
         public async Task<IActionResult> LogoutPost()
         {
