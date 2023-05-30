@@ -41,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make forms type-safe [88259910da5490be845fe79dab066e868ee841c1](https://github.com/building-envelope-data/metabase/commit/88259910da5490be845fe79dab066e868ee841c1)
 - Clean-up authentication and authorization set-up [#161](https://github.com/building-envelope-data/metabase/pull/161)
 - Protect personal user data and login/registration mutations with client-specific scopes [#162](https://github.com/building-envelope-data/metabase/pull/162)
--
+- Improve security, in particular, implement the Cookie to Header Token Pattern to prevent Cross Site Request Forgery attacks for user mutations [#163](https://github.com/building-envelope-data/metabase/pull/163)
 -
 -
 -
