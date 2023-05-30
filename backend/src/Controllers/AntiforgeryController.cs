@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Metabase.Controllers
 {
+    // For gotchas regarding antiforgery tokens read
+    // [Clarity around IAntiforgery and ValidateAntiForgeryToken](https://github.com/dotnet/aspnetcore/issues/2783)
     public sealed class AntiforgeryController : Controller
     {
         private const string XsrfCookieKey = "XSRF-TOKEN";
