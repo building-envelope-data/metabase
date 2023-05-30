@@ -21,7 +21,7 @@ namespace Metabase.GraphQl.ComponentGeneralizations
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<AddComponentGeneralizationPayload> AddComponentGeneralizationAsync(
             AddComponentGeneralizationInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -109,7 +109,7 @@ namespace Metabase.GraphQl.ComponentGeneralizations
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<RemoveComponentGeneralizationPayload> RemoveComponentGeneralizationAsync(
             RemoveComponentGeneralizationInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

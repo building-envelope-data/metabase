@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.Components
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateComponentPayload> CreateComponentAsync(
             CreateComponentInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -87,7 +87,7 @@ namespace Metabase.GraphQl.Components
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<UpdateComponentPayload> UpdateComponentAsync(
             UpdateComponentInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

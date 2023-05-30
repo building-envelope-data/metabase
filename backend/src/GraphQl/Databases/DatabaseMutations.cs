@@ -23,7 +23,7 @@ namespace Metabase.GraphQl.Databases
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateDatabasePayload> CreateDatabaseAsync(
             CreateDatabaseInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -79,7 +79,7 @@ namespace Metabase.GraphQl.Databases
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<UpdateDatabasePayload> UpdateDatabaseAsync(
             UpdateDatabaseInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -130,7 +130,7 @@ namespace Metabase.GraphQl.Databases
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<VerifyDatabasePayload> VerifyDatabaseAsync(
             VerifyDatabaseInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             [Service] IHttpClientFactory httpClientFactory,

@@ -100,7 +100,7 @@ namespace Metabase.GraphQl.Components
         {
                 public Task<bool> GetCanCurrentUserUpdateNodeAsync(
                   [Parent] Data.Component component,
-                  [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+                  ClaimsPrincipal claimsPrincipal,
                   [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
                   Data.ApplicationDbContext context,
                   CancellationToken cancellationToken

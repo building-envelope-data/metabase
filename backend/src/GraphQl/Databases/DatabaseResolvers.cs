@@ -30,7 +30,7 @@ namespace Metabase.GraphQl.Databases
 
         public Task<bool> GetCanCurrentUserUpdateNodeAsync(
           [Parent] Data.Database database,
-          [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+          ClaimsPrincipal claimsPrincipal,
           [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
           Data.ApplicationDbContext context,
           CancellationToken cancellationToken
@@ -41,7 +41,7 @@ namespace Metabase.GraphQl.Databases
 
         public Task<bool> GetCanCurrentUserVerifyNodeAsync(
           [Parent] Data.Database database,
-          [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+          ClaimsPrincipal claimsPrincipal,
           [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
           Data.ApplicationDbContext context,
           CancellationToken cancellationToken

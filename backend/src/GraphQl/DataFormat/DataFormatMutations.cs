@@ -20,7 +20,7 @@ namespace Metabase.GraphQl.DataFormats
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateDataFormatPayload> CreateDataFormatAsync(
             CreateDataFormatInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -121,7 +121,7 @@ namespace Metabase.GraphQl.DataFormats
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<UpdateDataFormatPayload> UpdateDataFormatAsync(
             UpdateDataFormatInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

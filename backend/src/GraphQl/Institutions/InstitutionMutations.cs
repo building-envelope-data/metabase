@@ -21,7 +21,7 @@ namespace Metabase.GraphQl.Institutions
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateInstitutionPayload> CreateInstitutionAsync(
             CreateInstitutionInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             [Service] Services.IEmailSender emailSender,
@@ -167,7 +167,7 @@ namespace Metabase.GraphQl.Institutions
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<VerifyInstitutionPayload> VerifyInstitutionAsync(
             VerifyInstitutionInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -211,7 +211,7 @@ namespace Metabase.GraphQl.Institutions
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<UpdateInstitutionPayload> UpdateInstitutionAsync(
             UpdateInstitutionInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -264,7 +264,7 @@ namespace Metabase.GraphQl.Institutions
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<DeleteInstitutionPayload> DeleteInstitutionAsync(
             DeleteInstitutionInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

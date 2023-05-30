@@ -44,7 +44,7 @@ namespace Metabase.GraphQl.DataFormats
         {
                 public Task<bool> GetCanCurrentUserUpdateNodeAsync(
                   [Parent] Data.DataFormat dataFormat,
-                  [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+                  ClaimsPrincipal claimsPrincipal,
                   [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
                   Data.ApplicationDbContext context,
                   CancellationToken cancellationToken

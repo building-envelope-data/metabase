@@ -26,7 +26,7 @@ namespace Metabase.GraphQl.Components
 
         [UseUserManager]
         public Task<bool> CanCurrentUserUpdateEdgeAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -44,7 +44,7 @@ namespace Metabase.GraphQl.Components
 
         [UseUserManager]
         public Task<bool> CanCurrentUserRemoveEdgeAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

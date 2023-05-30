@@ -21,7 +21,7 @@ namespace Metabase.GraphQl.ComponentAssemblies
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<AddComponentAssemblyPayload> AddComponentAssemblyAsync(
             AddComponentAssemblyInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -111,7 +111,7 @@ namespace Metabase.GraphQl.ComponentAssemblies
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<UpdateComponentAssemblyPayload> UpdateComponentAssemblyAsync(
             UpdateComponentAssemblyInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -197,7 +197,7 @@ namespace Metabase.GraphQl.ComponentAssemblies
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<RemoveComponentAssemblyPayload> RemoveComponentAssemblyAsync(
             RemoveComponentAssemblyInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

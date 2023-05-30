@@ -661,7 +661,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<DeleteUserPayload> DeleteUserAsync(
             DeleteUserInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
@@ -745,7 +745,7 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<ChangeUserPasswordPayload> ChangeUserPasswordAsync(
             ChangeUserPasswordInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
@@ -847,7 +847,7 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<DeletePersonalUserDataPayload> DeletePersonalUserDataAsync(
             DeletePersonalUserDataInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
@@ -920,7 +920,7 @@ namespace Metabase.GraphQl.Users
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseUserManager]
         public async Task<DisableUserTwoFactorAuthenticationPayload> DisableUserTwoFactorAuthenticationAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
@@ -957,7 +957,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         [UseSignInManager]
         public async Task<ForgetUserTwoFactorAuthenticationClientPayload> ForgetUserTwoFactorAuthenticationClientAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
@@ -984,7 +984,7 @@ namespace Metabase.GraphQl.Users
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseUserManager]
         public async Task<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload> GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] UrlEncoder urlEncoder,
             [Service] IAntiforgery antiforgeryService,
@@ -1051,7 +1051,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<EnableUserTwoFactorAuthenticatorPayload> EnableUserTwoFactorAuthenticatorAsync(
             EnableUserTwoFactorAuthenticatorInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] UrlEncoder urlEncoder,
             [Service] IAntiforgery antiforgeryService,
@@ -1222,7 +1222,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         [UseSignInManager]
         public async Task<ResetUserTwoFactorAuthenticatorPayload> ResetUserTwoFactorAuthenticatorAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
@@ -1272,7 +1272,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<ChangeUserEmailPayload> ChangeUserEmailAsync(
             ChangeUserEmailInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
             [Service] UrlEncoder urlEncoder,
@@ -1332,7 +1332,7 @@ namespace Metabase.GraphQl.Users
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseUserManager]
         public async Task<ResendUserEmailVerificationPayload> ResendUserEmailVerificationAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
             [Service] UrlEncoder urlEncoder,
@@ -1379,7 +1379,7 @@ namespace Metabase.GraphQl.Users
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseUserManager]
         public async Task<GenerateUserTwoFactorRecoveryCodesPayload> GenerateUserTwoFactorRecoveryCodesAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
@@ -1432,7 +1432,7 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<SetUserPhoneNumberPayload> SetUserPhoneNumberAsync(
             SetUserPhoneNumberInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
@@ -1494,7 +1494,7 @@ namespace Metabase.GraphQl.Users
         [UseSignInManager]
         public async Task<SetUserPasswordPayload> SetUserPasswordAsync(
             SetUserPasswordInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
@@ -1594,7 +1594,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<AddUserRolePayload> AddUserRoleAsync(
             AddUserRoleInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor,
@@ -1656,7 +1656,7 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<RemoveUserRolePayload> RemoveUserRoleAsync(
             RemoveUserRoleInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor,

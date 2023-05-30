@@ -21,7 +21,7 @@ namespace Metabase.GraphQl.Methods
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateMethodPayload> CreateMethodAsync(
             CreateMethodInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -186,7 +186,7 @@ namespace Metabase.GraphQl.Methods
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<UpdateMethodPayload> UpdateMethodAsync(
             UpdateMethodInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

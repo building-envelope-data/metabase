@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.ComponentManufacturers
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<AddComponentManufacturerPayload> AddComponentManufacturerAsync(
             AddComponentManufacturerInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -110,7 +110,7 @@ namespace Metabase.GraphQl.ComponentManufacturers
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<ConfirmComponentManufacturerPayload> ConfirmComponentManufacturerAsync(
             ConfirmComponentManufacturerInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -193,7 +193,7 @@ namespace Metabase.GraphQl.ComponentManufacturers
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<RemoveComponentManufacturerPayload> RemoveComponentManufacturerAsync(
             RemoveComponentManufacturerInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

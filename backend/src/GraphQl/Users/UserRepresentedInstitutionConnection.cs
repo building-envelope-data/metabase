@@ -24,7 +24,7 @@ namespace Metabase.GraphQl.Users
 
         [UseUserManager]
         public Task<bool> CanCurrentUserConfirmEdgeAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
         )
         {

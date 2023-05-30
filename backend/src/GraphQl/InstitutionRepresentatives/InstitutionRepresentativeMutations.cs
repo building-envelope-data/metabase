@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentativeAsync(
             AddInstitutionRepresentativeInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -111,7 +111,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<RemoveInstitutionRepresentativePayload> RemoveInstitutionRepresentativeAsync(
             RemoveInstitutionRepresentativeInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -211,7 +211,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<ChangeInstitutionRepresentativeRolePayload> ChangeInstitutionRepresentativeRoleAsync(
             ChangeInstitutionRepresentativeRoleInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -312,7 +312,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<ConfirmInstitutionRepresentativePayload> ConfirmInstitutionRepresentativeAsync(
             ConfirmInstitutionRepresentativeInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

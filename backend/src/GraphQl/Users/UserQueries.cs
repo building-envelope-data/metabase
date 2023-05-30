@@ -15,7 +15,7 @@ namespace Metabase.GraphQl.Users
     {
         [UseUserManager]
         public async Task<Data.User?> GetCurrentUserAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
         {

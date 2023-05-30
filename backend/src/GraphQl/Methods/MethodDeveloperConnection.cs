@@ -58,7 +58,7 @@ namespace Metabase.GraphQl.Methods
 
         [UseUserManager]
         public Task<bool> CanCurrentUserAddInstitutionEdgeAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -75,7 +75,7 @@ namespace Metabase.GraphQl.Methods
 
         [UseUserManager]
         public Task<bool> CanCurrentUserAddUserEdgeAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

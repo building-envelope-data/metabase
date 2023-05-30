@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.UserMethodDevelopers
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<AddUserMethodDeveloperPayload> AddUserMethodDeveloperAsync(
             AddUserMethodDeveloperInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -110,7 +110,7 @@ namespace Metabase.GraphQl.UserMethodDevelopers
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<ConfirmUserMethodDeveloperPayload> ConfirmUserMethodDeveloperAsync(
             ConfirmUserMethodDeveloperInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
@@ -191,7 +191,7 @@ namespace Metabase.GraphQl.UserMethodDevelopers
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<RemoveUserMethodDeveloperPayload> RemoveUserMethodDeveloperAsync(
             RemoveUserMethodDeveloperInput input,
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+            ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken

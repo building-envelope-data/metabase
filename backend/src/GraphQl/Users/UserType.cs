@@ -268,7 +268,7 @@ namespace Metabase.GraphQl.Users
             // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
             public async Task<TwoFactorAuthentication?> GetTwoFactorAuthenticationAsync(
               [Parent] Data.User user,
-              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
               [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
             )
@@ -294,7 +294,7 @@ namespace Metabase.GraphQl.Users
             }
 
             public Task<bool> GetCanCurrentUserDeleteUserAsync(
-              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
             {
@@ -302,7 +302,7 @@ namespace Metabase.GraphQl.Users
             }
 
             public async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanAddAsync(
-              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
               CancellationToken cancellationToken
             )
@@ -313,7 +313,7 @@ namespace Metabase.GraphQl.Users
             }
 
             public async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanRemoveAsync(
-              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
               CancellationToken cancellationToken
             )
@@ -324,7 +324,7 @@ namespace Metabase.GraphQl.Users
             }
 
             private async IAsyncEnumerable<Enumerations.UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
-              [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
+              ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
             {
