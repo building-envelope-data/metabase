@@ -1,14 +1,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Menu, Button, message } from "antd";
-import {
-  useCurrentUserQuery,
-  useLogoutUserMutation,
-} from "../queries/currentUser.graphql";
+import { Menu, Button } from "antd";
+import { useCurrentUserQuery } from "../queries/currentUser.graphql";
 import paths from "../paths";
-import { initializeApollo } from "../lib/apollo";
-import { useState } from "react";
+import { getXsrfToken } from "../lib/apollo";
 import { UserRole } from "../__generated__/__types__";
 import { UserOutlined } from "@ant-design/icons";
 
@@ -27,36 +23,9 @@ export type NavBarProps = {
 export default function NavBar({ items }: NavBarProps) {
   const router = useRouter();
   const currentUser = useCurrentUserQuery()?.data?.currentUser;
-  const apolloClient = initializeApollo();
-  const [logoutUserMutation] = useLogoutUserMutation();
-  const [loggingOut, setLoggingOut] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
-
-  const logout = async () => {
-    try {
-      setLoggingOut(true);
-      const { errors, data } = await logoutUserMutation();
-      if (errors) {
-        console.log(errors); // TODO What to do?
-      } else if (data?.logoutUser?.errors) {
-        // TODO Is this how we want to display errors?
-        messageApi.error(
-          data?.logoutUser?.errors.map((error) => error.message)
-        );
-      } else {
-        // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        await apolloClient.resetStore();
-        await router.push(paths.userLogin);
-        // signOut();
-      }
-    } finally {
-      setLoggingOut(false);
-    }
-  };
 
   return (
     <>
-      {contextHolder}
       <Menu mode="horizontal" selectedKeys={[router.pathname]} theme="dark">
         {items.map((item) =>
           item.subitems === null ? (
@@ -94,17 +63,28 @@ export default function NavBar({ items }: NavBarProps) {
               <Menu.Item key={paths.me.manage.profile}>
                 <Link href={paths.me.manage.profile}>Account</Link>
               </Menu.Item>
-              <Menu.Item key="logout">
-                <Button type="primary" onClick={logout} loading={loggingOut}>
-                  Logout
-                </Button>
+              <Menu.Item key={paths.openIdConnectClientLogout}>
+                <form action={paths.openIdConnectClientLogout} method="post">
+                  <input
+                    name="__RequestVerificationToken"
+                    type="hidden"
+                    value={
+                      typeof window !== "undefined"
+                        ? getXsrfToken() ?? undefined
+                        : ""
+                    }
+                  />
+                  <Button type="primary" htmlType="submit">
+                    Logout
+                  </Button>
+                </form>
               </Menu.Item>
             </Menu.SubMenu>
           </>
         ) : (
           <>
-            <Menu.Item key={paths.userLogin}>
-              <Link href={paths.userLogin}>Login</Link>
+            <Menu.Item key={paths.openIdConnectClientLogin}>
+              <Link href={paths.openIdConnectClientLogin}>Login</Link>
             </Menu.Item>
             <Menu.Item key={paths.userRegister}>
               <Link href={paths.userRegister}>Register</Link>

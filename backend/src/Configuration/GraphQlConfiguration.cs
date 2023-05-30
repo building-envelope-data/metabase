@@ -11,6 +11,8 @@ using OpenIddict.Validation.AspNetCore;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
 using Microsoft.Extensions.Logging;
 using HotChocolate.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Metabase.Authorization;
 
 namespace Metabase.Configuration
 {
@@ -63,19 +65,21 @@ namespace Metabase.Configuration
                   // Persisted queries
                   /* .AddFileSystemQueryStorage("./persisted_queries") */
                   /* .UsePersistedQueryPipeline(); */
+                  // HotChocolate uses the default authentication scheme,
+                  // which we set to `null` in `AuthConfiguration` to force
+                  // users to be explicit about what scheme to use when
+                  // making it easier to grasp the various authentication
+                  // flows.
                   .AddHttpRequestInterceptor(async (httpContext, requestExecutor, requestBuilder, cancellationToken) =>
                   {
-                      // HotChocolate uses the default cookie authentication
-                      // scheme `IdentityConstants.ApplicationScheme` by
-                      // default. We want it to use the JavaScript Web Token
-                      // (JWT), aka, Access Token, provided as `Authorization`
-                      // HTTP header with the prefix `Bearer` as issued by
-                      // OpenIddict though. This Access Token includes Scopes
-                      // and Claims.
-                      var authenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
-                      if (authenticateResult.Succeeded && authenticateResult.Principal is not null)
+                      try
                       {
-                          httpContext.User = authenticateResult.Principal;
+                          await HttpContextAuthentication.Authenticate(httpContext);
+                      }
+                      catch (Exception e)
+                      {
+                          // TODO Log to a `ILogger<GraphQlConfiguration>` instead.
+                          Console.WriteLine(e);
                       }
                   })
                   .AddDiagnosticEventListener(_ =>

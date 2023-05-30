@@ -69,6 +69,7 @@ server {
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
+    proxy_cache_bypass $http_upgrade;
     limit_req zone=one burst=30 nodelay;
   }
 
@@ -78,6 +79,11 @@ server {
   }
 
   location /connect {
+    proxy_pass http://backend;
+    limit_req  zone=one burst=10 nodelay;
+  }
+
+  location /antiforgery {
     proxy_pass http://backend;
     limit_req  zone=one burst=10 nodelay;
   }

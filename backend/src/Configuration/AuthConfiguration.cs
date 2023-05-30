@@ -1,7 +1,5 @@
 using System;
-using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,20 +9,41 @@ using OpenIddict.Validation.AspNetCore;
 using Quartz;
 using System.Reflection;
 using System.IO;
+using OpenIddict.Client;
+using Metabase.Data;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Metabase.Configuration
 {
     public abstract class AuthConfiguration
     {
+        // `IdentityConstants.ApplicationScheme` is not a constant but only
+        // read-only. It can thus not be used in the `Authorize` attribute. See the corresponding issue
+        // https://github.com/dotnet/aspnetcore/issues/20122 and un-merged pull request
+        // https://github.com/dotnet/aspnetcore/pull/21343/files
+        public const string IdentityConstantsApplicationScheme = "Identity.Application";
+
         public const string Audience = "metabase";
         public const string ReadPolicy = "Read";
         public const string WritePolicy = "Write";
-        public const string UserPolicy = "User";
         public const string ManageUserPolicy = "ManageUser";
         public static string ReadApiScope { get; } = "api:read";
         public static string WriteApiScope { get; } = "api:write";
-        public static string UserApiScope { get; } = "api:user:manage";
         public static string ManageUserApiScope { get; } = "api:user:manage";
+
+        // Keep in sync with the scopes set in `OpenIddictClientRegistration`.
+        private static readonly HashSet<string> ClientScopes = new() {
+            OpenIddictConstants.Scopes.Address,
+            OpenIddictConstants.Scopes.Email,
+            OpenIddictConstants.Scopes.Phone,
+            OpenIddictConstants.Scopes.Profile,
+            OpenIddictConstants.Scopes.Roles,
+            ReadApiScope,
+            WriteApiScope,
+            ManageUserApiScope
+        };
 
         public static void ConfigureServices(
             IServiceCollection services,
@@ -35,7 +54,7 @@ namespace Metabase.Configuration
             var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx", appSettings.JsonWebToken.EncryptionCertificatePassword);
             var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
             ConfigureIdentityServices(services);
-            ConfigureAuthenticiationAndAuthorizationServices(services);
+            ConfigureAuthenticationAndAuthorizationServices(services);
             ConfigureTaskScheduling(services, environment);
             ConfigureOpenIddictServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
         }
@@ -92,61 +111,22 @@ namespace Metabase.Configuration
                 })
               .AddEntityFrameworkStores<Data.ApplicationDbContext>()
               .AddDefaultTokenProviders(); // used to generate tokens for reset passwords, change email and change telephone number operations, and for two factor authentication token generation
+            // The application cookies is used by the metabase acting as
+            // authentication server through the authentication scheme
+            // `IdentityConstants.ApplicationScheme`, that is,
+            // "Identity.Application". See also the constant
+            // `IdentityConstantsApplicationScheme`.
             services.ConfigureApplicationCookie(_ =>
             {
                 _.AccessDeniedPath = "/unauthorized";
                 _.LoginPath = "/users/login";
                 _.LogoutPath = "/me/logout";
                 _.ReturnUrlParameter = "returnTo";
-                _.Events.OnValidatePrincipal = context =>
-                {
-                    if (context?.Principal is not null)
-                    {
-                        var identity = new ClaimsIdentity();
-                        // The metabase frontend uses application cookies for
-                        // user authentication and is allowed to show user data
-                        // for all standard scopes. The corresponding
-                        // authorization logic in `UserType` uses
-                        // `ClaimsPrincipal.HasScope`.
-                        identity.SetScopes(
-                            new[] {
-                                OpenIddictConstants.Scopes.Address,
-                                OpenIddictConstants.Scopes.Email,
-                                OpenIddictConstants.Scopes.Phone,
-                                OpenIddictConstants.Scopes.Profile,
-                                OpenIddictConstants.Scopes.Roles
-                            }
-                        );
-                        // The metabase frontend uses application cookies for user
-                        // authentication and is allowed to read data, write data,
-                        // and manage users. The corresponding policies `*Policy`
-                        // use scopes, so we need to add them.
-                        foreach (
-                            var claim in
-                                new[] {
-                                    ReadApiScope,
-                                    WriteApiScope,
-                                    UserApiScope,
-                                    ManageUserApiScope
-                                }
-                        )
-                        {
-                            identity.AddClaim(
-                                new Claim(
-                                    OpenIddictConstants.Claims.Private.Scope,
-                                    claim
-                                    )
-                                );
-                        }
-                        context.Principal.AddIdentity(identity);
-                    }
-                    return Task.CompletedTask;
-                };
             }
             );
         }
 
-        private static void ConfigureAuthenticiationAndAuthorizationServices(
+        private static void ConfigureAuthenticationAndAuthorizationServices(
             IServiceCollection services
             )
         {
@@ -154,13 +134,54 @@ namespace Metabase.Configuration
             // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-7.0#defaultscheme
             AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.SuppressAutoDefaultScheme", isEnabled: true);
             // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/
-            services.AddAuthentication();
+            services.AddAuthentication(_ =>
+            {
+                // To make the various authentication control flows obvious, do
+                // not use default schemes for anything and always be explicit
+                // instead.
+                _.DefaultAuthenticateScheme = null;
+                _.DefaultChallengeScheme = null;
+                _.DefaultForbidScheme = null;
+                _.DefaultScheme = null;
+                _.DefaultSignInScheme = null;
+                _.DefaultSignOutScheme = null;
+            })
+            // The cookie is used by the metabase acting as its own client
+            // application through the authentication scheme
+            // `CookieAuthenticationDefaults.AuthenticationScheme`, that is,
+            // "Cookies".
+            .AddCookie(_ =>
+            {
+                _.AccessDeniedPath = "/unauthorized";
+                _.LoginPath = "/connect/client/login";
+                _.LogoutPath = "/connect/client/logout";
+                _.ReturnUrlParameter = "returnTo";
+                _.ExpireTimeSpan = TimeSpan.FromMinutes(50);
+                _.SlidingExpiration = false;
+                _.Events.OnValidatePrincipal = context =>
+                {
+                    if (context?.Principal is not null)
+                    {
+                        var identity = new ClaimsIdentity();
+                        // The metabase frontend uses the "Cookies" scheme for
+                        // user authentication and is allowed to show user data
+                        // for all standard scopes. The corresponding
+                        // authorization logic in `UserType` uses
+                        // `ClaimsPrincipal.HasScope`. And it is also allowed to
+                        // read data, write data, and manage users. The
+                        // corresponding policies `*Policy` use scopes, so we
+                        // need to add them.
+                        identity.SetScopes(ClientScopes);
+                        context.Principal.AddIdentity(identity);
+                    }
+                    return Task.CompletedTask;
+                };
+            });
             services.AddAuthorization(_ =>
             {
                 foreach (var (policyName, scope) in new[] {
                      (ReadPolicy, ReadApiScope),
                      (WritePolicy, WriteApiScope),
-                     (UserPolicy, UserApiScope),
                      (ManageUserPolicy, ManageUserApiScope)
                      }
                    )
@@ -358,6 +379,8 @@ namespace Metabase.Configuration
                      _.UseAspNetCore();
                      // Enable token entry validation: https://documentation.openiddict.com/configuration/token-storage.html#enabling-token-entry-validation-at-the-api-level
                      _.EnableTokenEntryValidation();
+                     // Enable authorization entry validation: https://documentation.openiddict.com/configuration/authorization-storage.html#enabling-authorization-entry-validation-at-the-api-level
+                     _.EnableAuthorizationEntryValidation();
                      // Note: the validation handler uses OpenID Connect discovery
                      // to retrieve the address of the introspection endpoint.
                      //options.SetIssuer("http://localhost:12345/");
@@ -368,7 +391,62 @@ namespace Metabase.Configuration
                      //       .SetClientSecret("846B62D0-DEF9-4215-A99D-86E6B8DAB342");
                      // Register the System.Net.Http integration.
                      //options.UseSystemNetHttp();
-                 });
+                 })
+            .AddClient(_ =>
+            {
+                _.AllowAuthorizationCodeFlow();
+
+                // Register the signing and encryption credentials.
+                // See https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
+                _.AddEncryptionCertificate(encryptionCertificate)
+                 .AddSigningCertificate(signingCertificate);
+
+                // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
+                _.UseAspNetCore()
+                 .EnableStatusCodePagesIntegration()
+                 .EnableRedirectionEndpointPassthrough()
+                 .EnablePostLogoutRedirectionEndpointPassthrough();
+                // .DisableTransportSecurityRequirement();
+
+                // Register the System.Net.Http integration and use the identity of the current
+                // assembly as a more specific user agent, which can be useful when dealing with
+                // providers that use the user agent as a way to throttle requests (e.g Reddit).
+                _.UseSystemNetHttp()
+                 .SetProductInformation(typeof(Startup).Assembly);
+
+                // Add a client registration matching the client application definition in the server project.
+                _.AddRegistration(
+                    new OpenIddictClientRegistration
+                    {
+                        Issuer = new Uri(appSettings.Host, UriKind.Absolute),
+
+                        // Note: these settings must match the application details
+                        // inserted in the database at the server level.
+                        ClientId = DbSeeder.MetabaseClientId,
+                        ClientSecret = appSettings.OpenIdConnectClientSecret,
+
+                        // https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims
+                        Scopes = {
+                            // Keep in sync with `ClientScopes`.
+                            OpenIddictConstants.Scopes.Address,
+                            OpenIddictConstants.Scopes.Email,
+                            OpenIddictConstants.Scopes.Phone,
+                            OpenIddictConstants.Scopes.Profile,
+                            OpenIddictConstants.Scopes.Roles,
+                            ReadApiScope,
+                            WriteApiScope,
+                            ManageUserApiScope
+                        },
+
+                        // Note: to mitigate mix-up attacks, it's recommended to use a unique redirection endpoint
+                        // URI per provider, unless all the registered providers support returning a special "iss"
+                        // parameter containing their URL as part of authorization responses. For more information,
+                        // see https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.4.
+                        RedirectUri = new Uri("connect/callback/login/metabase", UriKind.Relative),
+                        PostLogoutRedirectUri = new Uri("connect/callback/logout/metabase", UriKind.Relative)
+                    }
+                );
+            });
         }
     }
 }

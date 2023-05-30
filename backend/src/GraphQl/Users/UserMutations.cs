@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -10,6 +11,8 @@ using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Extensions;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +27,19 @@ namespace Metabase.GraphQl.Users
         // Key Uri Format https://github.com/google/google-authenticator/wiki/Key-Uri-Format
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
+        private static async Task ValidateAntiforgeryTokenAsync(
+            IAntiforgery antiforgeryService,
+            IHttpContextAccessor httpContextAccessor
+        )
+        {
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext is null)
+            {
+                throw new AntiforgeryValidationException("Cannot access the HTTP context to validate the antiforgery token.");
+            }
+            await antiforgeryService.ValidateRequestAsync(httpContext).ConfigureAwait(false);
+        }
+
         /////////////////////
         // LOGGED-OUT USER //
         /////////////////////
@@ -31,13 +47,15 @@ namespace Metabase.GraphQl.Users
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ConfirmEmail.cs.cshtml
         // and https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.RegisterConfirmation.cs.cshtml
         // Despite its name, it is also used to confirm registrations. TODO Should we add another mutation for that?
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<ConfirmUserEmailPayload> ConfirmUserEmailAsync(
             ConfirmUserEmailInput input,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
             if (user is null)
             {
@@ -81,15 +99,17 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ConfirmEmailChange.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         [UseSignInManager]
         public async Task<ConfirmUserEmailChangePayload> ConfirmUserEmailChangeAsync(
             ConfirmUserEmailChangeInput input,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             // TODO This public endpoint can be used to test whether there is a user for the given email address. Is this a problem? In other endpoints like `ResetUserPasswordAsync` do not do that on purpose. Why exactly?
             var user = await userManager.FindByEmailAsync(input.CurrentEmail).ConfigureAwait(false);
             if (user is null)
@@ -167,19 +187,21 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Login.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         [UseSignInManager]
         public async Task<LoginUserPayload> LoginUserAsync(
             LoginUserInput input,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var signInResult = await signInManager.PasswordSignInAsync(
                 input.Email,
                 input.Password,
-                isPersistent: input.RememberMe,
+                isPersistent: false,
                 lockoutOnFailure: true
                 ).ConfigureAwait(false);
             // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinresult?view=aspnetcore-5.0
@@ -225,6 +247,13 @@ namespace Metabase.GraphQl.Users
                       )
                     );
             }
+            // We could set
+            // HttpContext.User = await _signInManager.CreateUserPrincipalAsync(user);
+            // and add tokens as cookies as is done in the antiforgery
+            // controller (XSRF). However, the GraphQL endpoint allows CORS
+            // whereas the antiforgery controller does not making the latter
+            // more secure because the antiforgery token should only be
+            // requestable from the same domain.
             if (signInResult.RequiresTwoFactor)
             {
                 return new LoginUserPayload(user, requiresTwoFactor: true);
@@ -233,14 +262,16 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWith2fa.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         [UseSignInManager]
         public async Task<LoginUserWithTwoFactorCodePayload> LoginUserWithTwoFactorCodeAsync(
             LoginUserWithTwoFactorCodeInput input,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
             if (user is null)
             {
@@ -259,7 +290,7 @@ namespace Metabase.GraphQl.Users
             var signInResult =
                 await signInManager.TwoFactorAuthenticatorSignInAsync(
                     authenticatorCode,
-                    isPersistent: input.RememberMe,
+                    isPersistent: false,
                     rememberClient: input.RememberMachine
                 ).ConfigureAwait(false);
             if (signInResult.IsLockedOut)
@@ -296,14 +327,16 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.LoginWithRecoveryCode.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         [UseSignInManager]
         public async Task<LoginUserWithRecoveryCodePayload> LoginUserWithRecoveryCodeAsync(
             LoginUserWithRecoveryCodeInput input,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
             if (user is null)
             {
@@ -356,15 +389,18 @@ namespace Metabase.GraphQl.Users
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Register.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<RegisterUserPayload> RegisterUserAsync(
             RegisterUserInput input,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
-            [Service] AppSettings appSettings
+            [Service] UrlEncoder urlEncoder,
+            [Service] AppSettings appSettings,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = new Data.User(
                 name: input.Name,
                 email: input.Email,
@@ -464,21 +500,26 @@ namespace Metabase.GraphQl.Users
                 (user.Name, input.Email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender,
-                appSettings.Host
+                appSettings.Host,
+                input.ReturnTo,
+                urlEncoder
                 ).ConfigureAwait(false);
             return new RegisterUserPayload(user);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResendEmailConfirmation.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<ResendUserEmailConfirmationPayload> ResendUserEmailConfirmationAsync(
             ResendUserEmailConfirmationInput input,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
-            [Service] AppSettings appSettings
+            [Service] UrlEncoder urlEncoder,
+            [Service] AppSettings appSettings,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
             // Don't reveal that the user does not exist.
             if (user is not null)
@@ -487,22 +528,27 @@ namespace Metabase.GraphQl.Users
                     (user.Name, input.Email),
                     await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                     emailSender,
-                    appSettings.Host
+                    appSettings.Host,
+                    null,
+                    urlEncoder
                     ).ConfigureAwait(false);
             }
             return new ResendUserEmailConfirmationPayload();
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ForgotPassword.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<RequestUserPasswordResetPayload> RequestUserPasswordResetAsync(
             RequestUserPasswordResetInput input,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
-            [Service] AppSettings appSettings
+            [Service] UrlEncoder urlEncoder,
+            [Service] AppSettings appSettings,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
             // Don't reveal that the user does not exist or is not confirmed
             if (user is not null && await userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
@@ -515,20 +561,22 @@ namespace Metabase.GraphQl.Users
                 await emailSender.SendAsync(
                     (user.Name, input.Email),
                     "Reset password",
-                    $"Please reset your password by following the link {appSettings.Host}/users/reset-password?resetCode={resetCode}."
+                    $"Please reset your password by following the link {appSettings.Host}/users/reset-password?resetCode={resetCode}" + (input.ReturnTo is null ? "" : $"&returnTo={urlEncoder.Encode(input.ReturnTo.OriginalString)}")
                     ).ConfigureAwait(false);
             }
             return new RequestUserPasswordResetPayload();
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.ResetPassword.cs.cshtml
-        [Authorize(Policy = Configuration.AuthConfiguration.UserPolicy)]
         [UseUserManager]
         public async Task<ResetUserPasswordPayload> ResetUserPasswordAsync(
             ResetUserPasswordInput input,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
             if (input.Password != input.PasswordConfirmation)
             {
@@ -614,9 +662,12 @@ namespace Metabase.GraphQl.Users
         public async Task<DeleteUserPayload> DeleteUserAsync(
             DeleteUserInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             if (!await UserAuthorization.IsAuthorizedToDeleteUsers(
                     claimsPrincipal,
                     userManager
@@ -678,9 +729,12 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         [UseSignInManager]
         public async Task<LogoutUserPayload> LogoutUserAsync(
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             await signInManager.SignOutAsync().ConfigureAwait(false);
             return new LogoutUserPayload();
         }
@@ -693,9 +747,12 @@ namespace Metabase.GraphQl.Users
             ChangeUserPasswordInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -792,9 +849,12 @@ namespace Metabase.GraphQl.Users
             DeletePersonalUserDataInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -861,9 +921,12 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<DisableUserTwoFactorAuthenticationPayload> DisableUserTwoFactorAuthenticationAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -896,9 +959,12 @@ namespace Metabase.GraphQl.Users
         public async Task<ForgetUserTwoFactorAuthenticationClientPayload> ForgetUserTwoFactorAuthenticationClientAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -920,9 +986,12 @@ namespace Metabase.GraphQl.Users
         public async Task<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload> GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service] UrlEncoder urlEncoder
+            [Service] UrlEncoder urlEncoder,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -984,9 +1053,12 @@ namespace Metabase.GraphQl.Users
             EnableUserTwoFactorAuthenticatorInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service] UrlEncoder urlEncoder
+            [Service] UrlEncoder urlEncoder,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -1152,9 +1224,12 @@ namespace Metabase.GraphQl.Users
         public async Task<ResetUserTwoFactorAuthenticatorPayload> ResetUserTwoFactorAuthenticatorAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -1200,9 +1275,13 @@ namespace Metabase.GraphQl.Users
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
-            [Service] AppSettings appSettings
+            [Service] UrlEncoder urlEncoder,
+            [Service] AppSettings appSettings,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -1243,7 +1322,8 @@ namespace Metabase.GraphQl.Users
                 input.NewEmail,
                 await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),
                 emailSender,
-                appSettings.Host
+                appSettings.Host,
+                urlEncoder
                 ).ConfigureAwait(false);
             return new ChangeUserEmailPayload(user);
         }
@@ -1255,9 +1335,13 @@ namespace Metabase.GraphQl.Users
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] Services.IEmailSender emailSender,
-            [Service] AppSettings appSettings
+            [Service] UrlEncoder urlEncoder,
+            [Service] AppSettings appSettings,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -1284,7 +1368,9 @@ namespace Metabase.GraphQl.Users
                 (user.Name, email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
                 emailSender,
-                appSettings.Host
+                appSettings.Host,
+                null,
+                urlEncoder
                 ).ConfigureAwait(false);
             return new ResendUserEmailVerificationPayload(user);
         }
@@ -1294,9 +1380,12 @@ namespace Metabase.GraphQl.Users
         [UseUserManager]
         public async Task<GenerateUserTwoFactorRecoveryCodesPayload> GenerateUserTwoFactorRecoveryCodesAsync(
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -1345,9 +1434,12 @@ namespace Metabase.GraphQl.Users
             SetUserPhoneNumberInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -1404,9 +1496,12 @@ namespace Metabase.GraphQl.Users
             SetUserPasswordInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
@@ -1501,10 +1596,13 @@ namespace Metabase.GraphQl.Users
             AddUserRoleInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager).ConfigureAwait(false))
             {
                 return new AddUserRolePayload(
@@ -1560,10 +1658,13 @@ namespace Metabase.GraphQl.Users
             RemoveUserRoleInput input,
             [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service] IAntiforgery antiforgeryService,
+            [Service] IHttpContextAccessor httpContextAccessor,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
             )
         {
+            await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager).ConfigureAwait(false))
             {
                 return new RemoveUserRolePayload(
@@ -1617,14 +1718,16 @@ namespace Metabase.GraphQl.Users
             (string name, string address) to,
             string confirmationToken,
             Services.IEmailSender emailSender,
-            string host
+            string host,
+            Uri? returnTo,
+            UrlEncoder urlEncoder
             )
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendAsync(
                 to,
                 "Confirm your email",
-                $"Please confirm your email address by following the link {host}/users/confirm-email?email={to.address}&confirmationCode={confirmationCode}")
+                $"Please confirm your email address by following the link {host}/users/confirm-email?email={urlEncoder.Encode(to.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}" + (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}"))
                 .ConfigureAwait(false);
         }
 
@@ -1634,14 +1737,15 @@ namespace Metabase.GraphQl.Users
             string newEmail,
             string confirmationToken,
             Services.IEmailSender emailSender,
-            string host
+            string host,
+            UrlEncoder urlEncoder
         )
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendAsync(
                 (name, newEmail),
                 "Confirm your email change",
-                $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={currentEmail}&newEmail={newEmail}&confirmationCode={confirmationCode}")
+                $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={urlEncoder.Encode(currentEmail)}&newEmail={urlEncoder.Encode(newEmail)}&confirmationCode={confirmationCode}")
                 .ConfigureAwait(false);
         }
 

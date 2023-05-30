@@ -1,83 +1,21 @@
 import Head from "next/head";
 import { ReactNode, useEffect, useState } from "react";
 import Footer from "./Footer";
-import NavBar from "./NavBar";
 import { Modal, Layout as AntLayout, Typography } from "antd";
 import paths from "../paths";
 import { useCookies } from "react-cookie";
 
-const navItems = [
-  {
-    path: paths.home,
-    label: "Home",
-    subitems: null,
-  },
-  {
-    label: "Data",
-    subitems: [
-      {
-        path: paths.data,
-        label: "All Data",
-      },
-      {
-        path: paths.calorimetricData,
-        label: "Calorimetric Data",
-      },
-      {
-        path: paths.hygrothermalData,
-        label: "Hygrothermal Data",
-      },
-      {
-        path: paths.opticalData,
-        label: "Optical Data",
-      },
-      {
-        path: paths.photovoltaicData,
-        label: "Photovoltaic Data",
-      },
-    ],
-  },
-  {
-    path: paths.components,
-    label: "Components",
-    subitems: null,
-  },
-  {
-    path: paths.institutions,
-    label: "Institutions",
-    subitems: null,
-  },
-  {
-    path: paths.databases,
-    label: "Databases",
-    subitems: null,
-  },
-  {
-    path: paths.dataFormats,
-    label: "Data Formats",
-    subitems: null,
-  },
-  {
-    path: paths.methods,
-    label: "Methods",
-    subitems: null,
-  },
-  {
-    path: paths.users,
-    label: "Users",
-    subitems: null,
-  },
-];
-
-export type LayoutProps = {
+export type SingleSignOnLayoutProps = {
   children?: ReactNode;
 };
 
 const cookieConsentName = "consent";
 const cookieConsentValue = "yes";
 
-export default function Layout({ children }: LayoutProps) {
-  const appTitle = "Building Envelope Data";
+export default function SingleSignOnLayout({
+  children,
+}: SingleSignOnLayoutProps) {
+  const appTitle = "Single-Sign On • Building Envelope Data";
 
   const [cookies, setCookie] = useCookies([cookieConsentName]);
   const shouldShowCookieConsent =
@@ -120,9 +58,6 @@ export default function Layout({ children }: LayoutProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
       </Head>
-      <AntLayout.Header>
-        <NavBar items={navItems} />
-      </AntLayout.Header>
       <AntLayout.Content style={{ padding: "50px" }}>
         {children}
       </AntLayout.Content>

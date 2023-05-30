@@ -17,7 +17,7 @@ namespace Metabase.Data
         public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password, Enumerations.UserRole Role)> Users =
             Role.AllEnum.Select(role => (
                 Role.EnumToName(role),
-                $"{Role.EnumToName(role).ToLower()}@buildingenvelopedata.org",
+                $"{Role.EnumToName(role).ToLowerInvariant()}@buildingenvelopedata.org",
                 "abcABC123@",
                 role
             )).ToList().AsReadOnly();
@@ -27,6 +27,9 @@ namespace Metabase.Data
 
         public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role) VerifierUser =
             Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
+
+        public const string MetabaseClientId = "metabase";
+        public const string TestlabSolarFacadesClientId = "testlab-solar-facades";
 
         public static async Task DoAsync(
             IServiceProvider services
@@ -39,7 +42,7 @@ namespace Metabase.Data
             await CreateRolesAsync(services, logger).ConfigureAwait(false);
             await CreateUsersAsync(services, logger).ConfigureAwait(false);
             await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
-            await RegisterScopesAsync(services, logger, appSettings).ConfigureAwait(false);
+            await RegisterScopesAsync(services, logger).ConfigureAwait(false);
         }
 
         private static async Task CreateRolesAsync(
@@ -52,7 +55,7 @@ namespace Metabase.Data
             {
                 if (await manager.FindByNameAsync(Role.EnumToName(role)).ConfigureAwait(false) is null)
                 {
-                    logger.LogDebug("Creating role {role}", role);
+                    logger.LogDebug("Creating role {Role}", role);
                     await manager.CreateAsync(
                         new Role(role)
                         ).ConfigureAwait(false);
@@ -91,22 +94,24 @@ namespace Metabase.Data
             )
         {
             var manager = services.GetRequiredService<IOpenIddictApplicationManager>();
-            if (await manager.FindByClientIdAsync("testlab-solar-facades").ConfigureAwait(false) is null)
+            if (await manager.FindByClientIdAsync(MetabaseClientId).ConfigureAwait(false) is null)
             {
-                logger.LogDebug("Creating application client 'testlab-solar-facades'");
-                // TODO Do not hardcode URL or at least port in development environment.
-                var host = appSettings.TestlabSolarFacadesHost;
+                logger.LogDebug("Creating application client '{ClientId}'", MetabaseClientId);
+                var host = appSettings.Host;
                 await manager.CreateAsync(
                     new OpenIddictApplicationDescriptor
                     {
-                        ClientId = "testlab-solar-facades",
-                        // The secret is used in tests, see `IntegrationTests#RequestAuthToken` and in the database frontned, see `AUTH_CLIENT_SECRET` in `/frontend/.env.*`.
-                        ClientSecret = appSettings.TestlabSolarFacadesOpenIdConnectClientSecret,
+                        ClientId = MetabaseClientId,
+                        // The secret is used in tests, see
+                        // `IntegrationTests#RequestAuthToken` and in the
+                        // metabase client, see `OPEN_ID_CONNECT_CLIENT_SECRET`
+                        // in `.env.*`.
+                        ClientSecret = appSettings.OpenIdConnectClientSecret,
                         ConsentType = environment.IsEnvironment("test") ? OpenIddictConstants.ConsentTypes.Systematic : OpenIddictConstants.ConsentTypes.Explicit,
-                        DisplayName = "Testlab-Solar-Facades client application",
+                        DisplayName = "Metabase client application",
                         DisplayNames =
                         {
-                            [CultureInfo.GetCultureInfo("de-DE")] = "Testlab-Solar-Facades-Klient-Anwendung"
+                            [CultureInfo.GetCultureInfo("de-DE")] = "Metabase-Klient-Anwendung"
                         },
                         RedirectUris =
                         {
@@ -119,9 +124,9 @@ namespace Metabase.Data
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
                             // OpenIddictConstants.Permissions.Endpoints.Device,
-                            // OpenIddictConstants.Permissions.Endpoints.Introspection,
+                            OpenIddictConstants.Permissions.Endpoints.Introspection,
                             OpenIddictConstants.Permissions.Endpoints.Logout,
-                            // OpenIddictConstants.Permissions.Endpoints.Revocation,
+                            OpenIddictConstants.Permissions.Endpoints.Revocation,
                             OpenIddictConstants.Permissions.Endpoints.Token,
                             environment.IsEnvironment("test") ? OpenIddictConstants.Permissions.GrantTypes.Password : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                             // OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
@@ -135,10 +140,59 @@ namespace Metabase.Data
                             OpenIddictConstants.Permissions.Scopes.Roles,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ReadApiScope,
                             OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.WriteApiScope,
-                            // Is there a better way to optionally add a value to a hash set inline?
-                            environment.IsEnvironment("test")
-                            ? OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ManageUserApiScope
-                            : OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ReadApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ManageUserApiScope
+                        },
+                        Requirements =
+                        {
+                            OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange
+                        }
+                    }
+                ).ConfigureAwait(false);
+            }
+            if (await manager.FindByClientIdAsync(TestlabSolarFacadesClientId).ConfigureAwait(false) is null)
+            {
+                logger.LogDebug("Creating application client '{ClientId}'", TestlabSolarFacadesClientId);
+                var host = appSettings.TestlabSolarFacadesHost;
+                await manager.CreateAsync(
+                    new OpenIddictApplicationDescriptor
+                    {
+                        ClientId = TestlabSolarFacadesClientId,
+                        // The secret is used in the database client, see
+                        // `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
+                        ClientSecret = appSettings.TestlabSolarFacadesOpenIdConnectClientSecret,
+                        ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
+                        DisplayName = "Testlab-Solar-Facades client application",
+                        DisplayNames =
+                        {
+                            [CultureInfo.GetCultureInfo("de-DE")] = "Testlab-Solar-Facades-Klient-Anwendung"
+                        },
+                        RedirectUris =
+                        {
+                            new Uri($"{host}/connect/callback/login/metabase")
+                        },
+                        PostLogoutRedirectUris =
+                        {
+                            new Uri($"{host}/connect/callback/logout/metabase")
+                        },
+                        Permissions = {
+                            OpenIddictConstants.Permissions.Endpoints.Authorization,
+                            // OpenIddictConstants.Permissions.Endpoints.Device,
+                            OpenIddictConstants.Permissions.Endpoints.Introspection,
+                            OpenIddictConstants.Permissions.Endpoints.Logout,
+                            OpenIddictConstants.Permissions.Endpoints.Revocation,
+                            OpenIddictConstants.Permissions.Endpoints.Token,
+                            OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                            // OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
+                            // OpenIddictConstants.Permissions.GrantTypes.DeviceCode,
+                            OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                            OpenIddictConstants.Permissions.ResponseTypes.Code,
+                            OpenIddictConstants.Permissions.Scopes.Address,
+                            OpenIddictConstants.Permissions.Scopes.Email,
+                            OpenIddictConstants.Permissions.Scopes.Phone,
+                            OpenIddictConstants.Permissions.Scopes.Profile,
+                            OpenIddictConstants.Permissions.Scopes.Roles,
+                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ReadApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.WriteApiScope
                         },
                         Requirements =
                         {
@@ -151,8 +205,7 @@ namespace Metabase.Data
 
         private static async Task RegisterScopesAsync(
             IServiceProvider services,
-            ILogger<DbSeeder> logger,
-            AppSettings appSettings
+            ILogger<DbSeeder> logger
             )
         {
             var manager = services.GetRequiredService<IOpenIddictScopeManager>();
@@ -187,6 +240,25 @@ namespace Metabase.Data
                             [CultureInfo.GetCultureInfo("de-DE")] = "API Schreibzugriff"
                         },
                         Name = Configuration.AuthConfiguration.WriteApiScope,
+                        Resources =
+                        {
+                            Configuration.AuthConfiguration.Audience
+                        }
+                    }
+                ).ConfigureAwait(false);
+            }
+            if (await manager.FindByNameAsync(Configuration.AuthConfiguration.ManageUserApiScope).ConfigureAwait(false) is null)
+            {
+                logger.LogDebug("Creating scope '{Scope}'", Configuration.AuthConfiguration.ManageUserApiScope);
+                await manager.CreateAsync(
+                    new OpenIddictScopeDescriptor
+                    {
+                        DisplayName = "Manage user API access",
+                        DisplayNames =
+                        {
+                            [CultureInfo.GetCultureInfo("de-DE")] = "Benutzerverwaltung-API-Zugriff"
+                        },
+                        Name = Configuration.AuthConfiguration.ManageUserApiScope,
                         Resources =
                         {
                             Configuration.AuthConfiguration.Audience

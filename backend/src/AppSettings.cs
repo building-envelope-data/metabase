@@ -43,6 +43,9 @@ namespace Metabase
             = 0;
         }
 
+        public string OpenIdConnectClientSecret { get; set; }
+        = "";
+
         public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }
         = "";
 

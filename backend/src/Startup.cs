@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
+using OpenIddict.Validation.AspNetCore;
 using Serilog;
 
 // TODO Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth
@@ -27,6 +28,8 @@ namespace Metabase
 {
     public sealed class Startup
     {
+        private const string GraphQlCorsPolicy = "GraphQlCorsPolicy";
+
         private readonly IWebHostEnvironment _environment;
         private readonly AppSettings _appSettings;
 
@@ -36,7 +39,7 @@ namespace Metabase
             )
         {
             _environment = environment;
-            _appSettings = configuration.Get<AppSettings>() ?? throw new Exception("Failed to get application settings from configuration.");
+            _appSettings = configuration.Get<AppSettings>() ?? throw new InvalidOperationException("Failed to get application settings from configuration.");
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -47,6 +50,10 @@ namespace Metabase
             ConfigureMessageSenderServices(services);
             ConfigureRequestResponseServices(services);
             ConfigureSessionServices(services);
+            services.AddAntiforgery(_ =>
+            {
+                _.HeaderName = "X-XSRF-TOKEN";
+            });
             services
                 .AddDataProtection()
                 .PersistKeysToDbContext<Data.ApplicationDbContext>();
@@ -73,11 +80,13 @@ namespace Metabase
             }
             );
             services.AddCors(_ =>
-                _.AddDefaultPolicy(policy =>
-                    policy
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
+                _.AddPolicy(
+                    name: GraphQlCorsPolicy,
+                    policy =>
+                        policy
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
                     )
                 );
             services.AddControllersWithViews();
@@ -193,7 +202,7 @@ namespace Metabase
             // app.UseHttpsRedirection(); // Done by NGINX
             app.UseSerilogRequestLogging();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+            app.UseCookiePolicy(); // [SameSite cookies](https://learn.microsoft.com/en-us/aspnet/core/security/samesite)
             app.UseRouting();
             // TODO Do we really want this? See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0
             app.UseRequestLocalization(_ =>
@@ -212,7 +221,8 @@ namespace Metabase
             /* app.UseWebSockets(); */
             app.UseEndpoints(_ =>
             {
-                _.MapGraphQL().WithOptions(
+                _.MapGraphQL()
+                .WithOptions(
                     // https://chillicream.com/docs/hotchocolate/server/middleware
                     new GraphQLServerOptions
                     {
@@ -229,7 +239,8 @@ namespace Metabase
                             Title = "GraphQL"
                         }
                     }
-                );
+                )
+                .RequireCors(GraphQlCorsPolicy);
                 _.MapControllers();
                 _.MapHealthChecks("/health",
                     new HealthCheckOptions

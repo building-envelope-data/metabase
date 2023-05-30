@@ -2,10 +2,12 @@ import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
 import { useLoginUserWithRecoveryCodeMutation } from "../../queries/currentUser.graphql";
 import { Alert, Form, Input, Button, Row, Col, Card, Typography } from "antd";
-import Layout from "../../components/Layout";
+import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import paths from "../../paths";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
+import { isLocalUrl } from "../../lib/url";
+import Link from "next/link";
 
 function LoginWithRecoveryCode() {
   const router = useRouter();
@@ -42,8 +44,11 @@ function LoginWithRecoveryCode() {
           data?.loginUserWithRecoveryCode?.user
         ) {
           await apolloClient.resetStore();
+          await fetch(paths.antiforgeryToken);
           await router.push(
-            typeof returnTo === "string" ? returnTo : paths.home
+            typeof returnTo === "string" && isLocalUrl(returnTo)
+              ? returnTo
+              : paths.home
           );
         }
       } catch (error) {
@@ -61,7 +66,7 @@ function LoginWithRecoveryCode() {
   };
 
   return (
-    <Layout>
+    <SingleSignOnLayout>
       <Row justify="center">
         <Col>
           <Card title="Login">
@@ -103,12 +108,22 @@ function LoginWithRecoveryCode() {
                 >
                   Login
                 </Button>
+                Don&apos;t have access to your recovery code? You can{" "}
+                <Link
+                  href={{
+                    pathname: paths.userLoginWithTwoFactorCode,
+                    query: returnTo ? { returnTo: returnTo } : null,
+                  }}
+                >
+                  login with a two-factor code
+                </Link>
+                .
               </Form.Item>
             </Form>
           </Card>
         </Col>
       </Row>
-    </Layout>
+    </SingleSignOnLayout>
   );
 }
 
