@@ -19,10 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
-using OpenIddict.Validation.AspNetCore;
 using Serilog;
-
-// TODO Certificate authentication: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/certauth
 
 namespace Metabase
 {
@@ -179,7 +176,7 @@ namespace Metabase
         public void Configure(IApplicationBuilder app)
         {
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/
-            if (_environment.IsDevelopment() || _environment.IsEnvironment("test"))
+            if (_environment.IsDevelopment() || _environment.IsEnvironment(Program.TestEnvironment))
             {
                 app.UseDeveloperExceptionPage();
                 // app.UseMigrationsEndPoint();

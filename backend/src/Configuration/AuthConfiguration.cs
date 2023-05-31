@@ -242,7 +242,7 @@ namespace Metabase.Configuration
                 _.UseDefaultThreadPool(_ =>
                     _.MaxConcurrency = 10
                 );
-                if (environment.IsEnvironment("test"))
+                if (environment.IsEnvironment(Program.TestEnvironment))
                 {
                     // See https://gitter.im/MassTransit/MassTransit?at=5db2d058f6db7f4f856fb404
                     _.SchedulerName = Guid.NewGuid().ToString();
