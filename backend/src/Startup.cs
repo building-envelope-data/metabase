@@ -173,7 +173,7 @@ namespace Metabase
             // }
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(WebApplication app)
         {
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/
             if (_environment.IsDevelopment() || _environment.IsEnvironment(Program.TestEnvironment))
@@ -216,36 +216,33 @@ namespace Metabase
             // app.UseResponseCompression(); // Done by Nginx
             // app.UseResponseCaching(); // Done by Nginx
             /* app.UseWebSockets(); */
-            app.UseEndpoints(_ =>
-            {
-                _.MapGraphQL()
-                .WithOptions(
-                    // https://chillicream.com/docs/hotchocolate/server/middleware
-                    new GraphQLServerOptions
-                    {
-                        EnableSchemaRequests = true,
-                        EnableGetRequests = false,
-                        // AllowedGetOperations = AllowedGetOperations.Query
-                        EnableMultipartRequests = false,
-                        Tool = {
-                            DisableTelemetry = true,
-                            Enable = true, // _environment.IsDevelopment()
-                            IncludeCookies = false,
-                            GraphQLEndpoint = "/graphql",
-                            HttpMethod = DefaultHttpMethod.Post,
-                            Title = "GraphQL"
-                        }
-                    }
-                )
-                .RequireCors(GraphQlCorsPolicy);
-                _.MapControllers();
-                _.MapHealthChecks("/health",
-                    new HealthCheckOptions
-                    {
-                        ResponseWriter = WriteJsonResponse
-                    }
-                );
-            });
+            app.MapGraphQL()
+               .WithOptions(
+                   // https://chillicream.com/docs/hotchocolate/server/middleware
+                   new GraphQLServerOptions
+                   {
+                       EnableSchemaRequests = true,
+                       EnableGetRequests = false,
+                       // AllowedGetOperations = AllowedGetOperations.Query
+                       EnableMultipartRequests = false,
+                       Tool = {
+                           DisableTelemetry = true,
+                           Enable = true, // _environment.IsDevelopment()
+                           IncludeCookies = false,
+                           GraphQLEndpoint = "/graphql",
+                           HttpMethod = DefaultHttpMethod.Post,
+                           Title = "GraphQL"
+                       }
+                   }
+               )
+               .RequireCors(GraphQlCorsPolicy);
+            app.MapControllers();
+            app.MapHealthChecks("/health",
+                new HealthCheckOptions
+                {
+                    ResponseWriter = WriteJsonResponse
+                }
+            );
         }
 
         // Inspired by https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-7.0#customize-output
