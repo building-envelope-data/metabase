@@ -91,7 +91,7 @@ namespace Metabase
             }
         }
 
-        public static async Task CreateAndSeedDbIfNotExists(
+        private static async Task CreateAndSeedDbIfNotExists(
             IServiceProvider services
             )
         {
@@ -113,7 +113,7 @@ namespace Metabase
         }
 
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
-        public static WebApplicationBuilder CreateWebApplicationBuilder(
+        private static WebApplicationBuilder CreateWebApplicationBuilder(
             string[] commandLineArguments
             )
         {
