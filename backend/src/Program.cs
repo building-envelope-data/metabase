@@ -125,21 +125,11 @@ namespace Metabase
                 }
             );
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/
-            builder.Configuration
-                .SetBasePath(builder.Environment.ContentRootPath)
-                .AddJsonFile(
-                    "appsettings.json",
-                    optional: false,
-                    reloadOnChange: !builder.Environment.IsEnvironment(TestEnvironment)
-                    )
-                .AddJsonFile(
-                    $"appsettings.{builder.Environment.EnvironmentName}.json",
-                    optional: false,
-                    reloadOnChange: !builder.Environment.IsEnvironment(TestEnvironment)
-                    )
-                .AddEnvironmentVariables()
-                .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
-                .AddCommandLine(commandLineArguments);
+            ConfigureAppConfiguration(
+                builder.Configuration,
+                builder.Environment,
+                commandLineArguments
+            );
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection
             // https://github.com/dotnet/aspnetcore/issues/38334#issuecomment-967709919
             builder.Host.UseDefaultServiceProvider(_ =>
@@ -158,6 +148,30 @@ namespace Metabase
                     .ReadFrom.Configuration(webHostBuilderContext.Configuration);
             });
             return builder;
+        }
+
+        public static void ConfigureAppConfiguration(
+            IConfigurationBuilder configuration,
+            IHostEnvironment environment,
+            string[] commandLineArguments
+            )
+        {
+            configuration.Sources.Clear();
+            configuration
+                .SetBasePath(environment.ContentRootPath)
+                .AddJsonFile(
+                    "appsettings.json",
+                    optional: false,
+                    reloadOnChange: !environment.IsEnvironment(TestEnvironment)
+                    )
+                .AddJsonFile(
+                    $"appsettings.{environment.EnvironmentName}.json",
+                    optional: false,
+                    reloadOnChange: !environment.IsEnvironment(TestEnvironment)
+                    )
+                .AddEnvironmentVariables()
+                .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
+                .AddCommandLine(commandLineArguments);
         }
     }
 }
