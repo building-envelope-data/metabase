@@ -1716,6 +1716,12 @@ input ComponentFilterInput {
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
   categories: ListComponentCategoryOperationFilterInput
+  partOf: ListComponentFilterTypeFilterInput
+  parts: ListComponentFilterTypeFilterInput
+  concretizations: ListComponentFilterTypeFilterInput
+  generalizations: ListComponentFilterTypeFilterInput
+  variants: ListComponentFilterTypeFilterInput
+  manufacturers: ListInstitutionFilterTypeFilterInput
 }
 
 input ComponentSortInput {
@@ -1841,8 +1847,11 @@ input DataFormatFilterInput {
   or: [DataFormatFilterInput!]
   id: UuidOperationFilterInput
   name: StringOperationFilterInput
+  extension: StringOperationFilterInput
   description: StringOperationFilterInput
   mediaType: StringOperationFilterInput
+  schemaLocator: UrlOperationFilterInput
+  manager: InstitutionFilterInput
 }
 
 input DataFormatSortInput {
@@ -1884,6 +1893,7 @@ input DatabaseFilterInput {
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   locator: UrlOperationFilterInput
+  operator: InstitutionFilterInput
 }
 
 input DatabaseSortInput {
@@ -1971,6 +1981,14 @@ input InstitutionFilterInput {
   description: StringOperationFilterInput
   websiteLocator: UrlOperationFilterInput
   state: InstitutionStateOperationFilterInput
+  developedMethods: ListMethodFilterTypeFilterInput
+  managedMethods: ListMethodFilterTypeFilterInput
+  managedDataFormats: ListDataFormatFilterTypeFilterInput
+  manufacturedComponents: ListComponentFilterTypeFilterInput
+  operatedDatabases: ListDatabaseFilterTypeFilterInput
+  manager: InstitutionFilterInput
+  managedInstitutions: ListInstitutionFilterTypeFilterInput
+  representatives: ListUserFilterTypeFilterInput
 }
 
 input InstitutionSortInput {
@@ -2000,10 +2018,52 @@ input ListComponentCategoryOperationFilterInput {
   any: Boolean
 }
 
+input ListComponentFilterTypeFilterInput {
+  all: ComponentFilterInput
+  none: ComponentFilterInput
+  some: ComponentFilterInput
+  any: Boolean
+}
+
+input ListDataFormatFilterTypeFilterInput {
+  all: DataFormatFilterInput
+  none: DataFormatFilterInput
+  some: DataFormatFilterInput
+  any: Boolean
+}
+
+input ListDatabaseFilterTypeFilterInput {
+  all: DatabaseFilterInput
+  none: DatabaseFilterInput
+  some: DatabaseFilterInput
+  any: Boolean
+}
+
+input ListInstitutionFilterTypeFilterInput {
+  all: InstitutionFilterInput
+  none: InstitutionFilterInput
+  some: InstitutionFilterInput
+  any: Boolean
+}
+
 input ListMethodCategoryOperationFilterInput {
   all: MethodCategoryOperationFilterInput
   none: MethodCategoryOperationFilterInput
   some: MethodCategoryOperationFilterInput
+  any: Boolean
+}
+
+input ListMethodFilterTypeFilterInput {
+  all: MethodFilterInput
+  none: MethodFilterInput
+  some: MethodFilterInput
+  any: Boolean
+}
+
+input ListUserFilterTypeFilterInput {
+  all: UserFilterInput
+  none: UserFilterInput
+  some: UserFilterInput
   any: Boolean
 }
 
@@ -2034,7 +2094,11 @@ input MethodFilterInput {
   id: UuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
+  calculationLocator: UrlOperationFilterInput
   categories: ListMethodCategoryOperationFilterInput
+  institutionDevelopers: ListInstitutionFilterTypeFilterInput
+  userDevelopers: ListUserFilterTypeFilterInput
+  manager: InstitutionFilterInput
 }
 
 input MethodSortInput {
@@ -2320,6 +2384,14 @@ input UrlOperationFilterInput {
   nlt: Url
   lte: Url
   nlte: Url
+}
+
+input UserFilterInput {
+  and: [UserFilterInput!]
+  or: [UserFilterInput!]
+  id: UuidOperationFilterInput
+  developedMethods: ListMethodFilterTypeFilterInput
+  representedInstitutions: ListInstitutionFilterTypeFilterInput
 }
 
 input UserSortInput {

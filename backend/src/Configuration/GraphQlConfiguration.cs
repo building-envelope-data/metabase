@@ -159,6 +159,7 @@ namespace Metabase.Configuration
                          descriptor.BindRuntimeType<Data.Database, GraphQl.Databases.DatabaseFilterType>();
                          descriptor.BindRuntimeType<Data.Institution, GraphQl.Institutions.InstitutionFilterType>();
                          descriptor.BindRuntimeType<Data.Method, GraphQl.Methods.MethodFilterType>();
+                         descriptor.BindRuntimeType<Data.User, GraphQl.Users.UserFilterType>();
                      }
                      )
                    )

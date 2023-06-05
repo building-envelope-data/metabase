@@ -14,6 +14,7 @@ namespace Metabase.GraphQl.Databases
             descriptor.Field(x => x.Name);
             descriptor.Field(x => x.Description);
             descriptor.Field(x => x.Locator);
+            descriptor.Field(x => x.Operator);
         }
     }
 }

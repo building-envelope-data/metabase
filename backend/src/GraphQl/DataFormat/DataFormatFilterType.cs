@@ -12,8 +12,11 @@ namespace Metabase.GraphQl.DataFormats
             descriptor.BindFieldsExplicitly();
             descriptor.Field(x => x.Id);
             descriptor.Field(x => x.Name);
+            descriptor.Field(x => x.Extension);
             descriptor.Field(x => x.Description);
             descriptor.Field(x => x.MediaType);
+            descriptor.Field(x => x.SchemaLocator);
+            descriptor.Field(x => x.Manager);
         }
     }
 }
