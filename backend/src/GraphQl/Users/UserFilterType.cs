@@ -17,7 +17,9 @@ namespace Metabase.GraphQl.Users
             // descriptor.Field(x => x.PostalAddress);
             // descriptor.Field(x => x.WebsiteLocator);
             descriptor.Field(x => x.DevelopedMethods);
+            descriptor.Field(x => x.DevelopedMethodEdges);
             descriptor.Field(x => x.RepresentedInstitutions);
+            descriptor.Field(x => x.RepresentedInstitutionEdges);
         }
     }
 }

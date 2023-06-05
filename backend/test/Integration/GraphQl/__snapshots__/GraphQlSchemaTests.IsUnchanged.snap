@@ -1658,6 +1658,26 @@ input AddUserRoleInput {
   userId: Uuid!
 }
 
+input BooleanOperationFilterInput {
+  eq: Boolean
+  neq: Boolean
+}
+
+input ByteOperationFilterInput {
+  eq: Byte
+  neq: Byte
+  in: [Byte]
+  nin: [Byte]
+  gt: Byte
+  ngt: Byte
+  gte: Byte
+  ngte: Byte
+  lt: Byte
+  nlt: Byte
+  lte: Byte
+  nlte: Byte
+}
+
 input CalorimetricDataPropositionInput {
   and: [CalorimetricDataPropositionInput!]
   componentId: UuidPropositionInput
@@ -1701,6 +1721,15 @@ input ClosedIntervalInput {
   upperBound: Float!
 }
 
+input ComponentAssemblyFilterInput {
+  and: [ComponentAssemblyFilterInput!]
+  or: [ComponentAssemblyFilterInput!]
+  assembledComponent: ComponentFilterInput
+  partComponent: ComponentFilterInput
+  index: ByteOperationFilterInput
+  primeSurface: NullableOfPrimeSurfaceOperationFilterInput
+}
+
 input ComponentCategoryOperationFilterInput {
   eq: ComponentCategory
   neq: ComponentCategory
@@ -1718,10 +1747,21 @@ input ComponentFilterInput {
   categories: ListComponentCategoryOperationFilterInput
   partOf: ListComponentFilterTypeFilterInput
   parts: ListComponentFilterTypeFilterInput
+  partOfEdges: ListComponentAssemblyFilterTypeFilterInput
+  partEdges: ListComponentAssemblyFilterTypeFilterInput
   concretizations: ListComponentFilterTypeFilterInput
   generalizations: ListComponentFilterTypeFilterInput
   variants: ListComponentFilterTypeFilterInput
   manufacturers: ListInstitutionFilterTypeFilterInput
+  manufacturerEdges: ListComponentManufacturerFilterTypeFilterInput
+}
+
+input ComponentManufacturerFilterInput {
+  and: [ComponentManufacturerFilterInput!]
+  or: [ComponentManufacturerFilterInput!]
+  component: ComponentFilterInput
+  institution: InstitutionFilterInput
+  pending: BooleanOperationFilterInput
 }
 
 input ComponentSortInput {
@@ -1984,13 +2024,40 @@ input InstitutionFilterInput {
   websiteLocator: UrlOperationFilterInput
   state: InstitutionStateOperationFilterInput
   developedMethods: ListMethodFilterTypeFilterInput
+  developedMethodEdges: ListInstitutionMethodDeveloperFilterTypeFilterInput
   managedMethods: ListMethodFilterTypeFilterInput
   managedDataFormats: ListDataFormatFilterTypeFilterInput
   manufacturedComponents: ListComponentFilterTypeFilterInput
+  manufacturedComponentEdges: ListComponentManufacturerFilterTypeFilterInput
   operatedDatabases: ListDatabaseFilterTypeFilterInput
   manager: InstitutionFilterInput
   managedInstitutions: ListInstitutionFilterTypeFilterInput
   representatives: ListUserFilterTypeFilterInput
+  representativeEdges: ListInstitutionRepresentativeFilterTypeFilterInput
+}
+
+input InstitutionMethodDeveloperFilterInput {
+  and: [InstitutionMethodDeveloperFilterInput!]
+  or: [InstitutionMethodDeveloperFilterInput!]
+  method: MethodFilterInput
+  institution: InstitutionFilterInput
+  pending: BooleanOperationFilterInput
+}
+
+input InstitutionRepresentativeFilterInput {
+  and: [InstitutionRepresentativeFilterInput!]
+  or: [InstitutionRepresentativeFilterInput!]
+  institution: InstitutionFilterInput
+  user: UserFilterInput
+  role: InstitutionRepresentativeRoleOperationFilterInput
+  pending: BooleanOperationFilterInput
+}
+
+input InstitutionRepresentativeRoleOperationFilterInput {
+  eq: InstitutionRepresentativeRole
+  neq: InstitutionRepresentativeRole
+  in: [InstitutionRepresentativeRole!]
+  nin: [InstitutionRepresentativeRole!]
 }
 
 input InstitutionSortInput {
@@ -2028,6 +2095,13 @@ input IntOperationFilterInput {
   nlte: Int
 }
 
+input ListComponentAssemblyFilterTypeFilterInput {
+  all: ComponentAssemblyFilterInput
+  none: ComponentAssemblyFilterInput
+  some: ComponentAssemblyFilterInput
+  any: Boolean
+}
+
 input ListComponentCategoryOperationFilterInput {
   all: ComponentCategoryOperationFilterInput
   none: ComponentCategoryOperationFilterInput
@@ -2039,6 +2113,13 @@ input ListComponentFilterTypeFilterInput {
   all: ComponentFilterInput
   none: ComponentFilterInput
   some: ComponentFilterInput
+  any: Boolean
+}
+
+input ListComponentManufacturerFilterTypeFilterInput {
+  all: ComponentManufacturerFilterInput
+  none: ComponentManufacturerFilterInput
+  some: ComponentManufacturerFilterInput
   any: Boolean
 }
 
@@ -2060,6 +2141,20 @@ input ListInstitutionFilterTypeFilterInput {
   all: InstitutionFilterInput
   none: InstitutionFilterInput
   some: InstitutionFilterInput
+  any: Boolean
+}
+
+input ListInstitutionMethodDeveloperFilterTypeFilterInput {
+  all: InstitutionMethodDeveloperFilterInput
+  none: InstitutionMethodDeveloperFilterInput
+  some: InstitutionMethodDeveloperFilterInput
+  any: Boolean
+}
+
+input ListInstitutionRepresentativeFilterTypeFilterInput {
+  all: InstitutionRepresentativeFilterInput
+  none: InstitutionRepresentativeFilterInput
+  some: InstitutionRepresentativeFilterInput
   any: Boolean
 }
 
@@ -2098,6 +2193,13 @@ input ListUserFilterTypeFilterInput {
   any: Boolean
 }
 
+input ListUserMethodDeveloperFilterTypeFilterInput {
+  all: UserMethodDeveloperFilterInput
+  none: UserMethodDeveloperFilterInput
+  some: UserMethodDeveloperFilterInput
+  any: Boolean
+}
+
 input LoginUserInput {
   email: String!
   password: String!
@@ -2130,7 +2232,9 @@ input MethodFilterInput {
   calculationLocator: UrlOperationFilterInput
   categories: ListMethodCategoryOperationFilterInput
   institutionDevelopers: ListInstitutionFilterTypeFilterInput
+  institutionDeveloperEdges: ListInstitutionMethodDeveloperFilterTypeFilterInput
   userDevelopers: ListUserFilterTypeFilterInput
+  userDeveloperEdges: ListUserMethodDeveloperFilterTypeFilterInput
   manager: InstitutionFilterInput
 }
 
@@ -2147,6 +2251,13 @@ input MethodSortInput {
   manager: InstitutionSortInput
   id: SortEnumType
   version: SortEnumType
+}
+
+input NullableOfPrimeSurfaceOperationFilterInput {
+  eq: PrimeSurface
+  neq: PrimeSurface
+  in: [PrimeSurface]
+  nin: [PrimeSurface]
 }
 
 input NumerationFilterInput {
@@ -2472,7 +2583,17 @@ input UserFilterInput {
   or: [UserFilterInput!]
   id: UuidOperationFilterInput
   developedMethods: ListMethodFilterTypeFilterInput
+  developedMethodEdges: ListUserMethodDeveloperFilterTypeFilterInput
   representedInstitutions: ListInstitutionFilterTypeFilterInput
+  representedInstitutionEdges: ListInstitutionRepresentativeFilterTypeFilterInput
+}
+
+input UserMethodDeveloperFilterInput {
+  and: [UserMethodDeveloperFilterInput!]
+  or: [UserMethodDeveloperFilterInput!]
+  method: MethodFilterInput
+  user: UserFilterInput
+  pending: BooleanOperationFilterInput
 }
 
 input UserSortInput {

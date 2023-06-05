@@ -18,7 +18,9 @@ namespace Metabase.GraphQl.Methods
             descriptor.Field(x => x.CalculationLocator);
             descriptor.Field(x => x.Categories);
             descriptor.Field(x => x.InstitutionDevelopers);
+            descriptor.Field(x => x.InstitutionDeveloperEdges);
             descriptor.Field(x => x.UserDevelopers);
+            descriptor.Field(x => x.UserDeveloperEdges);
             descriptor.Field(x => x.Manager);
         }
     }
