@@ -1851,6 +1851,8 @@ input DataFormatFilterInput {
   description: StringOperationFilterInput
   mediaType: StringOperationFilterInput
   schemaLocator: UrlOperationFilterInput
+  standard: StandardFilterInput
+  publication: PublicationFilterInput
   manager: InstitutionFilterInput
 }
 
@@ -2011,6 +2013,21 @@ input InstitutionStateOperationFilterInput {
   nin: [InstitutionState!]
 }
 
+input IntOperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int]
+  nin: [Int]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
 input ListComponentCategoryOperationFilterInput {
   all: ComponentCategoryOperationFilterInput
   none: ComponentCategoryOperationFilterInput
@@ -2060,6 +2077,20 @@ input ListMethodFilterTypeFilterInput {
   any: Boolean
 }
 
+input ListStandardizerOperationFilterInput {
+  all: StandardizerOperationFilterInput
+  none: StandardizerOperationFilterInput
+  some: StandardizerOperationFilterInput
+  any: Boolean
+}
+
+input ListStringOperationFilterInput {
+  all: StringOperationFilterInput
+  none: StringOperationFilterInput
+  some: StringOperationFilterInput
+  any: Boolean
+}
+
 input ListUserFilterTypeFilterInput {
   all: UserFilterInput
   none: UserFilterInput
@@ -2094,6 +2125,8 @@ input MethodFilterInput {
   id: UuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
+  standard: StandardFilterInput
+  publication: PublicationFilterInput
   calculationLocator: UrlOperationFilterInput
   categories: ListMethodCategoryOperationFilterInput
   institutionDevelopers: ListInstitutionFilterTypeFilterInput
@@ -2114,6 +2147,14 @@ input MethodSortInput {
   manager: InstitutionSortInput
   id: SortEnumType
   version: SortEnumType
+}
+
+input NumerationFilterInput {
+  and: [NumerationFilterInput!]
+  or: [NumerationFilterInput!]
+  prefix: StringOperationFilterInput
+  mainNumber: StringOperationFilterInput
+  suffix: StringOperationFilterInput
 }
 
 input NumerationSortInput {
@@ -2148,6 +2189,24 @@ input PhotovoltaicDataPropositionInput {
   not: PhotovoltaicDataPropositionInput
   or: [PhotovoltaicDataPropositionInput!]
   resources: GetHttpsResourcesPropositionInput
+}
+
+input PublicationFilterInput {
+  and: [PublicationFilterInput!]
+  or: [PublicationFilterInput!]
+  title: StringOperationFilterInput
+  abstract: StringOperationFilterInput
+  "Referenced section"
+  section: StringOperationFilterInput
+  authors: ListStringOperationFilterInput
+  "The Digital Object Identifier (DOI) is a very important persistent identifier for publications. It MUST be defined here if it is available for a publication."
+  doi: StringOperationFilterInput
+  "The website arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
+  arXiv: StringOperationFilterInput
+  "A Uniform Resource Name (URN) can be used to define a publication. TODO: Improve the regex pattern to further restrict the string."
+  urn: StringOperationFilterInput
+  "If a persistent identifiert like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long."
+  webAddress: UrlOperationFilterInput
 }
 
 input PublicationSortInput {
@@ -2239,6 +2298,21 @@ input SetUserPhoneNumberInput {
 }
 
 "`ISO 52022` is an example of the abbreviation of a standardizer and the main number of the identifier."
+input StandardFilterInput {
+  and: [StandardFilterInput!]
+  or: [StandardFilterInput!]
+  title: StringOperationFilterInput
+  abstract: StringOperationFilterInput
+  "The section of the standard to which the reference refers to."
+  section: StringOperationFilterInput
+  "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
+  year: IntOperationFilterInput
+  numeration: NumerationFilterInput
+  standardizers: ListStandardizerOperationFilterInput
+  locator: UrlOperationFilterInput
+}
+
+"`ISO 52022` is an example of the abbreviation of a standardizer and the main number of the identifier."
 input StandardSortInput {
   title: SortEnumType
   abstract: SortEnumType
@@ -2248,6 +2322,13 @@ input StandardSortInput {
   year: SortEnumType
   numeration: NumerationSortInput
   locator: UriSortInput
+}
+
+input StandardizerOperationFilterInput {
+  eq: Standardizer
+  neq: Standardizer
+  in: [Standardizer!]
+  nin: [Standardizer!]
 }
 
 input StringOperationFilterInput {

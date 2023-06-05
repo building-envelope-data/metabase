@@ -16,6 +16,8 @@ namespace Metabase.GraphQl.DataFormats
             descriptor.Field(x => x.Description);
             descriptor.Field(x => x.MediaType);
             descriptor.Field(x => x.SchemaLocator);
+            descriptor.Field(x => x.Standard);
+            descriptor.Field(x => x.Publication);
             descriptor.Field(x => x.Manager);
         }
     }
