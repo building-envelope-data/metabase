@@ -148,7 +148,7 @@ namespace Metabase.Tests.Integration
                   password: password
                   )
               .ConfigureAwait(false);
-            httpClient.SetBearerToken(tokenResponse.AccessToken);
+            httpClient.SetBearerToken(tokenResponse.AccessToken ?? throw new InvalidOperationException($"The auth-token request to {httpClient.BaseAddress} with email address {email} and password {password} returned `null` as access token."));
         }
 
         protected Task LoginUser(
@@ -167,7 +167,7 @@ namespace Metabase.Tests.Integration
             HttpClient httpClient
         )
         {
-            httpClient.SetBearerToken(null);
+            httpClient.SetBearerToken("");
         }
 
         protected void LogoutUser()

@@ -3,25 +3,25 @@
   "isRoot": true,
   "tools": {
     "dotnet-aspnet-codegenerator": {
-      "version": "7.0.6",
+      "version": "7.0.7",
       "commands": [
         "dotnet-aspnet-codegenerator"
       ]
     },
     "dotnet-counters": {
-      "version": "7.0.410101",
+      "version": "7.0.430602",
       "commands": [
         "dotnet-counters"
       ]
     },
     "dotnet-dump": {
-      "version": "7.0.410101",
+      "version": "7.0.430602",
       "commands": [
         "dotnet-dump"
       ]
     },
     "dotnet-ef": {
-      "version": "7.0.5",
+      "version": "7.0.7",
       "commands": [
         "dotnet-ef"
       ]
@@ -39,31 +39,31 @@
       ]
     },
     "dotnet-trace": {
-      "version": "7.0.410101",
+      "version": "7.0.430602",
       "commands": [
         "dotnet-trace"
       ]
     },
     "dotnet-gcdump": {
-      "version": "7.0.410101",
+      "version": "7.0.430602",
       "commands": [
         "dotnet-gcdump"
       ]
     },
     "dotnet-sos": {
-      "version": "7.0.410101",
+      "version": "7.0.430602",
       "commands": [
         "dotnet-sos"
       ]
     },
     "roslynator.dotnet.cli": {
-      "version": "0.5.0",
+      "version": "0.6.0",
       "commands": [
         "roslynator"
       ]
     },
     "jetbrains.resharper.globaltools": {
-      "version": "2023.1.0",
+      "version": "2023.1.2",
       "commands": [
         "jb"
       ]

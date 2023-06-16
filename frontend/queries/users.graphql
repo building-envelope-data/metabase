@@ -131,8 +131,8 @@ mutation ConfirmUserEmailChange(
   }
 }
 
-mutation RequestUserPasswordReset($email: String!) {
-  requestUserPasswordReset(input: { email: $email }) {
+mutation RequestUserPasswordReset($email: String!, $returnTo: Url) {
+  requestUserPasswordReset(input: { email: $email, returnTo: $returnTo }) {
     errors {
       code
       message
