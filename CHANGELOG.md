@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Require verification of registered databases [#160](https://github.com/building-envelope-data/metabase/pull/160)
 - Forward GraphQL errors returned when querying databases for data [bf6d16099cb3f9681883d9a6f20eada4185044c7](https://github.com/building-envelope-data/metabase/commit/bf6d16099cb3f9681883d9a6f20eada4185044c7)
 - Enable automatic persisted queries [94277dfc336af87f279a549b38567dd9c13de233](https://github.com/building-envelope-data/metabase/commit/94277dfc336af87f279a549b38567dd9c13de233)
--
+- Make entities filterable by associated entities [#167](https://github.com/building-envelope-data/metabase/pull/167)
 -
 -
 -

@@ -1658,6 +1658,26 @@ input AddUserRoleInput {
   userId: Uuid!
 }
 
+input BooleanOperationFilterInput {
+  eq: Boolean
+  neq: Boolean
+}
+
+input ByteOperationFilterInput {
+  eq: Byte
+  neq: Byte
+  in: [Byte]
+  nin: [Byte]
+  gt: Byte
+  ngt: Byte
+  gte: Byte
+  ngte: Byte
+  lt: Byte
+  nlt: Byte
+  lte: Byte
+  nlte: Byte
+}
+
 input CalorimetricDataPropositionInput {
   and: [CalorimetricDataPropositionInput!]
   componentId: UuidPropositionInput
@@ -1701,6 +1721,15 @@ input ClosedIntervalInput {
   upperBound: Float!
 }
 
+input ComponentAssemblyFilterInput {
+  and: [ComponentAssemblyFilterInput!]
+  or: [ComponentAssemblyFilterInput!]
+  assembledComponent: ComponentFilterInput
+  partComponent: ComponentFilterInput
+  index: ByteOperationFilterInput
+  primeSurface: NullableOfPrimeSurfaceOperationFilterInput
+}
+
 input ComponentCategoryOperationFilterInput {
   eq: ComponentCategory
   neq: ComponentCategory
@@ -1716,6 +1745,23 @@ input ComponentFilterInput {
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
   categories: ListComponentCategoryOperationFilterInput
+  partOf: ListComponentFilterTypeFilterInput
+  parts: ListComponentFilterTypeFilterInput
+  partOfEdges: ListComponentAssemblyFilterTypeFilterInput
+  partEdges: ListComponentAssemblyFilterTypeFilterInput
+  concretizations: ListComponentFilterTypeFilterInput
+  generalizations: ListComponentFilterTypeFilterInput
+  variants: ListComponentFilterTypeFilterInput
+  manufacturers: ListInstitutionFilterTypeFilterInput
+  manufacturerEdges: ListComponentManufacturerFilterTypeFilterInput
+}
+
+input ComponentManufacturerFilterInput {
+  and: [ComponentManufacturerFilterInput!]
+  or: [ComponentManufacturerFilterInput!]
+  component: ComponentFilterInput
+  institution: InstitutionFilterInput
+  pending: BooleanOperationFilterInput
 }
 
 input ComponentSortInput {
@@ -1841,8 +1887,13 @@ input DataFormatFilterInput {
   or: [DataFormatFilterInput!]
   id: UuidOperationFilterInput
   name: StringOperationFilterInput
+  extension: StringOperationFilterInput
   description: StringOperationFilterInput
   mediaType: StringOperationFilterInput
+  schemaLocator: UrlOperationFilterInput
+  standard: StandardFilterInput
+  publication: PublicationFilterInput
+  manager: InstitutionFilterInput
 }
 
 input DataFormatSortInput {
@@ -1884,6 +1935,7 @@ input DatabaseFilterInput {
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   locator: UrlOperationFilterInput
+  operator: InstitutionFilterInput
 }
 
 input DatabaseSortInput {
@@ -1971,6 +2023,41 @@ input InstitutionFilterInput {
   description: StringOperationFilterInput
   websiteLocator: UrlOperationFilterInput
   state: InstitutionStateOperationFilterInput
+  developedMethods: ListMethodFilterTypeFilterInput
+  developedMethodEdges: ListInstitutionMethodDeveloperFilterTypeFilterInput
+  managedMethods: ListMethodFilterTypeFilterInput
+  managedDataFormats: ListDataFormatFilterTypeFilterInput
+  manufacturedComponents: ListComponentFilterTypeFilterInput
+  manufacturedComponentEdges: ListComponentManufacturerFilterTypeFilterInput
+  operatedDatabases: ListDatabaseFilterTypeFilterInput
+  manager: InstitutionFilterInput
+  managedInstitutions: ListInstitutionFilterTypeFilterInput
+  representatives: ListUserFilterTypeFilterInput
+  representativeEdges: ListInstitutionRepresentativeFilterTypeFilterInput
+}
+
+input InstitutionMethodDeveloperFilterInput {
+  and: [InstitutionMethodDeveloperFilterInput!]
+  or: [InstitutionMethodDeveloperFilterInput!]
+  method: MethodFilterInput
+  institution: InstitutionFilterInput
+  pending: BooleanOperationFilterInput
+}
+
+input InstitutionRepresentativeFilterInput {
+  and: [InstitutionRepresentativeFilterInput!]
+  or: [InstitutionRepresentativeFilterInput!]
+  institution: InstitutionFilterInput
+  user: UserFilterInput
+  role: InstitutionRepresentativeRoleOperationFilterInput
+  pending: BooleanOperationFilterInput
+}
+
+input InstitutionRepresentativeRoleOperationFilterInput {
+  eq: InstitutionRepresentativeRole
+  neq: InstitutionRepresentativeRole
+  in: [InstitutionRepresentativeRole!]
+  nin: [InstitutionRepresentativeRole!]
 }
 
 input InstitutionSortInput {
@@ -1993,6 +2080,28 @@ input InstitutionStateOperationFilterInput {
   nin: [InstitutionState!]
 }
 
+input IntOperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int]
+  nin: [Int]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+input ListComponentAssemblyFilterTypeFilterInput {
+  all: ComponentAssemblyFilterInput
+  none: ComponentAssemblyFilterInput
+  some: ComponentAssemblyFilterInput
+  any: Boolean
+}
+
 input ListComponentCategoryOperationFilterInput {
   all: ComponentCategoryOperationFilterInput
   none: ComponentCategoryOperationFilterInput
@@ -2000,10 +2109,94 @@ input ListComponentCategoryOperationFilterInput {
   any: Boolean
 }
 
+input ListComponentFilterTypeFilterInput {
+  all: ComponentFilterInput
+  none: ComponentFilterInput
+  some: ComponentFilterInput
+  any: Boolean
+}
+
+input ListComponentManufacturerFilterTypeFilterInput {
+  all: ComponentManufacturerFilterInput
+  none: ComponentManufacturerFilterInput
+  some: ComponentManufacturerFilterInput
+  any: Boolean
+}
+
+input ListDataFormatFilterTypeFilterInput {
+  all: DataFormatFilterInput
+  none: DataFormatFilterInput
+  some: DataFormatFilterInput
+  any: Boolean
+}
+
+input ListDatabaseFilterTypeFilterInput {
+  all: DatabaseFilterInput
+  none: DatabaseFilterInput
+  some: DatabaseFilterInput
+  any: Boolean
+}
+
+input ListInstitutionFilterTypeFilterInput {
+  all: InstitutionFilterInput
+  none: InstitutionFilterInput
+  some: InstitutionFilterInput
+  any: Boolean
+}
+
+input ListInstitutionMethodDeveloperFilterTypeFilterInput {
+  all: InstitutionMethodDeveloperFilterInput
+  none: InstitutionMethodDeveloperFilterInput
+  some: InstitutionMethodDeveloperFilterInput
+  any: Boolean
+}
+
+input ListInstitutionRepresentativeFilterTypeFilterInput {
+  all: InstitutionRepresentativeFilterInput
+  none: InstitutionRepresentativeFilterInput
+  some: InstitutionRepresentativeFilterInput
+  any: Boolean
+}
+
 input ListMethodCategoryOperationFilterInput {
   all: MethodCategoryOperationFilterInput
   none: MethodCategoryOperationFilterInput
   some: MethodCategoryOperationFilterInput
+  any: Boolean
+}
+
+input ListMethodFilterTypeFilterInput {
+  all: MethodFilterInput
+  none: MethodFilterInput
+  some: MethodFilterInput
+  any: Boolean
+}
+
+input ListStandardizerOperationFilterInput {
+  all: StandardizerOperationFilterInput
+  none: StandardizerOperationFilterInput
+  some: StandardizerOperationFilterInput
+  any: Boolean
+}
+
+input ListStringOperationFilterInput {
+  all: StringOperationFilterInput
+  none: StringOperationFilterInput
+  some: StringOperationFilterInput
+  any: Boolean
+}
+
+input ListUserFilterTypeFilterInput {
+  all: UserFilterInput
+  none: UserFilterInput
+  some: UserFilterInput
+  any: Boolean
+}
+
+input ListUserMethodDeveloperFilterTypeFilterInput {
+  all: UserMethodDeveloperFilterInput
+  none: UserMethodDeveloperFilterInput
+  some: UserMethodDeveloperFilterInput
   any: Boolean
 }
 
@@ -2034,7 +2227,15 @@ input MethodFilterInput {
   id: UuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
+  standard: StandardFilterInput
+  publication: PublicationFilterInput
+  calculationLocator: UrlOperationFilterInput
   categories: ListMethodCategoryOperationFilterInput
+  institutionDevelopers: ListInstitutionFilterTypeFilterInput
+  institutionDeveloperEdges: ListInstitutionMethodDeveloperFilterTypeFilterInput
+  userDevelopers: ListUserFilterTypeFilterInput
+  userDeveloperEdges: ListUserMethodDeveloperFilterTypeFilterInput
+  manager: InstitutionFilterInput
 }
 
 input MethodSortInput {
@@ -2050,6 +2251,21 @@ input MethodSortInput {
   manager: InstitutionSortInput
   id: SortEnumType
   version: SortEnumType
+}
+
+input NullableOfPrimeSurfaceOperationFilterInput {
+  eq: PrimeSurface
+  neq: PrimeSurface
+  in: [PrimeSurface]
+  nin: [PrimeSurface]
+}
+
+input NumerationFilterInput {
+  and: [NumerationFilterInput!]
+  or: [NumerationFilterInput!]
+  prefix: StringOperationFilterInput
+  mainNumber: StringOperationFilterInput
+  suffix: StringOperationFilterInput
 }
 
 input NumerationSortInput {
@@ -2084,6 +2300,24 @@ input PhotovoltaicDataPropositionInput {
   not: PhotovoltaicDataPropositionInput
   or: [PhotovoltaicDataPropositionInput!]
   resources: GetHttpsResourcesPropositionInput
+}
+
+input PublicationFilterInput {
+  and: [PublicationFilterInput!]
+  or: [PublicationFilterInput!]
+  title: StringOperationFilterInput
+  abstract: StringOperationFilterInput
+  "Referenced section"
+  section: StringOperationFilterInput
+  authors: ListStringOperationFilterInput
+  "The Digital Object Identifier (DOI) is a very important persistent identifier for publications. It MUST be defined here if it is available for a publication."
+  doi: StringOperationFilterInput
+  "The website arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
+  arXiv: StringOperationFilterInput
+  "A Uniform Resource Name (URN) can be used to define a publication. TODO: Improve the regex pattern to further restrict the string."
+  urn: StringOperationFilterInput
+  "If a persistent identifiert like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long."
+  webAddress: UrlOperationFilterInput
 }
 
 input PublicationSortInput {
@@ -2175,6 +2409,21 @@ input SetUserPhoneNumberInput {
 }
 
 "`ISO 52022` is an example of the abbreviation of a standardizer and the main number of the identifier."
+input StandardFilterInput {
+  and: [StandardFilterInput!]
+  or: [StandardFilterInput!]
+  title: StringOperationFilterInput
+  abstract: StringOperationFilterInput
+  "The section of the standard to which the reference refers to."
+  section: StringOperationFilterInput
+  "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
+  year: IntOperationFilterInput
+  numeration: NumerationFilterInput
+  standardizers: ListStandardizerOperationFilterInput
+  locator: UrlOperationFilterInput
+}
+
+"`ISO 52022` is an example of the abbreviation of a standardizer and the main number of the identifier."
 input StandardSortInput {
   title: SortEnumType
   abstract: SortEnumType
@@ -2184,6 +2433,13 @@ input StandardSortInput {
   year: SortEnumType
   numeration: NumerationSortInput
   locator: UriSortInput
+}
+
+input StandardizerOperationFilterInput {
+  eq: Standardizer
+  neq: Standardizer
+  in: [Standardizer!]
+  nin: [Standardizer!]
 }
 
 input StringOperationFilterInput {
@@ -2320,6 +2576,24 @@ input UrlOperationFilterInput {
   nlt: Url
   lte: Url
   nlte: Url
+}
+
+input UserFilterInput {
+  and: [UserFilterInput!]
+  or: [UserFilterInput!]
+  id: UuidOperationFilterInput
+  developedMethods: ListMethodFilterTypeFilterInput
+  developedMethodEdges: ListUserMethodDeveloperFilterTypeFilterInput
+  representedInstitutions: ListInstitutionFilterTypeFilterInput
+  representedInstitutionEdges: ListInstitutionRepresentativeFilterTypeFilterInput
+}
+
+input UserMethodDeveloperFilterInput {
+  and: [UserMethodDeveloperFilterInput!]
+  or: [UserMethodDeveloperFilterInput!]
+  method: MethodFilterInput
+  user: UserFilterInput
+  pending: BooleanOperationFilterInput
 }
 
 input UserSortInput {

@@ -155,10 +155,16 @@ namespace Metabase.Configuration
                    new FilterConventionExtension(descriptor =>
                      {
                          descriptor.BindRuntimeType<Data.Component, GraphQl.Components.ComponentFilterType>();
+                         descriptor.BindRuntimeType<Data.ComponentAssembly, GraphQl.ComponentAssemblies.ComponentAssemblyFilterType>();
+                         descriptor.BindRuntimeType<Data.ComponentManufacturer, GraphQl.ComponentManufacturers.ComponentManufacturerFilterType>();
                          descriptor.BindRuntimeType<Data.DataFormat, GraphQl.DataFormats.DataFormatFilterType>();
                          descriptor.BindRuntimeType<Data.Database, GraphQl.Databases.DatabaseFilterType>();
                          descriptor.BindRuntimeType<Data.Institution, GraphQl.Institutions.InstitutionFilterType>();
+                         descriptor.BindRuntimeType<Data.InstitutionMethodDeveloper, GraphQl.InstitutionMethodDevelopers.InstitutionMethodDeveloperFilterType>();
+                         descriptor.BindRuntimeType<Data.InstitutionRepresentative, GraphQl.InstitutionRepresentatives.InstitutionRepresentativeFilterType>();
                          descriptor.BindRuntimeType<Data.Method, GraphQl.Methods.MethodFilterType>();
+                         descriptor.BindRuntimeType<Data.User, GraphQl.Users.UserFilterType>();
+                         descriptor.BindRuntimeType<Data.UserMethodDeveloper, GraphQl.UserMethodDevelopers.UserMethodDeveloperFilterType>();
                      }
                      )
                    )

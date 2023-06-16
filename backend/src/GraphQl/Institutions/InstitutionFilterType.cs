@@ -16,6 +16,17 @@ namespace Metabase.GraphQl.Institutions
             descriptor.Field(x => x.Description);
             descriptor.Field(x => x.WebsiteLocator);
             descriptor.Field(x => x.State);
+            descriptor.Field(x => x.DevelopedMethods);
+            descriptor.Field(x => x.DevelopedMethodEdges);
+            descriptor.Field(x => x.ManagedMethods);
+            descriptor.Field(x => x.ManagedDataFormats);
+            descriptor.Field(x => x.ManufacturedComponents);
+            descriptor.Field(x => x.ManufacturedComponentEdges);
+            descriptor.Field(x => x.OperatedDatabases);
+            descriptor.Field(x => x.Manager);
+            descriptor.Field(x => x.ManagedInstitutions);
+            descriptor.Field(x => x.Representatives);
+            descriptor.Field(x => x.RepresentativeEdges);
         }
     }
 }
