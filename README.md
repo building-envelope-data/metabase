@@ -89,11 +89,17 @@ and the pages following it.
 
 ### Creating a release
 
-1. [Draft a new release](https://github.com/building-envelope-data/metabase/actions/workflows/draft-new-release.yml)
-   with a new version according to [Semantic Versioning](https://semver.org) by
-   running the GitHub action which, in particular, creates a new branch named
-   `release/v*.*.*`, where `*.*.*` is the version, and a corresponding pull
-   request.
+1. Draft a new release with a new version according to
+   [Semantic Versioning](https://semver.org) by running the GitHub action
+   [Draft a new release](https://github.com/building-envelope-data/metabase/actions/workflows/draft-new-release.yml)
+   which, creates a new branch named `release/v*.*.*`,
+   creates a corresponding pull request, updates the
+   [Changelog](https://github.com/building-envelope-data/metabase/blob/develop/CHANGELOG.md),
+   and bumps the version in
+   [`package.json`](https://github.com/building-envelope-data/metabase/blob/develop/frontend/package.json),
+   where `*.*.*` is the version. Note that this is **not** the same as "Draft
+   a new release" on
+   [Releases](https://github.com/building-envelope-data/metabase/releases).
 1. Fetch the release branch by running `git fetch` and check it out by running
    `git checkout release/v*.*.*`, where `*.*.*` is the version.
 1. Prepare the release by running `make prepare-release` in your shell, review,
