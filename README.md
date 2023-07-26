@@ -243,7 +243,6 @@ We may add some error detection and correction capabilities by, for example, gen
 - [API design best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
   [API implementation best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-implementation)
   [Shallow Nesting](https://guides.rubyonrails.org/routing.html#shallow-nesting)
-- [Implicit Flow](https://auth0.com/docs/flows/concepts/implicit)
 - Our domain model is inspired by
   [AnemicDomainModels](https://github.com/vkhorikov/AnemicDomainModel/tree/master/After/src/Logic/Customers)
   and by
@@ -254,6 +253,8 @@ We may add some error detection and correction capabilities by, for example, gen
 - [Unit testing best practices](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices)
   and
   [Naming standards for unit tests](https://osherove.com/blog/2005/4/3/naming-standards-for-unit-tests.html)
+- [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce)
 - [OAuth 2.0 Simplified](https://www.oauth.com)
 - [Setting up an Authorization Server with OpenIddict](https://dev.to/robinvanderknaap/setting-up-an-authorization-server-with-openiddict-part-iv-authorization-code-flow-3eh8)
 - [Bearer Token Authentication in ASP.NET Core](https://devblogs.microsoft.com/aspnet/bearer-token-authentication-in-asp-net-core/)
+- [ID Token and Access Token: What's the difference?](https://auth0.com/blog/id-token-access-token-what-is-the-difference/)
