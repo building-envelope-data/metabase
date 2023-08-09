@@ -67,7 +67,7 @@ function Page() {
           <Typography.Link href="https://github.com/building-envelope-data/api">
             buildingenvelopedata.org API specification
           </Typography.Link>
-          . Other data formats are as well available. The{" "}
+          . Other data formats are also available. The{" "}
           <Typography.Link href="https://github.com/building-envelope-data/metabase">
             source code
           </Typography.Link>{" "}
