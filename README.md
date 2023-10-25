@@ -2,9 +2,11 @@
 
 The network of databases [buildingenvelopedata.org](https://www.buildingenvelopedata.org/) is based on [databases](https://github.com/building-envelope-data/database) and one metabase. This repository presents the source code of the metabase. Before deploying this repository, [machine](https://github.com/building-envelope-data/machine) can be used to set up the machine.
 
-The [API specification of the metabase](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql) is available in the repository [api](https://github.com/building-envelope-data/api). There is also a [visualization of the API of the metabase](https://graphql-kit.com/graphql-voyager/?url=https://www.buildingenvelopedata.org/graphql/).
+The [API specification of the metabase](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql) is available in the repository [api](https://github.com/building-envelope-data/api). There is also a [visualization of the API of the metabase](https://graphql-kit.com/graphql-voyager/?url=https://www.buildingenvelopedata.org/graphql/). You can try the queries of the [tutorial](https://github.com/building-envelope-data/api/blob/develop/queries/metabase/tutorial.graphql) at the [GraphQL endpoint of the metabase](https://www.buildingenvelopedata.org/graphql/).
 
 If you have a question for which you don't find the answer in this repository, please raise a [new issue](https://github.com/building-envelope-data/metabase/issues/new) and add the tag `question`! All ways to contribute are presented by [CONTRIBUTING.md](https://github.com/building-envelope-data/metabase/blob/develop/CONTRIBUTING.md). The basis for our collaboration is decribed by our [Code of Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF_CONDUCT.md).
+
+[![Watch the video introduction](https://img.youtube.com/vi/QsulJnpvuh0/maxresdefault.jpg)](https://www.youtube.com/watch?v=QsulJnpvuh0)
 
 ## Getting started
 
