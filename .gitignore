@@ -26,6 +26,3 @@ coverage
 
 # Backups
 *.bak
-
-# Image Diagrams
-/diagrams/*.png
