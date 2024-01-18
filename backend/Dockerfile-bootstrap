@@ -14,8 +14,18 @@ RUN \
   addgroup --system --gid ${GROUP_ID} us && \
   adduser --system --uid ${USER_ID} --ingroup us me
 
+ENV HOME=/home/me
+RUN \
+  mkdir --parents ${HOME} && \
+  chown \
+    me:us \
+    ${HOME}
+
 USER me
 WORKDIR /app
+
+RUN \
+  mkdir --parents ${HOME}/.dotnet
 
 ENV PATH=$PATH:/home/me/.dotnet/tools
 RUN \
