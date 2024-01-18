@@ -3,25 +3,25 @@
   "isRoot": true,
   "tools": {
     "dotnet-aspnet-codegenerator": {
-      "version": "7.0.7",
+      "version": "8.0.0",
       "commands": [
         "dotnet-aspnet-codegenerator"
       ]
     },
     "dotnet-counters": {
-      "version": "7.0.430602",
+      "version": "8.0.505301",
       "commands": [
         "dotnet-counters"
       ]
     },
     "dotnet-dump": {
-      "version": "7.0.430602",
+      "version": "8.0.505301",
       "commands": [
         "dotnet-dump"
       ]
     },
     "dotnet-ef": {
-      "version": "7.0.7",
+      "version": "8.0.1",
       "commands": [
         "dotnet-ef"
       ]
@@ -33,37 +33,37 @@
       ]
     },
     "dotnet-script": {
-      "version": "1.4.0",
+      "version": "1.5.0",
       "commands": [
         "dotnet-script"
       ]
     },
     "dotnet-trace": {
-      "version": "7.0.430602",
+      "version": "8.0.505301",
       "commands": [
         "dotnet-trace"
       ]
     },
     "dotnet-gcdump": {
-      "version": "7.0.430602",
+      "version": "8.0.505301",
       "commands": [
         "dotnet-gcdump"
       ]
     },
     "dotnet-sos": {
-      "version": "7.0.430602",
+      "version": "8.0.505301",
       "commands": [
         "dotnet-sos"
       ]
     },
     "roslynator.dotnet.cli": {
-      "version": "0.6.0",
+      "version": "0.8.2",
       "commands": [
         "roslynator"
       ]
     },
     "jetbrains.resharper.globaltools": {
-      "version": "2023.1.2",
+      "version": "2023.3.2",
       "commands": [
         "jb"
       ]
