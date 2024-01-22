@@ -22,6 +22,11 @@ function Page() {
         loading={loading}
         columns={[
           {
+            title: "applicationType",
+            dataIndex: "applicationType",
+            key: "applicationType",
+          },
+          {
             title: "clientId",
             dataIndex: "clientId",
             key: "clientId",
@@ -30,6 +35,11 @@ function Page() {
             title: "clientSecret",
             dataIndex: "clientSecret",
             key: "clientSecret",
+          },
+          {
+            title: "clientType",
+            dataIndex: "clientType",
+            key: "clientType",
           },
           {
             title: "concurrencyToken",
@@ -57,6 +67,11 @@ function Page() {
             key: "id",
           },
           {
+            title: "jsonWebKeySet",
+            dataIndex: "jsonWebKeySet",
+            key: "jsonWebKeySet",
+          },
+          {
             title: "permissions",
             dataIndex: "permissions",
             key: "permissions",
@@ -82,9 +97,9 @@ function Page() {
             key: "requirements",
           },
           {
-            title: "type",
-            dataIndex: "type",
-            key: "type",
+            title: "settings",
+            dataIndex: "settings",
+            key: "settings",
           },
           //   {
           //     title: "authorizations",

@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1.6
 # The above line fixes the Dockerfile frontend used by BuildKit. For details
 # see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 # Available versions are listed on https://hub.docker.com/r/docker/dockerfile
@@ -6,7 +6,7 @@
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim-amd64
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-amd64
 
 ARG GROUP_ID
 ARG USER_ID
@@ -83,6 +83,9 @@ RUN \
   mkdir --parents ${HOME}/app && \
   chown \
     me:us \
+    ${HOME} && \
+  chown \
+    me:us \
     ${HOME}/app && \
   ln --symbolic ${HOME}/app /app
 
@@ -109,9 +112,8 @@ COPY \
   --chown=me:us \
   ./dotnet-certificate-tool ./dotnet-certificate-tool
 RUN \
+  # `dotnet pack` is run automatically by `dotnet build` because `GeneratePackageOnBuild` is set to `True`.
   dotnet build \
-    ./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
-  dotnet pack \
     ./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
   dotnet tool restore \
     --tool-manifest ./dotnet-tools.json \

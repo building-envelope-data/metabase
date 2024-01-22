@@ -130,6 +130,7 @@ update-tools : ## Update tools
 	dotnet tool list | \
 		tail -n +3 | \
 		awk '{print $$1}' | \
+		awk '!/dotnet-certificate-tool/' | \
 		xargs -n 1 dotnet tool update
 	dotnet tool run dotnet-sos install
 .PHONY : update-tools

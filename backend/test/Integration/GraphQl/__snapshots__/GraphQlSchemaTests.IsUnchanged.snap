@@ -1004,21 +1004,24 @@ type OpenEndedDateTimeRange {
 }
 
 type OpenIdConnectApplication {
+  applicationType: String
   authorizations: [OpenIdConnectAuthorization!]!
   clientId: String
   clientSecret: String
+  clientType: String
   concurrencyToken: String
   consentType: String
   displayName: String
   displayNames: String
   id: String
+  jsonWebKeySet: String
   permissions: String
   postLogoutRedirectUris: String
   properties: String
   redirectUris: String
   requirements: String
+  settings: String
   tokens: [OpenIdConnectToken!]!
-  type: String
 }
 
 type OpenIdConnectAuthorization {
@@ -3159,10 +3162,7 @@ enum VerifyInstitutionErrorCode {
   UNAUTHORIZED
 }
 
-directive @authorize("Defines when when the authorize directive shall be applied.By default the authorize directives are applied during the validation phase." apply: ApplyPolicy! = VALIDATION "The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!]) repeatable on OBJECT | FIELD_DEFINITION
-
-"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
-directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+directive @authorize("Defines when when the authorize directive shall be applied.By default the authorize directives are applied during the validation phase." apply: ApplyPolicy! = BEFORE_RESOLVER "The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!]) repeatable on OBJECT | FIELD_DEFINITION
 
 scalar Any
 

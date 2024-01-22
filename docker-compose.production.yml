@@ -3,7 +3,7 @@ version: '3.3'
 services:
   database: # https://hub.docker.com/_/postgres
     restart: always
-    image: postgres:13.9-bullseye
+    image: postgres:13.13-bookworm
     # For possible command-line arguments see
     # https://www.postgresql.org/docs/current/app-postgres.html
     # and for possible configuration parameters like `max_connections` see
@@ -100,7 +100,7 @@ services:
 
   nginx: # https://hub.docker.com/_/nginx
     restart: always
-    image: nginx:1.23
+    image: nginx:1.25-bookworm
     command: [
       "nginx",
       "-g", "daemon off;"
