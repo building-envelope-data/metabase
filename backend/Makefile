@@ -158,10 +158,6 @@ dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for exampl
 					}"
 .PHONY : dedup
 
-diagrams : ## Draw images from textual UML diagrams
-	plantuml diagrams/*.puml
-.PHONY : diagrams
-
 # See https://github.com/hasura/graphqurl#export-schema
 schema : ## Fetch GraphQL schema using `hasura/graphqurl`
 	gq http://backend:8080/graphql/ --introspect > schema.graphql

@@ -195,6 +195,10 @@ prepare-release : ## Prepare release
 		make prepare-release
 .PHONY : prepare-release
 
+diagrams-plantuml : ## Draw images from textual UML diagrams
+	plantuml diagrams/plantuml/*.puml
+.PHONY : diagrams
+
 diagrams-structurizr : ## Serve diagrams to browser localhost Port 9090
 	docker run -it --rm -p 9090:8080 -v $(shell pwd)/diagrams/structurizr:/usr/local/structurizr structurizr/lite
 .PHONY : diagrams-structurizr
