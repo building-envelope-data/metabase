@@ -27,5 +27,6 @@ coverage
 # Backups
 *.bak
 
-# Image Diagrams
-/diagrams/*.png
+# Structurizr diagrams
+/diagrams/structurizr/.structurizr/
+/diagrams/structurizr/*.json
