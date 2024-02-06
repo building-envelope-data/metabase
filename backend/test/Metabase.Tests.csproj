@@ -6,8 +6,12 @@
     <LangVersion>12.0</LangVersion>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
+    <!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/overview -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+    <AnalysisLevel>latest-Recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
