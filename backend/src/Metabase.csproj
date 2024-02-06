@@ -6,8 +6,12 @@
     <UserSecretsId>31666837686487542159</UserSecretsId>
     <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
     <Nullable>enable</Nullable>
+    <!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/overview -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+    <AnalysisLevel>latest-Recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
