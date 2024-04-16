@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using Array = System.Array;
+using System.Globalization;
 
 // Note that `SignInManager` relies on cookies, see https://github.com/aspnet/Identity/issues/1421. For its source code see https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/SignInManager.cs
 namespace Metabase.GraphQl.Users
@@ -1210,6 +1210,7 @@ namespace Metabase.GraphQl.Users
         private static string GenerateQrCodeUri(UrlEncoder urlEncoder, string email, string unformattedKey)
         {
             return string.Format(
+                CultureInfo.InvariantCulture,
                 AuthenticatorUriFormat,
                 urlEncoder.Encode("buildingenvelopedata.org"), // issuer
                 urlEncoder.Encode(email), // account name

@@ -19,6 +19,10 @@ namespace Metabase.GraphQl.Databases
     [ExtendObjectType(nameof(Mutation))]
     public sealed class DatabaseMutations
     {
+        private static string[] _verificationCodeFileNames = new[] {
+            "VerificationCode.graphql"
+        };
+
         [UseUserManager]
         [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
         public async Task<CreateDatabasePayload> CreateDatabaseAsync(
@@ -231,9 +235,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "VerificationCode.graphql"
-                        }
+                        _verificationCodeFileNames
                     ).ConfigureAwait(false),
                     operationName: "VerificationCode"
                 ),

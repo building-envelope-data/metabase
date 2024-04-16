@@ -16,7 +16,7 @@ namespace Metabase
         public sealed class LoggingSettings
         {
             public bool EnableSensitiveDataLogging { get; set; }
-            = false;
+
         }
 
         public JsonWebTokenSettings JsonWebToken { get; set; }
@@ -40,7 +40,7 @@ namespace Metabase
             = "";
 
             public int SmtpPort { get; set; }
-            = 0;
+
         }
 
         public string OpenIdConnectClientSecret { get; set; }

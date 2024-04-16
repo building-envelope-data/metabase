@@ -42,7 +42,7 @@ namespace Metabase.GraphQl.Methods
             {
                 return await _userMethodDeveloperEdge.GetNodeAsync(userById, cancellationToken).ConfigureAwait(false);
             }
-            throw new Exception("Impossible!");
+            throw new ArgumentException("Impossible!");
         }
 
         [UseUserManager]
@@ -61,7 +61,7 @@ namespace Metabase.GraphQl.Methods
             {
                 return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager).ConfigureAwait(false);
             }
-            throw new Exception("Impossible!");
+            throw new ArgumentException("Impossible!");
         }
 
         [UseUserManager]
@@ -80,7 +80,7 @@ namespace Metabase.GraphQl.Methods
             {
                 return await _userMethodDeveloperEdge.CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken).ConfigureAwait(false);
             }
-            throw new Exception("Impossible!");
+            throw new ArgumentException("Impossible!");
         }
     }
 }

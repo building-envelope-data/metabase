@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Snapshooter.NUnit;
 using NUnit.Framework;
@@ -25,6 +26,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task ValidData_ResetsUserPassword()
         {
             // Arrange
@@ -50,6 +52,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task InvalidResetCode_IsUserError()
         {
             // Arrange
@@ -74,6 +77,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordConfirmationMismatch_IsUserError()
         {
             // Arrange
@@ -98,6 +102,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordRequiresDigit_IsUserError()
         {
             // Arrange
@@ -122,6 +127,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordRequiresLower_IsUserError()
         {
             // Arrange
@@ -146,6 +152,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordRequiresNonAlphanumeric_IsUserError()
         {
             // Arrange
@@ -170,6 +177,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordRequiresUpper_IsUserError()
         {
             // Arrange
@@ -194,6 +202,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordTooShort_IsUserError()
         {
             // Arrange

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
       : ComponentIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task NoComponent_ReturnsEmptyList()
         {
             // Act
@@ -23,6 +25,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task SingleComponent_IsReturned()
         {
             // Arrange
@@ -57,6 +60,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task MultipleComponents_AreReturned()
         {
             // Arrange

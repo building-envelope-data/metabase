@@ -92,7 +92,7 @@ namespace Metabase.Controllers
         // but for users who prefer using a different action per provider,
         // the following action can be split into separate actions.
         [HttpGet("~/connect/callback/login/{provider}"), HttpPost("~/connect/callback/login/{provider}"), IgnoreAntiforgeryToken]
-        public async Task<ActionResult> LogInCallback()
+        public async Task<ActionResult> LogInCallback(string provider)
         {
             // Retrieve the authorization data validated by OpenIddict as part of the callback handling.
             var result = await HttpContext.AuthenticateAsync(OpenIddictClientAspNetCoreDefaults.AuthenticationScheme);
@@ -202,7 +202,7 @@ namespace Metabase.Controllers
         // but for users who prefer using a different action per provider,
         // the following action can be split into separate actions.
         [HttpGet("~/connect/callback/logout/{provider}"), HttpPost("~/connect/callback/logout/{provider}"), IgnoreAntiforgeryToken]
-        public async Task<ActionResult> LogOutCallback()
+        public async Task<ActionResult> LogOutCallback(string provider)
         {
             // Retrieve the data stored by OpenIddict in the state token created when the logout was triggered.
             var result = await HttpContext.AuthenticateAsync(OpenIddictClientAspNetCoreDefaults.AuthenticationScheme);

@@ -33,7 +33,7 @@ namespace Metabase.GraphQl.Users
         {
             var claimsPrincipal =
                 context.GetGlobalStateOrDefault<ClaimsPrincipal>(nameof(ClaimsPrincipal))
-                ?? throw new Exception("Claims principal must not be null.");
+                ?? throw new ArgumentException("Claims principal must not be null.");
             if (scope is not null && !claimsPrincipal.HasScope(scope))
             {
                 return null;
@@ -41,7 +41,7 @@ namespace Metabase.GraphQl.Users
             var user = context.Parent<Data.User>();
             var userManager =
                 context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                ?? throw new Exception("User manager must not be null.");
+                ?? throw new ArgumentException("User manager must not be null.");
             if (!await UserAuthorization.IsAuthorizedToManageUser(
                 claimsPrincipal,
                 user.Id,
@@ -62,7 +62,7 @@ namespace Metabase.GraphQl.Users
         {
             var claimsPrincipal =
                 context.GetGlobalStateOrDefault<ClaimsPrincipal>(nameof(ClaimsPrincipal))
-                ?? throw new Exception("Claims principal must not be null.");
+                ?? throw new ArgumentException("Claims principal must not be null.");
             if (scope is not null && !claimsPrincipal.HasScope(scope))
             {
                 return null;
@@ -70,7 +70,7 @@ namespace Metabase.GraphQl.Users
             var user = context.Parent<Data.User>();
             var userManager =
                 context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                ?? throw new Exception("User manager must not be null.");
+                ?? throw new ArgumentException("User manager must not be null.");
             if (!await UserAuthorization.IsAuthorizedToManageUser(
                 claimsPrincipal,
                 user.Id,
@@ -91,7 +91,7 @@ namespace Metabase.GraphQl.Users
         {
             var claimsPrincipal =
                 context.GetGlobalStateOrDefault<ClaimsPrincipal>(nameof(ClaimsPrincipal))
-                ?? throw new Exception("Claims principal must not be null.");
+                ?? throw new ArgumentException("Claims principal must not be null.");
             if (scope is not null && !claimsPrincipal.HasScope(scope))
             {
                 return null;
@@ -99,7 +99,7 @@ namespace Metabase.GraphQl.Users
             var user = context.Parent<Data.User>();
             var userManager =
                 context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                ?? throw new Exception("User manager must not be null.");
+                ?? throw new ArgumentException("User manager must not be null.");
             if (!await UserAuthorization.IsAuthorizedToManageUser(
                 claimsPrincipal,
                 user.Id,
@@ -120,7 +120,7 @@ namespace Metabase.GraphQl.Users
         {
             var claimsPrincipal =
                 context.GetGlobalStateOrDefault<ClaimsPrincipal>(nameof(ClaimsPrincipal))
-                ?? throw new Exception("Claims principal must not be null.");
+                ?? throw new ArgumentException("Claims principal must not be null.");
             if (scope is not null && !claimsPrincipal.HasScope(scope))
             {
                 return null;
@@ -128,7 +128,7 @@ namespace Metabase.GraphQl.Users
             var user = context.Parent<Data.User>();
             var userManager =
                 context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                ?? throw new Exception("User manager must not be null.");
+                ?? throw new ArgumentException("User manager must not be null.");
             if (!await UserAuthorization.IsAuthorizedToManageUser(
                 claimsPrincipal,
                 user.Id,
@@ -202,7 +202,7 @@ namespace Metabase.GraphQl.Users
               .UseUserManager();
             descriptor
               .Field("twoFactorAuthentication")
-              .ResolveWith<UserResolvers>(t => t.GetTwoFactorAuthenticationAsync(default!, default!, default!, default!))
+              .ResolveWith<UserResolvers>(t => UserResolvers.GetTwoFactorAuthenticationAsync(default!, default!, default!, default!))
               .UseUserManager()
               .UseSignInManager();
             descriptor
@@ -231,15 +231,15 @@ namespace Metabase.GraphQl.Users
               .UseUserManager();
             descriptor
               .Field("rolesCurrentUserCanAdd")
-              .ResolveWith<UserResolvers>(x => x.GetRolesCurrentUserCanAddAsync(default!, default!, default!))
+              .ResolveWith<UserResolvers>(x => UserResolvers.GetRolesCurrentUserCanAddAsync(default!, default!, default!))
               .UseUserManager();
             descriptor
               .Field("rolesCurrentUserCanRemove")
-              .ResolveWith<UserResolvers>(x => x.GetRolesCurrentUserCanRemoveAsync(default!, default!, default!))
+              .ResolveWith<UserResolvers>(x => UserResolvers.GetRolesCurrentUserCanRemoveAsync(default!, default!, default!))
               .UseUserManager();
             descriptor
               .Field("canCurrentUserDeleteUser")
-              .ResolveWith<UserResolvers>(x => x.GetCanCurrentUserDeleteUserAsync(default!, default!))
+              .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserDeleteUserAsync(default!, default!))
               .UseUserManager();
             descriptor
               .Field(t => t.DevelopedMethods)
@@ -266,7 +266,7 @@ namespace Metabase.GraphQl.Users
         private sealed class UserResolvers
         {
             // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
-            public async Task<TwoFactorAuthentication?> GetTwoFactorAuthenticationAsync(
+            public static async Task<TwoFactorAuthentication?> GetTwoFactorAuthenticationAsync(
               [Parent] Data.User user,
               ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
@@ -293,7 +293,7 @@ namespace Metabase.GraphQl.Users
                     );
             }
 
-            public Task<bool> GetCanCurrentUserDeleteUserAsync(
+            public static Task<bool> GetCanCurrentUserDeleteUserAsync(
               ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )
@@ -301,7 +301,7 @@ namespace Metabase.GraphQl.Users
                 return UserAuthorization.IsAuthorizedToDeleteUsers(claimsPrincipal, userManager);
             }
 
-            public async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanAddAsync(
+            public static async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanAddAsync(
               ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
               CancellationToken cancellationToken
@@ -312,7 +312,7 @@ namespace Metabase.GraphQl.Users
                   .ConfigureAwait(false);
             }
 
-            public async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanRemoveAsync(
+            public static async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanRemoveAsync(
               ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
               CancellationToken cancellationToken
@@ -323,7 +323,7 @@ namespace Metabase.GraphQl.Users
                   .ConfigureAwait(false);
             }
 
-            private async IAsyncEnumerable<Enumerations.UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
+            private static async IAsyncEnumerable<Enumerations.UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
               ClaimsPrincipal claimsPrincipal,
               [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
             )

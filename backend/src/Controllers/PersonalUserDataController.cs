@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
+using Microsoft.AspNetCore.Http;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Metabase.Controllers
@@ -66,7 +67,7 @@ namespace Metabase.Controllers
             {
                 personalData[Claims.Role] = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
             }
-            Response.Headers.Add("Content-Disposition", "attachment; filename=PersonalUserData.json");
+            Response.Headers.Append("Content-Disposition", "attachment; filename=PersonalUserData.json");
             return new FileContentResult(JsonSerializer.SerializeToUtf8Bytes(personalData), "application/json");
         }
     }

@@ -59,13 +59,13 @@ namespace Metabase.GraphQl.Methods
             .Ignore();
             descriptor
               .Field("canCurrentUserUpdateNode")
-              .ResolveWith<MethodResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+              .ResolveWith<MethodResolvers>(x => MethodResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
               .UseUserManager();
         }
 
         private sealed class MethodResolvers
         {
-                public Task<bool> GetCanCurrentUserUpdateNodeAsync(
+                public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
                   [Parent] Data.Method method,
                   ClaimsPrincipal claimsPrincipal,
                   [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,

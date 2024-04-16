@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
       : ComponentIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task AnonymousUser_IsAuthenticationError()
         {
             // Act
@@ -28,6 +30,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task AnonymousUser_CannotCreateComponent()
         {
             // Act
@@ -42,6 +45,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
 
         [TestCaseSource(nameof(EnumerateComponentInputs))]
         [Theory]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task LoggedInUser_IsSuccess(
             string key,
             CreateComponentInput input
@@ -81,6 +85,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
 
         [TestCaseSource(nameof(EnumerateComponentInputs))]
         [Theory]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task LoggedInUser_CreatesComponent(
             string key,
             CreateComponentInput input

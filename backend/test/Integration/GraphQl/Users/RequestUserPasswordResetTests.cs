@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Snapshooter.NUnit;
@@ -10,6 +11,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
       : UserIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task ExistingAndConfirmedEmailAddress_RequestsUserPasswordReset()
         {
             // Arrange
@@ -34,6 +36,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task UnknownEmailAddress_DoesNothing()
         {
             // Arrange
@@ -50,6 +53,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task UnconfirmedEmailAddress_DoesNothing()
         {
             // Arrange

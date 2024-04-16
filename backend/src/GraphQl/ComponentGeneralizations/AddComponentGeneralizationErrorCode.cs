@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Metabase.GraphQl.ComponentGeneralizations
 {
+    [SuppressMessage("Naming", "CA1707")]
     public enum AddComponentGeneralizationErrorCode
     {
         UNKNOWN,

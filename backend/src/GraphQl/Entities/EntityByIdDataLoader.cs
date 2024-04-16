@@ -29,14 +29,14 @@ namespace Metabase.GraphQl.Entities
         }
 
         protected override async Task<IReadOnlyDictionary<Guid, TEntity?>> LoadBatchAsync(
-            IReadOnlyList<Guid> ids,
+            IReadOnlyList<Guid> keys,
             CancellationToken cancellationToken
             )
         {
             await using var dbContext =
                 _dbContextFactory.CreateDbContext();
             return await _getQueryable(dbContext).AsQueryable()
-                .Where(entity => ids.Contains(entity.Id))
+                .Where(entity => keys.Contains(entity.Id))
                 .ToDictionaryAsync(
                     entity => entity.Id,
                     entity => (TEntity?)entity,

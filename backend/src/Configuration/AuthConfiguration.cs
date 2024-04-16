@@ -34,7 +34,7 @@ namespace Metabase.Configuration
         public static string ManageUserApiScope { get; } = "api:user:manage";
 
         // Keep in sync with the scopes set in `OpenIddictClientRegistration`.
-        private static readonly HashSet<string> ClientScopes = new() {
+        private static readonly HashSet<string> _clientScopes = new() {
             OpenIddictConstants.Scopes.Address,
             OpenIddictConstants.Scopes.Email,
             OpenIddictConstants.Scopes.Phone,
@@ -66,11 +66,11 @@ namespace Metabase.Configuration
         {
             if (string.IsNullOrEmpty(password))
             {
-                throw new Exception($"Empty password for certificate {fileName}.");
+                throw new ArgumentException($"Empty password for certificate {fileName}.");
             }
             var stream =
                 Assembly.GetExecutingAssembly().GetManifestResourceStream($"Metabase.{fileName}")
-                ?? throw new Exception($"Missing certificate {fileName}.");
+                ?? throw new ArgumentException($"Missing certificate {fileName}.");
             using var buffer = new MemoryStream();
             stream.CopyTo(buffer);
             return new X509Certificate2(
@@ -171,7 +171,7 @@ namespace Metabase.Configuration
                         // read data, write data, and manage users. The
                         // corresponding policies `*Policy` use scopes, so we
                         // need to add them.
-                        identity.SetScopes(ClientScopes);
+                        identity.SetScopes(_clientScopes);
                         context.Principal.AddIdentity(identity);
                     }
                     return Task.CompletedTask;
@@ -236,7 +236,6 @@ namespace Metabase.Configuration
             {
                 _.SchedulerId = "metabase";
                 _.SchedulerName = "Metabase";
-                _.UseMicrosoftDependencyInjectionJobFactory();
                 _.UseSimpleTypeLoader();
                 _.UseInMemoryStore();
                 _.UseDefaultThreadPool(_ =>
@@ -427,7 +426,7 @@ namespace Metabase.Configuration
 
                         // https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims
                         Scopes = {
-                            // Keep in sync with `ClientScopes`.
+                            // Keep in sync with `_clientScopes`.
                             OpenIddictConstants.Scopes.Address,
                             OpenIddictConstants.Scopes.Email,
                             OpenIddictConstants.Scopes.Phone,

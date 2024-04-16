@@ -16,6 +16,86 @@ namespace Metabase.GraphQl.Databases
 {
     public sealed class DatabaseResolvers
     {
+        private const string IgsdbUrl = "https://igsdb-v2.herokuapp.com/graphql/";
+
+        private static readonly string[] _dataFileNames = new[] {
+                            "DataFields.graphql",
+                            "Data.graphql"
+                        };
+        private static readonly string[] _opticalDataFileNames = new[] {
+                            "DataFields.graphql",
+                            "OpticalDataFields.graphql",
+                            "OpticalData.graphql"
+                        };
+        private static readonly string[] _hygrothermalDataFileNames = new[] {
+                            "DataFields.graphql",
+                            "HygrothermalDataFields.graphql",
+                            "HygrothermalData.graphql"
+                        };
+        private static readonly string[] _calorimetricDataFileNames = new[] {
+                            "DataFields.graphql",
+                            "CalorimetricDataFields.graphql",
+                            "CalorimetricData.graphql"
+                        };
+        private static readonly string[] _photovoltaicDataFileNames = new[] {
+                            "DataFields.graphql",
+                            "PhotovoltaicDataFields.graphql",
+                            "PhotovoltaicData.graphql"
+                        };
+        private static readonly string[] _igsdbAllDataFileNames = new[] {
+                              "DataFields.graphql",
+                              "AllDataX.graphql"
+                          };
+        private static readonly string[] _allDataFileNames = new[] {
+                              "DataFields.graphql",
+                              "PageInfoFields.graphql",
+                              "AllData.graphql"
+                          };
+        private static readonly string[] _igsdbAllOpticalDataFileNames = new[] {
+                              "DataFields.graphql",
+                              "OpticalDataFields.graphql",
+                              "AllOpticalDataX.graphql"
+                          };
+        private static readonly string[] _allOpticalDataFileNames = new[] {
+                              "DataFields.graphql",
+                              "OpticalDataFields.graphql",
+                              "PageInfoFields.graphql",
+                              "AllOpticalData.graphql"
+                          };
+        private static readonly string[] _allHygrothermalDataFileNames = new[] {
+                            "DataFields.graphql",
+                            "HygrothermalDataFields.graphql",
+                            "PageInfoFields.graphql",
+                            "AllHygrothermalData.graphql"
+                        };
+        private static readonly string[] _allCalorimetricDataFileNames = new[] {
+                            "DataFields.graphql",
+                            "CalorimetricDataFields.graphql",
+                            "PageInfoFields.graphql",
+                            "AllCalorimetricData.graphql"
+                        };
+        private static readonly string[] _allPhotovoltaicDataFileNames = new[] {
+                            "DataFields.graphql",
+                            "PhotovoltaicDataFields.graphql",
+                            "PageInfoFields.graphql",
+                            "AllPhotovoltaicData.graphql"
+                        };
+        private static readonly string[] _hasDataFileNames = new[] {
+                            "HasData.graphql"
+                        };
+        private static readonly string[] _hasOpticalDataFileNames = new[] {
+                            "HasOpticalData.graphql"
+                        };
+        private static readonly string[] _hasCalorimetricDataFileNames = new[] {
+                            "HasCalorimetricData.graphql"
+                        };
+        private static readonly string[] _hasHygrothermalDataFileNames = new[] {
+                            "HasHygrothermalData.graphql"
+                        };
+        private static readonly string[] _hasPhotovoltaicDataFileNames = new[] {
+                            "HasPhotovoltaicData.graphql"
+                        };
+
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<DatabaseResolvers> _logger;
 
@@ -69,10 +149,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "Data.graphql"
-                        }
+                        _dataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -108,11 +185,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "OpticalDataFields.graphql",
-                            "OpticalData.graphql"
-                        }
+                        _opticalDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -148,11 +221,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "HygrothermalDataFields.graphql",
-                            "HygrothermalData.graphql"
-                        }
+                        _hygrothermalDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -188,11 +257,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "CalorimetricDataFields.graphql",
-                            "CalorimetricData.graphql"
-                        }
+                        _calorimetricDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -228,11 +293,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "PhotovoltaicDataFields.graphql",
-                            "PhotovoltaicData.graphql"
-                        }
+                        _photovoltaicDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -272,17 +333,8 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
-                        ? new[] {
-                              "DataFields.graphql",
-                              "AllDataX.graphql"
-                          }
-                        : new[] {
-                              "DataFields.graphql",
-                              "PageInfoFields.graphql",
-                              "AllData.graphql"
-                          }
-                    ).ConfigureAwait(false),
+                        database.Locator.AbsoluteUri == IgsdbUrl
+                        ? _igsdbAllDataFileNames : _allDataFileNames).ConfigureAwait(false),
                     variables: new
                     {
                         where = RewriteDataPropositionInput(where, database),
@@ -313,7 +365,7 @@ namespace Metabase.GraphQl.Databases
             Data.Database database
             )
         {
-            return database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
+            return database.Locator.AbsoluteUri == IgsdbUrl
                 ? (where ?? new DataX.DataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null))
                 : where;
         }
@@ -341,19 +393,8 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
-                        ? new[] {
-                              "DataFields.graphql",
-                              "OpticalDataFields.graphql",
-                              "AllOpticalDataX.graphql"
-                          }
-                        : new[] {
-                              "DataFields.graphql",
-                              "OpticalDataFields.graphql",
-                              "PageInfoFields.graphql",
-                              "AllOpticalData.graphql"
-                          }
-                    ).ConfigureAwait(false),
+                        database.Locator.AbsoluteUri == IgsdbUrl
+                        ? _igsdbAllOpticalDataFileNames : _allOpticalDataFileNames).ConfigureAwait(false),
                     variables: new
                     {
                         where = RewriteOpticalDataPropositionInput(where, database),
@@ -378,7 +419,7 @@ namespace Metabase.GraphQl.Databases
             Data.Database database
             )
         {
-            return database.Locator.AbsoluteUri == "https://igsdb-icon.herokuapp.com/icon_graphql/"
+            return database.Locator.AbsoluteUri == IgsdbUrl
                 ? (where ?? new DataX.OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null))
                 : where;
         }
@@ -406,12 +447,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "HygrothermalDataFields.graphql",
-                            "PageInfoFields.graphql",
-                            "AllHygrothermalData.graphql"
-                        }
+                        _allHygrothermalDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -455,12 +491,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "CalorimetricDataFields.graphql",
-                            "PageInfoFields.graphql",
-                            "AllCalorimetricData.graphql"
-                        }
+                        _allCalorimetricDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -504,12 +535,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "DataFields.graphql",
-                            "PhotovoltaicDataFields.graphql",
-                            "PageInfoFields.graphql",
-                            "AllPhotovoltaicData.graphql"
-                        }
+                        _allPhotovoltaicDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -549,9 +575,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "HasData.graphql"
-                        }
+                        _hasDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -587,9 +611,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "HasOpticalData.graphql"
-                        }
+                        _hasOpticalDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -625,9 +647,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "HasCalorimetricData.graphql"
-                        }
+                        _hasCalorimetricDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -663,9 +683,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "HasHygrothermalData.graphql"
-                        }
+                        _hasHygrothermalDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {
@@ -701,9 +719,7 @@ namespace Metabase.GraphQl.Databases
                 database,
                 new GraphQL.GraphQLRequest(
                     query: await QueryingDatabases.ConstructQuery(
-                        new[] {
-                            "HasPhotovoltaicData.graphql"
-                        }
+                        _hasPhotovoltaicDataFileNames
                     ).ConfigureAwait(false),
                     variables: new
                     {

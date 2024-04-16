@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
       : UserIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task CorrectPassword_IsSuccess()
         {
             // Arrange
@@ -35,6 +37,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task CorrectPassword_DeletesPersonalUserData()
         {
             // Arrange
@@ -55,6 +58,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
@@ -77,6 +81,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task NonLoggedInUser_DoesNotDeletePersonalUserData()
         {
             // Arrange
@@ -110,6 +115,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task MissingPassword_IsUserError()
         {
             // Arrange
@@ -133,6 +139,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task MissingPassword_DoesNotDeletePersonalUserData()
         {
             // Arrange
@@ -158,6 +165,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task IncorrectPassword_IsUserError()
         {
             // Arrange
@@ -181,6 +189,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task IncorrectPassword_DoesNotDeletePersonalUserData()
         {
             // Arrange

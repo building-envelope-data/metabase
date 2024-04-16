@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
       : UserIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task ValidData_ChangesUserPassword()
         {
             // Arrange
@@ -41,6 +43,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
@@ -70,6 +73,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task UnconfirmedUser_IsError()
         {
             // Arrange
@@ -95,6 +99,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordConfirmationMismatch_IsUserError()
         {
             // Arrange
@@ -124,6 +129,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordRequiresDigit_IsUserError()
         {
             // Arrange
@@ -152,6 +158,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordRequiresLower_IsUserError()
         {
             // Arrange
@@ -180,6 +187,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordRequiresNonAlphanumeric_IsUserError()
         {
             // Arrange
@@ -208,6 +216,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordRequiresUpper_IsUserError()
         {
             // Arrange
@@ -236,6 +245,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task PasswordTooShort_IsUserError()
         {
             // Arrange

@@ -92,13 +92,13 @@ namespace Metabase.GraphQl.Components
                 .Field(t => t.VariantOfEdges).Ignore();
             descriptor
               .Field("canCurrentUserUpdateNode")
-              .ResolveWith<ComponentResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+              .ResolveWith<ComponentResolvers>(x => ComponentResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
               .UseUserManager();
         }
 
         private sealed class ComponentResolvers
         {
-                public Task<bool> GetCanCurrentUserUpdateNodeAsync(
+                public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
                   [Parent] Data.Component component,
                   ClaimsPrincipal claimsPrincipal,
                   [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,

@@ -105,17 +105,17 @@ namespace Metabase.GraphQl.Institutions
                 .Ignore();
             descriptor
               .Field("canCurrentUserUpdateNode")
-              .ResolveWith<InstitutionResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+              .ResolveWith<InstitutionResolvers>(x => InstitutionResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
               .UseUserManager();
             descriptor
               .Field("canCurrentUserDeleteNode")
-              .ResolveWith<InstitutionResolvers>(x => x.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!, default!))
+              .ResolveWith<InstitutionResolvers>(x => InstitutionResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!, default!))
               .UseUserManager();
         }
 
         private sealed class InstitutionResolvers
         {
-                public Task<bool> GetCanCurrentUserUpdateNodeAsync(
+                public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
                   [Parent] Data.Institution institution,
                   ClaimsPrincipal claimsPrincipal,
                   [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
@@ -126,7 +126,7 @@ namespace Metabase.GraphQl.Institutions
                     return InstitutionAuthorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, userManager, context, cancellationToken);
                 }
 
-                public Task<bool> GetCanCurrentUserDeleteNodeAsync(
+                public static Task<bool> GetCanCurrentUserDeleteNodeAsync(
                   [Parent] Data.Institution institution,
                   ClaimsPrincipal claimsPrincipal,
                   [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,

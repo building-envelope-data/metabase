@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -11,6 +12,7 @@ namespace Metabase.Tests.Integration.GraphQl
       : IntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task IsUnchanged()
         {
             // Act

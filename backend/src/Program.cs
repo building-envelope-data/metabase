@@ -24,7 +24,7 @@ namespace Metabase
         {
             var environment =
                 Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-                ?? throw new Exception("Unknown enrivornment.");
+                ?? throw new ArgumentException("Unknown enrivornment.");
             // https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
             ConfigureBootstrapLogging(environment);
             try

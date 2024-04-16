@@ -31,14 +31,14 @@ namespace Metabase.GraphQl.Entities
         }
 
         protected override async Task<ILookup<Guid, TAssociation>> LoadGroupedBatchAsync(
-            IReadOnlyList<Guid> ids,
+            IReadOnlyList<Guid> keys,
             CancellationToken cancellationToken
             )
         {
             await using var dbContext =
                 _dbContextFactory.CreateDbContext();
             return (
-                await _getAssociations(dbContext, ids)
+                await _getAssociations(dbContext, keys)
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false)
                 )

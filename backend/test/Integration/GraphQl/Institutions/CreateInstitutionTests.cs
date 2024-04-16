@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
       : InstitutionIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task AnonymousUser_IsAuthenticationError()
         {
             // Act
@@ -27,6 +29,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task AnonymousUser_CannotCreateInstitution()
         {
             // Act
@@ -41,6 +44,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
 
         [TestCaseSource(nameof(EnumerateInstitutionInputs))]
         [Theory]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task LoggedInUser_IsSuccess(
             string key,
             CreateInstitutionInput input
@@ -73,6 +77,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
 
         [TestCaseSource(nameof(EnumerateInstitutionInputs))]
         [Theory]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task LoggedInUser_CreatesInstitution(
             string key,
             CreateInstitutionInput input

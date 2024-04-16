@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Snapshooter.NUnit;
@@ -10,6 +11,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
       : UserIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task ValidDataWithConfirmationCodeFromRegistrationEmail_ConfirmsUserEmail()
         {
             // Arrange
@@ -31,6 +33,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task ValidDataWithConfirmationCodeFromResendUserEmailConfirmation_ConfirmsUserEmail()
         {
             // Arrange
@@ -56,6 +59,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task ValidDataWithConfirmationCodeFromResendUserEmailVerification_ConfirmsUserEmail()
         {
             // Arrange
@@ -79,6 +83,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task ResentUserEmailConfirmation_ContainsValidCode()
         {
             // Arrange
@@ -103,6 +108,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task UnknownUser_IsUserError()
         {
             // Arrange
@@ -118,6 +124,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task InvalidConfirmationCode_IsUserError()
         {
             // Arrange

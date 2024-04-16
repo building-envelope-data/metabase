@@ -36,13 +36,13 @@ namespace Metabase.GraphQl.DataFormats
                 .Ignore();
             descriptor
               .Field("canCurrentUserUpdateNode")
-              .ResolveWith<DataFormatResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+              .ResolveWith<DataFormatResolvers>(x => DataFormatResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
               .UseUserManager();
         }
 
         private sealed class DataFormatResolvers
         {
-                public Task<bool> GetCanCurrentUserUpdateNodeAsync(
+                public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
                   [Parent] Data.DataFormat dataFormat,
                   ClaimsPrincipal claimsPrincipal,
                   [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,

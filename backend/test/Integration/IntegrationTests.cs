@@ -32,7 +32,14 @@ namespace Metabase.Tests.Integration
         [GeneratedRegex("resetCode=(?<resetCode>\\w+)")]
         private static partial Regex ResetCodeRegex();
 
-        private bool _disposed = false;
+        private static readonly JsonSerializerOptions _customJsonSerializerOptions =
+            new()
+            {
+                Converters = { new JsonStringEnumConverter() },
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+
+        private bool _disposed;
         protected CustomWebApplicationFactory Factory { get; }
         protected CollectingEmailSender EmailSender { get => Factory.EmailSender; }
         protected HttpClient HttpClient { get; }
@@ -118,7 +125,7 @@ namespace Metabase.Tests.Integration
               .ConfigureAwait(false);
             if (response.IsError)
             {
-                throw new Exception(response.Error);
+                throw new HttpRequestException(response.Error);
             }
             return response;
         }
@@ -554,10 +561,10 @@ namespace Metabase.Tests.Integration
                 );
             if (pathResult.Error is not null)
             {
-                throw new Exception(pathResult.Error);
+                throw new ArgumentException(pathResult.Error);
             }
             return pathResult.Matches?.Single()?.Value?.GetValue<string>()
-            ?? throw new Exception("String is null");
+            ?? throw new ArgumentException("String is null");
         }
 
         protected static string Base64Encode(string text)
@@ -587,20 +594,15 @@ namespace Metabase.Tests.Integration
             email.Body.Should().MatchRegex(bodyRegEx);
         }
 
-        private static HttpContent MakeJsonHttpContent<TContent>(
+        private static ByteArrayContent MakeJsonHttpContent<TContent>(
             TContent content
             )
         {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
             var result =
               new ByteArrayContent(
                 JsonSerializer.SerializeToUtf8Bytes(
                   content,
-                  options
+                  _customJsonSerializerOptions
                   )
                 );
             result.Headers.ContentType =
@@ -622,7 +624,7 @@ namespace Metabase.Tests.Integration
             string testName = $"{testType.Name}.{testMethod}_{keyName}.snap";
             string testDirectory =
                 Path.GetDirectoryName(testFilePath)
-                ?? throw new Exception($"The path '{testFilePath}' denotes a root directory or is `null`.");
+                ?? throw new ArgumentException($"The path '{testFilePath}' denotes a root directory or is `null`.");
             return new SnapshotFullName(testName, testDirectory);
         }
 

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -11,6 +12,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
       : UserIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task LoggedInUser_ResendsUserEmailVerification()
         {
             // Arrange
@@ -40,6 +42,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange

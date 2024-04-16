@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
       : UserIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task ValidData_EmailsConfirmationCode()
         {
             // Arrange
@@ -48,6 +50,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task NonLoggedInUser_IsAuthenticationError()
         {
             // Arrange
@@ -75,6 +78,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task UnchangedEmail_IsUserError()
         {
             // Arrange
@@ -102,6 +106,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task InvalidEmail_IsUserError()
         {
             // Arrange

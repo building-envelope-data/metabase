@@ -9,6 +9,7 @@ using HotChocolate.Execution.Instrumentation;
 using HotChocolate.Execution.Processing;
 using HotChocolate.Resolvers;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace Metabase.GraphQl
 {
@@ -94,7 +95,7 @@ namespace Metabase.GraphQl
             return $"{error}(Code {error.Code}, Message {error.Message}, Path {error.Path?.Print()})";
         }
 
-        private class RequestScope : IDisposable
+        private sealed class RequestScope : IDisposable
         {
             private readonly IRequestContext _context;
             private readonly ILogger<LoggingDiagnosticEventListener> _logger;
@@ -123,7 +124,7 @@ namespace Metabase.GraphQl
                         var variablesConcrete = _context.Variables!.ToList();
                         if (variablesConcrete.Count > 0)
                         {
-                            stringBuilder.AppendFormat($"Variables {Environment.NewLine}");
+                            stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"Variables {Environment.NewLine}");
                             try
                             {
                                 foreach (var variableValue in _context.Variables!)
@@ -143,20 +144,21 @@ namespace Metabase.GraphQl
                                         return existingString + " ".PadRight(lengthToPadTo - existingString.Length);
                                     }
                                     stringBuilder.AppendFormat(
+                                        CultureInfo.InvariantCulture,
                                         $"  {PadRightHelper(variableValue.Name, 20)} :  {PadRightHelper(variableValue.Value.ToString(), 20)}: {variableValue.Type}");
-                                    stringBuilder.AppendFormat($"{Environment.NewLine}");
+                                    stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"{Environment.NewLine}");
                                 }
                             }
                             catch
                             {
                                 // all input type records will land here.
                                 stringBuilder.Append("  Formatting Variables Error. Continuing...");
-                                stringBuilder.AppendFormat($"{Environment.NewLine}");
+                                stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"{Environment.NewLine}");
                             }
                         }
                     }
                     s_queryTimer.Stop();
-                    stringBuilder.AppendFormat($"Ellapsed time for query is {s_queryTimer.Elapsed.TotalMilliseconds:0.#} milliseconds.");
+                    stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"Ellapsed time for query is {s_queryTimer.Elapsed.TotalMilliseconds:0.#} milliseconds.");
                     _logger.LogInformation(stringBuilder.ToString());
                 }
             }

@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Metabase.GraphQl.DataFormats
 {
+    [SuppressMessage("Naming", "CA1707")]
     public enum CreateDataFormatErrorCode
     {
         UNKNOWN,

@@ -19,7 +19,7 @@ namespace Metabase.GraphQl.Databases
 {
     public sealed class QueryingDatabases
     {
-        public const string DATABASE_HTTP_CLIENT = "Database";
+        public const string DatabaseHttpClient = "Database";
 
         private static readonly JsonSerializerOptions NonDataSerializerOptions =
             new()
@@ -115,27 +115,27 @@ namespace Metabase.GraphQl.Databases
             }
 
             public override void Write(
-                Utf8JsonWriter writer, DataX.IData data, JsonSerializerOptions options)
+                Utf8JsonWriter writer, DataX.IData value, JsonSerializerOptions options)
             {
                 try
                 {
                     writer.WriteStartObject();
-                    if (data is DataX.CalorimetricData calorimetricData)
+                    if (value is DataX.CalorimetricData calorimetricData)
                     {
                         writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, CALORIMETRIC_DATA);
                         throw new JsonException("Unsupported!");
                     }
-                    else if (data is DataX.HygrothermalData hygrothermalData)
+                    else if (value is DataX.HygrothermalData hygrothermalData)
                     {
                         writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, HYGROTHERMAL_DATA);
                         throw new JsonException("Unsupported!");
                     }
-                    else if (data is DataX.OpticalData opticalData)
+                    else if (value is DataX.OpticalData opticalData)
                     {
                         writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, OPTICAL_DATA);
                         throw new JsonException("Unsupported!");
                     }
-                    else if (data is DataX.PhotovoltaicData photovoltaicData)
+                    else if (value is DataX.PhotovoltaicData photovoltaicData)
                     {
                         writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, PHOTOVOLTAIC_DATA);
                         throw new JsonException("Unsupported!");
@@ -218,7 +218,7 @@ namespace Metabase.GraphQl.Databases
             //    .ConfigureAwait(false)
             //    )
             //   .AsGraphQLHttpResponse();
-            using var httpClient = httpClientFactory.CreateClient(DATABASE_HTTP_CLIENT);
+            using var httpClient = httpClientFactory.CreateClient(DatabaseHttpClient);
             var bearerToken = await ExtractBearerToken(httpContextAccessor).ConfigureAwait(false);
             if (bearerToken is not null)
             {
@@ -265,7 +265,7 @@ namespace Metabase.GraphQl.Databases
         //         );
         // }
 
-        private static HttpContent MakeJsonHttpContent<TContent>(
+        private static ByteArrayContent MakeJsonHttpContent<TContent>(
             TContent content
             )
         {

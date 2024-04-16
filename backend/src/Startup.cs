@@ -160,7 +160,7 @@ namespace Metabase
         private static void ConfigureHttpClientServices(IServiceCollection services)
         {
             services.AddHttpClient();
-            services.AddHttpClient(QueryingDatabases.DATABASE_HTTP_CLIENT);
+            services.AddHttpClient(QueryingDatabases.DatabaseHttpClient);
             // var httpClientBuilder = services.AddHttpClient(QueryingDatabases.DATABASE_HTTP_CLIENT);
             // if (!_environment.IsProduction())
             // {

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Snapshooter.NUnit;
@@ -28,6 +29,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task ValidData_ConfirmsUserEmailChange()
         {
             // Arrange
@@ -53,6 +55,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task UnknownUser_IsUserError()
         {
             // Arrange
@@ -73,6 +76,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task DuplicateEmail_IsUserError()
         {
             // Arrange
@@ -97,6 +101,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task DifferentNewEmail_IsUserError()
         {
             // Arrange
@@ -117,6 +122,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task InvalidConfirmationCode_IsUserError()
         {
             // Arrange

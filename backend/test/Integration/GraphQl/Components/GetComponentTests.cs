@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
       : ComponentIntegrationTests
     {
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task NoComponent_Fails()
         {
             // Act
@@ -24,6 +26,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task UnknownId_Fails()
         {
             // Arrange
@@ -53,6 +56,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
         }
 
         [Test]
+        [SuppressMessage("Naming", "CA1707")]
         public async Task KnownId_Succeeds()
         {
             // Arrange

@@ -18,7 +18,7 @@ namespace Metabase.Tests.Integration
     public sealed class CustomWebApplicationFactory
       : WebApplicationFactory<Startup>
     {
-        private bool _disposed = false;
+        private bool _disposed;
 
         public CollectingEmailSender EmailSender { get; }
 
