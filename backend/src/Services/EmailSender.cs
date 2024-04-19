@@ -6,6 +6,20 @@ using MimeKit;
 
 namespace Metabase.Services
 {
+    public static partial class Log
+    {
+        [LoggerMessage(
+            EventId = 0,
+            Level = LogLevel.Debug,
+            Message = "About to send email to `{To}` with subject `{Subject}` and body `{Body}`")]
+        public static partial void AboutToSendEmail(
+            this ILogger logger,
+            (string name, string address) To,
+            string Subject,
+            string Body
+        );
+    }
+
     public sealed class EmailSender
       : IEmailSender
     {
@@ -30,7 +44,7 @@ namespace Metabase.Services
             string body
         )
         {
-            _logger.LogDebug("About to send email to `{To}` with subject `{Subject}` and body `{Body}`", to, subject, body);
+            _logger.AboutToSendEmail(to, subject, body);
             var message = new MimeMessage();
             message.From.Add(
                 new MailboxAddress(

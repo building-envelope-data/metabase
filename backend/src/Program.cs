@@ -11,9 +11,24 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Microsoft.AspNetCore.Builder;
+using System.Globalization;
 
 namespace Metabase
 {
+    public static partial class LoggerExtensions
+    {
+        [LoggerMessage(
+            EventId = 0,
+            Level = LogLevel.Error,
+            Message = "An error occurred creating and seeding the database.")]
+        public static partial void FailedToCreateAndSeedDatabase(
+            this Microsoft.Extensions.Logging.ILogger logger,
+            // The first exception is implicitly taken care of as detailed in
+            // https://learn.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator#log-method-anatomy
+            Exception exception
+        );
+    }
+
     public sealed class Program
     {
         public const string TestEnvironment = "test";
@@ -77,7 +92,7 @@ namespace Metabase
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithProperty("Environment", environment)
-                .WriteTo.Console()
+                .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
                 .WriteTo.File(
                     formatter: new CompactJsonFormatter(),
                     path: "./logs/serilog.json",
@@ -87,7 +102,7 @@ namespace Metabase
                     retainedFileCountLimit: 7);
             if (environment != "production")
             {
-                configuration.WriteTo.Debug();
+                configuration.WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture);
             }
         }
 
@@ -108,7 +123,7 @@ namespace Metabase
             catch (Exception exception)
             {
                 var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(exception, "An error occurred creating and seeding the database.");
+                logger.FailedToCreateAndSeedDatabase(exception);
             }
         }
 

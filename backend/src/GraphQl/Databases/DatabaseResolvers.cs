@@ -11,9 +11,62 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using Microsoft.AspNetCore.Http;
 using Metabase.Authorization;
+using System.Net;
 
 namespace Metabase.GraphQl.Databases
 {
+    public static partial class Log
+    {
+        [LoggerMessage(
+            EventId = 0,
+            Level = LogLevel.Warning,
+            Message = "Failed with errors {Errors} to query the database {Locator} for {Request}.")]
+        public static partial void FailedWithErrors(
+            this ILogger logger,
+            string Errors,
+            Uri Locator,
+            string Request
+        );
+
+        [LoggerMessage(
+            EventId = 1,
+            Level = LogLevel.Error,
+            Message = "Failed with status code {StatusCode} to request {Locator} for {Request}.")]
+        public static partial void FailedWithStatusCode(
+            this ILogger logger,
+            Exception exception,
+            HttpStatusCode? StatusCode,
+            Uri Locator,
+            string Request
+        );
+
+        [LoggerMessage(
+            EventId = 2,
+            Level = LogLevel.Error,
+            Message = "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.")]
+        public static partial void FailedToDeserialize(
+            this ILogger logger,
+            Exception exception,
+            Uri Locator,
+            string Request,
+            long? BytePositionInLine,
+            long? LineNumber,
+            string Message,
+            string? Path
+        );
+
+        [LoggerMessage(
+            EventId = 3,
+            Level = LogLevel.Error,
+            Message = "Failed to request {Locator} for {Request} or failed to deserialize the response.")]
+        public static partial void FailedToRequestOrDeserialize(
+            this ILogger logger,
+            Exception exception,
+            Uri Locator,
+            string Request
+        );
+    }
+
     public sealed class DatabaseResolvers
     {
         private const string IgsdbUrl = "https://igsdb-v2.herokuapp.com/graphql/";
@@ -759,7 +812,7 @@ namespace Metabase.GraphQl.Databases
                     );
                 if (deserializedGraphQlResponse.Errors?.Length >= 1)
                 {
-                    _logger.LogWarning("Failed with errors {Errors} to query the database {Locator} for {Request}", JsonSerializer.Serialize(deserializedGraphQlResponse.Errors), database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
+                    _logger.FailedWithErrors(JsonSerializer.Serialize(deserializedGraphQlResponse.Errors), database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
                     foreach (var error in deserializedGraphQlResponse.Errors)
                     {
                         var errorBuilder = ErrorBuilder.New()
@@ -781,7 +834,7 @@ namespace Metabase.GraphQl.Databases
             }
             catch (HttpRequestException e)
             {
-                _logger.LogError(e, "Failed with status code {StatusCode} to request {Locator} for {Request}.", e.StatusCode, database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
+                _logger.FailedWithStatusCode(e, e.StatusCode, database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
                 resolverContext.ReportError(
                     ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
@@ -794,7 +847,7 @@ namespace Metabase.GraphQl.Databases
             }
             catch (JsonException e)
             {
-                _logger.LogError(e, "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.", database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions), e.BytePositionInLine, e.LineNumber, e.Message, e.Path);
+                _logger.FailedToDeserialize(e, database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions), e.BytePositionInLine, e.LineNumber, e.Message, e.Path);
                 resolverContext.ReportError(
                     ErrorBuilder.New()
                     .SetCode("DESERIALIZATION_FAILED")
@@ -807,7 +860,7 @@ namespace Metabase.GraphQl.Databases
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to request {Locator} for {Request} or failed to deserialize the response.", database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
+                _logger.FailedToRequestOrDeserialize(e, database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
                 resolverContext.ReportError(
                     ErrorBuilder.New()
                     .SetCode("DATABASE_REQUEST_FAILED")
