@@ -11,10 +11,10 @@ namespace Metabase.Services
         [LoggerMessage(
             EventId = 0,
             Level = LogLevel.Debug,
-            Message = "About to send email to `{To}` with subject `{Subject}` and body `{Body}`")]
+            Message = "About to send email to `{Recipient}` with subject `{Subject}` and body `{Body}`")]
         public static partial void AboutToSendEmail(
             this ILogger logger,
-            (string name, string address) To,
+            (string name, string address) Recipient,
             string Subject,
             string Body
         );
@@ -39,12 +39,12 @@ namespace Metabase.Services
         }
 
         public Task SendAsync(
-            (string name, string address) to,
+            (string name, string address) recipient,
             string subject,
             string body
         )
         {
-            _logger.AboutToSendEmail(to, subject, body);
+            _logger.AboutToSendEmail(recipient, subject, body);
             var message = new MimeMessage();
             message.From.Add(
                 new MailboxAddress(
@@ -54,8 +54,8 @@ namespace Metabase.Services
             );
             message.To.Add(
                 new MailboxAddress(
-                    to.name,
-                    to.address
+                    recipient.name,
+                    recipient.address
                 )
             );
             message.Subject = subject;

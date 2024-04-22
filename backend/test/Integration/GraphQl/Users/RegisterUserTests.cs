@@ -35,7 +35,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                     )
                 );
             EmailsShouldContainSingle(
-                to: (name, email),
+                recipient: (name, email),
                 subject: "Confirm your email",
                 bodyRegEx: @"^Please confirm your email address by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
                 );

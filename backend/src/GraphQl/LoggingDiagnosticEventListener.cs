@@ -13,6 +13,83 @@ using System.Globalization;
 
 namespace Metabase.GraphQl
 {
+    public static partial class Log
+    {
+        [LoggerMessage(
+            EventId = 0,
+            Level = LogLevel.Error,
+            Message = "Failed executing the query {Query}.")]
+        public static partial void FailedQueryExecution(
+            this ILogger logger,
+            Exception exception,
+            IQuery? query
+        );
+
+        [LoggerMessage(
+            EventId = 1,
+            Level = LogLevel.Error,
+            Message = "Failed executing the operation {Operation} with the error {Error}.")]
+        public static partial void FailedOperationExecution(
+            this ILogger logger,
+            Exception? exception,
+            IOperation operation,
+            string error
+        );
+
+        [LoggerMessage(
+            EventId = 2,
+            Level = LogLevel.Error,
+            Message = "Failed handling the subscription event of the operation {Operation}.")]
+        public static partial void FailedSubscriptionEvent(
+            this ILogger logger,
+            Exception exception,
+            IOperation operation
+        );
+
+        [LoggerMessage(
+            EventId = 3,
+            Level = LogLevel.Error,
+            Message = "Failed transporting the subscription of the operation {Operation}.")]
+        public static partial void FailedSubscriptionTransport(
+            this ILogger logger,
+            Exception exception,
+            IOperation operation
+        );
+
+        [LoggerMessage(
+            EventId = 4,
+            Level = LogLevel.Error,
+            Message = "The query {Query} has the syntax error {Error}.")]
+        public static partial void FailedSyntax(
+            this ILogger logger,
+            Exception? exception,
+            IQuery? query,
+            string error
+        );
+
+        [LoggerMessage(
+            EventId = 5,
+            Level = LogLevel.Error,
+            Message = "Failed processing the task {Task} with the error {Error}.")]
+        public static partial void FailedTask(
+            this ILogger logger,
+            Exception? exception,
+            IExecutionTask task,
+            string error
+        );
+
+        [LoggerMessage(
+            EventId = 6,
+            Level = LogLevel.Error,
+            Message = "Failed validating the query {Query} with the error {Error}.")]
+        public static partial void FailedValidation(
+            this ILogger logger,
+            Exception? exception,
+            IQuery? query,
+            string error
+        );
+    }
+
     // Inspired by https://chillicream.com/blog/2019/03/19/logging-with-hotchocolate
     // and https://chillicream.com/blog/2021/01/10/hot-chocolate-logging
     public sealed class LoggingDiagnosticEventListener
@@ -40,7 +117,7 @@ namespace Metabase.GraphQl
             Exception exception
             )
         {
-            _logger.LogError(exception, "During execution of the query {Query} the exception {Exception} occurred.", context.Request.Query, exception);
+            _logger.FailedQueryExecution(exception, context.Request.Query);
         }
 
         public override void ResolverError(
@@ -48,17 +125,17 @@ namespace Metabase.GraphQl
             IError error
             )
         {
-            _logger.LogError(error.Exception, "During execution of the operation {Operation} the error {Error} occurred.", context.Operation, ConvertErrorToString(error));
+            _logger.FailedOperationExecution(error.Exception, context.Operation, ConvertErrorToString(error));
         }
 
         public override void SubscriptionEventError(SubscriptionEventContext context, Exception exception)
         {
-            _logger.LogError(exception, "During execution of the subscription operation {Operation} the exception {Exception} occurred.", context.Subscription.Operation, exception);
+            _logger.FailedSubscriptionEvent(exception, context.Subscription.Operation);
         }
 
         public override void SubscriptionTransportError(ISubscription subscription, Exception exception)
         {
-            _logger.LogError(exception, "During execution of the subscription operation {Operation} the exception {Exception} occurred.", subscription.Operation, exception);
+            _logger.FailedSubscriptionTransport(exception, subscription.Operation);
         }
 
         public override void SyntaxError(
@@ -66,7 +143,7 @@ namespace Metabase.GraphQl
             IError error
             )
         {
-            _logger.LogError(error.Exception, "During execution of the query {Query} the error {Error} occurred.", context.Request.Query, ConvertErrorToString(error));
+            _logger.FailedSyntax(error.Exception, context.Request.Query, ConvertErrorToString(error));
         }
 
         public override void TaskError(
@@ -74,7 +151,7 @@ namespace Metabase.GraphQl
             IError error
             )
         {
-            _logger.LogError(error.Exception, "During execution of the task {Task} the error {Error} occurred.", task, ConvertErrorToString(error));
+            _logger.FailedTask(error.Exception, task, ConvertErrorToString(error));
         }
 
         public override void ValidationErrors(
@@ -84,7 +161,7 @@ namespace Metabase.GraphQl
         {
             foreach (var error in errors)
             {
-                _logger.LogError(error.Exception, "During execution of the query {Query} the error {Error} occurred.", context.Request.Query, ConvertErrorToString(error));
+                _logger.FailedValidation(error.Exception, context.Request.Query, ConvertErrorToString(error));
             }
         }
 
@@ -159,7 +236,11 @@ namespace Metabase.GraphQl
                     }
                     s_queryTimer.Stop();
                     stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"Ellapsed time for query is {s_queryTimer.Elapsed.TotalMilliseconds:0.#} milliseconds.");
+#pragma warning disable CA1848 // Use the LoggerMessage delegates
+#pragma warning disable CA2254 // Template should be a static expression
                     _logger.LogInformation(stringBuilder.ToString());
+#pragma warning restore CA2254 // Template should be a static expression
+#pragma warning restore CA1848 // Use the LoggerMessage delegates
                 }
             }
         }

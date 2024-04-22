@@ -582,14 +582,14 @@ namespace Metabase.Tests.Integration
         }
 
         protected void EmailsShouldContainSingle(
-            (string name, string address) to,
+            (string name, string address) recipient,
             string subject,
             string bodyRegEx
         )
         {
             EmailSender.Emails.Should().ContainSingle();
             var email = EmailSender.Emails.First();
-            email.To.Should().Be(to);
+            email.Recipient.Should().Be(recipient);
             email.Subject.Should().Be(subject);
             email.Body.Should().MatchRegex(bodyRegEx);
         }

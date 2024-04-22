@@ -24,7 +24,7 @@ namespace Metabase.Tests.Integration
         }
 
         public Task SendAsync(
-            (string name, string address) to,
+            (string name, string address) recipient,
             string subject,
             string body
         )
@@ -32,7 +32,7 @@ namespace Metabase.Tests.Integration
             _emails.Add(
                 new Email
                 (
-                    To: to,
+                    Recipient: recipient,
                     Subject: subject,
                     Body: body
                  )
@@ -41,7 +41,7 @@ namespace Metabase.Tests.Integration
         }
 
         public sealed record Email(
-            (string name, string address) To,
+            (string name, string address) Recipient,
             string Subject,
             string Body
         );

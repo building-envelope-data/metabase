@@ -25,7 +25,7 @@ namespace Metabase.GraphQl.Users
     public sealed class UserMutations
     {
         // Key Uri Format https://github.com/google/google-authenticator/wiki/Key-Uri-Format
-        private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
+        private static readonly CompositeFormat AuthenticatorUriFormat = CompositeFormat.Parse("otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6");
 
         private static async Task ValidateAntiforgeryTokenAsync(
             IAntiforgery antiforgeryService,
@@ -1716,7 +1716,7 @@ namespace Metabase.GraphQl.Users
         }
 
         private static async Task SendUserEmailConfirmation(
-            (string name, string address) to,
+            (string name, string address) recipient,
             string confirmationToken,
             Services.IEmailSender emailSender,
             string host,
@@ -1726,9 +1726,9 @@ namespace Metabase.GraphQl.Users
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendAsync(
-                to,
+                recipient,
                 "Confirm your email",
-                $"Please confirm your email address by following the link {host}/users/confirm-email?email={urlEncoder.Encode(to.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}" + (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}"))
+                $"Please confirm your email address by following the link {host}/users/confirm-email?email={urlEncoder.Encode(recipient.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}" + (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}"))
                 .ConfigureAwait(false);
         }
 
