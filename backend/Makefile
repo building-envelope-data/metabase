@@ -85,8 +85,8 @@ analyze : ## Analyze with Roslynator
 .PHONY : analyze
 
 # https://www.jetbrains.com/help/resharper/ReSharper_Command_Line_Tools.html#install-and-use-resharper-command-line-tools-as-net-core-tools
-inspect : ## Inspect with ReSharper
-	dotnet tool run jb inspectcode --build ./Metabase.sln
+inspect : ## Inspect with ReSharper, for example, `make OUTPUT=./inspection.xml inspect`
+	dotnet tool run jb inspectcode --build ./Metabase.sln -o ${OUTPUT}
 .PHONY : inspect
 
 play : ## Run tests in `Metabase.Tests.Play` (semi-alternative to the buggy `dotnet script` REPL)
