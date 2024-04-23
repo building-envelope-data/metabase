@@ -117,7 +117,8 @@ syntax : ## Apply syntax style
 	dotnet tool run jb cleanupcode --profile="Built-in: Reformat & Apply Syntax Style" ./Metabase.sln
 .PHONY : syntax
 
-# Built-in: Full Cleanup
+# The profile `Built-in: Full Cleanup` does not update file headers.
+# See https://www.jetbrains.com/help/resharper/Code_Cleanup__Index.html#profiles
 cleanup : ## Clean-up code
 	dotnet tool run jb cleanupcode ./Metabase.sln
 .PHONY : cleanup
