@@ -3,6 +3,7 @@
 /src/wwwroot/assets/
 /trace.*
 /.secrets
+/.mono
 
 /secrets
 /ssl
