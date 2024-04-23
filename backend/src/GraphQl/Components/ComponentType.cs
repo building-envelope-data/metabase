@@ -98,16 +98,16 @@ namespace Metabase.GraphQl.Components
 
         private sealed class ComponentResolvers
         {
-                public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-                  [Parent] Data.Component component,
-                  ClaimsPrincipal claimsPrincipal,
-                  [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-                  Data.ApplicationDbContext context,
-                  CancellationToken cancellationToken
-                )
-                {
-                    return ComponentAuthorization.IsAuthorizedToUpdate(claimsPrincipal, component.Id, userManager, context, cancellationToken);
-                }
+            public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
+              [Parent] Data.Component component,
+              ClaimsPrincipal claimsPrincipal,
+              [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+              Data.ApplicationDbContext context,
+              CancellationToken cancellationToken
+            )
+            {
+                return ComponentAuthorization.IsAuthorizedToUpdate(claimsPrincipal, component.Id, userManager, context, cancellationToken);
+            }
         }
     }
 }

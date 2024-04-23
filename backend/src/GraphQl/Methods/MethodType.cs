@@ -65,16 +65,16 @@ namespace Metabase.GraphQl.Methods
 
         private sealed class MethodResolvers
         {
-                public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-                  [Parent] Data.Method method,
-                  ClaimsPrincipal claimsPrincipal,
-                  [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-                  Data.ApplicationDbContext context,
-                  CancellationToken cancellationToken
-                )
-                {
-                    return MethodAuthorization.IsAuthorizedToUpdate(claimsPrincipal, method.Id, userManager, context, cancellationToken);
-                }
+            public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
+              [Parent] Data.Method method,
+              ClaimsPrincipal claimsPrincipal,
+              [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+              Data.ApplicationDbContext context,
+              CancellationToken cancellationToken
+            )
+            {
+                return MethodAuthorization.IsAuthorizedToUpdate(claimsPrincipal, method.Id, userManager, context, cancellationToken);
+            }
         }
     }
 }

@@ -42,16 +42,16 @@ namespace Metabase.GraphQl.DataFormats
 
         private sealed class DataFormatResolvers
         {
-                public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-                  [Parent] Data.DataFormat dataFormat,
-                  ClaimsPrincipal claimsPrincipal,
-                  [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-                  Data.ApplicationDbContext context,
-                  CancellationToken cancellationToken
-                )
-                {
-                    return DataFormatAuthorization.IsAuthorizedToUpdate(claimsPrincipal, dataFormat.Id, userManager, context, cancellationToken);
-                }
+            public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
+              [Parent] Data.DataFormat dataFormat,
+              ClaimsPrincipal claimsPrincipal,
+              [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+              Data.ApplicationDbContext context,
+              CancellationToken cancellationToken
+            )
+            {
+                return DataFormatAuthorization.IsAuthorizedToUpdate(claimsPrincipal, dataFormat.Id, userManager, context, cancellationToken);
+            }
         }
     }
 }

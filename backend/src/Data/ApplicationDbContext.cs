@@ -201,11 +201,11 @@ namespace Metabase.Data
 
         private static void ConfigureDatabaseOperator(ModelBuilder builder)
         {
-          builder.Entity<Institution>()
-            .HasMany(i => i.OperatedDatabases)
-            .WithOne(i => i.Operator)
-            .HasForeignKey(i => i.OperatorId)
-            .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Institution>()
+              .HasMany(i => i.OperatedDatabases)
+              .WithOne(i => i.Operator)
+              .HasForeignKey(i => i.OperatorId)
+              .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureUserMethodDeveloper(ModelBuilder builder)
@@ -232,29 +232,29 @@ namespace Metabase.Data
 
         private static void ConfigureInstitutionManager(ModelBuilder builder)
         {
-          builder.Entity<Institution>()
-            .HasMany(i => i.ManagedInstitutions)
-            .WithOne(i => i.Manager)
-            .HasForeignKey(i => i.ManagerId)
-            .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Institution>()
+              .HasMany(i => i.ManagedInstitutions)
+              .WithOne(i => i.Manager)
+              .HasForeignKey(i => i.ManagerId)
+              .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureDataFormatManager(ModelBuilder builder)
         {
-          builder.Entity<Institution>()
-            .HasMany(i => i.ManagedDataFormats)
-            .WithOne(i => i.Manager)
-            .HasForeignKey(i => i.ManagerId)
-            .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Institution>()
+              .HasMany(i => i.ManagedDataFormats)
+              .WithOne(i => i.Manager)
+              .HasForeignKey(i => i.ManagerId)
+              .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureMethodManager(ModelBuilder builder)
         {
-          builder.Entity<Institution>()
-            .HasMany(i => i.ManagedMethods)
-            .WithOne(i => i.Manager)
-            .HasForeignKey(i => i.ManagerId)
-            .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Institution>()
+              .HasMany(i => i.ManagedMethods)
+              .WithOne(i => i.Manager)
+              .HasForeignKey(i => i.ManagerId)
+              .OnDelete(DeleteBehavior.Restrict);
         }
 
         private readonly string _schemaName;

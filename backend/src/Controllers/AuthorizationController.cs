@@ -372,7 +372,7 @@ namespace Metabase.Controllers
             // Remove the `Identity.Application` cookie as it was only needed to authenticate the user.
             await _signInManager.SignOutAsync().ConfigureAwait(false);
             return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        } 
+        }
 
         #endregion
 

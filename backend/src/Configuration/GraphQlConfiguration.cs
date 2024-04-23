@@ -91,8 +91,8 @@ namespace Metabase.Configuration
                   .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
                   .AddType(new UrlType("Url"))
                   .AddType(new JsonType("Any", bind: BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
-                  // .BindRuntimeType<Guid, MyUuidType>()
-                  // Query Types
+                                                                                // .BindRuntimeType<Guid, MyUuidType>()
+                                                                                // Query Types
                   .AddQueryType(d => d.Name(nameof(GraphQl.Query)))
                       .AddType<GraphQl.Components.ComponentQueries>()
                       .AddType<GraphQl.DataFormats.DataFormatQueries>()

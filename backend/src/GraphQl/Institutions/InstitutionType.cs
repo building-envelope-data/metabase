@@ -115,27 +115,27 @@ namespace Metabase.GraphQl.Institutions
 
         private sealed class InstitutionResolvers
         {
-                public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-                  [Parent] Data.Institution institution,
-                  ClaimsPrincipal claimsPrincipal,
-                  [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-                  Data.ApplicationDbContext context,
-                  CancellationToken cancellationToken
-                )
-                {
-                    return InstitutionAuthorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, userManager, context, cancellationToken);
-                }
+            public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
+              [Parent] Data.Institution institution,
+              ClaimsPrincipal claimsPrincipal,
+              [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+              Data.ApplicationDbContext context,
+              CancellationToken cancellationToken
+            )
+            {
+                return InstitutionAuthorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, userManager, context, cancellationToken);
+            }
 
-                public static Task<bool> GetCanCurrentUserDeleteNodeAsync(
-                  [Parent] Data.Institution institution,
-                  ClaimsPrincipal claimsPrincipal,
-                  [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-                  Data.ApplicationDbContext context,
-                  CancellationToken cancellationToken
-                )
-                {
-                    return InstitutionAuthorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id, userManager, context, cancellationToken);
-                }
+            public static Task<bool> GetCanCurrentUserDeleteNodeAsync(
+              [Parent] Data.Institution institution,
+              ClaimsPrincipal claimsPrincipal,
+              [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+              Data.ApplicationDbContext context,
+              CancellationToken cancellationToken
+            )
+            {
+                return InstitutionAuthorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id, userManager, context, cancellationToken);
+            }
         }
     }
 }
