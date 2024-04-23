@@ -124,6 +124,7 @@ namespace Metabase
                     dataSourceBuilder.MapEnum<Enumerations.DatabaseVerificationState>();
                     dataSourceBuilder.MapEnum<Enumerations.InstitutionRepresentativeRole>();
                     dataSourceBuilder.MapEnum<Enumerations.InstitutionState>();
+                    dataSourceBuilder.MapEnum<Enumerations.InstitutionOperatingState>();
                     dataSourceBuilder.MapEnum<Enumerations.MethodCategory>();
                     dataSourceBuilder.MapEnum<Enumerations.PrimeSurface>();
                     dataSourceBuilder.MapEnum<Enumerations.Standardizer>();

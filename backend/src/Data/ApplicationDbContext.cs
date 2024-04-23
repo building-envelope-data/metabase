@@ -23,6 +23,7 @@ namespace Metabase.Data
             builder.HasPostgresEnum<Enumerations.DatabaseVerificationState>("public");
             builder.HasPostgresEnum<Enumerations.InstitutionRepresentativeRole>("public");
             builder.HasPostgresEnum<Enumerations.InstitutionState>("public");
+            builder.HasPostgresEnum<Enumerations.InstitutionOperatingState>("public");
             builder.HasPostgresEnum<Enumerations.MethodCategory>("public");
             builder.HasPostgresEnum<Enumerations.PrimeSurface>("public");
             builder.HasPostgresEnum<Enumerations.Standardizer>("public");

@@ -108,7 +108,8 @@ namespace Metabase.GraphQl.Institutions
                 description: input.Description,
                 websiteLocator: input.WebsiteLocator,
                 publicKey: input.PublicKey,
-                state: await GetInitialInstitutionState(input, user, userManager).ConfigureAwait(false)
+                state: await GetInitialInstitutionState(input, user, userManager).ConfigureAwait(false),
+                operatingState: Enumerations.InstitutionOperatingState.OPERATING
             )
             {
                 ManagerId = input.ManagerId
