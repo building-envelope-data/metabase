@@ -5,25 +5,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Metabase.Data
 {
     public sealed class DataFormat
-      : Data.Entity
+        : Data.Entity
     {
-        [Required]
-        [MinLength(1)]
-        public string Name { get; private set; }
+        [Required] [MinLength(1)] public string Name { get; private set; }
 
-        [MinLength(1)]
-        public string? Extension { get; private set; }
+        [MinLength(1)] public string? Extension { get; private set; }
 
-        [Required]
-        [MinLength(1)]
-        public string Description { get; private set; }
+        [Required] [MinLength(1)] public string Description { get; private set; }
 
-        [Required]
-        [MinLength(1)]
-        public string MediaType { get; private set; }
+        [Required] [MinLength(1)] public string MediaType { get; private set; }
 
-        [Url]
-        public Uri? SchemaLocator { get; private set; }
+        [Url] public Uri? SchemaLocator { get; private set; }
 
         // Standard, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
         public Standard? Standard { get; set; }
@@ -56,7 +48,7 @@ namespace Metabase.Data
             string description,
             string mediaType,
             Uri? schemaLocator
-            )
+        )
         {
             Name = name;
             Extension = extension;
@@ -71,7 +63,7 @@ namespace Metabase.Data
             string description,
             string mediaType,
             Uri? schemaLocator
-            )
+        )
         {
             Name = name;
             Extension = extension;

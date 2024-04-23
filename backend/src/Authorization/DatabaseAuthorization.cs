@@ -16,16 +16,16 @@ namespace Metabase.Authorization
             UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null)
-            && await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                user,
-                institutionId,
-                context,
-                cancellationToken
-            );
+                   && await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+                       user,
+                       institutionId,
+                       context,
+                       cancellationToken
+                   );
         }
 
         public static async Task<bool> IsAuthorizedToUpdate(
@@ -34,16 +34,16 @@ namespace Metabase.Authorization
             UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null) &&
-                await IsAtLeastAssistantOfVerifiedDatabaseOperator(
-                    user,
-                    databaseId,
-                    context,
-                    cancellationToken
-                );
+                   await IsAtLeastAssistantOfVerifiedDatabaseOperator(
+                       user,
+                       databaseId,
+                       context,
+                       cancellationToken
+                   );
         }
 
         public static async Task<bool> IsAuthorizedToVerify(
@@ -52,16 +52,16 @@ namespace Metabase.Authorization
             UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null) &&
-                await IsAtLeastAssistantOfVerifiedDatabaseOperator(
-                    user,
-                    databaseId,
-                    context,
-                    cancellationToken
-                );
+                   await IsAtLeastAssistantOfVerifiedDatabaseOperator(
+                       user,
+                       databaseId,
+                       context,
+                       cancellationToken
+                   );
         }
 
         private static async Task<bool> IsAtLeastAssistantOfVerifiedDatabaseOperator(
@@ -73,14 +73,15 @@ namespace Metabase.Authorization
         {
             var wrappedOperatorId =
                 await context.Databases.AsQueryable()
-                .Where(x => x.Id == databaseId)
-                .Select(x => new { x.OperatorId })
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(x => x.Id == databaseId)
+                    .Select(x => new { x.OperatorId })
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (wrappedOperatorId is null)
             {
                 return false;
             }
+
             return await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
                 user, wrappedOperatorId.OperatorId, context, cancellationToken
             );

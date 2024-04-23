@@ -26,80 +26,86 @@ namespace Metabase.GraphQl.UserMethodDevelopers
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await UserMethodDeveloperAuthorization.IsAuthorizedToAdd(
-                 claimsPrincipal,
-                 input.MethodId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
+                    claimsPrincipal,
+                    input.MethodId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
                )
             {
                 return new AddUserMethodDeveloperPayload(
                     new AddUserMethodDeveloperError(
-                      AddUserMethodDeveloperErrorCode.UNAUTHORIZED,
-                      $"You are not authorized to add method developer relation for method ${input.MethodId}.",
-                      Array.Empty<string>()
-                      )
-                      );
+                        AddUserMethodDeveloperErrorCode.UNAUTHORIZED,
+                        $"You are not authorized to add method developer relation for method ${input.MethodId}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var errors = new List<AddUserMethodDeveloperError>();
             if (!await context.Methods.AsQueryable()
-                .Where(u => u.Id == input.MethodId)
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
-                )
+                    .Where(u => u.Id == input.MethodId)
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
+               )
             {
                 errors.Add(
                     new AddUserMethodDeveloperError(
-                      AddUserMethodDeveloperErrorCode.UNKNOWN_METHOD,
-                      "Unknown method.",
-                      new[] { nameof(input), nameof(input.MethodId).FirstCharToLower() }
-                      )
+                        AddUserMethodDeveloperErrorCode.UNKNOWN_METHOD,
+                        "Unknown method.",
+                        new[] { nameof(input), nameof(input.MethodId).FirstCharToLower() }
+                    )
                 );
             }
+
             if (!await context.Users.AsQueryable()
-                .Where(i => i.Id == input.UserId)
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
-            )
+                    .Where(i => i.Id == input.UserId)
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
+               )
             {
                 errors.Add(
                     new AddUserMethodDeveloperError(
-                      AddUserMethodDeveloperErrorCode.UNKNOWN_USER,
-                      "Unknown user.",
-                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
-                      )
+                        AddUserMethodDeveloperErrorCode.UNKNOWN_USER,
+                        "Unknown user.",
+                        new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                    )
                 );
             }
+
             if (errors.Count is not 0)
             {
                 return new AddUserMethodDeveloperPayload(errors.AsReadOnly());
             }
+
             if (await context.UserMethodDevelopers.AsQueryable()
-                .Where(m =>
-                    m.MethodId == input.MethodId
-                    && m.UserId == input.UserId
-                )
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
-            )
+                    .Where(m =>
+                        m.MethodId == input.MethodId
+                        && m.UserId == input.UserId
+                    )
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
+               )
             {
                 return new AddUserMethodDeveloperPayload(
                     new AddUserMethodDeveloperError(
-                      AddUserMethodDeveloperErrorCode.DUPLICATE,
-                      "User method developer already exists.",
-                      new[] { nameof(input) }
-                      )
-                      );
+                        AddUserMethodDeveloperErrorCode.DUPLICATE,
+                        "User method developer already exists.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             var userMethodDeveloper = new Data.UserMethodDeveloper
             {
                 MethodId = input.MethodId,
                 UserId = input.UserId,
-                Pending = !await UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId, userManager).ConfigureAwait(false)
+                Pending = !await UserMethodDeveloperAuthorization
+                    .IsAuthorizedToConfirm(claimsPrincipal, input.UserId, userManager).ConfigureAwait(false)
             };
             context.UserMethodDevelopers.Add(userMethodDeveloper);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -114,74 +120,79 @@ namespace Metabase.GraphQl.UserMethodDevelopers
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(
-                 claimsPrincipal,
-                 input.UserId,
-                 userManager
-                 ).ConfigureAwait(false)
+                    claimsPrincipal,
+                    input.UserId,
+                    userManager
+                ).ConfigureAwait(false)
                )
             {
                 return new ConfirmUserMethodDeveloperPayload(
                     new ConfirmUserMethodDeveloperError(
-                      ConfirmUserMethodDeveloperErrorCode.UNAUTHORIZED,
-                      $"You are not authorized to confirm method developer relation for user ${input.UserId}.",
-                      Array.Empty<string>()
-                      )
-                      );
+                        ConfirmUserMethodDeveloperErrorCode.UNAUTHORIZED,
+                        $"You are not authorized to confirm method developer relation for user ${input.UserId}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var errors = new List<ConfirmUserMethodDeveloperError>();
             if (!await context.Methods.AsQueryable()
-                .Where(u => u.Id == input.MethodId)
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
-                )
+                    .Where(u => u.Id == input.MethodId)
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
+               )
             {
                 errors.Add(
                     new ConfirmUserMethodDeveloperError(
-                      ConfirmUserMethodDeveloperErrorCode.UNKNOWN_METHOD,
-                      "Unknown method.",
-                      new[] { nameof(input), nameof(input.MethodId).FirstCharToLower() }
-                      )
+                        ConfirmUserMethodDeveloperErrorCode.UNKNOWN_METHOD,
+                        "Unknown method.",
+                        new[] { nameof(input), nameof(input.MethodId).FirstCharToLower() }
+                    )
                 );
             }
+
             if (!await context.Users.AsQueryable()
-                .Where(i => i.Id == input.UserId)
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
-            )
+                    .Where(i => i.Id == input.UserId)
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
+               )
             {
                 errors.Add(
                     new ConfirmUserMethodDeveloperError(
-                      ConfirmUserMethodDeveloperErrorCode.UNKNOWN_USER,
-                      "Unknown user.",
-                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
-                      )
+                        ConfirmUserMethodDeveloperErrorCode.UNKNOWN_USER,
+                        "Unknown user.",
+                        new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                    )
                 );
             }
+
             if (errors.Count is not 0)
             {
                 return new ConfirmUserMethodDeveloperPayload(errors.AsReadOnly());
             }
+
             var userMethodDeveloper =
                 await context.UserMethodDevelopers.AsQueryable()
-                .Where(r =>
-                       r.MethodId == input.MethodId
-                    && r.UserId == input.UserId
+                    .Where(r =>
+                        r.MethodId == input.MethodId
+                        && r.UserId == input.UserId
                     )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (userMethodDeveloper is null)
             {
                 return new ConfirmUserMethodDeveloperPayload(
                     new ConfirmUserMethodDeveloperError(
-                      ConfirmUserMethodDeveloperErrorCode.UNKNOWN_DEVELOPER,
-                      "Unknown developer.",
-                      new[] { nameof(input) }
-                      )
+                        ConfirmUserMethodDeveloperErrorCode.UNKNOWN_DEVELOPER,
+                        "Unknown developer.",
+                        new[] { nameof(input) }
+                    )
                 );
             }
+
             userMethodDeveloper.Pending = false;
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new ConfirmUserMethodDeveloperPayload(userMethodDeveloper);
@@ -195,76 +206,81 @@ namespace Metabase.GraphQl.UserMethodDevelopers
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await UserMethodDeveloperAuthorization.IsAuthorizedToRemove(
-                 claimsPrincipal,
-                 input.MethodId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
+                    claimsPrincipal,
+                    input.MethodId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
                )
             {
                 return new RemoveUserMethodDeveloperPayload(
                     new RemoveUserMethodDeveloperError(
-                      RemoveUserMethodDeveloperErrorCode.UNAUTHORIZED,
-                      $"You are not authorized to remove method developer relation for method ${input.MethodId}.",
-                      Array.Empty<string>()
-                      )
-                      );
+                        RemoveUserMethodDeveloperErrorCode.UNAUTHORIZED,
+                        $"You are not authorized to remove method developer relation for method ${input.MethodId}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var errors = new List<RemoveUserMethodDeveloperError>();
             if (!await context.Methods.AsQueryable()
-                .Where(u => u.Id == input.MethodId)
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
-                )
+                    .Where(u => u.Id == input.MethodId)
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
+               )
             {
                 errors.Add(
                     new RemoveUserMethodDeveloperError(
-                      RemoveUserMethodDeveloperErrorCode.UNKNOWN_METHOD,
-                      "Unknown method.",
-                      new[] { nameof(input), nameof(input.MethodId).FirstCharToLower() }
-                      )
+                        RemoveUserMethodDeveloperErrorCode.UNKNOWN_METHOD,
+                        "Unknown method.",
+                        new[] { nameof(input), nameof(input.MethodId).FirstCharToLower() }
+                    )
                 );
             }
+
             if (!await context.Users.AsQueryable()
-                .Where(i => i.Id == input.UserId)
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
-            )
+                    .Where(i => i.Id == input.UserId)
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
+               )
             {
                 errors.Add(
                     new RemoveUserMethodDeveloperError(
-                      RemoveUserMethodDeveloperErrorCode.UNKNOWN_USER,
-                      "Unknown user.",
-                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
-                      )
+                        RemoveUserMethodDeveloperErrorCode.UNKNOWN_USER,
+                        "Unknown user.",
+                        new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                    )
                 );
             }
+
             if (errors.Count is not 0)
             {
                 return new RemoveUserMethodDeveloperPayload(errors.AsReadOnly());
             }
+
             var userMethodDeveloper =
                 await context.UserMethodDevelopers.AsQueryable()
-                .Where(r =>
-                       r.MethodId == input.MethodId
-                    && r.UserId == input.UserId
+                    .Where(r =>
+                        r.MethodId == input.MethodId
+                        && r.UserId == input.UserId
                     )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (userMethodDeveloper is null)
             {
                 return new RemoveUserMethodDeveloperPayload(
                     new RemoveUserMethodDeveloperError(
-                      RemoveUserMethodDeveloperErrorCode.UNKNOWN_DEVELOPER,
-                      "Unknown developer.",
-                      new[] { nameof(input) }
-                      )
+                        RemoveUserMethodDeveloperErrorCode.UNKNOWN_DEVELOPER,
+                        "Unknown developer.",
+                        new[] { nameof(input) }
+                    )
                 );
             }
+
             context.UserMethodDevelopers.Remove(userMethodDeveloper);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new RemoveUserMethodDeveloperPayload(userMethodDeveloper);

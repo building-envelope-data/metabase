@@ -8,11 +8,11 @@ namespace Metabase.GraphQl.Users
         public int RecoveryCodesLeftCount { get; }
 
         public TwoFactorAuthentication(
-                bool hasAuthenticator,
-                bool isEnabled,
-                bool isMachineRemembered,
-                int recoveryCodesLeftCount
-            )
+            bool hasAuthenticator,
+            bool isEnabled,
+            bool isMachineRemembered,
+            int recoveryCodesLeftCount
+        )
         {
             HasAuthenticator = hasAuthenticator;
             IsEnabled = isEnabled;

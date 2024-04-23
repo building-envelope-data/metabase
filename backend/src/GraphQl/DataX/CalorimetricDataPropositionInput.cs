@@ -10,5 +10,5 @@ namespace Metabase.GraphQl.DataX
         GetHttpsResourcesPropositionInput? Resources,
         FloatsPropositionInput? GValues,
         FloatsPropositionInput? UValues
-        );
+    );
 }

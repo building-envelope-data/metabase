@@ -8,10 +8,10 @@ namespace Metabase.GraphQl.DataX
     public abstract class DataConnectionBase<TDataEdge, TData>
     {
         protected DataConnectionBase(
-          IReadOnlyList<TDataEdge> edges,
-          IReadOnlyList<TData> nodes,
-          uint totalCount,
-          DateTime timestamp
+            IReadOnlyList<TDataEdge> edges,
+            IReadOnlyList<TData> nodes,
+            uint totalCount,
+            DateTime timestamp
         )
         {
             Edges = edges;
@@ -24,8 +24,7 @@ namespace Metabase.GraphQl.DataX
 
         public IReadOnlyList<TData> Nodes { get; }
 
-        [GraphQLType<NonNegativeIntType>]
-        public uint TotalCount { get; }
+        [GraphQLType<NonNegativeIntType>] public uint TotalCount { get; }
 
         // public PageInfo PageInfo { get; } // TODO Resolve clash with `PageInfo` provided by `HotChocolate` 
 

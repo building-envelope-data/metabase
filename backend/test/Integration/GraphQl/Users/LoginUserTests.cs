@@ -10,7 +10,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
     public sealed class LoginUserTests
-      : UserIntegrationTests
+        : UserIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -29,15 +29,15 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                     ["password"] = password,
                     ["rememberMe"] = false
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             // TODO assert that cookie was set!
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.loginUser.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.loginUser.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         // TODO Other cases!

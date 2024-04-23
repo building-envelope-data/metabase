@@ -13,7 +13,7 @@ namespace Metabase.GraphQl
 
         protected Edge(
             Guid nodeId
-            )
+        )
         {
             _nodeId = nodeId;
         }
@@ -21,7 +21,7 @@ namespace Metabase.GraphQl
         public async Task<TNode> GetNodeAsync(
             TNodeByIdDataLoader byId,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await byId.LoadAsync(_nodeId, cancellationToken).ConfigureAwait(false))!;
         }

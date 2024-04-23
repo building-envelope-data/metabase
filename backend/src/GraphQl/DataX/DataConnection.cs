@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.DataX
 {
     public sealed class DataConnection
-    : DataConnectionBase<DataEdge, IData>
+        : DataConnectionBase<DataEdge, IData>
     {
         public DataConnection(
             IReadOnlyList<DataEdge> edges,
@@ -12,12 +12,12 @@ namespace Metabase.GraphQl.DataX
             uint totalCount,
             DateTime timestamp
         )
-        : base(
-            edges,
-            nodes,
-            totalCount,
-            timestamp
-        )
+            : base(
+                edges,
+                nodes,
+                totalCount,
+                timestamp
+            )
         {
         }
     }

@@ -10,7 +10,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
     public sealed class DeletePersonalUserDataTests
-      : UserIntegrationTests
+        : UserIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -26,14 +26,14 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await DeletePersonalUserData(
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.deletePersonalUserData.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.deletePersonalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             await DeletePersonalUserData(
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var response = await GetUser(userId).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -75,7 +75,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 {
                     ["password"] = password
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }
@@ -99,7 +99,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 {
                     ["password"] = password
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             await LoginUser(
                 email: email,
                 password: password
@@ -109,9 +109,9 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         [Test]
@@ -128,14 +128,14 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await DeletePersonalUserData(
                 null
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.deletePersonalUserData.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.deletePersonalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         [Test]
@@ -153,15 +153,15 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             await DeletePersonalUserData(
                 null
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var response = await GetUser(userId).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         [Test]
@@ -178,14 +178,14 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await DeletePersonalUserData(
                 "incorrect" + password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.deletePersonalUserData.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.deletePersonalUserData.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         [Test]
@@ -203,15 +203,15 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             await DeletePersonalUserData(
                 "incorrect" + password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var response = await GetUser(userId).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
     }
 }

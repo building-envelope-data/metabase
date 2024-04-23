@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionManagedMethodConnection
-        : Connection<Data.Institution, Data.Method, InstitutionManagedMethodsByInstitutionIdDataLoader, InstitutionManagedMethodEdge>
+        : Connection<Data.Institution, Data.Method, InstitutionManagedMethodsByInstitutionIdDataLoader,
+            InstitutionManagedMethodEdge>
     {
         public InstitutionManagedMethodConnection(
             Data.Institution institution
@@ -18,7 +19,7 @@ namespace Metabase.GraphQl.Institutions
             : base(
                 institution,
                 x => new InstitutionManagedMethodEdge(x)
-                )
+            )
         {
         }
 
@@ -31,12 +32,12 @@ namespace Metabase.GraphQl.Institutions
         )
         {
             return MethodAuthorization.IsAuthorizedToCreateMethodManagedByInstitution(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                Subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

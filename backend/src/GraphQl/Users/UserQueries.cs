@@ -17,7 +17,7 @@ namespace Metabase.GraphQl.Users
         public async Task<Data.User?> GetCurrentUserAsync(
             ClaimsPrincipal claimsPrincipal,
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
-            )
+        )
         {
             return await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
         }
@@ -28,7 +28,7 @@ namespace Metabase.GraphQl.Users
         [UseSorting]
         public IQueryable<Data.User> GetUsers(
             Data.ApplicationDbContext context
-            )
+        )
         {
             return context.Users;
         }
@@ -37,12 +37,12 @@ namespace Metabase.GraphQl.Users
             Guid uuid,
             UserByIdDataLoader userById,
             CancellationToken cancellationToken
-            )
+        )
         {
             return userById.LoadAsync(
                 uuid,
                 cancellationToken
-                );
+            );
         }
     }
 }

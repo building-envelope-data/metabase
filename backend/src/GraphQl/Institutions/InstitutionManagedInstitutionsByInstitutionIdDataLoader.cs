@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionManagedInstitutionsByInstitutionIdDataLoader
-      : Entities.AssociationsByAssociateIdDataLoader<Data.Institution>
+        : Entities.AssociationsByAssociateIdDataLoader<Data.Institution>
     {
         public InstitutionManagedInstitutionsByInstitutionIdDataLoader(
             IBatchScheduler batchScheduler,
             DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
-            )
+        )
             : base(
                 batchScheduler,
                 options,
@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.Institutions
                         ids.Contains(x.ManagerId ?? Guid.Empty)
                     ),
                 x => x.ManagerId ?? Guid.Empty
-                )
+            )
         {
         }
     }

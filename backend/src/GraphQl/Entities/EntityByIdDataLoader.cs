@@ -10,8 +10,8 @@ using Guid = System.Guid;
 namespace Metabase.GraphQl.Entities
 {
     public abstract class EntityByIdDataLoader<TEntity>
-      : BatchDataLoader<Guid, TEntity?>
-      where TEntity : class, Data.IEntity
+        : BatchDataLoader<Guid, TEntity?>
+        where TEntity : class, Data.IEntity
     {
         private readonly IDbContextFactory<Data.ApplicationDbContext> _dbContextFactory;
         private readonly Func<Data.ApplicationDbContext, DbSet<TEntity>> _getQueryable;
@@ -21,7 +21,7 @@ namespace Metabase.GraphQl.Entities
             DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory,
             Func<Data.ApplicationDbContext, DbSet<TEntity>> getQueryable
-            )
+        )
             : base(batchScheduler, options)
         {
             _dbContextFactory = dbContextFactory;
@@ -31,7 +31,7 @@ namespace Metabase.GraphQl.Entities
         protected override async Task<IReadOnlyDictionary<Guid, TEntity?>> LoadBatchAsync(
             IReadOnlyList<Guid> keys,
             CancellationToken cancellationToken
-            )
+        )
         {
             await using var dbContext =
                 _dbContextFactory.CreateDbContext();
@@ -41,7 +41,7 @@ namespace Metabase.GraphQl.Entities
                     entity => entity.Id,
                     entity => (TEntity?)entity,
                     cancellationToken
-                    )
+                )
                 .ConfigureAwait(false);
         }
     }

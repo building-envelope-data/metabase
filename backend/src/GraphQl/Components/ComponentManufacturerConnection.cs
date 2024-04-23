@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Components
 {
     public sealed class ComponentManufacturerConnection
-        : ForkingConnection<Data.Component, Data.ComponentManufacturer, PendingComponentManufacturersByComponentIdDataLoader, ComponentManufacturersByComponentIdDataLoader, ComponentManufacturerEdge>
+        : ForkingConnection<Data.Component, Data.ComponentManufacturer,
+            PendingComponentManufacturersByComponentIdDataLoader, ComponentManufacturersByComponentIdDataLoader,
+            ComponentManufacturerEdge>
     {
         public ComponentManufacturerConnection(
             Data.Component subject,
@@ -19,7 +21,7 @@ namespace Metabase.GraphQl.Components
                 subject,
                 pending,
                 x => new ComponentManufacturerEdge(x)
-                )
+            )
         {
         }
 
@@ -32,12 +34,12 @@ namespace Metabase.GraphQl.Components
         )
         {
             return ComponentManufacturerAuthorization.IsAuthorizedToAdd(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                Subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

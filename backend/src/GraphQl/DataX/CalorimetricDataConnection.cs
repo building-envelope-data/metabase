@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.DataX
 {
     public sealed class CalorimetricDataConnection
-    : DataConnectionBase<CalorimetricDataEdge, CalorimetricData>
+        : DataConnectionBase<CalorimetricDataEdge, CalorimetricData>
     {
         public CalorimetricDataConnection(
             IReadOnlyList<CalorimetricDataEdge> edges,
@@ -12,12 +12,12 @@ namespace Metabase.GraphQl.DataX
             uint totalCount,
             DateTime timestamp
         )
-        : base(
-            edges,
-            nodes,
-            totalCount,
-            timestamp
-        )
+            : base(
+                edges,
+                nodes,
+                totalCount,
+                timestamp
+            )
         {
         }
     }

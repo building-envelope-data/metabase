@@ -61,7 +61,8 @@ namespace Metabase.Data
 
     public sealed class DbSeeder
     {
-        public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password, Enumerations.UserRole Role)> Users =
+        public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password,
+            Enumerations.UserRole Role)> Users =
             Role.AllEnum.Select(role => (
                 Role.EnumToName(role),
                 $"{Role.EnumToName(role).ToLowerInvariant()}@buildingenvelopedata.org",
@@ -69,18 +70,20 @@ namespace Metabase.Data
                 role
             )).ToList().AsReadOnly();
 
-        public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role) AdministratorUser =
-            Users.First(x => x.Role == Enumerations.UserRole.ADMINISTRATOR);
+        public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role)
+            AdministratorUser =
+                Users.First(x => x.Role == Enumerations.UserRole.ADMINISTRATOR);
 
-        public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role) VerifierUser =
-            Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
+        public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role)
+            VerifierUser =
+                Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
 
         public const string MetabaseClientId = "metabase";
         public const string TestlabSolarFacadesClientId = "testlab-solar-facades";
 
         public static async Task DoAsync(
             IServiceProvider services
-            )
+        )
         {
             var logger = services.GetRequiredService<ILogger<DbSeeder>>();
             logger.SeedingDatabase();
@@ -105,7 +108,7 @@ namespace Metabase.Data
                     logger.CreatingRole(role);
                     await manager.CreateAsync(
                         new Role(role)
-                        ).ConfigureAwait(false);
+                    ).ConfigureAwait(false);
                 }
             }
         }
@@ -125,8 +128,9 @@ namespace Metabase.Data
                     await manager.CreateAsync(
                         user,
                         Password
-                        ).ConfigureAwait(false);
-                    var confirmationToken = await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+                    ).ConfigureAwait(false);
+                    var confirmationToken =
+                        await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
                     await manager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
                     await manager.AddToRoleAsync(user, Data.Role.EnumToName(Role)).ConfigureAwait(false);
                 }
@@ -138,7 +142,7 @@ namespace Metabase.Data
             ILogger<DbSeeder> logger,
             IWebHostEnvironment environment,
             AppSettings appSettings
-            )
+        )
         {
             var manager = services.GetRequiredService<IOpenIddictApplicationManager>();
             if (await manager.FindByClientIdAsync(MetabaseClientId).ConfigureAwait(false) is null)
@@ -154,7 +158,9 @@ namespace Metabase.Data
                         // metabase client, see `OPEN_ID_CONNECT_CLIENT_SECRET`
                         // in `.env.*`.
                         ClientSecret = appSettings.OpenIdConnectClientSecret,
-                        ConsentType = environment.IsEnvironment("test") ? OpenIddictConstants.ConsentTypes.Systematic : OpenIddictConstants.ConsentTypes.Explicit,
+                        ConsentType = environment.IsEnvironment("test")
+                            ? OpenIddictConstants.ConsentTypes.Systematic
+                            : OpenIddictConstants.ConsentTypes.Explicit,
                         DisplayName = "Metabase client application",
                         DisplayNames =
                         {
@@ -162,32 +168,44 @@ namespace Metabase.Data
                         },
                         RedirectUris =
                         {
-                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"{host}/connect/callback/login/metabase")
+                            new Uri(environment.IsEnvironment("test")
+                                ? "urn:test"
+                                : $"{host}/connect/callback/login/metabase")
                         },
                         PostLogoutRedirectUris =
                         {
-                            new Uri(environment.IsEnvironment("test") ? "urn:test" : $"{host}/connect/callback/logout/metabase")
+                            new Uri(environment.IsEnvironment("test")
+                                ? "urn:test"
+                                : $"{host}/connect/callback/logout/metabase")
                         },
-                        Permissions = {
+                        Permissions =
+                        {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
                             // OpenIddictConstants.Permissions.Endpoints.Device,
                             OpenIddictConstants.Permissions.Endpoints.Introspection,
                             OpenIddictConstants.Permissions.Endpoints.Logout,
                             OpenIddictConstants.Permissions.Endpoints.Revocation,
                             OpenIddictConstants.Permissions.Endpoints.Token,
-                            environment.IsEnvironment("test") ? OpenIddictConstants.Permissions.GrantTypes.Password : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                            environment.IsEnvironment("test")
+                                ? OpenIddictConstants.Permissions.GrantTypes.Password
+                                : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                             // OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
                             // OpenIddictConstants.Permissions.GrantTypes.DeviceCode,
                             OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                            environment.IsEnvironment("test") ? OpenIddictConstants.Permissions.ResponseTypes.Token : OpenIddictConstants.Permissions.ResponseTypes.Code,
+                            environment.IsEnvironment("test")
+                                ? OpenIddictConstants.Permissions.ResponseTypes.Token
+                                : OpenIddictConstants.Permissions.ResponseTypes.Code,
                             OpenIddictConstants.Permissions.Scopes.Address,
                             OpenIddictConstants.Permissions.Scopes.Email,
                             OpenIddictConstants.Permissions.Scopes.Phone,
                             OpenIddictConstants.Permissions.Scopes.Profile,
                             OpenIddictConstants.Permissions.Scopes.Roles,
-                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ReadApiScope,
-                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.WriteApiScope,
-                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ManageUserApiScope
+                            OpenIddictConstants.Permissions.Prefixes.Scope +
+                            Configuration.AuthConfiguration.ReadApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope +
+                            Configuration.AuthConfiguration.WriteApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope +
+                            Configuration.AuthConfiguration.ManageUserApiScope
                         },
                         Requirements =
                         {
@@ -196,6 +214,7 @@ namespace Metabase.Data
                     }
                 ).ConfigureAwait(false);
             }
+
             if (await manager.FindByClientIdAsync(TestlabSolarFacadesClientId).ConfigureAwait(false) is null)
             {
                 logger.CreatingApplicationClient(TestlabSolarFacadesClientId);
@@ -221,7 +240,8 @@ namespace Metabase.Data
                         {
                             new Uri($"{host}/connect/callback/logout/metabase")
                         },
-                        Permissions = {
+                        Permissions =
+                        {
                             OpenIddictConstants.Permissions.Endpoints.Authorization,
                             // OpenIddictConstants.Permissions.Endpoints.Device,
                             OpenIddictConstants.Permissions.Endpoints.Introspection,
@@ -238,8 +258,10 @@ namespace Metabase.Data
                             OpenIddictConstants.Permissions.Scopes.Phone,
                             OpenIddictConstants.Permissions.Scopes.Profile,
                             OpenIddictConstants.Permissions.Scopes.Roles,
-                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.ReadApiScope,
-                            OpenIddictConstants.Permissions.Prefixes.Scope + Configuration.AuthConfiguration.WriteApiScope
+                            OpenIddictConstants.Permissions.Prefixes.Scope +
+                            Configuration.AuthConfiguration.ReadApiScope,
+                            OpenIddictConstants.Permissions.Prefixes.Scope +
+                            Configuration.AuthConfiguration.WriteApiScope
                         },
                         Requirements =
                         {
@@ -253,10 +275,11 @@ namespace Metabase.Data
         private static async Task RegisterScopesAsync(
             IServiceProvider services,
             ILogger<DbSeeder> logger
-            )
+        )
         {
             var manager = services.GetRequiredService<IOpenIddictScopeManager>();
-            if (await manager.FindByNameAsync(Configuration.AuthConfiguration.ReadApiScope).ConfigureAwait(false) is null)
+            if (await manager.FindByNameAsync(Configuration.AuthConfiguration.ReadApiScope)
+                    .ConfigureAwait(false) is null)
             {
                 logger.CreatingScope(Configuration.AuthConfiguration.ReadApiScope);
                 await manager.CreateAsync(
@@ -275,7 +298,9 @@ namespace Metabase.Data
                     }
                 ).ConfigureAwait(false);
             }
-            if (await manager.FindByNameAsync(Configuration.AuthConfiguration.WriteApiScope).ConfigureAwait(false) is null)
+
+            if (await manager.FindByNameAsync(Configuration.AuthConfiguration.WriteApiScope)
+                    .ConfigureAwait(false) is null)
             {
                 logger.CreatingScope(Configuration.AuthConfiguration.WriteApiScope);
                 await manager.CreateAsync(
@@ -294,7 +319,9 @@ namespace Metabase.Data
                     }
                 ).ConfigureAwait(false);
             }
-            if (await manager.FindByNameAsync(Configuration.AuthConfiguration.ManageUserApiScope).ConfigureAwait(false) is null)
+
+            if (await manager.FindByNameAsync(Configuration.AuthConfiguration.ManageUserApiScope)
+                    .ConfigureAwait(false) is null)
             {
                 logger.CreatingScope(Configuration.AuthConfiguration.ManageUserApiScope);
                 await manager.CreateAsync(

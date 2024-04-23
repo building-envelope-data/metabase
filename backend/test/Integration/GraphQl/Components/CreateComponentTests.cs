@@ -13,7 +13,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
 {
     [TestFixture]
     public sealed class CreateComponentTests
-      : ComponentIntegrationTests
+        : ComponentIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -37,7 +37,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             await UnsuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
                 variables: MinimalComponentInput
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var response = await GetComponents().ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -61,26 +61,26 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 {
                     OwnerIds = new[] { userId }
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var response = await CreateComponent(
                 input with
                 {
                     ManufacturerId = institutionId
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 testName,
                 matchOptions => matchOptions
-                .Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.createComponent.component.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                 .Assert(fieldOptions =>
-                 fieldOptions.Field<Guid>("data.createComponent.component.uuid").Should().NotBe(Guid.Empty)
-                 )
-                );
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<string>("data.createComponent.component.id").Should().NotBeNullOrWhiteSpace()
+                    )
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<Guid>("data.createComponent.component.uuid").Should().NotBe(Guid.Empty)
+                    )
+            );
         }
 
         [TestCaseSource(nameof(EnumerateComponentInputs))]
@@ -101,27 +101,27 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 {
                     OwnerIds = new[] { userId }
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(
                 input with
                 {
                     ManufacturerId = institutionId
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var response = await GetComponents().ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 testName,
                 matchOptions => matchOptions
-                .Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.components.edges[*].node.id").Should().Be(componentId)
-                 )
-                .Assert(fieldOptions =>
-                 fieldOptions.Field<Guid>("data.components.edges[*].node.uuid").Should().Be(componentUuid)
-                 )
-                );
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<string>("data.components.edges[*].node.id").Should().Be(componentId)
+                    )
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<Guid>("data.components.edges[*].node.uuid").Should().Be(componentUuid)
+                    )
+            );
         }
     }
 }

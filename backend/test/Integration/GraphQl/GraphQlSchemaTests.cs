@@ -9,7 +9,7 @@ namespace Metabase.Tests.Integration.GraphQl
 {
     [TestFixture]
     public sealed class GraphQlSchemaTests
-      : IntegrationTests
+        : IntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]

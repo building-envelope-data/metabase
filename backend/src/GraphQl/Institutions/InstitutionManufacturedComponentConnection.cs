@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionManufacturedComponentConnection
-        : ForkingConnection<Data.Institution, Data.ComponentManufacturer, PendingInstitutionManufacturedComponentsByInstitutionIdDataLoader, InstitutionManufacturedComponentsByInstitutionIdDataLoader, InstitutionManufacturedComponentEdge>
+        : ForkingConnection<Data.Institution, Data.ComponentManufacturer,
+            PendingInstitutionManufacturedComponentsByInstitutionIdDataLoader,
+            InstitutionManufacturedComponentsByInstitutionIdDataLoader, InstitutionManufacturedComponentEdge>
     {
         public InstitutionManufacturedComponentConnection(
             Data.Institution institution,
@@ -20,7 +22,7 @@ namespace Metabase.GraphQl.Institutions
                 institution,
                 pending,
                 x => new InstitutionManufacturedComponentEdge(x)
-                )
+            )
         {
         }
 
@@ -33,12 +35,12 @@ namespace Metabase.GraphQl.Institutions
         )
         {
             return ComponentAuthorization.IsAuthorizedToCreateComponentForInstitution(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                Subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
 
         [UseUserManager]
@@ -50,12 +52,12 @@ namespace Metabase.GraphQl.Institutions
         )
         {
             return ComponentManufacturerAuthorization.IsAuthorizedToConfirm(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                Subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

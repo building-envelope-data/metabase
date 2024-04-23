@@ -15,10 +15,10 @@ namespace Metabase.GraphQl.DataX
         // public IReadOnlyList<FileMetaInformation> ArchivedFilesMetaInformation { get; }
 
         public GetHttpsResource(
-          string description,
-          string hashValue,
-          Uri locator,
-          Guid dataFormatId
+            string description,
+            string hashValue,
+            Uri locator,
+            Guid dataFormatId
         )
         {
             Description = description;
@@ -28,14 +28,14 @@ namespace Metabase.GraphQl.DataX
         }
 
         public Task<Metabase.Data.DataFormat?> GetDataFormatAsync(
-                DataFormatByIdDataLoader dataFormatById,
-                CancellationToken cancellationToken
+            DataFormatByIdDataLoader dataFormatById,
+            CancellationToken cancellationToken
         )
         {
             return dataFormatById.LoadAsync(
                 DataFormatId,
                 cancellationToken
-                );
+            );
         }
     }
 }

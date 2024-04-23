@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionManagedDataFormatConnection
-        : Connection<Data.Institution, Data.DataFormat, InstitutionManagedDataFormatsByInstitutionIdDataLoader, InstitutionManagedDataFormatEdge>
+        : Connection<Data.Institution, Data.DataFormat, InstitutionManagedDataFormatsByInstitutionIdDataLoader,
+            InstitutionManagedDataFormatEdge>
     {
         public InstitutionManagedDataFormatConnection(
             Data.Institution institution
@@ -18,7 +19,7 @@ namespace Metabase.GraphQl.Institutions
             : base(
                 institution,
                 x => new InstitutionManagedDataFormatEdge(x)
-                )
+            )
         {
         }
 
@@ -31,12 +32,12 @@ namespace Metabase.GraphQl.Institutions
         )
         {
             return DataFormatAuthorization.IsAuthorizedToCreateDataFormatForInstitution(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                Subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

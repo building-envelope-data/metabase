@@ -14,30 +14,30 @@ namespace Metabase.Authorization
             UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null)
-            && await CommonAuthorization.IsOwnerOfVerifiedInstitution(
-                user,
-                institutionId,
-                context,
-                cancellationToken
-            );
+                   && await CommonAuthorization.IsOwnerOfVerifiedInstitution(
+                       user,
+                       institutionId,
+                       context,
+                       cancellationToken
+                   );
         }
 
         public static async Task<bool> IsAuthorizedToConfirm(
             ClaimsPrincipal claimsPrincipal,
             Guid userId,
             UserManager<Data.User> userManager
-            )
+        )
         {
             var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (loggedInUser is not null)
-            && CommonAuthorization.IsSame(
-                loggedInUser,
-                userId
-            );
+                   && CommonAuthorization.IsSame(
+                       loggedInUser,
+                       userId
+                   );
         }
     }
 }

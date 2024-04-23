@@ -1,4 +1,5 @@
 // TODO Compare for completeness with JSON Schema
+
 namespace Metabase.Enumerations
 {
     public enum Standardizer

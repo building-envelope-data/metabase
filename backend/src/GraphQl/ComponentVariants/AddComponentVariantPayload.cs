@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.ComponentVariants
         public AddComponentVariantPayload(
             Data.ComponentVariant componentVariant,
             Data.ComponentVariant reverseComponentVariant
-            )
+        )
         {
             VariantOfEdge = new ComponentVariantOfEdge(componentVariant);
             ReverseVariantOfEdge = new ComponentVariantOfEdge(reverseComponentVariant);
@@ -20,14 +20,14 @@ namespace Metabase.GraphQl.ComponentVariants
 
         public AddComponentVariantPayload(
             IReadOnlyCollection<AddComponentVariantError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public AddComponentVariantPayload(
             AddComponentVariantError error
-            )
+        )
             : this(new[] { error })
         {
         }

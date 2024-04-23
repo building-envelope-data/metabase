@@ -1,4 +1,3 @@
-
 using HotChocolate.Types;
 
 namespace Metabase.GraphQl.References

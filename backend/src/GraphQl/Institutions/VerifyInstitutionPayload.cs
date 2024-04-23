@@ -9,21 +9,21 @@ namespace Metabase.GraphQl.Institutions
 
         public VerifyInstitutionPayload(
             Data.Institution institution
-            )
+        )
         {
             Institution = institution;
         }
 
         public VerifyInstitutionPayload(
             IReadOnlyCollection<VerifyInstitutionError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public VerifyInstitutionPayload(
             VerifyInstitutionError error
-            )
+        )
             : this(new[] { error })
         {
         }

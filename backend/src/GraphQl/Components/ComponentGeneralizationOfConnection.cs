@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Components
 {
     public sealed class ComponentGeneralizationOfConnection
-        : Connection<Data.Component, Data.ComponentConcretizationAndGeneralization, ComponentConcretizationsByComponentIdDataLoader, ComponentGeneralizationOfEdge>
+        : Connection<Data.Component, Data.ComponentConcretizationAndGeneralization,
+            ComponentConcretizationsByComponentIdDataLoader, ComponentGeneralizationOfEdge>
     {
         public ComponentGeneralizationOfConnection(
             Data.Component subject
@@ -17,7 +18,7 @@ namespace Metabase.GraphQl.Components
             : base(
                 subject,
                 x => new ComponentGeneralizationOfEdge(x)
-                )
+            )
         {
         }
 
@@ -30,12 +31,12 @@ namespace Metabase.GraphQl.Components
         )
         {
             return ComponentGeneralizationAuthorization.IsAuthorizedToAdd(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                Subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

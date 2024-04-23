@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Metabase.Tests.Integration.GraphQl.Users
 {
     public abstract class UserIntegrationTests
-      : IntegrationTests
+        : IntegrationTests
     {
         protected Task<string> GetUser(Guid uuid)
         {
@@ -16,14 +16,14 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 {
                     ["uuid"] = uuid
                 }
-                );
+            );
         }
 
         protected Task<string> ChangeUserPassword(
             string currentPassword,
             string newPassword,
             string? newPasswordConfirmation = null
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Users/ChangeUserPassword.graphql"),
@@ -33,12 +33,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                     ["newPassword"] = newPassword,
                     ["newPasswordConfirmation"] = newPasswordConfirmation ?? newPassword
                 }
-                );
+            );
         }
 
         protected Task<string> ResendUserEmailConfirmation(
             string email
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailConfirmation.graphql"),
@@ -46,12 +46,12 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 {
                     ["email"] = email
                 }
-                );
+            );
         }
 
         protected Task<string> RequestUserPasswordReset(
             string email
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Users/RequestUserPasswordReset.graphql"),
@@ -59,7 +59,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 {
                     ["email"] = email
                 }
-                );
+            );
         }
 
         protected Task<string> ResetUserPassword(
@@ -67,7 +67,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             string password,
             string resetCode,
             string? passwordConfirmation = null
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Users/ResetUserPassword.graphql"),
@@ -78,7 +78,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                     ["passwordConfirmation"] = passwordConfirmation ?? password,
                     ["resetCode"] = resetCode
                 }
-                );
+            );
         }
 
         protected Task<string> DeletePersonalUserData(
@@ -91,7 +91,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 {
                     ["password"] = password,
                 }
-                );
+            );
         }
 
         protected Task<string> ChangeUserEmail(
@@ -104,7 +104,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 {
                     ["newEmail"] = newEmail
                 }
-                );
+            );
         }
 
         protected Task<string> ConfirmUserEmailChange(
@@ -121,14 +121,14 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                     ["newEmail"] = newEmail,
                     ["confirmationCode"] = confirmationCode
                 }
-                );
+            );
         }
 
         protected Task<string> ResendUserEmailVerification()
         {
             return SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailVerification.graphql")
-                );
+            );
         }
     }
 }

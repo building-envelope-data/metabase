@@ -33,10 +33,12 @@ namespace Metabase
         public Startup(
             IWebHostEnvironment environment,
             IConfiguration configuration
-            )
+        )
         {
             _environment = environment;
-            _appSettings = configuration.Get<AppSettings>() ?? throw new InvalidOperationException("Failed to get application settings from configuration.");
+            _appSettings = configuration.Get<AppSettings>() ??
+                           throw new InvalidOperationException(
+                               "Failed to get application settings from configuration.");
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -47,10 +49,7 @@ namespace Metabase
             ConfigureMessageSenderServices(services);
             ConfigureRequestResponseServices(services);
             ConfigureSessionServices(services);
-            services.AddAntiforgery(_ =>
-            {
-                _.HeaderName = "X-XSRF-TOKEN";
-            });
+            services.AddAntiforgery(_ => { _.HeaderName = "X-XSRF-TOKEN"; });
             services
                 .AddDataProtection()
                 .PersistKeysToDbContext<Data.ApplicationDbContext>();
@@ -68,24 +67,24 @@ namespace Metabase
         {
             // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order
             services.Configure<ForwardedHeadersOptions>(_ =>
-            {
-                // TODO _.AllowedHosts = ...
-                _.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-                // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forward-the-scheme-for-linux-and-non-iis-reverse-proxies
-                _.KnownNetworks.Clear();
-                _.KnownProxies.Clear();
-            }
+                {
+                    // TODO _.AllowedHosts = ...
+                    _.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                    // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer#forward-the-scheme-for-linux-and-non-iis-reverse-proxies
+                    _.KnownNetworks.Clear();
+                    _.KnownProxies.Clear();
+                }
             );
             services.AddCors(_ =>
                 _.AddPolicy(
                     name: GraphQlCorsPolicy,
                     policy =>
                         policy
-                        .AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                    )
-                );
+                            .AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                )
+            );
             services.AddControllersWithViews();
         }
 
@@ -105,13 +104,13 @@ namespace Metabase
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
-                {
-                    // Set a short timeout for easy testing.
-                    options.IdleTimeout = TimeSpan.FromSeconds(10);
-                    options.Cookie.HttpOnly = true;
-                    // Make the session cookie essential
-                    options.Cookie.IsEssential = true;
-                });
+            {
+                // Set a short timeout for easy testing.
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.HttpOnly = true;
+                // Make the session cookie essential
+                options.Cookie.IsEssential = true;
+            });
         }
 
         private void ConfigureDatabaseServices(IServiceCollection services)
@@ -128,17 +127,17 @@ namespace Metabase
                     dataSourceBuilder.MapEnum<Enumerations.PrimeSurface>();
                     dataSourceBuilder.MapEnum<Enumerations.Standardizer>();
                     options
-                    .UseNpgsql(dataSourceBuilder.Build() /*, optionsBuilder => optionsBuilder.UseNodaTime() */)
-                    .UseSchemaName(_appSettings.Database.SchemaName)
-                    .UseOpenIddict();
+                        .UseNpgsql(dataSourceBuilder.Build() /*, optionsBuilder => optionsBuilder.UseNodaTime() */)
+                        .UseSchemaName(_appSettings.Database.SchemaName)
+                        .UseOpenIddict();
                     if (!_environment.IsProduction())
                     {
                         options
-                        .EnableSensitiveDataLogging()
-                        .EnableDetailedErrors();
+                            .EnableSensitiveDataLogging()
+                            .EnableDetailedErrors();
                     }
                 }
-                );
+            );
             // Database context as services are used by `Identity` and `OpenIddict`.
             services.AddDbContext<Data.ApplicationDbContext>(
                 (services, options) =>
@@ -146,15 +145,16 @@ namespace Metabase
                     if (!_environment.IsProduction())
                     {
                         options
-                        .EnableSensitiveDataLogging()
-                        .EnableDetailedErrors();
+                            .EnableSensitiveDataLogging()
+                            .EnableDetailedErrors();
                     }
+
                     services
-                    .GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
-                    .CreateDbContext();
+                        .GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
+                        .CreateDbContext();
                 },
                 ServiceLifetime.Transient
-                );
+            );
         }
 
         private static void ConfigureHttpClientServices(IServiceCollection services)
@@ -195,6 +195,7 @@ namespace Metabase
                 // https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl
                 // app.UseHsts(); // Done by NGINX, see https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
             }
+
             // app.UseStatusCodePages();
             // app.UseHttpsRedirection(); // Done by NGINX
             app.UseSerilogRequestLogging();
@@ -217,25 +218,26 @@ namespace Metabase
             // app.UseResponseCaching(); // Done by Nginx
             /* app.UseWebSockets(); */
             app.MapGraphQL()
-               .WithOptions(
-                   // https://chillicream.com/docs/hotchocolate/server/middleware
-                   new GraphQLServerOptions
-                   {
-                       EnableSchemaRequests = true,
-                       EnableGetRequests = false,
-                       // AllowedGetOperations = AllowedGetOperations.Query
-                       EnableMultipartRequests = false,
-                       Tool = {
-                           DisableTelemetry = true,
-                           Enable = true, // _environment.IsDevelopment()
-                           IncludeCookies = false,
-                           GraphQLEndpoint = "/graphql",
-                           HttpMethod = DefaultHttpMethod.Post,
-                           Title = "GraphQL"
-                       }
-                   }
-               )
-               .RequireCors(GraphQlCorsPolicy);
+                .WithOptions(
+                    // https://chillicream.com/docs/hotchocolate/server/middleware
+                    new GraphQLServerOptions
+                    {
+                        EnableSchemaRequests = true,
+                        EnableGetRequests = false,
+                        // AllowedGetOperations = AllowedGetOperations.Query
+                        EnableMultipartRequests = false,
+                        Tool =
+                        {
+                            DisableTelemetry = true,
+                            Enable = true, // _environment.IsDevelopment()
+                            IncludeCookies = false,
+                            GraphQLEndpoint = "/graphql",
+                            HttpMethod = DefaultHttpMethod.Post,
+                            Title = "GraphQL"
+                        }
+                    }
+                )
+                .RequireCors(GraphQlCorsPolicy);
             app.MapControllers();
             app.MapHealthChecks("/health",
                 new HealthCheckOptions
@@ -271,6 +273,7 @@ namespace Metabase
                     {
                         jsonWriter.WriteStringValue(tag);
                     }
+
                     jsonWriter.WriteEndArray();
                     var exception = healthReportEntry.Value.Exception;
                     if (exception is not null)
@@ -281,20 +284,25 @@ namespace Metabase
                         {
                             jsonWriter.WriteString("stackTrace", exception.StackTrace);
                         }
+
                         if (exception.InnerException is not null)
                         {
                             jsonWriter.WriteString("innerException", exception.InnerException.ToString());
                         }
+
                         if (exception.Source is not null)
                         {
                             jsonWriter.WriteString("source", exception.Source);
                         }
+
                         if (exception.TargetSite is not null)
                         {
                             jsonWriter.WriteString("targetSite", exception.TargetSite.ToString());
                         }
+
                         jsonWriter.WriteEndObject();
                     }
+
                     jsonWriter.WriteStartObject("data");
                     foreach (var item in healthReportEntry.Value.Data)
                     {
@@ -302,12 +310,15 @@ namespace Metabase
                         JsonSerializer.Serialize(jsonWriter, item.Value,
                             item.Value?.GetType() ?? typeof(object));
                     }
+
                     jsonWriter.WriteEndObject();
                     jsonWriter.WriteEndObject();
                 }
+
                 jsonWriter.WriteEndObject();
                 jsonWriter.WriteEndObject();
             }
+
             return context.Response.WriteAsync(
                 Encoding.UTF8.GetString(memoryStream.ToArray()));
         }

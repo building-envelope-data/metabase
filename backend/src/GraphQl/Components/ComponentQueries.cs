@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.Components
         [UseSorting]
         public IQueryable<Data.Component> GetComponents(
             Data.ApplicationDbContext context
-            )
+        )
         {
             return context.Components;
         }
@@ -27,12 +27,12 @@ namespace Metabase.GraphQl.Components
             Guid uuid,
             ComponentByIdDataLoader componentById,
             CancellationToken cancellationToken
-            )
+        )
         {
             return componentById.LoadAsync(
                 uuid,
                 cancellationToken
-                );
+            );
         }
     }
 }

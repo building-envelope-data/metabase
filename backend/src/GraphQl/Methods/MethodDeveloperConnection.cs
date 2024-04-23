@@ -19,7 +19,7 @@ namespace Metabase.GraphQl.Methods
         public MethodDeveloperConnection(
             Data.Method subject,
             bool pending
-            )
+        )
         {
             _subject = subject;
             _pending = pending;
@@ -31,28 +31,28 @@ namespace Metabase.GraphQl.Methods
             PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
             PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
             CancellationToken cancellationToken
-            )
+        )
         {
             return
                 (await new InstitutionMethodDeveloperConnection(_subject, _pending)
-                .GetEdgesAsync(
-                    pendingInstitutionMethodDevelopersDataLoader,
-                    institutionMethodDevelopersDataLoader,
-                    cancellationToken
+                    .GetEdgesAsync(
+                        pendingInstitutionMethodDevelopersDataLoader,
+                        institutionMethodDevelopersDataLoader,
+                        cancellationToken
                     )
-                .ConfigureAwait(false)
+                    .ConfigureAwait(false)
                 )
                 .Select(e => new MethodDeveloperEdge(e))
                 .Concat(
-                (await new UserMethodDeveloperConnection(_subject, _pending)
-                .GetEdgesAsync(
-                    pendingUserMethodDevelopersDataLoader,
-                    userMethodDevelopersDataLoader,
-                    cancellationToken
+                    (await new UserMethodDeveloperConnection(_subject, _pending)
+                        .GetEdgesAsync(
+                            pendingUserMethodDevelopersDataLoader,
+                            userMethodDevelopersDataLoader,
+                            cancellationToken
+                        )
+                        .ConfigureAwait(false)
                     )
-                .ConfigureAwait(false)
-                )
-                .Select(e => new MethodDeveloperEdge(e))
+                    .Select(e => new MethodDeveloperEdge(e))
                 );
         }
 
@@ -65,12 +65,12 @@ namespace Metabase.GraphQl.Methods
         )
         {
             return InstitutionMethodDeveloperAuthorization.IsAuthorizedToAdd(
-                 claimsPrincipal,
-                 _subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
 
         [UseUserManager]
@@ -82,17 +82,19 @@ namespace Metabase.GraphQl.Methods
         )
         {
             return UserMethodDeveloperAuthorization.IsAuthorizedToAdd(
-                 claimsPrincipal,
-                 _subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 
     internal sealed class InstitutionMethodDeveloperConnection
-        : ForkingConnection<Data.Method, Data.InstitutionMethodDeveloper, PendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDeveloperEdge>
+        : ForkingConnection<Data.Method, Data.InstitutionMethodDeveloper,
+            PendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDevelopersByMethodIdDataLoader,
+            InstitutionMethodDeveloperEdge>
     {
         public InstitutionMethodDeveloperConnection(
             Data.Method subject,
@@ -102,13 +104,14 @@ namespace Metabase.GraphQl.Methods
                 subject,
                 pending,
                 x => new InstitutionMethodDeveloperEdge(x)
-                )
+            )
         {
         }
     }
 
     internal sealed class UserMethodDeveloperConnection
-        : ForkingConnection<Data.Method, Data.UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader, UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>
+        : ForkingConnection<Data.Method, Data.UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader,
+            UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>
     {
         public UserMethodDeveloperConnection(
             Data.Method subject,
@@ -118,7 +121,7 @@ namespace Metabase.GraphQl.Methods
                 subject,
                 pending,
                 x => new UserMethodDeveloperEdge(x)
-                )
+            )
         {
         }
     }

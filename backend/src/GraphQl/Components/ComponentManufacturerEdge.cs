@@ -13,6 +13,7 @@ namespace Metabase.GraphQl.Components
         : Edge<Data.Institution, InstitutionByIdDataLoader>
     {
         private readonly Data.ComponentManufacturer _association;
+
         public ComponentManufacturerEdge(
             Data.ComponentManufacturer association
         )
@@ -30,12 +31,12 @@ namespace Metabase.GraphQl.Components
         )
         {
             return ComponentManufacturerAuthorization.IsAuthorizedToConfirm(
-                 claimsPrincipal,
-                 _association.InstitutionId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _association.InstitutionId,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
 
         [UseUserManager]
@@ -47,12 +48,12 @@ namespace Metabase.GraphQl.Components
         )
         {
             return ComponentManufacturerAuthorization.IsAuthorizedToRemove(
-                 claimsPrincipal,
-                 _association.InstitutionId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _association.InstitutionId,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

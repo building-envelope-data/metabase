@@ -12,7 +12,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
 {
     [TestFixture]
     public sealed class CreateInstitutionTests
-      : InstitutionIntegrationTests
+        : InstitutionIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -36,7 +36,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             await UnsuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
                 variables: PendingInstitutionInput
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var response = await GetInstitutions().ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
@@ -60,19 +60,20 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
                 {
                     OwnerIds = new[] { userId }
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 testName,
                 matchOptions => matchOptions
-                .Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.createInstitution.institution.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                 .Assert(fieldOptions =>
-                 fieldOptions.Field<Guid>("data.createInstitution.institution.uuid").Should().NotBe(Guid.Empty)
-                 )
-                );
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<string>("data.createInstitution.institution.id").Should()
+                            .NotBeNullOrWhiteSpace()
+                    )
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<Guid>("data.createInstitution.institution.uuid").Should().NotBe(Guid.Empty)
+                    )
+            );
         }
 
         [TestCaseSource(nameof(EnumerateInstitutionInputs))]
@@ -93,20 +94,20 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
                 {
                     OwnerIds = new[] { userId }
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var response = await GetInstitutions().ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 testName,
                 matchOptions => matchOptions
-                .Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.institutions.edges[*].node.id").Should().Be(institutionId)
-                 )
-                .Assert(fieldOptions =>
-                 fieldOptions.Field<Guid>("data.institutions.edges[*].node.uuid").Should().Be(institutionUuid)
-                 )
-                );
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<string>("data.institutions.edges[*].node.id").Should().Be(institutionId)
+                    )
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<Guid>("data.institutions.edges[*].node.uuid").Should().Be(institutionUuid)
+                    )
+            );
         }
     }
 }

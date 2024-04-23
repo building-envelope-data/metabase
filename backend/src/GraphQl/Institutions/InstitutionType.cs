@@ -11,16 +11,17 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionType
-      : EntityType<Data.Institution, InstitutionByIdDataLoader>
+        : EntityType<Data.Institution, InstitutionByIdDataLoader>
     {
         protected override void Configure(
             IObjectTypeDescriptor<Data.Institution> descriptor
-            )
+        )
         {
             base.Configure(descriptor);
             descriptor
                 .Field(t => t.DevelopedMethods)
-                .Argument(nameof(Data.InstitutionMethodDeveloper.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
+                .Argument(nameof(Data.InstitutionMethodDeveloper.Pending).FirstCharToLower(),
+                    _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
                 .Type<NonNullType<ObjectType<InstitutionDevelopedMethodConnection>>>()
                 .Resolve(context =>
                     new InstitutionDevelopedMethodConnection(
@@ -33,14 +34,15 @@ namespace Metabase.GraphQl.Institutions
                 .Ignore();
             descriptor
                 .Field(t => t.ManufacturedComponents)
-                .Argument(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
+                .Argument(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower(),
+                    _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
                 .Type<NonNullType<ObjectType<InstitutionManufacturedComponentConnection>>>()
                 .Resolve(context =>
                     new InstitutionManufacturedComponentConnection(
                         context.Parent<Data.Institution>(),
                         context.ArgumentValue<bool>(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower())
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.ManufacturedComponentEdges)
                 .Ignore();
@@ -50,7 +52,7 @@ namespace Metabase.GraphQl.Institutions
                 .Resolve(context =>
                     new InstitutionManagedDataFormatConnection(
                         context.Parent<Data.Institution>()
-                        )
+                    )
                 );
             descriptor
                 .Field(t => t.ManagedInstitutions)
@@ -58,7 +60,7 @@ namespace Metabase.GraphQl.Institutions
                 .Resolve(context =>
                     new InstitutionManagedInstitutionConnection(
                         context.Parent<Data.Institution>()
-                        )
+                    )
                 );
             descriptor
                 .Field(t => t.ManagedMethods)
@@ -88,53 +90,60 @@ namespace Metabase.GraphQl.Institutions
                 .Resolve(context =>
                     new InstitutionOperatedDatabaseConnection(
                         context.Parent<Data.Institution>()
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.Representatives)
-                .Argument(nameof(Data.InstitutionRepresentative.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
+                .Argument(nameof(Data.InstitutionRepresentative.Pending).FirstCharToLower(),
+                    _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
                 .Type<NonNullType<ObjectType<InstitutionRepresentativeConnection>>>()
                 .Resolve(context =>
                     new InstitutionRepresentativeConnection(
                         context.Parent<Data.Institution>(),
                         context.ArgumentValue<bool>(nameof(Data.InstitutionRepresentative.Pending).FirstCharToLower())
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.RepresentativeEdges)
                 .Ignore();
             descriptor
-              .Field("canCurrentUserUpdateNode")
-              .ResolveWith<InstitutionResolvers>(x => InstitutionResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
-              .UseUserManager();
+                .Field("canCurrentUserUpdateNode")
+                .ResolveWith<InstitutionResolvers>(x =>
+                    InstitutionResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!,
+                        default!))
+                .UseUserManager();
             descriptor
-              .Field("canCurrentUserDeleteNode")
-              .ResolveWith<InstitutionResolvers>(x => InstitutionResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!, default!))
-              .UseUserManager();
+                .Field("canCurrentUserDeleteNode")
+                .ResolveWith<InstitutionResolvers>(x =>
+                    InstitutionResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!,
+                        default!))
+                .UseUserManager();
         }
 
         private sealed class InstitutionResolvers
         {
             public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-              [Parent] Data.Institution institution,
-              ClaimsPrincipal claimsPrincipal,
-              [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-              Data.ApplicationDbContext context,
-              CancellationToken cancellationToken
+                [Parent] Data.Institution institution,
+                ClaimsPrincipal claimsPrincipal,
+                [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+                Data.ApplicationDbContext context,
+                CancellationToken cancellationToken
             )
             {
-                return InstitutionAuthorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, userManager, context, cancellationToken);
+                return InstitutionAuthorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id,
+                    userManager, context, cancellationToken);
             }
 
             public static Task<bool> GetCanCurrentUserDeleteNodeAsync(
-              [Parent] Data.Institution institution,
-              ClaimsPrincipal claimsPrincipal,
-              [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-              Data.ApplicationDbContext context,
-              CancellationToken cancellationToken
+                [Parent] Data.Institution institution,
+                ClaimsPrincipal claimsPrincipal,
+                [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+                Data.ApplicationDbContext context,
+                CancellationToken cancellationToken
             )
             {
-                return InstitutionAuthorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id, userManager, context, cancellationToken);
+                return InstitutionAuthorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id,
+                    userManager, context, cancellationToken);
             }
         }
     }

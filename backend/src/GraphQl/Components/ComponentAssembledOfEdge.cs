@@ -13,8 +13,16 @@ namespace Metabase.GraphQl.Components
         : Edge<Data.Component, ComponentByIdDataLoader>
     {
         private readonly Data.ComponentAssembly _association;
-        public byte? Index { get => _association.Index; }
-        public PrimeSurface? PrimeSurface { get => _association.PrimeSurface; }
+
+        public byte? Index
+        {
+            get => _association.Index;
+        }
+
+        public PrimeSurface? PrimeSurface
+        {
+            get => _association.PrimeSurface;
+        }
 
         public ComponentAssembledOfEdge(
             Data.ComponentAssembly association
@@ -33,13 +41,13 @@ namespace Metabase.GraphQl.Components
         )
         {
             return ComponentAssemblyAuthorization.IsAuthorizedToManage(
-                 claimsPrincipal,
-                 _association.AssembledComponentId,
-                 _association.PartComponentId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _association.AssembledComponentId,
+                _association.PartComponentId,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
 
         [UseUserManager]
@@ -51,13 +59,13 @@ namespace Metabase.GraphQl.Components
         )
         {
             return ComponentAssemblyAuthorization.IsAuthorizedToManage(
-                 claimsPrincipal,
-                 _association.AssembledComponentId,
-                 _association.PartComponentId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _association.AssembledComponentId,
+                _association.PartComponentId,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

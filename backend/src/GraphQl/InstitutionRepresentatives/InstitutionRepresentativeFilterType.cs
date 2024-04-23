@@ -3,11 +3,11 @@ using HotChocolate.Data.Filters;
 namespace Metabase.GraphQl.InstitutionRepresentatives
 {
     public sealed class InstitutionRepresentativeFilterType
-      : FilterInputType<Data.InstitutionRepresentative>
+        : FilterInputType<Data.InstitutionRepresentative>
     {
         protected override void Configure(
-          IFilterInputTypeDescriptor<Data.InstitutionRepresentative> descriptor
-          )
+            IFilterInputTypeDescriptor<Data.InstitutionRepresentative> descriptor
+        )
         {
             descriptor.BindFieldsExplicitly();
             descriptor.Field(x => x.Institution);

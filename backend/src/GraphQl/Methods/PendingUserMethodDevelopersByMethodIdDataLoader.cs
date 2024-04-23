@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 namespace Metabase.GraphQl.Methods
 {
     public sealed class PendingUserMethodDevelopersByMethodIdDataLoader
-      : Entities.AssociationsByAssociateIdDataLoader<Data.UserMethodDeveloper>
+        : Entities.AssociationsByAssociateIdDataLoader<Data.UserMethodDeveloper>
     {
         public PendingUserMethodDevelopersByMethodIdDataLoader(
             IBatchScheduler batchScheduler,
             DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
-            )
+        )
             : base(
                 batchScheduler,
                 options,
@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.Methods
                         x.Pending && ids.Contains(x.MethodId)
                     ),
                 x => x.MethodId
-                )
+            )
         {
         }
     }

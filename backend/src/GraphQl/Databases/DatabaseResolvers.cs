@@ -43,7 +43,8 @@ namespace Metabase.GraphQl.Databases
         [LoggerMessage(
             EventId = 2,
             Level = LogLevel.Error,
-            Message = "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.")]
+            Message =
+                "Failed to deserialize GraphQL response of request to {Locator} for {Request}. The details given are: Zero-based number of bytes read within the current line before the exception are {BytePositionInLine}, zero-based number of lines read before the exception are {LineNumber}, message that describes the current exception is '{Message}', path within the JSON where the exception was encountered is {Path}.")]
         public static partial void FailedToDeserialize(
             this ILogger logger,
             Exception exception,
@@ -71,83 +72,116 @@ namespace Metabase.GraphQl.Databases
     {
         private const string IgsdbUrl = "https://igsdb-v2.herokuapp.com/graphql/";
 
-        private static readonly string[] _dataFileNames = new[] {
-                            "DataFields.graphql",
-                            "Data.graphql"
-                        };
-        private static readonly string[] _opticalDataFileNames = new[] {
-                            "DataFields.graphql",
-                            "OpticalDataFields.graphql",
-                            "OpticalData.graphql"
-                        };
-        private static readonly string[] _hygrothermalDataFileNames = new[] {
-                            "DataFields.graphql",
-                            "HygrothermalDataFields.graphql",
-                            "HygrothermalData.graphql"
-                        };
-        private static readonly string[] _calorimetricDataFileNames = new[] {
-                            "DataFields.graphql",
-                            "CalorimetricDataFields.graphql",
-                            "CalorimetricData.graphql"
-                        };
-        private static readonly string[] _photovoltaicDataFileNames = new[] {
-                            "DataFields.graphql",
-                            "PhotovoltaicDataFields.graphql",
-                            "PhotovoltaicData.graphql"
-                        };
-        private static readonly string[] _igsdbAllDataFileNames = new[] {
-                              "DataFields.graphql",
-                              "AllDataX.graphql"
-                          };
-        private static readonly string[] _allDataFileNames = new[] {
-                              "DataFields.graphql",
-                              "PageInfoFields.graphql",
-                              "AllData.graphql"
-                          };
-        private static readonly string[] _igsdbAllOpticalDataFileNames = new[] {
-                              "DataFields.graphql",
-                              "OpticalDataFields.graphql",
-                              "AllOpticalDataX.graphql"
-                          };
-        private static readonly string[] _allOpticalDataFileNames = new[] {
-                              "DataFields.graphql",
-                              "OpticalDataFields.graphql",
-                              "PageInfoFields.graphql",
-                              "AllOpticalData.graphql"
-                          };
-        private static readonly string[] _allHygrothermalDataFileNames = new[] {
-                            "DataFields.graphql",
-                            "HygrothermalDataFields.graphql",
-                            "PageInfoFields.graphql",
-                            "AllHygrothermalData.graphql"
-                        };
-        private static readonly string[] _allCalorimetricDataFileNames = new[] {
-                            "DataFields.graphql",
-                            "CalorimetricDataFields.graphql",
-                            "PageInfoFields.graphql",
-                            "AllCalorimetricData.graphql"
-                        };
-        private static readonly string[] _allPhotovoltaicDataFileNames = new[] {
-                            "DataFields.graphql",
-                            "PhotovoltaicDataFields.graphql",
-                            "PageInfoFields.graphql",
-                            "AllPhotovoltaicData.graphql"
-                        };
-        private static readonly string[] _hasDataFileNames = new[] {
-                            "HasData.graphql"
-                        };
-        private static readonly string[] _hasOpticalDataFileNames = new[] {
-                            "HasOpticalData.graphql"
-                        };
-        private static readonly string[] _hasCalorimetricDataFileNames = new[] {
-                            "HasCalorimetricData.graphql"
-                        };
-        private static readonly string[] _hasHygrothermalDataFileNames = new[] {
-                            "HasHygrothermalData.graphql"
-                        };
-        private static readonly string[] _hasPhotovoltaicDataFileNames = new[] {
-                            "HasPhotovoltaicData.graphql"
-                        };
+        private static readonly string[] _dataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "Data.graphql"
+        };
+
+        private static readonly string[] _opticalDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "OpticalDataFields.graphql",
+            "OpticalData.graphql"
+        };
+
+        private static readonly string[] _hygrothermalDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "HygrothermalDataFields.graphql",
+            "HygrothermalData.graphql"
+        };
+
+        private static readonly string[] _calorimetricDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "CalorimetricDataFields.graphql",
+            "CalorimetricData.graphql"
+        };
+
+        private static readonly string[] _photovoltaicDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "PhotovoltaicDataFields.graphql",
+            "PhotovoltaicData.graphql"
+        };
+
+        private static readonly string[] _igsdbAllDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "AllDataX.graphql"
+        };
+
+        private static readonly string[] _allDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "PageInfoFields.graphql",
+            "AllData.graphql"
+        };
+
+        private static readonly string[] _igsdbAllOpticalDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "OpticalDataFields.graphql",
+            "AllOpticalDataX.graphql"
+        };
+
+        private static readonly string[] _allOpticalDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "OpticalDataFields.graphql",
+            "PageInfoFields.graphql",
+            "AllOpticalData.graphql"
+        };
+
+        private static readonly string[] _allHygrothermalDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "HygrothermalDataFields.graphql",
+            "PageInfoFields.graphql",
+            "AllHygrothermalData.graphql"
+        };
+
+        private static readonly string[] _allCalorimetricDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "CalorimetricDataFields.graphql",
+            "PageInfoFields.graphql",
+            "AllCalorimetricData.graphql"
+        };
+
+        private static readonly string[] _allPhotovoltaicDataFileNames = new[]
+        {
+            "DataFields.graphql",
+            "PhotovoltaicDataFields.graphql",
+            "PageInfoFields.graphql",
+            "AllPhotovoltaicData.graphql"
+        };
+
+        private static readonly string[] _hasDataFileNames = new[]
+        {
+            "HasData.graphql"
+        };
+
+        private static readonly string[] _hasOpticalDataFileNames = new[]
+        {
+            "HasOpticalData.graphql"
+        };
+
+        private static readonly string[] _hasCalorimetricDataFileNames = new[]
+        {
+            "HasCalorimetricData.graphql"
+        };
+
+        private static readonly string[] _hasHygrothermalDataFileNames = new[]
+        {
+            "HasHygrothermalData.graphql"
+        };
+
+        private static readonly string[] _hasPhotovoltaicDataFileNames = new[]
+        {
+            "HasPhotovoltaicData.graphql"
+        };
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<DatabaseResolvers> _logger;
@@ -162,25 +196,27 @@ namespace Metabase.GraphQl.Databases
         }
 
         public Task<bool> GetCanCurrentUserUpdateNodeAsync(
-          [Parent] Data.Database database,
-          ClaimsPrincipal claimsPrincipal,
-          [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-          Data.ApplicationDbContext context,
-          CancellationToken cancellationToken
+            [Parent] Data.Database database,
+            ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
         )
         {
-            return DatabaseAuthorization.IsAuthorizedToUpdate(claimsPrincipal, database.Id, userManager, context, cancellationToken);
+            return DatabaseAuthorization.IsAuthorizedToUpdate(claimsPrincipal, database.Id, userManager, context,
+                cancellationToken);
         }
 
         public Task<bool> GetCanCurrentUserVerifyNodeAsync(
-          [Parent] Data.Database database,
-          ClaimsPrincipal claimsPrincipal,
-          [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-          Data.ApplicationDbContext context,
-          CancellationToken cancellationToken
+            [Parent] Data.Database database,
+            ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            Data.ApplicationDbContext context,
+            CancellationToken cancellationToken
         )
         {
-            return DatabaseAuthorization.IsAuthorizedToVerify(claimsPrincipal, database.Id, userManager, context, cancellationToken);
+            return DatabaseAuthorization.IsAuthorizedToVerify(claimsPrincipal, database.Id, userManager, context,
+                cancellationToken);
         }
 
         private sealed class DataData
@@ -199,24 +235,24 @@ namespace Metabase.GraphQl.Databases
         )
         {
             return (await QueryDatabase<DataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _dataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        id,
-                        timestamp,
-                        locale,
-                    },
-                    operationName: "Data"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.Data;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _dataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                id,
+                                timestamp,
+                                locale,
+                            },
+                            operationName: "Data"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.Data;
         }
 
         private sealed class OpticalDataData
@@ -235,24 +271,24 @@ namespace Metabase.GraphQl.Databases
         )
         {
             return (await QueryDatabase<OpticalDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _opticalDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        id,
-                        timestamp,
-                        locale,
-                    },
-                    operationName: "OpticalData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.OpticalData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _opticalDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                id,
+                                timestamp,
+                                locale,
+                            },
+                            operationName: "OpticalData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.OpticalData;
         }
 
         private sealed class HygrothermalDataData
@@ -271,24 +307,24 @@ namespace Metabase.GraphQl.Databases
         )
         {
             return (await QueryDatabase<HygrothermalDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _hygrothermalDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        id,
-                        timestamp,
-                        locale,
-                    },
-                    operationName: "HygrothermalData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.HygrothermalData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _hygrothermalDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                id,
+                                timestamp,
+                                locale,
+                            },
+                            operationName: "HygrothermalData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.HygrothermalData;
         }
 
         private sealed class CalorimetricDataData
@@ -307,24 +343,24 @@ namespace Metabase.GraphQl.Databases
         )
         {
             return (await QueryDatabase<CalorimetricDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _calorimetricDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        id,
-                        timestamp,
-                        locale,
-                    },
-                    operationName: "CalorimetricData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.CalorimetricData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _calorimetricDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                id,
+                                timestamp,
+                                locale,
+                            },
+                            operationName: "CalorimetricData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.CalorimetricData;
         }
 
         private sealed class PhotovoltaicDataData
@@ -343,24 +379,24 @@ namespace Metabase.GraphQl.Databases
         )
         {
             return (await QueryDatabase<PhotovoltaicDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _photovoltaicDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        id,
-                        timestamp,
-                        locale,
-                    },
-                    operationName: "PhotovoltaicData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.PhotovoltaicData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _photovoltaicDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                id,
+                                timestamp,
+                                locale,
+                            },
+                            operationName: "PhotovoltaicData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.PhotovoltaicData;
         }
 
         private sealed class AllDataData
@@ -380,46 +416,50 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             var dataConnection = (await QueryDatabase<AllDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        database.Locator.AbsoluteUri == IgsdbUrl
-                        ? _igsdbAllDataFileNames : _allDataFileNames).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where = RewriteDataPropositionInput(where, database),
-                        timestamp,
-                        locale,
-                        first,
-                        after,
-                        last,
-                        before
-                    },
-                    operationName: "AllData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.AllData;
-            return dataConnection is null ? null : new DataX.DataConnection(
-                dataConnection.Edges,
-                dataConnection.Nodes,
-                dataConnection.TotalCount,
-                dataConnection.Timestamp
-            );
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                database.Locator.AbsoluteUri == IgsdbUrl
+                                    ? _igsdbAllDataFileNames
+                                    : _allDataFileNames).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where = RewriteDataPropositionInput(where, database),
+                                timestamp,
+                                locale,
+                                first,
+                                after,
+                                last,
+                                before
+                            },
+                            operationName: "AllData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllData;
+            return dataConnection is null
+                ? null
+                : new DataX.DataConnection(
+                    dataConnection.Edges,
+                    dataConnection.Nodes,
+                    dataConnection.TotalCount,
+                    dataConnection.Timestamp
+                );
         }
 
         private static DataX.DataPropositionInput? RewriteDataPropositionInput(
             DataX.DataPropositionInput? where,
             Data.Database database
-            )
+        )
         {
             return database.Locator.AbsoluteUri == IgsdbUrl
-                ? (where ?? new DataX.DataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null))
+                ? (where ?? new DataX.DataPropositionInput(null, null, null, null, null, null, null, null, null, null,
+                    null, null, null, null))
                 : where;
         }
 
@@ -440,40 +480,42 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await QueryDatabase<AllOpticalDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        database.Locator.AbsoluteUri == IgsdbUrl
-                        ? _igsdbAllOpticalDataFileNames : _allOpticalDataFileNames).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where = RewriteOpticalDataPropositionInput(where, database),
-                        timestamp,
-                        locale,
-                        first,
-                        after,
-                        last,
-                        before
-                    },
-                    operationName: "AllOpticalData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.AllOpticalData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                database.Locator.AbsoluteUri == IgsdbUrl
+                                    ? _igsdbAllOpticalDataFileNames
+                                    : _allOpticalDataFileNames).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where = RewriteOpticalDataPropositionInput(where, database),
+                                timestamp,
+                                locale,
+                                first,
+                                after,
+                                last,
+                                before
+                            },
+                            operationName: "AllOpticalData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllOpticalData;
         }
 
         private static DataX.OpticalDataPropositionInput? RewriteOpticalDataPropositionInput(
             DataX.OpticalDataPropositionInput? where,
             Data.Database database
-            )
+        )
         {
             return database.Locator.AbsoluteUri == IgsdbUrl
-                ? (where ?? new DataX.OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null))
+                ? (where ?? new DataX.OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null,
+                    null, null, null))
                 : where;
         }
 
@@ -494,31 +536,31 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await QueryDatabase<AllHygrothermalDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _allHygrothermalDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where,
-                        timestamp,
-                        locale,
-                        first,
-                        after,
-                        last,
-                        before
-                    },
-                    operationName: "AllHygrothermalData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.AllHygrothermalData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _allHygrothermalDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where,
+                                timestamp,
+                                locale,
+                                first,
+                                after,
+                                last,
+                                before
+                            },
+                            operationName: "AllHygrothermalData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllHygrothermalData;
         }
 
         private sealed class AllCalorimetricDataData
@@ -538,31 +580,31 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await QueryDatabase<AllCalorimetricDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _allCalorimetricDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where,
-                        timestamp,
-                        locale,
-                        first,
-                        after,
-                        last,
-                        before
-                    },
-                    operationName: "AllCalorimetricData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.AllCalorimetricData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _allCalorimetricDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where,
+                                timestamp,
+                                locale,
+                                first,
+                                after,
+                                last,
+                                before
+                            },
+                            operationName: "AllCalorimetricData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllCalorimetricData;
         }
 
         private sealed class AllPhotovoltaicDataData
@@ -582,31 +624,31 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await QueryDatabase<AllPhotovoltaicDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _allPhotovoltaicDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where,
-                        timestamp,
-                        locale,
-                        first,
-                        after,
-                        last,
-                        before
-                    },
-                    operationName: "AllPhotovoltaicData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.AllPhotovoltaicData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _allPhotovoltaicDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where,
+                                timestamp,
+                                locale,
+                                first,
+                                after,
+                                last,
+                                before
+                            },
+                            operationName: "AllPhotovoltaicData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllPhotovoltaicData;
         }
 
         private sealed class HasDataData
@@ -622,27 +664,27 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await QueryDatabase<HasDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _hasDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where = RewriteDataPropositionInput(where, database),
-                        timestamp,
-                        locale
-                    },
-                    operationName: "HasData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.HasData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _hasDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where = RewriteDataPropositionInput(where, database),
+                                timestamp,
+                                locale
+                            },
+                            operationName: "HasData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.HasData;
         }
 
         private sealed class HasOpticalDataData
@@ -658,27 +700,27 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await QueryDatabase<HasOpticalDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _hasOpticalDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where = RewriteOpticalDataPropositionInput(where, database),
-                        timestamp,
-                        locale
-                    },
-                    operationName: "HasOpticalData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.HasOpticalData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _hasOpticalDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where = RewriteOpticalDataPropositionInput(where, database),
+                                timestamp,
+                                locale
+                            },
+                            operationName: "HasOpticalData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.HasOpticalData;
         }
 
         private sealed class HasCalorimetricDataData
@@ -694,27 +736,27 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await QueryDatabase<HasCalorimetricDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _hasCalorimetricDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where,
-                        timestamp,
-                        locale
-                    },
-                    operationName: "HasCalorimetricData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.HasCalorimetricData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _hasCalorimetricDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where,
+                                timestamp,
+                                locale
+                            },
+                            operationName: "HasCalorimetricData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.HasCalorimetricData;
         }
 
         private sealed class HasHygrothermalDataData
@@ -730,27 +772,27 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await QueryDatabase<HasHygrothermalDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _hasHygrothermalDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where,
-                        timestamp,
-                        locale
-                    },
-                    operationName: "HasHygrothermalData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.HasHygrothermalData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _hasHygrothermalDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where,
+                                timestamp,
+                                locale
+                            },
+                            operationName: "HasHygrothermalData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.HasHygrothermalData;
         }
 
         private sealed class HasPhotovoltaicDataData
@@ -766,39 +808,39 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (await QueryDatabase<HasPhotovoltaicDataData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _hasPhotovoltaicDataFileNames
-                    ).ConfigureAwait(false),
-                    variables: new
-                    {
-                        where,
-                        timestamp,
-                        locale
-                    },
-                    operationName: "HasPhotovoltaicData"
-                ),
-                httpContextAccessor,
-                resolverContext,
-                cancellationToken
-            ).ConfigureAwait(false)
-            )?.HasPhotovoltaicData;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _hasPhotovoltaicDataFileNames
+                            ).ConfigureAwait(false),
+                            variables: new
+                            {
+                                where,
+                                timestamp,
+                                locale
+                            },
+                            operationName: "HasPhotovoltaicData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.HasPhotovoltaicData;
         }
 
         private async
-          Task<TGraphQlResponse?>
-          QueryDatabase<TGraphQlResponse>(
-            Data.Database database,
-            GraphQL.GraphQLRequest request,
-            IHttpContextAccessor httpContextAccessor,
-            IResolverContext resolverContext,
-            CancellationToken cancellationToken
+            Task<TGraphQlResponse?>
+            QueryDatabase<TGraphQlResponse>(
+                Data.Database database,
+                GraphQL.GraphQLRequest request,
+                IHttpContextAccessor httpContextAccessor,
+                IResolverContext resolverContext,
+                CancellationToken cancellationToken
             )
-          where TGraphQlResponse : class
+            where TGraphQlResponse : class
         {
             try
             {
@@ -812,12 +854,14 @@ namespace Metabase.GraphQl.Databases
                     );
                 if (deserializedGraphQlResponse.Errors?.Length >= 1)
                 {
-                    _logger.FailedWithErrors(JsonSerializer.Serialize(deserializedGraphQlResponse.Errors), database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
+                    _logger.FailedWithErrors(JsonSerializer.Serialize(deserializedGraphQlResponse.Errors),
+                        database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
                     foreach (var error in deserializedGraphQlResponse.Errors)
                     {
                         var errorBuilder = ErrorBuilder.New()
                             .SetCode("DATABASE_QUERY_ERROR")
-                            .SetMessage($"The GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)} reported the error {error.Message}.")
+                            .SetMessage(
+                                $"The GraphQL response received from the database {database.Locator} for the request {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)} reported the error {error.Message}.")
                             .SetPath(error.Path);
                         if (error.Extensions is not null)
                         {
@@ -826,48 +870,58 @@ namespace Metabase.GraphQl.Databases
                                 errorBuilder.SetExtension(key, value);
                             }
                         }
+
                         // TODO Add `error.Locations` to `errorBuilder`.
                         resolverContext.ReportError(errorBuilder.Build());
                     }
                 }
+
                 return deserializedGraphQlResponse.Data;
             }
             catch (HttpRequestException e)
             {
-                _logger.FailedWithStatusCode(e, e.StatusCode, database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
+                _logger.FailedWithStatusCode(e, e.StatusCode, database.Locator,
+                    JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
                 resolverContext.ReportError(
                     ErrorBuilder.New()
-                    .SetCode("DATABASE_REQUEST_FAILED")
-                    .SetPath(resolverContext.Path)
-                    .SetMessage($"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)}.")
-                    .SetException(e)
-                    .Build()
+                        .SetCode("DATABASE_REQUEST_FAILED")
+                        .SetPath(resolverContext.Path)
+                        .SetMessage(
+                            $"Failed with status code {e.StatusCode} to request {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)}.")
+                        .SetException(e)
+                        .Build()
                 );
                 return null;
             }
             catch (JsonException e)
             {
-                _logger.FailedToDeserialize(e, database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions), e.BytePositionInLine, e.LineNumber, e.Message, e.Path);
+                _logger.FailedToDeserialize(e, database.Locator,
+                    JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions), e.BytePositionInLine,
+                    e.LineNumber, e.Message, e.Path);
                 resolverContext.ReportError(
                     ErrorBuilder.New()
-                    .SetCode("DESERIALIZATION_FAILED")
-                    .SetPath(resolverContext.Path.ToList().Concat(e.Path?.Split('.') ?? Array.Empty<string>()).ToList()) // TODO Splitting the path at '.' is wrong in general.
-                    .SetMessage($"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
-                    .SetException(e)
-                    .Build()
+                        .SetCode("DESERIALIZATION_FAILED")
+                        .SetPath(resolverContext.Path.ToList().Concat(e.Path?.Split('.') ?? Array.Empty<string>())
+                            .ToList()) // TODO Splitting the path at '.' is wrong in general.
+                        .SetMessage(
+                            $"Failed to deserialize GraphQL response of request to {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.")
+                        .SetException(e)
+                        .Build()
                 );
                 return null;
             }
             catch (Exception e)
             {
-                _logger.FailedToRequestOrDeserialize(e, database.Locator, JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
+                _logger.FailedToRequestOrDeserialize(e, database.Locator,
+                    JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions));
                 resolverContext.ReportError(
                     ErrorBuilder.New()
-                    .SetCode("DATABASE_REQUEST_FAILED")
-                    .SetPath(resolverContext.Path)
-                    .SetMessage($"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)} or failed to deserialize the response.")
-                    .SetException(e)
-                    .Build()
+                        .SetCode("DATABASE_REQUEST_FAILED")
+                        .SetPath(resolverContext.Path)
+                        .SetMessage(
+                            $"Failed to request {database.Locator} for {JsonSerializer.Serialize(request, QueryingDatabases.SerializerOptions)} or failed to deserialize the response.")
+                        .SetException(e)
+                        .Build()
                 );
                 return null;
             }

@@ -16,11 +16,11 @@ namespace Metabase.GraphQl.Databases
         [UseSorting]
         public IQueryable<Data.Database> GetDatabases(
             Data.ApplicationDbContext context
-            )
+        )
         {
             return
                 context.Databases.AsQueryable()
-                .Where(d => d.VerificationState == Enumerations.DatabaseVerificationState.VERIFIED);
+                    .Where(d => d.VerificationState == Enumerations.DatabaseVerificationState.VERIFIED);
         }
 
         [UsePaging]
@@ -29,23 +29,23 @@ namespace Metabase.GraphQl.Databases
         [UseSorting]
         public IQueryable<Data.Database> GetPendingDatabases(
             Data.ApplicationDbContext context
-            )
+        )
         {
             return
                 context.Databases.AsQueryable()
-                .Where(d => d.VerificationState == Enumerations.DatabaseVerificationState.PENDING);
+                    .Where(d => d.VerificationState == Enumerations.DatabaseVerificationState.PENDING);
         }
 
         public Task<Data.Database?> GetDatabaseAsync(
             Guid uuid,
             DatabaseByIdDataLoader databaseById,
             CancellationToken cancellationToken
-            )
+        )
         {
             return databaseById.LoadAsync(
                 uuid,
                 cancellationToken
-                );
+            );
         }
     }
 }

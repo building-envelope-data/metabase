@@ -24,53 +24,56 @@ namespace Metabase.GraphQl.DataFormats
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await DataFormatAuthorization.IsAuthorizedToCreateDataFormatForInstitution(
-                 claimsPrincipal,
-                 input.ManagerId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
-            )
+                    claimsPrincipal,
+                    input.ManagerId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
+               )
             {
                 return new CreateDataFormatPayload(
                     new CreateDataFormatError(
-                      CreateDataFormatErrorCode.UNAUTHORIZED,
-                      "You are not authorized to create data formats for the institution.",
-                      new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
+                        CreateDataFormatErrorCode.UNAUTHORIZED,
+                        "You are not authorized to create data formats for the institution.",
+                        new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
                     )
                 );
             }
+
             if (!await context.Institutions.AsQueryable()
-            .AnyAsync(
-                x => x.Id == input.ManagerId,
-             cancellationToken: cancellationToken
-             )
-            .ConfigureAwait(false)
-            )
+                    .AnyAsync(
+                        x => x.Id == input.ManagerId,
+                        cancellationToken: cancellationToken
+                    )
+                    .ConfigureAwait(false)
+               )
             {
                 return new CreateDataFormatPayload(
                     new CreateDataFormatError(
                         CreateDataFormatErrorCode.UNKNOWN_MANAGER,
                         "Unknown manager.",
-                      new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
+                        new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
                     )
                 );
             }
+
             if (input.Standard is not null &&
                 input.Publication is not null
-                )
+               )
             {
                 return new CreateDataFormatPayload(
                     new CreateDataFormatError(
                         CreateDataFormatErrorCode.TWO_REFERENCES,
                         "Specify either a standard or a publication as reference.",
-                      new[] { nameof(input), nameof(input.Publication).FirstCharToLower() }
+                        new[] { nameof(input), nameof(input.Publication).FirstCharToLower() }
                     )
                 );
             }
+
             var dataFormat = new Data.DataFormat(
                 name: input.Name,
                 extension: input.Extension,
@@ -82,35 +85,35 @@ namespace Metabase.GraphQl.DataFormats
                 ManagerId = input.ManagerId,
                 Standard =
                     input.Standard is null
-                     ? null
-                     : new Data.Standard(
-                          title: input.Standard.Title,
-                          @abstract: input.Standard.Abstract,
-                          section: input.Standard.Section,
-                          year: input.Standard.Year,
-                          standardizers: input.Standard.Standardizers,
-                          locator: input.Standard.Locator
-                    )
-                     {
-                         Numeration = new Data.Numeration(
-                            prefix: input.Standard.Numeration.Prefix,
-                            mainNumber: input.Standard.Numeration.MainNumber,
-                            suffix: input.Standard.Numeration.Suffix
-                    )
-                     },
+                        ? null
+                        : new Data.Standard(
+                            title: input.Standard.Title,
+                            @abstract: input.Standard.Abstract,
+                            section: input.Standard.Section,
+                            year: input.Standard.Year,
+                            standardizers: input.Standard.Standardizers,
+                            locator: input.Standard.Locator
+                        )
+                        {
+                            Numeration = new Data.Numeration(
+                                prefix: input.Standard.Numeration.Prefix,
+                                mainNumber: input.Standard.Numeration.MainNumber,
+                                suffix: input.Standard.Numeration.Suffix
+                            )
+                        },
                 Publication =
                     input.Publication is null
-                    ? null
-                    : new Data.Publication(
-                                title: input.Publication.Title,
-                                @abstract: input.Publication.Abstract,
-                                section: input.Publication.Section,
-                                authors: input.Publication.Authors,
-                                doi: input.Publication.Doi,
-                                arXiv: input.Publication.ArXiv,
-                                urn: input.Publication.Urn,
-                                webAddress: input.Publication.WebAddress
-                )
+                        ? null
+                        : new Data.Publication(
+                            title: input.Publication.Title,
+                            @abstract: input.Publication.Abstract,
+                            section: input.Publication.Section,
+                            authors: input.Publication.Authors,
+                            doi: input.Publication.Doi,
+                            arXiv: input.Publication.ArXiv,
+                            urn: input.Publication.Urn,
+                            webAddress: input.Publication.WebAddress
+                        )
             };
             context.DataFormats.Add(dataFormat);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -125,52 +128,55 @@ namespace Metabase.GraphQl.DataFormats
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await DataFormatAuthorization.IsAuthorizedToUpdate(
-                 claimsPrincipal,
-                 input.DataFormatId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
-            )
+                    claimsPrincipal,
+                    input.DataFormatId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
+               )
             {
                 return new UpdateDataFormatPayload(
                     new UpdateDataFormatError(
-                      UpdateDataFormatErrorCode.UNAUTHORIZED,
-                      "You are not authorized to the update data format.",
-                      new[] { nameof(input) }
+                        UpdateDataFormatErrorCode.UNAUTHORIZED,
+                        "You are not authorized to the update data format.",
+                        new[] { nameof(input) }
                     )
                 );
             }
+
             if (input.Standard is not null &&
                 input.Publication is not null
-                )
+               )
             {
                 return new UpdateDataFormatPayload(
                     new UpdateDataFormatError(
                         UpdateDataFormatErrorCode.TWO_REFERENCES,
                         "Specify either a standard or a publication as reference.",
-                      new[] { nameof(input), nameof(input.Publication).FirstCharToLower() }
+                        new[] { nameof(input), nameof(input.Publication).FirstCharToLower() }
                     )
                 );
             }
+
             var dataFormat =
                 await context.DataFormats.AsQueryable()
-                .Where(i => i.Id == input.DataFormatId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(i => i.Id == input.DataFormatId)
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (dataFormat is null)
             {
                 return new UpdateDataFormatPayload(
                     new UpdateDataFormatError(
-                      UpdateDataFormatErrorCode.UNKNOWN_DATA_FORMAT,
-                      "Unknown data format.",
-                      new[] { nameof(input), nameof(input.DataFormatId).FirstCharToLower() }
-                      )
-                      );
+                        UpdateDataFormatErrorCode.UNKNOWN_DATA_FORMAT,
+                        "Unknown data format.",
+                        new[] { nameof(input), nameof(input.DataFormatId).FirstCharToLower() }
+                    )
+                );
             }
+
             dataFormat.Update(
                 name: input.Name,
                 extension: input.Extension,
@@ -179,36 +185,36 @@ namespace Metabase.GraphQl.DataFormats
                 schemaLocator: input.SchemaLocator
             );
             dataFormat.Standard =
-                    input.Standard is null
-                     ? null
-                     : new Data.Standard(
-                          title: input.Standard.Title,
-                          @abstract: input.Standard.Abstract,
-                          section: input.Standard.Section,
-                          year: input.Standard.Year,
-                          standardizers: input.Standard.Standardizers,
-                          locator: input.Standard.Locator
+                input.Standard is null
+                    ? null
+                    : new Data.Standard(
+                        title: input.Standard.Title,
+                        @abstract: input.Standard.Abstract,
+                        section: input.Standard.Section,
+                        year: input.Standard.Year,
+                        standardizers: input.Standard.Standardizers,
+                        locator: input.Standard.Locator
                     )
-                     {
-                         Numeration = new Data.Numeration(
+                    {
+                        Numeration = new Data.Numeration(
                             prefix: input.Standard.Numeration.Prefix,
                             mainNumber: input.Standard.Numeration.MainNumber,
                             suffix: input.Standard.Numeration.Suffix
-                    )
-                     };
+                        )
+                    };
             dataFormat.Publication =
-                    input.Publication is null
+                input.Publication is null
                     ? null
                     : new Data.Publication(
-                                title: input.Publication.Title,
-                                @abstract: input.Publication.Abstract,
-                                section: input.Publication.Section,
-                                authors: input.Publication.Authors,
-                                doi: input.Publication.Doi,
-                                arXiv: input.Publication.ArXiv,
-                                urn: input.Publication.Urn,
-                                webAddress: input.Publication.WebAddress
-                );
+                        title: input.Publication.Title,
+                        @abstract: input.Publication.Abstract,
+                        section: input.Publication.Section,
+                        authors: input.Publication.Authors,
+                        doi: input.Publication.Doi,
+                        arXiv: input.Publication.ArXiv,
+                        urn: input.Publication.Urn,
+                        webAddress: input.Publication.WebAddress
+                    );
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new UpdateDataFormatPayload(dataFormat);
         }

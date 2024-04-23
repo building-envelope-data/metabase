@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.UserMethodDevelopers
 
         public ConfirmUserMethodDeveloperPayload(
             Data.UserMethodDeveloper userMethodDeveloper
-            )
+        )
         {
             DevelopedMethodEdge = new UserDevelopedMethodEdge(userMethodDeveloper);
             MethodDeveloperEdge = new UserMethodDeveloperEdge(userMethodDeveloper);
@@ -20,14 +20,14 @@ namespace Metabase.GraphQl.UserMethodDevelopers
 
         public ConfirmUserMethodDeveloperPayload(
             IReadOnlyCollection<ConfirmUserMethodDeveloperError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public ConfirmUserMethodDeveloperPayload(
             ConfirmUserMethodDeveloperError error
-            )
+        )
             : this(new[] { error })
         {
         }

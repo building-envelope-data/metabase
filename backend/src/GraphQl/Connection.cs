@@ -17,7 +17,7 @@ namespace Metabase.GraphQl
         protected Connection(
             TSubject subject,
             Func<TAssociation, TEdge> createEdge
-            )
+        )
         {
             Subject = subject;
             _createEdge = createEdge;
@@ -26,11 +26,11 @@ namespace Metabase.GraphQl
         public async Task<IEnumerable<TEdge>> GetEdgesAsync(
             TAssociationsByAssociateIdDataLoader dataLoader,
             CancellationToken cancellationToken
-            )
+        )
         {
             return (
-                await dataLoader.LoadAsync(Subject.Id, cancellationToken)
-                .ConfigureAwait(false)
+                    await dataLoader.LoadAsync(Subject.Id, cancellationToken)
+                        .ConfigureAwait(false)
                 )
                 .Select(_createEdge);
         }

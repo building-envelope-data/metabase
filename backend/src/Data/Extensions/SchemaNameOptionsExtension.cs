@@ -6,10 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Metabase.Data.Extensions
 {
     public sealed class SchemaNameOptionsExtension
-      : IDbContextOptionsExtension
+        : IDbContextOptionsExtension
     {
         public DbContextOptionsExtensionInfo Info
-          => new SchemaNameExtensionInfo(this);
+            => new SchemaNameExtensionInfo(this);
 
         public string SchemaName { get; }
 
@@ -27,18 +27,18 @@ namespace Metabase.Data.Extensions
         }
 
         public sealed class SchemaNameExtensionInfo
-          : DbContextOptionsExtensionInfo
+            : DbContextOptionsExtensionInfo
         {
             public override bool IsDatabaseProvider
-              => false;
+                => false;
 
             public override string LogFragment
-              => $"{nameof(Extension.SchemaName)}={Extension.SchemaName}";
+                => $"{nameof(Extension.SchemaName)}={Extension.SchemaName}";
 
             public new SchemaNameOptionsExtension Extension => (SchemaNameOptionsExtension)base.Extension;
 
             public SchemaNameExtensionInfo(SchemaNameOptionsExtension extension)
-              : base(extension)
+                : base(extension)
             {
             }
 
@@ -54,10 +54,10 @@ namespace Metabase.Data.Extensions
 
             public override void PopulateDebugInfo(
                 IDictionary<string, string> debugInfo
-                )
+            )
             {
                 debugInfo[$"Metabase.Data.Extensions:${nameof(SchemaNameOptionsExtension.SchemaName)}"]
-                  = Extension.SchemaName;
+                    = Extension.SchemaName;
             }
         }
     }

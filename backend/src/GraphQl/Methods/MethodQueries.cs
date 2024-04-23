@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.Methods
         [UseSorting]
         public IQueryable<Data.Method> GetMethods(
             Data.ApplicationDbContext context
-            )
+        )
         {
             return context.Methods;
         }
@@ -27,12 +27,12 @@ namespace Metabase.GraphQl.Methods
             Guid uuid,
             MethodByIdDataLoader methodById,
             CancellationToken cancellationToken
-            )
+        )
         {
             return methodById.LoadAsync(
                 uuid,
                 cancellationToken
-                );
+            );
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.DataX
 {
     public sealed class OpticalDataConnection
-    : DataConnectionBase<OpticalDataEdge, OpticalData>
+        : DataConnectionBase<OpticalDataEdge, OpticalData>
     {
         public OpticalDataConnection(
             IReadOnlyList<OpticalDataEdge> edges,
@@ -12,12 +12,12 @@ namespace Metabase.GraphQl.DataX
             uint totalCount,
             DateTime timestamp
         )
-        : base(
-            edges,
-            nodes,
-            totalCount,
-            timestamp
-        )
+            : base(
+                edges,
+                nodes,
+                totalCount,
+                timestamp
+            )
         {
         }
     }

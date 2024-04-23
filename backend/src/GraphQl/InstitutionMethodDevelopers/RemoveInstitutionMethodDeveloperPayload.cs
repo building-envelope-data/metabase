@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.InstitutionMethodDevelopers
 
         public RemoveInstitutionMethodDeveloperPayload(
             Data.InstitutionMethodDeveloper institutionMethodDeveloper
-            )
+        )
         {
             DevelopedMethodEdge = new InstitutionDevelopedMethodEdge(institutionMethodDeveloper);
             MethodDeveloperEdge = new InstitutionMethodDeveloperEdge(institutionMethodDeveloper);
@@ -20,14 +20,14 @@ namespace Metabase.GraphQl.InstitutionMethodDevelopers
 
         public RemoveInstitutionMethodDeveloperPayload(
             IReadOnlyCollection<RemoveInstitutionMethodDeveloperError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public RemoveInstitutionMethodDeveloperPayload(
             RemoveInstitutionMethodDeveloperError error
-            )
+        )
             : this(new[] { error })
         {
         }

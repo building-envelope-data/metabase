@@ -25,7 +25,8 @@ namespace Metabase.GraphQl.Users
     public sealed class UserMutations
     {
         // Key Uri Format https://github.com/google/google-authenticator/wiki/Key-Uri-Format
-        private static readonly CompositeFormat AuthenticatorUriFormat = CompositeFormat.Parse("otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6");
+        private static readonly CompositeFormat AuthenticatorUriFormat =
+            CompositeFormat.Parse("otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6");
 
         private static async Task ValidateAntiforgeryTokenAsync(
             IAntiforgery antiforgeryService,
@@ -35,8 +36,10 @@ namespace Metabase.GraphQl.Users
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext is null)
             {
-                throw new AntiforgeryValidationException("Cannot access the HTTP context to validate the antiforgery token.");
+                throw new AntiforgeryValidationException(
+                    "Cannot access the HTTP context to validate the antiforgery token.");
             }
+
             await antiforgeryService.ValidateRequestAsync(httpContext).ConfigureAwait(false);
         }
 
@@ -53,7 +56,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -61,12 +64,13 @@ namespace Metabase.GraphQl.Users
             {
                 return new ConfirmUserEmailPayload(
                     new ConfirmUserEmailError(
-                      ConfirmUserEmailErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with email address {input.Email}.",
-                      new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
-                      )
-                    );
+                        ConfirmUserEmailErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with email address {input.Email}.",
+                        new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
+                    )
+                );
             }
+
             var confirmationToken = DecodeCode(input.ConfirmationCode);
             var identityResult = await userManager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
             if (!identityResult.Succeeded)
@@ -79,22 +83,24 @@ namespace Metabase.GraphQl.Users
                         error.Code switch
                         {
                             "InvalidToken" =>
-                        new ConfirmUserEmailError(
-                            ConfirmUserEmailErrorCode.INVALID_CONFIRMATION_CODE,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.ConfirmationCode).FirstCharToLower() }
-                            ),
+                                new ConfirmUserEmailError(
+                                    ConfirmUserEmailErrorCode.INVALID_CONFIRMATION_CODE,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.ConfirmationCode).FirstCharToLower() }
+                                ),
                             _ =>
-                        new ConfirmUserEmailError(
-                            ConfirmUserEmailErrorCode.UNKNOWN,
-                            error.Description,
-                            new[] { nameof(input) }
-                            )
+                                new ConfirmUserEmailError(
+                                    ConfirmUserEmailErrorCode.UNKNOWN,
+                                    error.Description,
+                                    new[] { nameof(input) }
+                                )
                         }
-                        );
+                    );
                 }
+
                 return new ConfirmUserEmailPayload(errors);
             }
+
             return new ConfirmUserEmailPayload(user);
         }
 
@@ -107,7 +113,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             // TODO This public endpoint can be used to test whether there is a user for the given email address. Is this a problem? In other endpoints like `ResetUserPasswordAsync` do not do that on purpose. Why exactly?
@@ -116,21 +122,23 @@ namespace Metabase.GraphQl.Users
             {
                 return new ConfirmUserEmailChangePayload(
                     new ConfirmUserEmailChangeError(
-                      ConfirmUserEmailChangeErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with email address {input.CurrentEmail}.",
-                      new[] { nameof(input), nameof(input.CurrentEmail).FirstCharToLower() }
-                      )
-                    );
+                        ConfirmUserEmailChangeErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with email address {input.CurrentEmail}.",
+                        new[] { nameof(input), nameof(input.CurrentEmail).FirstCharToLower() }
+                    )
+                );
             }
+
             var changeEmailIdentityResult =
                 await userManager.ChangeEmailAsync(
                     user,
                     input.NewEmail,
                     DecodeCode(input.ConfirmationCode)
-                    ).ConfigureAwait(false);
+                ).ConfigureAwait(false);
             // For us email and user name are one and the same, so when we
             // update the email we need to update the user name.
-            var setUserNameIdentityResult = await userManager.SetUserNameAsync(user, input.NewEmail).ConfigureAwait(false);
+            var setUserNameIdentityResult =
+                await userManager.SetUserNameAsync(user, input.NewEmail).ConfigureAwait(false);
             if (!(changeEmailIdentityResult.Succeeded && setUserNameIdentityResult.Succeeded))
             {
                 var errors = new List<ConfirmUserEmailChangeError>();
@@ -141,26 +149,27 @@ namespace Metabase.GraphQl.Users
                         error.Code switch
                         {
                             "DuplicateEmail" =>
-                        new ConfirmUserEmailChangeError(
-                            ConfirmUserEmailChangeErrorCode.DUPLICATE_EMAIL,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.NewEmail).FirstCharToLower() }
-                            ),
+                                new ConfirmUserEmailChangeError(
+                                    ConfirmUserEmailChangeErrorCode.DUPLICATE_EMAIL,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.NewEmail).FirstCharToLower() }
+                                ),
                             "InvalidToken" =>
-                        new ConfirmUserEmailChangeError(
-                            ConfirmUserEmailChangeErrorCode.INVALID_CONFIRMATION_CODE,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.ConfirmationCode).FirstCharToLower() }
-                            ),
+                                new ConfirmUserEmailChangeError(
+                                    ConfirmUserEmailChangeErrorCode.INVALID_CONFIRMATION_CODE,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.ConfirmationCode).FirstCharToLower() }
+                                ),
                             _ =>
-                        new ConfirmUserEmailChangeError(
-                            ConfirmUserEmailChangeErrorCode.UNKNOWN,
-                            error.Description,
-                            new[] { nameof(input) }
-                            )
+                                new ConfirmUserEmailChangeError(
+                                    ConfirmUserEmailChangeErrorCode.UNKNOWN,
+                                    error.Description,
+                                    new[] { nameof(input) }
+                                )
                         }
-                        );
+                    );
                 }
+
                 foreach (var error in setUserNameIdentityResult.Errors)
                 {
                     // Ignore `*UserName` errors that have corresponding `*Email` errors because we use `Email` as `UserName`.
@@ -171,17 +180,19 @@ namespace Metabase.GraphQl.Users
                             error.Code switch
                             {
                                 _ =>
-                          new ConfirmUserEmailChangeError(
-                              ConfirmUserEmailChangeErrorCode.UNKNOWN,
-                              error.Description,
-                              new[] { nameof(input) }
-                              )
+                                    new ConfirmUserEmailChangeError(
+                                        ConfirmUserEmailChangeErrorCode.UNKNOWN,
+                                        error.Description,
+                                        new[] { nameof(input) }
+                                    )
                             }
-                            );
+                        );
                     }
                 }
+
                 return new ConfirmUserEmailChangePayload(errors);
             }
+
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new ConfirmUserEmailChangePayload(user);
         }
@@ -195,7 +206,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var signInResult = await signInManager.PasswordSignInAsync(
@@ -203,50 +214,54 @@ namespace Metabase.GraphQl.Users
                 input.Password,
                 isPersistent: false,
                 lockoutOnFailure: true
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinresult?view=aspnetcore-5.0
             if (signInResult.IsLockedOut)
             {
                 return new LoginUserPayload(
                     new LoginUserError(
-                      LoginUserErrorCode.LOCKED_OUT,
-                      "User is locked out.",
-                      new[] { nameof(input) }
-                      )
-                    );
+                        LoginUserErrorCode.LOCKED_OUT,
+                        "User is locked out.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             if (signInResult.IsNotAllowed)
             {
                 return new LoginUserPayload(
                     new LoginUserError(
-                      LoginUserErrorCode.NOT_ALLOWED,
-                      "User is not allowed to login.",
-                      new[] { nameof(input) }
-                      )
-                    );
+                        LoginUserErrorCode.NOT_ALLOWED,
+                        "User is not allowed to login.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             if (!signInResult.Succeeded && !signInResult.RequiresTwoFactor)
             {
                 return new LoginUserPayload(
                     new LoginUserError(
-                      LoginUserErrorCode.INVALID,
-                      "Invalid login attempt.",
-                      new[] { nameof(input) }
-                      )
-                    );
+                        LoginUserErrorCode.INVALID,
+                        "Invalid login attempt.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             // TODO Only load the user if requested in the GraphQl query. Use resolver in payload and just pass email address.
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
             if (user is null)
             {
                 return new LoginUserPayload(
                     new LoginUserError(
-                      LoginUserErrorCode.UNKNOWN,
-                      "Failed to fetch user.",
-                      new[] { nameof(input) }
-                      )
-                    );
+                        LoginUserErrorCode.UNKNOWN,
+                        "Failed to fetch user.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             // We could set
             // HttpContext.User = await _signInManager.CreateUserPrincipalAsync(user);
             // and add tokens as cookies as is done in the antiforgery
@@ -258,6 +273,7 @@ namespace Metabase.GraphQl.Users
             {
                 return new LoginUserPayload(user, requiresTwoFactor: true);
             }
+
             return new LoginUserPayload(user, requiresTwoFactor: false);
         }
 
@@ -269,7 +285,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
@@ -277,16 +293,17 @@ namespace Metabase.GraphQl.Users
             {
                 return new LoginUserWithTwoFactorCodePayload(
                     new LoginUserWithTwoFactorCodeError(
-                      LoginUserWithTwoFactorCodeErrorCode.UNKNOWN_USER,
-                      "Failed to load two-factor authentication user.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        LoginUserWithTwoFactorCodeErrorCode.UNKNOWN_USER,
+                        "Failed to load two-factor authentication user.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var authenticatorCode =
                 input.AuthenticatorCode
-                .Replace(" ", string.Empty)
-                .Replace("-", string.Empty);
+                    .Replace(" ", string.Empty)
+                    .Replace("-", string.Empty);
             var signInResult =
                 await signInManager.TwoFactorAuthenticatorSignInAsync(
                     authenticatorCode,
@@ -297,32 +314,35 @@ namespace Metabase.GraphQl.Users
             {
                 return new LoginUserWithTwoFactorCodePayload(
                     new LoginUserWithTwoFactorCodeError(
-                      LoginUserWithTwoFactorCodeErrorCode.LOCKED_OUT,
-                      "User is locked out.",
-                      new[] { nameof(input) }
-                      )
-                    );
+                        LoginUserWithTwoFactorCodeErrorCode.LOCKED_OUT,
+                        "User is locked out.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             if (signInResult.IsNotAllowed)
             {
                 return new LoginUserWithTwoFactorCodePayload(
                     new LoginUserWithTwoFactorCodeError(
-                      LoginUserWithTwoFactorCodeErrorCode.NOT_ALLOWED,
-                      "User is not allowed to login.",
-                      new[] { nameof(input) }
-                      )
-                    );
+                        LoginUserWithTwoFactorCodeErrorCode.NOT_ALLOWED,
+                        "User is not allowed to login.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             if (!signInResult.Succeeded)
             {
                 return new LoginUserWithTwoFactorCodePayload(
                     new LoginUserWithTwoFactorCodeError(
-                      LoginUserWithTwoFactorCodeErrorCode.INVALID_AUTHENTICATOR_CODE,
-                      "Invalid authenticator code.",
-                      new[] { nameof(input), nameof(input.AuthenticatorCode).FirstCharToLower() }
-                      )
-                    );
+                        LoginUserWithTwoFactorCodeErrorCode.INVALID_AUTHENTICATOR_CODE,
+                        "Invalid authenticator code.",
+                        new[] { nameof(input), nameof(input.AuthenticatorCode).FirstCharToLower() }
+                    )
+                );
             }
+
             return new LoginUserWithTwoFactorCodePayload(user);
         }
 
@@ -334,7 +354,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
@@ -342,15 +362,16 @@ namespace Metabase.GraphQl.Users
             {
                 return new LoginUserWithRecoveryCodePayload(
                     new LoginUserWithRecoveryCodeError(
-                      LoginUserWithRecoveryCodeErrorCode.UNKNOWN_USER,
-                      "Failed to load two-factor authentication user.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        LoginUserWithRecoveryCodeErrorCode.UNKNOWN_USER,
+                        "Failed to load two-factor authentication user.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var recoveryCode =
                 input.RecoveryCode
-                .Replace(" ", string.Empty);
+                    .Replace(" ", string.Empty);
             var signInResult =
                 await signInManager.TwoFactorRecoveryCodeSignInAsync(
                     recoveryCode
@@ -359,32 +380,35 @@ namespace Metabase.GraphQl.Users
             {
                 return new LoginUserWithRecoveryCodePayload(
                     new LoginUserWithRecoveryCodeError(
-                      LoginUserWithRecoveryCodeErrorCode.LOCKED_OUT,
-                      "User is locked out.",
-                      new[] { nameof(input) }
-                      )
-                    );
+                        LoginUserWithRecoveryCodeErrorCode.LOCKED_OUT,
+                        "User is locked out.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             if (signInResult.IsNotAllowed)
             {
                 return new LoginUserWithRecoveryCodePayload(
                     new LoginUserWithRecoveryCodeError(
-                      LoginUserWithRecoveryCodeErrorCode.NOT_ALLOWED,
-                      "User is not allowed to login.",
-                      new[] { nameof(input) }
-                      )
-                    );
+                        LoginUserWithRecoveryCodeErrorCode.NOT_ALLOWED,
+                        "User is not allowed to login.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             if (!signInResult.Succeeded)
             {
                 return new LoginUserWithRecoveryCodePayload(
                     new LoginUserWithRecoveryCodeError(
-                      LoginUserWithRecoveryCodeErrorCode.INVALID_RECOVERY_CODE,
-                      "Invalid recovery code.",
-                      new[] { nameof(input), nameof(input.RecoveryCode).FirstCharToLower() }
-                      )
-                    );
+                        LoginUserWithRecoveryCodeErrorCode.INVALID_RECOVERY_CODE,
+                        "Invalid recovery code.",
+                        new[] { nameof(input), nameof(input.RecoveryCode).FirstCharToLower() }
+                    )
+                );
             }
+
             return new LoginUserWithRecoveryCodePayload(user);
         }
 
@@ -398,7 +422,7 @@ namespace Metabase.GraphQl.Users
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = new Data.User(
@@ -411,16 +435,17 @@ namespace Metabase.GraphQl.Users
             {
                 return new RegisterUserPayload(
                     new RegisterUserError(
-                      RegisterUserErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
-                      "Password and confirmation password do not match.",
-                      new[] { nameof(input), nameof(input.PasswordConfirmation).FirstCharToLower() }
-                      )
-                    );
+                        RegisterUserErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
+                        "Password and confirmation password do not match.",
+                        new[] { nameof(input), nameof(input.PasswordConfirmation).FirstCharToLower() }
+                    )
+                );
             }
+
             var identityResult =
-              await userManager.CreateAsync(
-                user,
-                input.Password
+                await userManager.CreateAsync(
+                    user,
+                    input.Password
                 ).ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
@@ -436,65 +461,67 @@ namespace Metabase.GraphQl.Users
                             error.Code switch
                             {
                                 "DuplicateEmail" =>
-                        new RegisterUserError(
-                            RegisterUserErrorCode.DUPLICATE_EMAIL,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
-                            ),
+                                    new RegisterUserError(
+                                        RegisterUserErrorCode.DUPLICATE_EMAIL,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
+                                    ),
                                 "InvalidEmail" =>
-                        new RegisterUserError(
-                            RegisterUserErrorCode.INVALID_EMAIL,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
-                            ),
+                                    new RegisterUserError(
+                                        RegisterUserErrorCode.INVALID_EMAIL,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
+                                    ),
                                 "PasswordRequiresDigit" =>
-                        new RegisterUserError(
-                            RegisterUserErrorCode.PASSWORD_REQUIRES_DIGIT,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                            ),
+                                    new RegisterUserError(
+                                        RegisterUserErrorCode.PASSWORD_REQUIRES_DIGIT,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 "PasswordRequiresLower" =>
-                          new RegisterUserError(
-                              RegisterUserErrorCode.PASSWORD_REQUIRES_LOWER,
-                              error.Description,
-                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                              ),
+                                    new RegisterUserError(
+                                        RegisterUserErrorCode.PASSWORD_REQUIRES_LOWER,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 "PasswordRequiresNonAlphanumeric" =>
-                          new RegisterUserError(
-                              RegisterUserErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
-                              error.Description,
-                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                              ),
+                                    new RegisterUserError(
+                                        RegisterUserErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 "PasswordRequiresUpper" =>
-                          new RegisterUserError(
-                              RegisterUserErrorCode.PASSWORD_REQUIRES_UPPER,
-                              error.Description,
-                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                              ),
+                                    new RegisterUserError(
+                                        RegisterUserErrorCode.PASSWORD_REQUIRES_UPPER,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 "PasswordTooShort" =>
-                          new RegisterUserError(
-                              RegisterUserErrorCode.PASSWORD_TOO_SHORT,
-                              error.Description,
-                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                              ),
+                                    new RegisterUserError(
+                                        RegisterUserErrorCode.PASSWORD_TOO_SHORT,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 "PropertyTooShort" =>
-                          new RegisterUserError(
-                              RegisterUserErrorCode.NULL_OR_EMPTY_EMAIL,
-                              error.Description,
-                              new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
-                              ),
+                                    new RegisterUserError(
+                                        RegisterUserErrorCode.NULL_OR_EMPTY_EMAIL,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Email).FirstCharToLower() }
+                                    ),
                                 _ =>
-                          new RegisterUserError(
-                              RegisterUserErrorCode.UNKNOWN,
-                              $"{error.Description} (error code `{error.Code}`)",
-                              new[] { nameof(input) }
-                              )
+                                    new RegisterUserError(
+                                        RegisterUserErrorCode.UNKNOWN,
+                                        $"{error.Description} (error code `{error.Code}`)",
+                                        new[] { nameof(input) }
+                                    )
                             }
                         );
                     }
                 }
+
                 return new RegisterUserPayload(errors);
             }
+
             // TODO The confirmation also confirms the registration/account. Should we use another email text then?
             await SendUserEmailConfirmation(
                 (user.Name, input.Email),
@@ -503,7 +530,7 @@ namespace Metabase.GraphQl.Users
                 appSettings.Host,
                 input.ReturnTo,
                 urlEncoder
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             return new RegisterUserPayload(user);
         }
 
@@ -517,7 +544,7 @@ namespace Metabase.GraphQl.Users
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -531,8 +558,9 @@ namespace Metabase.GraphQl.Users
                     appSettings.Host,
                     null,
                     urlEncoder
-                    ).ConfigureAwait(false);
+                ).ConfigureAwait(false);
             }
+
             return new ResendUserEmailConfirmationPayload();
         }
 
@@ -546,7 +574,7 @@ namespace Metabase.GraphQl.Users
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -556,14 +584,16 @@ namespace Metabase.GraphQl.Users
                 // For more information on how to enable account confirmation and password reset please
                 // visit https://docs.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-5.0
                 var resetCode = EncodeToken(
-                      await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
-                      );
+                    await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
+                );
                 await emailSender.SendAsync(
                     (user.Name, input.Email),
                     "Reset password",
-                    $"Please reset your password by following the link {appSettings.Host}/users/reset-password?resetCode={resetCode}" + (input.ReturnTo is null ? "" : $"&returnTo={urlEncoder.Encode(input.ReturnTo.OriginalString)}")
-                    ).ConfigureAwait(false);
+                    $"Please reset your password by following the link {appSettings.Host}/users/reset-password?resetCode={resetCode}" +
+                    (input.ReturnTo is null ? "" : $"&returnTo={urlEncoder.Encode(input.ReturnTo.OriginalString)}")
+                ).ConfigureAwait(false);
             }
+
             return new RequestUserPasswordResetPayload();
         }
 
@@ -574,7 +604,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
@@ -582,12 +612,13 @@ namespace Metabase.GraphQl.Users
             {
                 return new ResetUserPasswordPayload(
                     new ResetUserPasswordError(
-                      ResetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
-                      "Password and confirmation password do not match.",
-                      new[] { nameof(input), nameof(input.PasswordConfirmation).FirstCharToLower() }
-                      )
-                    );
+                        ResetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
+                        "Password and confirmation password do not match.",
+                        new[] { nameof(input), nameof(input.PasswordConfirmation).FirstCharToLower() }
+                    )
+                );
             }
+
             // Don't reveal that the user does not exist
             // TODO As said above, do not reveal that the user does or does not exist. However, right now we reveal whether the user exists or not because errors with the password are only reported when the user exists and not otherwise.
             if (user is not null)
@@ -596,7 +627,7 @@ namespace Metabase.GraphQl.Users
                     user,
                     DecodeCode(input.ResetCode),
                     input.Password
-                    ).ConfigureAwait(false);
+                ).ConfigureAwait(false);
                 if (!identityResult.Succeeded)
                 {
                     var errors = new List<ResetUserPasswordError>();
@@ -607,53 +638,55 @@ namespace Metabase.GraphQl.Users
                             error.Code switch
                             {
                                 "InvalidToken" =>
-                            new ResetUserPasswordError(
-                                ResetUserPasswordErrorCode.INVALID_RESET_CODE,
-                                error.Description,
-                                new[] { nameof(input), nameof(input.ResetCode).FirstCharToLower() }
-                                ),
+                                    new ResetUserPasswordError(
+                                        ResetUserPasswordErrorCode.INVALID_RESET_CODE,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.ResetCode).FirstCharToLower() }
+                                    ),
                                 "PasswordRequiresDigit" =>
-                        new ResetUserPasswordError(
-                            ResetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                            ),
+                                    new ResetUserPasswordError(
+                                        ResetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 "PasswordRequiresLower" =>
-                          new ResetUserPasswordError(
-                              ResetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
-                              error.Description,
-                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                              ),
+                                    new ResetUserPasswordError(
+                                        ResetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 "PasswordRequiresNonAlphanumeric" =>
-                          new ResetUserPasswordError(
-                              ResetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
-                              error.Description,
-                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                              ),
+                                    new ResetUserPasswordError(
+                                        ResetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 "PasswordRequiresUpper" =>
-                          new ResetUserPasswordError(
-                              ResetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
-                              error.Description,
-                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                              ),
+                                    new ResetUserPasswordError(
+                                        ResetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 "PasswordTooShort" =>
-                          new ResetUserPasswordError(
-                              ResetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
-                              error.Description,
-                              new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                              ),
+                                    new ResetUserPasswordError(
+                                        ResetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
+                                        error.Description,
+                                        new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                    ),
                                 _ =>
-                          new ResetUserPasswordError(
-                              ResetUserPasswordErrorCode.UNKNOWN,
-                              $"{error.Description} (error code `{error.Code}`)",
-                              new[] { nameof(input) }
-                              )
+                                    new ResetUserPasswordError(
+                                        ResetUserPasswordErrorCode.UNKNOWN,
+                                        $"{error.Description} (error code `{error.Code}`)",
+                                        new[] { nameof(input) }
+                                    )
                             }
                         );
                     }
+
                     return new ResetUserPasswordPayload(errors);
                 }
             }
+
             return new ResetUserPasswordPayload();
         }
 
@@ -665,23 +698,24 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             if (!await UserAuthorization.IsAuthorizedToDeleteUsers(
                     claimsPrincipal,
                     userManager
                 ).ConfigureAwait(false)
-            )
+               )
             {
                 return new DeleteUserPayload(
                     new DeleteUserError(
-                      DeleteUserErrorCode.UNAUTHORIZED,
-                      $"You are not authorized to delete user with identifier {input.UserId}.",
-                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
-                      )
-                    );
+                        DeleteUserErrorCode.UNAUTHORIZED,
+                        $"You are not authorized to delete user with identifier {input.UserId}.",
+                        new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                    )
+                );
             }
+
             var user =
                 await userManager.Users.SingleOrDefaultAsync(_ =>
                     _.Id == input.UserId
@@ -690,12 +724,13 @@ namespace Metabase.GraphQl.Users
             {
                 return new DeleteUserPayload(
                     new DeleteUserError(
-                      DeleteUserErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {input.UserId}.",
-                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
-                      )
-                    );
+                        DeleteUserErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {input.UserId}.",
+                        new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                    )
+                );
             }
+
             var identityResult = await userManager.DeleteAsync(user).ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
@@ -707,16 +742,18 @@ namespace Metabase.GraphQl.Users
                         error.Code switch
                         {
                             _ =>
-                        new DeleteUserError(
-                            DeleteUserErrorCode.UNKNOWN,
-                            $"{error.Description} (error code `{error.Code}`)",
-                            new[] { nameof(input) }
-                            )
+                                new DeleteUserError(
+                                    DeleteUserErrorCode.UNKNOWN,
+                                    $"{error.Description} (error code `{error.Code}`)",
+                                    new[] { nameof(input) }
+                                )
                         }
                     );
                 }
+
                 return new DeleteUserPayload(user, errors);
             }
+
             return new DeleteUserPayload(user);
         }
 
@@ -732,7 +769,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             await signInManager.SignOutAsync().ConfigureAwait(false);
@@ -750,7 +787,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -758,35 +795,39 @@ namespace Metabase.GraphQl.Users
             {
                 return new ChangeUserPasswordPayload(
                     new ChangeUserPasswordError(
-                      ChangeUserPasswordErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ChangeUserPasswordErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             if (!await userManager.HasPasswordAsync(user).ConfigureAwait(false))
             {
                 return new ChangeUserPasswordPayload(
                     user,
                     new ChangeUserPasswordError(
-                      ChangeUserPasswordErrorCode.NO_PASSWORD,
-                      "You do not have a password yet.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ChangeUserPasswordErrorCode.NO_PASSWORD,
+                        "You do not have a password yet.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             if (input.NewPassword != input.NewPasswordConfirmation)
             {
                 return new ChangeUserPasswordPayload(
                     user,
                     new ChangeUserPasswordError(
-                      ChangeUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
-                      "Password and confirmation password do not match.",
-                      new[] { nameof(input), nameof(input.NewPasswordConfirmation).FirstCharToLower() }
-                      )
-                    );
+                        ChangeUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
+                        "Password and confirmation password do not match.",
+                        new[] { nameof(input), nameof(input.NewPasswordConfirmation).FirstCharToLower() }
+                    )
+                );
             }
-            var identityResult = await userManager.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword).ConfigureAwait(false);
+
+            var identityResult = await userManager.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword)
+                .ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
                 var errors = new List<ChangeUserPasswordError>();
@@ -797,46 +838,48 @@ namespace Metabase.GraphQl.Users
                         error.Code switch
                         {
                             "PasswordRequiresDigit" =>
-                      new ChangeUserPasswordError(
-                          ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
-                          error.Description,
-                          new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
-                          ),
+                                new ChangeUserPasswordError(
+                                    ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
+                                ),
                             "PasswordRequiresLower" =>
-                      new ChangeUserPasswordError(
-                          ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
-                          error.Description,
-                          new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
-                          ),
+                                new ChangeUserPasswordError(
+                                    ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
+                                ),
                             "PasswordRequiresNonAlphanumeric" =>
-                      new ChangeUserPasswordError(
-                          ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
-                          error.Description,
-                          new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
-                          ),
+                                new ChangeUserPasswordError(
+                                    ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
+                                ),
                             "PasswordRequiresUpper" =>
-                        new ChangeUserPasswordError(
-                            ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
-                            ),
+                                new ChangeUserPasswordError(
+                                    ChangeUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
+                                ),
                             "PasswordTooShort" =>
-                        new ChangeUserPasswordError(
-                            ChangeUserPasswordErrorCode.PASSWORD_TOO_SHORT,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
-                            ),
+                                new ChangeUserPasswordError(
+                                    ChangeUserPasswordErrorCode.PASSWORD_TOO_SHORT,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.NewPassword).FirstCharToLower() }
+                                ),
                             _ =>
-                        new ChangeUserPasswordError(
-                            ChangeUserPasswordErrorCode.UNKNOWN,
-                            $"{error.Description} (error code `{error.Code}`)",
-                            new[] { nameof(input) }
-                            )
+                                new ChangeUserPasswordError(
+                                    ChangeUserPasswordErrorCode.UNKNOWN,
+                                    $"{error.Description} (error code `{error.Code}`)",
+                                    new[] { nameof(input) }
+                                )
                         }
                     );
                 }
+
                 return new ChangeUserPasswordPayload(user, errors);
             }
+
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new ChangeUserPasswordPayload(user);
         }
@@ -852,7 +895,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -860,12 +903,13 @@ namespace Metabase.GraphQl.Users
             {
                 return new DeletePersonalUserDataPayload(
                     new DeletePersonalUserDataError(
-                      DeletePersonalUserDataErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        DeletePersonalUserDataErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             if (await userManager.HasPasswordAsync(user).ConfigureAwait(false))
             {
                 if (input.Password is null)
@@ -873,24 +917,26 @@ namespace Metabase.GraphQl.Users
                     return new DeletePersonalUserDataPayload(
                         user,
                         new DeletePersonalUserDataError(
-                          DeletePersonalUserDataErrorCode.MISSING_PASSWORD,
-                          "Missing password.",
-                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                          )
-                        );
+                            DeletePersonalUserDataErrorCode.MISSING_PASSWORD,
+                            "Missing password.",
+                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                        )
+                    );
                 }
+
                 if (!await userManager.CheckPasswordAsync(user, input.Password).ConfigureAwait(false))
                 {
                     return new DeletePersonalUserDataPayload(
                         user,
                         new DeletePersonalUserDataError(
-                          DeletePersonalUserDataErrorCode.INCORRECT_PASSWORD,
-                          "Incorrect password.",
-                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                          )
-                        );
+                            DeletePersonalUserDataErrorCode.INCORRECT_PASSWORD,
+                            "Incorrect password.",
+                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                        )
+                    );
                 }
             }
+
             var identityResult = await userManager.DeleteAsync(user).ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
@@ -902,16 +948,18 @@ namespace Metabase.GraphQl.Users
                         error.Code switch
                         {
                             _ =>
-                        new DeletePersonalUserDataError(
-                            DeletePersonalUserDataErrorCode.UNKNOWN,
-                            $"{error.Description} (error code `{error.Code}`)",
-                            new[] { nameof(input) }
-                            )
+                                new DeletePersonalUserDataError(
+                                    DeletePersonalUserDataErrorCode.UNKNOWN,
+                                    $"{error.Description} (error code `{error.Code}`)",
+                                    new[] { nameof(input) }
+                                )
                         }
                     );
                 }
+
                 return new DeletePersonalUserDataPayload(user, errors);
             }
+
             await signInManager.SignOutAsync().ConfigureAwait(false);
             return new DeletePersonalUserDataPayload(user);
         }
@@ -924,7 +972,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -932,23 +980,25 @@ namespace Metabase.GraphQl.Users
             {
                 return new DisableUserTwoFactorAuthenticationPayload(
                     new DisableUserTwoFactorAuthenticationError(
-                      DisableUserTwoFactorAuthenticationErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        DisableUserTwoFactorAuthenticationErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var disableResult = await userManager.SetTwoFactorEnabledAsync(user, false).ConfigureAwait(false);
             if (!disableResult.Succeeded)
             {
                 return new DisableUserTwoFactorAuthenticationPayload(
                     new DisableUserTwoFactorAuthenticationError(
-                      DisableUserTwoFactorAuthenticationErrorCode.UNKNOWN,
-                      "Unknown error.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        DisableUserTwoFactorAuthenticationErrorCode.UNKNOWN,
+                        "Unknown error.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             return new DisableUserTwoFactorAuthenticationPayload(user);
         }
 
@@ -962,7 +1012,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -970,12 +1020,13 @@ namespace Metabase.GraphQl.Users
             {
                 return new ForgetUserTwoFactorAuthenticationClientPayload(
                     new ForgetUserTwoFactorAuthenticationClientError(
-                      ForgetUserTwoFactorAuthenticationClientErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ForgetUserTwoFactorAuthenticationClientErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             await signInManager.ForgetTwoFactorClientAsync().ConfigureAwait(false);
             return new ForgetUserTwoFactorAuthenticationClientPayload(user);
         }
@@ -983,12 +1034,13 @@ namespace Metabase.GraphQl.Users
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.EnableAuthenticator.cs.cshtml
         [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
         [UseUserManager]
-        public async Task<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload> GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriAsync(
-            ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service] UrlEncoder urlEncoder,
-            [Service] IAntiforgery antiforgeryService,
-            [Service] IHttpContextAccessor httpContextAccessor
+        public async Task<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload>
+            GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriAsync(
+                ClaimsPrincipal claimsPrincipal,
+                [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+                [Service] UrlEncoder urlEncoder,
+                [Service] IAntiforgery antiforgeryService,
+                [Service] IHttpContextAccessor httpContextAccessor
             )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
@@ -997,12 +1049,13 @@ namespace Metabase.GraphQl.Users
             {
                 return new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
-                      GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false) switch
             {
                 LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
@@ -1010,39 +1063,41 @@ namespace Metabase.GraphQl.Users
                         user,
                         sharedKey,
                         authenticatorUri
-                        ),
+                    ),
                 LoadSharedKeyAndQrCodeUriPayload.ResettingAuthenticatorKeyFailure =>
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
                         new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
-                          GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.RESETTING_AUTHENTICATOR_KEY_FAILED,
-                          $"Failed to reset authenticator key.",
-                          Array.Empty<string>()
-                          )
-                        ),
+                            GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode
+                                .RESETTING_AUTHENTICATOR_KEY_FAILED,
+                            $"Failed to reset authenticator key.",
+                            Array.Empty<string>()
+                        )
+                    ),
                 LoadSharedKeyAndQrCodeUriPayload.GettingAuthenticatorKeyFailure =>
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
                         new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
-                          GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.GETTING_AUTHENTICATOR_KEY_FAILED,
-                          $"Failed to get authenticator key.",
-                          Array.Empty<string>()
-                          )
-                        ),
+                            GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode
+                                .GETTING_AUTHENTICATOR_KEY_FAILED,
+                            $"Failed to get authenticator key.",
+                            Array.Empty<string>()
+                        )
+                    ),
                 LoadSharedKeyAndQrCodeUriPayload.GettingEmailFailure =>
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
                         new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
-                          GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.GETTING_EMAIL_FAILED,
-                          $"Failed to get email.",
-                          Array.Empty<string>()
-                          )
-                        ),
+                            GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.GETTING_EMAIL_FAILED,
+                            $"Failed to get email.",
+                            Array.Empty<string>()
+                        )
+                    ),
                 _ =>
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
                         new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
-                          GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.UNKNOWN,
-                          $"Failed to load shared key and QR code URI.",
-                          Array.Empty<string>()
-                          )
+                            GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.UNKNOWN,
+                            $"Failed to load shared key and QR code URI.",
+                            Array.Empty<string>()
                         )
+                    )
             };
         }
 
@@ -1056,7 +1111,7 @@ namespace Metabase.GraphQl.Users
             [Service] UrlEncoder urlEncoder,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1064,21 +1119,22 @@ namespace Metabase.GraphQl.Users
             {
                 return new EnableUserTwoFactorAuthenticatorPayload(
                     new EnableUserTwoFactorAuthenticatorError(
-                      EnableUserTwoFactorAuthenticatorErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        EnableUserTwoFactorAuthenticatorErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var verificationToken =
                 input.VerificationCode
-                .Replace(" ", string.Empty)
-                .Replace("-", string.Empty);
+                    .Replace(" ", string.Empty)
+                    .Replace("-", string.Empty);
             var isTokenValid =
                 await userManager.VerifyTwoFactorTokenAsync(
-                    user,
-                    userManager.Options.Tokens.AuthenticatorTokenProvider,
-                    verificationToken
+                        user,
+                        userManager.Options.Tokens.AuthenticatorTokenProvider,
+                        verificationToken
                     )
                     .ConfigureAwait(false);
             if (!isTokenValid)
@@ -1088,23 +1144,24 @@ namespace Metabase.GraphQl.Users
                     LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
                         new EnableUserTwoFactorAuthenticatorPayload(
                             new EnableUserTwoFactorAuthenticatorError(
-                              EnableUserTwoFactorAuthenticatorErrorCode.INVALID_VERIFICATION_CODE,
-                              "Verification code is invalid.",
-                              new[] { nameof(input), nameof(input.VerificationCode).FirstCharToLower() }
-                              ),
+                                EnableUserTwoFactorAuthenticatorErrorCode.INVALID_VERIFICATION_CODE,
+                                "Verification code is invalid.",
+                                new[] { nameof(input), nameof(input.VerificationCode).FirstCharToLower() }
+                            ),
                             sharedKey,
                             authenticatorUri
-                            ),
+                        ),
                     _ =>
                         new EnableUserTwoFactorAuthenticatorPayload(
                             new EnableUserTwoFactorAuthenticatorError(
-                              EnableUserTwoFactorAuthenticatorErrorCode.INVALID_VERIFICATION_CODE,
-                              "Verification code is invalid.",
-                              new[] { nameof(input), nameof(input.VerificationCode).FirstCharToLower() }
-                              )
+                                EnableUserTwoFactorAuthenticatorErrorCode.INVALID_VERIFICATION_CODE,
+                                "Verification code is invalid.",
+                                new[] { nameof(input), nameof(input.VerificationCode).FirstCharToLower() }
                             )
+                        )
                 };
             }
+
             var enableResult = await userManager.SetTwoFactorEnabledAsync(user, true).ConfigureAwait(false);
             if (!enableResult.Succeeded)
             {
@@ -1113,26 +1170,28 @@ namespace Metabase.GraphQl.Users
                     LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
                         new EnableUserTwoFactorAuthenticatorPayload(
                             new EnableUserTwoFactorAuthenticatorError(
-                              EnableUserTwoFactorAuthenticatorErrorCode.ENABLING_FAILED,
-                              "Unknown error enabling.",
-                              Array.Empty<string>()
-                              ),
+                                EnableUserTwoFactorAuthenticatorErrorCode.ENABLING_FAILED,
+                                "Unknown error enabling.",
+                                Array.Empty<string>()
+                            ),
                             sharedKey,
                             authenticatorUri
-                            ),
+                        ),
                     _ =>
                         new EnableUserTwoFactorAuthenticatorPayload(
                             new EnableUserTwoFactorAuthenticatorError(
-                              EnableUserTwoFactorAuthenticatorErrorCode.ENABLING_FAILED,
-                              "Unknown error enabling.",
-                              Array.Empty<string>()
-                              )
+                                EnableUserTwoFactorAuthenticatorErrorCode.ENABLING_FAILED,
+                                "Unknown error enabling.",
+                                Array.Empty<string>()
                             )
+                        )
                 };
             }
+
             if (await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false) == 0)
             {
-                var recoveryCodes = await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
+                var recoveryCodes =
+                    await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
                 if (recoveryCodes is null)
                 {
                     return new EnableUserTwoFactorAuthenticatorPayload(user, Array.Empty<string>());
@@ -1145,6 +1204,7 @@ namespace Metabase.GraphQl.Users
                     //       )
                     //     );
                 }
+
                 return new EnableUserTwoFactorAuthenticatorPayload(user, recoveryCodes.ToList().AsReadOnly());
             }
             else
@@ -1158,13 +1218,18 @@ namespace Metabase.GraphQl.Users
             public sealed record Success(string SharedKey, string AuthenticatorUri) : LoadSharedKeyAndQrCodeUriPayload;
 
             public sealed record ResettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
+
             public sealed record GettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
+
             public sealed record GettingEmailFailure() : LoadSharedKeyAndQrCodeUriPayload;
 
-            private LoadSharedKeyAndQrCodeUriPayload() { }
+            private LoadSharedKeyAndQrCodeUriPayload()
+            {
+            }
         }
 
-        private static async Task<LoadSharedKeyAndQrCodeUriPayload> LoadSharedKeyAndQrCodeUriAsync(UserManager<Data.User> userManager, UrlEncoder urlEncoder, Data.User user)
+        private static async Task<LoadSharedKeyAndQrCodeUriPayload> LoadSharedKeyAndQrCodeUriAsync(
+            UserManager<Data.User> userManager, UrlEncoder urlEncoder, Data.User user)
         {
             // Load the authenticator key & QR code URI to display on the form
             var unformattedKey = await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
@@ -1175,18 +1240,21 @@ namespace Metabase.GraphQl.Users
                 {
                     return new LoadSharedKeyAndQrCodeUriPayload.ResettingAuthenticatorKeyFailure();
                 }
+
                 unformattedKey = await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
                 if (string.IsNullOrEmpty(unformattedKey))
                 {
                     return new LoadSharedKeyAndQrCodeUriPayload.GettingAuthenticatorKeyFailure();
                 }
             }
+
             var sharedKey = FormatKey(unformattedKey);
             var email = await userManager.GetEmailAsync(user).ConfigureAwait(false);
             if (email is null)
             {
                 return new LoadSharedKeyAndQrCodeUriPayload.GettingEmailFailure();
             }
+
             var authenticatorUri = GenerateQrCodeUri(urlEncoder, email, unformattedKey);
             return new LoadSharedKeyAndQrCodeUriPayload.Success(sharedKey, authenticatorUri);
         }
@@ -1200,10 +1268,12 @@ namespace Metabase.GraphQl.Users
                 result.Append(unformattedKey, currentPosition, 4).Append(' ');
                 currentPosition += 4;
             }
+
             if (currentPosition < unformattedKey.Length)
             {
                 result.Append(unformattedKey, currentPosition, unformattedKey.Length - currentPosition);
             }
+
             return result.ToString().ToLowerInvariant();
         }
 
@@ -1215,7 +1285,7 @@ namespace Metabase.GraphQl.Users
                 urlEncoder.Encode("buildingenvelopedata.org"), // issuer
                 urlEncoder.Encode(email), // account name
                 unformattedKey // secret
-                );
+            );
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.ResetAuthenticator.cs.cshtml
@@ -1228,7 +1298,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1236,34 +1306,37 @@ namespace Metabase.GraphQl.Users
             {
                 return new ResetUserTwoFactorAuthenticatorPayload(
                     new ResetUserTwoFactorAuthenticatorError(
-                      ResetUserTwoFactorAuthenticatorErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ResetUserTwoFactorAuthenticatorErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var disableResult = await userManager.SetTwoFactorEnabledAsync(user, false).ConfigureAwait(false);
             if (!disableResult.Succeeded)
             {
                 return new ResetUserTwoFactorAuthenticatorPayload(
                     new ResetUserTwoFactorAuthenticatorError(
-                      ResetUserTwoFactorAuthenticatorErrorCode.DISABLING_FAILED,
-                      "Unknown error disabling.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ResetUserTwoFactorAuthenticatorErrorCode.DISABLING_FAILED,
+                        "Unknown error disabling.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var resetResult = await userManager.ResetAuthenticatorKeyAsync(user).ConfigureAwait(false);
             if (!resetResult.Succeeded)
             {
                 return new ResetUserTwoFactorAuthenticatorPayload(
                     new ResetUserTwoFactorAuthenticatorError(
-                      ResetUserTwoFactorAuthenticatorErrorCode.RESETTING_FAILED,
-                      "Unknown error resetting.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ResetUserTwoFactorAuthenticatorErrorCode.RESETTING_FAILED,
+                        "Unknown error resetting.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new ResetUserTwoFactorAuthenticatorPayload(user);
         }
@@ -1280,7 +1353,7 @@ namespace Metabase.GraphQl.Users
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1288,34 +1361,37 @@ namespace Metabase.GraphQl.Users
             {
                 return new ChangeUserEmailPayload(
                     new ChangeUserEmailError(
-                      ChangeUserEmailErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ChangeUserEmailErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var currentEmail = await userManager.GetEmailAsync(user).ConfigureAwait(false);
             if (currentEmail is null)
             {
                 return new ChangeUserEmailPayload(
                     new ChangeUserEmailError(
-                      ChangeUserEmailErrorCode.UNKNOWN_CURRENT_EMAIL,
-                      $"Failed to load current email address.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ChangeUserEmailErrorCode.UNKNOWN_CURRENT_EMAIL,
+                        $"Failed to load current email address.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             if (currentEmail == input.NewEmail)
             {
                 return new ChangeUserEmailPayload(
                     user,
                     new ChangeUserEmailError(
-                      ChangeUserEmailErrorCode.UNCHANGED_EMAIL,
-                      "Your email is unchanged.",
-                      new string[] { nameof(input), nameof(input.NewEmail).FirstCharToLower() }
-                      )
-                    );
+                        ChangeUserEmailErrorCode.UNCHANGED_EMAIL,
+                        "Your email is unchanged.",
+                        new string[] { nameof(input), nameof(input.NewEmail).FirstCharToLower() }
+                    )
+                );
             }
+
             // TODO Check validity of `input.NewEmail` (use error code `INVALID_EMAIL`)
             await SendChangeUserEmailConfirmation(
                 user.Name,
@@ -1325,7 +1401,7 @@ namespace Metabase.GraphQl.Users
                 emailSender,
                 appSettings.Host,
                 urlEncoder
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             return new ChangeUserEmailPayload(user);
         }
 
@@ -1340,7 +1416,7 @@ namespace Metabase.GraphQl.Users
             [Service] AppSettings appSettings,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1348,23 +1424,25 @@ namespace Metabase.GraphQl.Users
             {
                 return new ResendUserEmailVerificationPayload(
                     new ResendUserEmailVerificationError(
-                      ResendUserEmailVerificationErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ResendUserEmailVerificationErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var email = await userManager.GetEmailAsync(user).ConfigureAwait(false);
             if (email is null)
             {
                 return new ResendUserEmailVerificationPayload(
                     new ResendUserEmailVerificationError(
-                      ResendUserEmailVerificationErrorCode.UNKNOWN_EMAIL,
-                      $"Failed to load email address.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        ResendUserEmailVerificationErrorCode.UNKNOWN_EMAIL,
+                        $"Failed to load email address.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             await SendUserEmailConfirmation(
                 (user.Name, email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
@@ -1372,7 +1450,7 @@ namespace Metabase.GraphQl.Users
                 appSettings.Host,
                 null,
                 urlEncoder
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             return new ResendUserEmailVerificationPayload(user);
         }
 
@@ -1384,7 +1462,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1392,39 +1470,43 @@ namespace Metabase.GraphQl.Users
             {
                 return new GenerateUserTwoFactorRecoveryCodesPayload(
                     new GenerateUserTwoFactorRecoveryCodesError(
-                      GenerateUserTwoFactorRecoveryCodesErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        GenerateUserTwoFactorRecoveryCodesErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             if (!await userManager.GetTwoFactorEnabledAsync(user).ConfigureAwait(false))
             {
                 return new GenerateUserTwoFactorRecoveryCodesPayload(
                     user,
                     new GenerateUserTwoFactorRecoveryCodesError(
-                      GenerateUserTwoFactorRecoveryCodesErrorCode.TWO_FACTOR_AUTHENTICATION_DISABLED,
-                      "You have disabled two-factor authentication.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        GenerateUserTwoFactorRecoveryCodesErrorCode.TWO_FACTOR_AUTHENTICATION_DISABLED,
+                        "You have disabled two-factor authentication.",
+                        Array.Empty<string>()
+                    )
+                );
             }
-            var recoveryCodes = await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
+
+            var recoveryCodes =
+                await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
             if (recoveryCodes is null)
             {
                 return new GenerateUserTwoFactorRecoveryCodesPayload(
                     user,
                     new GenerateUserTwoFactorRecoveryCodesError(
-                      GenerateUserTwoFactorRecoveryCodesErrorCode.CODE_GENERATION_FAILED,
-                      "Code generation failed.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        GenerateUserTwoFactorRecoveryCodesErrorCode.CODE_GENERATION_FAILED,
+                        "Code generation failed.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             return new GenerateUserTwoFactorRecoveryCodesPayload(
                 user,
                 recoveryCodes.ToList().AsReadOnly()
-                );
+            );
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Index.cs.cshtml
@@ -1438,7 +1520,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1446,24 +1528,26 @@ namespace Metabase.GraphQl.Users
             {
                 return new SetUserPhoneNumberPayload(
                     new SetUserPhoneNumberError(
-                      SetUserPhoneNumberErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        SetUserPhoneNumberErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var currentPhoneNumber = await userManager.GetPhoneNumberAsync(user).ConfigureAwait(false);
             if (currentPhoneNumber == input.PhoneNumber)
             {
                 return new SetUserPhoneNumberPayload(
                     user,
                     new SetUserPhoneNumberError(
-                      SetUserPhoneNumberErrorCode.UNCHANGED_PHONE_NUMBER,
-                      "Your phone number is unchanged.",
-                      new string[] { nameof(input), nameof(input.PhoneNumber).FirstCharToLower() }
-                      )
-                    );
+                        SetUserPhoneNumberErrorCode.UNCHANGED_PHONE_NUMBER,
+                        "Your phone number is unchanged.",
+                        new string[] { nameof(input), nameof(input.PhoneNumber).FirstCharToLower() }
+                    )
+                );
             }
+
             var identityResult = await userManager.SetPhoneNumberAsync(user, input.PhoneNumber).ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
@@ -1475,16 +1559,18 @@ namespace Metabase.GraphQl.Users
                         error.Code switch
                         {
                             _ =>
-                        new SetUserPhoneNumberError(
-                            SetUserPhoneNumberErrorCode.UNKNOWN,
-                            $"{error.Description} (error code `{error.Code}`)",
-                            new[] { nameof(input) }
-                            )
+                                new SetUserPhoneNumberError(
+                                    SetUserPhoneNumberErrorCode.UNKNOWN,
+                                    $"{error.Description} (error code `{error.Code}`)",
+                                    new[] { nameof(input) }
+                                )
                         }
                     );
                 }
+
                 return new SetUserPhoneNumberPayload(user, errors);
             }
+
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new SetUserPhoneNumberPayload(user);
         }
@@ -1500,7 +1586,7 @@ namespace Metabase.GraphQl.Users
             [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
@@ -1508,34 +1594,37 @@ namespace Metabase.GraphQl.Users
             {
                 return new SetUserPasswordPayload(
                     new SetUserPasswordError(
-                      SetUserPasswordErrorCode.UNKNOWN_USER,
-                      $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        SetUserPasswordErrorCode.UNKNOWN_USER,
+                        $"Failed to load user with identifier {userManager.GetUserId(claimsPrincipal)}.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             if (await userManager.HasPasswordAsync(user).ConfigureAwait(false))
             {
                 return new SetUserPasswordPayload(
                     user,
                     new SetUserPasswordError(
-                      SetUserPasswordErrorCode.EXISTING_PASSWORD,
-                      "You already have a password.",
-                      Array.Empty<string>()
-                      )
-                    );
+                        SetUserPasswordErrorCode.EXISTING_PASSWORD,
+                        "You already have a password.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             if (input.Password != input.PasswordConfirmation)
             {
                 return new SetUserPasswordPayload(
                     user,
                     new SetUserPasswordError(
-                      SetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
-                      "Password and confirmation password do not match.",
-                      new[] { nameof(input), nameof(input.PasswordConfirmation).FirstCharToLower() }
-                      )
-                    );
+                        SetUserPasswordErrorCode.PASSWORD_CONFIRMATION_MISMATCH,
+                        "Password and confirmation password do not match.",
+                        new[] { nameof(input), nameof(input.PasswordConfirmation).FirstCharToLower() }
+                    )
+                );
             }
+
             var identityResult = await userManager.AddPasswordAsync(user, input.Password).ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
@@ -1547,46 +1636,48 @@ namespace Metabase.GraphQl.Users
                         error.Code switch
                         {
                             "PasswordRequiresDigit" =>
-                      new SetUserPasswordError(
-                          SetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
-                          error.Description,
-                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                          ),
+                                new SetUserPasswordError(
+                                    SetUserPasswordErrorCode.PASSWORD_REQUIRES_DIGIT,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                ),
                             "PasswordRequiresLower" =>
-                      new SetUserPasswordError(
-                          SetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
-                          error.Description,
-                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                          ),
+                                new SetUserPasswordError(
+                                    SetUserPasswordErrorCode.PASSWORD_REQUIRES_LOWER,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                ),
                             "PasswordRequiresNonAlphanumeric" =>
-                      new SetUserPasswordError(
-                          SetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
-                          error.Description,
-                          new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                          ),
+                                new SetUserPasswordError(
+                                    SetUserPasswordErrorCode.PASSWORD_REQUIRES_NON_ALPHANUMERIC,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                ),
                             "PasswordRequiresUpper" =>
-                        new SetUserPasswordError(
-                            SetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                            ),
+                                new SetUserPasswordError(
+                                    SetUserPasswordErrorCode.PASSWORD_REQUIRES_UPPER,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                ),
                             "PasswordTooShort" =>
-                        new SetUserPasswordError(
-                            SetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
-                            error.Description,
-                            new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
-                            ),
+                                new SetUserPasswordError(
+                                    SetUserPasswordErrorCode.PASSWORD_TOO_SHORT,
+                                    error.Description,
+                                    new[] { nameof(input), nameof(input.Password).FirstCharToLower() }
+                                ),
                             _ =>
-                        new SetUserPasswordError(
-                            SetUserPasswordErrorCode.UNKNOWN,
-                            $"{error.Description} (error code `{error.Code}`)",
-                            new[] { nameof(input) }
-                            )
+                                new SetUserPasswordError(
+                                    SetUserPasswordErrorCode.UNKNOWN,
+                                    $"{error.Description} (error code `{error.Code}`)",
+                                    new[] { nameof(input) }
+                                )
                         }
                     );
                 }
+
                 return new SetUserPasswordPayload(user, errors);
             }
+
             await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
             return new SetUserPasswordPayload(user);
         }
@@ -1601,19 +1692,21 @@ namespace Metabase.GraphQl.Users
             [Service] IHttpContextAccessor httpContextAccessor,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-            if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager).ConfigureAwait(false))
+            if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager)
+                    .ConfigureAwait(false))
             {
                 return new AddUserRolePayload(
                     new AddUserRoleError(
-                      AddUserRoleErrorCode.UNAUTHORIZED,
-                      $"You are not authorized to add role {input.Role}.",
-                      Array.Empty<string>()
+                        AddUserRoleErrorCode.UNAUTHORIZED,
+                        $"You are not authorized to add role {input.Role}.",
+                        Array.Empty<string>()
                     )
                 );
             }
+
             var user = await context.Users.AsQueryable()
                 .SingleOrDefaultAsync(
                     x => x.Id == input.UserId,
@@ -1623,13 +1716,15 @@ namespace Metabase.GraphQl.Users
             {
                 return new AddUserRolePayload(
                     new AddUserRoleError(
-                      AddUserRoleErrorCode.UNKNOWN_USER,
-                      "Unknown user.",
-                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
-                      )
-                    );
+                        AddUserRoleErrorCode.UNKNOWN_USER,
+                        "Unknown user.",
+                        new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                    )
+                );
             }
-            var identityResult = await userManager.AddToRoleAsync(user, Data.Role.EnumToName(input.Role)).ConfigureAwait(false);
+
+            var identityResult = await userManager.AddToRoleAsync(user, Data.Role.EnumToName(input.Role))
+                .ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
                 var errors = new List<AddUserRoleError>();
@@ -1644,12 +1739,14 @@ namespace Metabase.GraphQl.Users
                                     AddUserRoleErrorCode.UNKNOWN,
                                     $"{error.Description} (error code `{error.Code}`)",
                                     new[] { nameof(input) }
-                                    )
+                                )
                         }
                     );
                 }
+
                 return new AddUserRolePayload(user, errors);
             }
+
             return new AddUserRolePayload(user);
         }
 
@@ -1663,19 +1760,21 @@ namespace Metabase.GraphQl.Users
             [Service] IHttpContextAccessor httpContextAccessor,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-            if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager).ConfigureAwait(false))
+            if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager)
+                    .ConfigureAwait(false))
             {
                 return new RemoveUserRolePayload(
                     new RemoveUserRoleError(
-                      RemoveUserRoleErrorCode.UNAUTHORIZED,
-                      $"You are not authorized to remove role {input.Role}.",
-                      Array.Empty<string>()
+                        RemoveUserRoleErrorCode.UNAUTHORIZED,
+                        $"You are not authorized to remove role {input.Role}.",
+                        Array.Empty<string>()
                     )
                 );
             }
+
             var user = await context.Users.AsQueryable()
                 .SingleOrDefaultAsync(
                     x => x.Id == input.UserId,
@@ -1685,13 +1784,15 @@ namespace Metabase.GraphQl.Users
             {
                 return new RemoveUserRolePayload(
                     new RemoveUserRoleError(
-                      RemoveUserRoleErrorCode.UNKNOWN_USER,
-                      "Unknown user.",
-                      new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
-                      )
-                    );
+                        RemoveUserRoleErrorCode.UNKNOWN_USER,
+                        "Unknown user.",
+                        new[] { nameof(input), nameof(input.UserId).FirstCharToLower() }
+                    )
+                );
             }
-            var identityResult = await userManager.RemoveFromRoleAsync(user, Data.Role.EnumToName(input.Role)).ConfigureAwait(false);
+
+            var identityResult = await userManager.RemoveFromRoleAsync(user, Data.Role.EnumToName(input.Role))
+                .ConfigureAwait(false);
             if (!identityResult.Succeeded)
             {
                 var errors = new List<RemoveUserRoleError>();
@@ -1706,12 +1807,14 @@ namespace Metabase.GraphQl.Users
                                     RemoveUserRoleErrorCode.UNKNOWN,
                                     $"{error.Description} (error code `{error.Code}`)",
                                     new[] { nameof(input) }
-                                    )
+                                )
                         }
                     );
                 }
+
                 return new RemoveUserRolePayload(user, errors);
             }
+
             return new RemoveUserRolePayload(user);
         }
 
@@ -1722,13 +1825,14 @@ namespace Metabase.GraphQl.Users
             string host,
             Uri? returnTo,
             UrlEncoder urlEncoder
-            )
+        )
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendAsync(
-                recipient,
-                "Confirm your email",
-                $"Please confirm your email address by following the link {host}/users/confirm-email?email={urlEncoder.Encode(recipient.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}" + (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}"))
+                    recipient,
+                    "Confirm your email",
+                    $"Please confirm your email address by following the link {host}/users/confirm-email?email={urlEncoder.Encode(recipient.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}" +
+                    (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}"))
                 .ConfigureAwait(false);
         }
 
@@ -1744,29 +1848,29 @@ namespace Metabase.GraphQl.Users
         {
             var confirmationCode = EncodeToken(confirmationToken);
             await emailSender.SendAsync(
-                (name, newEmail),
-                "Confirm your email change",
-                $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={urlEncoder.Encode(currentEmail)}&newEmail={urlEncoder.Encode(newEmail)}&confirmationCode={confirmationCode}")
+                    (name, newEmail),
+                    "Confirm your email change",
+                    $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={urlEncoder.Encode(currentEmail)}&newEmail={urlEncoder.Encode(newEmail)}&confirmationCode={confirmationCode}")
                 .ConfigureAwait(false);
         }
 
         private static string EncodeToken(string token)
         {
             return
-              WebEncoders.Base64UrlEncode(
-                  Encoding.UTF8.GetBytes(
-                    token
+                WebEncoders.Base64UrlEncode(
+                    Encoding.UTF8.GetBytes(
+                        token
                     )
-                  );
+                );
         }
 
         private static string DecodeCode(string code)
         {
             return
-              Encoding.UTF8.GetString(
-                WebEncoders.Base64UrlDecode(
-                  code
-                  )
+                Encoding.UTF8.GetString(
+                    WebEncoders.Base64UrlDecode(
+                        code
+                    )
                 );
         }
     }

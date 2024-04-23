@@ -10,7 +10,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
     public sealed class ChangeUserEmailTests
-      : UserIntegrationTests
+        : UserIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -30,23 +30,24 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await ChangeUserEmail(
                 newEmail
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             EmailsShouldContainSingle(
                 recipient: (name, newEmail),
                 subject: "Confirm your email change",
-                bodyRegEx: @"^Please confirm your email address change by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email-change\?currentEmail=john\.doe@ise\.fraunhofer\.de&newEmail=new.john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
-                );
+                bodyRegEx:
+                @"^Please confirm your email address change by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email-change\?currentEmail=john\.doe@ise\.fraunhofer\.de&newEmail=new.john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
+            );
         }
 
         [Test]
@@ -68,13 +69,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 {
                     ["newEmail"] = newEmail
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         [Test]
@@ -91,18 +92,18 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await ChangeUserEmail(
                 email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
+                    fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
+                )
             );
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         [Test]
@@ -120,18 +121,18 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await ChangeUserEmail(
                 newEmail
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
     }
 }

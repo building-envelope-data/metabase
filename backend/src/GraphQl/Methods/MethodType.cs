@@ -11,33 +11,34 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Methods
 {
     public sealed class MethodType
-      : EntityType<Data.Method, MethodByIdDataLoader>
+        : EntityType<Data.Method, MethodByIdDataLoader>
     {
         protected override void Configure(
             IObjectTypeDescriptor<Data.Method> descriptor
-            )
+        )
         {
             base.Configure(descriptor);
             descriptor
-            .Field(t => t.Standard)
-            .Ignore();
+                .Field(t => t.Standard)
+                .Ignore();
             descriptor
-            .Field(t => t.Publication)
-            .Ignore();
+                .Field(t => t.Publication)
+                .Ignore();
             descriptor
                 .Field(t => t.Manager)
                 .Type<NonNullType<ObjectType<MethodManagerEdge>>>()
                 .Resolve(context =>
                     new MethodManagerEdge(
                         context.Parent<Data.Method>()
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.ManagerId)
                 .Ignore();
             descriptor
                 .Field(t => t.Developers)
-                .Argument(nameof(Data.IMethodDeveloper.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
+                .Argument(nameof(Data.IMethodDeveloper.Pending).FirstCharToLower(),
+                    _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
                 .Type<NonNullType<ObjectType<MethodDeveloperConnection>>>()
                 .Resolve(context =>
                     new MethodDeveloperConnection(
@@ -46,34 +47,36 @@ namespace Metabase.GraphQl.Methods
                     )
                 );
             descriptor
-            .Field(t => t.InstitutionDevelopers)
-            .Ignore();
+                .Field(t => t.InstitutionDevelopers)
+                .Ignore();
             descriptor
-            .Field(t => t.InstitutionDeveloperEdges)
-            .Ignore();
+                .Field(t => t.InstitutionDeveloperEdges)
+                .Ignore();
             descriptor
-            .Field(t => t.UserDevelopers)
-            .Ignore();
+                .Field(t => t.UserDevelopers)
+                .Ignore();
             descriptor
-            .Field(t => t.UserDeveloperEdges)
-            .Ignore();
+                .Field(t => t.UserDeveloperEdges)
+                .Ignore();
             descriptor
-              .Field("canCurrentUserUpdateNode")
-              .ResolveWith<MethodResolvers>(x => MethodResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
-              .UseUserManager();
+                .Field("canCurrentUserUpdateNode")
+                .ResolveWith<MethodResolvers>(x =>
+                    MethodResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+                .UseUserManager();
         }
 
         private sealed class MethodResolvers
         {
             public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-              [Parent] Data.Method method,
-              ClaimsPrincipal claimsPrincipal,
-              [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-              Data.ApplicationDbContext context,
-              CancellationToken cancellationToken
+                [Parent] Data.Method method,
+                ClaimsPrincipal claimsPrincipal,
+                [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+                Data.ApplicationDbContext context,
+                CancellationToken cancellationToken
             )
             {
-                return MethodAuthorization.IsAuthorizedToUpdate(claimsPrincipal, method.Id, userManager, context, cancellationToken);
+                return MethodAuthorization.IsAuthorizedToUpdate(claimsPrincipal, method.Id, userManager, context,
+                    cancellationToken);
             }
         }
     }

@@ -40,6 +40,7 @@ namespace Metabase.Controllers
                             "The subject claim is missing."
                     }));
             }
+
             var user = await _userManager.FindByIdAsync(subject).ConfigureAwait(false);
             if (user is null)
             {
@@ -52,6 +53,7 @@ namespace Metabase.Controllers
                             "The specified access token is bound to an account that no longer exists."
                     }));
             }
+
             var claims = new Dictionary<string, object>(StringComparer.Ordinal)
             {
                 // Note: the "sub" claim is a mandatory claim and must be included in the JSON response.
@@ -69,18 +71,22 @@ namespace Metabase.Controllers
                     );
                 }
             }
+
             if (User.HasScope(Scopes.Email))
             {
                 var email = await _userManager.GetEmailAsync(user).ConfigureAwait(false);
                 if (email is not null) claims[Claims.Email] = email;
                 claims[Claims.EmailVerified] = await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false);
             }
+
             if (User.HasScope(Scopes.Phone))
             {
                 var phoneNumber = await _userManager.GetPhoneNumberAsync(user).ConfigureAwait(false);
                 if (phoneNumber is not null) claims[Claims.PhoneNumber] = phoneNumber;
-                claims[Claims.PhoneNumberVerified] = await _userManager.IsPhoneNumberConfirmedAsync(user).ConfigureAwait(false);
+                claims[Claims.PhoneNumberVerified] =
+                    await _userManager.IsPhoneNumberConfirmedAsync(user).ConfigureAwait(false);
             }
+
             if (User.HasScope(Scopes.Profile))
             {
                 // https://openid.net/specs/openid-connect-basic-1_0.html#Scopes
@@ -88,10 +94,12 @@ namespace Metabase.Controllers
                 // claims[Claims.UpdatedAt] = ...;
                 if (user.WebsiteLocator is not null) claims[Claims.Website] = user.WebsiteLocator;
             }
+
             if (User.HasScope(Scopes.Roles))
             {
                 claims[Claims.Role] = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
             }
+
             // Note: the complete list of standard claims supported by the OpenID Connect specification
             // can be found here: http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
             return Ok(claims);

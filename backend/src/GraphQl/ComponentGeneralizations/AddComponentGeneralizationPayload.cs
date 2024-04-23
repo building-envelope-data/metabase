@@ -11,7 +11,7 @@ namespace Metabase.GraphQl.ComponentGeneralizations
 
         public AddComponentGeneralizationPayload(
             Data.ComponentConcretizationAndGeneralization association
-            )
+        )
         {
             GeneralizationOfEdge = new ComponentGeneralizationOfEdge(association);
             ConcretizationOfEdge = new ComponentConcretizationOfEdge(association);
@@ -19,14 +19,14 @@ namespace Metabase.GraphQl.ComponentGeneralizations
 
         public AddComponentGeneralizationPayload(
             IReadOnlyCollection<AddComponentGeneralizationError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public AddComponentGeneralizationPayload(
             AddComponentGeneralizationError error
-            )
+        )
             : this(new[] { error })
         {
         }

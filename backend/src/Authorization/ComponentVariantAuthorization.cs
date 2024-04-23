@@ -14,17 +14,17 @@ namespace Metabase.Authorization
             UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null)
-                &&
-                await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-                    user,
-                    componentId,
-                    context,
-                    cancellationToken
-                );
+                   &&
+                   await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                       user,
+                       componentId,
+                       context,
+                       cancellationToken
+                   );
         }
 
         public static async Task<bool> IsAuthorizedToManage(
@@ -34,24 +34,24 @@ namespace Metabase.Authorization
             UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null)
-                &&
-                await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-                    user,
-                    ofComponentId,
-                    context,
-                    cancellationToken
-                )
-                &&
-                await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-                    user,
-                    toComponentId,
-                    context,
-                    cancellationToken
-                );
+                   &&
+                   await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                       user,
+                       ofComponentId,
+                       context,
+                       cancellationToken
+                   )
+                   &&
+                   await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                       user,
+                       toComponentId,
+                       context,
+                       cancellationToken
+                   );
         }
     }
 }

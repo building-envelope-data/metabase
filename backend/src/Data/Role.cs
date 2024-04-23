@@ -11,7 +11,8 @@ namespace Metabase.Data
         private const string Verifier = "Verifier";
 
         public static readonly ReadOnlyCollection<Enumerations.UserRole> AllEnum =
-            Array.AsReadOnly(new[] {
+            Array.AsReadOnly(new[]
+            {
                 Enumerations.UserRole.ADMINISTRATOR,
                 Enumerations.UserRole.VERIFIER
             });

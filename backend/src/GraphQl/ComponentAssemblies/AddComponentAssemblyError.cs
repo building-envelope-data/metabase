@@ -3,14 +3,14 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.ComponentAssemblies
 {
     public sealed class AddComponentAssemblyError
-      : UserErrorBase<AddComponentAssemblyErrorCode>
+        : UserErrorBase<AddComponentAssemblyErrorCode>
     {
         public AddComponentAssemblyError(
             AddComponentAssemblyErrorCode code,
             string message,
             IReadOnlyList<string> path
-            )
-          : base(code, message, path)
+        )
+            : base(code, message, path)
         {
         }
     }

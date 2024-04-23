@@ -31,12 +31,12 @@ namespace Metabase.GraphQl.Methods
         )
         {
             return InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(
-                 claimsPrincipal,
-                 _association.InstitutionId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _association.InstitutionId,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
 
         [UseUserManager]
@@ -48,12 +48,12 @@ namespace Metabase.GraphQl.Methods
         )
         {
             return InstitutionMethodDeveloperAuthorization.IsAuthorizedToRemove(
-                 claimsPrincipal,
-                 _association.MethodId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _association.MethodId,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

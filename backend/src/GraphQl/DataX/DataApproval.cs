@@ -6,7 +6,7 @@ using Metabase.GraphQl.Institutions;
 namespace Metabase.GraphQl.DataX
 {
     public sealed class DataApproval
-    : IApproval
+        : IApproval
     {
         public DateTime Timestamp { get; }
         public string Signature { get; }
@@ -16,12 +16,12 @@ namespace Metabase.GraphQl.DataX
         public Guid ApproverId { get; }
 
         public DataApproval(
-          DateTime timestamp,
-          string signature,
-          string keyFingerprint,
-          string query,
-          string response,
-          Guid approverId
+            DateTime timestamp,
+            string signature,
+            string keyFingerprint,
+            string query,
+            string response,
+            Guid approverId
         )
         {
             Timestamp = timestamp;
@@ -33,14 +33,14 @@ namespace Metabase.GraphQl.DataX
         }
 
         public Task<Metabase.Data.Institution?> GetApproverAsync(
-                InstitutionByIdDataLoader institutionById,
-                CancellationToken cancellationToken
+            InstitutionByIdDataLoader institutionById,
+            CancellationToken cancellationToken
         )
         {
             return institutionById.LoadAsync(
                 ApproverId,
                 cancellationToken
-                );
+            );
         }
     }
 }

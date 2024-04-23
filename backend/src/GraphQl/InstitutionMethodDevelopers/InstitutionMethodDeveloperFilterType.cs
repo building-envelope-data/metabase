@@ -3,11 +3,11 @@ using HotChocolate.Data.Filters;
 namespace Metabase.GraphQl.InstitutionMethodDevelopers
 {
     public sealed class InstitutionMethodDeveloperFilterType
-      : FilterInputType<Data.InstitutionMethodDeveloper>
+        : FilterInputType<Data.InstitutionMethodDeveloper>
     {
         protected override void Configure(
-          IFilterInputTypeDescriptor<Data.InstitutionMethodDeveloper> descriptor
-          )
+            IFilterInputTypeDescriptor<Data.InstitutionMethodDeveloper> descriptor
+        )
         {
             descriptor.BindFieldsExplicitly();
             descriptor.Field(x => x.Method);

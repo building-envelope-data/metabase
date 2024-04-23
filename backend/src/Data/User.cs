@@ -10,8 +10,8 @@ namespace Metabase.Data
 {
     public sealed class User
         : IdentityUser<Guid>,
-          Data.IEntity,
-          IStakeholder
+            Data.IEntity,
+            IStakeholder
     {
         [GraphQLDescription("Full name")]
         [ProtectedPersonalData]
@@ -36,7 +36,8 @@ namespace Metabase.Data
         public ICollection<UserMethodDeveloper> DevelopedMethodEdges { get; } = new List<UserMethodDeveloper>();
         public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
 
-        public ICollection<InstitutionRepresentative> RepresentedInstitutionEdges { get; } = new List<InstitutionRepresentative>();
+        public ICollection<InstitutionRepresentative> RepresentedInstitutionEdges { get; } =
+            new List<InstitutionRepresentative>();
 
         public ICollection<Institution> RepresentedInstitutions { get; } = new List<Institution>();
 
@@ -54,7 +55,7 @@ namespace Metabase.Data
             string email,
             string? postalAddress,
             Uri? websiteLocator
-            )
+        )
         {
             Email = email;
             UserName = email; // TODO Make `UserName`, `ConfirmedUserName`, ... of `IdentityUser` aliases for the respective `*Email` properties!

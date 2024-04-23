@@ -38,10 +38,11 @@ namespace Metabase.GraphQl.Databases
         internal static readonly JsonSerializerOptions SerializerOptions =
             new()
             {
-                Converters = {
-                        new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
-                        new DataConverterWithTypeDiscriminatorProperty(NonDataSerializerOptions)
-                        },
+                Converters =
+                {
+                    new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
+                    new DataConverterWithTypeDiscriminatorProperty(NonDataSerializerOptions)
+                },
                 NumberHandling = JsonNumberHandling.Strict,
                 PropertyNameCaseInsensitive = false,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -85,31 +86,39 @@ namespace Metabase.GraphQl.Databases
                 {
                     throw new JsonException($"Token is not a start object but {readerClone.TokenType}.");
                 }
+
                 readerClone.Read();
                 if (readerClone.TokenType != JsonTokenType.PropertyName)
                 {
                     throw new JsonException($"Token is not a property but {readerClone.TokenType}.");
                 }
+
                 var propertyName = readerClone.GetString();
                 if (propertyName != DISCRIMINATOR_PROPERTY_NAME)
                 {
                     throw new JsonException($"Property is not discriminator property but {propertyName}.");
                 }
+
                 readerClone.Read();
                 if (readerClone.TokenType != JsonTokenType.String)
                 {
                     throw new JsonException($"Token is not a string but {readerClone.TokenType}.");
                 }
+
                 var typeDiscriminator = readerClone.GetString();
                 // Note that you can't pass in the original options instance
                 // that registers the converter to `Deserialize` as told on
                 // https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#an-alternative-way-to-do-polymorphic-deserialization
                 return typeDiscriminator switch
                 {
-                    CALORIMETRIC_DATA => JsonSerializer.Deserialize<DataX.CalorimetricData>(ref reader, _options) ?? throw new JsonException("Could not deserialize calorimetric data."),
-                    HYGROTHERMAL_DATA => JsonSerializer.Deserialize<DataX.HygrothermalData>(ref reader, _options) ?? throw new JsonException("Could not deserialize hygrothermal data."),
-                    OPTICAL_DATA => JsonSerializer.Deserialize<DataX.OpticalData>(ref reader, _options) ?? throw new JsonException("Could not deserialize optical data."),
-                    PHOTOVOLTAIC_DATA => JsonSerializer.Deserialize<DataX.PhotovoltaicData>(ref reader, _options) ?? throw new JsonException("Could not deserialize photovoltaic data."),
+                    CALORIMETRIC_DATA => JsonSerializer.Deserialize<DataX.CalorimetricData>(ref reader, _options) ??
+                                         throw new JsonException("Could not deserialize calorimetric data."),
+                    HYGROTHERMAL_DATA => JsonSerializer.Deserialize<DataX.HygrothermalData>(ref reader, _options) ??
+                                         throw new JsonException("Could not deserialize hygrothermal data."),
+                    OPTICAL_DATA => JsonSerializer.Deserialize<DataX.OpticalData>(ref reader, _options) ??
+                                    throw new JsonException("Could not deserialize optical data."),
+                    PHOTOVOLTAIC_DATA => JsonSerializer.Deserialize<DataX.PhotovoltaicData>(ref reader, _options) ??
+                                         throw new JsonException("Could not deserialize photovoltaic data."),
                     _ => throw new JsonException($"Type discriminator has unknown value {typeDiscriminator}.")
                 };
             }
@@ -140,6 +149,7 @@ namespace Metabase.GraphQl.Databases
                         writer.WriteString(DISCRIMINATOR_PROPERTY_NAME, PHOTOVOLTAIC_DATA);
                         throw new JsonException("Unsupported!");
                     }
+
                     throw new JsonException("Unsupported!");
                 }
                 finally
@@ -168,13 +178,14 @@ namespace Metabase.GraphQl.Databases
         }
 
         private static async Task<string?> ExtractBearerToken(
-                IHttpContextAccessor httpContextAccessor
-                )
+            IHttpContextAccessor httpContextAccessor
+        )
         {
             if (httpContextAccessor.HttpContext is null)
             {
                 return null;
             }
+
             // Extract bearer token stored in cookie (used by Metabase Web
             // frontend)
             var cookieBearerToken = await httpContextAccessor.HttpContext.GetTokenAsync(
@@ -185,27 +196,28 @@ namespace Metabase.GraphQl.Databases
             {
                 return cookieBearerToken;
             }
+
             // Extract bearer token given in authorization header (used by
             // third-party frontends)
             var bearerTokenPrefix = $"{IdentityModel.OidcConstants.AuthenticationSchemes.AuthorizationHeaderBearer} ";
             return httpContextAccessor.HttpContext.Request?.Headers?.Authorization
                 .FirstOrDefault(
                     x => x is not null
-                     && x.TrimStart().StartsWith(bearerTokenPrefix, StringComparison.Ordinal))
+                         && x.TrimStart().StartsWith(bearerTokenPrefix, StringComparison.Ordinal))
                 ?.TrimStart()
                 ?.Replace(bearerTokenPrefix, "");
         }
 
         public static async
-          Task<GraphQL.GraphQLResponse<TGraphQlResponse>>
-          QueryDatabase<TGraphQlResponse>(
-            Data.Database database,
-            GraphQL.GraphQLRequest request,
-            IHttpClientFactory httpClientFactory,
-            IHttpContextAccessor httpContextAccessor,
-            CancellationToken cancellationToken
+            Task<GraphQL.GraphQLResponse<TGraphQlResponse>>
+            QueryDatabase<TGraphQlResponse>(
+                Data.Database database,
+                GraphQL.GraphQLRequest request,
+                IHttpClientFactory httpClientFactory,
+                IHttpContextAccessor httpContextAccessor,
+                CancellationToken cancellationToken
             )
-          where TGraphQlResponse : class
+            where TGraphQlResponse : class
         {
             // https://github.com/graphql-dotnet/graphql-client/blob/47b4abfbfda507a91b5c62a18a9789bd3a8079c7/src/GraphQL.Client/GraphQLHttpResponse.cs
             // var response =
@@ -224,6 +236,7 @@ namespace Metabase.GraphQl.Databases
             {
                 httpClient.SetBearerToken(bearerToken);
             }
+
             // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
             using var jsonHttpContent = MakeJsonHttpContent(request);
             using var httpResponseMessage =
@@ -234,13 +247,16 @@ namespace Metabase.GraphQl.Databases
                 ).ConfigureAwait(false);
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
             {
-                throw new HttpRequestException($"The status code is not {HttpStatusCode.OK} but {httpResponseMessage.StatusCode}.", null, httpResponseMessage.StatusCode);
+                throw new HttpRequestException(
+                    $"The status code is not {HttpStatusCode.OK} but {httpResponseMessage.StatusCode}.", null,
+                    httpResponseMessage.StatusCode);
             }
+
             // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
             using var graphQlResponseStream =
                 await httpResponseMessage.Content
-                .ReadAsStreamAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .ReadAsStreamAsync(cancellationToken)
+                    .ConfigureAwait(false);
             var deserializedGraphQlResponse =
                 await JsonSerializer.DeserializeAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>(
                     graphQlResponseStream,
@@ -251,6 +267,7 @@ namespace Metabase.GraphQl.Databases
             {
                 throw new JsonException("Failed to deserialize the GraphQL response.");
             }
+
             return deserializedGraphQlResponse;
         }
 
@@ -267,18 +284,18 @@ namespace Metabase.GraphQl.Databases
 
         private static ByteArrayContent MakeJsonHttpContent<TContent>(
             TContent content
-            )
+        )
         {
             // For some reason using `JsonContent.Create<TContent>(content, null, SerializerOptions)` results in status code `BadRequest`.
             var result =
-              new ByteArrayContent(
-                JsonSerializer.SerializeToUtf8Bytes(
-                  content,
-                  SerializerOptions
-                  )
+                new ByteArrayContent(
+                    JsonSerializer.SerializeToUtf8Bytes(
+                        content,
+                        SerializerOptions
+                    )
                 );
             result.Headers.ContentType =
-              new MediaTypeHeaderValue("application/json");
+                new MediaTypeHeaderValue("application/json");
             return result;
         }
     }

@@ -9,14 +9,14 @@ namespace Metabase.Authorization
         public static async Task<bool> IsAuthorizedToView(
             ClaimsPrincipal claimsPrincipal,
             UserManager<Data.User> userManager
-            )
+        )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null)
-            && await CommonAuthorization.IsAdministrator(
-                user,
-                userManager
-            );
+                   && await CommonAuthorization.IsAdministrator(
+                       user,
+                       userManager
+                   );
         }
     }
 }

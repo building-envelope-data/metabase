@@ -3,11 +3,11 @@ using HotChocolate.Data.Filters;
 namespace Metabase.GraphQl.Users
 {
     public sealed class UserFilterType
-      : FilterInputType<Data.User>
+        : FilterInputType<Data.User>
     {
         protected override void Configure(
-          IFilterInputTypeDescriptor<Data.User> descriptor
-          )
+            IFilterInputTypeDescriptor<Data.User> descriptor
+        )
         {
             descriptor.BindFieldsExplicitly();
             descriptor.Field(x => x.Id);

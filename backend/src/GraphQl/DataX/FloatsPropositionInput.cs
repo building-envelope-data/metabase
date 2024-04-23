@@ -4,5 +4,5 @@ namespace Metabase.GraphQl.DataX
         FloatPropositionInput? All,
         FloatPropositionInput? None,
         FloatPropositionInput? Some
-        );
+    );
 }

@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 namespace Metabase.Data
 {
     public sealed class Database
-      : Data.Entity
+        : Data.Entity
     {
         // Inspired by https://jonathancrozier.com/blog/how-to-generate-a-cryptographically-secure-random-string-in-dot-net-with-c-sharp
         private static string CreateSecureRandomString(int count = 64) =>
@@ -20,24 +20,15 @@ namespace Metabase.Data
         //     return Convert.ToBase64String(hashValue);
         // }
 
-        [Required]
-        [MinLength(1)]
-        public string Name { get; private set; }
+        [Required] [MinLength(1)] public string Name { get; private set; }
 
-        [Required]
-        [MinLength(1)]
-        public string Description { get; private set; }
+        [Required] [MinLength(1)] public string Description { get; private set; }
 
-        [Required]
-        [Url]
-        public Uri Locator { get; private set; }
+        [Required] [Url] public Uri Locator { get; private set; }
 
-        [Required]
-        public Enumerations.DatabaseVerificationState VerificationState { get; private set; }
+        [Required] public Enumerations.DatabaseVerificationState VerificationState { get; private set; }
 
-        [Required]
-        [MinLength(32)]
-        public string VerificationCode { get; private set; }
+        [Required] [MinLength(32)] public string VerificationCode { get; private set; }
 
         public Guid OperatorId { get; set; }
 
@@ -55,7 +46,7 @@ namespace Metabase.Data
             string name,
             string description,
             Uri locator
-            )
+        )
         {
             Name = name;
             Description = description;

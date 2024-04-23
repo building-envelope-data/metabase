@@ -10,11 +10,14 @@ namespace Metabase.GraphQl.DataX
         DateTime Timestamp { get; }
         Guid ComponentId { get; }
         string? Name { get; }
+
         string? Description { get; }
+
         // IReadOnlyList<string> Warnings { get; }
         // Guid CreatorId { get; }
         // DateTime CreatedAt { get; }
         AppliedMethod AppliedMethod { get; }
+
         // IReadOnlyList<DataApproval> Approvals { get; }
         // IReadOnlyList<GetHttpsResource> Resources { get; }
         GetHttpsResourceTree ResourceTree { get; }

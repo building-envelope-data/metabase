@@ -1,7 +1,7 @@
 namespace Metabase.GraphQl.Users
 {
     public sealed class GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload
-      : UserPayload<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError>
+        : UserPayload<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError>
     {
         public string? SharedKey { get; }
         public string? AuthenticatorUri { get; }
@@ -10,8 +10,8 @@ namespace Metabase.GraphQl.Users
             Data.User user,
             string sharedKey,
             string authenticatorUri
-            )
-          : base(user)
+        )
+            : base(user)
         {
             SharedKey = sharedKey;
             AuthenticatorUri = authenticatorUri;
@@ -19,8 +19,8 @@ namespace Metabase.GraphQl.Users
 
         public GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
             GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError error
-            )
-          : base(error)
+        )
+            : base(error)
         {
         }
     }

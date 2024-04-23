@@ -5,7 +5,7 @@ namespace Metabase.GraphQl.DataX
     public sealed class GetHttpsResourceTree
     {
         public GetHttpsResourceTree(
-          GetHttpsResourceTreeRoot root
+            GetHttpsResourceTreeRoot root
         )
         {
             Root = root;

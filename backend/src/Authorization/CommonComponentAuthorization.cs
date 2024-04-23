@@ -17,10 +17,10 @@ namespace Metabase.Authorization
         {
             var manufacturerIds =
                 await context.Institutions.AsQueryable()
-                .Where(i => i.ManufacturedComponents.Any(c => c.Id == componentId))
-                .Select(i => i.Id)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(i => i.ManufacturedComponents.Any(c => c.Id == componentId))
+                    .Select(i => i.Id)
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false);
             foreach (var manufacturerId in manufacturerIds)
             {
                 if (await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
@@ -36,11 +36,12 @@ namespace Metabase.Authorization
                         context,
                         cancellationToken
                     ).ConfigureAwait(false)
-                )
+                   )
                 {
                     return true;
                 }
             }
+
             return false;
         }
     }

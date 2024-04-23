@@ -8,7 +8,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
     public sealed class ConfirmUserEmailChangeTests
-      : UserIntegrationTests
+        : UserIntegrationTests
     {
         private async Task<string> Arrange(
             string email,
@@ -18,11 +18,11 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             await RegisterAndConfirmAndLoginUser(
                 email: email,
                 password: DefaultPassword
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             EmailSender.Clear();
             await ChangeUserEmail(
                 newEmail
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             EmailSender.Clear();
             return confirmationCode;
@@ -44,14 +44,14 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 currentEmail: email,
                 newEmail: newEmail,
                 confirmationCode: confirmationCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.confirmUserEmailChange.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.confirmUserEmailChange.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 currentEmail: "unknown." + email,
                 newEmail: newEmail,
                 confirmationCode: confirmationCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }
@@ -89,13 +89,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             await RegisterAndConfirmUser(
                 email: newEmail,
                 password: DefaultPassword
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var response = await ConfirmUserEmailChange(
                 currentEmail: email,
                 newEmail: newEmail,
                 confirmationCode: confirmationCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }
@@ -116,7 +116,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 currentEmail: email,
                 newEmail: "other." + newEmail,
                 confirmationCode: confirmationCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }
@@ -137,7 +137,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 currentEmail: email,
                 newEmail: newEmail,
                 confirmationCode: "invalid" + confirmationCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }

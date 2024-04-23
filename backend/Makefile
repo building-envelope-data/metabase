@@ -109,12 +109,8 @@ dos2unix : ## Strip the byte-order mark, also known as, BOM, and remove carriage
 	# find . -type f -exec dos2unix {} \;
 .PHONY : dos2unix
 
-# dotnet tool run jb cleanupcode --profile="Built-in: Reformat Code" Metabase.sln
-dosformat : ## Format code and add byte-order marks
-	dotnet format
-.PHONY : dosformat
-
-format : dosformat dos2unix ## Format code
+format : ## Format code
+	dotnet tool run jb cleanupcode --profile="Built-in: Reformat Code" Metabase.sln
 .PHONY : format
 
 update-packages : ## Update packages

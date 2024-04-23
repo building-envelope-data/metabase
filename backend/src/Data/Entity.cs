@@ -1,10 +1,11 @@
 using Guid = System.Guid;
+
 // using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Metabase.Data
 {
     public abstract class Entity
-      : IEntity
+        : IEntity
     {
         public Guid Id { get; private set; }
 
@@ -14,7 +15,7 @@ namespace Metabase.Data
         public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
 
         protected Entity(
-            )
+        )
         {
         }
     }

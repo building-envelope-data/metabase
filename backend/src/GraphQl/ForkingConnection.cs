@@ -8,7 +8,8 @@ using HotChocolate;
 
 namespace Metabase.GraphQl
 {
-    public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociationsByAssociateIdDataLoader, TOtherAssociationsByAssociateIdDataLoader, TEdge>
+    public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociationsByAssociateIdDataLoader,
+        TOtherAssociationsByAssociateIdDataLoader, TEdge>
         where TSubject : Data.IEntity
         where TSomeAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
         where TOtherAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
@@ -21,7 +22,7 @@ namespace Metabase.GraphQl
             TSubject subject,
             bool useFirstDataLoader,
             Func<TAssociation, TEdge> createEdge
-            )
+        )
         {
             Subject = subject;
             _useFirstDataLoader = useFirstDataLoader;
@@ -32,7 +33,7 @@ namespace Metabase.GraphQl
             TSomeAssociationsByAssociateIdDataLoader someDataLoader,
             TOtherAssociationsByAssociateIdDataLoader otherDataLoader,
             CancellationToken cancellationToken
-            )
+        )
         {
             return _useFirstDataLoader
                 ? GetEdgesAsync(someDataLoader, cancellationToken)
@@ -42,12 +43,12 @@ namespace Metabase.GraphQl
         private async Task<IEnumerable<TEdge>> GetEdgesAsync<TDataLoader>(
             TDataLoader dataLoader,
             CancellationToken cancellationToken
-            )
+        )
             where TDataLoader : IDataLoader<Guid, TAssociation[]>
         {
             return (
-                await dataLoader.LoadAsync(Subject.Id, cancellationToken)
-                .ConfigureAwait(false)
+                    await dataLoader.LoadAsync(Subject.Id, cancellationToken)
+                        .ConfigureAwait(false)
                 )
                 .Select(_createEdge);
         }

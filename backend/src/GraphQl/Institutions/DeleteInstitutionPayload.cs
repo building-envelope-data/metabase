@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.Institutions
 
         public DeleteInstitutionPayload(
             DeleteInstitutionError error
-            )
+        )
         {
             Errors = new[] { error };
         }

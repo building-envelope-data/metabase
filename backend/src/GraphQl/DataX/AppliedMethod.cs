@@ -12,21 +12,21 @@ namespace Metabase.GraphQl.DataX
         // public IReadOnlyList<NamedMethodSource> Sources { get; }
 
         public AppliedMethod(
-          Guid methodId
+            Guid methodId
         )
         {
             MethodId = methodId;
         }
 
         public Task<Metabase.Data.Method?> GetMethodAsync(
-                MethodByIdDataLoader methodById,
-                CancellationToken cancellationToken
+            MethodByIdDataLoader methodById,
+            CancellationToken cancellationToken
         )
         {
             return methodById.LoadAsync(
                 MethodId,
                 cancellationToken
-                );
+            );
         }
     }
 }

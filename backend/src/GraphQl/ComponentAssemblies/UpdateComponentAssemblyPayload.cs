@@ -11,7 +11,7 @@ namespace Metabase.GraphQl.ComponentAssemblies
 
         public UpdateComponentAssemblyPayload(
             Data.ComponentAssembly componentAssembly
-            )
+        )
         {
             AssembledOfEdge = new ComponentAssembledOfEdge(componentAssembly);
             PartOfEdge = new ComponentPartOfEdge(componentAssembly);
@@ -19,14 +19,14 @@ namespace Metabase.GraphQl.ComponentAssemblies
 
         public UpdateComponentAssemblyPayload(
             IReadOnlyCollection<UpdateComponentAssemblyError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public UpdateComponentAssemblyPayload(
             UpdateComponentAssemblyError error
-            )
+        )
             : this(new[] { error })
         {
         }

@@ -13,9 +13,9 @@ namespace Metabase.GraphQl.DataX
         public string SourceName { get; }
 
         public ToTreeVertexAppliedConversionMethod(
-        Guid methodId,
-        IReadOnlyList<NamedMethodArgument> arguments,
-        string sourceName
+            Guid methodId,
+            IReadOnlyList<NamedMethodArgument> arguments,
+            string sourceName
         )
         {
             MethodId = methodId;
@@ -24,14 +24,14 @@ namespace Metabase.GraphQl.DataX
         }
 
         public Task<Metabase.Data.Method?> GetMethodAsync(
-                MethodByIdDataLoader methodById,
-                CancellationToken cancellationToken
+            MethodByIdDataLoader methodById,
+            CancellationToken cancellationToken
         )
         {
             return methodById.LoadAsync(
                 MethodId,
                 cancellationToken
-                );
+            );
         }
     }
 }

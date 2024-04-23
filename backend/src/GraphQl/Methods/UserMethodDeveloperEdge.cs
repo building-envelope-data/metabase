@@ -29,10 +29,10 @@ namespace Metabase.GraphQl.Methods
         )
         {
             return UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(
-                 claimsPrincipal,
-                 _association.UserId,
-                 userManager
-                 );
+                claimsPrincipal,
+                _association.UserId,
+                userManager
+            );
         }
 
         [UseUserManager]
@@ -44,12 +44,12 @@ namespace Metabase.GraphQl.Methods
         )
         {
             return UserMethodDeveloperAuthorization.IsAuthorizedToRemove(
-                 claimsPrincipal,
-                 _association.MethodId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _association.MethodId,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

@@ -6,11 +6,11 @@ using Metabase.GraphQl.Users;
 namespace Metabase.GraphQl.Databases
 {
     public sealed class DatabaseType
-      : EntityType<Data.Database, DatabaseByIdDataLoader>
+        : EntityType<Data.Database, DatabaseByIdDataLoader>
     {
         protected override void Configure(
             IObjectTypeDescriptor<Data.Database> descriptor
-            )
+        )
         {
             base.Configure(descriptor);
             descriptor
@@ -19,8 +19,8 @@ namespace Metabase.GraphQl.Databases
                 .Resolve(context =>
                     new DatabaseOperatorEdge(
                         context.Parent<Data.Database>()
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.OperatorId).Ignore();
             ConfigureDataField(
@@ -31,7 +31,8 @@ namespace Metabase.GraphQl.Databases
             ConfigureAllDataField<DataX.DataPropositionInput>(
                 descriptor,
                 "allData",
-                _ => _.GetAllDataAsync(default!, default, default, default, default, default, default, default, default!, default!, default)
+                _ => _.GetAllDataAsync(default!, default, default, default, default, default, default, default,
+                    default!, default!, default)
             );
             ConfigureHasDataField<DataX.DataPropositionInput>(
                 descriptor,
@@ -46,7 +47,8 @@ namespace Metabase.GraphQl.Databases
             ConfigureAllDataField<DataX.OpticalDataPropositionInput>(
                 descriptor,
                 "allOpticalData",
-                _ => _.GetAllOpticalDataAsync(default!, default, default, default, default, default, default, default, default!, default!, default)
+                _ => _.GetAllOpticalDataAsync(default!, default, default, default, default, default, default, default,
+                    default!, default!, default)
             );
             ConfigureHasDataField<DataX.OpticalDataPropositionInput>(
                 descriptor,
@@ -61,7 +63,8 @@ namespace Metabase.GraphQl.Databases
             ConfigureAllDataField<DataX.HygrothermalDataPropositionInput>(
                 descriptor,
                 "allHygrothermalData",
-                _ => _.GetAllHygrothermalDataAsync(default!, default, default, default, default, default, default, default, default!, default!, default)
+                _ => _.GetAllHygrothermalDataAsync(default!, default, default, default, default, default, default,
+                    default, default!, default!, default)
             );
             ConfigureHasDataField<DataX.HygrothermalDataPropositionInput>(
                 descriptor,
@@ -76,7 +79,8 @@ namespace Metabase.GraphQl.Databases
             ConfigureAllDataField<DataX.CalorimetricDataPropositionInput>(
                 descriptor,
                 "allCalorimetricData",
-                _ => _.GetAllCalorimetricDataAsync(default!, default, default, default, default, default, default, default, default!, default!, default)
+                _ => _.GetAllCalorimetricDataAsync(default!, default, default, default, default, default, default,
+                    default, default!, default!, default)
             );
             ConfigureHasDataField<DataX.CalorimetricDataPropositionInput>(
                 descriptor,
@@ -91,7 +95,8 @@ namespace Metabase.GraphQl.Databases
             ConfigureAllDataField<DataX.PhotovoltaicDataPropositionInput>(
                 descriptor,
                 "allPhotovoltaicData",
-                _ => _.GetAllPhotovoltaicDataAsync(default!, default, default, default, default, default, default, default, default!, default!, default)
+                _ => _.GetAllPhotovoltaicDataAsync(default!, default, default, default, default, default, default,
+                    default, default!, default!, default)
             );
             ConfigureHasDataField<DataX.PhotovoltaicDataPropositionInput>(
                 descriptor,
@@ -99,13 +104,15 @@ namespace Metabase.GraphQl.Databases
                 _ => _.GetHasPhotovoltaicDataAsync(default!, default, default, default, default!, default!, default)
             );
             descriptor
-              .Field("canCurrentUserUpdateNode")
-              .ResolveWith<DatabaseResolvers>(x => x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
-              .UseUserManager();
+                .Field("canCurrentUserUpdateNode")
+                .ResolveWith<DatabaseResolvers>(x =>
+                    x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+                .UseUserManager();
             descriptor
-              .Field("canCurrentUserVerifyNode")
-              .ResolveWith<DatabaseResolvers>(x => x.GetCanCurrentUserVerifyNodeAsync(default!, default!, default!, default!, default!))
-              .UseUserManager();
+                .Field("canCurrentUserVerifyNode")
+                .ResolveWith<DatabaseResolvers>(x =>
+                    x.GetCanCurrentUserVerifyNodeAsync(default!, default!, default!, default!, default!))
+                .UseUserManager();
         }
 
         private static void ConfigureDataField(

@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.InstitutionMethodDevelopers
 
         public ConfirmInstitutionMethodDeveloperPayload(
             Data.InstitutionMethodDeveloper institutionMethodDeveloper
-            )
+        )
         {
             DevelopedMethodEdge = new InstitutionDevelopedMethodEdge(institutionMethodDeveloper);
             MethodDeveloperEdge = new InstitutionMethodDeveloperEdge(institutionMethodDeveloper);
@@ -20,14 +20,14 @@ namespace Metabase.GraphQl.InstitutionMethodDevelopers
 
         public ConfirmInstitutionMethodDeveloperPayload(
             IReadOnlyCollection<ConfirmInstitutionMethodDeveloperError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public ConfirmInstitutionMethodDeveloperPayload(
             ConfirmInstitutionMethodDeveloperError error
-            )
+        )
             : this(new[] { error })
         {
         }

@@ -10,7 +10,7 @@ using Metabase.GraphQl.Institutions;
 namespace Metabase.Tests.Integration.GraphQl.Institutions
 {
     public abstract class InstitutionIntegrationTests
-      : IntegrationTests
+        : IntegrationTests
     {
         internal static CreateInstitutionInput PendingInstitutionInput { get; } = new(
             Name: "Institution A",
@@ -20,14 +20,11 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             PublicKey: null,
             OwnerIds: Array.Empty<Guid>(),
             ManagerId: null
-            );
+        );
 
         internal static IEnumerable<CreateInstitutionInput> InstitutionInputs
         {
-            get
-            {
-                yield return PendingInstitutionInput;
-            }
+            get { yield return PendingInstitutionInput; }
         }
 
         internal static IEnumerable<object[]> EnumerateInstitutionInputs()
@@ -47,12 +44,12 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
             return SuccessfullyQueryGraphQlContentAsString(
                 httpClient,
                 File.ReadAllText("Integration/GraphQl/Institutions/GetInstitutions.graphql")
-                );
+            );
         }
 
         protected Task<string> GetInstitution(
             string uuid
-            )
+        )
         {
             return GetInstitution(HttpClient, uuid);
         }
@@ -60,7 +57,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
         internal static Task<string> GetInstitution(
             HttpClient httpClient,
             string uuid
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContentAsString(
                 httpClient,
@@ -69,12 +66,12 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
                 {
                     ["uuid"] = uuid
                 }
-                );
+            );
         }
 
         protected Task<string> CreateInstitution(
             CreateInstitutionInput input
-            )
+        )
         {
             return CreateInstitution(HttpClient, input);
         }
@@ -82,18 +79,18 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
         internal static Task<string> CreateInstitution(
             HttpClient httpClient,
             CreateInstitutionInput input
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContentAsString(
                 httpClient,
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
                 variables: input
-                );
+            );
         }
 
         protected Task<JsonElement> CreateInstitutionAsJson(
             CreateInstitutionInput input
-            )
+        )
         {
             return CreateInstitutionAsJson(HttpClient, input);
         }
@@ -101,13 +98,13 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
         internal static Task<JsonElement> CreateInstitutionAsJson(
             HttpClient httpClient,
             CreateInstitutionInput input
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContentAsJson(
                 httpClient,
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
                 variables: input
-                );
+            );
         }
 
         protected Task<Guid> CreateInstitutionReturningUuid(
@@ -176,7 +173,7 @@ namespace Metabase.Tests.Integration.GraphQl.Institutions
                         {
                             ["institutionId"] = institutionId
                         }
-                        );
+                    );
                 }
             );
         }

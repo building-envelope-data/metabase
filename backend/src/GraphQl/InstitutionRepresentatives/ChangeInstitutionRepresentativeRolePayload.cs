@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
 
         public ChangeInstitutionRepresentativeRolePayload(
             Data.InstitutionRepresentative institutionRepresentative
-            )
+        )
         {
             RepresentedInstitutionEdge = new UserRepresentedInstitutionEdge(institutionRepresentative);
             InstitutionRepresentativeEdge = new InstitutionRepresentativeEdge(institutionRepresentative);
@@ -20,14 +20,14 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
 
         public ChangeInstitutionRepresentativeRolePayload(
             IReadOnlyCollection<ChangeInstitutionRepresentativeRoleError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public ChangeInstitutionRepresentativeRolePayload(
             ChangeInstitutionRepresentativeRoleError error
-            )
+        )
             : this(new[] { error })
         {
         }

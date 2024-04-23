@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 namespace Metabase.GraphQl.Users
 {
     public sealed class UserRepresentedInstitutionsByUserIdDataLoader
-      : Entities.AssociationsByAssociateIdDataLoader<Data.InstitutionRepresentative>
+        : Entities.AssociationsByAssociateIdDataLoader<Data.InstitutionRepresentative>
     {
         public UserRepresentedInstitutionsByUserIdDataLoader(
             IBatchScheduler batchScheduler,
             DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
-            )
+        )
             : base(
                 batchScheduler,
                 options,
@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.Users
                         !x.Pending && ids.Contains(x.UserId)
                     ),
                 x => x.UserId
-                )
+            )
         {
         }
     }

@@ -7,7 +7,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
     public sealed class ResetUserPasswordTests
-      : UserIntegrationTests
+        : UserIntegrationTests
     {
         private async Task<string> RegisterAndConfirmUserAndRequestPasswordReset(
             string email,
@@ -21,7 +21,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Clear();
             await RequestUserPasswordReset(
                 email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             return ExtractResetCodeFromEmail();
         }
 
@@ -35,20 +35,20 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             const string newPassword = "new" + password;
             // Act
             var response = await ResetUserPassword(
                 email: email,
                 password: newPassword,
                 resetCode: resetCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             await LoginUser(
                 email: email,
                 password: newPassword
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         [Test]
@@ -61,19 +61,19 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var response = await ResetUserPassword(
                 email: email,
                 password: "new" + password,
                 resetCode: "invalid" + resetCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         [Test]
@@ -86,7 +86,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var response = await ResetUserPassword(
                 email: email,
@@ -98,7 +98,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         [Test]
@@ -111,19 +111,19 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var response = await ResetUserPassword(
                 email: email,
                 password: "aabb@$CCDD",
                 resetCode: resetCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         [Test]
@@ -136,19 +136,19 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var response = await ResetUserPassword(
                 email: email,
                 password: "AABB@$567",
                 resetCode: resetCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         [Test]
@@ -161,19 +161,19 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var response = await ResetUserPassword(
                 email: email,
                 password: "aaBBccDDeeFF123",
                 resetCode: resetCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         [Test]
@@ -186,19 +186,19 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var response = await ResetUserPassword(
                 email: email,
                 password: "aabb@$567",
                 resetCode: resetCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         [Test]
@@ -211,19 +211,19 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Act
             var response = await ResetUserPassword(
                 email: email,
                 password: "aA@$567",
                 resetCode: resetCode
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             await LoginUser(
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
     }
 }

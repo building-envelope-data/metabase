@@ -14,24 +14,26 @@ namespace Metabase.Authorization
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null)
-            && await CommonAuthorization.IsAdministrator(user, userManager);
+                   && await CommonAuthorization.IsAdministrator(user, userManager);
         }
 
         public static async Task<bool> IsAuthorizedToManageUser(
             ClaimsPrincipal claimsPrincipal,
             Guid userId,
             UserManager<Data.User> userManager
-            )
+        )
         {
             var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (loggedInUser is null)
             {
                 return false;
             }
+
             if (loggedInUser.Id == userId)
             {
                 return true;
             }
+
             if (await userManager.IsInRoleAsync(
                     loggedInUser,
                     Data.Role.EnumToName(Enumerations.UserRole.ADMINISTRATOR)
@@ -39,6 +41,7 @@ namespace Metabase.Authorization
             {
                 return true;
             }
+
             return false;
         }
 
@@ -53,10 +56,12 @@ namespace Metabase.Authorization
             {
                 return false;
             }
+
             if (await CommonAuthorization.IsAdministrator(user, userManager).ConfigureAwait(false))
             {
                 return true;
             }
+
             return role switch
             {
                 Enumerations.UserRole.ADMINISTRATOR =>

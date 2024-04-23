@@ -8,7 +8,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
     public sealed class ResendUserEmailConfirmationTests
-      : UserIntegrationTests
+        : UserIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -20,19 +20,20 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             await RegisterUser(
                 name: name,
                 email: email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             EmailSender.Clear();
             // Act
             var response = await ResendUserEmailConfirmation(
                 email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             EmailsShouldContainSingle(
                 recipient: (name, email),
                 subject: "Confirm your email",
-                bodyRegEx: @"^Please confirm your email address by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
-                );
+                bodyRegEx:
+                @"^Please confirm your email address by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
+            );
         }
 
         [Test]
@@ -46,7 +47,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await ResendUserEmailConfirmation(
                 "unknown." + email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             EmailSender.Emails.Should().BeEmpty();

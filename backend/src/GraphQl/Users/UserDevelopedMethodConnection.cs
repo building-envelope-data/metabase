@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Users
 {
     public sealed class UserDevelopedMethodConnection
-        : ForkingConnection<Data.User, Data.UserMethodDeveloper, PendingUserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge>
+        : ForkingConnection<Data.User, Data.UserMethodDeveloper, PendingUserDevelopedMethodsByUserIdDataLoader,
+            UserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge>
     {
         public UserDevelopedMethodConnection(
             Data.User subject,
@@ -18,7 +19,7 @@ namespace Metabase.GraphQl.Users
                 subject,
                 pending,
                 x => new UserDevelopedMethodEdge(x)
-                )
+            )
         {
         }
 
@@ -29,10 +30,10 @@ namespace Metabase.GraphQl.Users
         )
         {
             return UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager
-                 );
+                claimsPrincipal,
+                Subject.Id,
+                userManager
+            );
         }
     }
 }

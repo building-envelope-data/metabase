@@ -16,11 +16,11 @@ namespace Metabase.GraphQl.Institutions
         [UseSorting]
         public IQueryable<Data.Institution> GetInstitutions(
             Data.ApplicationDbContext context
-            )
+        )
         {
             return
                 context.Institutions.AsQueryable()
-                .Where(d => d.State == Enumerations.InstitutionState.VERIFIED);
+                    .Where(d => d.State == Enumerations.InstitutionState.VERIFIED);
         }
 
         [UsePaging]
@@ -29,23 +29,23 @@ namespace Metabase.GraphQl.Institutions
         [UseSorting]
         public IQueryable<Data.Institution> GetPendingInstitutions(
             Data.ApplicationDbContext context
-            )
+        )
         {
             return
                 context.Institutions.AsQueryable()
-                .Where(d => d.State == Enumerations.InstitutionState.PENDING);
+                    .Where(d => d.State == Enumerations.InstitutionState.PENDING);
         }
 
         public Task<Data.Institution?> GetInstitutionAsync(
             Guid uuid,
             InstitutionByIdDataLoader institutionById,
             CancellationToken cancellationToken
-            )
+        )
         {
             return institutionById.LoadAsync(
                 uuid,
                 cancellationToken
-                );
+            );
         }
     }
 }

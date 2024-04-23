@@ -18,7 +18,7 @@ namespace Metabase.Controllers
 
         public PersonalUserDataController(
             UserManager<Data.User> userManager
-            )
+        )
         {
             _userManager = userManager;
         }
@@ -31,6 +31,7 @@ namespace Metabase.Controllers
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
+
             var personalData = new Dictionary<string, object>();
             if (User.HasScope(Scopes.Address))
             {
@@ -39,18 +40,23 @@ namespace Metabase.Controllers
                     personalData[Claims.Address] = user.PostalAddress;
                 }
             }
+
             if (User.HasScope(Scopes.Email))
             {
                 var email = await _userManager.GetEmailAsync(user).ConfigureAwait(false);
                 if (email is not null) personalData[Claims.Email] = email;
-                personalData[Claims.EmailVerified] = await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false);
+                personalData[Claims.EmailVerified] =
+                    await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false);
             }
+
             if (User.HasScope(Scopes.Phone))
             {
                 var phoneNumber = await _userManager.GetPhoneNumberAsync(user).ConfigureAwait(false);
                 if (phoneNumber is not null) personalData[Claims.PhoneNumber] = phoneNumber;
-                personalData[Claims.PhoneNumberVerified] = await _userManager.IsPhoneNumberConfirmedAsync(user).ConfigureAwait(false);
+                personalData[Claims.PhoneNumberVerified] =
+                    await _userManager.IsPhoneNumberConfirmedAsync(user).ConfigureAwait(false);
             }
+
             if (User.HasScope(Scopes.Profile))
             {
                 // https://openid.net/specs/openid-connect-basic-1_0.html#Scopes
@@ -63,10 +69,12 @@ namespace Metabase.Controllers
                     personalData.Add($"{login.LoginProvider} external login provider key", login.ProviderKey);
                 }
             }
+
             if (User.HasScope(Scopes.Roles))
             {
                 personalData[Claims.Role] = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
             }
+
             Response.Headers.Append("Content-Disposition", "attachment; filename=PersonalUserData.json");
             return new FileContentResult(JsonSerializer.SerializeToUtf8Bytes(personalData), "application/json");
         }

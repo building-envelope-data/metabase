@@ -12,8 +12,8 @@ namespace Metabase.GraphQl.DataX
         public Guid DataFormatId { get; }
 
         public FileMetaInformation(
-          IReadOnlyList<string> path,
-          Guid dataFormatId
+            IReadOnlyList<string> path,
+            Guid dataFormatId
         )
         {
             Path = path;
@@ -21,14 +21,14 @@ namespace Metabase.GraphQl.DataX
         }
 
         public Task<Metabase.Data.DataFormat?> GetDataFormatAsync(
-                DataFormatByIdDataLoader dataFormatById,
-                CancellationToken cancellationToken
+            DataFormatByIdDataLoader dataFormatById,
+            CancellationToken cancellationToken
         )
         {
             return dataFormatById.LoadAsync(
                 DataFormatId,
                 cancellationToken
-                );
+            );
         }
     }
 }

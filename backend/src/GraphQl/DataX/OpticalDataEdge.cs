@@ -1,16 +1,16 @@
 namespace Metabase.GraphQl.DataX
 {
     public sealed class OpticalDataEdge
-    : DataEdgeBase<OpticalData>
+        : DataEdgeBase<OpticalData>
     {
         public OpticalDataEdge(
-        string cursor,
-        OpticalData node
+            string cursor,
+            OpticalData node
         )
-        : base(
-            cursor,
-            node
-        )
+            : base(
+                cursor,
+                node
+            )
         {
         }
     }

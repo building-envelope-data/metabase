@@ -21,7 +21,7 @@ namespace Metabase.Services
     }
 
     public sealed class EmailSender
-      : IEmailSender
+        : IEmailSender
     {
         private readonly string _smtpHost;
         private readonly int _smtpPort;
@@ -74,6 +74,7 @@ namespace Metabase.Services
                 client.Send(message);
                 client.Disconnect(quit: true);
             }
+
             return Task.FromResult(0);
         }
     }

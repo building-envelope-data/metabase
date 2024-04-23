@@ -5,8 +5,8 @@ namespace Metabase.GraphQl.DataX
     public sealed class OpenEndedDateTimeRange
     {
         public OpenEndedDateTimeRange(
-        DateTime from,
-        DateTime until
+            DateTime from,
+            DateTime until
         )
         {
             From = from;

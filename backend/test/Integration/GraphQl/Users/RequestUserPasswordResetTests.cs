@@ -8,7 +8,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
     public sealed class RequestUserPasswordResetTests
-      : UserIntegrationTests
+        : UserIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -20,19 +20,20 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             await RegisterAndConfirmUser(
                 name: name,
                 email: email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             EmailSender.Clear();
             // Act
             var response = await RequestUserPasswordReset(
                 email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             EmailsShouldContainSingle(
                 recipient: (name, email),
                 subject: "Reset password",
-                bodyRegEx: @"^Please reset your password by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
-                );
+                bodyRegEx:
+                @"^Please reset your password by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
+            );
         }
 
         [Test]
@@ -46,7 +47,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await RequestUserPasswordReset(
                 "unknown." + email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             EmailSender.Emails.Should().BeEmpty();
@@ -63,7 +64,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await RequestUserPasswordReset(
                 email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
             EmailSender.Emails.Should().BeEmpty();

@@ -12,15 +12,15 @@ namespace Metabase.GraphQl.Users
 
         public ResetUserPasswordPayload(
             IReadOnlyCollection<ResetUserPasswordError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public ResetUserPasswordPayload(
             ResetUserPasswordError error
-            )
-          : this(new[] { error })
+        )
+            : this(new[] { error })
         {
         }
     }

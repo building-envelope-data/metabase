@@ -30,13 +30,13 @@ namespace Metabase.GraphQl.Components
         )
         {
             return ComponentAssemblyAuthorization.IsAuthorizedToManage(
-                 claimsPrincipal,
-                 _association.OfComponentId,
-                 _association.ToComponentId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                _association.OfComponentId,
+                _association.ToComponentId,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

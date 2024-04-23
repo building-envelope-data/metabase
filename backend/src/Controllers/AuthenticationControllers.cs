@@ -24,10 +24,11 @@ namespace Metabase.Controllers
         public AuthenticationController(
             AppSettings appSettings,
             IOptions<IdentityOptions> identityOptions
-            )
+        )
         {
             _issuer = appSettings.Host;
-            _identityOptions = identityOptions.Value ?? throw new InvalidOperationException("There are no identity options.");
+            _identityOptions = identityOptions.Value ??
+                               throw new InvalidOperationException("There are no identity options.");
         }
 
         [HttpGet("~/connect/client/login")]
@@ -64,6 +65,7 @@ namespace Metabase.Controllers
                 // https://learn.microsoft.com/en-us/aspnet/core/security/preventing-open-redirects
                 return LocalRedirect(SanitizeReturnUrl(returnUrl));
             }
+
             // Remove the local authentication cookie before triggering a redirection to the remote server.
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
             // Ask the OpenIddict client middleware to redirect the user agent to the identity provider.
@@ -77,7 +79,8 @@ namespace Metabase.Controllers
                         // While not required, the specification encourages sending an id_token_hint
                         // parameter containing an identity token returned by the server for this user.
                         [OpenIddictClientAspNetCoreConstants.Properties.IdentityTokenHint] =
-                            result.Properties.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken)
+                            result.Properties.GetTokenValue(OpenIddictClientAspNetCoreConstants.Tokens
+                                .BackchannelIdentityToken)
                     }
                 )
                 {
@@ -91,7 +94,8 @@ namespace Metabase.Controllers
         // Note: this controller uses the same callback action for all providers
         // but for users who prefer using a different action per provider,
         // the following action can be split into separate actions.
-        [HttpGet("~/connect/callback/login/{provider}"), HttpPost("~/connect/callback/login/{provider}"), IgnoreAntiforgeryToken]
+        [HttpGet("~/connect/callback/login/{provider}"), HttpPost("~/connect/callback/login/{provider}"),
+         IgnoreAntiforgeryToken]
         public async Task<ActionResult> LogInCallback(string provider)
         {
             // Retrieve the authorization data validated by OpenIddict as part of the callback handling.
@@ -125,8 +129,10 @@ namespace Metabase.Controllers
             // the access/refresh tokens can be retrieved using result.Properties.GetTokens() to make API calls.
             if (result.Principal?.Identity is not ClaimsIdentity { IsAuthenticated: true })
             {
-                throw new InvalidOperationException("The external authorization data cannot be used for authentication.");
+                throw new InvalidOperationException(
+                    "The external authorization data cannot be used for authentication.");
             }
+
             // Build an identity based on the external claims and that will be used to create the authentication cookie.
             //
             // By default, all claims extracted during the authorization dance are available. The claims collection stored
@@ -136,30 +142,31 @@ namespace Metabase.Controllers
             // authorization provider.
             var claims = new List<Claim>(
                 result.Principal.Claims
-                .Select(claim => claim switch
-                {
-                    // https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
-                    // Map the standard "sub" and custom "id" claims to ClaimTypes.NameIdentifier, which is
-                    // the default claim type used by .NET and is required by the antiforgery components.
-                    { Type: Claims.Subject }
-                        => new Claim(ClaimTypes.NameIdentifier, claim.Value, claim.ValueType, claim.Issuer),
-                    // Map the standard "name" claim to ClaimTypes.Name.
-                    { Type: Claims.Name }
-                        => new Claim(ClaimTypes.Name, claim.Value, claim.ValueType, claim.Issuer),
-                    _ => claim
-                })
-                .Where(claim => claim switch
-                {
-                    // Preserve the basic claims that are necessary for the application to work correctly.
-                    { Type: ClaimTypes.NameIdentifier or ClaimTypes.Name } => true,
-                    // Don't preserve the other claims.
-                    _ => false
-                }));
+                    .Select(claim => claim switch
+                    {
+                        // https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+                        // Map the standard "sub" and custom "id" claims to ClaimTypes.NameIdentifier, which is
+                        // the default claim type used by .NET and is required by the antiforgery components.
+                        { Type: Claims.Subject }
+                            => new Claim(ClaimTypes.NameIdentifier, claim.Value, claim.ValueType, claim.Issuer),
+                        // Map the standard "name" claim to ClaimTypes.Name.
+                        { Type: Claims.Name }
+                            => new Claim(ClaimTypes.Name, claim.Value, claim.ValueType, claim.Issuer),
+                        _ => claim
+                    })
+                    .Where(claim => claim switch
+                    {
+                        // Preserve the basic claims that are necessary for the application to work correctly.
+                        { Type: ClaimTypes.NameIdentifier or ClaimTypes.Name } => true,
+                        // Don't preserve the other claims.
+                        _ => false
+                    }));
             // Add the claim `IdentityOptions.ClaimsIdentity.UserIdClaimType` to
             // make `UserManager.GetUserAsync(claimsPrincipal)` return the
             // authenticated user.
             var identifierClaim = claims.First(claim => claim.Type == ClaimTypes.NameIdentifier);
-            claims.Add(new Claim(_identityOptions.ClaimsIdentity.UserIdClaimType, identifierClaim.Value, identifierClaim.ValueType, identifierClaim.Issuer));
+            claims.Add(new Claim(_identityOptions.ClaimsIdentity.UserIdClaimType, identifierClaim.Value,
+                identifierClaim.ValueType, identifierClaim.Issuer));
             var identity = new ClaimsIdentity(
                 claims,
                 authenticationType: CookieAuthenticationDefaults.AuthenticationScheme,
@@ -182,13 +189,14 @@ namespace Metabase.Controllers
                     // Preserve the access, identity and refresh tokens returned in the token response, if available.
                     {
                         Name: OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken or
-                              OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken or
-                              OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
+                        OpenIddictClientAspNetCoreConstants.Tokens.BackchannelIdentityToken or
+                        OpenIddictClientAspNetCoreConstants.Tokens.RefreshToken
                     } => true,
                     // Ignore the other tokens.
                     _ => false
                 }));
             }
+
             // Ask the cookie authentication handler to return a new cookie and redirect
             // the user agent to the return URL stored in the authentication properties.
             return SignIn(
@@ -201,7 +209,8 @@ namespace Metabase.Controllers
         // Note: this controller uses the same callback action for all providers
         // but for users who prefer using a different action per provider,
         // the following action can be split into separate actions.
-        [HttpGet("~/connect/callback/logout/{provider}"), HttpPost("~/connect/callback/logout/{provider}"), IgnoreAntiforgeryToken]
+        [HttpGet("~/connect/callback/logout/{provider}"), HttpPost("~/connect/callback/logout/{provider}"),
+         IgnoreAntiforgeryToken]
         public async Task<ActionResult> LogOutCallback(string provider)
         {
             // Retrieve the data stored by OpenIddict in the state token created when the logout was triggered.
@@ -221,8 +230,8 @@ namespace Metabase.Controllers
         {
             return
                 returnUrl is not null && Url.IsLocalUrl(returnUrl)
-                ? returnUrl
-                : "/";
+                    ? returnUrl
+                    : "/";
         }
     }
 }

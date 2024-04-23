@@ -17,5 +17,5 @@ namespace Metabase.GraphQl.DataX
         FloatsPropositionInput? InfraredEmittances,
         FloatsPropositionInput? ColorRenderingIndices,
         CielabColorsPropositionInput? CielabColors
-        );
+    );
 }

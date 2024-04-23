@@ -6,28 +6,27 @@ using DateTime = System.DateTime;
 namespace Metabase.Data
 {
     public sealed class Component
-      : Data.Entity
+        : Data.Entity
     {
         // Entity Framework Core Read-Only Properties https://docs.microsoft.com/en-us/ef/core/modeling/constructors#read-only-properties
         // Data Annotations https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations
         // Built-In Validation Attributes https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation#built-in-attributes
 
-        [Required]
-        [MinLength(1)]
-        public string Name { get; private set; }
+        [Required] [MinLength(1)] public string Name { get; private set; }
 
-        [MinLength(1)]
-        public string? Abbreviation { get; private set; }
+        [MinLength(1)] public string? Abbreviation { get; private set; }
 
-        [Required]
-        [MinLength(1)]
-        public string Description { get; private set; }
+        [Required] [MinLength(1)] public string Description { get; private set; }
 
-        public NpgsqlRange<DateTime>? Availability { get; private set; } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
+        public NpgsqlRange<DateTime>?
+            Availability
+        {
+            get;
+            private set;
+        } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
 
         // https://www.npgsql.org/efcore/mapping/array.html
-        [Required]
-        public Enumerations.ComponentCategory[] Categories { get; private set; }
+        [Required] public Enumerations.ComponentCategory[] Categories { get; private set; }
 
         public ICollection<ComponentAssembly> PartOfEdges { get; } = new List<ComponentAssembly>();
         public ICollection<Component> PartOf { get; } = new List<Component>();
@@ -35,10 +34,14 @@ namespace Metabase.Data
         public ICollection<ComponentAssembly> PartEdges { get; } = new List<ComponentAssembly>();
         public ICollection<Component> Parts { get; } = new List<Component>();
 
-        public ICollection<ComponentConcretizationAndGeneralization> ConcretizationEdges { get; } = new List<ComponentConcretizationAndGeneralization>();
+        public ICollection<ComponentConcretizationAndGeneralization> ConcretizationEdges { get; } =
+            new List<ComponentConcretizationAndGeneralization>();
+
         public ICollection<Component> Concretizations { get; } = new List<Component>();
 
-        public ICollection<ComponentConcretizationAndGeneralization> GeneralizationEdges { get; } = new List<ComponentConcretizationAndGeneralization>();
+        public ICollection<ComponentConcretizationAndGeneralization> GeneralizationEdges { get; } =
+            new List<ComponentConcretizationAndGeneralization>();
+
         public ICollection<Component> Generalizations { get; } = new List<Component>();
 
         public ICollection<ComponentVariant> VariantOfEdges { get; } = new List<ComponentVariant>();
@@ -63,7 +66,7 @@ namespace Metabase.Data
             string description,
             NpgsqlRange<DateTime>? availability,
             Enumerations.ComponentCategory[] categories
-            )
+        )
         {
             Name = name;
             Abbreviation = abbreviation;
@@ -78,7 +81,7 @@ namespace Metabase.Data
             string description,
             NpgsqlRange<DateTime>? availability,
             Enumerations.ComponentCategory[] categories
-            )
+        )
         {
             Name = name;
             Abbreviation = abbreviation;

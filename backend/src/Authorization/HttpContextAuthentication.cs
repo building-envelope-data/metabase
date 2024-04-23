@@ -23,12 +23,14 @@ namespace Metabase.Authorization
             // in the authorization code flow, see
             // `AuthorizationController#Authorize`,
             // `AuthorizationController#Accept` `AuthorizationController#Deny`.
-            var identityAuthenticateResult = await httpContext.AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme).ConfigureAwait(false);
+            var identityAuthenticateResult = await httpContext
+                .AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme).ConfigureAwait(false);
             if (identityAuthenticateResult.Succeeded && identityAuthenticateResult.Principal is not null)
             {
                 httpContext.User = identityAuthenticateResult.Principal;
                 return identityAuthenticateResult;
             }
+
             // For the Next.js Web frontend, the metabase acts as OpenId Connect
             // Client and uses the cookie scheme for authentication. See
             // `AuthConfiguration#ConfigureAuthenticationAndAuthorizationServices`
@@ -36,12 +38,14 @@ namespace Metabase.Authorization
             // is set by methods in `AuthenticationController` and is related to
             // `OpenIddictBuilder#AddClient` in
             // `AuthConfiguration#ConfigureOpenIddictServices`.
-            var cookieAuthenticateResult = await httpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
+            var cookieAuthenticateResult = await httpContext
+                .AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
             if (cookieAuthenticateResult.Succeeded && cookieAuthenticateResult.Principal is not null)
             {
                 httpContext.User = cookieAuthenticateResult.Principal;
                 return cookieAuthenticateResult;
             }
+
             // For third-party frontends, the metabase acts as resource server
             // and uses authorization-header bearer tokens for authentication,
             // that is JavaScript Web Tokens (JWT), aka, Access Tokens, provided
@@ -50,13 +54,16 @@ namespace Metabase.Authorization
             // scheme is configured in
             // `AuthConfiguration#ConfigureOpenIddictServices` by
             // `OpenIddictBuilder#AddValidation`.
-            var jwtAuthenticateResult = await httpContext.AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
+            var jwtAuthenticateResult = await httpContext
+                .AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
             if (jwtAuthenticateResult.Succeeded && jwtAuthenticateResult.Principal is not null)
             {
                 httpContext.User = jwtAuthenticateResult.Principal;
                 return jwtAuthenticateResult;
             }
-            return AuthenticateResult.Fail("All available authentication schemes failed or yielded no claims principal.");
+
+            return AuthenticateResult.Fail(
+                "All available authentication schemes failed or yielded no claims principal.");
         }
     }
 }

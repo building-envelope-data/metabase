@@ -3,7 +3,7 @@ namespace Metabase.GraphQl.DataX
     public sealed class GetHttpsResourceTreeRoot : IGetHttpsResourceTreeVertex
     {
         public GetHttpsResourceTreeRoot(
-          GetHttpsResource value
+            GetHttpsResource value
         )
         {
             Value = value;

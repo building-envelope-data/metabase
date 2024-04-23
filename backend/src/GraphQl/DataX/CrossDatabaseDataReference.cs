@@ -13,10 +13,10 @@ namespace Metabase.GraphQl.DataX
         public Guid DatabaseId { get; }
 
         public CrossDatabaseDataReference(
-        Guid dataId,
-        DateTime dataTimestamp,
-        DataKind dataKind,
-        Guid databaseId
+            Guid dataId,
+            DateTime dataTimestamp,
+            DataKind dataKind,
+            Guid databaseId
         )
         {
             DataId = dataId;
@@ -26,14 +26,14 @@ namespace Metabase.GraphQl.DataX
         }
 
         public Task<Metabase.Data.Institution?> GetDatabaseAsync(
-                InstitutionByIdDataLoader databaseById,
-                CancellationToken cancellationToken
+            InstitutionByIdDataLoader databaseById,
+            CancellationToken cancellationToken
         )
         {
             return databaseById.LoadAsync(
                 DatabaseId,
                 cancellationToken
-                );
+            );
         }
     }
 }

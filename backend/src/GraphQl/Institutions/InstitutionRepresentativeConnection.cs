@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionRepresentativeConnection
-        : ForkingConnection<Data.Institution, Data.InstitutionRepresentative, PendingInstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge>
+        : ForkingConnection<Data.Institution, Data.InstitutionRepresentative,
+            PendingInstitutionRepresentativesByInstitutionIdDataLoader,
+            InstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge>
     {
         public InstitutionRepresentativeConnection(
             Data.Institution institution,
@@ -19,7 +21,7 @@ namespace Metabase.GraphQl.Institutions
                 institution,
                 pending,
                 x => new InstitutionRepresentativeEdge(x)
-                )
+            )
         {
         }
 
@@ -32,12 +34,12 @@ namespace Metabase.GraphQl.Institutions
         )
         {
             return InstitutionRepresentativeAuthorization.IsAuthorizedToManage(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                Subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

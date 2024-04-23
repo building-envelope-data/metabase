@@ -1,19 +1,19 @@
 namespace Metabase.GraphQl.DataFormats
 {
     public sealed class CreateDataFormatPayload
-      : DataFormatPayload<CreateDataFormatError>
+        : DataFormatPayload<CreateDataFormatError>
     {
         public CreateDataFormatPayload(
             Data.DataFormat standard
-            )
-              : base(standard)
+        )
+            : base(standard)
         {
         }
 
         public CreateDataFormatPayload(
-          CreateDataFormatError error
+            CreateDataFormatError error
         )
-        : base(error)
+            : base(error)
         {
         }
     }

@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class InstitutionDevelopedMethodConnection
-        : ForkingConnection<Data.Institution, Data.InstitutionMethodDeveloper, PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodEdge>
+        : ForkingConnection<Data.Institution, Data.InstitutionMethodDeveloper,
+            PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader,
+            InstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodEdge>
     {
         public InstitutionDevelopedMethodConnection(
             Data.Institution institution,
@@ -20,7 +22,7 @@ namespace Metabase.GraphQl.Institutions
                 institution,
                 pending,
                 x => new InstitutionDevelopedMethodEdge(x)
-                )
+            )
         {
         }
 
@@ -33,12 +35,12 @@ namespace Metabase.GraphQl.Institutions
         )
         {
             return InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
+                claimsPrincipal,
+                Subject.Id,
+                userManager,
+                context,
+                cancellationToken
+            );
         }
     }
 }

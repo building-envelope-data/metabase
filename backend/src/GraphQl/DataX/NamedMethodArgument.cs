@@ -5,8 +5,8 @@ namespace Metabase.GraphQl.DataX
     public sealed class NamedMethodArgument
     {
         public NamedMethodArgument(
-        string name,
-        JsonElement value
+            string name,
+            JsonElement value
         )
         {
             Name = name;

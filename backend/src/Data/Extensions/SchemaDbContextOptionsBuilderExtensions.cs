@@ -9,20 +9,20 @@ namespace Metabase.Data.Extensions
         public static DbContextOptionsBuilder UseSchemaName(
             this DbContextOptionsBuilder optionsBuilder,
             string schemaName
-            )
+        )
         {
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(
-              new SchemaNameOptionsExtension(schemaName)
-              );
+                new SchemaNameOptionsExtension(schemaName)
+            );
             return optionsBuilder;
         }
 
         public static DbContextOptionsBuilder<TContext> UseSchemaName<TContext>(
             this DbContextOptionsBuilder<TContext> optionsBuilder,
             string connectionString
-            )
-          where TContext : DbContext
-          => (DbContextOptionsBuilder<TContext>)UseSchemaName(
-              (DbContextOptionsBuilder)optionsBuilder, connectionString);
+        )
+            where TContext : DbContext
+            => (DbContextOptionsBuilder<TContext>)UseSchemaName(
+                (DbContextOptionsBuilder)optionsBuilder, connectionString);
     }
 }

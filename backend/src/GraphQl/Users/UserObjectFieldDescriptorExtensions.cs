@@ -23,7 +23,7 @@ namespace Metabase.GraphQl.Users
 
         public static IObjectFieldDescriptor UseUserManager(
             this IObjectFieldDescriptor descriptor
-            )
+        )
         {
             // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
             var userManagerServiceName = GetServiceName<UserManager<Data.User>>();
@@ -31,10 +31,11 @@ namespace Metabase.GraphQl.Users
             {
                 var services = context.Service<IServiceProvider>();
                 var userManager = new UserManager<Data.User>(
-                    new UserStore<Data.User, Data.Role, Data.ApplicationDbContext, Guid, Data.UserClaim, Data.UserRole, Data.UserLogin, Data.UserToken, Data.RoleClaim>(
-                      context.Service<Data.ApplicationDbContext>()
-                      ?? throw new InvalidOperationException("Application database context is null.")
-                      ),
+                    new UserStore<Data.User, Data.Role, Data.ApplicationDbContext, Guid, Data.UserClaim, Data.UserRole,
+                        Data.UserLogin, Data.UserToken, Data.RoleClaim>(
+                        context.Service<Data.ApplicationDbContext>()
+                        ?? throw new InvalidOperationException("Application database context is null.")
+                    ),
                     services.GetRequiredService<IOptions<IdentityOptions>>(),
                     services.GetRequiredService<IPasswordHasher<Data.User>>(),
                     /* new PasswordHasher<Data.User>( */
@@ -48,7 +49,7 @@ namespace Metabase.GraphQl.Users
                     /* new IdentityErrorDescriber(), */
                     services,
                     services.GetRequiredService<ILogger<UserManager<Data.User>>>()
-                    );
+                );
                 try
                 {
                     context.SetLocalState(userManagerServiceName, userManager);
@@ -64,7 +65,7 @@ namespace Metabase.GraphQl.Users
 
         public static IObjectFieldDescriptor UseSignInManager(
             this IObjectFieldDescriptor descriptor
-            )
+        )
         {
             // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
             var signInManagerServiceName = GetServiceName<SignInManager<Data.User>>();
@@ -73,14 +74,15 @@ namespace Metabase.GraphQl.Users
                 var services = context.Service<IServiceProvider>();
                 var signInManager = new SignInManager<Data.User>(
                     context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                    ?? throw new InvalidOperationException("Add attribute `[UseUserManager]` before attribute `[UseSignInManager]`."),
+                    ?? throw new InvalidOperationException(
+                        "Add attribute `[UseUserManager]` before attribute `[UseSignInManager]`."),
                     services.GetRequiredService<IHttpContextAccessor>(),
                     services.GetRequiredService<IUserClaimsPrincipalFactory<Data.User>>(),
                     services.GetRequiredService<IOptions<IdentityOptions>>(),
                     services.GetRequiredService<ILogger<SignInManager<Data.User>>>(),
                     services.GetRequiredService<IAuthenticationSchemeProvider>(),
                     services.GetRequiredService<IUserConfirmation<Data.User>>()
-                    );
+                );
                 try
                 {
                     context.SetLocalState(signInManagerServiceName, signInManager);

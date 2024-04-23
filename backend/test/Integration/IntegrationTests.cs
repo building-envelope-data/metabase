@@ -25,7 +25,6 @@ namespace Metabase.Tests.Integration
     public abstract partial class IntegrationTests
         : IDisposable
     {
-
         [GeneratedRegex("confirmationCode=(?<confirmationCode>\\w+)")]
         private static partial Regex ConfirmationCodeRegex();
 
@@ -41,7 +40,12 @@ namespace Metabase.Tests.Integration
 
         private bool _disposed;
         protected CustomWebApplicationFactory Factory { get; }
-        protected CollectingEmailSender EmailSender { get => Factory.EmailSender; }
+
+        protected CollectingEmailSender EmailSender
+        {
+            get => Factory.EmailSender;
+        }
+
         protected HttpClient HttpClient { get; }
         public const string DefaultName = "John Doe";
         public const string DefaultEmail = "john.doe@ise.fraunhofer.de";
@@ -74,6 +78,7 @@ namespace Metabase.Tests.Integration
                     Factory.Dispose();
                     HttpClient.Dispose();
                 }
+
                 _disposed = true;
             }
         }
@@ -81,7 +86,7 @@ namespace Metabase.Tests.Integration
         protected static HttpClient CreateHttpClient(
             CustomWebApplicationFactory factory,
             bool allowAutoRedirect = true
-            )
+        )
         {
             return factory.CreateClient(
                 new WebApplicationFactoryClientOptions
@@ -96,7 +101,7 @@ namespace Metabase.Tests.Integration
 
         protected HttpClient CreateHttpClient(
             bool allowAutoRedirect = true
-            )
+        )
         {
             return CreateHttpClient(
                 Factory,
@@ -108,32 +113,33 @@ namespace Metabase.Tests.Integration
             HttpClient httpClient,
             string emailAddress,
             string password
-            )
+        )
         {
             var response =
-              await httpClient.RequestPasswordTokenAsync(
-                new PasswordTokenRequest
-                {
-                    Address = "http://localhost/connect/token",
-                    ClientId = "metabase",
-                    ClientSecret = "secret",
-                    Scope = "api:read api:write api:user:manage",
-                    UserName = emailAddress,
-                    Password = password,
-                }
-              )
-              .ConfigureAwait(false);
+                await httpClient.RequestPasswordTokenAsync(
+                        new PasswordTokenRequest
+                        {
+                            Address = "http://localhost/connect/token",
+                            ClientId = "metabase",
+                            ClientSecret = "secret",
+                            Scope = "api:read api:write api:user:manage",
+                            UserName = emailAddress,
+                            Password = password,
+                        }
+                    )
+                    .ConfigureAwait(false);
             if (response.IsError)
             {
                 throw new HttpRequestException(response.Error);
             }
+
             return response;
         }
 
         protected Task<TokenResponse> RequestAuthToken(
             string emailAddress,
             string password
-            )
+        )
         {
             return RequestAuthToken(
                 HttpClient,
@@ -146,22 +152,24 @@ namespace Metabase.Tests.Integration
             HttpClient httpClient,
             string email = DefaultEmail,
             string password = DefaultPassword
-            )
+        )
         {
             var tokenResponse =
-              await RequestAuthToken(
-                  httpClient,
-                  emailAddress: email,
-                  password: password
-                  )
-              .ConfigureAwait(false);
-            httpClient.SetBearerToken(tokenResponse.AccessToken ?? throw new InvalidOperationException($"The auth-token request to {httpClient.BaseAddress} with email address {email} and password {password} returned `null` as access token."));
+                await RequestAuthToken(
+                        httpClient,
+                        emailAddress: email,
+                        password: password
+                    )
+                    .ConfigureAwait(false);
+            httpClient.SetBearerToken(tokenResponse.AccessToken ??
+                                      throw new InvalidOperationException(
+                                          $"The auth-token request to {httpClient.BaseAddress} with email address {email} and password {password} returned `null` as access token."));
         }
 
         protected Task LoginUser(
             string email = DefaultEmail,
             string password = DefaultPassword
-            )
+        )
         {
             return LoginUser(
                 HttpClient,
@@ -229,7 +237,7 @@ namespace Metabase.Tests.Integration
                     ["password"] = password,
                     ["passwordConfirmation"] = passwordConfirmation ?? password
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         protected async Task<Guid> RegisterUserReturningUuid(
@@ -248,7 +256,7 @@ namespace Metabase.Tests.Integration
                     ["password"] = password,
                     ["passwordConfirmation"] = passwordConfirmation ?? password
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             return new Guid(
                 ExtractString(
                     "$.data.registerUser.user.uuid",
@@ -280,7 +288,7 @@ namespace Metabase.Tests.Integration
         protected async Task<string> ConfirmUserEmail(
             string confirmationCode,
             string email = DefaultEmail
-            )
+        )
         {
             return await SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Users/ConfirmUserEmail.graphql"),
@@ -289,7 +297,7 @@ namespace Metabase.Tests.Integration
                     ["email"] = email,
                     ["confirmationCode"] = confirmationCode
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
         }
 
         protected async Task<Guid> RegisterAndConfirmUser(
@@ -303,12 +311,12 @@ namespace Metabase.Tests.Integration
                     name: name,
                     email: email,
                     password: password
-                    ).ConfigureAwait(false);
+                ).ConfigureAwait(false);
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             await ConfirmUserEmail(
                 confirmationCode: confirmationCode,
                 email: email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             return uuid;
         }
 
@@ -323,7 +331,7 @@ namespace Metabase.Tests.Integration
                     name: name,
                     email: email,
                     password: password
-                    ).ConfigureAwait(false);
+                ).ConfigureAwait(false);
             await LoginUser(
                 email: email,
                 password: password
@@ -335,7 +343,7 @@ namespace Metabase.Tests.Integration
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return QueryGraphQl(
                 HttpClient,
@@ -350,25 +358,25 @@ namespace Metabase.Tests.Integration
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return httpClient.PostAsync(
                 "/graphql",
                 MakeJsonHttpContent(
-                  new GraphQlRequest(
-                      query: query,
-                      operationName: operationName,
-                      variables: variables
+                    new GraphQlRequest(
+                        query: query,
+                        operationName: operationName,
+                        variables: variables
                     )
-                  )
-                );
+                )
+            );
         }
 
         protected Task<HttpContent> SuccessfullyQueryGraphQlContent(
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContent(
                 HttpClient,
@@ -383,14 +391,14 @@ namespace Metabase.Tests.Integration
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             var httpResponseMessage = await QueryGraphQl(
                 httpClient,
                 query,
                 operationName,
                 variables
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
             {
                 // We wrap this check in an if-condition such that the message
@@ -398,8 +406,9 @@ namespace Metabase.Tests.Integration
                 httpResponseMessage.StatusCode.Should().Be(
                     HttpStatusCode.OK,
                     await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false)
-                    );
+                );
             }
+
             return httpResponseMessage.Content;
         }
 
@@ -407,7 +416,7 @@ namespace Metabase.Tests.Integration
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return UnsuccessfullyQueryGraphQlContent(
                 HttpClient,
@@ -422,14 +431,14 @@ namespace Metabase.Tests.Integration
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             var httpResponseMessage = await QueryGraphQl(
                 httpClient,
                 query,
                 operationName,
                 variables
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
             {
                 // We wrap this check in an if-condition such that the message
@@ -437,8 +446,9 @@ namespace Metabase.Tests.Integration
                 httpResponseMessage.StatusCode.Should().NotBe(
                     HttpStatusCode.OK,
                     await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false)
-                    );
+                );
             }
+
             return httpResponseMessage.Content;
         }
 
@@ -446,7 +456,7 @@ namespace Metabase.Tests.Integration
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContentAsString(
                 HttpClient,
@@ -461,26 +471,26 @@ namespace Metabase.Tests.Integration
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return await (
-                await SuccessfullyQueryGraphQlContent(
-                    httpClient,
-                    query,
-                    operationName,
-                    variables
+                    await SuccessfullyQueryGraphQlContent(
+                            httpClient,
+                            query,
+                            operationName,
+                            variables
+                        )
+                        .ConfigureAwait(false)
                 )
-                .ConfigureAwait(false)
-            )
-            .ReadAsStringAsync()
-            .ConfigureAwait(false);
+                .ReadAsStringAsync()
+                .ConfigureAwait(false);
         }
 
         protected Task<JsonElement> SuccessfullyQueryGraphQlContentAsJson(
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return SuccessfullyQueryGraphQlContentAsJson(
                 HttpClient,
@@ -495,32 +505,32 @@ namespace Metabase.Tests.Integration
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return (
-                await JsonDocument.ParseAsync(
-                    await (
-                        await SuccessfullyQueryGraphQlContent(
-                            httpClient,
-                            query,
-                            operationName,
-                            variables
-                    )
-                    .ConfigureAwait(false)
+                    await JsonDocument.ParseAsync(
+                            await (
+                                    await SuccessfullyQueryGraphQlContent(
+                                            httpClient,
+                                            query,
+                                            operationName,
+                                            variables
+                                        )
+                                        .ConfigureAwait(false)
+                                )
+                                .ReadAsStreamAsync()
+                                .ConfigureAwait(false)
+                        )
+                        .ConfigureAwait(false)
                 )
-                .ReadAsStreamAsync()
-                .ConfigureAwait(false)
-                )
-                .ConfigureAwait(false)
-            )
-            .RootElement;
+                .RootElement;
         }
 
         protected Task<string> UnsuccessfullyQueryGraphQlContentAsString(
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return UnsuccessfullyQueryGraphQlContentAsString(
                 HttpClient,
@@ -535,25 +545,25 @@ namespace Metabase.Tests.Integration
             string query,
             string? operationName = null,
             object? variables = null
-            )
+        )
         {
             return await (
-                await UnsuccessfullyQueryGraphQlContent(
-                    httpClient,
-                    query,
-                    operationName,
-                    variables
+                    await UnsuccessfullyQueryGraphQlContent(
+                            httpClient,
+                            query,
+                            operationName,
+                            variables
+                        )
+                        .ConfigureAwait(false)
                 )
-                .ConfigureAwait(false)
-            )
-            .ReadAsStringAsync()
-            .ConfigureAwait(false);
+                .ReadAsStringAsync()
+                .ConfigureAwait(false);
         }
 
         protected static string ExtractString(
             string jsonPath,
             JsonElement jsonElement
-            )
+        )
         {
             var pathResult =
                 JsonPath.Parse(jsonPath).Evaluate(
@@ -563,8 +573,9 @@ namespace Metabase.Tests.Integration
             {
                 throw new ArgumentException(pathResult.Error);
             }
+
             return pathResult.Matches?.Single()?.Value?.GetValue<string>()
-            ?? throw new ArgumentException("String is null");
+                   ?? throw new ArgumentException("String is null");
         }
 
         protected static string Base64Encode(string text)
@@ -596,17 +607,17 @@ namespace Metabase.Tests.Integration
 
         private static ByteArrayContent MakeJsonHttpContent<TContent>(
             TContent content
-            )
+        )
         {
             var result =
-              new ByteArrayContent(
-                JsonSerializer.SerializeToUtf8Bytes(
-                  content,
-                  _customJsonSerializerOptions
-                  )
+                new ByteArrayContent(
+                    JsonSerializer.SerializeToUtf8Bytes(
+                        content,
+                        _customJsonSerializerOptions
+                    )
                 );
             result.Headers.ContentType =
-              new MediaTypeHeaderValue("application/json");
+                new MediaTypeHeaderValue("application/json");
             return result;
         }
 
@@ -638,7 +649,7 @@ namespace Metabase.Tests.Integration
                 string query,
                 string? operationName,
                 object? variables
-                )
+            )
             {
                 Query = query;
                 OperationName = operationName;

@@ -19,7 +19,8 @@ namespace Metabase.GraphQl.Databases
     [ExtendObjectType(nameof(Mutation))]
     public sealed class DatabaseMutations
     {
-        private static string[] _verificationCodeFileNames = new[] {
+        private static string[] _verificationCodeFileNames = new[]
+        {
             "VerificationCode.graphql"
         };
 
@@ -31,41 +32,43 @@ namespace Metabase.GraphQl.Databases
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await DatabaseAuthorization.IsAuthorizedToCreateDatabaseForInstitution(
-                 claimsPrincipal,
-                 input.OperatorId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
-            )
+                    claimsPrincipal,
+                    input.OperatorId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
+               )
             {
                 return new CreateDatabasePayload(
                     new CreateDatabaseError(
-                      CreateDatabaseErrorCode.UNAUTHORIZED,
-                      "You are not authorized to create databases for the institution.",
-                      new[] { nameof(input), nameof(input.OperatorId).FirstCharToLower() }
+                        CreateDatabaseErrorCode.UNAUTHORIZED,
+                        "You are not authorized to create databases for the institution.",
+                        new[] { nameof(input), nameof(input.OperatorId).FirstCharToLower() }
                     )
                 );
             }
+
             if (!await context.Institutions
-            .AnyAsync(
-                x => x.Id == input.OperatorId,
-             cancellationToken: cancellationToken
-             )
-            .ConfigureAwait(false)
-            )
+                    .AnyAsync(
+                        x => x.Id == input.OperatorId,
+                        cancellationToken: cancellationToken
+                    )
+                    .ConfigureAwait(false)
+               )
             {
                 return new CreateDatabasePayload(
                     new CreateDatabaseError(
                         CreateDatabaseErrorCode.UNKNOWN_OPERATOR,
                         "Unknown operator",
-                      new[] { nameof(input), nameof(input.OperatorId).FirstCharToLower() }
+                        new[] { nameof(input), nameof(input.OperatorId).FirstCharToLower() }
                     )
                 );
             }
+
             var database = new Data.Database(
                 name: input.Name,
                 description: input.Description,
@@ -87,40 +90,42 @@ namespace Metabase.GraphQl.Databases
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await DatabaseAuthorization.IsAuthorizedToUpdate(
-                 claimsPrincipal,
-                 input.DatabaseId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
-            )
+                    claimsPrincipal,
+                    input.DatabaseId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
+               )
             {
                 return new UpdateDatabasePayload(
                     new UpdateDatabaseError(
-                      UpdateDatabaseErrorCode.UNAUTHORIZED,
-                      "You are not authorized to update the database.",
-                      new[] { nameof(input) }
+                        UpdateDatabaseErrorCode.UNAUTHORIZED,
+                        "You are not authorized to update the database.",
+                        new[] { nameof(input) }
                     )
                 );
             }
+
             var database =
                 await context.Databases.AsQueryable()
-                .Where(i => i.Id == input.DatabaseId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(i => i.Id == input.DatabaseId)
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (database is null)
             {
                 return new UpdateDatabasePayload(
                     new UpdateDatabaseError(
-                      UpdateDatabaseErrorCode.UNKNOWN_DATABASE,
-                      "Unknown database.",
-                      new[] { nameof(input), nameof(input.DatabaseId).FirstCharToLower() }
-                      )
-                      );
+                        UpdateDatabaseErrorCode.UNKNOWN_DATABASE,
+                        "Unknown database.",
+                        new[] { nameof(input), nameof(input.DatabaseId).FirstCharToLower() }
+                    )
+                );
             }
+
             database.Update(
                 name: input.Name,
                 description: input.Description,
@@ -140,40 +145,42 @@ namespace Metabase.GraphQl.Databases
             [Service] IHttpClientFactory httpClientFactory,
             [Service] IHttpContextAccessor httpContextAccessor,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await DatabaseAuthorization.IsAuthorizedToVerify(
-                 claimsPrincipal,
-                 input.DatabaseId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
-            )
+                    claimsPrincipal,
+                    input.DatabaseId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
+               )
             {
                 return new VerifyDatabasePayload(
                     new VerifyDatabaseError(
-                      VerifyDatabaseErrorCode.UNAUTHORIZED,
-                      "You are not authorized to verify the database.",
-                      new[] { nameof(input) }
+                        VerifyDatabaseErrorCode.UNAUTHORIZED,
+                        "You are not authorized to verify the database.",
+                        new[] { nameof(input) }
                     )
                 );
             }
+
             var database =
                 await context.Databases.AsQueryable()
-                .Where(i => i.Id == input.DatabaseId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(i => i.Id == input.DatabaseId)
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (database is null)
             {
                 return new VerifyDatabasePayload(
                     new VerifyDatabaseError(
-                      VerifyDatabaseErrorCode.UNKNOWN_DATABASE,
-                      "Unknown database.",
-                      new[] { nameof(input), nameof(input.DatabaseId).FirstCharToLower() }
-                      )
-                      );
+                        VerifyDatabaseErrorCode.UNKNOWN_DATABASE,
+                        "Unknown database.",
+                        new[] { nameof(input), nameof(input.DatabaseId).FirstCharToLower() }
+                    )
+                );
             }
+
             string queriedVerificationCode;
             try
             {
@@ -188,32 +195,34 @@ namespace Metabase.GraphQl.Databases
             {
                 return new VerifyDatabasePayload(
                     new VerifyDatabaseError(
-                      VerifyDatabaseErrorCode.REQUEST_FAILED,
-                      $"Failed with status code {e.StatusCode} to request {database.Locator}.",
-                      new[] { nameof(input) }
-                      )
-                      );
+                        VerifyDatabaseErrorCode.REQUEST_FAILED,
+                        $"Failed with status code {e.StatusCode} to request {database.Locator}.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
             catch (JsonException e)
             {
                 return new VerifyDatabasePayload(
                     new VerifyDatabaseError(
-                      VerifyDatabaseErrorCode.DESERIALIZATION_FAILED,
-                      $"Failed to deserialize GraphQL response of request to {database.Locator}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.",
-                      new[] { nameof(input) }
-                      )
-                      );
+                        VerifyDatabaseErrorCode.DESERIALIZATION_FAILED,
+                        $"Failed to deserialize GraphQL response of request to {database.Locator}. The details given are: Zero-based number of bytes read within the current line before the exception are {e.BytePositionInLine}, zero-based number of lines read before the exception are {e.LineNumber}, message that describes the current exception is '{e.Message}', path within the JSON where the exception was encountered is {e.Path}.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             if (queriedVerificationCode != database.VerificationCode)
             {
                 return new VerifyDatabasePayload(
                     new VerifyDatabaseError(
-                      VerifyDatabaseErrorCode.WRONG_VERIFICATION_CODE,
-                      $"The verification code stored in the metabase {database.VerificationCode} does not match the one returned by the database {queriedVerificationCode}.",
-                      new[] { nameof(input) }
-                      )
-                      );
+                        VerifyDatabaseErrorCode.WRONG_VERIFICATION_CODE,
+                        $"The verification code stored in the metabase {database.VerificationCode} does not match the one returned by the database {queriedVerificationCode}.",
+                        new[] { nameof(input) }
+                    )
+                );
             }
+
             database.Verify();
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new VerifyDatabasePayload(database);
@@ -232,18 +241,18 @@ namespace Metabase.GraphQl.Databases
         )
         {
             return (await QueryingDatabases.QueryDatabase<VerificationCodeData>(
-                database,
-                new GraphQL.GraphQLRequest(
-                    query: await QueryingDatabases.ConstructQuery(
-                        _verificationCodeFileNames
-                    ).ConfigureAwait(false),
-                    operationName: "VerificationCode"
-                ),
-                httpClientFactory,
-                httpContextAccessor,
-                cancellationToken
-            ).ConfigureAwait(false)
-            ).Data.VerificationCode;
+                        database,
+                        new GraphQL.GraphQLRequest(
+                            query: await QueryingDatabases.ConstructQuery(
+                                _verificationCodeFileNames
+                            ).ConfigureAwait(false),
+                            operationName: "VerificationCode"
+                        ),
+                        httpClientFactory,
+                        httpContextAccessor,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                ).Data.VerificationCode;
         }
     }
 }

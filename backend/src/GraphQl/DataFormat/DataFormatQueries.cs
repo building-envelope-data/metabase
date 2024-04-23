@@ -18,7 +18,7 @@ namespace Metabase.GraphQl.DataFormats
         [UseSorting]
         public IQueryable<Data.DataFormat> GetDataFormats(
             Data.ApplicationDbContext context
-            )
+        )
         {
             return context.DataFormats;
         }
@@ -27,12 +27,12 @@ namespace Metabase.GraphQl.DataFormats
             Guid uuid,
             DataFormatByIdDataLoader dataFormatById,
             CancellationToken cancellationToken
-            )
+        )
         {
             return dataFormatById.LoadAsync(
                 uuid,
                 cancellationToken
-                );
+            );
         }
     }
 }

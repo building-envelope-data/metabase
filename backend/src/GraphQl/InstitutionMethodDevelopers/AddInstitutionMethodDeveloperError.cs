@@ -3,14 +3,14 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.InstitutionMethodDevelopers
 {
     public sealed class AddInstitutionMethodDeveloperError
-      : UserErrorBase<AddInstitutionMethodDeveloperErrorCode>
+        : UserErrorBase<AddInstitutionMethodDeveloperErrorCode>
     {
         public AddInstitutionMethodDeveloperError(
             AddInstitutionMethodDeveloperErrorCode code,
             string message,
             IReadOnlyList<string> path
-            )
-          : base(code, message, path)
+        )
+            : base(code, message, path)
         {
         }
     }

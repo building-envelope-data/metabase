@@ -8,15 +8,11 @@ using NpgsqlTypes;
 namespace Metabase.Data
 {
     public sealed class Method
-      : Data.Entity
+        : Data.Entity
     {
-        [Required]
-        [MinLength(1)]
-        public string Name { get; private set; }
+        [Required] [MinLength(1)] public string Name { get; private set; }
 
-        [Required]
-        [MinLength(1)]
-        public string Description { get; private set; }
+        [Required] [MinLength(1)] public string Description { get; private set; }
 
         // Standard, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
         public Standard? Standard { get; set; }
@@ -35,17 +31,27 @@ namespace Metabase.Data
         // TODO service
         // TODO Description of named parameters and sources?
 
-        public NpgsqlRange<DateTime>? Validity { get; private set; } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
+        public NpgsqlRange<DateTime>?
+            Validity
+        {
+            get;
+            private set;
+        } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
 
-        public NpgsqlRange<DateTime>? Availability { get; private set; } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
+        public NpgsqlRange<DateTime>?
+            Availability
+        {
+            get;
+            private set;
+        } // Inifinite bounds: https://github.com/npgsql/efcore.pg/issues/570#issuecomment-437119937 and https://www.npgsql.org/doc/api/NpgsqlTypes.NpgsqlRange-1.html#NpgsqlTypes_NpgsqlRange_1__ctor__0_System_Boolean_System_Boolean__0_System_Boolean_System_Boolean_
 
-        [Url]
-        public Uri? CalculationLocator { get; private set; }
+        [Url] public Uri? CalculationLocator { get; private set; }
 
-        [Required]
-        public Enumerations.MethodCategory[] Categories { get; private set; }
+        [Required] public Enumerations.MethodCategory[] Categories { get; private set; }
 
-        public ICollection<InstitutionMethodDeveloper> InstitutionDeveloperEdges { get; } = new List<InstitutionMethodDeveloper>();
+        public ICollection<InstitutionMethodDeveloper> InstitutionDeveloperEdges { get; } =
+            new List<InstitutionMethodDeveloper>();
+
         public ICollection<Institution> InstitutionDevelopers { get; } = new List<Institution>();
 
         public ICollection<UserMethodDeveloper> UserDeveloperEdges { get; } = new List<UserMethodDeveloper>();
@@ -56,7 +62,7 @@ namespace Metabase.Data
         {
             get => InstitutionDevelopers.Cast<IStakeholder>().Concat(
                 UserDevelopers.Cast<IStakeholder>()
-                );
+            );
         }
 
         public Guid ManagerId { get; set; }
@@ -78,7 +84,7 @@ namespace Metabase.Data
             NpgsqlRange<DateTime>? availability,
             Uri? calculationLocator,
             Enumerations.MethodCategory[] categories
-            )
+        )
         {
             Name = name;
             Description = description;
@@ -95,7 +101,7 @@ namespace Metabase.Data
             NpgsqlRange<DateTime>? availability,
             Uri? calculationLocator,
             Enumerations.MethodCategory[] categories
-            )
+        )
         {
             Name = name;
             Description = description;

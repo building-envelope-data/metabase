@@ -10,7 +10,7 @@ namespace Metabase.GraphQl.Users
             IDescriptorContext context,
             IObjectFieldDescriptor descriptor,
             MemberInfo member
-            )
+        )
         {
             descriptor.UseSignInManager();
         }

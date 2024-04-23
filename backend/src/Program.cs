@@ -35,7 +35,7 @@ namespace Metabase
 
         public static async Task<int> Main(
             string[] commandLineArguments
-            )
+        )
         {
             var environment =
                 Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
@@ -59,6 +59,7 @@ namespace Metabase
                         await CreateAndSeedDbIfNotExists(scope.ServiceProvider).ConfigureAwait(false);
                     }
                 }
+
                 application.Run();
                 return 0;
             }
@@ -108,13 +109,13 @@ namespace Metabase
 
         private static async Task CreateAndSeedDbIfNotExists(
             IServiceProvider services
-            )
+        )
         {
             try
             {
                 using var dbContext =
-                 services.GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
-                 .CreateDbContext();
+                    services.GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
+                        .CreateDbContext();
                 if (dbContext.Database.EnsureCreated())
                 {
                     await Data.DbSeeder.DoAsync(services).ConfigureAwait(false);
@@ -130,7 +131,7 @@ namespace Metabase
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
         private static WebApplicationBuilder CreateWebApplicationBuilder(
             string[] commandLineArguments
-            )
+        )
         {
             var builder = WebApplication.CreateBuilder(
                 new WebApplicationOptions
@@ -158,7 +159,7 @@ namespace Metabase
                 ConfigureLogging(
                     loggerConfiguration,
                     webHostBuilderContext.HostingEnvironment.EnvironmentName
-                    );
+                );
                 loggerConfiguration
                     .ReadFrom.Configuration(webHostBuilderContext.Configuration);
             });
@@ -169,7 +170,7 @@ namespace Metabase
             IConfigurationBuilder configuration,
             IHostEnvironment environment,
             string[] commandLineArguments
-            )
+        )
         {
             configuration.Sources.Clear();
             configuration
@@ -178,14 +179,16 @@ namespace Metabase
                     "appsettings.json",
                     optional: false,
                     reloadOnChange: !environment.IsEnvironment(TestEnvironment)
-                    )
+                )
                 .AddJsonFile(
                     $"appsettings.{environment.EnvironmentName}.json",
                     optional: false,
                     reloadOnChange: !environment.IsEnvironment(TestEnvironment)
-                    )
+                )
                 .AddEnvironmentVariables()
-                .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
+                .AddEnvironmentVariables(
+                    prefix:
+                    "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
                 .AddCommandLine(commandLineArguments);
         }
     }

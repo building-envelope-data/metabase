@@ -3,8 +3,8 @@ namespace Metabase.GraphQl.DataX
     public sealed class NamedMethodSource
     {
         public NamedMethodSource(
-        string name,
-        CrossDatabaseDataReference value
+            string name,
+            CrossDatabaseDataReference value
         )
         {
             Name = name;

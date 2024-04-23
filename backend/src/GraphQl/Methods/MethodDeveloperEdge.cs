@@ -32,16 +32,19 @@ namespace Metabase.GraphQl.Methods
             InstitutionByIdDataLoader institutionById,
             UserByIdDataLoader userById,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (_institutionMethodDeveloperEdge is not null)
             {
-                return await _institutionMethodDeveloperEdge.GetNodeAsync(institutionById, cancellationToken).ConfigureAwait(false);
+                return await _institutionMethodDeveloperEdge.GetNodeAsync(institutionById, cancellationToken)
+                    .ConfigureAwait(false);
             }
+
             if (_userMethodDeveloperEdge is not null)
             {
                 return await _userMethodDeveloperEdge.GetNodeAsync(userById, cancellationToken).ConfigureAwait(false);
             }
+
             throw new ArgumentException("Impossible!");
         }
 
@@ -55,12 +58,17 @@ namespace Metabase.GraphQl.Methods
         {
             if (_institutionMethodDeveloperEdge is not null)
             {
-                return await _institutionMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager, context, cancellationToken).ConfigureAwait(false);
+                return await _institutionMethodDeveloperEdge
+                    .CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager, context, cancellationToken)
+                    .ConfigureAwait(false);
             }
+
             if (_userMethodDeveloperEdge is not null)
             {
-                return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager).ConfigureAwait(false);
+                return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager)
+                    .ConfigureAwait(false);
             }
+
             throw new ArgumentException("Impossible!");
         }
 
@@ -74,12 +82,18 @@ namespace Metabase.GraphQl.Methods
         {
             if (_institutionMethodDeveloperEdge is not null)
             {
-                return await _institutionMethodDeveloperEdge.CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken).ConfigureAwait(false);
+                return await _institutionMethodDeveloperEdge
+                    .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken)
+                    .ConfigureAwait(false);
             }
+
             if (_userMethodDeveloperEdge is not null)
             {
-                return await _userMethodDeveloperEdge.CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken).ConfigureAwait(false);
+                return await _userMethodDeveloperEdge
+                    .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken)
+                    .ConfigureAwait(false);
             }
+
             throw new ArgumentException("Impossible!");
         }
     }

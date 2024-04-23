@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
 
         public ConfirmInstitutionRepresentativePayload(
             Data.InstitutionRepresentative institutionRepresentative
-            )
+        )
         {
             RepresentedInstitutionEdge = new UserRepresentedInstitutionEdge(institutionRepresentative);
             InstitutionRepresentativeEdge = new InstitutionRepresentativeEdge(institutionRepresentative);
@@ -20,14 +20,14 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
 
         public ConfirmInstitutionRepresentativePayload(
             IReadOnlyCollection<ConfirmInstitutionRepresentativeError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public ConfirmInstitutionRepresentativePayload(
             ConfirmInstitutionRepresentativeError error
-            )
+        )
             : this(new[] { error })
         {
         }

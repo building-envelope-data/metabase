@@ -14,16 +14,16 @@ namespace Metabase.Authorization
             UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null) &&
-                await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-                    user,
-                    institutionId,
-                    context,
-                    cancellationToken
-                );
+                   await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+                       user,
+                       institutionId,
+                       context,
+                       cancellationToken
+                   );
         }
 
         public static async Task<bool> IsAuthorizedToUpdate(
@@ -32,16 +32,16 @@ namespace Metabase.Authorization
             UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             return (user is not null) &&
-                await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-                    user,
-                    componentId,
-                    context,
-                    cancellationToken
-                );
+                   await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                       user,
+                       componentId,
+                       context,
+                       cancellationToken
+                   );
         }
     }
 }

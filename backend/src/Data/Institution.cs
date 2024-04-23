@@ -6,30 +6,24 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Metabase.Data
 {
     public sealed class Institution
-      : Data.Entity,
-        IStakeholder
+        : Data.Entity,
+            IStakeholder
     {
-        [Required]
-        [MinLength(1)]
-        public string Name { get; private set; }
+        [Required] [MinLength(1)] public string Name { get; private set; }
 
-        [MinLength(1)]
-        public string? Abbreviation { get; private set; }
+        [MinLength(1)] public string? Abbreviation { get; private set; }
 
-        [Required]
-        [MinLength(1)]
-        public string Description { get; private set; }
+        [Required] [MinLength(1)] public string Description { get; private set; }
 
-        [Url]
-        public Uri? WebsiteLocator { get; private set; }
+        [Url] public Uri? WebsiteLocator { get; private set; }
 
-        [MinLength(1)]
-        public string? PublicKey { get; private set; }
+        [MinLength(1)] public string? PublicKey { get; private set; }
 
-        [Required]
-        public Enumerations.InstitutionState State { get; private set; }
+        [Required] public Enumerations.InstitutionState State { get; private set; }
 
-        public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } = new List<InstitutionMethodDeveloper>();
+        public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } =
+            new List<InstitutionMethodDeveloper>();
+
         public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
 
         [InverseProperty(nameof(Method.Manager))]
@@ -38,7 +32,9 @@ namespace Metabase.Data
         [InverseProperty(nameof(DataFormat.Manager))]
         public ICollection<DataFormat> ManagedDataFormats { get; } = new List<DataFormat>();
 
-        public ICollection<ComponentManufacturer> ManufacturedComponentEdges { get; } = new List<ComponentManufacturer>();
+        public ICollection<ComponentManufacturer> ManufacturedComponentEdges { get; } =
+            new List<ComponentManufacturer>();
+
         public ICollection<Component> ManufacturedComponents { get; } = new List<Component>();
 
         [InverseProperty(nameof(Database.Operator))]
@@ -52,7 +48,9 @@ namespace Metabase.Data
         [InverseProperty(nameof(Manager))]
         public ICollection<Institution> ManagedInstitutions { get; } = new List<Institution>();
 
-        public ICollection<InstitutionRepresentative> RepresentativeEdges { get; } = new List<InstitutionRepresentative>();
+        public ICollection<InstitutionRepresentative> RepresentativeEdges { get; } =
+            new List<InstitutionRepresentative>();
+
         public ICollection<User> Representatives { get; } = new List<User>();
 
 #nullable disable
@@ -69,7 +67,7 @@ namespace Metabase.Data
             Uri? websiteLocator,
             string? publicKey,
             Enumerations.InstitutionState state
-            )
+        )
         {
             Name = name;
             Abbreviation = abbreviation;

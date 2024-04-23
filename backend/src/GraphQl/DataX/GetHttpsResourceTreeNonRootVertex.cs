@@ -1,13 +1,13 @@
 namespace Metabase.GraphQl.DataX
 {
     public sealed class GetHttpsResourceTreeNonRootVertex
-    : IGetHttpsResourceTreeVertex
+        : IGetHttpsResourceTreeVertex
     {
         public GetHttpsResourceTreeNonRootVertex(
-        string vertexId,
-        GetHttpsResource value,
-        string parentId,
-        ToTreeVertexAppliedConversionMethod appliedConversionMethod
+            string vertexId,
+            GetHttpsResource value,
+            string parentId,
+            ToTreeVertexAppliedConversionMethod appliedConversionMethod
         )
         {
             VertexId = vertexId;

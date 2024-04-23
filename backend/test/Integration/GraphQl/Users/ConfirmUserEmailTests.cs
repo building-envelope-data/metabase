@@ -8,7 +8,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
     public sealed class ConfirmUserEmailTests
-      : UserIntegrationTests
+        : UserIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -21,15 +21,15 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await ConfirmUserEmail(
                 confirmationCode: confirmationCode
-,
+                ,
                 email: email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         [Test]
@@ -42,20 +42,20 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             EmailSender.Clear();
             await ResendUserEmailConfirmation(
                 email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var confirmationCode = ExtractConfirmationCodeFromEmail();
             // Act
             var response = await ConfirmUserEmail(
                 confirmationCode: confirmationCode
-,
+                ,
                 email: email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         [Test]
@@ -71,15 +71,15 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await ConfirmUserEmail(
                 confirmationCode: confirmationCode
-,
+                ,
                 email: email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
+                )
+            );
         }
 
         [Test]
@@ -93,17 +93,17 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             await ResendUserEmailConfirmation(
                 email
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var response = await ConfirmUserEmail(
                 confirmationCode: ExtractConfirmationCodeFromEmail()
-,
+                ,
                 email: email).ConfigureAwait(false);
             // Assert
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
+                    fieldOptions.Field<string>("data.confirmUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
+                )
             );
         }
 

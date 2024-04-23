@@ -93,7 +93,7 @@ namespace Metabase.GraphQl
     // Inspired by https://chillicream.com/blog/2019/03/19/logging-with-hotchocolate
     // and https://chillicream.com/blog/2021/01/10/hot-chocolate-logging
     public sealed class LoggingDiagnosticEventListener
-    : ExecutionDiagnosticEventListener
+        : ExecutionDiagnosticEventListener
     {
         private static Stopwatch s_queryTimer = null!;
         private readonly ILogger<LoggingDiagnosticEventListener> _logger;
@@ -115,7 +115,7 @@ namespace Metabase.GraphQl
         public override void RequestError(
             IRequestContext context,
             Exception exception
-            )
+        )
         {
             _logger.FailedQueryExecution(exception, context.Request.Query);
         }
@@ -123,7 +123,7 @@ namespace Metabase.GraphQl
         public override void ResolverError(
             IMiddlewareContext context,
             IError error
-            )
+        )
         {
             _logger.FailedOperationExecution(error.Exception, context.Operation, ConvertErrorToString(error));
         }
@@ -141,7 +141,7 @@ namespace Metabase.GraphQl
         public override void SyntaxError(
             IRequestContext context,
             IError error
-            )
+        )
         {
             _logger.FailedSyntax(error.Exception, context.Request.Query, ConvertErrorToString(error));
         }
@@ -149,7 +149,7 @@ namespace Metabase.GraphQl
         public override void TaskError(
             IExecutionTask task,
             IError error
-            )
+        )
         {
             _logger.FailedTask(error.Exception, task, ConvertErrorToString(error));
         }
@@ -157,7 +157,7 @@ namespace Metabase.GraphQl
         public override void ValidationErrors(
             IRequestContext context,
             IReadOnlyList<IError> errors
-            )
+        )
         {
             foreach (var error in errors)
             {
@@ -201,7 +201,8 @@ namespace Metabase.GraphQl
                         var variablesConcrete = _context.Variables!.ToList();
                         if (variablesConcrete.Count > 0)
                         {
-                            stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"Variables {Environment.NewLine}");
+                            stringBuilder.AppendFormat(CultureInfo.InvariantCulture,
+                                $"Variables {Environment.NewLine}");
                             try
                             {
                                 foreach (var variableValue in _context.Variables!)
@@ -220,6 +221,7 @@ namespace Metabase.GraphQl
 
                                         return existingString + " ".PadRight(lengthToPadTo - existingString.Length);
                                     }
+
                                     stringBuilder.AppendFormat(
                                         CultureInfo.InvariantCulture,
                                         $"  {PadRightHelper(variableValue.Name, 20)} :  {PadRightHelper(variableValue.Value.ToString(), 20)}: {variableValue.Type}");
@@ -234,8 +236,10 @@ namespace Metabase.GraphQl
                             }
                         }
                     }
+
                     s_queryTimer.Stop();
-                    stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"Ellapsed time for query is {s_queryTimer.Elapsed.TotalMilliseconds:0.#} milliseconds.");
+                    stringBuilder.AppendFormat(CultureInfo.InvariantCulture,
+                        $"Ellapsed time for query is {s_queryTimer.Elapsed.TotalMilliseconds:0.#} milliseconds.");
 #pragma warning disable CA1848 // Use the LoggerMessage delegates
 #pragma warning disable CA2254 // Template should be a static expression
                     _logger.LogInformation(stringBuilder.ToString());

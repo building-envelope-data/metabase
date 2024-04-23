@@ -18,6 +18,7 @@ namespace Metabase.Authorization
             {
                 return false;
             }
+
             return user.Id == userId;
         }
 
@@ -55,6 +56,7 @@ namespace Metabase.Authorization
             {
                 return false;
             }
+
             return await userManager.IsInRoleAsync(
                 user,
                 Data.Role.EnumToName(role)
@@ -69,8 +71,8 @@ namespace Metabase.Authorization
         {
             return await context.Institutions.AsQueryable()
                 .AnyAsync(x =>
-                    x.Id == institutionId &&
-                    x.State == Enumerations.InstitutionState.VERIFIED,
+                        x.Id == institutionId &&
+                        x.State == Enumerations.InstitutionState.VERIFIED,
                     cancellationToken
                 ).ConfigureAwait(false);
         }
@@ -83,12 +85,12 @@ namespace Metabase.Authorization
         )
         {
             return await FetchRole(
-                user,
-                institutionId,
-                context,
-                cancellationToken
-            ).ConfigureAwait(false)
-            == Enumerations.InstitutionRepresentativeRole.OWNER;
+                       user,
+                       institutionId,
+                       context,
+                       cancellationToken
+                   ).ConfigureAwait(false)
+                   == Enumerations.InstitutionRepresentativeRole.OWNER;
         }
 
         public static async Task<bool> IsOwnerOfVerifiedInstitution(
@@ -106,12 +108,12 @@ namespace Metabase.Authorization
                     cancellationToken
                 ).ConfigureAwait(false)) &&
                 (await IsOwner(
-                    user,
-                    institutionId,
-                    context,
-                    cancellationToken
-                ).ConfigureAwait(false)
-            );
+                        user,
+                        institutionId,
+                        context,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                );
         }
 
         public static async Task<bool> IsAtLeastAssistant(
@@ -123,11 +125,11 @@ namespace Metabase.Authorization
         {
             var role =
                 await FetchRole(
-                user,
-                institutionId,
-                context,
-                cancellationToken
-            ).ConfigureAwait(false);
+                    user,
+                    institutionId,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false);
             return
                 role == Enumerations.InstitutionRepresentativeRole.OWNER
                 || role == Enumerations.InstitutionRepresentativeRole.ASSISTANT;
@@ -148,12 +150,12 @@ namespace Metabase.Authorization
                     cancellationToken
                 ).ConfigureAwait(false)) &&
                 (await IsAtLeastAssistant(
-                    user,
-                    institutionId,
-                    context,
-                    cancellationToken
-                ).ConfigureAwait(false)
-            );
+                        user,
+                        institutionId,
+                        context,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                );
         }
 
         private static async Task<Enumerations.InstitutionRepresentativeRole?> FetchRole(
@@ -167,36 +169,45 @@ namespace Metabase.Authorization
             {
                 return null;
             }
+
             var wrappedRole =
                 await context.InstitutionRepresentatives.AsQueryable()
-                .Where(x =>
-                    x.InstitutionId == institutionId &&
-                    x.UserId == user.Id &&
-                    !x.Pending
+                    .Where(x =>
+                        x.InstitutionId == institutionId &&
+                        x.UserId == user.Id &&
+                        !x.Pending
                     )
-                .Select(x => new { x.Role }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Select(x => new
+                    {
+                        x.Role
+                    }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (wrappedRole is not null)
             {
                 return wrappedRole.Role;
             }
+
             var wrappedManagerRole =
                 await context.InstitutionRepresentatives.AsQueryable()
-                .Where(x => !x.Pending)
-                .Join(
-                    context.Institutions,
-                    representative => representative.InstitutionId,
-                    institution => institution.ManagerId,
-                    (representative, institution) => new { Representative = representative, Institution = institution }
-                )
-                .Where(x =>
-                    x.Institution.Id == institutionId &&
-                    x.Representative.UserId == user.Id
+                    .Where(x => !x.Pending)
+                    .Join(
+                        context.Institutions,
+                        representative => representative.InstitutionId,
+                        institution => institution.ManagerId,
+                        (representative, institution) => new
+                            { Representative = representative, Institution = institution }
                     )
-                .Select(x => new { x.Representative.Role }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(x =>
+                        x.Institution.Id == institutionId &&
+                        x.Representative.UserId == user.Id
+                    )
+                    .Select(x => new
+                    {
+                        x.Representative.Role
+                    }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             return wrappedManagerRole?.Role;
         }
 
@@ -211,13 +222,14 @@ namespace Metabase.Authorization
             {
                 return true;
             }
+
             return await context.ComponentManufacturers.AsQueryable()
                 .AnyAsync(x =>
-                    x.InstitutionId == institutionId &&
-                    componentIds.Contains(x.ComponentId) &&
-                    !x.Pending,
+                        x.InstitutionId == institutionId &&
+                        componentIds.Contains(x.ComponentId) &&
+                        !x.Pending,
                     cancellationToken
-                    )
+                )
                 .ConfigureAwait(false);
         }
 
@@ -230,11 +242,11 @@ namespace Metabase.Authorization
         {
             return await context.ComponentManufacturers.AsQueryable()
                 .AnyAsync(x =>
-                    x.InstitutionId == institutionId &&
-                    x.ComponentId == componentId &&
-                    !x.Pending,
+                        x.InstitutionId == institutionId &&
+                        x.ComponentId == componentId &&
+                        !x.Pending,
                     cancellationToken
-                    )
+                )
                 .ConfigureAwait(false);
         }
     }

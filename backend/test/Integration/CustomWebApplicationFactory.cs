@@ -16,7 +16,7 @@ using Microsoft.Extensions.Hosting;
 namespace Metabase.Tests.Integration
 {
     public sealed class CustomWebApplicationFactory
-      : WebApplicationFactory<Startup>
+        : WebApplicationFactory<Startup>
     {
         private bool _disposed;
 
@@ -70,7 +70,7 @@ namespace Metabase.Tests.Integration
                         configurationBuilder,
                         webHostBuilderContext.HostingEnvironment,
                         Array.Empty<string>()
-                        );
+                    );
                 }
             );
             builder.ConfigureServices(serviceCollection =>
@@ -78,16 +78,18 @@ namespace Metabase.Tests.Integration
                     using var scope = serviceCollection.BuildServiceProvider().CreateScope();
                     var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
                     // appSettings.Database.SchemaName += Guid.NewGuid().ToString().Replace("-", ""); // does not work because enumeration types in public schema cannot be created when they already exist. We therefore create a whole new database for each test instead of just a new schema.
-                    appSettings.Database.ConnectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;";
+                    appSettings.Database.ConnectionString =
+                        $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;";
                     // Configure `IEmailSender`
                     var emailSenderServiceDescriptor =
-                    serviceCollection.SingleOrDefault(d =>
-                     d.ServiceType == typeof(Services.IEmailSender)
+                        serviceCollection.SingleOrDefault(d =>
+                            d.ServiceType == typeof(Services.IEmailSender)
                         );
                     if (emailSenderServiceDescriptor is not null)
                     {
                         serviceCollection.Remove(emailSenderServiceDescriptor);
                     }
+
                     serviceCollection.AddTransient<Services.IEmailSender>(_ => EmailSender);
                 }
             );
@@ -102,14 +104,14 @@ namespace Metabase.Tests.Integration
             databaseCreator.CreateTables();
             Task.Run(async () =>
                 await SeedDatabase().ConfigureAwait(false)
-             ).GetAwaiter().GetResult();
+            ).GetAwaiter().GetResult();
         }
 
         private async Task SeedDatabase()
         {
             await DoAsync(
                 async services =>
-                 await Data.DbSeeder.DoAsync(services).ConfigureAwait(false)
+                    await Data.DbSeeder.DoAsync(services).ConfigureAwait(false)
             ).ConfigureAwait(false);
         }
 
@@ -123,15 +125,16 @@ namespace Metabase.Tests.Integration
             {
                 Do(
                     services =>
-                        {
-                            services
+                    {
+                        services
                             .GetRequiredService<Data.ApplicationDbContext>()
                             .Database
                             .EnsureDeleted();
-                        }
+                    }
                 );
                 _disposed = true;
             }
+
             base.Dispose(disposing);
         }
     }

@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 namespace Metabase.GraphQl.Components
 {
     public sealed class ComponentPartsByComponentIdDataLoader
-      : Entities.AssociationsByAssociateIdDataLoader<Data.ComponentAssembly>
+        : Entities.AssociationsByAssociateIdDataLoader<Data.ComponentAssembly>
     {
         public ComponentPartsByComponentIdDataLoader(
             IBatchScheduler batchScheduler,
             DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
-            )
+        )
             : base(
                 batchScheduler,
                 options,
@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.Components
                         ids.Contains(x.AssembledComponentId)
                     ).OrderBy(x => x.Index),
                 x => x.AssembledComponentId
-                )
+            )
         {
         }
     }

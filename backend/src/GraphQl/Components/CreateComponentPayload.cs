@@ -3,26 +3,26 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.Components
 {
     public sealed class CreateComponentPayload
-      : ComponentPayload<CreateComponentError>
+        : ComponentPayload<CreateComponentError>
     {
         public CreateComponentPayload(
             Data.Component component
-            )
-              : base(component)
+        )
+            : base(component)
         {
         }
 
         public CreateComponentPayload(
-          CreateComponentError error
+            CreateComponentError error
         )
-        : base(error)
+            : base(error)
         {
         }
 
         public CreateComponentPayload(
-          IReadOnlyCollection<CreateComponentError> errors
+            IReadOnlyCollection<CreateComponentError> errors
         )
-        : base(errors)
+            : base(errors)
         {
         }
     }

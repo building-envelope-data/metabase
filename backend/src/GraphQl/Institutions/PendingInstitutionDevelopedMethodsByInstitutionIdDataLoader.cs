@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 namespace Metabase.GraphQl.Institutions
 {
     public sealed class PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader
-      : Entities.AssociationsByAssociateIdDataLoader<Data.InstitutionMethodDeveloper>
+        : Entities.AssociationsByAssociateIdDataLoader<Data.InstitutionMethodDeveloper>
     {
         public PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader(
             IBatchScheduler batchScheduler,
             DataLoaderOptions options,
             IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
-            )
+        )
             : base(
                 batchScheduler,
                 options,
@@ -22,7 +22,7 @@ namespace Metabase.GraphQl.Institutions
                         x.Pending && ids.Contains(x.InstitutionId)
                     ),
                 x => x.InstitutionId
-                )
+            )
         {
         }
     }

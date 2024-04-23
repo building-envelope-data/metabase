@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Metabase.Tests.Integration
 {
     public sealed class CollectingEmailSender
-      : Services.IEmailSender
+        : Services.IEmailSender
     {
         private readonly List<Email> _emails;
 
@@ -35,7 +35,7 @@ namespace Metabase.Tests.Integration
                     Recipient: recipient,
                     Subject: subject,
                     Body: body
-                 )
+                )
             );
             return Task.FromResult(0);
         }

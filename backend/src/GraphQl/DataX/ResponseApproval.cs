@@ -3,14 +3,14 @@ using System;
 namespace Metabase.GraphQl.DataX
 {
     public sealed class ResponseApproval
-    : IApproval
+        : IApproval
     {
         public ResponseApproval(
-        DateTime timestamp,
-        string signature,
-        string keyFingerprint,
-        string query,
-        string response
+            DateTime timestamp,
+            string signature,
+            string keyFingerprint,
+            string query,
+            string response
         )
         {
             Timestamp = timestamp;
@@ -19,6 +19,7 @@ namespace Metabase.GraphQl.DataX
             Query = query;
             Response = response;
         }
+
         public DateTime Timestamp { get; }
         public string Signature { get; }
         public string KeyFingerprint { get; }

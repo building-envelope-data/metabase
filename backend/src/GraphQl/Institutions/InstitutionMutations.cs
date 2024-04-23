@@ -27,81 +27,87 @@ namespace Metabase.GraphQl.Institutions
             [Service] Services.IEmailSender emailSender,
             [Service] AppSettings appSettings,
             CancellationToken cancellationToken
-            )
+        )
         {
-            if (input.ManagerId is not null && !await InstitutionAuthorization.IsAuthorizedToCreateInstitutionManagedByInstitution(
-                 claimsPrincipal,
-                 input.ManagerId ?? Guid.Empty,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
-            )
+            if (input.ManagerId is not null && !await InstitutionAuthorization
+                    .IsAuthorizedToCreateInstitutionManagedByInstitution(
+                        claimsPrincipal,
+                        input.ManagerId ?? Guid.Empty,
+                        userManager,
+                        context,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+               )
             {
                 return new CreateInstitutionPayload(
                     new CreateInstitutionError(
-                      CreateInstitutionErrorCode.UNAUTHORIZED,
-                      "You are not authorized to create institutions.",
-                      new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
+                        CreateInstitutionErrorCode.UNAUTHORIZED,
+                        "You are not authorized to create institutions.",
+                        new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
                     )
                 );
             }
+
             var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
             {
                 return new CreateInstitutionPayload(
                     new CreateInstitutionError(
-                      CreateInstitutionErrorCode.UNKNOWN,
-                      "Unknown user.",
-                      Array.Empty<string>()
-                      )
+                        CreateInstitutionErrorCode.UNKNOWN,
+                        "Unknown user.",
+                        Array.Empty<string>()
+                    )
                 );
             }
+
             if (input.OwnerIds.Count is 0 && input.ManagerId is null)
             {
                 return new CreateInstitutionPayload(
                     new CreateInstitutionError(
-                      CreateInstitutionErrorCode.NEITHER_OWNER_NOR_MANAGER,
-                      "Neither owner nor manager given.",
-                      new[] { nameof(input) }
-                      )
+                        CreateInstitutionErrorCode.NEITHER_OWNER_NOR_MANAGER,
+                        "Neither owner nor manager given.",
+                        new[] { nameof(input) }
+                    )
                 );
             }
+
             var unknownOwnerIds =
                 input.OwnerIds.Except(
                     await context.Users.AsQueryable()
-                    .Where(u => input.OwnerIds.Contains(u.Id))
-                    .Select(u => u.Id)
-                    .ToListAsync(cancellationToken)
-                    .ConfigureAwait(false)
+                        .Where(u => input.OwnerIds.Contains(u.Id))
+                        .Select(u => u.Id)
+                        .ToListAsync(cancellationToken)
+                        .ConfigureAwait(false)
                 );
             if (unknownOwnerIds.Any())
             {
                 return new CreateInstitutionPayload(
                     new CreateInstitutionError(
-                      CreateInstitutionErrorCode.UNKNOWN_OWNERS,
-                      $"There are no users with identifier(s) {string.Join(", ", unknownOwnerIds)}.",
-                      new[] { nameof(input), nameof(input.OwnerIds).FirstCharToLower() }
-                      )
+                        CreateInstitutionErrorCode.UNKNOWN_OWNERS,
+                        $"There are no users with identifier(s) {string.Join(", ", unknownOwnerIds)}.",
+                        new[] { nameof(input), nameof(input.OwnerIds).FirstCharToLower() }
+                    )
                 );
             }
+
             if (input.ManagerId is not null &&
                 !await context.Institutions.AsQueryable()
-                .AnyAsync(
-                    x => x.Id == input.ManagerId,
-                    cancellationToken: cancellationToken
-                 )
-                .ConfigureAwait(false)
-            )
+                    .AnyAsync(
+                        x => x.Id == input.ManagerId,
+                        cancellationToken: cancellationToken
+                    )
+                    .ConfigureAwait(false)
+               )
             {
                 return new CreateInstitutionPayload(
                     new CreateInstitutionError(
                         CreateInstitutionErrorCode.UNKNOWN_MANAGER,
                         "Unknown manager.",
-                      new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
+                        new[] { nameof(input), nameof(input.ManagerId).FirstCharToLower() }
                     )
                 );
             }
+
             var institution = new Data.Institution(
                 name: input.Name,
                 abbreviation: input.Abbreviation,
@@ -120,10 +126,12 @@ namespace Metabase.GraphQl.Institutions
                     {
                         UserId = ownerId,
                         Role = Enumerations.InstitutionRepresentativeRole.OWNER,
-                        Pending = !await InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId, userManager).ConfigureAwait(false)
+                        Pending = !await InstitutionRepresentativeAuthorization
+                            .IsAuthorizedToConfirm(claimsPrincipal, ownerId, userManager).ConfigureAwait(false)
                     }
                 );
             }
+
             context.Institutions.Add(institution);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             if (institution.State == Enumerations.InstitutionState.PENDING)
@@ -135,15 +143,16 @@ namespace Metabase.GraphQl.Institutions
                 await Task.WhenAll(
                     verifiers.Select(verifier =>
                         verifier.Email is null
-                        ? Task.CompletedTask
-                        : emailSender.SendAsync(
-                              (verifier.Name, verifier.Email),
-                              $"New institution `{institution.Name}` in metabase awaits verification",
-                              $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID {institution.Id:D} on {appSettings.Host}/institutions Have a nice day! :-)"
-                          )
+                            ? Task.CompletedTask
+                            : emailSender.SendAsync(
+                                (verifier.Name, verifier.Email),
+                                $"New institution `{institution.Name}` in metabase awaits verification",
+                                $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID {institution.Id:D} on {appSettings.Host}/institutions Have a nice day! :-)"
+                            )
                     )
                 ).ConfigureAwait(false);
             }
+
             return new CreateInstitutionPayload(institution);
         }
 
@@ -154,12 +163,15 @@ namespace Metabase.GraphQl.Institutions
         )
         {
             if (input.ManagerId is not null
-                || await userManager.IsInRoleAsync(user, Data.Role.EnumToName(Enumerations.UserRole.ADMINISTRATOR)).ConfigureAwait(false)
-                || await userManager.IsInRoleAsync(user, Data.Role.EnumToName(Enumerations.UserRole.VERIFIER)).ConfigureAwait(false)
-            )
+                || await userManager.IsInRoleAsync(user, Data.Role.EnumToName(Enumerations.UserRole.ADMINISTRATOR))
+                    .ConfigureAwait(false)
+                || await userManager.IsInRoleAsync(user, Data.Role.EnumToName(Enumerations.UserRole.VERIFIER))
+                    .ConfigureAwait(false)
+               )
             {
                 return Enumerations.InstitutionState.VERIFIED;
             }
+
             return Enumerations.InstitutionState.PENDING;
         }
 
@@ -171,37 +183,39 @@ namespace Metabase.GraphQl.Institutions
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await InstitutionAuthorization.IsAuthorizedToVerifyInstitution(
-                 claimsPrincipal,
-                 userManager
-                 ).ConfigureAwait(false)
+                    claimsPrincipal,
+                    userManager
+                ).ConfigureAwait(false)
                )
             {
                 return new VerifyInstitutionPayload(
                     new VerifyInstitutionError(
-                      VerifyInstitutionErrorCode.UNAUTHORIZED,
-                      "You are not authorized to verify institutions.",
-                      Array.Empty<string>()
-                      )
-                      );
+                        VerifyInstitutionErrorCode.UNAUTHORIZED,
+                        "You are not authorized to verify institutions.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var institution =
                 await context.Institutions.AsQueryable()
-                .Where(i => i.Id == input.InstitutionId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(i => i.Id == input.InstitutionId)
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (institution is null)
             {
                 return new VerifyInstitutionPayload(
                     new VerifyInstitutionError(
-                      VerifyInstitutionErrorCode.UNKNOWN_INSTITUTION,
-                      "Unknown institution.",
-                      new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
-                      )
-                      );
+                        VerifyInstitutionErrorCode.UNKNOWN_INSTITUTION,
+                        "Unknown institution.",
+                        new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                    )
+                );
             }
+
             institution.Verify();
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new VerifyInstitutionPayload(institution);
@@ -215,40 +229,42 @@ namespace Metabase.GraphQl.Institutions
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await InstitutionAuthorization.IsAuthorizedToUpdateInstitution(
-                 claimsPrincipal,
-                 input.InstitutionId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
+                    claimsPrincipal,
+                    input.InstitutionId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
                )
             {
                 return new UpdateInstitutionPayload(
                     new UpdateInstitutionError(
-                      UpdateInstitutionErrorCode.UNAUTHORIZED,
-                      "You are not authorized to update the institution.",
-                      Array.Empty<string>()
-                      )
-                      );
+                        UpdateInstitutionErrorCode.UNAUTHORIZED,
+                        "You are not authorized to update the institution.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var institution =
                 await context.Institutions.AsQueryable()
-                .Where(i => i.Id == input.InstitutionId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(i => i.Id == input.InstitutionId)
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (institution is null)
             {
                 return new UpdateInstitutionPayload(
                     new UpdateInstitutionError(
-                      UpdateInstitutionErrorCode.UNKNOWN_INSTITUTION,
-                      "Unknown institution.",
-                      new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
-                      )
-                      );
+                        UpdateInstitutionErrorCode.UNKNOWN_INSTITUTION,
+                        "Unknown institution.",
+                        new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                    )
+                );
             }
+
             institution.Update(
                 name: input.Name,
                 abbreviation: input.Abbreviation,
@@ -268,85 +284,88 @@ namespace Metabase.GraphQl.Institutions
             [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
             Data.ApplicationDbContext context,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (!await InstitutionAuthorization.IsAuthorizedToDeleteInstitution(
-                 claimsPrincipal,
-                 input.InstitutionId,
-                 userManager,
-                 context,
-                 cancellationToken
-                 ).ConfigureAwait(false)
+                    claimsPrincipal,
+                    input.InstitutionId,
+                    userManager,
+                    context,
+                    cancellationToken
+                ).ConfigureAwait(false)
                )
             {
                 return new DeleteInstitutionPayload(
                     new DeleteInstitutionError(
-                      DeleteInstitutionErrorCode.UNAUTHORIZED,
-                      "You are not authorized to delete the institution.",
-                      Array.Empty<string>()
-                      )
-                      );
+                        DeleteInstitutionErrorCode.UNAUTHORIZED,
+                        "You are not authorized to delete the institution.",
+                        Array.Empty<string>()
+                    )
+                );
             }
+
             var institution =
                 await context.Institutions.AsQueryable()
-                .Where(i => i.Id == input.InstitutionId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(i => i.Id == input.InstitutionId)
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (institution is null)
             {
                 return new DeleteInstitutionPayload(
                     new DeleteInstitutionError(
-                      DeleteInstitutionErrorCode.UNKNOWN_INSTITUTION,
-                      "Unknown institution.",
-                      new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
-                      )
-                      );
+                        DeleteInstitutionErrorCode.UNKNOWN_INSTITUTION,
+                        "Unknown institution.",
+                        new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                    )
+                );
             }
+
             if (
                 await context
-                .Entry(institution)
-                .Collection(i => i.ManagedDataFormats)
-                .Query()
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
+                    .Entry(institution)
+                    .Collection(i => i.ManagedDataFormats)
+                    .Query()
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
                 ||
                 await context
-                .Entry(institution)
-                .Collection(i => i.ManagedInstitutions)
-                .Query()
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
+                    .Entry(institution)
+                    .Collection(i => i.ManagedInstitutions)
+                    .Query()
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
                 ||
                 await context
-                .Entry(institution)
-                .Collection(i => i.ManagedMethods)
-                .Query()
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
+                    .Entry(institution)
+                    .Collection(i => i.ManagedMethods)
+                    .Query()
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
                 ||
                 await context
-                .Entry(institution)
-                .Collection(i => i.OperatedDatabases)
-                .Query()
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
+                    .Entry(institution)
+                    .Collection(i => i.OperatedDatabases)
+                    .Query()
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
                 ||
                 await context
-                .Entry(institution)
-                .Collection(i => i.ManufacturedComponents)
-                .Query()
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
-                )
+                    .Entry(institution)
+                    .Collection(i => i.ManufacturedComponents)
+                    .Query()
+                    .AnyAsync(cancellationToken)
+                    .ConfigureAwait(false)
+            )
             {
                 return new DeleteInstitutionPayload(
                     new DeleteInstitutionError(
-                      DeleteInstitutionErrorCode.MANAGING,
-                      "The institution manages or is associated to other entities.",
-                      new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
-                      )
-                      );
+                        DeleteInstitutionErrorCode.MANAGING,
+                        "The institution manages or is associated to other entities.",
+                        new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                    )
+                );
             }
+
             context.Institutions.Remove(institution);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new DeleteInstitutionPayload();

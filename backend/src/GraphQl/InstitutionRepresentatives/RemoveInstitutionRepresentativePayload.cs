@@ -13,21 +13,21 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
 
         public RemoveInstitutionRepresentativePayload(
             Data.InstitutionRepresentative institutionRepresentative
-            )
+        )
         {
             _association = institutionRepresentative;
         }
 
         public RemoveInstitutionRepresentativePayload(
             IReadOnlyCollection<RemoveInstitutionRepresentativeError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public RemoveInstitutionRepresentativePayload(
             RemoveInstitutionRepresentativeError error
-            )
+        )
             : this(new[] { error })
         {
         }
@@ -35,24 +35,26 @@ namespace Metabase.GraphQl.InstitutionRepresentatives
         public async Task<Data.Institution?> GetInstitution(
             InstitutionByIdDataLoader byId,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (_association is null)
             {
                 return null;
             }
+
             return await byId.LoadAsync(_association.InstitutionId, cancellationToken)!;
         }
 
         public async Task<Data.User?> GetUser(
             UserByIdDataLoader byId,
             CancellationToken cancellationToken
-            )
+        )
         {
             if (_association is null)
             {
                 return null;
             }
+
             return await byId.LoadAsync(_association.UserId, cancellationToken)!;
         }
     }

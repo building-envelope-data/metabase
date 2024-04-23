@@ -9,7 +9,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
 {
     [TestFixture]
     public sealed class ResendUserEmailVerificationTests
-      : UserIntegrationTests
+        : UserIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -23,7 +23,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
                 name: name,
                 email: email,
                 password: password
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             EmailSender.Clear();
             // Act
             var response = await ResendUserEmailVerification().ConfigureAwait(false);
@@ -31,14 +31,16 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions.Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.resendUserEmailVerification.user.id").Should().NotBeNullOrWhiteSpace()
-                 )
-                );
+                    fieldOptions.Field<string>("data.resendUserEmailVerification.user.id").Should()
+                        .NotBeNullOrWhiteSpace()
+                )
+            );
             EmailsShouldContainSingle(
                 recipient: (name, email),
                 subject: "Confirm your email",
-                bodyRegEx: @"^Please confirm your email address by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
-                );
+                bodyRegEx:
+                @"^Please confirm your email address by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/confirm-email\?email=john\.doe@ise\.fraunhofer\.de&confirmationCode=\w+$"
+            );
         }
 
         [Test]
@@ -55,7 +57,7 @@ namespace Metabase.Tests.Integration.GraphQl.Users
             // Act
             var response = await UnsuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailVerification.graphql")
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             // Assert
             Snapshot.Match(response);
         }

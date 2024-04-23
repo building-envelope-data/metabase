@@ -12,7 +12,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
 {
     [TestFixture]
     public sealed class GetComponentsTests
-      : ComponentIntegrationTests
+        : ComponentIntegrationTests
     {
         [Test]
         [SuppressMessage("Naming", "CA1707")]
@@ -36,13 +36,13 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 {
                     OwnerIds = new[] { userId }
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(
                 MinimalComponentInput with
                 {
                     ManufacturerId = institutionId
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             LogoutUser();
             // Act
             var response = await GetComponents().ConfigureAwait(false);
@@ -50,13 +50,13 @@ namespace Metabase.Tests.Integration.GraphQl.Components
             Snapshot.Match(
                 response,
                 matchOptions => matchOptions
-                .Assert(fieldOptions =>
-                 fieldOptions.Field<string>("data.components.edges[*].node.id").Should().Be(componentId)
-                 )
-                .Assert(fieldOptions =>
-                 fieldOptions.Field<Guid>("data.components.edges[*].node.uuid").Should().Be(componentUuid)
-                 )
-                );
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<string>("data.components.edges[*].node.id").Should().Be(componentId)
+                    )
+                    .Assert(fieldOptions =>
+                        fieldOptions.Field<Guid>("data.components.edges[*].node.uuid").Should().Be(componentUuid)
+                    )
+            );
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 {
                     OwnerIds = new[] { userId }
                 }
-                ).ConfigureAwait(false);
+            ).ConfigureAwait(false);
             var componentIdsAndUuids = new List<(string, string)>();
             foreach (var input in ComponentInputs)
             {
@@ -81,9 +81,10 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                         {
                             ManufacturerId = institutionId
                         }
-                        ).ConfigureAwait(false)
-                    );
+                    ).ConfigureAwait(false)
+                );
             }
+
             LogoutUser();
             // Act
             var response = await GetComponents().ConfigureAwait(false);
@@ -93,18 +94,24 @@ namespace Metabase.Tests.Integration.GraphQl.Components
                 matchOptions =>
                     componentIdsAndUuids.Select(
                         ((string componentId, string componentUuid) componentIdAndUuid, int index)
-                         => (componentIdAndUuid.componentId, componentIdAndUuid.componentUuid, index)
-                     ).Aggregate(
+                            => (componentIdAndUuid.componentId, componentIdAndUuid.componentUuid, index)
+                    ).Aggregate(
                         matchOptions,
                         (accumulatedMatchOptions, componentIdAndUuidAndIndex) =>
                             accumulatedMatchOptions
-                            .Assert(fieldOptions =>
-                                fieldOptions.Field<string>($"data.components.edges[{componentIdAndUuidAndIndex.index}].node.id").Should().Be(componentIdAndUuidAndIndex.componentId)
+                                .Assert(fieldOptions =>
+                                    fieldOptions
+                                        .Field<string>(
+                                            $"data.components.edges[{componentIdAndUuidAndIndex.index}].node.id")
+                                        .Should().Be(componentIdAndUuidAndIndex.componentId)
                                 )
-                            .Assert(fieldOptions =>
-                                fieldOptions.Field<Guid>($"data.components.edges[{componentIdAndUuidAndIndex.index}].node.uuid").Should().Be(componentIdAndUuidAndIndex.componentUuid)
+                                .Assert(fieldOptions =>
+                                    fieldOptions
+                                        .Field<Guid>(
+                                            $"data.components.edges[{componentIdAndUuidAndIndex.index}].node.uuid")
+                                        .Should().Be(componentIdAndUuidAndIndex.componentUuid)
                                 )
-                )
+                    )
             );
         }
     }

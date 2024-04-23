@@ -11,23 +11,24 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Components
 {
     public sealed class ComponentType
-      : EntityType<Data.Component, ComponentByIdDataLoader>
+        : EntityType<Data.Component, ComponentByIdDataLoader>
     {
         protected override void Configure(
             IObjectTypeDescriptor<Data.Component> descriptor
-            )
+        )
         {
             base.Configure(descriptor);
             descriptor
                 .Field(t => t.Manufacturers)
-                .Argument(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower(), _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
+                .Argument(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower(),
+                    _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
                 .Type<NonNullType<ObjectType<ComponentManufacturerConnection>>>()
                 .Resolve(context =>
                     new ComponentManufacturerConnection(
                         context.Parent<Data.Component>(),
                         context.ArgumentValue<bool>(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower())
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.ManufacturerEdges).Ignore();
             descriptor
@@ -37,8 +38,8 @@ namespace Metabase.GraphQl.Components
                 .Resolve(context =>
                     new ComponentAssembledOfConnection(
                         context.Parent<Data.Component>()
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.PartEdges).Ignore();
             descriptor
@@ -47,8 +48,8 @@ namespace Metabase.GraphQl.Components
                 .Resolve(context =>
                     new ComponentPartOfConnection(
                         context.Parent<Data.Component>()
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.PartOfEdges).Ignore();
             descriptor
@@ -58,8 +59,8 @@ namespace Metabase.GraphQl.Components
                 .Resolve(context =>
                     new ComponentConcretizationOfConnection(
                         context.Parent<Data.Component>()
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.GeneralizationEdges)
                 .Ignore();
@@ -70,8 +71,8 @@ namespace Metabase.GraphQl.Components
                 .Resolve(context =>
                     new ComponentGeneralizationOfConnection(
                         context.Parent<Data.Component>()
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.ConcretizationEdges)
                 .Ignore();
@@ -86,27 +87,30 @@ namespace Metabase.GraphQl.Components
                 .Resolve(context =>
                     new ComponentVariantOfConnection(
                         context.Parent<Data.Component>()
-                        )
-                    );
+                    )
+                );
             descriptor
                 .Field(t => t.VariantOfEdges).Ignore();
             descriptor
-              .Field("canCurrentUserUpdateNode")
-              .ResolveWith<ComponentResolvers>(x => ComponentResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
-              .UseUserManager();
+                .Field("canCurrentUserUpdateNode")
+                .ResolveWith<ComponentResolvers>(x =>
+                    ComponentResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!,
+                        default!))
+                .UseUserManager();
         }
 
         private sealed class ComponentResolvers
         {
             public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-              [Parent] Data.Component component,
-              ClaimsPrincipal claimsPrincipal,
-              [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-              Data.ApplicationDbContext context,
-              CancellationToken cancellationToken
+                [Parent] Data.Component component,
+                ClaimsPrincipal claimsPrincipal,
+                [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+                Data.ApplicationDbContext context,
+                CancellationToken cancellationToken
             )
             {
-                return ComponentAuthorization.IsAuthorizedToUpdate(claimsPrincipal, component.Id, userManager, context, cancellationToken);
+                return ComponentAuthorization.IsAuthorizedToUpdate(claimsPrincipal, component.Id, userManager, context,
+                    cancellationToken);
             }
         }
     }

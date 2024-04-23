@@ -12,7 +12,7 @@ namespace Metabase.GraphQl.ComponentManufacturers
 
         public ConfirmComponentManufacturerPayload(
             Data.ComponentManufacturer componentManufacturer
-            )
+        )
         {
             ManufacturedComponentEdge = new InstitutionManufacturedComponentEdge(componentManufacturer);
             ComponentManufacturerEdge = new ComponentManufacturerEdge(componentManufacturer);
@@ -20,14 +20,14 @@ namespace Metabase.GraphQl.ComponentManufacturers
 
         public ConfirmComponentManufacturerPayload(
             IReadOnlyCollection<ConfirmComponentManufacturerError> errors
-            )
+        )
         {
             Errors = errors;
         }
 
         public ConfirmComponentManufacturerPayload(
             ConfirmComponentManufacturerError error
-            )
+        )
             : this(new[] { error })
         {
         }

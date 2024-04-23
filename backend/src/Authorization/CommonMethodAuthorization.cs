@@ -17,14 +17,15 @@ namespace Metabase.Authorization
         {
             var wrappedManagerId =
                 await context.Methods.AsQueryable()
-                .Where(x => x.Id == methodId)
-                .Select(x => new { x.ManagerId })
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                    .Where(x => x.Id == methodId)
+                    .Select(x => new { x.ManagerId })
+                    .SingleOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
             if (wrappedManagerId is null)
             {
                 return false;
             }
+
             return await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
                 user, wrappedManagerId.ManagerId, context, cancellationToken
             );

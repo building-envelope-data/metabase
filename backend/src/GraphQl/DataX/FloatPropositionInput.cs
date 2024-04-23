@@ -5,5 +5,5 @@ namespace Metabase.GraphQl.DataX
         double? GreaterThanOrEqualTo,
         ClosedIntervalInput? InClosedInterval,
         double? LessThanOrEqualTo
-        );
+    );
 }

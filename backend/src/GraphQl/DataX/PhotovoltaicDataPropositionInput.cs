@@ -9,5 +9,5 @@ namespace Metabase.GraphQl.DataX
         PhotovoltaicDataPropositionInput? Not,
         IReadOnlyList<PhotovoltaicDataPropositionInput>? Or,
         GetHttpsResourcesPropositionInput? Resources
-        );
+    );
 }

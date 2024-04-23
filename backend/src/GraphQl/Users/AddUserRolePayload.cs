@@ -9,14 +9,14 @@ namespace Metabase.GraphQl.Users
 
         public AddUserRolePayload(
             Data.User user
-            )
+        )
         {
             User = user;
         }
 
         public AddUserRolePayload(
             IReadOnlyCollection<AddUserRoleError> errors
-            )
+        )
         {
             Errors = errors;
         }
@@ -24,7 +24,7 @@ namespace Metabase.GraphQl.Users
         public AddUserRolePayload(
             Data.User user,
             IReadOnlyCollection<AddUserRoleError> errors
-            )
+        )
         {
             User = user;
             Errors = errors;
@@ -32,7 +32,7 @@ namespace Metabase.GraphQl.Users
 
         public AddUserRolePayload(
             AddUserRoleError error
-            )
+        )
             : this(new[] { error })
         {
         }
