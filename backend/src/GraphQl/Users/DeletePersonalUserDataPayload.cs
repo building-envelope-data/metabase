@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
@@ -6,7 +7,7 @@ public sealed class DeletePersonalUserDataPayload
     : UserPayload<DeletePersonalUserDataError>
 {
     public DeletePersonalUserDataPayload(
-        Data.User user
+        User user
     )
         : base(user)
     {
@@ -20,7 +21,7 @@ public sealed class DeletePersonalUserDataPayload
     }
 
     public DeletePersonalUserDataPayload(
-        Data.User user,
+        User user,
         IReadOnlyCollection<DeletePersonalUserDataError> errors
     )
         : base(user, errors)
@@ -28,7 +29,7 @@ public sealed class DeletePersonalUserDataPayload
     }
 
     public DeletePersonalUserDataPayload(
-        Data.User user,
+        User user,
         DeletePersonalUserDataError error
     )
         : base(user, error)

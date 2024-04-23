@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Metabase.GraphQl.Components;
 
 namespace Metabase.GraphQl.ComponentVariants;
@@ -10,7 +11,6 @@ public sealed class RemoveComponentVariantPayload
 {
     private readonly Guid? _oneComponentId;
     private readonly Guid? _otherComponentId;
-    public IReadOnlyCollection<RemoveComponentVariantError>? Errors { get; }
 
     public RemoveComponentVariantPayload(
         Guid oneComponentId,
@@ -35,7 +35,9 @@ public sealed class RemoveComponentVariantPayload
     {
     }
 
-    public async Task<Data.Component?> GetOneComponentAsync(
+    public IReadOnlyCollection<RemoveComponentVariantError>? Errors { get; }
+
+    public async Task<Component?> GetOneComponentAsync(
         ComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
@@ -45,7 +47,7 @@ public sealed class RemoveComponentVariantPayload
         return await byId.LoadAsync(_oneComponentId.GetValueOrDefault(), cancellationToken)!;
     }
 
-    public async Task<Data.Component?> GetOtherComponentAsync(
+    public async Task<Component?> GetOtherComponentAsync(
         ComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )

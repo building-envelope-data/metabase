@@ -2,19 +2,19 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.Data;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionManagedDataFormatConnection
-    : Connection<Data.Institution, Data.DataFormat, InstitutionManagedDataFormatsByInstitutionIdDataLoader,
+    : Connection<Institution, DataFormat, InstitutionManagedDataFormatsByInstitutionIdDataLoader,
         InstitutionManagedDataFormatEdge>
 {
     public InstitutionManagedDataFormatConnection(
-        Data.Institution institution
+        Institution institution
     )
         : base(
             institution,
@@ -26,8 +26,8 @@ public sealed class InstitutionManagedDataFormatConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

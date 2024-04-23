@@ -3,18 +3,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionRepresentativeConnection
-    : ForkingConnection<Data.Institution, Data.InstitutionRepresentative,
+    : ForkingConnection<Institution, InstitutionRepresentative,
         PendingInstitutionRepresentativesByInstitutionIdDataLoader,
         InstitutionRepresentativesByInstitutionIdDataLoader, InstitutionRepresentativeEdge>
 {
     public InstitutionRepresentativeConnection(
-        Data.Institution institution,
+        Institution institution,
         bool pending
     )
         : base(
@@ -28,8 +29,8 @@ public sealed class InstitutionRepresentativeConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

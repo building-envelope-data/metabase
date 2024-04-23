@@ -1,12 +1,12 @@
-using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Metabase.Tests.Integration.GraphQl.Institutions;
-using Snapshooter.NUnit;
 using NUnit.Framework;
+using Snapshooter.NUnit;
 
 namespace Metabase.Tests.Integration.GraphQl.Components;
 

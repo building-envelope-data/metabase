@@ -6,6 +6,8 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Users;
@@ -18,12 +20,12 @@ namespace Metabase.GraphQl.Methods;
 public sealed class MethodMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<CreateMethodPayload> CreateMethodAsync(
         CreateMethodInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -103,7 +105,7 @@ public sealed class MethodMutations
                 )
             );
 
-        var method = new Data.Method(
+        var method = new Method(
             input.Name,
             input.Description,
             input.Validity is null
@@ -121,7 +123,7 @@ public sealed class MethodMutations
             Standard =
                 input.Standard is null
                     ? null
-                    : new Data.Standard(
+                    : new Standard(
                         input.Standard.Title,
                         input.Standard.Abstract,
                         input.Standard.Section,
@@ -130,7 +132,7 @@ public sealed class MethodMutations
                         input.Standard.Locator
                     )
                     {
-                        Numeration = new Data.Numeration(
+                        Numeration = new Numeration(
                             input.Standard.Numeration.Prefix,
                             input.Standard.Numeration.MainNumber,
                             input.Standard.Numeration.Suffix
@@ -139,7 +141,7 @@ public sealed class MethodMutations
             Publication =
                 input.Publication is null
                     ? null
-                    : new Data.Publication(
+                    : new Publication(
                         input.Publication.Title,
                         input.Publication.Abstract,
                         input.Publication.Section,
@@ -152,7 +154,7 @@ public sealed class MethodMutations
         };
         foreach (var institutionDeveloperId in input.InstitutionDeveloperIds.Distinct())
             method.InstitutionDeveloperEdges.Add(
-                new Data.InstitutionMethodDeveloper
+                new InstitutionMethodDeveloper
                 {
                     InstitutionId = institutionDeveloperId,
                     Pending = !await InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal,
@@ -163,7 +165,7 @@ public sealed class MethodMutations
         var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
         foreach (var userDeveloperId in input.UserDeveloperIds.Distinct())
             method.UserDeveloperEdges.Add(
-                new Data.UserMethodDeveloper
+                new UserMethodDeveloper
                 {
                     UserId = userDeveloperId,
                     Pending = !await UserMethodDeveloperAuthorization
@@ -177,12 +179,12 @@ public sealed class MethodMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<UpdateMethodPayload> UpdateMethodAsync(
         UpdateMethodInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -242,7 +244,7 @@ public sealed class MethodMutations
         method.Standard =
             input.Standard is null
                 ? null
-                : new Data.Standard(
+                : new Standard(
                     input.Standard.Title,
                     input.Standard.Abstract,
                     input.Standard.Section,
@@ -251,7 +253,7 @@ public sealed class MethodMutations
                     input.Standard.Locator
                 )
                 {
-                    Numeration = new Data.Numeration(
+                    Numeration = new Numeration(
                         input.Standard.Numeration.Prefix,
                         input.Standard.Numeration.MainNumber,
                         input.Standard.Numeration.Suffix
@@ -260,7 +262,7 @@ public sealed class MethodMutations
         method.Publication =
             input.Publication is null
                 ? null
-                : new Data.Publication(
+                : new Publication(
                     input.Publication.Title,
                     input.Publication.Abstract,
                     input.Publication.Section,

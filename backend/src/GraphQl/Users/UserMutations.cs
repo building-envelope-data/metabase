@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -10,13 +11,15 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.Extensions;
+using Metabase.Services;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 // Note that `SignInManager` relies on cookies, see https://github.com/aspnet/Identity/issues/1421. For its source code see https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/SignInManager.cs
 namespace Metabase.GraphQl.Users;
@@ -51,7 +54,7 @@ public sealed class UserMutations
     [UseUserManager]
     public async Task<ConfirmUserEmailPayload> ConfirmUserEmailAsync(
         ConfirmUserEmailInput input,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -103,8 +106,8 @@ public sealed class UserMutations
     [UseSignInManager]
     public async Task<ConfirmUserEmailChangePayload> ConfirmUserEmailChangeAsync(
         ConfirmUserEmailChangeInput input,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -188,8 +191,8 @@ public sealed class UserMutations
     [UseSignInManager]
     public async Task<LoginUserPayload> LoginUserAsync(
         LoginUserInput input,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -257,7 +260,7 @@ public sealed class UserMutations
     [UseSignInManager]
     public async Task<LoginUserWithTwoFactorCodePayload> LoginUserWithTwoFactorCodeAsync(
         LoginUserWithTwoFactorCodeInput input,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -318,7 +321,7 @@ public sealed class UserMutations
     [UseSignInManager]
     public async Task<LoginUserWithRecoveryCodePayload> LoginUserWithRecoveryCodeAsync(
         LoginUserWithRecoveryCodeInput input,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -375,8 +378,8 @@ public sealed class UserMutations
     [UseUserManager]
     public async Task<RegisterUserPayload> RegisterUserAsync(
         RegisterUserInput input,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service] Services.IEmailSender emailSender,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] IEmailSender emailSender,
         [Service] UrlEncoder urlEncoder,
         [Service] AppSettings appSettings,
         [Service] IAntiforgery antiforgeryService,
@@ -384,7 +387,7 @@ public sealed class UserMutations
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = new Data.User(
+        var user = new User(
             input.Name,
             input.Email,
             null,
@@ -491,8 +494,8 @@ public sealed class UserMutations
     [UseUserManager]
     public async Task<ResendUserEmailConfirmationPayload> ResendUserEmailConfirmationAsync(
         ResendUserEmailConfirmationInput input,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service] Services.IEmailSender emailSender,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] IEmailSender emailSender,
         [Service] UrlEncoder urlEncoder,
         [Service] AppSettings appSettings,
         [Service] IAntiforgery antiforgeryService,
@@ -519,8 +522,8 @@ public sealed class UserMutations
     [UseUserManager]
     public async Task<RequestUserPasswordResetPayload> RequestUserPasswordResetAsync(
         RequestUserPasswordResetInput input,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service] Services.IEmailSender emailSender,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] IEmailSender emailSender,
         [Service] UrlEncoder urlEncoder,
         [Service] AppSettings appSettings,
         [Service] IAntiforgery antiforgeryService,
@@ -552,7 +555,7 @@ public sealed class UserMutations
     [UseUserManager]
     public async Task<ResetUserPasswordPayload> ResetUserPasswordAsync(
         ResetUserPasswordInput input,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -637,12 +640,12 @@ public sealed class UserMutations
         return new ResetUserPasswordPayload();
     }
 
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     public async Task<DeleteUserPayload> DeleteUserAsync(
         DeleteUserInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -703,11 +706,11 @@ public sealed class UserMutations
     ////////////////////
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Account.Logout.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<LogoutUserPayload> LogoutUserAsync(
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -718,14 +721,14 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.ChangePassword.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<ChangeUserPasswordPayload> ChangeUserPasswordAsync(
         ChangeUserPasswordInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -818,14 +821,14 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.DeletePersonalData.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<DeletePersonalUserDataPayload> DeletePersonalUserDataAsync(
         DeletePersonalUserDataInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -890,11 +893,11 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Disable2fa.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     public async Task<DisableUserTwoFactorAuthenticationPayload> DisableUserTwoFactorAuthenticationAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -924,13 +927,13 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<ForgetUserTwoFactorAuthenticationClientPayload> ForgetUserTwoFactorAuthenticationClientAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -951,12 +954,12 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.EnableAuthenticator.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     public async Task<GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload>
         GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriAsync(
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
             [Service] UrlEncoder urlEncoder,
             [Service] IAntiforgery antiforgeryService,
             [Service] IHttpContextAccessor httpContextAccessor
@@ -986,7 +989,7 @@ public sealed class UserMutations
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
                         GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode
                             .RESETTING_AUTHENTICATOR_KEY_FAILED,
-                        $"Failed to reset authenticator key.",
+                        "Failed to reset authenticator key.",
                         Array.Empty<string>()
                     )
                 ),
@@ -995,7 +998,7 @@ public sealed class UserMutations
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
                         GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode
                             .GETTING_AUTHENTICATOR_KEY_FAILED,
-                        $"Failed to get authenticator key.",
+                        "Failed to get authenticator key.",
                         Array.Empty<string>()
                     )
                 ),
@@ -1003,7 +1006,7 @@ public sealed class UserMutations
                 new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
                         GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.GETTING_EMAIL_FAILED,
-                        $"Failed to get email.",
+                        "Failed to get email.",
                         Array.Empty<string>()
                     )
                 ),
@@ -1011,7 +1014,7 @@ public sealed class UserMutations
                 new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
                     new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError(
                         GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode.UNKNOWN,
-                        $"Failed to load shared key and QR code URI.",
+                        "Failed to load shared key and QR code URI.",
                         Array.Empty<string>()
                     )
                 )
@@ -1019,12 +1022,12 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.EnableAuthenticator.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     public async Task<EnableUserTwoFactorAuthenticatorPayload> EnableUserTwoFactorAuthenticatorAsync(
         EnableUserTwoFactorAuthenticatorInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         [Service] UrlEncoder urlEncoder,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
@@ -1114,29 +1117,12 @@ public sealed class UserMutations
             //     );
             return new EnableUserTwoFactorAuthenticatorPayload(user, recoveryCodes.ToList().AsReadOnly());
         }
-        else
-        {
-            return new EnableUserTwoFactorAuthenticatorPayload(user);
-        }
-    }
 
-    public abstract record LoadSharedKeyAndQrCodeUriPayload
-    {
-        public sealed record Success(string SharedKey, string AuthenticatorUri) : LoadSharedKeyAndQrCodeUriPayload;
-
-        public sealed record ResettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
-
-        public sealed record GettingAuthenticatorKeyFailure() : LoadSharedKeyAndQrCodeUriPayload;
-
-        public sealed record GettingEmailFailure() : LoadSharedKeyAndQrCodeUriPayload;
-
-        private LoadSharedKeyAndQrCodeUriPayload()
-        {
-        }
+        return new EnableUserTwoFactorAuthenticatorPayload(user);
     }
 
     private static async Task<LoadSharedKeyAndQrCodeUriPayload> LoadSharedKeyAndQrCodeUriAsync(
-        UserManager<Data.User> userManager, UrlEncoder urlEncoder, Data.User user)
+        UserManager<User> userManager, UrlEncoder urlEncoder, User user)
     {
         // Load the authenticator key & QR code URI to display on the form
         var unformattedKey = await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
@@ -1187,13 +1173,13 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.ResetAuthenticator.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<ResetUserTwoFactorAuthenticatorPayload> ResetUserTwoFactorAuthenticatorAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -1234,13 +1220,13 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     public async Task<ChangeUserEmailPayload> ChangeUserEmailAsync(
         ChangeUserEmailInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service] Services.IEmailSender emailSender,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] IEmailSender emailSender,
         [Service] UrlEncoder urlEncoder,
         [Service] AppSettings appSettings,
         [Service] IAntiforgery antiforgeryService,
@@ -1263,7 +1249,7 @@ public sealed class UserMutations
             return new ChangeUserEmailPayload(
                 new ChangeUserEmailError(
                     ChangeUserEmailErrorCode.UNKNOWN_CURRENT_EMAIL,
-                    $"Failed to load current email address.",
+                    "Failed to load current email address.",
                     Array.Empty<string>()
                 )
             );
@@ -1274,7 +1260,7 @@ public sealed class UserMutations
                 new ChangeUserEmailError(
                     ChangeUserEmailErrorCode.UNCHANGED_EMAIL,
                     "Your email is unchanged.",
-                    new string[] { nameof(input), nameof(input.NewEmail).FirstCharToLower() }
+                    new[] { nameof(input), nameof(input.NewEmail).FirstCharToLower() }
                 )
             );
 
@@ -1292,12 +1278,12 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Email.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     public async Task<ResendUserEmailVerificationPayload> ResendUserEmailVerificationAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service] Services.IEmailSender emailSender,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] IEmailSender emailSender,
         [Service] UrlEncoder urlEncoder,
         [Service] AppSettings appSettings,
         [Service] IAntiforgery antiforgeryService,
@@ -1320,7 +1306,7 @@ public sealed class UserMutations
             return new ResendUserEmailVerificationPayload(
                 new ResendUserEmailVerificationError(
                     ResendUserEmailVerificationErrorCode.UNKNOWN_EMAIL,
-                    $"Failed to load email address.",
+                    "Failed to load email address.",
                     Array.Empty<string>()
                 )
             );
@@ -1337,11 +1323,11 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.GenerateRecoveryCodes.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     public async Task<GenerateUserTwoFactorRecoveryCodesPayload> GenerateUserTwoFactorRecoveryCodesAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -1386,14 +1372,14 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.Index.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<SetUserPhoneNumberPayload> SetUserPhoneNumberAsync(
         SetUserPhoneNumberInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -1416,7 +1402,7 @@ public sealed class UserMutations
                 new SetUserPhoneNumberError(
                     SetUserPhoneNumberErrorCode.UNCHANGED_PHONE_NUMBER,
                     "Your phone number is unchanged.",
-                    new string[] { nameof(input), nameof(input.PhoneNumber).FirstCharToLower() }
+                    new[] { nameof(input), nameof(input.PhoneNumber).FirstCharToLower() }
                 )
             );
 
@@ -1446,14 +1432,14 @@ public sealed class UserMutations
     }
 
     // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.SetPassword.cs.cshtml
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     [UseSignInManager]
     public async Task<SetUserPasswordPayload> SetUserPasswordAsync(
         SetUserPasswordInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service(ServiceKind.Resolver)] SignInManager<User> signInManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor
     )
@@ -1544,15 +1530,15 @@ public sealed class UserMutations
         return new SetUserPasswordPayload(user);
     }
 
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     public async Task<AddUserRolePayload> AddUserRoleAsync(
         AddUserRoleInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -1581,7 +1567,7 @@ public sealed class UserMutations
                 )
             );
 
-        var identityResult = await userManager.AddToRoleAsync(user, Data.Role.EnumToName(input.Role))
+        var identityResult = await userManager.AddToRoleAsync(user, Role.EnumToName(input.Role))
             .ConfigureAwait(false);
         if (!identityResult.Succeeded)
         {
@@ -1606,15 +1592,15 @@ public sealed class UserMutations
         return new AddUserRolePayload(user);
     }
 
-    [Authorize(Policy = Configuration.AuthConfiguration.ManageUserPolicy)]
+    [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
     public async Task<RemoveUserRolePayload> RemoveUserRoleAsync(
         RemoveUserRoleInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         [Service] IAntiforgery antiforgeryService,
         [Service] IHttpContextAccessor httpContextAccessor,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -1643,7 +1629,7 @@ public sealed class UserMutations
                 )
             );
 
-        var identityResult = await userManager.RemoveFromRoleAsync(user, Data.Role.EnumToName(input.Role))
+        var identityResult = await userManager.RemoveFromRoleAsync(user, Role.EnumToName(input.Role))
             .ConfigureAwait(false);
         if (!identityResult.Succeeded)
         {
@@ -1671,7 +1657,7 @@ public sealed class UserMutations
     private static async Task SendUserEmailConfirmation(
         (string name, string address) recipient,
         string confirmationToken,
-        Services.IEmailSender emailSender,
+        IEmailSender emailSender,
         string host,
         Uri? returnTo,
         UrlEncoder urlEncoder
@@ -1691,7 +1677,7 @@ public sealed class UserMutations
         string currentEmail,
         string newEmail,
         string confirmationToken,
-        Services.IEmailSender emailSender,
+        IEmailSender emailSender,
         string host,
         UrlEncoder urlEncoder
     )
@@ -1722,5 +1708,20 @@ public sealed class UserMutations
                     code
                 )
             );
+    }
+
+    public abstract record LoadSharedKeyAndQrCodeUriPayload
+    {
+        private LoadSharedKeyAndQrCodeUriPayload()
+        {
+        }
+
+        public sealed record Success(string SharedKey, string AuthenticatorUri) : LoadSharedKeyAndQrCodeUriPayload;
+
+        public sealed record ResettingAuthenticatorKeyFailure : LoadSharedKeyAndQrCodeUriPayload;
+
+        public sealed record GettingAuthenticatorKeyFailure : LoadSharedKeyAndQrCodeUriPayload;
+
+        public sealed record GettingEmailFailure : LoadSharedKeyAndQrCodeUriPayload;
     }
 }

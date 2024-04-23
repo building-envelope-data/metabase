@@ -1,16 +1,17 @@
 using GreenDonut;
+using Metabase.Data;
 using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Methods;
 
 public sealed class MethodByIdDataLoader
-    : EntityByIdDataLoader<Data.Method>
+    : EntityByIdDataLoader<Method>
 {
     public MethodByIdDataLoader(
         IBatchScheduler batchScheduler,
         DataLoaderOptions options,
-        IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
+        IDbContextFactory<ApplicationDbContext> dbContextFactory
     )
         : base(
             batchScheduler,

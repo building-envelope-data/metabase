@@ -1,15 +1,17 @@
 using System;
 using System.Linq.Expressions;
 using HotChocolate.Types;
+using Metabase.Data;
+using Metabase.GraphQl.DataX;
 using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Databases;
 
 public sealed class DatabaseType
-    : EntityType<Data.Database, DatabaseByIdDataLoader>
+    : EntityType<Database, DatabaseByIdDataLoader>
 {
     protected override void Configure(
-        IObjectTypeDescriptor<Data.Database> descriptor
+        IObjectTypeDescriptor<Database> descriptor
     )
     {
         base.Configure(descriptor);
@@ -18,7 +20,7 @@ public sealed class DatabaseType
             .Type<NonNullType<ObjectType<DatabaseOperatorEdge>>>()
             .Resolve(context =>
                 new DatabaseOperatorEdge(
-                    context.Parent<Data.Database>()
+                    context.Parent<Database>()
                 )
             );
         descriptor
@@ -28,13 +30,13 @@ public sealed class DatabaseType
             "data",
             _ => _.GetDataAsync(default!, default, default, default, default!, default!, default)
         );
-        ConfigureAllDataField<DataX.DataPropositionInput>(
+        ConfigureAllDataField<DataPropositionInput>(
             descriptor,
             "allData",
             _ => _.GetAllDataAsync(default!, default, default, default, default, default, default, default,
                 default!, default!, default)
         );
-        ConfigureHasDataField<DataX.DataPropositionInput>(
+        ConfigureHasDataField<DataPropositionInput>(
             descriptor,
             "hasData",
             _ => _.GetHasDataAsync(default!, default, default, default, default!, default!, default)
@@ -44,13 +46,13 @@ public sealed class DatabaseType
             "opticalData",
             _ => _.GetOpticalDataAsync(default!, default, default, default, default!, default!, default)
         );
-        ConfigureAllDataField<DataX.OpticalDataPropositionInput>(
+        ConfigureAllDataField<OpticalDataPropositionInput>(
             descriptor,
             "allOpticalData",
             _ => _.GetAllOpticalDataAsync(default!, default, default, default, default, default, default, default,
                 default!, default!, default)
         );
-        ConfigureHasDataField<DataX.OpticalDataPropositionInput>(
+        ConfigureHasDataField<OpticalDataPropositionInput>(
             descriptor,
             "hasOpticalData",
             _ => _.GetHasOpticalDataAsync(default!, default, default, default, default!, default!, default)
@@ -60,13 +62,13 @@ public sealed class DatabaseType
             "hygrothermalData",
             _ => _.GetHygrothermalDataAsync(default!, default, default, default, default!, default!, default)
         );
-        ConfigureAllDataField<DataX.HygrothermalDataPropositionInput>(
+        ConfigureAllDataField<HygrothermalDataPropositionInput>(
             descriptor,
             "allHygrothermalData",
             _ => _.GetAllHygrothermalDataAsync(default!, default, default, default, default, default, default,
                 default, default!, default!, default)
         );
-        ConfigureHasDataField<DataX.HygrothermalDataPropositionInput>(
+        ConfigureHasDataField<HygrothermalDataPropositionInput>(
             descriptor,
             "hasHygrothermalData",
             _ => _.GetHasHygrothermalDataAsync(default!, default, default, default, default!, default!, default)
@@ -76,13 +78,13 @@ public sealed class DatabaseType
             "calorimetricData",
             _ => _.GetCalorimetricDataAsync(default!, default, default, default, default!, default!, default)
         );
-        ConfigureAllDataField<DataX.CalorimetricDataPropositionInput>(
+        ConfigureAllDataField<CalorimetricDataPropositionInput>(
             descriptor,
             "allCalorimetricData",
             _ => _.GetAllCalorimetricDataAsync(default!, default, default, default, default, default, default,
                 default, default!, default!, default)
         );
-        ConfigureHasDataField<DataX.CalorimetricDataPropositionInput>(
+        ConfigureHasDataField<CalorimetricDataPropositionInput>(
             descriptor,
             "hasCalorimetricData",
             _ => _.GetHasCalorimetricDataAsync(default!, default, default, default, default!, default!, default)
@@ -92,13 +94,13 @@ public sealed class DatabaseType
             "photovoltaicData",
             _ => _.GetPhotovoltaicDataAsync(default!, default, default, default, default!, default!, default)
         );
-        ConfigureAllDataField<DataX.PhotovoltaicDataPropositionInput>(
+        ConfigureAllDataField<PhotovoltaicDataPropositionInput>(
             descriptor,
             "allPhotovoltaicData",
             _ => _.GetAllPhotovoltaicDataAsync(default!, default, default, default, default, default, default,
                 default, default!, default!, default)
         );
-        ConfigureHasDataField<DataX.PhotovoltaicDataPropositionInput>(
+        ConfigureHasDataField<PhotovoltaicDataPropositionInput>(
             descriptor,
             "hasPhotovoltaicData",
             _ => _.GetHasPhotovoltaicDataAsync(default!, default, default, default, default!, default!, default)
@@ -116,7 +118,7 @@ public sealed class DatabaseType
     }
 
     private static void ConfigureDataField(
-        IObjectTypeDescriptor<Data.Database> descriptor,
+        IObjectTypeDescriptor<Database> descriptor,
         string fieldName,
         Expression<Func<DatabaseResolvers, object?>> resolverMethod
     )
@@ -130,7 +132,7 @@ public sealed class DatabaseType
     }
 
     private static void ConfigureAllDataField<TDataPropositionInput>(
-        IObjectTypeDescriptor<Data.Database> descriptor,
+        IObjectTypeDescriptor<Database> descriptor,
         string fieldName,
         Expression<Func<DatabaseResolvers, object?>> resolverMethod
     )
@@ -148,7 +150,7 @@ public sealed class DatabaseType
     }
 
     private static void ConfigureHasDataField<TDataPropositionInput>(
-        IObjectTypeDescriptor<Data.Database> descriptor,
+        IObjectTypeDescriptor<Database> descriptor,
         string fieldName,
         Expression<Func<DatabaseResolvers, object?>> resolverMethod
     )

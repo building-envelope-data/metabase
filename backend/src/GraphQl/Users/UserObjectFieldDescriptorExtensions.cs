@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.Types;
+using Metabase.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -26,29 +27,29 @@ public static class UserObjectFieldDescriptorExtensions
     )
     {
         // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
-        var userManagerServiceName = GetServiceName<UserManager<Data.User>>();
+        var userManagerServiceName = GetServiceName<UserManager<User>>();
         return descriptor.Use(next => async context =>
         {
             var services = context.Service<IServiceProvider>();
-            var userManager = new UserManager<Data.User>(
-                new UserStore<Data.User, Data.Role, Data.ApplicationDbContext, Guid, Data.UserClaim, Data.UserRole,
-                    Data.UserLogin, Data.UserToken, Data.RoleClaim>(
-                    context.Service<Data.ApplicationDbContext>()
+            var userManager = new UserManager<User>(
+                new UserStore<User, Role, ApplicationDbContext, Guid, UserClaim, UserRole,
+                    UserLogin, UserToken, RoleClaim>(
+                    context.Service<ApplicationDbContext>()
                     ?? throw new InvalidOperationException("Application database context is null.")
                 ),
                 services.GetRequiredService<IOptions<IdentityOptions>>(),
-                services.GetRequiredService<IPasswordHasher<Data.User>>(),
+                services.GetRequiredService<IPasswordHasher<User>>(),
                 /* new PasswordHasher<Data.User>( */
                 /*   services.GetRequiredService<IOptions<PasswordHasherOptions>>() */
                 /*   ), */
-                services.GetRequiredService<IEnumerable<IUserValidator<Data.User>>>(),
-                services.GetRequiredService<IEnumerable<IPasswordValidator<Data.User>>>(),
+                services.GetRequiredService<IEnumerable<IUserValidator<User>>>(),
+                services.GetRequiredService<IEnumerable<IPasswordValidator<User>>>(),
                 services.GetRequiredService<ILookupNormalizer>(),
                 /* new UpperInvariantLookupNormalizer(), */
                 services.GetRequiredService<IdentityErrorDescriber>(),
                 /* new IdentityErrorDescriber(), */
                 services,
-                services.GetRequiredService<ILogger<UserManager<Data.User>>>()
+                services.GetRequiredService<ILogger<UserManager<User>>>()
             );
             try
             {
@@ -68,20 +69,20 @@ public static class UserObjectFieldDescriptorExtensions
     )
     {
         // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
-        var signInManagerServiceName = GetServiceName<SignInManager<Data.User>>();
+        var signInManagerServiceName = GetServiceName<SignInManager<User>>();
         return descriptor.Use(next => async context =>
         {
             var services = context.Service<IServiceProvider>();
-            var signInManager = new SignInManager<Data.User>(
-                context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+            var signInManager = new SignInManager<User>(
+                context.GetLocalStateOrDefault<UserManager<User>>(GetServiceName<UserManager<User>>())
                 ?? throw new InvalidOperationException(
                     "Add attribute `[UseUserManager]` before attribute `[UseSignInManager]`."),
                 services.GetRequiredService<IHttpContextAccessor>(),
-                services.GetRequiredService<IUserClaimsPrincipalFactory<Data.User>>(),
+                services.GetRequiredService<IUserClaimsPrincipalFactory<User>>(),
                 services.GetRequiredService<IOptions<IdentityOptions>>(),
-                services.GetRequiredService<ILogger<SignInManager<Data.User>>>(),
+                services.GetRequiredService<ILogger<SignInManager<User>>>(),
                 services.GetRequiredService<IAuthenticationSchemeProvider>(),
-                services.GetRequiredService<IUserConfirmation<Data.User>>()
+                services.GetRequiredService<IUserConfirmation<User>>()
             );
             try
             {

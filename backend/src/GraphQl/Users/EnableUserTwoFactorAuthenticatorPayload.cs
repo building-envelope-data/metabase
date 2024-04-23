@@ -1,23 +1,20 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
 public sealed class EnableUserTwoFactorAuthenticatorPayload
     : UserPayload<EnableUserTwoFactorAuthenticatorError>
 {
-    public IReadOnlyCollection<string>? TwoFactorRecoveryCodes { get; }
-    public string? SharedKey { get; }
-    public string? AuthenticatorUri { get; }
-
     public EnableUserTwoFactorAuthenticatorPayload(
-        Data.User user
+        User user
     )
         : base(user)
     {
     }
 
     public EnableUserTwoFactorAuthenticatorPayload(
-        Data.User user,
+        User user,
         IReadOnlyCollection<string> recoveryCodes
     )
         : base(user)
@@ -42,4 +39,8 @@ public sealed class EnableUserTwoFactorAuthenticatorPayload
         : base(error)
     {
     }
+
+    public IReadOnlyCollection<string>? TwoFactorRecoveryCodes { get; }
+    public string? SharedKey { get; }
+    public string? AuthenticatorUri { get; }
 }

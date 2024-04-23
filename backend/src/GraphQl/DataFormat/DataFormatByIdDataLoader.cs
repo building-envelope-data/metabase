@@ -1,16 +1,17 @@
 using GreenDonut;
+using Metabase.Data;
 using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.DataFormats;
 
 public sealed class DataFormatByIdDataLoader
-    : EntityByIdDataLoader<Data.DataFormat>
+    : EntityByIdDataLoader<DataFormat>
 {
     public DataFormatByIdDataLoader(
         IBatchScheduler batchScheduler,
         DataLoaderOptions options,
-        IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
+        IDbContextFactory<ApplicationDbContext> dbContextFactory
     )
         : base(
             batchScheduler,

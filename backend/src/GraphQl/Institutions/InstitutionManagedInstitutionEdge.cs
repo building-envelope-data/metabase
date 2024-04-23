@@ -1,13 +1,15 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionManagedInstitutionEdge
 {
-    public Data.Institution Node { get; }
-
     public InstitutionManagedInstitutionEdge(
-        Data.Institution node
+        Institution node
     )
     {
         Node = node;
     }
+
+    public Institution Node { get; }
 }

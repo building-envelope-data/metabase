@@ -3,17 +3,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentPartOfConnection
-    : Connection<Data.Component, Data.ComponentAssembly, ComponentPartOfByComponentIdDataLoader,
+    : Connection<Component, ComponentAssembly, ComponentPartOfByComponentIdDataLoader,
         ComponentPartOfEdge>
 {
     public ComponentPartOfConnection(
-        Data.Component subject
+        Component subject
     )
         : base(
             subject,
@@ -25,8 +26,8 @@ public sealed class ComponentPartOfConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

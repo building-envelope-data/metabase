@@ -1,4 +1,5 @@
 using System;
+using Metabase.Enumerations;
 using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Publications;
 using Metabase.GraphQl.Standards;
@@ -13,7 +14,7 @@ public sealed record CreateMethodInput(
     CreateStandardInput? Standard,
     CreatePublicationInput? Publication,
     Uri? CalculationLocator,
-    Enumerations.MethodCategory[] Categories,
+    MethodCategory[] Categories,
     Guid ManagerId,
     Guid[] InstitutionDeveloperIds,
     Guid[] UserDeveloperIds

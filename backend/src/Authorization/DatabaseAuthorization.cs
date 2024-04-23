@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,8 +14,8 @@ public static class DatabaseAuthorization
     public static async Task<bool> IsAuthorizedToCreateDatabaseForInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -31,8 +32,8 @@ public static class DatabaseAuthorization
     public static async Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid databaseId,
-        UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -49,8 +50,8 @@ public static class DatabaseAuthorization
     public static async Task<bool> IsAuthorizedToVerify(
         ClaimsPrincipal claimsPrincipal,
         Guid databaseId,
-        UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -65,9 +66,9 @@ public static class DatabaseAuthorization
     }
 
     private static async Task<bool> IsAtLeastAssistantOfVerifiedDatabaseOperator(
-        Data.User user,
+        User user,
         Guid databaseId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

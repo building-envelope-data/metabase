@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,8 +14,8 @@ public static class DataFormatAuthorization
     public static async Task<bool> IsAuthorizedToCreateDataFormatForInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -31,8 +32,8 @@ public static class DataFormatAuthorization
     public static async Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid dataFormatId,
-        UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -47,9 +48,9 @@ public static class DataFormatAuthorization
     }
 
     private static async Task<bool> IsAtLeastAssistantOfVerifiedDataFormatManager(
-        Data.User user,
+        User user,
         Guid dataFormatId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

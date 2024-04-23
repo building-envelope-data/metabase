@@ -8,6 +8,8 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
@@ -19,12 +21,12 @@ namespace Metabase.GraphQl.ComponentManufacturers;
 public sealed class ComponentManufacturerMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<AddComponentManufacturerPayload> AddComponentManufacturerAsync(
         AddComponentManufacturerInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -89,7 +91,7 @@ public sealed class ComponentManufacturerMutations
                 )
             );
 
-        var componentManufacturer = new Data.ComponentManufacturer
+        var componentManufacturer = new ComponentManufacturer
         {
             ComponentId = input.ComponentId,
             InstitutionId = input.InstitutionId,
@@ -103,12 +105,12 @@ public sealed class ComponentManufacturerMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<ConfirmComponentManufacturerPayload> ConfirmComponentManufacturerAsync(
         ConfirmComponentManufacturerInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -180,12 +182,12 @@ public sealed class ComponentManufacturerMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<RemoveComponentManufacturerPayload> RemoveComponentManufacturerAsync(
         RemoveComponentManufacturerInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

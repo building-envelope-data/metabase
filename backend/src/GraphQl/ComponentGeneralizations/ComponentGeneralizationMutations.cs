@@ -7,6 +7,8 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
@@ -18,12 +20,12 @@ namespace Metabase.GraphQl.ComponentGeneralizations;
 public sealed class ComponentGeneralizationMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<AddComponentGeneralizationPayload> AddComponentGeneralizationAsync(
         AddComponentGeneralizationInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -89,7 +91,7 @@ public sealed class ComponentGeneralizationMutations
                 )
             );
 
-        var componentGeneralization = new Data.ComponentConcretizationAndGeneralization
+        var componentGeneralization = new ComponentConcretizationAndGeneralization
         {
             GeneralComponentId = input.GeneralComponentId,
             ConcreteComponentId = input.ConcreteComponentId
@@ -100,12 +102,12 @@ public sealed class ComponentGeneralizationMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<RemoveComponentGeneralizationPayload> RemoveComponentGeneralizationAsync(
         RemoveComponentGeneralizationInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

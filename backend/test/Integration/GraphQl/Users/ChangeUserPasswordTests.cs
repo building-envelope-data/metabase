@@ -1,10 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.NUnit;
 using NUnit.Framework;
+using Snapshooter.NUnit;
 
 namespace Metabase.Tests.Integration.GraphQl.Users;
 
@@ -66,10 +66,7 @@ public sealed class ChangeUserPasswordTests
         ).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -122,10 +119,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -151,10 +145,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -180,10 +171,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -209,10 +197,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -238,10 +223,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -267,9 +249,6 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 }

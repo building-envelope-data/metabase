@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Metabase.GraphQl.Components;
 using Metabase.GraphQl.Institutions;
 
@@ -8,11 +9,10 @@ namespace Metabase.GraphQl.ComponentManufacturers;
 
 public sealed class RemoveComponentManufacturerPayload
 {
-    private readonly Data.ComponentManufacturer? _association;
-    public IReadOnlyCollection<RemoveComponentManufacturerError>? Errors { get; }
+    private readonly ComponentManufacturer? _association;
 
     public RemoveComponentManufacturerPayload(
-        Data.ComponentManufacturer componentManufacturer
+        ComponentManufacturer componentManufacturer
     )
     {
         _association = componentManufacturer;
@@ -32,7 +32,9 @@ public sealed class RemoveComponentManufacturerPayload
     {
     }
 
-    public async Task<Data.Component?> GetComponentAsync(
+    public IReadOnlyCollection<RemoveComponentManufacturerError>? Errors { get; }
+
+    public async Task<Component?> GetComponentAsync(
         ComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
@@ -42,7 +44,7 @@ public sealed class RemoveComponentManufacturerPayload
         return await byId.LoadAsync(_association.ComponentId, cancellationToken)!;
     }
 
-    public async Task<Data.Institution?> GetInstitutionAsync(
+    public async Task<Institution?> GetInstitutionAsync(
         InstitutionByIdDataLoader byId,
         CancellationToken cancellationToken
     )

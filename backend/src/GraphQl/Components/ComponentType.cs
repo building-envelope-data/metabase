@@ -3,30 +3,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-using Metabase.Extensions;
 using Metabase.Authorization;
+using Metabase.Data;
+using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentType
-    : EntityType<Data.Component, ComponentByIdDataLoader>
+    : EntityType<Component, ComponentByIdDataLoader>
 {
     protected override void Configure(
-        IObjectTypeDescriptor<Data.Component> descriptor
+        IObjectTypeDescriptor<Component> descriptor
     )
     {
         base.Configure(descriptor);
         descriptor
             .Field(t => t.Manufacturers)
-            .Argument(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower(),
+            .Argument(nameof(ComponentManufacturer.Pending).FirstCharToLower(),
                 _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<ComponentManufacturerConnection>>>()
             .Resolve(context =>
                 new ComponentManufacturerConnection(
-                    context.Parent<Data.Component>(),
-                    context.ArgumentValue<bool>(nameof(Data.ComponentManufacturer.Pending).FirstCharToLower())
+                    context.Parent<Component>(),
+                    context.ArgumentValue<bool>(nameof(ComponentManufacturer.Pending).FirstCharToLower())
                 )
             );
         descriptor
@@ -37,7 +38,7 @@ public sealed class ComponentType
             .Type<NonNullType<ObjectType<ComponentAssembledOfConnection>>>()
             .Resolve(context =>
                 new ComponentAssembledOfConnection(
-                    context.Parent<Data.Component>()
+                    context.Parent<Component>()
                 )
             );
         descriptor
@@ -47,7 +48,7 @@ public sealed class ComponentType
             .Type<NonNullType<ObjectType<ComponentPartOfConnection>>>()
             .Resolve(context =>
                 new ComponentPartOfConnection(
-                    context.Parent<Data.Component>()
+                    context.Parent<Component>()
                 )
             );
         descriptor
@@ -58,7 +59,7 @@ public sealed class ComponentType
             .Type<NonNullType<ObjectType<ComponentConcretizationOfConnection>>>()
             .Resolve(context =>
                 new ComponentConcretizationOfConnection(
-                    context.Parent<Data.Component>()
+                    context.Parent<Component>()
                 )
             );
         descriptor
@@ -70,7 +71,7 @@ public sealed class ComponentType
             .Type<NonNullType<ObjectType<ComponentGeneralizationOfConnection>>>()
             .Resolve(context =>
                 new ComponentGeneralizationOfConnection(
-                    context.Parent<Data.Component>()
+                    context.Parent<Component>()
                 )
             );
         descriptor
@@ -86,7 +87,7 @@ public sealed class ComponentType
             .Type<NonNullType<ObjectType<ComponentVariantOfConnection>>>()
             .Resolve(context =>
                 new ComponentVariantOfConnection(
-                    context.Parent<Data.Component>()
+                    context.Parent<Component>()
                 )
             );
         descriptor
@@ -102,10 +103,10 @@ public sealed class ComponentType
     private sealed class ComponentResolvers
     {
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-            [Parent] Data.Component component,
+            [Parent] Component component,
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+            ApplicationDbContext context,
             CancellationToken cancellationToken
         )
         {

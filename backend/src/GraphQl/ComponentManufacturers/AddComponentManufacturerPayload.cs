@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 using Metabase.GraphQl.Components;
 using Metabase.GraphQl.Institutions;
 
@@ -6,12 +7,8 @@ namespace Metabase.GraphQl.ComponentManufacturers;
 
 public sealed class AddComponentManufacturerPayload
 {
-    public InstitutionManufacturedComponentEdge? ManufacturedComponentEdge { get; }
-    public ComponentManufacturerEdge? ComponentManufacturerEdge { get; }
-    public IReadOnlyCollection<AddComponentManufacturerError>? Errors { get; }
-
     public AddComponentManufacturerPayload(
-        Data.ComponentManufacturer componentManufacturer
+        ComponentManufacturer componentManufacturer
     )
     {
         ManufacturedComponentEdge = new InstitutionManufacturedComponentEdge(componentManufacturer);
@@ -31,4 +28,8 @@ public sealed class AddComponentManufacturerPayload
         : this(new[] { error })
     {
     }
+
+    public InstitutionManufacturedComponentEdge? ManufacturedComponentEdge { get; }
+    public ComponentManufacturerEdge? ComponentManufacturerEdge { get; }
+    public IReadOnlyCollection<AddComponentManufacturerError>? Errors { get; }
 }

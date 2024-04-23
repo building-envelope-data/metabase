@@ -9,15 +9,17 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.Extensions;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
+using UserRole = Metabase.Enumerations.UserRole;
 
 namespace Metabase.GraphQl.Users;
 
 public sealed class UserType
-    : EntityType<Data.User, UserByIdDataLoader>
+    : EntityType<User, UserByIdDataLoader>
 {
     private static string GetServiceName<TService>()
     {
@@ -26,7 +28,7 @@ public sealed class UserType
 
     private static async Task<T?> Authorize<T>(
         IResolverContext context,
-        Func<Data.User, T?> getValue,
+        Func<User, T?> getValue,
         string? scope = null
     )
         where T : class
@@ -36,9 +38,9 @@ public sealed class UserType
             ?? throw new ArgumentException("Claims principal must not be null.");
         if (scope is not null && !claimsPrincipal.HasScope(scope)) return null;
 
-        var user = context.Parent<Data.User>();
+        var user = context.Parent<User>();
         var userManager =
-            context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+            context.GetLocalStateOrDefault<UserManager<User>>(GetServiceName<UserManager<User>>())
             ?? throw new ArgumentException("User manager must not be null.");
         if (!await UserAuthorization.IsAuthorizedToManageUser(
                 claimsPrincipal,
@@ -52,7 +54,7 @@ public sealed class UserType
 
     private static async Task<T?> Authorize<T>(
         IResolverContext context,
-        Func<Data.User, T?> getValue,
+        Func<User, T?> getValue,
         string? scope = null
     )
         where T : struct
@@ -62,9 +64,9 @@ public sealed class UserType
             ?? throw new ArgumentException("Claims principal must not be null.");
         if (scope is not null && !claimsPrincipal.HasScope(scope)) return null;
 
-        var user = context.Parent<Data.User>();
+        var user = context.Parent<User>();
         var userManager =
-            context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+            context.GetLocalStateOrDefault<UserManager<User>>(GetServiceName<UserManager<User>>())
             ?? throw new ArgumentException("User manager must not be null.");
         if (!await UserAuthorization.IsAuthorizedToManageUser(
                 claimsPrincipal,
@@ -78,7 +80,7 @@ public sealed class UserType
 
     private static async Task<T?> AuthorizeAsync<T>(
         IResolverContext context,
-        Func<Data.User, UserManager<Data.User>, Task<T?>> getValue,
+        Func<User, UserManager<User>, Task<T?>> getValue,
         string? scope = null
     )
         where T : class
@@ -88,9 +90,9 @@ public sealed class UserType
             ?? throw new ArgumentException("Claims principal must not be null.");
         if (scope is not null && !claimsPrincipal.HasScope(scope)) return null;
 
-        var user = context.Parent<Data.User>();
+        var user = context.Parent<User>();
         var userManager =
-            context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+            context.GetLocalStateOrDefault<UserManager<User>>(GetServiceName<UserManager<User>>())
             ?? throw new ArgumentException("User manager must not be null.");
         if (!await UserAuthorization.IsAuthorizedToManageUser(
                 claimsPrincipal,
@@ -104,7 +106,7 @@ public sealed class UserType
 
     private static async Task<T?> AuthorizeAsync<T>(
         IResolverContext context,
-        Func<Data.User, UserManager<Data.User>, Task<T?>> getValue,
+        Func<User, UserManager<User>, Task<T?>> getValue,
         string? scope = null
     )
         where T : struct
@@ -114,9 +116,9 @@ public sealed class UserType
             ?? throw new ArgumentException("Claims principal must not be null.");
         if (scope is not null && !claimsPrincipal.HasScope(scope)) return null;
 
-        var user = context.Parent<Data.User>();
+        var user = context.Parent<User>();
         var userManager =
-            context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+            context.GetLocalStateOrDefault<UserManager<User>>(GetServiceName<UserManager<User>>())
             ?? throw new ArgumentException("User manager must not be null.");
         if (!await UserAuthorization.IsAuthorizedToManageUser(
                 claimsPrincipal,
@@ -129,7 +131,7 @@ public sealed class UserType
     }
 
     protected override void Configure(
-        IObjectTypeDescriptor<Data.User> descriptor
+        IObjectTypeDescriptor<User> descriptor
     )
     {
         descriptor.BindFieldsExplicitly();
@@ -213,7 +215,7 @@ public sealed class UserType
                     context,
                     async (user, userManager) =>
                         (await userManager.GetRolesAsync(user).ConfigureAwait(false))
-                        .Select(Data.Role.EnumFromName),
+                        .Select(Role.EnumFromName),
                     Scopes.Roles
                 )
             )
@@ -234,24 +236,24 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field(t => t.DevelopedMethods)
-            .Argument(nameof(Data.UserMethodDeveloper.Pending).FirstCharToLower(),
+            .Argument(nameof(UserMethodDeveloper.Pending).FirstCharToLower(),
                 _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<UserDevelopedMethodConnection>>>()
             .Resolve(context =>
                 new UserDevelopedMethodConnection(
-                    context.Parent<Data.User>(),
-                    context.ArgumentValue<bool>(nameof(Data.UserMethodDeveloper.Pending).FirstCharToLower())
+                    context.Parent<User>(),
+                    context.ArgumentValue<bool>(nameof(UserMethodDeveloper.Pending).FirstCharToLower())
                 )
             );
         descriptor
             .Field(t => t.RepresentedInstitutions)
-            .Argument(nameof(Data.InstitutionRepresentative.Pending).FirstCharToLower(),
+            .Argument(nameof(InstitutionRepresentative.Pending).FirstCharToLower(),
                 _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<UserRepresentedInstitutionConnection>>>()
             .Resolve(context =>
                 new UserRepresentedInstitutionConnection(
-                    context.Parent<Data.User>(),
-                    context.ArgumentValue<bool>(nameof(Data.InstitutionRepresentative.Pending).FirstCharToLower())
+                    context.Parent<User>(),
+                    context.ArgumentValue<bool>(nameof(InstitutionRepresentative.Pending).FirstCharToLower())
                 )
             );
     }
@@ -260,10 +262,10 @@ public sealed class UserType
     {
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
         public static async Task<TwoFactorAuthentication?> GetTwoFactorAuthenticationAsync(
-            [Parent] Data.User user,
+            [Parent] User user,
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            [Service(ServiceKind.Resolver)] SignInManager<Data.User> signInManager
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+            [Service(ServiceKind.Resolver)] SignInManager<User> signInManager
         )
         {
             if (!claimsPrincipal.HasScope(AuthConfiguration.ManageUserApiScope)) return null;
@@ -286,15 +288,15 @@ public sealed class UserType
 
         public static Task<bool> GetCanCurrentUserDeleteUserAsync(
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager
         )
         {
             return UserAuthorization.IsAuthorizedToDeleteUsers(claimsPrincipal, userManager);
         }
 
-        public static async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanAddAsync(
+        public static async Task<IList<UserRole>> GetRolesCurrentUserCanAddAsync(
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
             CancellationToken cancellationToken
         )
         {
@@ -303,9 +305,9 @@ public sealed class UserType
                 .ConfigureAwait(false);
         }
 
-        public static async Task<IList<Enumerations.UserRole>> GetRolesCurrentUserCanRemoveAsync(
+        public static async Task<IList<UserRole>> GetRolesCurrentUserCanRemoveAsync(
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
             CancellationToken cancellationToken
         )
         {
@@ -314,12 +316,12 @@ public sealed class UserType
                 .ConfigureAwait(false);
         }
 
-        private static async IAsyncEnumerable<Enumerations.UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
+        private static async IAsyncEnumerable<UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager
         )
         {
-            foreach (var role in Data.Role.AllEnum)
+            foreach (var role in Role.AllEnum)
                 if (await UserAuthorization.IsAuthorizedToAddOrRemoveRole(
                         claimsPrincipal,
                         role,

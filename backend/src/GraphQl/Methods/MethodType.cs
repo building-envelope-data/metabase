@@ -2,19 +2,20 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using Metabase.GraphQl.Users;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.Extensions;
+using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Methods;
 
 public sealed class MethodType
-    : EntityType<Data.Method, MethodByIdDataLoader>
+    : EntityType<Method, MethodByIdDataLoader>
 {
     protected override void Configure(
-        IObjectTypeDescriptor<Data.Method> descriptor
+        IObjectTypeDescriptor<Method> descriptor
     )
     {
         base.Configure(descriptor);
@@ -29,7 +30,7 @@ public sealed class MethodType
             .Type<NonNullType<ObjectType<MethodManagerEdge>>>()
             .Resolve(context =>
                 new MethodManagerEdge(
-                    context.Parent<Data.Method>()
+                    context.Parent<Method>()
                 )
             );
         descriptor
@@ -37,13 +38,13 @@ public sealed class MethodType
             .Ignore();
         descriptor
             .Field(t => t.Developers)
-            .Argument(nameof(Data.IMethodDeveloper.Pending).FirstCharToLower(),
+            .Argument(nameof(IMethodDeveloper.Pending).FirstCharToLower(),
                 _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<MethodDeveloperConnection>>>()
             .Resolve(context =>
                 new MethodDeveloperConnection(
-                    context.Parent<Data.Method>(),
-                    context.ArgumentValue<bool?>(nameof(Data.IMethodDeveloper.Pending).FirstCharToLower()) ?? false
+                    context.Parent<Method>(),
+                    context.ArgumentValue<bool?>(nameof(IMethodDeveloper.Pending).FirstCharToLower()) ?? false
                 )
             );
         descriptor
@@ -68,10 +69,10 @@ public sealed class MethodType
     private sealed class MethodResolvers
     {
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-            [Parent] Data.Method method,
+            [Parent] Method method,
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+            ApplicationDbContext context,
             CancellationToken cancellationToken
         )
         {

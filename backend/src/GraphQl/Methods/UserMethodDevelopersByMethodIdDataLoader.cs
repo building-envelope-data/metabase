@@ -1,17 +1,18 @@
-using System;
 using System.Linq;
 using GreenDonut;
+using Metabase.Data;
+using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Methods;
 
 public sealed class UserMethodDevelopersByMethodIdDataLoader
-    : Entities.AssociationsByAssociateIdDataLoader<Data.UserMethodDeveloper>
+    : AssociationsByAssociateIdDataLoader<UserMethodDeveloper>
 {
     public UserMethodDevelopersByMethodIdDataLoader(
         IBatchScheduler batchScheduler,
         DataLoaderOptions options,
-        IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
+        IDbContextFactory<ApplicationDbContext> dbContextFactory
     )
         : base(
             batchScheduler,

@@ -1,19 +1,19 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
+using OpenIddict.Client;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
-using System.Reflection;
-using System.IO;
-using OpenIddict.Client;
-using Metabase.Data;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace Metabase.Configuration;
 
@@ -29,9 +29,6 @@ public abstract class AuthConfiguration
     public const string ReadPolicy = "Read";
     public const string WritePolicy = "Write";
     public const string ManageUserPolicy = "ManageUser";
-    public static string ReadApiScope { get; } = "api:read";
-    public static string WriteApiScope { get; } = "api:write";
-    public static string ManageUserApiScope { get; } = "api:user:manage";
 
     // Keep in sync with the scopes set in `OpenIddictClientRegistration`.
     private static readonly HashSet<string> _clientScopes = new()
@@ -45,6 +42,10 @@ public abstract class AuthConfiguration
         WriteApiScope,
         ManageUserApiScope
     };
+
+    public static string ReadApiScope { get; } = "api:read";
+    public static string WriteApiScope { get; } = "api:write";
+    public static string ManageUserApiScope { get; } = "api:user:manage";
 
     public static void ConfigureServices(
         IServiceCollection services,

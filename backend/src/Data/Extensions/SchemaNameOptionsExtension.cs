@@ -8,15 +8,15 @@ namespace Metabase.Data.Extensions;
 public sealed class SchemaNameOptionsExtension
     : IDbContextOptionsExtension
 {
-    public DbContextOptionsExtensionInfo Info
-        => new SchemaNameExtensionInfo(this);
-
-    public string SchemaName { get; }
-
     public SchemaNameOptionsExtension(string schemaName)
     {
         SchemaName = schemaName;
     }
+
+    public string SchemaName { get; }
+
+    public DbContextOptionsExtensionInfo Info
+        => new SchemaNameExtensionInfo(this);
 
     public void ApplyServices(IServiceCollection services)
     {
@@ -29,6 +29,11 @@ public sealed class SchemaNameOptionsExtension
     public sealed class SchemaNameExtensionInfo
         : DbContextOptionsExtensionInfo
     {
+        public SchemaNameExtensionInfo(SchemaNameOptionsExtension extension)
+            : base(extension)
+        {
+        }
+
         public override bool IsDatabaseProvider
             => false;
 
@@ -36,11 +41,6 @@ public sealed class SchemaNameOptionsExtension
             => $"{nameof(Extension.SchemaName)}={Extension.SchemaName}";
 
         public new SchemaNameOptionsExtension Extension => (SchemaNameOptionsExtension)base.Extension;
-
-        public SchemaNameExtensionInfo(SchemaNameOptionsExtension extension)
-            : base(extension)
-        {
-        }
 
         public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
         {

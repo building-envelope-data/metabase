@@ -1,4 +1,5 @@
 using System;
+using Metabase.Enumerations;
 using Metabase.GraphQl.Numerations;
 
 namespace Metabase.GraphQl.Standards;
@@ -9,6 +10,6 @@ public sealed record CreateStandardInput(
     string? Section,
     int? Year,
     CreateNumerationInput Numeration,
-    Enumerations.Standardizer[] Standardizers,
+    Standardizer[] Standardizers,
     Uri? Locator
 );

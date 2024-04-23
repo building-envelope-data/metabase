@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Institutions;
 
@@ -6,11 +7,8 @@ public abstract class InstitutionPayload<TInstitutionError>
     : Payload
     where TInstitutionError : IUserError
 {
-    public Data.Institution? Institution { get; }
-    public IReadOnlyCollection<TInstitutionError>? Errors { get; }
-
     protected InstitutionPayload(
-        Data.Institution institution
+        Institution institution
     )
     {
         Institution = institution;
@@ -31,7 +29,7 @@ public abstract class InstitutionPayload<TInstitutionError>
     }
 
     protected InstitutionPayload(
-        Data.Institution institution,
+        Institution institution,
         IReadOnlyCollection<TInstitutionError> errors
     )
     {
@@ -40,7 +38,7 @@ public abstract class InstitutionPayload<TInstitutionError>
     }
 
     protected InstitutionPayload(
-        Data.Institution institution,
+        Institution institution,
         TInstitutionError error
     )
         : this(
@@ -49,4 +47,7 @@ public abstract class InstitutionPayload<TInstitutionError>
         )
     {
     }
+
+    public Institution? Institution { get; }
+    public IReadOnlyCollection<TInstitutionError>? Errors { get; }
 }

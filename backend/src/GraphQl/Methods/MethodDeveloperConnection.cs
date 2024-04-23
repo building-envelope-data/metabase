@@ -1,23 +1,23 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Security.Claims;
 using HotChocolate;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
-
 
 namespace Metabase.GraphQl.Methods;
 
 public sealed class MethodDeveloperConnection
 {
-    private readonly Data.Method _subject;
     private readonly bool _pending;
+    private readonly Method _subject;
 
     public MethodDeveloperConnection(
-        Data.Method subject,
+        Method subject,
         bool pending
     )
     {
@@ -59,8 +59,8 @@ public sealed class MethodDeveloperConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserAddInstitutionEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -76,8 +76,8 @@ public sealed class MethodDeveloperConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserAddUserEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -92,12 +92,12 @@ public sealed class MethodDeveloperConnection
 }
 
 internal sealed class InstitutionMethodDeveloperConnection
-    : ForkingConnection<Data.Method, Data.InstitutionMethodDeveloper,
+    : ForkingConnection<Method, InstitutionMethodDeveloper,
         PendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDevelopersByMethodIdDataLoader,
         InstitutionMethodDeveloperEdge>
 {
     public InstitutionMethodDeveloperConnection(
-        Data.Method subject,
+        Method subject,
         bool pending
     )
         : base(
@@ -110,11 +110,11 @@ internal sealed class InstitutionMethodDeveloperConnection
 }
 
 internal sealed class UserMethodDeveloperConnection
-    : ForkingConnection<Data.Method, Data.UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader,
+    : ForkingConnection<Method, UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader,
         UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>
 {
     public UserMethodDeveloperConnection(
-        Data.Method subject,
+        Method subject,
         bool pending
     )
         : base(

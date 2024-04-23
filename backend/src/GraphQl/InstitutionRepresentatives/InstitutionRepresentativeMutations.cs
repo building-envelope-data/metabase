@@ -8,6 +8,9 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
+using Metabase.Data;
+using Metabase.Enumerations;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
@@ -19,12 +22,12 @@ namespace Metabase.GraphQl.InstitutionRepresentatives;
 public sealed class InstitutionRepresentativeMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentativeAsync(
         AddInstitutionRepresentativeInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -89,7 +92,7 @@ public sealed class InstitutionRepresentativeMutations
                 )
             );
 
-        var institutionRepresentative = new Data.InstitutionRepresentative
+        var institutionRepresentative = new InstitutionRepresentative
         {
             InstitutionId = input.InstitutionId,
             UserId = input.UserId,
@@ -103,12 +106,12 @@ public sealed class InstitutionRepresentativeMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<RemoveInstitutionRepresentativePayload> RemoveInstitutionRepresentativeAsync(
         RemoveInstitutionRepresentativeInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -174,7 +177,7 @@ public sealed class InstitutionRepresentativeMutations
                 )
             );
 
-        if (institutionRepresentative.Role == Enumerations.InstitutionRepresentativeRole.OWNER
+        if (institutionRepresentative.Role == InstitutionRepresentativeRole.OWNER
             && !await ExistsOtherInstitutionOwner(
                 institutionRepresentative.InstitutionId,
                 institutionRepresentative.UserId,
@@ -196,12 +199,12 @@ public sealed class InstitutionRepresentativeMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<ChangeInstitutionRepresentativeRolePayload> ChangeInstitutionRepresentativeRoleAsync(
         ChangeInstitutionRepresentativeRoleInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -267,8 +270,8 @@ public sealed class InstitutionRepresentativeMutations
                 )
             );
 
-        if (input.Role != Enumerations.InstitutionRepresentativeRole.OWNER
-            && institutionRepresentative.Role == Enumerations.InstitutionRepresentativeRole.OWNER
+        if (input.Role != InstitutionRepresentativeRole.OWNER
+            && institutionRepresentative.Role == InstitutionRepresentativeRole.OWNER
             && !await ExistsOtherInstitutionOwner(
                 institutionRepresentative.InstitutionId,
                 institutionRepresentative.UserId,
@@ -290,12 +293,12 @@ public sealed class InstitutionRepresentativeMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<ConfirmInstitutionRepresentativePayload> ConfirmInstitutionRepresentativeAsync(
         ConfirmInstitutionRepresentativeInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -367,7 +370,7 @@ public sealed class InstitutionRepresentativeMutations
     private static async Task<bool> ExistsOtherInstitutionOwner(
         Guid institutionId,
         Guid userId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -375,7 +378,7 @@ public sealed class InstitutionRepresentativeMutations
             .Where(r =>
                 r.InstitutionId == institutionId
                 && r.UserId != userId
-                && r.Role == Enumerations.InstitutionRepresentativeRole.OWNER
+                && r.Role == InstitutionRepresentativeRole.OWNER
             )
             .AnyAsync(cancellationToken)
             .ConfigureAwait(false);

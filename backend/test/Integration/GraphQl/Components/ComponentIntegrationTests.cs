@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Metabase.Enumerations;
 using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Components;
 
@@ -17,7 +18,7 @@ public abstract class ComponentIntegrationTests
         "C!A",
         "Best component ever!",
         null,
-        Array.Empty<Enumerations.ComponentCategory>(),
+        Array.Empty<ComponentCategory>(),
         Guid.Empty
     );
 
@@ -31,8 +32,8 @@ public abstract class ComponentIntegrationTests
         ),
         new[]
         {
-            Enumerations.ComponentCategory.MATERIAL,
-            Enumerations.ComponentCategory.UNIT
+            ComponentCategory.MATERIAL,
+            ComponentCategory.UNIT
         },
         Guid.Empty
     );
@@ -47,7 +48,7 @@ public abstract class ComponentIntegrationTests
         ),
         new[]
         {
-            Enumerations.ComponentCategory.UNIT
+            ComponentCategory.UNIT
         },
         Guid.Empty
     );
@@ -62,9 +63,9 @@ public abstract class ComponentIntegrationTests
         ),
         new[]
         {
-            Enumerations.ComponentCategory.LAYER,
-            Enumerations.ComponentCategory.MATERIAL,
-            Enumerations.ComponentCategory.UNIT
+            ComponentCategory.LAYER,
+            ComponentCategory.MATERIAL,
+            ComponentCategory.UNIT
         },
         Guid.Empty
     );

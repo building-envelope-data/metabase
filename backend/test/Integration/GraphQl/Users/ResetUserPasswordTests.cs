@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Snapshooter.NUnit;
 using NUnit.Framework;
+using Snapshooter.NUnit;
 
 namespace Metabase.Tests.Integration.GraphQl.Users;
 
@@ -70,10 +70,7 @@ public sealed class ResetUserPasswordTests
         ).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -95,10 +92,7 @@ public sealed class ResetUserPasswordTests
             "other" + password).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -120,10 +114,7 @@ public sealed class ResetUserPasswordTests
         ).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -145,10 +136,7 @@ public sealed class ResetUserPasswordTests
         ).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -170,10 +158,7 @@ public sealed class ResetUserPasswordTests
         ).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -195,10 +180,7 @@ public sealed class ResetUserPasswordTests
         ).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -220,9 +202,6 @@ public sealed class ResetUserPasswordTests
         ).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 }

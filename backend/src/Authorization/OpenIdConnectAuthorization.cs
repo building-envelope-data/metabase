@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.Authorization;
@@ -8,7 +9,7 @@ public static class OpenIdConnectAuthorization
 {
     public static async Task<bool> IsAuthorizedToView(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<Data.User> userManager
+        UserManager<User> userManager
     )
     {
         var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);

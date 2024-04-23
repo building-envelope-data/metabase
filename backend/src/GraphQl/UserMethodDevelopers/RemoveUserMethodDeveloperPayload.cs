@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 using Metabase.GraphQl.Methods;
 using Metabase.GraphQl.Users;
 
@@ -6,12 +7,8 @@ namespace Metabase.GraphQl.UserMethodDevelopers;
 
 public sealed class RemoveUserMethodDeveloperPayload
 {
-    public UserDevelopedMethodEdge? DevelopedMethodEdge { get; }
-    public UserMethodDeveloperEdge? MethodDeveloperEdge { get; }
-    public IReadOnlyCollection<RemoveUserMethodDeveloperError>? Errors { get; }
-
     public RemoveUserMethodDeveloperPayload(
-        Data.UserMethodDeveloper userMethodDeveloper
+        UserMethodDeveloper userMethodDeveloper
     )
     {
         DevelopedMethodEdge = new UserDevelopedMethodEdge(userMethodDeveloper);
@@ -31,4 +28,8 @@ public sealed class RemoveUserMethodDeveloperPayload
         : this(new[] { error })
     {
     }
+
+    public UserDevelopedMethodEdge? DevelopedMethodEdge { get; }
+    public UserMethodDeveloperEdge? MethodDeveloperEdge { get; }
+    public IReadOnlyCollection<RemoveUserMethodDeveloperError>? Errors { get; }
 }

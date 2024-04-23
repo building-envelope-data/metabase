@@ -1,10 +1,12 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.Databases;
 
 public sealed class VerifyDatabasePayload
     : DatabasePayload<VerifyDatabaseError>
 {
     public VerifyDatabasePayload(
-        Data.Database database
+        Database database
     )
         : base(database)
     {

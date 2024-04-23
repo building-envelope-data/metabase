@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Components;
 
@@ -6,7 +7,7 @@ public sealed class UpdateComponentPayload
     : ComponentPayload<UpdateComponentError>
 {
     public UpdateComponentPayload(
-        Data.Component component
+        Component component
     )
         : base(component)
     {

@@ -18,8 +18,8 @@ namespace Metabase.Controllers;
 // https://github.com/openiddict/openiddict-samples/blob/855c31f91d6bf5cde735ef3f96fcc3c015b51d79/samples/Velusia/Velusia.Client/Controllers/AuthenticationController.cs
 public class AuthenticationController : Controller
 {
-    private readonly string _issuer;
     private readonly IdentityOptions _identityOptions;
+    private readonly string _issuer;
 
     public AuthenticationController(
         AppSettings appSettings,

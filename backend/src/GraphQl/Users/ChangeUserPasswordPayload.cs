@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
@@ -6,7 +7,7 @@ public sealed class ChangeUserPasswordPayload
     : UserPayload<ChangeUserPasswordError>
 {
     public ChangeUserPasswordPayload(
-        Data.User user
+        User user
     )
         : base(user)
     {
@@ -20,7 +21,7 @@ public sealed class ChangeUserPasswordPayload
     }
 
     public ChangeUserPasswordPayload(
-        Data.User user,
+        User user,
         IReadOnlyCollection<ChangeUserPasswordError> errors
     )
         : base(user, errors)
@@ -28,7 +29,7 @@ public sealed class ChangeUserPasswordPayload
     }
 
     public ChangeUserPasswordPayload(
-        Data.User user,
+        User user,
         ChangeUserPasswordError error
     )
         : base(user, error)

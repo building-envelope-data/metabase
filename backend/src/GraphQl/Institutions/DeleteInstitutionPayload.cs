@@ -4,8 +4,6 @@ namespace Metabase.GraphQl.Institutions;
 
 public sealed class DeleteInstitutionPayload
 {
-    public IReadOnlyCollection<DeleteInstitutionError>? Errors { get; }
-
     public DeleteInstitutionPayload()
     {
     }
@@ -16,4 +14,6 @@ public sealed class DeleteInstitutionPayload
     {
         Errors = new[] { error };
     }
+
+    public IReadOnlyCollection<DeleteInstitutionError>? Errors { get; }
 }

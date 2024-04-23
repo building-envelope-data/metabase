@@ -1,10 +1,12 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class UpdateInstitutionPayload
     : InstitutionPayload<UpdateInstitutionError>
 {
     public UpdateInstitutionPayload(
-        Data.Institution institution
+        Institution institution
     )
         : base(institution)
     {

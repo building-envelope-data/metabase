@@ -1,13 +1,15 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionManagedDataFormatEdge
 {
-    public Data.DataFormat Node { get; }
-
     public InstitutionManagedDataFormatEdge(
-        Data.DataFormat node
+        DataFormat node
     )
     {
         Node = node;
     }
+
+    public DataFormat Node { get; }
 }

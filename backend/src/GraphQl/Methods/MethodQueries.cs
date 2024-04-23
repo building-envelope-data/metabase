@@ -1,10 +1,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using Metabase.Data;
 using Guid = System.Guid;
 
 namespace Metabase.GraphQl.Methods;
@@ -16,14 +15,14 @@ public sealed class MethodQueries
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Data.Method> GetMethods(
-        Data.ApplicationDbContext context
+    public IQueryable<Method> GetMethods(
+        ApplicationDbContext context
     )
     {
         return context.Methods;
     }
 
-    public Task<Data.Method?> GetMethodAsync(
+    public Task<Method?> GetMethodAsync(
         Guid uuid,
         MethodByIdDataLoader methodById,
         CancellationToken cancellationToken

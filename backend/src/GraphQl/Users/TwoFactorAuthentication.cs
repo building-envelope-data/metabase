@@ -2,11 +2,6 @@ namespace Metabase.GraphQl.Users;
 
 public sealed class TwoFactorAuthentication
 {
-    public bool HasAuthenticator { get; }
-    public bool IsEnabled { get; }
-    public bool IsMachineRemembered { get; }
-    public int RecoveryCodesLeftCount { get; }
-
     public TwoFactorAuthentication(
         bool hasAuthenticator,
         bool isEnabled,
@@ -19,4 +14,9 @@ public sealed class TwoFactorAuthentication
         IsMachineRemembered = isMachineRemembered;
         RecoveryCodesLeftCount = recoveryCodesLeftCount;
     }
+
+    public bool HasAuthenticator { get; }
+    public bool IsEnabled { get; }
+    public bool IsMachineRemembered { get; }
+    public int RecoveryCodesLeftCount { get; }
 }

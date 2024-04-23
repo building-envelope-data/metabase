@@ -17,7 +17,7 @@ public sealed class GetHttpsResourceTreeNonRootVertex
     }
 
     public string VertexId { get; }
-    public GetHttpsResource Value { get; }
     public string ParentId { get; }
     public ToTreeVertexAppliedConversionMethod AppliedConversionMethod { get; }
+    public GetHttpsResource Value { get; }
 }

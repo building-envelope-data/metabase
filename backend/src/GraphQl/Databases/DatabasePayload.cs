@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Databases;
 
@@ -6,11 +7,8 @@ public abstract class DatabasePayload<TDatabaseError>
     : Payload
     where TDatabaseError : IUserError
 {
-    public Data.Database? Database { get; }
-    public IReadOnlyCollection<TDatabaseError>? Errors { get; }
-
     protected DatabasePayload(
-        Data.Database database
+        Database database
     )
     {
         Database = database;
@@ -31,7 +29,7 @@ public abstract class DatabasePayload<TDatabaseError>
     }
 
     protected DatabasePayload(
-        Data.Database database,
+        Database database,
         IReadOnlyCollection<TDatabaseError> errors
     )
     {
@@ -40,7 +38,7 @@ public abstract class DatabasePayload<TDatabaseError>
     }
 
     protected DatabasePayload(
-        Data.Database database,
+        Database database,
         TDatabaseError error
     )
         : this(
@@ -49,4 +47,7 @@ public abstract class DatabasePayload<TDatabaseError>
         )
     {
     }
+
+    public Database? Database { get; }
+    public IReadOnlyCollection<TDatabaseError>? Errors { get; }
 }

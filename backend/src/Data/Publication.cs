@@ -9,13 +9,26 @@ namespace Metabase.Data;
 public sealed class Publication
     : IReference
 {
-    [MinLength(1)] public string? Title { get; private set; }
-
-    [MinLength(1)] public string? Abstract { get; private set; }
-
-    [MinLength(1)]
-    [GraphQLDescription("Referenced section")]
-    public string? Section { get; private set; }
+    public Publication(
+        string? title,
+        string? @abstract,
+        string? section,
+        string[]? authors,
+        string? doi,
+        string? arXiv,
+        string? urn,
+        Uri? webAddress
+    )
+    {
+        Title = title;
+        Abstract = @abstract;
+        Section = section;
+        Authors = authors;
+        Doi = doi;
+        ArXiv = arXiv;
+        Urn = urn;
+        WebAddress = webAddress;
+    }
 
     [MinLength(1)] public string[]? Authors { get; private set; }
 
@@ -42,24 +55,11 @@ public sealed class Publication
         "If a persistent identifiert like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long.")]
     public Uri? WebAddress { get; private set; }
 
-    public Publication(
-        string? title,
-        string? @abstract,
-        string? section,
-        string[]? authors,
-        string? doi,
-        string? arXiv,
-        string? urn,
-        Uri? webAddress
-    )
-    {
-        Title = title;
-        Abstract = @abstract;
-        Section = section;
-        Authors = authors;
-        Doi = doi;
-        ArXiv = arXiv;
-        Urn = urn;
-        WebAddress = webAddress;
-    }
+    [MinLength(1)] public string? Title { get; }
+
+    [MinLength(1)] public string? Abstract { get; }
+
+    [MinLength(1)]
+    [GraphQLDescription("Referenced section")]
+    public string? Section { get; }
 }

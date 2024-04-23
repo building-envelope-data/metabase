@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Metabase.Enumerations;
 using NpgsqlTypes;
 
 namespace Metabase.Data;
@@ -10,6 +11,28 @@ namespace Metabase.Data;
 public sealed class Method
     : Entity
 {
+    public Method()
+    {
+        // Parameterless constructor is needed by HotChocolate's `UseProjection`
+    }
+
+    public Method(
+        string name,
+        string description,
+        NpgsqlRange<DateTime>? validity,
+        NpgsqlRange<DateTime>? availability,
+        Uri? calculationLocator,
+        MethodCategory[] categories
+    )
+    {
+        Name = name;
+        Description = description;
+        Validity = validity;
+        Availability = availability;
+        CalculationLocator = calculationLocator;
+        Categories = categories;
+    }
+
     [Required] [MinLength(1)] public string Name { get; private set; }
 
     [Required] [MinLength(1)] public string Description { get; private set; }
@@ -43,7 +66,7 @@ public sealed class Method
 
     [Url] public Uri? CalculationLocator { get; private set; }
 
-    [Required] public Enumerations.MethodCategory[] Categories { get; private set; }
+    [Required] public MethodCategory[] Categories { get; private set; }
 
     public ICollection<InstitutionMethodDeveloper> InstitutionDeveloperEdges { get; } =
         new List<InstitutionMethodDeveloper>();
@@ -55,7 +78,7 @@ public sealed class Method
 
     [NotMapped]
     public IEnumerable<IStakeholder> Developers =>
-        InstitutionDevelopers.Cast<IStakeholder>().Concat(
+        InstitutionDevelopers.Concat(
             UserDevelopers.Cast<IStakeholder>()
         );
 
@@ -64,37 +87,13 @@ public sealed class Method
     [InverseProperty(nameof(Institution.ManagedMethods))]
     public Institution? Manager { get; set; }
 
-#nullable disable
-    public Method()
-    {
-        // Parameterless constructor is needed by HotChocolate's `UseProjection`
-    }
-#nullable enable
-
-    public Method(
-        string name,
-        string description,
-        NpgsqlRange<DateTime>? validity,
-        NpgsqlRange<DateTime>? availability,
-        Uri? calculationLocator,
-        Enumerations.MethodCategory[] categories
-    )
-    {
-        Name = name;
-        Description = description;
-        Validity = validity;
-        Availability = availability;
-        CalculationLocator = calculationLocator;
-        Categories = categories;
-    }
-
     public void Update(
         string name,
         string description,
         NpgsqlRange<DateTime>? validity,
         NpgsqlRange<DateTime>? availability,
         Uri? calculationLocator,
-        Enumerations.MethodCategory[] categories
+        MethodCategory[] categories
     )
     {
         Name = name;

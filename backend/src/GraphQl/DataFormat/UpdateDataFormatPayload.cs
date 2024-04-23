@@ -1,10 +1,12 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.DataFormats;
 
 public sealed class UpdateDataFormatPayload
     : DataFormatPayload<UpdateDataFormatError>
 {
     public UpdateDataFormatPayload(
-        Data.DataFormat standard
+        DataFormat standard
     )
         : base(standard)
     {

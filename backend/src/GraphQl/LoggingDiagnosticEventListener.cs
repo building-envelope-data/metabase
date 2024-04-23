@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using HotChocolate;
@@ -9,7 +10,6 @@ using HotChocolate.Execution.Instrumentation;
 using HotChocolate.Execution.Processing;
 using HotChocolate.Resolvers;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
 
 namespace Metabase.GraphQl;
 

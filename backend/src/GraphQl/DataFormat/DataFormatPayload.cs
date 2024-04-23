@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.DataFormats;
 
@@ -6,11 +7,8 @@ public abstract class DataFormatPayload<TDataFormatError>
     : Payload
     where TDataFormatError : IUserError
 {
-    public Data.DataFormat? DataFormat { get; }
-    public IReadOnlyCollection<TDataFormatError>? Errors { get; }
-
     protected DataFormatPayload(
-        Data.DataFormat person
+        DataFormat person
     )
     {
         DataFormat = person;
@@ -31,7 +29,7 @@ public abstract class DataFormatPayload<TDataFormatError>
     }
 
     protected DataFormatPayload(
-        Data.DataFormat person,
+        DataFormat person,
         IReadOnlyCollection<TDataFormatError> errors
     )
     {
@@ -40,7 +38,7 @@ public abstract class DataFormatPayload<TDataFormatError>
     }
 
     protected DataFormatPayload(
-        Data.DataFormat person,
+        DataFormat person,
         TDataFormatError error
     )
         : this(
@@ -49,4 +47,7 @@ public abstract class DataFormatPayload<TDataFormatError>
         )
     {
     }
+
+    public DataFormat? DataFormat { get; }
+    public IReadOnlyCollection<TDataFormatError>? Errors { get; }
 }

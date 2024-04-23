@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
@@ -6,11 +7,8 @@ public abstract class UserPayload<TUserError>
     : Payload
     where TUserError : IUserError
 {
-    public Data.User? User { get; }
-    public IReadOnlyCollection<TUserError>? Errors { get; }
-
     protected UserPayload(
-        Data.User user
+        User user
     )
     {
         User = user;
@@ -31,7 +29,7 @@ public abstract class UserPayload<TUserError>
     }
 
     protected UserPayload(
-        Data.User user,
+        User user,
         IReadOnlyCollection<TUserError> errors
     )
     {
@@ -40,10 +38,13 @@ public abstract class UserPayload<TUserError>
     }
 
     protected UserPayload(
-        Data.User user,
+        User user,
         TUserError error
     )
         : this(user, new[] { error })
     {
     }
+
+    public User? User { get; }
+    public IReadOnlyCollection<TUserError>? Errors { get; }
 }

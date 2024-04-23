@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
@@ -6,7 +6,7 @@ public sealed class ChangeUserEmailPayload
     : UserPayload<ChangeUserEmailError>
 {
     public ChangeUserEmailPayload(
-        Data.User user
+        User user
     )
         : base(user)
     {
@@ -20,7 +20,7 @@ public sealed class ChangeUserEmailPayload
     }
 
     public ChangeUserEmailPayload(
-        Data.User user,
+        User user,
         ChangeUserEmailError error
     )
         : base(user, error)

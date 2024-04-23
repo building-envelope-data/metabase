@@ -13,13 +13,13 @@ public sealed class AntiforgeryController : Controller
 {
     private const string XsrfCookieKey = "XSRF-TOKEN";
 
+    private readonly IAntiforgery _antiforgeryService;
+
     private readonly CookieOptions XsrfCookieOptions =
         new()
         {
             HttpOnly = false
         };
-
-    private readonly IAntiforgery _antiforgeryService;
 
     public AntiforgeryController(IAntiforgery antiforgeryService)
     {

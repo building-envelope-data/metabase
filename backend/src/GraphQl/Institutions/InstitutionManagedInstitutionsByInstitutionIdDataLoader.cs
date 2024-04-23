@@ -1,17 +1,19 @@
 using System;
 using System.Linq;
 using GreenDonut;
+using Metabase.Data;
+using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionManagedInstitutionsByInstitutionIdDataLoader
-    : Entities.AssociationsByAssociateIdDataLoader<Data.Institution>
+    : AssociationsByAssociateIdDataLoader<Institution>
 {
     public InstitutionManagedInstitutionsByInstitutionIdDataLoader(
         IBatchScheduler batchScheduler,
         DataLoaderOptions options,
-        IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
+        IDbContextFactory<ApplicationDbContext> dbContextFactory
     )
         : base(
             batchScheduler,

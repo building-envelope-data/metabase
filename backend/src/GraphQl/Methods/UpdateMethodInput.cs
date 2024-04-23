@@ -1,4 +1,5 @@
 using System;
+using Metabase.Enumerations;
 using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Publications;
 using Metabase.GraphQl.Standards;
@@ -14,5 +15,5 @@ public sealed record UpdateMethodInput(
     UpdateStandardInput? Standard,
     UpdatePublicationInput? Publication,
     Uri? CalculationLocator,
-    Enumerations.MethodCategory[] Categories
+    MethodCategory[] Categories
 );

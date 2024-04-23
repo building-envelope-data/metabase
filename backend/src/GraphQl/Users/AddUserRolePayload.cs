@@ -1,14 +1,12 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
 public sealed class AddUserRolePayload
 {
-    public Data.User? User { get; }
-    public IReadOnlyCollection<AddUserRoleError>? Errors { get; }
-
     public AddUserRolePayload(
-        Data.User user
+        User user
     )
     {
         User = user;
@@ -22,7 +20,7 @@ public sealed class AddUserRolePayload
     }
 
     public AddUserRolePayload(
-        Data.User user,
+        User user,
         IReadOnlyCollection<AddUserRoleError> errors
     )
     {
@@ -36,4 +34,7 @@ public sealed class AddUserRolePayload
         : this(new[] { error })
     {
     }
+
+    public User? User { get; }
+    public IReadOnlyCollection<AddUserRoleError>? Errors { get; }
 }

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 
 namespace Metabase.Tests.Integration.GraphQl.Institutions;
@@ -162,9 +162,9 @@ public abstract class InstitutionIntegrationTests
     {
         return AsUser(
             httpClient,
-            Data.DbSeeder.VerifierUser.EmailAddress,
-            Data.DbSeeder.VerifierUser.Password,
-            (httpClient) =>
+            DbSeeder.VerifierUser.EmailAddress,
+            DbSeeder.VerifierUser.Password,
+            httpClient =>
             {
                 return SuccessfullyQueryGraphQlContentAsString(
                     httpClient,

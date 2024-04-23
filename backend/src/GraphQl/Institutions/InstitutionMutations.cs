@@ -7,10 +7,15 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
+using Metabase.Data;
+using Metabase.Enumerations;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
+using Metabase.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using UserRole = Metabase.Enumerations.UserRole;
 
 namespace Metabase.GraphQl.Institutions;
 
@@ -18,13 +23,13 @@ namespace Metabase.GraphQl.Institutions;
 public sealed class InstitutionMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<CreateInstitutionPayload> CreateInstitutionAsync(
         CreateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
-        [Service] Services.IEmailSender emailSender,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
+        [Service] IEmailSender emailSender,
         [Service] AppSettings appSettings,
         CancellationToken cancellationToken
     )
@@ -98,7 +103,7 @@ public sealed class InstitutionMutations
                 )
             );
 
-        var institution = new Data.Institution(
+        var institution = new Institution(
             input.Name,
             input.Abbreviation,
             input.Description,
@@ -111,10 +116,10 @@ public sealed class InstitutionMutations
         };
         foreach (var ownerId in input.OwnerIds)
             institution.RepresentativeEdges.Add(
-                new Data.InstitutionRepresentative
+                new InstitutionRepresentative
                 {
                     UserId = ownerId,
-                    Role = Enumerations.InstitutionRepresentativeRole.OWNER,
+                    Role = InstitutionRepresentativeRole.OWNER,
                     Pending = !await InstitutionRepresentativeAuthorization
                         .IsAuthorizedToConfirm(claimsPrincipal, ownerId, userManager).ConfigureAwait(false)
                 }
@@ -122,11 +127,11 @@ public sealed class InstitutionMutations
 
         context.Institutions.Add(institution);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        if (institution.State == Enumerations.InstitutionState.PENDING)
+        if (institution.State == InstitutionState.PENDING)
         {
             var verifiers =
                 await userManager.GetUsersInRoleAsync(
-                    Data.Role.EnumToName(Enumerations.UserRole.VERIFIER)
+                    Role.EnumToName(UserRole.VERIFIER)
                 ).ConfigureAwait(false);
             await Task.WhenAll(
                 verifiers.Select(verifier =>
@@ -144,30 +149,30 @@ public sealed class InstitutionMutations
         return new CreateInstitutionPayload(institution);
     }
 
-    private static async Task<Enumerations.InstitutionState> GetInitialInstitutionState(
+    private static async Task<InstitutionState> GetInitialInstitutionState(
         CreateInstitutionInput input,
-        Data.User user,
-        UserManager<Data.User> userManager
+        User user,
+        UserManager<User> userManager
     )
     {
         if (input.ManagerId is not null
-            || await userManager.IsInRoleAsync(user, Data.Role.EnumToName(Enumerations.UserRole.ADMINISTRATOR))
+            || await userManager.IsInRoleAsync(user, Role.EnumToName(UserRole.ADMINISTRATOR))
                 .ConfigureAwait(false)
-            || await userManager.IsInRoleAsync(user, Data.Role.EnumToName(Enumerations.UserRole.VERIFIER))
+            || await userManager.IsInRoleAsync(user, Role.EnumToName(UserRole.VERIFIER))
                 .ConfigureAwait(false)
            )
-            return Enumerations.InstitutionState.VERIFIED;
+            return InstitutionState.VERIFIED;
 
-        return Enumerations.InstitutionState.PENDING;
+        return InstitutionState.PENDING;
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<VerifyInstitutionPayload> VerifyInstitutionAsync(
         VerifyInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -204,12 +209,12 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<UpdateInstitutionPayload> UpdateInstitutionAsync(
         UpdateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -255,12 +260,12 @@ public sealed class InstitutionMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<DeleteInstitutionPayload> DeleteInstitutionAsync(
         DeleteInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

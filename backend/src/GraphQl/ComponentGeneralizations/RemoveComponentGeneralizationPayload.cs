@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Metabase.GraphQl.Components;
 
 namespace Metabase.GraphQl.ComponentGeneralizations;
 
 public sealed class RemoveComponentGeneralizationPayload
 {
-    private readonly Data.ComponentConcretizationAndGeneralization? _association;
-    public IReadOnlyCollection<RemoveComponentGeneralizationError>? Errors { get; }
+    private readonly ComponentConcretizationAndGeneralization? _association;
 
     public RemoveComponentGeneralizationPayload(
-        Data.ComponentConcretizationAndGeneralization association
+        ComponentConcretizationAndGeneralization association
     )
     {
         _association = association;
@@ -31,7 +31,9 @@ public sealed class RemoveComponentGeneralizationPayload
     {
     }
 
-    public async Task<Data.Component?> GetGeneralComponentAsync(
+    public IReadOnlyCollection<RemoveComponentGeneralizationError>? Errors { get; }
+
+    public async Task<Component?> GetGeneralComponentAsync(
         ComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
@@ -41,7 +43,7 @@ public sealed class RemoveComponentGeneralizationPayload
         return await byId.LoadAsync(_association.GeneralComponentId, cancellationToken)!;
     }
 
-    public async Task<Data.Component?> GetConcreteComponentAsync(
+    public async Task<Component?> GetConcreteComponentAsync(
         ComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )

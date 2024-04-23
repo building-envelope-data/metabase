@@ -3,19 +3,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Metabase.Authorization;
+using Metabase.Data;
+using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
-using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentManufacturerEdge
-    : Edge<Data.Institution, InstitutionByIdDataLoader>
+    : Edge<Institution, InstitutionByIdDataLoader>
 {
-    private readonly Data.ComponentManufacturer _association;
+    private readonly ComponentManufacturer _association;
 
     public ComponentManufacturerEdge(
-        Data.ComponentManufacturer association
+        ComponentManufacturer association
     )
         : base(association.InstitutionId)
     {
@@ -25,8 +26,8 @@ public sealed class ComponentManufacturerEdge
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -42,8 +43,8 @@ public sealed class ComponentManufacturerEdge
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

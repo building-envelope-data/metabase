@@ -1,12 +1,13 @@
+using Metabase.Data;
 using Metabase.GraphQl.Components;
 
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionManufacturedComponentEdge
-    : Edge<Data.Component, ComponentByIdDataLoader>
+    : Edge<Component, ComponentByIdDataLoader>
 {
     public InstitutionManufacturedComponentEdge(
-        Data.ComponentManufacturer association
+        ComponentManufacturer association
     )
         : base(association.ComponentId)
     {

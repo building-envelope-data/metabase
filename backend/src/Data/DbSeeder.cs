@@ -1,14 +1,15 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using Metabase.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Identity;
-using System.Linq;
-using System.Collections.ObjectModel;
 
 namespace Metabase.Data;
 
@@ -61,6 +62,9 @@ public static partial class Log
 
 public sealed class DbSeeder
 {
+    public const string MetabaseClientId = "metabase";
+    public const string TestlabSolarFacadesClientId = "testlab-solar-facades";
+
     public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password,
         Enumerations.UserRole Role)> Users =
         Role.AllEnum.Select(role => (
@@ -77,9 +81,6 @@ public sealed class DbSeeder
     public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role)
         VerifierUser =
             Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
-
-    public const string MetabaseClientId = "metabase";
-    public const string TestlabSolarFacadesClientId = "testlab-solar-facades";
 
     public static async Task DoAsync(
         IServiceProvider services
@@ -197,11 +198,11 @@ public sealed class DbSeeder
                         OpenIddictConstants.Permissions.Scopes.Profile,
                         OpenIddictConstants.Permissions.Scopes.Roles,
                         OpenIddictConstants.Permissions.Prefixes.Scope +
-                        Configuration.AuthConfiguration.ReadApiScope,
+                        AuthConfiguration.ReadApiScope,
                         OpenIddictConstants.Permissions.Prefixes.Scope +
-                        Configuration.AuthConfiguration.WriteApiScope,
+                        AuthConfiguration.WriteApiScope,
                         OpenIddictConstants.Permissions.Prefixes.Scope +
-                        Configuration.AuthConfiguration.ManageUserApiScope
+                        AuthConfiguration.ManageUserApiScope
                     },
                     Requirements =
                     {
@@ -255,9 +256,9 @@ public sealed class DbSeeder
                         OpenIddictConstants.Permissions.Scopes.Profile,
                         OpenIddictConstants.Permissions.Scopes.Roles,
                         OpenIddictConstants.Permissions.Prefixes.Scope +
-                        Configuration.AuthConfiguration.ReadApiScope,
+                        AuthConfiguration.ReadApiScope,
                         OpenIddictConstants.Permissions.Prefixes.Scope +
-                        Configuration.AuthConfiguration.WriteApiScope
+                        AuthConfiguration.WriteApiScope
                     },
                     Requirements =
                     {
@@ -274,10 +275,10 @@ public sealed class DbSeeder
     )
     {
         var manager = services.GetRequiredService<IOpenIddictScopeManager>();
-        if (await manager.FindByNameAsync(Configuration.AuthConfiguration.ReadApiScope)
+        if (await manager.FindByNameAsync(AuthConfiguration.ReadApiScope)
                 .ConfigureAwait(false) is null)
         {
-            logger.CreatingScope(Configuration.AuthConfiguration.ReadApiScope);
+            logger.CreatingScope(AuthConfiguration.ReadApiScope);
             await manager.CreateAsync(
                 new OpenIddictScopeDescriptor
                 {
@@ -286,19 +287,19 @@ public sealed class DbSeeder
                     {
                         [CultureInfo.GetCultureInfo("de-DE")] = "API Lesezugriff"
                     },
-                    Name = Configuration.AuthConfiguration.ReadApiScope,
+                    Name = AuthConfiguration.ReadApiScope,
                     Resources =
                     {
-                        Configuration.AuthConfiguration.Audience
+                        AuthConfiguration.Audience
                     }
                 }
             ).ConfigureAwait(false);
         }
 
-        if (await manager.FindByNameAsync(Configuration.AuthConfiguration.WriteApiScope)
+        if (await manager.FindByNameAsync(AuthConfiguration.WriteApiScope)
                 .ConfigureAwait(false) is null)
         {
-            logger.CreatingScope(Configuration.AuthConfiguration.WriteApiScope);
+            logger.CreatingScope(AuthConfiguration.WriteApiScope);
             await manager.CreateAsync(
                 new OpenIddictScopeDescriptor
                 {
@@ -307,19 +308,19 @@ public sealed class DbSeeder
                     {
                         [CultureInfo.GetCultureInfo("de-DE")] = "API Schreibzugriff"
                     },
-                    Name = Configuration.AuthConfiguration.WriteApiScope,
+                    Name = AuthConfiguration.WriteApiScope,
                     Resources =
                     {
-                        Configuration.AuthConfiguration.Audience
+                        AuthConfiguration.Audience
                     }
                 }
             ).ConfigureAwait(false);
         }
 
-        if (await manager.FindByNameAsync(Configuration.AuthConfiguration.ManageUserApiScope)
+        if (await manager.FindByNameAsync(AuthConfiguration.ManageUserApiScope)
                 .ConfigureAwait(false) is null)
         {
-            logger.CreatingScope(Configuration.AuthConfiguration.ManageUserApiScope);
+            logger.CreatingScope(AuthConfiguration.ManageUserApiScope);
             await manager.CreateAsync(
                 new OpenIddictScopeDescriptor
                 {
@@ -328,10 +329,10 @@ public sealed class DbSeeder
                     {
                         [CultureInfo.GetCultureInfo("de-DE")] = "Benutzerverwaltung-API-Zugriff"
                     },
-                    Name = Configuration.AuthConfiguration.ManageUserApiScope,
+                    Name = AuthConfiguration.ManageUserApiScope,
                     Resources =
                     {
-                        Configuration.AuthConfiguration.Audience
+                        AuthConfiguration.Audience
                     }
                 }
             ).ConfigureAwait(false);

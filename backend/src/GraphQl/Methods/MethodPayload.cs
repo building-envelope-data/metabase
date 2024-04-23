@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Methods;
 
@@ -6,11 +7,8 @@ public abstract class MethodPayload<TMethodError>
     : Payload
     where TMethodError : IUserError
 {
-    public Data.Method? Method { get; }
-    public IReadOnlyCollection<TMethodError>? Errors { get; }
-
     protected MethodPayload(
-        Data.Method method
+        Method method
     )
     {
         Method = method;
@@ -31,7 +29,7 @@ public abstract class MethodPayload<TMethodError>
     }
 
     protected MethodPayload(
-        Data.Method method,
+        Method method,
         IReadOnlyCollection<TMethodError> errors
     )
     {
@@ -40,7 +38,7 @@ public abstract class MethodPayload<TMethodError>
     }
 
     protected MethodPayload(
-        Data.Method method,
+        Method method,
         TMethodError error
     )
         : this(
@@ -49,4 +47,7 @@ public abstract class MethodPayload<TMethodError>
         )
     {
     }
+
+    public Method? Method { get; }
+    public IReadOnlyCollection<TMethodError>? Errors { get; }
 }

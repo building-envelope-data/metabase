@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.NUnit;
 using NUnit.Framework;
+using Snapshooter.NUnit;
 
 namespace Metabase.Tests.Integration.GraphQl.Users;
 
@@ -20,9 +20,7 @@ public sealed class ConfirmUserEmailTests
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            confirmationCode
-            ,
-            email).ConfigureAwait(false);
+            confirmationCode).ConfigureAwait(false);
         // Assert
         Snapshot.Match(
             response,
@@ -46,9 +44,7 @@ public sealed class ConfirmUserEmailTests
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            confirmationCode
-            ,
-            email).ConfigureAwait(false);
+            confirmationCode).ConfigureAwait(false);
         // Assert
         Snapshot.Match(
             response,
@@ -70,9 +66,7 @@ public sealed class ConfirmUserEmailTests
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            confirmationCode
-            ,
-            email).ConfigureAwait(false);
+            confirmationCode).ConfigureAwait(false);
         // Assert
         Snapshot.Match(
             response,
@@ -95,9 +89,7 @@ public sealed class ConfirmUserEmailTests
             email
         ).ConfigureAwait(false);
         var response = await ConfirmUserEmail(
-            ExtractConfirmationCodeFromEmail()
-            ,
-            email).ConfigureAwait(false);
+            ExtractConfirmationCodeFromEmail()).ConfigureAwait(false);
         // Assert
         Snapshot.Match(
             response,
@@ -133,8 +125,7 @@ public sealed class ConfirmUserEmailTests
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         // Act
         var response = await ConfirmUserEmail(
-            "invalid" + confirmationCode,
-            email).ConfigureAwait(false);
+            "invalid" + confirmationCode).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
     }

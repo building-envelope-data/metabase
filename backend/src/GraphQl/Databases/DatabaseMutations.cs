@@ -4,10 +4,13 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL;
 using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Http;
@@ -19,18 +22,18 @@ namespace Metabase.GraphQl.Databases;
 [ExtendObjectType(nameof(Mutation))]
 public sealed class DatabaseMutations
 {
-    private static string[] _verificationCodeFileNames = new[]
+    private static readonly string[] _verificationCodeFileNames =
     {
         "VerificationCode.graphql"
     };
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<CreateDatabasePayload> CreateDatabaseAsync(
         CreateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -65,7 +68,7 @@ public sealed class DatabaseMutations
                 )
             );
 
-        var database = new Data.Database(
+        var database = new Database(
             input.Name,
             input.Description,
             input.Locator
@@ -79,12 +82,12 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<UpdateDatabasePayload> UpdateDatabaseAsync(
         UpdateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -128,12 +131,12 @@ public sealed class DatabaseMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<VerifyDatabasePayload> VerifyDatabaseAsync(
         VerifyDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         [Service] IHttpClientFactory httpClientFactory,
         [Service] IHttpContextAccessor httpContextAccessor,
         CancellationToken cancellationToken
@@ -214,13 +217,8 @@ public sealed class DatabaseMutations
         return new VerifyDatabasePayload(database);
     }
 
-    private sealed class VerificationCodeData
-    {
-        public string VerificationCode { get; set; } = default!;
-    }
-
     private static async Task<string> QueryVerificationCode(
-        Data.Database database,
+        Database database,
         [Service] IHttpClientFactory httpClientFactory,
         [Service] IHttpContextAccessor httpContextAccessor,
         CancellationToken cancellationToken
@@ -228,7 +226,7 @@ public sealed class DatabaseMutations
     {
         return (await QueryingDatabases.QueryDatabase<VerificationCodeData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _verificationCodeFileNames
                         ).ConfigureAwait(false),
@@ -239,5 +237,10 @@ public sealed class DatabaseMutations
                     cancellationToken
                 ).ConfigureAwait(false)
             ).Data.VerificationCode;
+    }
+
+    private sealed class VerificationCodeData
+    {
+        public string VerificationCode { get; } = default!;
     }
 }

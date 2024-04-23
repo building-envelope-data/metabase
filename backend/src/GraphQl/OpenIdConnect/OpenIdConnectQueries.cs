@@ -1,17 +1,17 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading;
+using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
+using Metabase.Authorization;
+using Metabase.Data;
+using Metabase.GraphQl.Users;
+using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 using OpenIddict.EntityFrameworkCore.Models;
-using System.Linq;
-using System.Threading.Tasks;
-using Metabase.Authorization;
-using HotChocolate.Data;
-using Metabase.GraphQl.Users;
-using System;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.OpenIdConnect;
 
@@ -23,7 +23,7 @@ public sealed class OpendIdConnectQueries
     public async Task<IList<OpenIddictEntityFrameworkCoreApplication>> GetOpenIdConnectApplications(
         [Service] OpenIddictApplicationManager<OpenIddictEntityFrameworkCoreApplication> manager,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         // Data.ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
         CancellationToken cancellationToken
     )
@@ -41,7 +41,7 @@ public sealed class OpendIdConnectQueries
     public async Task<IList<OpenIddictEntityFrameworkCoreScope>> GetOpenIdConnectScopes(
         [Service] OpenIddictScopeManager<OpenIddictEntityFrameworkCoreScope> manager,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         // Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
         CancellationToken cancellationToken
     )
@@ -58,7 +58,7 @@ public sealed class OpendIdConnectQueries
     public async Task<IList<OpenIddictEntityFrameworkCoreToken>> GetOpenIdConnectTokens(
         [Service] OpenIddictTokenManager<OpenIddictEntityFrameworkCoreToken> manager,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         // [TokendService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
         CancellationToken cancellationToken
     )
@@ -75,7 +75,7 @@ public sealed class OpendIdConnectQueries
     public async Task<IList<OpenIddictEntityFrameworkCoreAuthorization>> GetOpenIdConnectAuthorizations(
         [Service] OpenIddictAuthorizationManager<OpenIddictEntityFrameworkCoreAuthorization> manager,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
         // [AuthorizationdService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
         CancellationToken cancellationToken
     )

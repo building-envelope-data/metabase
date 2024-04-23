@@ -2,15 +2,18 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
+using Metabase.Enumerations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using UserRole = Metabase.Enumerations.UserRole;
 
 namespace Metabase.Authorization;
 
 public static class CommonAuthorization
 {
     public static bool IsSame(
-        Data.User user,
+        User user,
         Guid userId
     )
     {
@@ -20,61 +23,61 @@ public static class CommonAuthorization
     }
 
     public static Task<bool> IsAdministrator(
-        Data.User user,
-        UserManager<Data.User> userManager
+        User user,
+        UserManager<User> userManager
     )
     {
         return IsInRole(
             user,
-            Enumerations.UserRole.ADMINISTRATOR,
+            UserRole.ADMINISTRATOR,
             userManager
         );
     }
 
     public static Task<bool> IsVerifier(
-        Data.User user,
-        UserManager<Data.User> userManager
+        User user,
+        UserManager<User> userManager
     )
     {
         return IsInRole(
             user,
-            Enumerations.UserRole.VERIFIER,
+            UserRole.VERIFIER,
             userManager
         );
     }
 
     private static async Task<bool> IsInRole(
-        Data.User user,
-        Enumerations.UserRole role,
-        UserManager<Data.User> userManager
+        User user,
+        UserRole role,
+        UserManager<User> userManager
     )
     {
         if (user is null) return false;
 
         return await userManager.IsInRoleAsync(
             user,
-            Data.Role.EnumToName(role)
+            Role.EnumToName(role)
         ).ConfigureAwait(false);
     }
 
     public static async Task<bool> IsVerified(
         Guid institutionId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         return await context.Institutions.AsQueryable()
             .AnyAsync(x =>
                     x.Id == institutionId &&
-                    x.State == Enumerations.InstitutionState.VERIFIED,
+                    x.State == InstitutionState.VERIFIED,
                 cancellationToken
             ).ConfigureAwait(false);
     }
 
     public static async Task<bool> IsOwner(
-        Data.User user,
+        User user,
         Guid institutionId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -84,13 +87,13 @@ public static class CommonAuthorization
                    context,
                    cancellationToken
                ).ConfigureAwait(false)
-               == Enumerations.InstitutionRepresentativeRole.OWNER;
+               == InstitutionRepresentativeRole.OWNER;
     }
 
     public static async Task<bool> IsOwnerOfVerifiedInstitution(
-        Data.User user,
+        User user,
         Guid institutionId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -110,9 +113,9 @@ public static class CommonAuthorization
     }
 
     public static async Task<bool> IsAtLeastAssistant(
-        Data.User user,
+        User user,
         Guid institutionId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -124,14 +127,14 @@ public static class CommonAuthorization
                 cancellationToken
             ).ConfigureAwait(false);
         return
-            role == Enumerations.InstitutionRepresentativeRole.OWNER
-            || role == Enumerations.InstitutionRepresentativeRole.ASSISTANT;
+            role == InstitutionRepresentativeRole.OWNER
+            || role == InstitutionRepresentativeRole.ASSISTANT;
     }
 
     public static async Task<bool> IsAtLeastAssistantOfVerifiedInstitution(
-        Data.User user,
+        User user,
         Guid institutionId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -150,10 +153,10 @@ public static class CommonAuthorization
             ).ConfigureAwait(false);
     }
 
-    private static async Task<Enumerations.InstitutionRepresentativeRole?> FetchRole(
-        Data.User user,
+    private static async Task<InstitutionRepresentativeRole?> FetchRole(
+        User user,
         Guid institutionId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -200,7 +203,7 @@ public static class CommonAuthorization
     public static async Task<bool> IsVerifiedManufacturerOfComponents(
         Guid institutionId,
         Guid[] componentIds,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -219,7 +222,7 @@ public static class CommonAuthorization
     public static async Task<bool> IsVerifiedManufacturerOfComponent(
         Guid institutionId,
         Guid componentId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

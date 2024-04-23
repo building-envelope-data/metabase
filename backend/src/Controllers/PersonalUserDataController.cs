@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Metabase.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
-using Microsoft.AspNetCore.Http;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Metabase.Controllers;
@@ -14,10 +14,10 @@ namespace Metabase.Controllers;
 // Keep in sync with `UserinfoController`.
 public sealed class PersonalUserDataController : Controller
 {
-    private readonly UserManager<Data.User> _userManager;
+    private readonly UserManager<User> _userManager;
 
     public PersonalUserDataController(
-        UserManager<Data.User> userManager
+        UserManager<User> userManager
     )
     {
         _userManager = userManager;

@@ -2,16 +2,29 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
+using Metabase.Enumerations;
 
 namespace Metabase.Data;
 
 public sealed class Database
     : Entity
 {
-    // Inspired by https://jonathancrozier.com/blog/how-to-generate-a-cryptographically-secure-random-string-in-dot-net-with-c-sharp
-    private static string CreateSecureRandomString(int count = 64)
+    public Database()
     {
-        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(count));
+        // Parameterless constructor is needed by HotChocolate's `UseProjection`
+    }
+
+    public Database(
+        string name,
+        string description,
+        Uri locator
+    )
+    {
+        Name = name;
+        Description = description;
+        Locator = locator;
+        VerificationState = DatabaseVerificationState.PENDING;
+        VerificationCode = CreateSecureRandomString();
     }
 
     // private static string CreateSha512Hash(string value)
@@ -28,7 +41,7 @@ public sealed class Database
 
     [Required] [Url] public Uri Locator { get; private set; }
 
-    [Required] public Enumerations.DatabaseVerificationState VerificationState { get; private set; }
+    [Required] public DatabaseVerificationState VerificationState { get; private set; }
 
     [Required] [MinLength(32)] public string VerificationCode { get; private set; }
 
@@ -37,24 +50,10 @@ public sealed class Database
     [InverseProperty(nameof(Institution.OperatedDatabases))]
     public Institution? Operator { get; set; }
 
-#nullable disable
-    public Database()
+    // Inspired by https://jonathancrozier.com/blog/how-to-generate-a-cryptographically-secure-random-string-in-dot-net-with-c-sharp
+    private static string CreateSecureRandomString(int count = 64)
     {
-        // Parameterless constructor is needed by HotChocolate's `UseProjection`
-    }
-#nullable enable
-
-    public Database(
-        string name,
-        string description,
-        Uri locator
-    )
-    {
-        Name = name;
-        Description = description;
-        Locator = locator;
-        VerificationState = Enumerations.DatabaseVerificationState.PENDING;
-        VerificationCode = CreateSecureRandomString();
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(count));
     }
 
     public void Update(
@@ -70,12 +69,12 @@ public sealed class Database
 
     public void Verify()
     {
-        VerificationState = Enumerations.DatabaseVerificationState.VERIFIED;
+        VerificationState = DatabaseVerificationState.VERIFIED;
     }
 
     // Refute
     public void RevokeVerification()
     {
-        VerificationState = Enumerations.DatabaseVerificationState.PENDING;
+        VerificationState = DatabaseVerificationState.PENDING;
     }
 }

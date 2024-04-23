@@ -8,14 +8,6 @@ namespace Metabase.Data;
 [Owned]
 public sealed class ContactInformation
 {
-    [Phone] public string? PhoneNumber { get; private set; }
-
-    [MinLength(1)] public string? PostalAddress { get; private set; }
-
-    [EmailAddress] public string? EmailAddress { get; private set; }
-
-    [Url] public Uri? WebsiteLocator { get; private set; }
-
     public ContactInformation(
         string? phoneNumber,
         string? postalAddress,
@@ -28,4 +20,12 @@ public sealed class ContactInformation
         EmailAddress = emailAddress;
         WebsiteLocator = websiteLocator;
     }
+
+    [Phone] public string? PhoneNumber { get; private set; }
+
+    [MinLength(1)] public string? PostalAddress { get; private set; }
+
+    [EmailAddress] public string? EmailAddress { get; private set; }
+
+    [Url] public Uri? WebsiteLocator { get; private set; }
 }

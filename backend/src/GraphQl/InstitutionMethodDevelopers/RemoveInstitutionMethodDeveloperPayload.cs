@@ -1,17 +1,14 @@
 using System.Collections.Generic;
-using Metabase.GraphQl.Methods;
+using Metabase.Data;
 using Metabase.GraphQl.Institutions;
+using Metabase.GraphQl.Methods;
 
 namespace Metabase.GraphQl.InstitutionMethodDevelopers;
 
 public sealed class RemoveInstitutionMethodDeveloperPayload
 {
-    public InstitutionDevelopedMethodEdge? DevelopedMethodEdge { get; }
-    public InstitutionMethodDeveloperEdge? MethodDeveloperEdge { get; }
-    public IReadOnlyCollection<RemoveInstitutionMethodDeveloperError>? Errors { get; }
-
     public RemoveInstitutionMethodDeveloperPayload(
-        Data.InstitutionMethodDeveloper institutionMethodDeveloper
+        InstitutionMethodDeveloper institutionMethodDeveloper
     )
     {
         DevelopedMethodEdge = new InstitutionDevelopedMethodEdge(institutionMethodDeveloper);
@@ -31,4 +28,8 @@ public sealed class RemoveInstitutionMethodDeveloperPayload
         : this(new[] { error })
     {
     }
+
+    public InstitutionDevelopedMethodEdge? DevelopedMethodEdge { get; }
+    public InstitutionMethodDeveloperEdge? MethodDeveloperEdge { get; }
+    public IReadOnlyCollection<RemoveInstitutionMethodDeveloperError>? Errors { get; }
 }

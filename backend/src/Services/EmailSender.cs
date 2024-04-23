@@ -23,9 +23,9 @@ public static partial class Log
 public sealed class EmailSender
     : IEmailSender
 {
+    private readonly ILogger<EmailSender> _logger;
     private readonly string _smtpHost;
     private readonly int _smtpPort;
-    private readonly ILogger<EmailSender> _logger;
 
     public EmailSender(
         string smtpHost,

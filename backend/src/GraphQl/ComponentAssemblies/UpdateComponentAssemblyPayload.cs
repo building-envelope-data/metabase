@@ -1,16 +1,13 @@
 using System.Collections.Generic;
+using Metabase.Data;
 using Metabase.GraphQl.Components;
 
 namespace Metabase.GraphQl.ComponentAssemblies;
 
 public sealed class UpdateComponentAssemblyPayload
 {
-    public ComponentAssembledOfEdge? AssembledOfEdge { get; }
-    public ComponentPartOfEdge? PartOfEdge { get; }
-    public IReadOnlyCollection<UpdateComponentAssemblyError>? Errors { get; }
-
     public UpdateComponentAssemblyPayload(
-        Data.ComponentAssembly componentAssembly
+        ComponentAssembly componentAssembly
     )
     {
         AssembledOfEdge = new ComponentAssembledOfEdge(componentAssembly);
@@ -30,4 +27,8 @@ public sealed class UpdateComponentAssemblyPayload
         : this(new[] { error })
     {
     }
+
+    public ComponentAssembledOfEdge? AssembledOfEdge { get; }
+    public ComponentPartOfEdge? PartOfEdge { get; }
+    public IReadOnlyCollection<UpdateComponentAssemblyError>? Errors { get; }
 }

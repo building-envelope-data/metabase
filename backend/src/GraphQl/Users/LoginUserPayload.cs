@@ -1,12 +1,12 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.Users;
 
 public sealed class LoginUserPayload
     : UserPayload<LoginUserError>
 {
-    public bool? RequiresTwoFactor { get; }
-
     public LoginUserPayload(
-        Data.User user,
+        User user,
         bool requiresTwoFactor
     )
         : base(user)
@@ -20,4 +20,6 @@ public sealed class LoginUserPayload
         : base(error)
     {
     }
+
+    public bool? RequiresTwoFactor { get; }
 }

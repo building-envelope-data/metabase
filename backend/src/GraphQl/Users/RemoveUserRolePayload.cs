@@ -1,14 +1,12 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
 public sealed class RemoveUserRolePayload
 {
-    public Data.User? User { get; }
-    public IReadOnlyCollection<RemoveUserRoleError>? Errors { get; }
-
     public RemoveUserRolePayload(
-        Data.User user
+        User user
     )
     {
         User = user;
@@ -22,7 +20,7 @@ public sealed class RemoveUserRolePayload
     }
 
     public RemoveUserRolePayload(
-        Data.User user,
+        User user,
         IReadOnlyCollection<RemoveUserRoleError> errors
     )
     {
@@ -36,4 +34,7 @@ public sealed class RemoveUserRolePayload
         : this(new[] { error })
     {
     }
+
+    public User? User { get; }
+    public IReadOnlyCollection<RemoveUserRoleError>? Errors { get; }
 }

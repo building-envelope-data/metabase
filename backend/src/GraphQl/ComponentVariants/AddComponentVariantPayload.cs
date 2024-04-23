@@ -1,17 +1,14 @@
 using System.Collections.Generic;
+using Metabase.Data;
 using Metabase.GraphQl.Components;
 
 namespace Metabase.GraphQl.ComponentVariants;
 
 public sealed class AddComponentVariantPayload
 {
-    public ComponentVariantOfEdge? VariantOfEdge { get; }
-    public ComponentVariantOfEdge? ReverseVariantOfEdge { get; }
-    public IReadOnlyCollection<AddComponentVariantError>? Errors { get; }
-
     public AddComponentVariantPayload(
-        Data.ComponentVariant componentVariant,
-        Data.ComponentVariant reverseComponentVariant
+        ComponentVariant componentVariant,
+        ComponentVariant reverseComponentVariant
     )
     {
         VariantOfEdge = new ComponentVariantOfEdge(componentVariant);
@@ -31,4 +28,8 @@ public sealed class AddComponentVariantPayload
         : this(new[] { error })
     {
     }
+
+    public ComponentVariantOfEdge? VariantOfEdge { get; }
+    public ComponentVariantOfEdge? ReverseVariantOfEdge { get; }
+    public IReadOnlyCollection<AddComponentVariantError>? Errors { get; }
 }

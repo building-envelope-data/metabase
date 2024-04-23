@@ -1,19 +1,19 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.Data;
 using Metabase.Authorization;
+using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Users;
 
 public sealed class UserRepresentedInstitutionConnection
-    : ForkingConnection<Data.User, Data.InstitutionRepresentative,
+    : ForkingConnection<User, InstitutionRepresentative,
         PendingUserRepresentedInstitutionsByUserIdDataLoader, UserRepresentedInstitutionsByUserIdDataLoader,
         UserRepresentedInstitutionEdge>
 {
     public UserRepresentedInstitutionConnection(
-        Data.User subject,
+        User subject,
         bool pending
     )
         : base(
@@ -27,7 +27,7 @@ public sealed class UserRepresentedInstitutionConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager
     )
     {
         return InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(

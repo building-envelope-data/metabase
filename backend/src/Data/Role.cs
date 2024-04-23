@@ -1,7 +1,7 @@
+using System;
 using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Identity;
 using Guid = System.Guid;
-using System;
 
 namespace Metabase.Data;
 
@@ -16,6 +16,22 @@ public sealed class Role : IdentityRole<Guid>
             Enumerations.UserRole.ADMINISTRATOR,
             Enumerations.UserRole.VERIFIER
         });
+
+    // public ICollection<UserRole> UserRoles { get; } = new List<UserRole>();
+
+    public Role()
+    {
+    }
+
+    public Role(string name)
+        : base(name)
+    {
+    }
+
+    public Role(Enumerations.UserRole role)
+        : base(EnumToName(role))
+    {
+    }
 
     public static string EnumToName(Enumerations.UserRole role)
     {
@@ -35,21 +51,5 @@ public sealed class Role : IdentityRole<Guid>
             Verifier => Enumerations.UserRole.VERIFIER,
             _ => throw new ArgumentOutOfRangeException(nameof(name), $"Unknown name `{name}.`")
         };
-    }
-
-    // public ICollection<UserRole> UserRoles { get; } = new List<UserRole>();
-
-    public Role()
-    {
-    }
-
-    public Role(string name)
-        : base(name)
-    {
-    }
-
-    public Role(Enumerations.UserRole role)
-        : base(EnumToName(role))
-    {
     }
 }

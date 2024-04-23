@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Authorization;
@@ -9,9 +10,9 @@ namespace Metabase.Authorization;
 public static class CommonComponentAuthorization
 {
     internal static async Task<bool> IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-        Data.User user,
+        User user,
         Guid componentId,
-        Data.ApplicationDbContext context,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

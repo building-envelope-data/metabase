@@ -1,16 +1,13 @@
 using System.Collections.Generic;
+using Metabase.Data;
 using Metabase.GraphQl.Components;
 
 namespace Metabase.GraphQl.ComponentGeneralizations;
 
 public sealed class AddComponentGeneralizationPayload
 {
-    public ComponentGeneralizationOfEdge? GeneralizationOfEdge { get; }
-    public ComponentConcretizationOfEdge? ConcretizationOfEdge { get; }
-    public IReadOnlyCollection<AddComponentGeneralizationError>? Errors { get; }
-
     public AddComponentGeneralizationPayload(
-        Data.ComponentConcretizationAndGeneralization association
+        ComponentConcretizationAndGeneralization association
     )
     {
         GeneralizationOfEdge = new ComponentGeneralizationOfEdge(association);
@@ -30,4 +27,8 @@ public sealed class AddComponentGeneralizationPayload
         : this(new[] { error })
     {
     }
+
+    public ComponentGeneralizationOfEdge? GeneralizationOfEdge { get; }
+    public ComponentConcretizationOfEdge? ConcretizationOfEdge { get; }
+    public IReadOnlyCollection<AddComponentGeneralizationError>? Errors { get; }
 }

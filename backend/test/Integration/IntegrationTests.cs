@@ -5,19 +5,20 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
 using FluentAssertions;
 using IdentityModel.Client;
 using Json.Path;
-using TokenResponse = IdentityModel.Client.TokenResponse;
-using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 using NUnit.Framework;
 using Snapshooter;
-using System.Text.Json.Nodes;
+using TokenResponse = IdentityModel.Client.TokenResponse;
+using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
 
 namespace Metabase.Tests.Integration;
 
@@ -25,11 +26,9 @@ namespace Metabase.Tests.Integration;
 public abstract partial class IntegrationTests
     : IDisposable
 {
-    [GeneratedRegex("confirmationCode=(?<confirmationCode>\\w+)")]
-    private static partial Regex ConfirmationCodeRegex();
-
-    [GeneratedRegex("resetCode=(?<resetCode>\\w+)")]
-    private static partial Regex ResetCodeRegex();
+    public const string DefaultName = "John Doe";
+    public const string DefaultEmail = "john.doe@ise.fraunhofer.de";
+    public const string DefaultPassword = "aaaAAA123$!@";
 
     private static readonly JsonSerializerOptions _customJsonSerializerOptions =
         new()
@@ -39,14 +38,6 @@ public abstract partial class IntegrationTests
         };
 
     private bool _disposed;
-    protected CustomWebApplicationFactory Factory { get; }
-
-    protected CollectingEmailSender EmailSender => Factory.EmailSender;
-
-    protected HttpClient HttpClient { get; }
-    public const string DefaultName = "John Doe";
-    public const string DefaultEmail = "john.doe@ise.fraunhofer.de";
-    public const string DefaultPassword = "aaaAAA123$!@";
 
     protected IntegrationTests()
     {
@@ -54,12 +45,11 @@ public abstract partial class IntegrationTests
         HttpClient = CreateHttpClient();
     }
 
-    // https://docs.microsoft.com/en-us/dotnet/standard/managed-code
-    // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose
-    ~IntegrationTests()
-    {
-        Dispose(false);
-    }
+    protected CustomWebApplicationFactory Factory { get; }
+
+    protected CollectingEmailSender EmailSender => Factory.EmailSender;
+
+    protected HttpClient HttpClient { get; }
 
     public void Dispose()
     {
@@ -67,6 +57,19 @@ public abstract partial class IntegrationTests
         Dispose(true);
         // Suppress finalization.
         GC.SuppressFinalize(this);
+    }
+
+    [GeneratedRegex("confirmationCode=(?<confirmationCode>\\w+)")]
+    private static partial Regex ConfirmationCodeRegex();
+
+    [GeneratedRegex("resetCode=(?<resetCode>\\w+)")]
+    private static partial Regex ResetCodeRegex();
+
+    // https://docs.microsoft.com/en-us/dotnet/standard/managed-code
+    // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose
+    ~IntegrationTests()
+    {
+        Dispose(false);
     }
 
     protected virtual void Dispose(bool disposing)
@@ -571,13 +574,13 @@ public abstract partial class IntegrationTests
     protected static string Base64Encode(string text)
     {
         return Convert.ToBase64String(
-            System.Text.Encoding.UTF8.GetBytes(text)
+            Encoding.UTF8.GetBytes(text)
         );
     }
 
     protected static string Base64Decode(string text)
     {
-        return System.Text.Encoding.UTF8.GetString(
+        return Encoding.UTF8.GetString(
             Convert.FromBase64String(text)
         );
     }
@@ -631,10 +634,6 @@ public abstract partial class IntegrationTests
 
     private sealed class GraphQlRequest
     {
-        public string Query { get; }
-        public string? OperationName { get; }
-        public object? Variables { get; }
-
         public GraphQlRequest(
             string query,
             string? operationName,
@@ -645,5 +644,9 @@ public abstract partial class IntegrationTests
             OperationName = operationName;
             Variables = variables;
         }
+
+        public string Query { get; }
+        public string? OperationName { get; }
+        public object? Variables { get; }
     }
 }

@@ -4,8 +4,6 @@ namespace Metabase.GraphQl.Users;
 
 public sealed class ResetUserPasswordPayload
 {
-    public IReadOnlyCollection<ResetUserPasswordError>? Errors { get; }
-
     public ResetUserPasswordPayload()
     {
     }
@@ -23,4 +21,6 @@ public sealed class ResetUserPasswordPayload
         : this(new[] { error })
     {
     }
+
+    public IReadOnlyCollection<ResetUserPasswordError>? Errors { get; }
 }

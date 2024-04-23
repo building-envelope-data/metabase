@@ -1,12 +1,13 @@
 using HotChocolate.Data.Filters;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Databases;
 
 public sealed class DatabaseFilterType
-    : FilterInputType<Data.Database>
+    : FilterInputType<Database>
 {
     protected override void Configure(
-        IFilterInputTypeDescriptor<Data.Database> descriptor
+        IFilterInputTypeDescriptor<Database> descriptor
     )
     {
         descriptor.BindFieldsExplicitly();

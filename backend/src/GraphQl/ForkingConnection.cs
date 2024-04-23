@@ -4,19 +4,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
-using HotChocolate;
+using Metabase.Data;
 
 namespace Metabase.GraphQl;
 
 public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociationsByAssociateIdDataLoader,
     TOtherAssociationsByAssociateIdDataLoader, TEdge>
-    where TSubject : Data.IEntity
+    where TSubject : IEntity
     where TSomeAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
     where TOtherAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
-    protected TSubject Subject { get; }
-    private readonly bool _useFirstDataLoader;
     private readonly Func<TAssociation, TEdge> _createEdge;
+    private readonly bool _useFirstDataLoader;
 
     protected ForkingConnection(
         TSubject subject,
@@ -28,6 +27,8 @@ public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociation
         _useFirstDataLoader = useFirstDataLoader;
         _createEdge = createEdge;
     }
+
+    protected TSubject Subject { get; }
 
     public Task<IEnumerable<TEdge>> GetEdgesAsync(
         TSomeAssociationsByAssociateIdDataLoader someDataLoader,

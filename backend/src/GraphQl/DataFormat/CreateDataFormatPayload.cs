@@ -1,10 +1,12 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.DataFormats;
 
 public sealed class CreateDataFormatPayload
     : DataFormatPayload<CreateDataFormatError>
 {
     public CreateDataFormatPayload(
-        Data.DataFormat standard
+        DataFormat standard
     )
         : base(standard)
     {

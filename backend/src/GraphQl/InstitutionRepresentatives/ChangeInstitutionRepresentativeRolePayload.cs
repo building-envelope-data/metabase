@@ -1,17 +1,14 @@
 using System.Collections.Generic;
-using Metabase.GraphQl.Users;
+using Metabase.Data;
 using Metabase.GraphQl.Institutions;
+using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives;
 
 public sealed class ChangeInstitutionRepresentativeRolePayload
 {
-    public UserRepresentedInstitutionEdge? RepresentedInstitutionEdge { get; }
-    public InstitutionRepresentativeEdge? InstitutionRepresentativeEdge { get; }
-    public IReadOnlyCollection<ChangeInstitutionRepresentativeRoleError>? Errors { get; }
-
     public ChangeInstitutionRepresentativeRolePayload(
-        Data.InstitutionRepresentative institutionRepresentative
+        InstitutionRepresentative institutionRepresentative
     )
     {
         RepresentedInstitutionEdge = new UserRepresentedInstitutionEdge(institutionRepresentative);
@@ -31,4 +28,8 @@ public sealed class ChangeInstitutionRepresentativeRolePayload
         : this(new[] { error })
     {
     }
+
+    public UserRepresentedInstitutionEdge? RepresentedInstitutionEdge { get; }
+    public InstitutionRepresentativeEdge? InstitutionRepresentativeEdge { get; }
+    public IReadOnlyCollection<ChangeInstitutionRepresentativeRoleError>? Errors { get; }
 }

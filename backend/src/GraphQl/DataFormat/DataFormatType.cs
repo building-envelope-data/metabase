@@ -4,16 +4,17 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.DataFormats;
 
 public sealed class DataFormatType
-    : EntityType<Data.DataFormat, DataFormatByIdDataLoader>
+    : EntityType<DataFormat, DataFormatByIdDataLoader>
 {
     protected override void Configure(
-        IObjectTypeDescriptor<Data.DataFormat> descriptor
+        IObjectTypeDescriptor<DataFormat> descriptor
     )
     {
         base.Configure(descriptor);
@@ -28,7 +29,7 @@ public sealed class DataFormatType
             .Type<NonNullType<ObjectType<DataFormatManagerEdge>>>()
             .Resolve(context =>
                 new DataFormatManagerEdge(
-                    context.Parent<Data.DataFormat>()
+                    context.Parent<DataFormat>()
                 )
             );
         descriptor
@@ -45,10 +46,10 @@ public sealed class DataFormatType
     private sealed class DataFormatResolvers
     {
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
-            [Parent] Data.DataFormat dataFormat,
+            [Parent] DataFormat dataFormat,
             ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+            ApplicationDbContext context,
             CancellationToken cancellationToken
         )
         {

@@ -1,10 +1,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using Metabase.Data;
 using Guid = System.Guid;
 
 namespace Metabase.GraphQl.DataFormats;
@@ -16,14 +15,14 @@ public sealed class DataFormatQueries
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Data.DataFormat> GetDataFormats(
-        Data.ApplicationDbContext context
+    public IQueryable<DataFormat> GetDataFormats(
+        ApplicationDbContext context
     )
     {
         return context.DataFormats;
     }
 
-    public Task<Data.DataFormat?> GetDataFormatAsync(
+    public Task<DataFormat?> GetDataFormatAsync(
         Guid uuid,
         DataFormatByIdDataLoader dataFormatById,
         CancellationToken cancellationToken

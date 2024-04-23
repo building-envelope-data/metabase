@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,11 +17,9 @@ namespace Metabase.Controllers;
 // Keep in sync with `PersonalUserDataController`.
 public sealed class UserinfoController : Controller
 {
-    private readonly record struct Address(string Formatted);
+    private readonly UserManager<User> _userManager;
 
-    private readonly UserManager<Data.User> _userManager;
-
-    public UserinfoController(UserManager<Data.User> userManager)
+    public UserinfoController(UserManager<User> userManager)
     {
         _userManager = userManager;
     }
@@ -98,4 +97,6 @@ public sealed class UserinfoController : Controller
         // can be found here: http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
         return Ok(claims);
     }
+
+    private readonly record struct Address(string Formatted);
 }

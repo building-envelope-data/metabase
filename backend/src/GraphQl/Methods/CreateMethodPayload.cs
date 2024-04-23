@@ -1,10 +1,12 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.Methods;
 
 public sealed class CreateMethodPayload
     : MethodPayload<CreateMethodError>
 {
     public CreateMethodPayload(
-        Data.Method method
+        Method method
     )
         : base(method)
     {

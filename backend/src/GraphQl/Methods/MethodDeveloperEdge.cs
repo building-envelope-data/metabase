@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
+using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
@@ -28,7 +29,7 @@ public sealed class MethodDeveloperEdge
         _userMethodDeveloperEdge = edge;
     }
 
-    public async Task<Data.IStakeholder> GetNodeAsync(
+    public async Task<IStakeholder> GetNodeAsync(
         InstitutionByIdDataLoader institutionById,
         UserByIdDataLoader userById,
         CancellationToken cancellationToken
@@ -47,8 +48,8 @@ public sealed class MethodDeveloperEdge
     [UseUserManager]
     public async Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -67,8 +68,8 @@ public sealed class MethodDeveloperEdge
     [UseUserManager]
     public async Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

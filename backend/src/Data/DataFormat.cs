@@ -7,6 +7,26 @@ namespace Metabase.Data;
 public sealed class DataFormat
     : Entity
 {
+    public DataFormat()
+    {
+        // Parameterless constructor is needed by HotChocolate's `UseProjection`
+    }
+
+    public DataFormat(
+        string name,
+        string? extension,
+        string description,
+        string mediaType,
+        Uri? schemaLocator
+    )
+    {
+        Name = name;
+        Extension = extension;
+        Description = description;
+        MediaType = mediaType;
+        SchemaLocator = schemaLocator;
+    }
+
     [Required] [MinLength(1)] public string Name { get; private set; }
 
     [MinLength(1)] public string? Extension { get; private set; }
@@ -30,28 +50,6 @@ public sealed class DataFormat
 
     [InverseProperty(nameof(Institution.ManagedDataFormats))]
     public Institution? Manager { get; set; }
-
-#nullable disable
-    public DataFormat()
-    {
-        // Parameterless constructor is needed by HotChocolate's `UseProjection`
-    }
-#nullable enable
-
-    public DataFormat(
-        string name,
-        string? extension,
-        string description,
-        string mediaType,
-        Uri? schemaLocator
-    )
-    {
-        Name = name;
-        Extension = extension;
-        Description = description;
-        MediaType = mediaType;
-        SchemaLocator = schemaLocator;
-    }
 
     public void Update(
         string name,

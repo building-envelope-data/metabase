@@ -3,18 +3,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentManufacturerConnection
-    : ForkingConnection<Data.Component, Data.ComponentManufacturer,
+    : ForkingConnection<Component, ComponentManufacturer,
         PendingComponentManufacturersByComponentIdDataLoader, ComponentManufacturersByComponentIdDataLoader,
         ComponentManufacturerEdge>
 {
     public ComponentManufacturerConnection(
-        Data.Component subject,
+        Component subject,
         bool pending
     )
         : base(
@@ -28,8 +29,8 @@ public sealed class ComponentManufacturerConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

@@ -1,12 +1,13 @@
 using HotChocolate.Types;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Stakeholders;
 
 public sealed class StakeholderType
-    : InterfaceType<Data.IStakeholder>
+    : InterfaceType<IStakeholder>
 {
-    protected override void Configure(IInterfaceTypeDescriptor<Data.IStakeholder> descriptor)
+    protected override void Configure(IInterfaceTypeDescriptor<IStakeholder> descriptor)
     {
-        descriptor.Name(nameof(Data.IStakeholder)[1..]);
+        descriptor.Name(nameof(IStakeholder)[1..]);
     }
 }

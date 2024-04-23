@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
+using Metabase.Data;
 using Microsoft.EntityFrameworkCore;
 using Guid = System.Guid;
 
@@ -11,16 +12,16 @@ namespace Metabase.GraphQl.Entities;
 
 public abstract class EntityByIdDataLoader<TEntity>
     : BatchDataLoader<Guid, TEntity?>
-    where TEntity : class, Data.IEntity
+    where TEntity : class, IEntity
 {
-    private readonly IDbContextFactory<Data.ApplicationDbContext> _dbContextFactory;
-    private readonly Func<Data.ApplicationDbContext, DbSet<TEntity>> _getQueryable;
+    private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
+    private readonly Func<ApplicationDbContext, DbSet<TEntity>> _getQueryable;
 
     protected EntityByIdDataLoader(
         IBatchScheduler batchScheduler,
         DataLoaderOptions options,
-        IDbContextFactory<Data.ApplicationDbContext> dbContextFactory,
-        Func<Data.ApplicationDbContext, DbSet<TEntity>> getQueryable
+        IDbContextFactory<ApplicationDbContext> dbContextFactory,
+        Func<ApplicationDbContext, DbSet<TEntity>> getQueryable
     )
         : base(batchScheduler, options)
     {

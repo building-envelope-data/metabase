@@ -3,19 +3,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
-
 
 namespace Metabase.GraphQl.Methods;
 
 public sealed class UserMethodDeveloperEdge
-    : Edge<Data.User, UserByIdDataLoader>
+    : Edge<User, UserByIdDataLoader>
 {
-    private readonly Data.UserMethodDeveloper _association;
+    private readonly UserMethodDeveloper _association;
 
     public UserMethodDeveloperEdge(
-        Data.UserMethodDeveloper association
+        UserMethodDeveloper association
     )
         : base(association.UserId)
     {
@@ -25,7 +25,7 @@ public sealed class UserMethodDeveloperEdge
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager
     )
     {
         return UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(
@@ -38,8 +38,8 @@ public sealed class UserMethodDeveloperEdge
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

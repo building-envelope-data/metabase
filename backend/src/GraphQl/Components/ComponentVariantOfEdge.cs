@@ -3,18 +3,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentVariantOfEdge
-    : Edge<Data.Component, ComponentByIdDataLoader>
+    : Edge<Component, ComponentByIdDataLoader>
 {
-    private readonly Data.ComponentVariant _association;
+    private readonly ComponentVariant _association;
 
     public ComponentVariantOfEdge(
-        Data.ComponentVariant association
+        ComponentVariant association
     )
         : base(association.OfComponentId)
     {
@@ -24,8 +25,8 @@ public sealed class ComponentVariantOfEdge
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

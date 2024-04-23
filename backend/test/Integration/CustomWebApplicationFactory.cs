@@ -5,13 +5,14 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Metabase.Data;
+using Metabase.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Metabase.Tests.Integration;
 
@@ -20,16 +21,16 @@ public sealed class CustomWebApplicationFactory
 {
     private bool _disposed;
 
-    public CollectingEmailSender EmailSender { get; }
-
     public CustomWebApplicationFactory()
     {
         EmailSender = new CollectingEmailSender();
         Do(
             services =>
-                SetUpDatabase(services.GetRequiredService<Data.ApplicationDbContext>())
+                SetUpDatabase(services.GetRequiredService<ApplicationDbContext>())
         );
     }
+
+    public CollectingEmailSender EmailSender { get; }
 
     private void Do(Action<IServiceProvider> what)
     {
@@ -83,11 +84,11 @@ public sealed class CustomWebApplicationFactory
                 // Configure `IEmailSender`
                 var emailSenderServiceDescriptor =
                     serviceCollection.SingleOrDefault(d =>
-                        d.ServiceType == typeof(Services.IEmailSender)
+                        d.ServiceType == typeof(IEmailSender)
                     );
                 if (emailSenderServiceDescriptor is not null) serviceCollection.Remove(emailSenderServiceDescriptor);
 
-                serviceCollection.AddTransient<Services.IEmailSender>(_ => EmailSender);
+                serviceCollection.AddTransient<IEmailSender>(_ => EmailSender);
             }
         );
     }
@@ -108,7 +109,7 @@ public sealed class CustomWebApplicationFactory
     {
         await DoAsync(
             async services =>
-                await Data.DbSeeder.DoAsync(services).ConfigureAwait(false)
+                await DbSeeder.DoAsync(services).ConfigureAwait(false)
         ).ConfigureAwait(false);
     }
 
@@ -127,7 +128,7 @@ public sealed class CustomWebApplicationFactory
                 services =>
                 {
                     services
-                        .GetRequiredService<Data.ApplicationDbContext>()
+                        .GetRequiredService<ApplicationDbContext>()
                         .Database
                         .EnsureDeleted();
                 }

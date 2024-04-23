@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
+using Metabase.Data;
 
 namespace Metabase.GraphQl;
 
 public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>
-    where TSubject : Data.IEntity
+    where TSubject : IEntity
     where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
-    protected TSubject Subject { get; }
     private readonly Func<TAssociation, TEdge> _createEdge;
 
     protected Connection(
@@ -22,6 +22,8 @@ public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociat
         Subject = subject;
         _createEdge = createEdge;
     }
+
+    protected TSubject Subject { get; }
 
     public async Task<IEnumerable<TEdge>> GetEdgesAsync(
         TAssociationsByAssociateIdDataLoader dataLoader,

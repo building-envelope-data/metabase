@@ -1,10 +1,12 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.Databases;
 
 public sealed class CreateDatabasePayload
     : DatabasePayload<CreateDatabaseError>
 {
     public CreateDatabasePayload(
-        Data.Database database
+        Database database
     )
         : base(database)
     {

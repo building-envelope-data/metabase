@@ -1,10 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.NUnit;
 using NUnit.Framework;
+using Snapshooter.NUnit;
 
 namespace Metabase.Tests.Integration.GraphQl.Users;
 
@@ -100,10 +100,7 @@ public sealed class DeletePersonalUserDataTests
                 ["password"] = password
             }
         ).ConfigureAwait(false);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
         var response = await GetUser(userId).ConfigureAwait(false);
         // Assert
         Snapshot.Match(

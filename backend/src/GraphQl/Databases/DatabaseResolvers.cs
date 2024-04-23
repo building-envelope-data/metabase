@@ -1,17 +1,20 @@
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Text.Json;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using GraphQL;
 using HotChocolate;
 using HotChocolate.Resolvers;
-using Microsoft.AspNetCore.Http;
 using Metabase.Authorization;
-using System.Net;
+using Metabase.Data;
+using Metabase.GraphQl.DataX;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace Metabase.GraphQl.Databases;
 
@@ -72,61 +75,61 @@ public sealed class DatabaseResolvers
 {
     private const string IgsdbUrl = "https://igsdb-v2.herokuapp.com/graphql/";
 
-    private static readonly string[] _dataFileNames = new[]
+    private static readonly string[] _dataFileNames =
     {
         "DataFields.graphql",
         "Data.graphql"
     };
 
-    private static readonly string[] _opticalDataFileNames = new[]
+    private static readonly string[] _opticalDataFileNames =
     {
         "DataFields.graphql",
         "OpticalDataFields.graphql",
         "OpticalData.graphql"
     };
 
-    private static readonly string[] _hygrothermalDataFileNames = new[]
+    private static readonly string[] _hygrothermalDataFileNames =
     {
         "DataFields.graphql",
         "HygrothermalDataFields.graphql",
         "HygrothermalData.graphql"
     };
 
-    private static readonly string[] _calorimetricDataFileNames = new[]
+    private static readonly string[] _calorimetricDataFileNames =
     {
         "DataFields.graphql",
         "CalorimetricDataFields.graphql",
         "CalorimetricData.graphql"
     };
 
-    private static readonly string[] _photovoltaicDataFileNames = new[]
+    private static readonly string[] _photovoltaicDataFileNames =
     {
         "DataFields.graphql",
         "PhotovoltaicDataFields.graphql",
         "PhotovoltaicData.graphql"
     };
 
-    private static readonly string[] _igsdbAllDataFileNames = new[]
+    private static readonly string[] _igsdbAllDataFileNames =
     {
         "DataFields.graphql",
         "AllDataX.graphql"
     };
 
-    private static readonly string[] _allDataFileNames = new[]
+    private static readonly string[] _allDataFileNames =
     {
         "DataFields.graphql",
         "PageInfoFields.graphql",
         "AllData.graphql"
     };
 
-    private static readonly string[] _igsdbAllOpticalDataFileNames = new[]
+    private static readonly string[] _igsdbAllOpticalDataFileNames =
     {
         "DataFields.graphql",
         "OpticalDataFields.graphql",
         "AllOpticalDataX.graphql"
     };
 
-    private static readonly string[] _allOpticalDataFileNames = new[]
+    private static readonly string[] _allOpticalDataFileNames =
     {
         "DataFields.graphql",
         "OpticalDataFields.graphql",
@@ -134,7 +137,7 @@ public sealed class DatabaseResolvers
         "AllOpticalData.graphql"
     };
 
-    private static readonly string[] _allHygrothermalDataFileNames = new[]
+    private static readonly string[] _allHygrothermalDataFileNames =
     {
         "DataFields.graphql",
         "HygrothermalDataFields.graphql",
@@ -142,7 +145,7 @@ public sealed class DatabaseResolvers
         "AllHygrothermalData.graphql"
     };
 
-    private static readonly string[] _allCalorimetricDataFileNames = new[]
+    private static readonly string[] _allCalorimetricDataFileNames =
     {
         "DataFields.graphql",
         "CalorimetricDataFields.graphql",
@@ -150,7 +153,7 @@ public sealed class DatabaseResolvers
         "AllCalorimetricData.graphql"
     };
 
-    private static readonly string[] _allPhotovoltaicDataFileNames = new[]
+    private static readonly string[] _allPhotovoltaicDataFileNames =
     {
         "DataFields.graphql",
         "PhotovoltaicDataFields.graphql",
@@ -158,27 +161,27 @@ public sealed class DatabaseResolvers
         "AllPhotovoltaicData.graphql"
     };
 
-    private static readonly string[] _hasDataFileNames = new[]
+    private static readonly string[] _hasDataFileNames =
     {
         "HasData.graphql"
     };
 
-    private static readonly string[] _hasOpticalDataFileNames = new[]
+    private static readonly string[] _hasOpticalDataFileNames =
     {
         "HasOpticalData.graphql"
     };
 
-    private static readonly string[] _hasCalorimetricDataFileNames = new[]
+    private static readonly string[] _hasCalorimetricDataFileNames =
     {
         "HasCalorimetricData.graphql"
     };
 
-    private static readonly string[] _hasHygrothermalDataFileNames = new[]
+    private static readonly string[] _hasHygrothermalDataFileNames =
     {
         "HasHygrothermalData.graphql"
     };
 
-    private static readonly string[] _hasPhotovoltaicDataFileNames = new[]
+    private static readonly string[] _hasPhotovoltaicDataFileNames =
     {
         "HasPhotovoltaicData.graphql"
     };
@@ -196,10 +199,10 @@ public sealed class DatabaseResolvers
     }
 
     public Task<bool> GetCanCurrentUserUpdateNodeAsync(
-        [Parent] Data.Database database,
+        [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -208,10 +211,10 @@ public sealed class DatabaseResolvers
     }
 
     public Task<bool> GetCanCurrentUserVerifyNodeAsync(
-        [Parent] Data.Database database,
+        [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -219,13 +222,8 @@ public sealed class DatabaseResolvers
             cancellationToken);
     }
 
-    private sealed class DataData
-    {
-        public DataX.Data Data { get; set; } = default!;
-    }
-
-    public async Task<DataX.IData?> GetDataAsync(
-        [Parent] Data.Database database,
+    public async Task<IData?> GetDataAsync(
+        [Parent] Database database,
         Guid id,
         DateTime? timestamp,
         string? locale,
@@ -236,7 +234,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<DataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _dataFileNames
                         ).ConfigureAwait(false),
@@ -255,13 +253,8 @@ public sealed class DatabaseResolvers
             )?.Data;
     }
 
-    private sealed class OpticalDataData
-    {
-        public DataX.OpticalData OpticalData { get; set; } = default!;
-    }
-
-    public async Task<DataX.OpticalData?> GetOpticalDataAsync(
-        [Parent] Data.Database database,
+    public async Task<OpticalData?> GetOpticalDataAsync(
+        [Parent] Database database,
         Guid id,
         DateTime? timestamp,
         string? locale,
@@ -272,7 +265,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<OpticalDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _opticalDataFileNames
                         ).ConfigureAwait(false),
@@ -291,13 +284,8 @@ public sealed class DatabaseResolvers
             )?.OpticalData;
     }
 
-    private sealed class HygrothermalDataData
-    {
-        public DataX.HygrothermalData HygrothermalData { get; set; } = default!;
-    }
-
-    public async Task<DataX.HygrothermalData?> GetHygrothermalDataAsync(
-        [Parent] Data.Database database,
+    public async Task<HygrothermalData?> GetHygrothermalDataAsync(
+        [Parent] Database database,
         Guid id,
         DateTime? timestamp,
         string? locale,
@@ -308,7 +296,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<HygrothermalDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _hygrothermalDataFileNames
                         ).ConfigureAwait(false),
@@ -327,13 +315,8 @@ public sealed class DatabaseResolvers
             )?.HygrothermalData;
     }
 
-    private sealed class CalorimetricDataData
-    {
-        public DataX.CalorimetricData CalorimetricData { get; set; } = default!;
-    }
-
-    public async Task<DataX.CalorimetricData?> GetCalorimetricDataAsync(
-        [Parent] Data.Database database,
+    public async Task<CalorimetricData?> GetCalorimetricDataAsync(
+        [Parent] Database database,
         Guid id,
         DateTime? timestamp,
         string? locale,
@@ -344,7 +327,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<CalorimetricDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _calorimetricDataFileNames
                         ).ConfigureAwait(false),
@@ -363,13 +346,8 @@ public sealed class DatabaseResolvers
             )?.CalorimetricData;
     }
 
-    private sealed class PhotovoltaicDataData
-    {
-        public DataX.PhotovoltaicData PhotovoltaicData { get; set; } = default!;
-    }
-
-    public async Task<DataX.PhotovoltaicData?> GetPhotovoltaicDataAsync(
-        [Parent] Data.Database database,
+    public async Task<PhotovoltaicData?> GetPhotovoltaicDataAsync(
+        [Parent] Database database,
         Guid id,
         DateTime? timestamp,
         string? locale,
@@ -380,7 +358,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<PhotovoltaicDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _photovoltaicDataFileNames
                         ).ConfigureAwait(false),
@@ -399,14 +377,9 @@ public sealed class DatabaseResolvers
             )?.PhotovoltaicData;
     }
 
-    private sealed class AllDataData
-    {
-        public DataX.DataConnection AllData { get; set; } = default!;
-    }
-
-    public async Task<DataX.DataConnection?> GetAllDataAsync(
-        [Parent] Data.Database database,
-        DataX.DataPropositionInput? where,
+    public async Task<DataConnection?> GetAllDataAsync(
+        [Parent] Database database,
+        DataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         uint? first,
@@ -420,7 +393,7 @@ public sealed class DatabaseResolvers
     {
         var dataConnection = (await QueryDatabase<AllDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             database.Locator.AbsoluteUri == IgsdbUrl
                                 ? _igsdbAllDataFileNames
@@ -444,7 +417,7 @@ public sealed class DatabaseResolvers
             )?.AllData;
         return dataConnection is null
             ? null
-            : new DataX.DataConnection(
+            : new DataConnection(
                 dataConnection.Edges,
                 dataConnection.Nodes,
                 dataConnection.TotalCount,
@@ -452,25 +425,20 @@ public sealed class DatabaseResolvers
             );
     }
 
-    private static DataX.DataPropositionInput? RewriteDataPropositionInput(
-        DataX.DataPropositionInput? where,
-        Data.Database database
+    private static DataPropositionInput? RewriteDataPropositionInput(
+        DataPropositionInput? where,
+        Database database
     )
     {
         return database.Locator.AbsoluteUri == IgsdbUrl
-            ? where ?? new DataX.DataPropositionInput(null, null, null, null, null, null, null, null, null, null,
+            ? where ?? new DataPropositionInput(null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null)
             : where;
     }
 
-    private sealed class AllOpticalDataData
-    {
-        public DataX.OpticalDataConnection AllOpticalData { get; set; } = default!;
-    }
-
-    public async Task<DataX.OpticalDataConnection?> GetAllOpticalDataAsync(
-        [Parent] Data.Database database,
-        DataX.OpticalDataPropositionInput? where,
+    public async Task<OpticalDataConnection?> GetAllOpticalDataAsync(
+        [Parent] Database database,
+        OpticalDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         uint? first,
@@ -484,7 +452,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<AllOpticalDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             database.Locator.AbsoluteUri == IgsdbUrl
                                 ? _igsdbAllOpticalDataFileNames
@@ -508,25 +476,20 @@ public sealed class DatabaseResolvers
             )?.AllOpticalData;
     }
 
-    private static DataX.OpticalDataPropositionInput? RewriteOpticalDataPropositionInput(
-        DataX.OpticalDataPropositionInput? where,
-        Data.Database database
+    private static OpticalDataPropositionInput? RewriteOpticalDataPropositionInput(
+        OpticalDataPropositionInput? where,
+        Database database
     )
     {
         return database.Locator.AbsoluteUri == IgsdbUrl
-            ? where ?? new DataX.OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null,
+            ? where ?? new OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null,
                 null, null, null)
             : where;
     }
 
-    private sealed class AllHygrothermalDataData
-    {
-        public DataX.HygrothermalDataConnection AllHygrothermalData { get; set; } = default!;
-    }
-
-    public async Task<DataX.HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
-        [Parent] Data.Database database,
-        DataX.HygrothermalDataPropositionInput? where,
+    public async Task<HygrothermalDataConnection?> GetAllHygrothermalDataAsync(
+        [Parent] Database database,
+        HygrothermalDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         uint? first,
@@ -540,7 +503,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<AllHygrothermalDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _allHygrothermalDataFileNames
                         ).ConfigureAwait(false),
@@ -563,14 +526,9 @@ public sealed class DatabaseResolvers
             )?.AllHygrothermalData;
     }
 
-    private sealed class AllCalorimetricDataData
-    {
-        public DataX.CalorimetricDataConnection AllCalorimetricData { get; set; } = default!;
-    }
-
-    public async Task<DataX.CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
-        [Parent] Data.Database database,
-        DataX.CalorimetricDataPropositionInput? where,
+    public async Task<CalorimetricDataConnection?> GetAllCalorimetricDataAsync(
+        [Parent] Database database,
+        CalorimetricDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         uint? first,
@@ -584,7 +542,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<AllCalorimetricDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _allCalorimetricDataFileNames
                         ).ConfigureAwait(false),
@@ -607,14 +565,9 @@ public sealed class DatabaseResolvers
             )?.AllCalorimetricData;
     }
 
-    private sealed class AllPhotovoltaicDataData
-    {
-        public DataX.PhotovoltaicDataConnection AllPhotovoltaicData { get; set; } = default!;
-    }
-
-    public async Task<DataX.PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
-        [Parent] Data.Database database,
-        DataX.PhotovoltaicDataPropositionInput? where,
+    public async Task<PhotovoltaicDataConnection?> GetAllPhotovoltaicDataAsync(
+        [Parent] Database database,
+        PhotovoltaicDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         uint? first,
@@ -628,7 +581,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<AllPhotovoltaicDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _allPhotovoltaicDataFileNames
                         ).ConfigureAwait(false),
@@ -651,14 +604,9 @@ public sealed class DatabaseResolvers
             )?.AllPhotovoltaicData;
     }
 
-    private sealed class HasDataData
-    {
-        public bool HasData { get; set; }
-    }
-
     public async Task<bool?> GetHasDataAsync(
-        [Parent] Data.Database database,
-        DataX.DataPropositionInput? where,
+        [Parent] Database database,
+        DataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         [Service] IHttpContextAccessor httpContextAccessor,
@@ -668,7 +616,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<HasDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _hasDataFileNames
                         ).ConfigureAwait(false),
@@ -687,14 +635,9 @@ public sealed class DatabaseResolvers
             )?.HasData;
     }
 
-    private sealed class HasOpticalDataData
-    {
-        public bool HasOpticalData { get; set; }
-    }
-
     public async Task<bool?> GetHasOpticalDataAsync(
-        [Parent] Data.Database database,
-        DataX.OpticalDataPropositionInput? where,
+        [Parent] Database database,
+        OpticalDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         [Service] IHttpContextAccessor httpContextAccessor,
@@ -704,7 +647,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<HasOpticalDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _hasOpticalDataFileNames
                         ).ConfigureAwait(false),
@@ -723,14 +666,9 @@ public sealed class DatabaseResolvers
             )?.HasOpticalData;
     }
 
-    private sealed class HasCalorimetricDataData
-    {
-        public bool HasCalorimetricData { get; set; }
-    }
-
     public async Task<bool?> GetHasCalorimetricDataAsync(
-        [Parent] Data.Database database,
-        DataX.CalorimetricDataPropositionInput? where,
+        [Parent] Database database,
+        CalorimetricDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         [Service] IHttpContextAccessor httpContextAccessor,
@@ -740,7 +678,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<HasCalorimetricDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _hasCalorimetricDataFileNames
                         ).ConfigureAwait(false),
@@ -759,14 +697,9 @@ public sealed class DatabaseResolvers
             )?.HasCalorimetricData;
     }
 
-    private sealed class HasHygrothermalDataData
-    {
-        public bool HasHygrothermalData { get; set; }
-    }
-
     public async Task<bool?> GetHasHygrothermalDataAsync(
-        [Parent] Data.Database database,
-        DataX.HygrothermalDataPropositionInput? where,
+        [Parent] Database database,
+        HygrothermalDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         [Service] IHttpContextAccessor httpContextAccessor,
@@ -776,7 +709,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<HasHygrothermalDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _hasHygrothermalDataFileNames
                         ).ConfigureAwait(false),
@@ -795,14 +728,9 @@ public sealed class DatabaseResolvers
             )?.HasHygrothermalData;
     }
 
-    private sealed class HasPhotovoltaicDataData
-    {
-        public bool HasPhotovoltaicData { get; set; }
-    }
-
     public async Task<bool?> GetHasPhotovoltaicDataAsync(
-        [Parent] Data.Database database,
-        DataX.PhotovoltaicDataPropositionInput? where,
+        [Parent] Database database,
+        PhotovoltaicDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
         [Service] IHttpContextAccessor httpContextAccessor,
@@ -812,7 +740,7 @@ public sealed class DatabaseResolvers
     {
         return (await QueryDatabase<HasPhotovoltaicDataData>(
                     database,
-                    new GraphQL.GraphQLRequest(
+                    new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             _hasPhotovoltaicDataFileNames
                         ).ConfigureAwait(false),
@@ -834,8 +762,8 @@ public sealed class DatabaseResolvers
     private async
         Task<TGraphQlResponse?>
         QueryDatabase<TGraphQlResponse>(
-            Data.Database database,
-            GraphQL.GraphQLRequest request,
+            Database database,
+            GraphQLRequest request,
             IHttpContextAccessor httpContextAccessor,
             IResolverContext resolverContext,
             CancellationToken cancellationToken
@@ -921,5 +849,80 @@ public sealed class DatabaseResolvers
             );
             return null;
         }
+    }
+
+    private sealed class DataData
+    {
+        public DataX.Data Data { get; } = default!;
+    }
+
+    private sealed class OpticalDataData
+    {
+        public OpticalData OpticalData { get; } = default!;
+    }
+
+    private sealed class HygrothermalDataData
+    {
+        public HygrothermalData HygrothermalData { get; } = default!;
+    }
+
+    private sealed class CalorimetricDataData
+    {
+        public CalorimetricData CalorimetricData { get; } = default!;
+    }
+
+    private sealed class PhotovoltaicDataData
+    {
+        public PhotovoltaicData PhotovoltaicData { get; } = default!;
+    }
+
+    private sealed class AllDataData
+    {
+        public DataConnection AllData { get; } = default!;
+    }
+
+    private sealed class AllOpticalDataData
+    {
+        public OpticalDataConnection AllOpticalData { get; } = default!;
+    }
+
+    private sealed class AllHygrothermalDataData
+    {
+        public HygrothermalDataConnection AllHygrothermalData { get; } = default!;
+    }
+
+    private sealed class AllCalorimetricDataData
+    {
+        public CalorimetricDataConnection AllCalorimetricData { get; } = default!;
+    }
+
+    private sealed class AllPhotovoltaicDataData
+    {
+        public PhotovoltaicDataConnection AllPhotovoltaicData { get; } = default!;
+    }
+
+    private sealed class HasDataData
+    {
+        public bool HasData { get; }
+    }
+
+    private sealed class HasOpticalDataData
+    {
+        public bool HasOpticalData { get; }
+    }
+
+    private sealed class HasCalorimetricDataData
+    {
+        public bool HasCalorimetricData { get; }
+    }
+
+    private sealed class HasHygrothermalDataData
+    {
+        public bool HasHygrothermalData { get; }
+    }
+
+    private sealed class HasPhotovoltaicDataData
+    {
+        public bool HasPhotovoltaicData { get; }
     }
 }

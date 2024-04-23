@@ -7,15 +7,10 @@ namespace Metabase.Data;
 public abstract class Entity
     : IEntity
 {
-    public Guid Id { get; private set; }
+    public Guid Id { get; }
 
     // [NotMapped]
     // public Guid Uuid { get => Id; }
 
-    public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
-
-    protected Entity(
-    )
-    {
-    }
+    public uint Version { get; } // https://www.npgsql.org/efcore/modeling/concurrency.html
 }

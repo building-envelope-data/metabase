@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Metabase.Enumerations;
 
 namespace Metabase.Data;
 
@@ -9,7 +10,27 @@ public sealed class Institution
     : Entity,
         IStakeholder
 {
-    [Required] [MinLength(1)] public string Name { get; private set; }
+    public Institution()
+    {
+        // Parameterless constructor is needed by HotChocolate's `UseProjection`
+    }
+
+    public Institution(
+        string name,
+        string? abbreviation,
+        string description,
+        Uri? websiteLocator,
+        string? publicKey,
+        InstitutionState state
+    )
+    {
+        Name = name;
+        Abbreviation = abbreviation;
+        Description = description;
+        WebsiteLocator = websiteLocator;
+        PublicKey = publicKey;
+        State = state;
+    }
 
     [MinLength(1)] public string? Abbreviation { get; private set; }
 
@@ -19,7 +40,7 @@ public sealed class Institution
 
     [MinLength(1)] public string? PublicKey { get; private set; }
 
-    [Required] public Enumerations.InstitutionState State { get; private set; }
+    [Required] public InstitutionState State { get; private set; }
 
     public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } =
         new List<InstitutionMethodDeveloper>();
@@ -52,30 +73,7 @@ public sealed class Institution
         new List<InstitutionRepresentative>();
 
     public ICollection<User> Representatives { get; } = new List<User>();
-
-#nullable disable
-    public Institution()
-    {
-        // Parameterless constructor is needed by HotChocolate's `UseProjection`
-    }
-#nullable enable
-
-    public Institution(
-        string name,
-        string? abbreviation,
-        string description,
-        Uri? websiteLocator,
-        string? publicKey,
-        Enumerations.InstitutionState state
-    )
-    {
-        Name = name;
-        Abbreviation = abbreviation;
-        Description = description;
-        WebsiteLocator = websiteLocator;
-        PublicKey = publicKey;
-        State = state;
-    }
+    [Required] [MinLength(1)] public string Name { get; private set; }
 
     public void Update(
         string name,
@@ -94,6 +92,6 @@ public sealed class Institution
 
     public void Verify()
     {
-        State = Enumerations.InstitutionState.VERIFIED;
+        State = InstitutionState.VERIFIED;
     }
 }

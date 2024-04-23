@@ -1,17 +1,19 @@
+using Metabase.Data;
+using Metabase.Enumerations;
 using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionRepresentativeEdge
-    : Edge<Data.User, UserByIdDataLoader>
+    : Edge<User, UserByIdDataLoader>
 {
-    public Enumerations.InstitutionRepresentativeRole Role { get; }
-
     public InstitutionRepresentativeEdge(
-        Data.InstitutionRepresentative association
+        InstitutionRepresentative association
     )
         : base(association.UserId)
     {
         Role = association.Role;
     }
+
+    public InstitutionRepresentativeRole Role { get; }
 }

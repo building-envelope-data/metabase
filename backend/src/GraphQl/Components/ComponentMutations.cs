@@ -7,6 +7,8 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Common;
 using Metabase.GraphQl.Users;
@@ -19,12 +21,12 @@ namespace Metabase.GraphQl.Components;
 public sealed class ComponentMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<CreateComponentPayload> CreateComponentAsync(
         CreateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -59,7 +61,7 @@ public sealed class ComponentMutations
                 )
             );
 
-        var component = new Data.Component(
+        var component = new Component(
             input.Name,
             input.Abbreviation,
             input.Description,
@@ -69,7 +71,7 @@ public sealed class ComponentMutations
             input.Categories
         );
         component.ManufacturerEdges.Add(
-            new Data.ComponentManufacturer
+            new ComponentManufacturer
             {
                 InstitutionId = input.ManufacturerId,
                 Pending = false
@@ -81,12 +83,12 @@ public sealed class ComponentMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<UpdateComponentPayload> UpdateComponentAsync(
         UpdateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

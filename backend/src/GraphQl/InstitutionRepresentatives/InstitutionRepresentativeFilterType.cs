@@ -1,12 +1,13 @@
 using HotChocolate.Data.Filters;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives;
 
 public sealed class InstitutionRepresentativeFilterType
-    : FilterInputType<Data.InstitutionRepresentative>
+    : FilterInputType<InstitutionRepresentative>
 {
     protected override void Configure(
-        IFilterInputTypeDescriptor<Data.InstitutionRepresentative> descriptor
+        IFilterInputTypeDescriptor<InstitutionRepresentative> descriptor
     )
     {
         descriptor.BindFieldsExplicitly();

@@ -1,9 +1,9 @@
 using System;
+using Metabase.Enumerations;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
-using Npgsql;
 using SchemaNameOptionsExtension = Metabase.Data.Extensions.SchemaNameOptionsExtension;
 
 namespace Metabase.Data;
@@ -15,18 +15,50 @@ public sealed class ApplicationDbContext
     : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>,
         IDataProtectionKeyContext
 {
+    private readonly string _schemaName;
+
+    public ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options
+    )
+        : base(options)
+    {
+        var schemaNameOptions = options.FindExtension<SchemaNameOptionsExtension>();
+        _schemaName = schemaNameOptions is null ? "metabase" : schemaNameOptions.SchemaName;
+    }
+
+    // https://docs.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
+    public DbSet<Component> Components { get; private set; } = default!;
+    public DbSet<ComponentAssembly> ComponentAssemblies { get; private set; } = default!;
+
+    public DbSet<ComponentConcretizationAndGeneralization> ComponentConcretizationAndGeneralizations
+    {
+        get;
+        private set;
+    } = default!;
+
+    public DbSet<ComponentManufacturer> ComponentManufacturers { get; private set; } = default!;
+    public DbSet<ComponentVariant> ComponentVariants { get; private set; } = default!;
+    public DbSet<DataFormat> DataFormats { get; private set; } = default!;
+    public DbSet<Database> Databases { get; private set; } = default!;
+    public DbSet<Institution> Institutions { get; private set; } = default!;
+    public DbSet<InstitutionMethodDeveloper> InstitutionMethodDevelopers { get; private set; } = default!;
+    public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
+    public DbSet<Method> Methods { get; private set; } = default!;
+    public DbSet<UserMethodDeveloper> UserMethodDevelopers { get; private set; } = default!;
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; } = default!;
+
     private static void CreateEnumerations(ModelBuilder builder)
     {
         // https://www.npgsql.org/efcore/mapping/enum.html#creating-your-database-enum
         // Create enumerations in public schema because that is where
         // `NpgsqlDataSourceBuilder.MapEnum` expects them to be by default.
-        builder.HasPostgresEnum<Enumerations.ComponentCategory>("public");
-        builder.HasPostgresEnum<Enumerations.DatabaseVerificationState>("public");
-        builder.HasPostgresEnum<Enumerations.InstitutionRepresentativeRole>("public");
-        builder.HasPostgresEnum<Enumerations.InstitutionState>("public");
-        builder.HasPostgresEnum<Enumerations.MethodCategory>("public");
-        builder.HasPostgresEnum<Enumerations.PrimeSurface>("public");
-        builder.HasPostgresEnum<Enumerations.Standardizer>("public");
+        builder.HasPostgresEnum<ComponentCategory>("public");
+        builder.HasPostgresEnum<DatabaseVerificationState>("public");
+        builder.HasPostgresEnum<InstitutionRepresentativeRole>("public");
+        builder.HasPostgresEnum<InstitutionState>("public");
+        builder.HasPostgresEnum<MethodCategory>("public");
+        builder.HasPostgresEnum<PrimeSurface>("public");
+        builder.HasPostgresEnum<Standardizer>("public");
     }
 
     private static
@@ -256,38 +288,6 @@ public sealed class ApplicationDbContext
             .WithOne(i => i.Manager)
             .HasForeignKey(i => i.ManagerId)
             .OnDelete(DeleteBehavior.Restrict);
-    }
-
-    private readonly string _schemaName;
-
-    // https://docs.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
-    public DbSet<Component> Components { get; private set; } = default!;
-    public DbSet<ComponentAssembly> ComponentAssemblies { get; private set; } = default!;
-
-    public DbSet<ComponentConcretizationAndGeneralization> ComponentConcretizationAndGeneralizations
-    {
-        get;
-        private set;
-    } = default!;
-
-    public DbSet<ComponentManufacturer> ComponentManufacturers { get; private set; } = default!;
-    public DbSet<ComponentVariant> ComponentVariants { get; private set; } = default!;
-    public DbSet<DataFormat> DataFormats { get; private set; } = default!;
-    public DbSet<Database> Databases { get; private set; } = default!;
-    public DbSet<Institution> Institutions { get; private set; } = default!;
-    public DbSet<InstitutionMethodDeveloper> InstitutionMethodDevelopers { get; private set; } = default!;
-    public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
-    public DbSet<Method> Methods { get; private set; } = default!;
-    public DbSet<UserMethodDeveloper> UserMethodDevelopers { get; private set; } = default!;
-    public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
-
-    public ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext> options
-    )
-        : base(options)
-    {
-        var schemaNameOptions = options.FindExtension<SchemaNameOptionsExtension>();
-        _schemaName = schemaNameOptions is null ? "metabase" : schemaNameOptions.SchemaName;
     }
 
     protected override void OnModelCreating(ModelBuilder builder)

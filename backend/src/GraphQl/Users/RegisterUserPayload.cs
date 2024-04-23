@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
@@ -6,7 +7,7 @@ public sealed class RegisterUserPayload
     : UserPayload<RegisterUserError>
 {
     public RegisterUserPayload(
-        Data.User user
+        User user
     )
         : base(user)
     {

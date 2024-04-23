@@ -13,10 +13,24 @@ public sealed class User
         IEntity,
         IStakeholder
 {
-    [GraphQLDescription("Full name")]
-    [ProtectedPersonalData]
-    [PersonalData]
-    public string Name { get; private set; }
+    public User()
+    {
+        // Parameterless constructor is needed by HotChocolate's `UseProjection`
+    }
+
+    public User(
+        string name,
+        string email,
+        string? postalAddress,
+        Uri? websiteLocator
+    )
+    {
+        Email = email;
+        UserName = email; // TODO Make `UserName`, `ConfirmedUserName`, ... of `IdentityUser` aliases for the respective `*Email` properties!
+        Name = name;
+        PostalAddress = postalAddress;
+        WebsiteLocator = websiteLocator;
+    }
 
     [MinLength(1)]
     [ProtectedPersonalData]
@@ -41,26 +55,10 @@ public sealed class User
 
     public ICollection<Institution> RepresentedInstitutions { get; } = new List<Institution>();
 
-    public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
+    public uint Version { get; } // https://www.npgsql.org/efcore/modeling/concurrency.html
 
-#nullable disable
-    public User()
-    {
-        // Parameterless constructor is needed by HotChocolate's `UseProjection`
-    }
-#nullable enable
-
-    public User(
-        string name,
-        string email,
-        string? postalAddress,
-        Uri? websiteLocator
-    )
-    {
-        Email = email;
-        UserName = email; // TODO Make `UserName`, `ConfirmedUserName`, ... of `IdentityUser` aliases for the respective `*Email` properties!
-        Name = name;
-        PostalAddress = postalAddress;
-        WebsiteLocator = websiteLocator;
-    }
+    [GraphQLDescription("Full name")]
+    [ProtectedPersonalData]
+    [PersonalData]
+    public string Name { get; }
 }

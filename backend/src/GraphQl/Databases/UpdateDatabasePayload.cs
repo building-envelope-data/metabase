@@ -1,10 +1,12 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.Databases;
 
 public sealed class UpdateDatabasePayload
     : DatabasePayload<UpdateDatabaseError>
 {
     public UpdateDatabasePayload(
-        Data.Database database
+        Database database
     )
         : base(database)
     {

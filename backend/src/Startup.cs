@@ -5,8 +5,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using HotChocolate.AspNetCore;
 using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.Data.Extensions;
+using Metabase.Enumerations;
 using Metabase.GraphQl.Databases;
+using Metabase.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -18,6 +21,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using Serilog;
 
@@ -26,9 +30,9 @@ namespace Metabase;
 public sealed class Startup
 {
     private const string GraphQlCorsPolicy = "GraphQlCorsPolicy";
+    private readonly AppSettings _appSettings;
 
     private readonly IWebHostEnvironment _environment;
-    private readonly AppSettings _appSettings;
 
     public Startup(
         IWebHostEnvironment environment,
@@ -52,12 +56,12 @@ public sealed class Startup
         services.AddAntiforgery(_ => { _.HeaderName = "X-XSRF-TOKEN"; });
         services
             .AddDataProtection()
-            .PersistKeysToDbContext<Data.ApplicationDbContext>();
+            .PersistKeysToDbContext<ApplicationDbContext>();
         ConfigureHttpClientServices(services);
         services.AddHttpContextAccessor();
         services
             .AddHealthChecks()
-            .AddDbContextCheck<Data.ApplicationDbContext>();
+            .AddDbContextCheck<ApplicationDbContext>();
         services.AddSingleton(_appSettings);
         services.AddSingleton(_environment);
         // services.AddDatabaseDeveloperPageExceptionFilter();
@@ -90,11 +94,11 @@ public sealed class Startup
 
     private void ConfigureMessageSenderServices(IServiceCollection services)
     {
-        services.AddTransient<Services.IEmailSender>(serviceProvider =>
-            new Services.EmailSender(
+        services.AddTransient<IEmailSender>(serviceProvider =>
+            new EmailSender(
                 _appSettings.Email.SmtpHost,
                 _appSettings.Email.SmtpPort,
-                serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Services.EmailSender>>()
+                serviceProvider.GetRequiredService<ILogger<EmailSender>>()
             )
         );
     }
@@ -115,17 +119,17 @@ public sealed class Startup
 
     private void ConfigureDatabaseServices(IServiceCollection services)
     {
-        services.AddPooledDbContextFactory<Data.ApplicationDbContext>(options =>
+        services.AddPooledDbContextFactory<ApplicationDbContext>(options =>
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(_appSettings.Database.ConnectionString);
                 // https://www.npgsql.org/efcore/mapping/enum.html#mapping-your-enum
-                dataSourceBuilder.MapEnum<Enumerations.ComponentCategory>();
-                dataSourceBuilder.MapEnum<Enumerations.DatabaseVerificationState>();
-                dataSourceBuilder.MapEnum<Enumerations.InstitutionRepresentativeRole>();
-                dataSourceBuilder.MapEnum<Enumerations.InstitutionState>();
-                dataSourceBuilder.MapEnum<Enumerations.MethodCategory>();
-                dataSourceBuilder.MapEnum<Enumerations.PrimeSurface>();
-                dataSourceBuilder.MapEnum<Enumerations.Standardizer>();
+                dataSourceBuilder.MapEnum<ComponentCategory>();
+                dataSourceBuilder.MapEnum<DatabaseVerificationState>();
+                dataSourceBuilder.MapEnum<InstitutionRepresentativeRole>();
+                dataSourceBuilder.MapEnum<InstitutionState>();
+                dataSourceBuilder.MapEnum<MethodCategory>();
+                dataSourceBuilder.MapEnum<PrimeSurface>();
+                dataSourceBuilder.MapEnum<Standardizer>();
                 options
                     .UseNpgsql(dataSourceBuilder.Build() /*, optionsBuilder => optionsBuilder.UseNodaTime() */)
                     .UseSchemaName(_appSettings.Database.SchemaName)
@@ -137,7 +141,7 @@ public sealed class Startup
             }
         );
         // Database context as services are used by `Identity` and `OpenIddict`.
-        services.AddDbContext<Data.ApplicationDbContext>(
+        services.AddDbContext<ApplicationDbContext>(
             (services, options) =>
             {
                 if (!_environment.IsProduction())
@@ -146,7 +150,7 @@ public sealed class Startup
                         .EnableDetailedErrors();
 
                 services
-                    .GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
+                    .GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
                     .CreateDbContext();
             },
             ServiceLifetime.Transient

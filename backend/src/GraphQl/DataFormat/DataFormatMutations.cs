@@ -6,6 +6,8 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
@@ -17,12 +19,12 @@ namespace Metabase.GraphQl.DataFormats;
 public sealed class DataFormatMutations
 {
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<CreateDataFormatPayload> CreateDataFormatAsync(
         CreateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -68,7 +70,7 @@ public sealed class DataFormatMutations
                 )
             );
 
-        var dataFormat = new Data.DataFormat(
+        var dataFormat = new DataFormat(
             input.Name,
             input.Extension,
             input.Description,
@@ -80,7 +82,7 @@ public sealed class DataFormatMutations
             Standard =
                 input.Standard is null
                     ? null
-                    : new Data.Standard(
+                    : new Standard(
                         input.Standard.Title,
                         input.Standard.Abstract,
                         input.Standard.Section,
@@ -89,7 +91,7 @@ public sealed class DataFormatMutations
                         input.Standard.Locator
                     )
                     {
-                        Numeration = new Data.Numeration(
+                        Numeration = new Numeration(
                             input.Standard.Numeration.Prefix,
                             input.Standard.Numeration.MainNumber,
                             input.Standard.Numeration.Suffix
@@ -98,7 +100,7 @@ public sealed class DataFormatMutations
             Publication =
                 input.Publication is null
                     ? null
-                    : new Data.Publication(
+                    : new Publication(
                         input.Publication.Title,
                         input.Publication.Abstract,
                         input.Publication.Section,
@@ -115,12 +117,12 @@ public sealed class DataFormatMutations
     }
 
     [UseUserManager]
-    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<UpdateDataFormatPayload> UpdateDataFormatAsync(
         UpdateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -175,7 +177,7 @@ public sealed class DataFormatMutations
         dataFormat.Standard =
             input.Standard is null
                 ? null
-                : new Data.Standard(
+                : new Standard(
                     input.Standard.Title,
                     input.Standard.Abstract,
                     input.Standard.Section,
@@ -184,7 +186,7 @@ public sealed class DataFormatMutations
                     input.Standard.Locator
                 )
                 {
-                    Numeration = new Data.Numeration(
+                    Numeration = new Numeration(
                         input.Standard.Numeration.Prefix,
                         input.Standard.Numeration.MainNumber,
                         input.Standard.Numeration.Suffix
@@ -193,7 +195,7 @@ public sealed class DataFormatMutations
         dataFormat.Publication =
             input.Publication is null
                 ? null
-                : new Data.Publication(
+                : new Publication(
                     input.Publication.Title,
                     input.Publication.Abstract,
                     input.Publication.Section,

@@ -1,10 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.NUnit;
 using NUnit.Framework;
+using Snapshooter.NUnit;
 
 namespace Metabase.Tests.Integration.GraphQl.Users;
 
@@ -20,11 +20,7 @@ public sealed class ChangeUserEmailTests
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
         const string password = "aaaAAA123$!@";
-        await RegisterAndConfirmAndLoginUser(
-            name,
-            email,
-            password
-        ).ConfigureAwait(false);
+        await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
         EmailSender.Clear();
         const string newEmail = "new." + email;
         // Act
@@ -38,10 +34,7 @@ public sealed class ChangeUserEmailTests
                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
         EmailsShouldContainSingle(
             (name, newEmail),
             "Confirm your email change",
@@ -71,10 +64,7 @@ public sealed class ChangeUserEmailTests
         ).ConfigureAwait(false);
         // Assert
         Snapshot.Match(response);
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -99,10 +89,7 @@ public sealed class ChangeUserEmailTests
                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 
     [Test]
@@ -128,9 +115,6 @@ public sealed class ChangeUserEmailTests
                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser(
-            email,
-            password
-        ).ConfigureAwait(false);
+        await LoginUser().ConfigureAwait(false);
     }
 }

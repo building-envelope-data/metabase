@@ -1,14 +1,12 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class VerifyInstitutionPayload
 {
-    public Data.Institution? Institution { get; }
-    public IReadOnlyCollection<VerifyInstitutionError>? Errors { get; }
-
     public VerifyInstitutionPayload(
-        Data.Institution institution
+        Institution institution
     )
     {
         Institution = institution;
@@ -27,4 +25,7 @@ public sealed class VerifyInstitutionPayload
         : this(new[] { error })
     {
     }
+
+    public Institution? Institution { get; }
+    public IReadOnlyCollection<VerifyInstitutionError>? Errors { get; }
 }

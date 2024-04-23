@@ -1,17 +1,18 @@
-using System;
 using System.Linq;
 using GreenDonut;
+using Metabase.Data;
+using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader
-    : Entities.AssociationsByAssociateIdDataLoader<Data.InstitutionMethodDeveloper>
+    : AssociationsByAssociateIdDataLoader<InstitutionMethodDeveloper>
 {
     public PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader(
         IBatchScheduler batchScheduler,
         DataLoaderOptions options,
-        IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
+        IDbContextFactory<ApplicationDbContext> dbContextFactory
     )
         : base(
             batchScheduler,

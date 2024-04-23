@@ -1,17 +1,18 @@
-using System;
 using System.Linq;
 using GreenDonut;
+using Metabase.Data;
+using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentGeneralizationsByComponentIdDataLoader
-    : Entities.AssociationsByAssociateIdDataLoader<Data.ComponentConcretizationAndGeneralization>
+    : AssociationsByAssociateIdDataLoader<ComponentConcretizationAndGeneralization>
 {
     public ComponentGeneralizationsByComponentIdDataLoader(
         IBatchScheduler batchScheduler,
         DataLoaderOptions options,
-        IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
+        IDbContextFactory<ApplicationDbContext> dbContextFactory
     )
         : base(
             batchScheduler,

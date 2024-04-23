@@ -2,8 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Snapshooter.NUnit;
 using NUnit.Framework;
+using Snapshooter.NUnit;
 
 namespace Metabase.Tests.Integration.GraphQl.Users;
 
@@ -19,11 +19,7 @@ public sealed class ResendUserEmailVerificationTests
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
         const string password = DefaultPassword;
-        await RegisterAndConfirmAndLoginUser(
-            name,
-            email,
-            password
-        ).ConfigureAwait(false);
+        await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
         EmailSender.Clear();
         // Act
         var response = await ResendUserEmailVerification().ConfigureAwait(false);

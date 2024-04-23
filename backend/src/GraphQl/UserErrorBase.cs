@@ -7,10 +7,6 @@ public abstract class UserErrorBase<TUserErrorCode>
     : IUserError
     where TUserErrorCode : struct, Enum
 {
-    public TUserErrorCode Code { get; }
-    public string Message { get; }
-    public IReadOnlyList<string> Path { get; }
-
     protected UserErrorBase(
         TUserErrorCode code,
         string message,
@@ -21,4 +17,8 @@ public abstract class UserErrorBase<TUserErrorCode>
         Message = message;
         Path = path;
     }
+
+    public TUserErrorCode Code { get; }
+    public string Message { get; }
+    public IReadOnlyList<string> Path { get; }
 }

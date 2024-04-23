@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Metabase.Configuration;
+using Metabase.Data;
 using Metabase.ViewModels.Authorization;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -29,15 +30,15 @@ public sealed class AuthorizationController : Controller
     private readonly IOpenIddictApplicationManager _applicationManager;
     private readonly IOpenIddictAuthorizationManager _authorizationManager;
     private readonly IOpenIddictScopeManager _scopeManager;
-    private readonly SignInManager<Data.User> _signInManager;
-    private readonly UserManager<Data.User> _userManager;
+    private readonly SignInManager<User> _signInManager;
+    private readonly UserManager<User> _userManager;
 
     public AuthorizationController(
         IOpenIddictApplicationManager applicationManager,
         IOpenIddictAuthorizationManager authorizationManager,
         IOpenIddictScopeManager scopeManager,
-        SignInManager<Data.User> signInManager,
-        UserManager<Data.User> userManager)
+        SignInManager<User> signInManager,
+        UserManager<User> userManager)
     {
         _applicationManager = applicationManager;
         _authorizationManager = authorizationManager;
@@ -57,7 +58,7 @@ public sealed class AuthorizationController : Controller
     }
 
     private Task<ClaimsPrincipal> CreateUserPrincipalAsync(
-        Data.User user,
+        User user,
         ImmutableArray<string> scopes
     )
     {
@@ -65,7 +66,7 @@ public sealed class AuthorizationController : Controller
     }
 
     private async Task<ClaimsPrincipal> CreateUserPrincipalAsync(
-        Data.User user,
+        User user,
         ImmutableArray<string> scopes,
         Func<ClaimsPrincipal, Task>? extend
     )
@@ -101,7 +102,7 @@ public sealed class AuthorizationController : Controller
 
     private async Task CreatePermanentAuthorization(
         ClaimsPrincipal principal,
-        Data.User user,
+        User user,
         List<object> authorizations,
         string applicationId
     )
@@ -120,6 +121,153 @@ public sealed class AuthorizationController : Controller
         principal.SetAuthorizationId(
             await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false)
         );
+    }
+
+    #region Password, authorization code, device and refresh token flows
+
+    [HttpPost("~/connect/token")]
+    [Produces("application/json")]
+    public async Task<IActionResult> Exchange()
+    {
+        var request = HttpContext.GetOpenIddictServerRequest() ??
+                      throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+
+        if (request.IsPasswordGrantType())
+        {
+            var user = request.Username is null
+                ? null
+                : await _userManager.FindByNameAsync(request.Username).ConfigureAwait(false);
+            if (user is null)
+                return Forbid(
+                    new AuthenticationProperties(new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                            "The username/password couple is invalid."
+                    }),
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+            // Validate the username/password parameters and ensure the account is not locked out.
+            var result = request.Password is null
+                ? null
+                : await _signInManager.CheckPasswordSignInAsync(user, request.Password, true)
+                    .ConfigureAwait(false);
+            if (result is null || !result.Succeeded)
+                return Forbid(
+                    new AuthenticationProperties(new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                            "The username/password couple is invalid."
+                    }),
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+            // Note: in this sample, the granted scopes match the requested scope
+            // but you may want to allow the user to uncheck specific scopes.
+            // For that, simply restrict the list of scopes.
+            var principal = await CreateUserPrincipalAsync(
+                user,
+                request.GetScopes()
+            ).ConfigureAwait(false);
+
+            // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
+            return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        }
+
+        if (request.IsAuthorizationCodeGrantType() || request.IsDeviceCodeGrantType() ||
+            request.IsRefreshTokenGrantType())
+        {
+            // Retrieve the claims principal stored in the authorization code/device code/refresh token.
+            var principal = (await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)
+                .ConfigureAwait(false)).Principal;
+            if (principal is null)
+                return Forbid(
+                    new AuthenticationProperties(new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                            "The token is no longer valid."
+                    }),
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+            // Retrieve the user profile corresponding to the authorization code/refresh token.
+            // Note: if you want to automatically invalidate the authorization code/refresh token
+            // when the user password/roles change, use the following line instead:
+            // var user = _signInManager.ValidateSecurityStampAsync(info.Principal);
+            var user = await _userManager.GetUserAsync(principal).ConfigureAwait(false);
+            if (user is null)
+                return Forbid(
+                    new AuthenticationProperties(new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                            "The token is no longer valid."
+                    }),
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+            // Ensure the user is still allowed to sign in.
+            if (!await _signInManager.CanSignInAsync(user).ConfigureAwait(false))
+                return Forbid(
+                    new AuthenticationProperties(new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                            "The user is no longer allowed to sign in."
+                    }),
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+            foreach (var claim in principal.Claims) claim.SetDestinations(GetDestinations(claim, principal));
+
+            // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
+            return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        }
+
+        throw new InvalidOperationException("The specified grant type is not supported.");
+    }
+
+    #endregion
+
+    private static IEnumerable<string> GetDestinations(Claim claim, ClaimsPrincipal principal)
+    {
+        // Note: by default, claims are NOT automatically included in the access and identity tokens.
+        // To allow OpenIddict to serialize them, you must attach them a destination, that specifies
+        // whether they should be included in access tokens, in identity tokens or in both.
+
+        switch (claim.Type)
+        {
+            // https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+            // Note that the information for the respective scopes can also be fetched from the userinfo endpoint.
+            case Claims.Name:
+                yield return Destinations.AccessToken;
+
+                if (principal.HasScope(Scopes.Profile))
+                    yield return Destinations.IdentityToken;
+
+                yield break;
+
+            case Claims.Email:
+                yield return Destinations.AccessToken;
+
+                if (principal.HasScope(Scopes.Email))
+                    yield return Destinations.IdentityToken;
+
+                yield break;
+
+            case Claims.Role:
+                yield return Destinations.AccessToken;
+
+                if (principal.HasScope(Scopes.Roles))
+                    yield return Destinations.IdentityToken;
+
+                yield break;
+
+            // Never include the security stamp in the access and identity tokens, as it's a secret value.
+            case "AspNet.Identity.SecurityStamp": yield break;
+
+            default:
+                yield return Destinations.AccessToken;
+                yield break;
+        }
     }
 
     #region Authorization code, implicit and hybrid flows
@@ -478,7 +626,7 @@ public sealed class AuthorizationController : Controller
         // Remove the `Identity.Application` cookie as it was only needed to authenticate the user.
         await _signInManager.SignOutAsync().ConfigureAwait(false);
         return Forbid(
-            new AuthenticationProperties()
+            new AuthenticationProperties
             {
                 // This property points to the address OpenIddict will automatically
                 // redirect the user to after rejecting the authorization demand.
@@ -521,152 +669,6 @@ public sealed class AuthorizationController : Controller
     }
 
     #endregion
-
-    #region Password, authorization code, device and refresh token flows
-
-    [HttpPost("~/connect/token")]
-    [Produces("application/json")]
-    public async Task<IActionResult> Exchange()
-    {
-        var request = HttpContext.GetOpenIddictServerRequest() ??
-                      throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
-
-        if (request.IsPasswordGrantType())
-        {
-            var user = request.Username is null
-                ? null
-                : await _userManager.FindByNameAsync(request.Username).ConfigureAwait(false);
-            if (user is null)
-                return Forbid(
-                    new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
-                            "The username/password couple is invalid."
-                    }),
-                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-
-            // Validate the username/password parameters and ensure the account is not locked out.
-            var result = request.Password is null
-                ? null
-                : await _signInManager.CheckPasswordSignInAsync(user, request.Password, true)
-                    .ConfigureAwait(false);
-            if (result is null || !result.Succeeded)
-                return Forbid(
-                    new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
-                            "The username/password couple is invalid."
-                    }),
-                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-
-            // Note: in this sample, the granted scopes match the requested scope
-            // but you may want to allow the user to uncheck specific scopes.
-            // For that, simply restrict the list of scopes.
-            var principal = await CreateUserPrincipalAsync(
-                user,
-                request.GetScopes()
-            ).ConfigureAwait(false);
-
-            // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
-            return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        }
-        else if (request.IsAuthorizationCodeGrantType() || request.IsDeviceCodeGrantType() ||
-                 request.IsRefreshTokenGrantType())
-        {
-            // Retrieve the claims principal stored in the authorization code/device code/refresh token.
-            var principal = (await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)
-                .ConfigureAwait(false)).Principal;
-            if (principal is null)
-                return Forbid(
-                    new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
-                            "The token is no longer valid."
-                    }),
-                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-
-            // Retrieve the user profile corresponding to the authorization code/refresh token.
-            // Note: if you want to automatically invalidate the authorization code/refresh token
-            // when the user password/roles change, use the following line instead:
-            // var user = _signInManager.ValidateSecurityStampAsync(info.Principal);
-            var user = await _userManager.GetUserAsync(principal).ConfigureAwait(false);
-            if (user is null)
-                return Forbid(
-                    new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
-                            "The token is no longer valid."
-                    }),
-                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-
-            // Ensure the user is still allowed to sign in.
-            if (!await _signInManager.CanSignInAsync(user).ConfigureAwait(false))
-                return Forbid(
-                    new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
-                            "The user is no longer allowed to sign in."
-                    }),
-                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-
-            foreach (var claim in principal.Claims) claim.SetDestinations(GetDestinations(claim, principal));
-
-            // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
-            return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        }
-
-        throw new InvalidOperationException("The specified grant type is not supported.");
-    }
-
-    #endregion
-
-    private static IEnumerable<string> GetDestinations(Claim claim, ClaimsPrincipal principal)
-    {
-        // Note: by default, claims are NOT automatically included in the access and identity tokens.
-        // To allow OpenIddict to serialize them, you must attach them a destination, that specifies
-        // whether they should be included in access tokens, in identity tokens or in both.
-
-        switch (claim.Type)
-        {
-            // https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
-            // Note that the information for the respective scopes can also be fetched from the userinfo endpoint.
-            case Claims.Name:
-                yield return Destinations.AccessToken;
-
-                if (principal.HasScope(Scopes.Profile))
-                    yield return Destinations.IdentityToken;
-
-                yield break;
-
-            case Claims.Email:
-                yield return Destinations.AccessToken;
-
-                if (principal.HasScope(Scopes.Email))
-                    yield return Destinations.IdentityToken;
-
-                yield break;
-
-            case Claims.Role:
-                yield return Destinations.AccessToken;
-
-                if (principal.HasScope(Scopes.Roles))
-                    yield return Destinations.IdentityToken;
-
-                yield break;
-
-            // Never include the security stamp in the access and identity tokens, as it's a secret value.
-            case "AspNet.Identity.SecurityStamp": yield break;
-
-            default:
-                yield return Destinations.AccessToken;
-                yield break;
-        }
-    }
 }
 
 public static class AsyncEnumerableExtensions

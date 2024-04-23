@@ -1,17 +1,19 @@
 using System;
+using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+using Metabase.Data;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.IO;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
-using Microsoft.AspNetCore.Builder;
-using System.Globalization;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Log = Serilog.Log;
 
 namespace Metabase;
 
@@ -22,7 +24,7 @@ public static partial class LoggerExtensions
         Level = LogLevel.Error,
         Message = "An error occurred creating and seeding the database.")]
     public static partial void FailedToCreateAndSeedDatabase(
-        this Microsoft.Extensions.Logging.ILogger logger,
+        this ILogger logger,
         // The first exception is implicitly taken care of as detailed in
         // https://learn.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator#log-method-anatomy
         Exception exception
@@ -109,9 +111,9 @@ public sealed class Program
         try
         {
             using var dbContext =
-                services.GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
+                services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
                     .CreateDbContext();
-            if (dbContext.Database.EnsureCreated()) await Data.DbSeeder.DoAsync(services).ConfigureAwait(false);
+            if (dbContext.Database.EnsureCreated()) await DbSeeder.DoAsync(services).ConfigureAwait(false);
         }
         catch (Exception exception)
         {

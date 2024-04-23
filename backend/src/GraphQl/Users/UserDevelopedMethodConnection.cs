@@ -1,18 +1,18 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.Data;
 using Metabase.Authorization;
+using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Users;
 
 public sealed class UserDevelopedMethodConnection
-    : ForkingConnection<Data.User, Data.UserMethodDeveloper, PendingUserDevelopedMethodsByUserIdDataLoader,
+    : ForkingConnection<User, UserMethodDeveloper, PendingUserDevelopedMethodsByUserIdDataLoader,
         UserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge>
 {
     public UserDevelopedMethodConnection(
-        Data.User subject,
+        User subject,
         bool pending
     )
         : base(
@@ -26,7 +26,7 @@ public sealed class UserDevelopedMethodConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager
     )
     {
         return UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(

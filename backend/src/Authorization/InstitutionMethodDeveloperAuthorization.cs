@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.Authorization;
@@ -11,8 +12,8 @@ public static class InstitutionMethodDeveloperAuthorization
     public static async Task<bool> IsAuthorizedToAdd(
         ClaimsPrincipal claimsPrincipal,
         Guid methodId,
-        UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -29,8 +30,8 @@ public static class InstitutionMethodDeveloperAuthorization
     public static async Task<bool> IsAuthorizedToConfirm(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -47,8 +48,8 @@ public static class InstitutionMethodDeveloperAuthorization
     public static async Task<bool> IsAuthorizedToRemove(
         ClaimsPrincipal claimsPrincipal,
         Guid methodId,
-        UserManager<Data.User> userManager,
-        Data.ApplicationDbContext context,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {

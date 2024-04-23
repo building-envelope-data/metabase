@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
@@ -6,7 +7,7 @@ public sealed class SetUserPhoneNumberPayload
     : UserPayload<SetUserPhoneNumberError>
 {
     public SetUserPhoneNumberPayload(
-        Data.User user
+        User user
     )
         : base(user)
     {
@@ -20,7 +21,7 @@ public sealed class SetUserPhoneNumberPayload
     }
 
     public SetUserPhoneNumberPayload(
-        Data.User user,
+        User user,
         IReadOnlyCollection<SetUserPhoneNumberError> errors
     )
         : base(user, errors)
@@ -28,7 +29,7 @@ public sealed class SetUserPhoneNumberPayload
     }
 
     public SetUserPhoneNumberPayload(
-        Data.User user,
+        User user,
         SetUserPhoneNumberError error
     )
         : base(user, error)

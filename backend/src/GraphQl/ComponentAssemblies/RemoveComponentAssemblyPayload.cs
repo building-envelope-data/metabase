@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Metabase.GraphQl.Components;
 
 namespace Metabase.GraphQl.ComponentAssemblies;
 
 public sealed class RemoveComponentAssemblyPayload
 {
-    private readonly Data.ComponentAssembly? _association;
-    public IReadOnlyCollection<RemoveComponentAssemblyError>? Errors { get; }
+    private readonly ComponentAssembly? _association;
 
     public RemoveComponentAssemblyPayload(
-        Data.ComponentAssembly componentAssembly
+        ComponentAssembly componentAssembly
     )
     {
         _association = componentAssembly;
@@ -31,7 +31,9 @@ public sealed class RemoveComponentAssemblyPayload
     {
     }
 
-    public async Task<Data.Component?> GetAssembledComponentAsync(
+    public IReadOnlyCollection<RemoveComponentAssemblyError>? Errors { get; }
+
+    public async Task<Component?> GetAssembledComponentAsync(
         ComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )
@@ -41,7 +43,7 @@ public sealed class RemoveComponentAssemblyPayload
         return await byId.LoadAsync(_association.AssembledComponentId, cancellationToken)!;
     }
 
-    public async Task<Data.Component?> GetPartComponentAsync(
+    public async Task<Component?> GetPartComponentAsync(
         ComponentByIdDataLoader byId,
         CancellationToken cancellationToken
     )

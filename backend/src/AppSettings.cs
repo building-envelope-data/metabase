@@ -12,12 +12,22 @@ public sealed class AppSettings
 
     public LoggingSettings Logging { get; set; } = new();
 
+    public JsonWebTokenSettings JsonWebToken { get; set; } = new();
+
+    public EmailSettings Email { get; set; } = new();
+
+    public string OpenIdConnectClientSecret { get; set; }
+        = "";
+
+    public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }
+        = "";
+
+    public DatabaseSettings Database { get; set; } = new();
+
     public sealed class LoggingSettings
     {
         public bool EnableSensitiveDataLogging { get; set; }
     }
-
-    public JsonWebTokenSettings JsonWebToken { get; set; } = new();
 
     public sealed class JsonWebTokenSettings
     {
@@ -28,8 +38,6 @@ public sealed class AppSettings
             = "";
     }
 
-    public EmailSettings Email { get; set; } = new();
-
     public sealed class EmailSettings
     {
         public string SmtpHost { get; set; }
@@ -37,14 +45,6 @@ public sealed class AppSettings
 
         public int SmtpPort { get; set; }
     }
-
-    public string OpenIdConnectClientSecret { get; set; }
-        = "";
-
-    public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }
-        = "";
-
-    public DatabaseSettings Database { get; set; } = new();
 
     public sealed class DatabaseSettings
     {

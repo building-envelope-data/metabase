@@ -1,13 +1,13 @@
-using HotChocolate.Types;
+using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.Databases;
 
 public sealed class DatabaseOperatorEdge
-    : Edge<Data.Institution, InstitutionByIdDataLoader>
+    : Edge<Institution, InstitutionByIdDataLoader>
 {
     public DatabaseOperatorEdge(
-        Data.Database association
+        Database association
     )
         : base(association.OperatorId)
     {

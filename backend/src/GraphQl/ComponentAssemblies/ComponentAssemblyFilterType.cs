@@ -1,12 +1,13 @@
 using HotChocolate.Data.Filters;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.ComponentAssemblies;
 
 public sealed class ComponentAssemblyFilterType
-    : FilterInputType<Data.ComponentAssembly>
+    : FilterInputType<ComponentAssembly>
 {
     protected override void Configure(
-        IFilterInputTypeDescriptor<Data.ComponentAssembly> descriptor
+        IFilterInputTypeDescriptor<ComponentAssembly> descriptor
     )
     {
         descriptor.BindFieldsExplicitly();

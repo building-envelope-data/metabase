@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using Metabase.Data;
+using Metabase.Enumerations;
 using Guid = System.Guid;
 
 namespace Metabase.GraphQl.Institutions;
@@ -14,29 +16,29 @@ public sealed class InstitutionQueries
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Data.Institution> GetInstitutions(
-        Data.ApplicationDbContext context
+    public IQueryable<Institution> GetInstitutions(
+        ApplicationDbContext context
     )
     {
         return
             context.Institutions.AsQueryable()
-                .Where(d => d.State == Enumerations.InstitutionState.VERIFIED);
+                .Where(d => d.State == InstitutionState.VERIFIED);
     }
 
     [UsePaging]
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Data.Institution> GetPendingInstitutions(
-        Data.ApplicationDbContext context
+    public IQueryable<Institution> GetPendingInstitutions(
+        ApplicationDbContext context
     )
     {
         return
             context.Institutions.AsQueryable()
-                .Where(d => d.State == Enumerations.InstitutionState.PENDING);
+                .Where(d => d.State == InstitutionState.PENDING);
     }
 
-    public Task<Data.Institution?> GetInstitutionAsync(
+    public Task<Institution?> GetInstitutionAsync(
         Guid uuid,
         InstitutionByIdDataLoader institutionById,
         CancellationToken cancellationToken

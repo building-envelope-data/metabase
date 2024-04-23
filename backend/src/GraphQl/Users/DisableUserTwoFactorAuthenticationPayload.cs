@@ -1,10 +1,12 @@
+using Metabase.Data;
+
 namespace Metabase.GraphQl.Users;
 
 public sealed class DisableUserTwoFactorAuthenticationPayload
     : UserPayload<DisableUserTwoFactorAuthenticationError>
 {
     public DisableUserTwoFactorAuthenticationPayload(
-        Data.User user
+        User user
     )
         : base(user)
     {

@@ -1,14 +1,13 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Users;
 
 public sealed class GenerateUserTwoFactorRecoveryCodesPayload
     : UserPayload<GenerateUserTwoFactorRecoveryCodesError>
 {
-    public IReadOnlyCollection<string>? TwoFactorRecoveryCodes { get; }
-
     public GenerateUserTwoFactorRecoveryCodesPayload(
-        Data.User user,
+        User user,
         IReadOnlyCollection<string> recoveryCodes
     )
         : base(user)
@@ -24,10 +23,12 @@ public sealed class GenerateUserTwoFactorRecoveryCodesPayload
     }
 
     public GenerateUserTwoFactorRecoveryCodesPayload(
-        Data.User user,
+        User user,
         GenerateUserTwoFactorRecoveryCodesError error
     )
         : base(user, error)
     {
     }
+
+    public IReadOnlyCollection<string>? TwoFactorRecoveryCodes { get; }
 }
