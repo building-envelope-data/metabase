@@ -9,7 +9,9 @@ namespace Metabase.Data;
 public sealed class Database
     : Entity
 {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public Database()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
         // Parameterless constructor is needed by HotChocolate's `UseProjection`
     }

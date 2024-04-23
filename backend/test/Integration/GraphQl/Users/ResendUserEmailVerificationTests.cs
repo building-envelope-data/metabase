@@ -18,7 +18,6 @@ public sealed class ResendUserEmailVerificationTests
         // Arrange
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
-        const string password = DefaultPassword;
         await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
         EmailSender.Clear();
         // Act

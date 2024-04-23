@@ -19,7 +19,6 @@ public sealed class ChangeUserEmailTests
         // Arrange
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
-        const string password = "aaaAAA123$!@";
         await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
         EmailSender.Clear();
         const string newEmail = "new." + email;

@@ -29,6 +29,9 @@ public abstract class AuthConfiguration
     public const string ReadPolicy = "Read";
     public const string WritePolicy = "Write";
     public const string ManageUserPolicy = "ManageUser";
+    public const string ReadApiScope = "api:read";
+    public const string WriteApiScope = "api:write";
+    public const string ManageUserApiScope = "api:user:manage";
 
     // Keep in sync with the scopes set in `OpenIddictClientRegistration`.
     private static readonly HashSet<string> _clientScopes = new()
@@ -42,10 +45,6 @@ public abstract class AuthConfiguration
         WriteApiScope,
         ManageUserApiScope
     };
-
-    public static string ReadApiScope { get; } = "api:read";
-    public static string WriteApiScope { get; } = "api:write";
-    public static string ManageUserApiScope { get; } = "api:user:manage";
 
     public static void ConfigureServices(
         IServiceCollection services,
