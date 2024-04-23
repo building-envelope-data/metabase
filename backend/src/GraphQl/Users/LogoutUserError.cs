@@ -1,17 +1,16 @@
 using System.Collections.Generic;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+public sealed class LogoutUserError
+    : UserErrorBase<LogoutUserErrorCode>
 {
-    public sealed class LogoutUserError
-        : GraphQl.UserErrorBase<LogoutUserErrorCode>
+    public LogoutUserError(
+        LogoutUserErrorCode code,
+        string message,
+        IReadOnlyList<string> path
+    )
+        : base(code, message, path)
     {
-        public LogoutUserError(
-            LogoutUserErrorCode code,
-            string message,
-            IReadOnlyList<string> path
-        )
-            : base(code, message, path)
-        {
-        }
     }
 }

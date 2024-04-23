@@ -12,87 +12,86 @@ using Guid = System.Guid;
 using InvalidOperationException = System.InvalidOperationException;
 using IServiceProvider = System.IServiceProvider;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+public static class UserObjectFieldDescriptorExtensions
 {
-    public static class UserObjectFieldDescriptorExtensions
+    private static string GetServiceName<TService>()
     {
-        private static string GetServiceName<TService>()
-        {
-            return typeof(TService).FullName ?? typeof(TService).Name;
-        }
+        return typeof(TService).FullName ?? typeof(TService).Name;
+    }
 
-        public static IObjectFieldDescriptor UseUserManager(
-            this IObjectFieldDescriptor descriptor
-        )
+    public static IObjectFieldDescriptor UseUserManager(
+        this IObjectFieldDescriptor descriptor
+    )
+    {
+        // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
+        var userManagerServiceName = GetServiceName<UserManager<Data.User>>();
+        return descriptor.Use(next => async context =>
         {
-            // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
-            var userManagerServiceName = GetServiceName<UserManager<Data.User>>();
-            return descriptor.Use(next => async context =>
+            var services = context.Service<IServiceProvider>();
+            var userManager = new UserManager<Data.User>(
+                new UserStore<Data.User, Data.Role, Data.ApplicationDbContext, Guid, Data.UserClaim, Data.UserRole,
+                    Data.UserLogin, Data.UserToken, Data.RoleClaim>(
+                    context.Service<Data.ApplicationDbContext>()
+                    ?? throw new InvalidOperationException("Application database context is null.")
+                ),
+                services.GetRequiredService<IOptions<IdentityOptions>>(),
+                services.GetRequiredService<IPasswordHasher<Data.User>>(),
+                /* new PasswordHasher<Data.User>( */
+                /*   services.GetRequiredService<IOptions<PasswordHasherOptions>>() */
+                /*   ), */
+                services.GetRequiredService<IEnumerable<IUserValidator<Data.User>>>(),
+                services.GetRequiredService<IEnumerable<IPasswordValidator<Data.User>>>(),
+                services.GetRequiredService<ILookupNormalizer>(),
+                /* new UpperInvariantLookupNormalizer(), */
+                services.GetRequiredService<IdentityErrorDescriber>(),
+                /* new IdentityErrorDescriber(), */
+                services,
+                services.GetRequiredService<ILogger<UserManager<Data.User>>>()
+            );
+            try
             {
-                var services = context.Service<IServiceProvider>();
-                var userManager = new UserManager<Data.User>(
-                    new UserStore<Data.User, Data.Role, Data.ApplicationDbContext, Guid, Data.UserClaim, Data.UserRole,
-                        Data.UserLogin, Data.UserToken, Data.RoleClaim>(
-                        context.Service<Data.ApplicationDbContext>()
-                        ?? throw new InvalidOperationException("Application database context is null.")
-                    ),
-                    services.GetRequiredService<IOptions<IdentityOptions>>(),
-                    services.GetRequiredService<IPasswordHasher<Data.User>>(),
-                    /* new PasswordHasher<Data.User>( */
-                    /*   services.GetRequiredService<IOptions<PasswordHasherOptions>>() */
-                    /*   ), */
-                    services.GetRequiredService<IEnumerable<IUserValidator<Data.User>>>(),
-                    services.GetRequiredService<IEnumerable<IPasswordValidator<Data.User>>>(),
-                    services.GetRequiredService<ILookupNormalizer>(),
-                    /* new UpperInvariantLookupNormalizer(), */
-                    services.GetRequiredService<IdentityErrorDescriber>(),
-                    /* new IdentityErrorDescriber(), */
-                    services,
-                    services.GetRequiredService<ILogger<UserManager<Data.User>>>()
-                );
-                try
-                {
-                    context.SetLocalState(userManagerServiceName, userManager);
-                    await next(context).ConfigureAwait(false);
-                }
-                finally
-                {
-                    context.RemoveLocalState(userManagerServiceName);
-                    userManager.Dispose();
-                }
-            });
-        }
+                context.SetLocalState(userManagerServiceName, userManager);
+                await next(context).ConfigureAwait(false);
+            }
+            finally
+            {
+                context.RemoveLocalState(userManagerServiceName);
+                userManager.Dispose();
+            }
+        });
+    }
 
-        public static IObjectFieldDescriptor UseSignInManager(
-            this IObjectFieldDescriptor descriptor
-        )
+    public static IObjectFieldDescriptor UseSignInManager(
+        this IObjectFieldDescriptor descriptor
+    )
+    {
+        // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
+        var signInManagerServiceName = GetServiceName<SignInManager<Data.User>>();
+        return descriptor.Use(next => async context =>
         {
-            // Inspired by https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Types/Types/Descriptors/Extensions/ScopedServiceObjectFieldDescriptorExtensions.cs
-            var signInManagerServiceName = GetServiceName<SignInManager<Data.User>>();
-            return descriptor.Use(next => async context =>
+            var services = context.Service<IServiceProvider>();
+            var signInManager = new SignInManager<Data.User>(
+                context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
+                ?? throw new InvalidOperationException(
+                    "Add attribute `[UseUserManager]` before attribute `[UseSignInManager]`."),
+                services.GetRequiredService<IHttpContextAccessor>(),
+                services.GetRequiredService<IUserClaimsPrincipalFactory<Data.User>>(),
+                services.GetRequiredService<IOptions<IdentityOptions>>(),
+                services.GetRequiredService<ILogger<SignInManager<Data.User>>>(),
+                services.GetRequiredService<IAuthenticationSchemeProvider>(),
+                services.GetRequiredService<IUserConfirmation<Data.User>>()
+            );
+            try
             {
-                var services = context.Service<IServiceProvider>();
-                var signInManager = new SignInManager<Data.User>(
-                    context.GetLocalStateOrDefault<UserManager<Data.User>>(GetServiceName<UserManager<Data.User>>())
-                    ?? throw new InvalidOperationException(
-                        "Add attribute `[UseUserManager]` before attribute `[UseSignInManager]`."),
-                    services.GetRequiredService<IHttpContextAccessor>(),
-                    services.GetRequiredService<IUserClaimsPrincipalFactory<Data.User>>(),
-                    services.GetRequiredService<IOptions<IdentityOptions>>(),
-                    services.GetRequiredService<ILogger<SignInManager<Data.User>>>(),
-                    services.GetRequiredService<IAuthenticationSchemeProvider>(),
-                    services.GetRequiredService<IUserConfirmation<Data.User>>()
-                );
-                try
-                {
-                    context.SetLocalState(signInManagerServiceName, signInManager);
-                    await next(context).ConfigureAwait(false);
-                }
-                finally
-                {
-                    context.RemoveLocalState(signInManagerServiceName);
-                }
-            });
-        }
+                context.SetLocalState(signInManagerServiceName, signInManager);
+                await next(context).ConfigureAwait(false);
+            }
+            finally
+            {
+                context.RemoveLocalState(signInManagerServiceName);
+            }
+        });
     }
 }

@@ -1,15 +1,14 @@
-namespace Metabase.GraphQl.DataX
-{
-    public sealed class GetHttpsResourceTreeRoot : IGetHttpsResourceTreeVertex
-    {
-        public GetHttpsResourceTreeRoot(
-            GetHttpsResource value
-        )
-        {
-            Value = value;
-        }
+namespace Metabase.GraphQl.DataX;
 
-        // public string VertexId { get; }
-        public GetHttpsResource Value { get; }
+public sealed class GetHttpsResourceTreeRoot : IGetHttpsResourceTreeVertex
+{
+    public GetHttpsResourceTreeRoot(
+        GetHttpsResource value
+    )
+    {
+        Value = value;
     }
+
+    // public string VertexId { get; }
+    public GetHttpsResource Value { get; }
 }

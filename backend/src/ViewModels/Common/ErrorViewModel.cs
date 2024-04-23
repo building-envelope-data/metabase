@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Metabase.ViewModels.Common
-{
-    public sealed class ErrorViewModel
-    {
-        [Display(Name = "Error")] public string? Error { get; set; }
+namespace Metabase.ViewModels.Common;
 
-        [Display(Name = "Description")] public string? ErrorDescription { get; set; }
-    }
+public sealed class ErrorViewModel
+{
+    [Display(Name = "Error")] public string? Error { get; set; }
+
+    [Display(Name = "Description")] public string? ErrorDescription { get; set; }
 }

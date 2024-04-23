@@ -1,14 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Metabase.GraphQl.UserMethodDevelopers
+namespace Metabase.GraphQl.UserMethodDevelopers;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum RemoveUserMethodDeveloperErrorCode
 {
-    [SuppressMessage("Naming", "CA1707")]
-    public enum RemoveUserMethodDeveloperErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_METHOD,
-        UNKNOWN_USER,
-        UNAUTHORIZED,
-        UNKNOWN_DEVELOPER,
-    }
+    UNKNOWN,
+    UNKNOWN_METHOD,
+    UNKNOWN_USER,
+    UNAUTHORIZED,
+    UNKNOWN_DEVELOPER
 }

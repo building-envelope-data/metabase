@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace Metabase.GraphQl.DataX
+namespace Metabase.GraphQl.DataX;
+
+public enum DataKind
 {
-    public enum DataKind
-    {
-        CALORIMETRICDATA,
-        HYGROTHERMALDATA,
-        OPTICALDATA,
-        PHOTOVOLTAICDATA
-    }
+    CALORIMETRICDATA,
+    HYGROTHERMALDATA,
+    OPTICALDATA,
+    PHOTOVOLTAICDATA
 }

@@ -1,14 +1,13 @@
-namespace Metabase.GraphQl.Institutions
-{
-    public sealed class InstitutionManagedMethodEdge
-    {
-        public Data.Method Node { get; }
+namespace Metabase.GraphQl.Institutions;
 
-        public InstitutionManagedMethodEdge(
-            Data.Method node
-        )
-        {
-            Node = node;
-        }
+public sealed class InstitutionManagedMethodEdge
+{
+    public Data.Method Node { get; }
+
+    public InstitutionManagedMethodEdge(
+        Data.Method node
+    )
+    {
+        Node = node;
     }
 }

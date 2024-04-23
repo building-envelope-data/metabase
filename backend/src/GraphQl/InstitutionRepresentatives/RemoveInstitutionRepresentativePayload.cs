@@ -4,58 +4,51 @@ using System.Threading.Tasks;
 using Metabase.GraphQl.Users;
 using Metabase.GraphQl.Institutions;
 
-namespace Metabase.GraphQl.InstitutionRepresentatives
+namespace Metabase.GraphQl.InstitutionRepresentatives;
+
+public sealed class RemoveInstitutionRepresentativePayload
 {
-    public sealed class RemoveInstitutionRepresentativePayload
+    private readonly Data.InstitutionRepresentative? _association;
+    public IReadOnlyCollection<RemoveInstitutionRepresentativeError>? Errors { get; }
+
+    public RemoveInstitutionRepresentativePayload(
+        Data.InstitutionRepresentative institutionRepresentative
+    )
     {
-        private readonly Data.InstitutionRepresentative? _association;
-        public IReadOnlyCollection<RemoveInstitutionRepresentativeError>? Errors { get; }
+        _association = institutionRepresentative;
+    }
 
-        public RemoveInstitutionRepresentativePayload(
-            Data.InstitutionRepresentative institutionRepresentative
-        )
-        {
-            _association = institutionRepresentative;
-        }
+    public RemoveInstitutionRepresentativePayload(
+        IReadOnlyCollection<RemoveInstitutionRepresentativeError> errors
+    )
+    {
+        Errors = errors;
+    }
 
-        public RemoveInstitutionRepresentativePayload(
-            IReadOnlyCollection<RemoveInstitutionRepresentativeError> errors
-        )
-        {
-            Errors = errors;
-        }
+    public RemoveInstitutionRepresentativePayload(
+        RemoveInstitutionRepresentativeError error
+    )
+        : this(new[] { error })
+    {
+    }
 
-        public RemoveInstitutionRepresentativePayload(
-            RemoveInstitutionRepresentativeError error
-        )
-            : this(new[] { error })
-        {
-        }
+    public async Task<Data.Institution?> GetInstitution(
+        InstitutionByIdDataLoader byId,
+        CancellationToken cancellationToken
+    )
+    {
+        if (_association is null) return null;
 
-        public async Task<Data.Institution?> GetInstitution(
-            InstitutionByIdDataLoader byId,
-            CancellationToken cancellationToken
-        )
-        {
-            if (_association is null)
-            {
-                return null;
-            }
+        return await byId.LoadAsync(_association.InstitutionId, cancellationToken)!;
+    }
 
-            return await byId.LoadAsync(_association.InstitutionId, cancellationToken)!;
-        }
+    public async Task<Data.User?> GetUser(
+        UserByIdDataLoader byId,
+        CancellationToken cancellationToken
+    )
+    {
+        if (_association is null) return null;
 
-        public async Task<Data.User?> GetUser(
-            UserByIdDataLoader byId,
-            CancellationToken cancellationToken
-        )
-        {
-            if (_association is null)
-            {
-                return null;
-            }
-
-            return await byId.LoadAsync(_association.UserId, cancellationToken)!;
-        }
+        return await byId.LoadAsync(_association.UserId, cancellationToken)!;
     }
 }

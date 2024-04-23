@@ -7,37 +7,36 @@ using Metabase.Authorization;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace Metabase.GraphQl.Institutions
-{
-    public sealed class InstitutionManagedInstitutionConnection
-        : Connection<Data.Institution, Data.Institution, InstitutionManagedInstitutionsByInstitutionIdDataLoader,
-            InstitutionManagedInstitutionEdge>
-    {
-        public InstitutionManagedInstitutionConnection(
-            Data.Institution institution
-        )
-            : base(
-                institution,
-                x => new InstitutionManagedInstitutionEdge(x)
-            )
-        {
-        }
+namespace Metabase.GraphQl.Institutions;
 
-        [UseUserManager]
-        public Task<bool> CanCurrentUserAddEdgeAsync(
-            ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
-            CancellationToken cancellationToken
+public sealed class InstitutionManagedInstitutionConnection
+    : Connection<Data.Institution, Data.Institution, InstitutionManagedInstitutionsByInstitutionIdDataLoader,
+        InstitutionManagedInstitutionEdge>
+{
+    public InstitutionManagedInstitutionConnection(
+        Data.Institution institution
+    )
+        : base(
+            institution,
+            x => new InstitutionManagedInstitutionEdge(x)
         )
-        {
-            return InstitutionAuthorization.IsAuthorizedToCreateInstitutionManagedByInstitution(
-                claimsPrincipal,
-                Subject.Id,
-                userManager,
-                context,
-                cancellationToken
-            );
-        }
+    {
+    }
+
+    [UseUserManager]
+    public Task<bool> CanCurrentUserAddEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        Data.ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        return InstitutionAuthorization.IsAuthorizedToCreateInstitutionManagedByInstitution(
+            claimsPrincipal,
+            Subject.Id,
+            userManager,
+            context,
+            cancellationToken
+        );
     }
 }

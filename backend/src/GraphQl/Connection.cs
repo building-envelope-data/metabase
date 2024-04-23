@@ -5,34 +5,33 @@ using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
 
-namespace Metabase.GraphQl
+namespace Metabase.GraphQl;
+
+public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>
+    where TSubject : Data.IEntity
+    where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
-    public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>
-        where TSubject : Data.IEntity
-        where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
+    protected TSubject Subject { get; }
+    private readonly Func<TAssociation, TEdge> _createEdge;
+
+    protected Connection(
+        TSubject subject,
+        Func<TAssociation, TEdge> createEdge
+    )
     {
-        protected TSubject Subject { get; }
-        private readonly Func<TAssociation, TEdge> _createEdge;
+        Subject = subject;
+        _createEdge = createEdge;
+    }
 
-        protected Connection(
-            TSubject subject,
-            Func<TAssociation, TEdge> createEdge
-        )
-        {
-            Subject = subject;
-            _createEdge = createEdge;
-        }
-
-        public async Task<IEnumerable<TEdge>> GetEdgesAsync(
-            TAssociationsByAssociateIdDataLoader dataLoader,
-            CancellationToken cancellationToken
-        )
-        {
-            return (
-                    await dataLoader.LoadAsync(Subject.Id, cancellationToken)
-                        .ConfigureAwait(false)
-                )
-                .Select(_createEdge);
-        }
+    public async Task<IEnumerable<TEdge>> GetEdgesAsync(
+        TAssociationsByAssociateIdDataLoader dataLoader,
+        CancellationToken cancellationToken
+    )
+    {
+        return (
+                await dataLoader.LoadAsync(Subject.Id, cancellationToken)
+                    .ConfigureAwait(false)
+            )
+            .Select(_createEdge);
     }
 }

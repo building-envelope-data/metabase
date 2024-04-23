@@ -1,27 +1,26 @@
 using System;
 using HotChocolate.Types;
 
-namespace Metabase.GraphQl.DataX
+namespace Metabase.GraphQl.DataX;
+
+[InterfaceType("Data")]
+public interface IData
 {
-    [InterfaceType("Data")]
-    public interface IData
-    {
-        Guid Uuid { get; }
-        DateTime Timestamp { get; }
-        Guid ComponentId { get; }
-        string? Name { get; }
+    Guid Uuid { get; }
+    DateTime Timestamp { get; }
+    Guid ComponentId { get; }
+    string? Name { get; }
 
-        string? Description { get; }
+    string? Description { get; }
 
-        // IReadOnlyList<string> Warnings { get; }
-        // Guid CreatorId { get; }
-        // DateTime CreatedAt { get; }
-        AppliedMethod AppliedMethod { get; }
+    // IReadOnlyList<string> Warnings { get; }
+    // Guid CreatorId { get; }
+    // DateTime CreatedAt { get; }
+    AppliedMethod AppliedMethod { get; }
 
-        // IReadOnlyList<DataApproval> Approvals { get; }
-        // IReadOnlyList<GetHttpsResource> Resources { get; }
-        GetHttpsResourceTree ResourceTree { get; }
-        // ResponseApproval Approval { get; }
-        // string Locale { get; }
-    }
+    // IReadOnlyList<DataApproval> Approvals { get; }
+    // IReadOnlyList<GetHttpsResource> Resources { get; }
+    GetHttpsResourceTree ResourceTree { get; }
+    // ResponseApproval Approval { get; }
+    // string Locale { get; }
 }

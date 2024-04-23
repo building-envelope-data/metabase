@@ -13,134 +13,123 @@ using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Metabase.GraphQl.Components
+namespace Metabase.GraphQl.Components;
+
+[ExtendObjectType(nameof(Mutation))]
+public sealed class ComponentMutations
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public sealed class ComponentMutations
+    [UseUserManager]
+    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    public async Task<CreateComponentPayload> CreateComponentAsync(
+        CreateComponentInput input,
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        Data.ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
     {
-        [UseUserManager]
-        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
-        public async Task<CreateComponentPayload> CreateComponentAsync(
-            CreateComponentInput input,
-            ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
-            CancellationToken cancellationToken
-        )
-        {
-            if (!await ComponentAuthorization.IsAuthorizedToCreateComponentForInstitution(
-                    claimsPrincipal,
-                    input.ManufacturerId,
-                    userManager,
-                    context,
+        if (!await ComponentAuthorization.IsAuthorizedToCreateComponentForInstitution(
+                claimsPrincipal,
+                input.ManufacturerId,
+                userManager,
+                context,
+                cancellationToken
+            ).ConfigureAwait(false)
+           )
+            return new CreateComponentPayload(
+                new CreateComponentError(
+                    CreateComponentErrorCode.UNAUTHORIZED,
+                    "You are not authorized to create components for the institution.",
+                    new[] { nameof(input), nameof(input.ManufacturerId).FirstCharToLower() }
+                )
+            );
+
+        if (!await context.Institutions.AsQueryable()
+                .AnyAsync(
+                    x => x.Id == input.ManufacturerId,
                     cancellationToken
-                ).ConfigureAwait(false)
-               )
-            {
-                return new CreateComponentPayload(
-                    new CreateComponentError(
-                        CreateComponentErrorCode.UNAUTHORIZED,
-                        "You are not authorized to create components for the institution.",
-                        new[] { nameof(input), nameof(input.ManufacturerId).FirstCharToLower() }
-                    )
-                );
-            }
-
-            if (!await context.Institutions.AsQueryable()
-                    .AnyAsync(
-                        x => x.Id == input.ManufacturerId,
-                        cancellationToken: cancellationToken
-                    )
-                    .ConfigureAwait(false)
-               )
-            {
-                return new CreateComponentPayload(
-                    new CreateComponentError(
-                        CreateComponentErrorCode.UNKNOWN_MANUFACTURER,
-                        "Unknown manufacturer",
-                        new[] { nameof(input), nameof(input.ManufacturerId).FirstCharToLower() }
-                    )
-                );
-            }
-
-            var component = new Data.Component(
-                name: input.Name,
-                abbreviation: input.Abbreviation,
-                description: input.Description,
-                availability:
-                input.Availability is null
-                    ? null
-                    : OpenEndedDateTimeRangeType.FromInput(input.Availability),
-                categories: input.Categories
+                )
+                .ConfigureAwait(false)
+           )
+            return new CreateComponentPayload(
+                new CreateComponentError(
+                    CreateComponentErrorCode.UNKNOWN_MANUFACTURER,
+                    "Unknown manufacturer",
+                    new[] { nameof(input), nameof(input.ManufacturerId).FirstCharToLower() }
+                )
             );
-            component.ManufacturerEdges.Add(
-                new Data.ComponentManufacturer
-                {
-                    InstitutionId = input.ManufacturerId,
-                    Pending = false
-                }
-            );
-            context.Components.Add(component);
-            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            return new CreateComponentPayload(component);
-        }
 
-        [UseUserManager]
-        [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
-        public async Task<UpdateComponentPayload> UpdateComponentAsync(
-            UpdateComponentInput input,
-            ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
-            CancellationToken cancellationToken
-        )
-        {
-            if (!await ComponentAuthorization.IsAuthorizedToUpdate(
-                    claimsPrincipal,
-                    input.ComponentId,
-                    userManager,
-                    context,
-                    cancellationToken
-                ).ConfigureAwait(false)
-               )
+        var component = new Data.Component(
+            input.Name,
+            input.Abbreviation,
+            input.Description,
+            input.Availability is null
+                ? null
+                : OpenEndedDateTimeRangeType.FromInput(input.Availability),
+            input.Categories
+        );
+        component.ManufacturerEdges.Add(
+            new Data.ComponentManufacturer
             {
-                return new UpdateComponentPayload(
-                    new UpdateComponentError(
-                        UpdateComponentErrorCode.UNAUTHORIZED,
-                        "You are not authorized to update the component.",
-                        Array.Empty<string>()
-                    )
-                );
+                InstitutionId = input.ManufacturerId,
+                Pending = false
             }
+        );
+        context.Components.Add(component);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return new CreateComponentPayload(component);
+    }
 
-            var component =
-                await context.Components.AsQueryable()
-                    .Where(i => i.Id == input.ComponentId)
-                    .SingleOrDefaultAsync(cancellationToken)
-                    .ConfigureAwait(false);
-            if (component is null)
-            {
-                return new UpdateComponentPayload(
-                    new UpdateComponentError(
-                        UpdateComponentErrorCode.UNKNOWN_COMPONENT,
-                        "Unknown component.",
-                        new[] { nameof(input), nameof(input.ComponentId).FirstCharToLower() }
-                    )
-                );
-            }
-
-            component.Update(
-                name: input.Name,
-                abbreviation: input.Abbreviation,
-                description: input.Description,
-                availability:
-                input.Availability is null
-                    ? null
-                    : OpenEndedDateTimeRangeType.FromInput(input.Availability),
-                categories: input.Categories
+    [UseUserManager]
+    [Authorize(Policy = Configuration.AuthConfiguration.WritePolicy)]
+    public async Task<UpdateComponentPayload> UpdateComponentAsync(
+        UpdateComponentInput input,
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        Data.ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        if (!await ComponentAuthorization.IsAuthorizedToUpdate(
+                claimsPrincipal,
+                input.ComponentId,
+                userManager,
+                context,
+                cancellationToken
+            ).ConfigureAwait(false)
+           )
+            return new UpdateComponentPayload(
+                new UpdateComponentError(
+                    UpdateComponentErrorCode.UNAUTHORIZED,
+                    "You are not authorized to update the component.",
+                    Array.Empty<string>()
+                )
             );
-            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            return new UpdateComponentPayload(component);
-        }
+
+        var component =
+            await context.Components.AsQueryable()
+                .Where(i => i.Id == input.ComponentId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+        if (component is null)
+            return new UpdateComponentPayload(
+                new UpdateComponentError(
+                    UpdateComponentErrorCode.UNKNOWN_COMPONENT,
+                    "Unknown component.",
+                    new[] { nameof(input), nameof(input.ComponentId).FirstCharToLower() }
+                )
+            );
+
+        component.Update(
+            input.Name,
+            input.Abbreviation,
+            input.Description,
+            input.Availability is null
+                ? null
+                : OpenEndedDateTimeRangeType.FromInput(input.Availability),
+            input.Categories
+        );
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return new UpdateComponentPayload(component);
     }
 }

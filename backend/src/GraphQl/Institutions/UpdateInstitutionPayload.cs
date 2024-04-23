@@ -1,20 +1,19 @@
-namespace Metabase.GraphQl.Institutions
-{
-    public sealed class UpdateInstitutionPayload
-        : InstitutionPayload<UpdateInstitutionError>
-    {
-        public UpdateInstitutionPayload(
-            Data.Institution institution
-        )
-            : base(institution)
-        {
-        }
+namespace Metabase.GraphQl.Institutions;
 
-        public UpdateInstitutionPayload(
-            UpdateInstitutionError error
-        )
-            : base(error)
-        {
-        }
+public sealed class UpdateInstitutionPayload
+    : InstitutionPayload<UpdateInstitutionError>
+{
+    public UpdateInstitutionPayload(
+        Data.Institution institution
+    )
+        : base(institution)
+    {
+    }
+
+    public UpdateInstitutionPayload(
+        UpdateInstitutionError error
+    )
+        : base(error)
+    {
     }
 }

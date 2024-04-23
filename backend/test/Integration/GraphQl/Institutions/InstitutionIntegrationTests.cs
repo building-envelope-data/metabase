@@ -7,175 +7,174 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Metabase.GraphQl.Institutions;
 
-namespace Metabase.Tests.Integration.GraphQl.Institutions
+namespace Metabase.Tests.Integration.GraphQl.Institutions;
+
+public abstract class InstitutionIntegrationTests
+    : IntegrationTests
 {
-    public abstract class InstitutionIntegrationTests
-        : IntegrationTests
+    internal static CreateInstitutionInput PendingInstitutionInput { get; } = new(
+        "Institution A",
+        "I!A",
+        "Best institution ever!",
+        new Uri("https://institution-a.com"),
+        null,
+        Array.Empty<Guid>(),
+        null
+    );
+
+    internal static IEnumerable<CreateInstitutionInput> InstitutionInputs
     {
-        internal static CreateInstitutionInput PendingInstitutionInput { get; } = new(
-            Name: "Institution A",
-            Abbreviation: "I!A",
-            Description: "Best institution ever!",
-            WebsiteLocator: new Uri("https://institution-a.com"),
-            PublicKey: null,
-            OwnerIds: Array.Empty<Guid>(),
-            ManagerId: null
+        get { yield return PendingInstitutionInput; }
+    }
+
+    internal static IEnumerable<object[]> EnumerateInstitutionInputs()
+    {
+        yield return new object[] { nameof(PendingInstitutionInput), PendingInstitutionInput };
+    }
+
+    protected Task<string> GetInstitutions()
+    {
+        return GetInstitutions(HttpClient);
+    }
+
+    internal static Task<string> GetInstitutions(
+        HttpClient httpClient
+    )
+    {
+        return SuccessfullyQueryGraphQlContentAsString(
+            httpClient,
+            File.ReadAllText("Integration/GraphQl/Institutions/GetInstitutions.graphql")
         );
+    }
 
-        internal static IEnumerable<CreateInstitutionInput> InstitutionInputs
-        {
-            get { yield return PendingInstitutionInput; }
-        }
+    protected Task<string> GetInstitution(
+        string uuid
+    )
+    {
+        return GetInstitution(HttpClient, uuid);
+    }
 
-        internal static IEnumerable<object[]> EnumerateInstitutionInputs()
-        {
-            yield return new object[] { nameof(PendingInstitutionInput), PendingInstitutionInput };
-        }
+    internal static Task<string> GetInstitution(
+        HttpClient httpClient,
+        string uuid
+    )
+    {
+        return SuccessfullyQueryGraphQlContentAsString(
+            httpClient,
+            File.ReadAllText("Integration/GraphQl/Institutions/GetInstitution.graphql"),
+            variables: new Dictionary<string, object?>
+            {
+                ["uuid"] = uuid
+            }
+        );
+    }
 
-        protected Task<string> GetInstitutions()
-        {
-            return GetInstitutions(HttpClient);
-        }
+    protected Task<string> CreateInstitution(
+        CreateInstitutionInput input
+    )
+    {
+        return CreateInstitution(HttpClient, input);
+    }
 
-        internal static Task<string> GetInstitutions(
-            HttpClient httpClient
-        )
-        {
-            return SuccessfullyQueryGraphQlContentAsString(
-                httpClient,
-                File.ReadAllText("Integration/GraphQl/Institutions/GetInstitutions.graphql")
-            );
-        }
+    internal static Task<string> CreateInstitution(
+        HttpClient httpClient,
+        CreateInstitutionInput input
+    )
+    {
+        return SuccessfullyQueryGraphQlContentAsString(
+            httpClient,
+            File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
+            variables: input
+        );
+    }
 
-        protected Task<string> GetInstitution(
-            string uuid
-        )
-        {
-            return GetInstitution(HttpClient, uuid);
-        }
+    protected Task<JsonElement> CreateInstitutionAsJson(
+        CreateInstitutionInput input
+    )
+    {
+        return CreateInstitutionAsJson(HttpClient, input);
+    }
 
-        internal static Task<string> GetInstitution(
-            HttpClient httpClient,
-            string uuid
-        )
-        {
-            return SuccessfullyQueryGraphQlContentAsString(
-                httpClient,
-                File.ReadAllText("Integration/GraphQl/Institutions/GetInstitution.graphql"),
-                variables: new Dictionary<string, object?>
-                {
-                    ["uuid"] = uuid
-                }
-            );
-        }
+    internal static Task<JsonElement> CreateInstitutionAsJson(
+        HttpClient httpClient,
+        CreateInstitutionInput input
+    )
+    {
+        return SuccessfullyQueryGraphQlContentAsJson(
+            httpClient,
+            File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
+            variables: input
+        );
+    }
 
-        protected Task<string> CreateInstitution(
-            CreateInstitutionInput input
-        )
-        {
-            return CreateInstitution(HttpClient, input);
-        }
+    protected Task<Guid> CreateInstitutionReturningUuid(
+        CreateInstitutionInput input
+    )
+    {
+        return CreateInstitutionReturningUuid(HttpClient, input);
+    }
 
-        internal static Task<string> CreateInstitution(
-            HttpClient httpClient,
-            CreateInstitutionInput input
-        )
-        {
-            return SuccessfullyQueryGraphQlContentAsString(
-                httpClient,
-                File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-                variables: input
-            );
-        }
+    internal static async Task<Guid> CreateInstitutionReturningUuid(
+        HttpClient httpClient,
+        CreateInstitutionInput input
+    )
+    {
+        var response = await CreateInstitutionAsJson(httpClient, input).ConfigureAwait(false);
+        return new Guid(
+            ExtractString(
+                "$.data.createInstitution.institution.uuid",
+                response
+            )
+        );
+    }
 
-        protected Task<JsonElement> CreateInstitutionAsJson(
-            CreateInstitutionInput input
-        )
-        {
-            return CreateInstitutionAsJson(HttpClient, input);
-        }
+    internal static async Task<Guid> CreateAndVerifyInstitutionReturningUuid(
+        HttpClient httpClient,
+        CreateInstitutionInput input
+    )
+    {
+        var uuid = await CreateInstitutionReturningUuid(httpClient, input).ConfigureAwait(false);
+        await VerifyInstitutionByVerifierUser(httpClient, uuid).ConfigureAwait(false);
+        return uuid;
+    }
 
-        internal static Task<JsonElement> CreateInstitutionAsJson(
-            HttpClient httpClient,
-            CreateInstitutionInput input
-        )
-        {
-            return SuccessfullyQueryGraphQlContentAsJson(
-                httpClient,
-                File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
-                variables: input
-            );
-        }
+    protected async Task<(string, string)> CreateInstitutionReturningIdAndUuid(
+        CreateInstitutionInput input
+    )
+    {
+        var response = await CreateInstitutionAsJson(input).ConfigureAwait(false);
+        return (
+            ExtractString(
+                "$.data.createInstitution.institution.id",
+                response
+            ),
+            ExtractString(
+                "$.data.createInstitution.institution.uuid",
+                response
+            )
+        );
+    }
 
-        protected Task<Guid> CreateInstitutionReturningUuid(
-            CreateInstitutionInput input
-        )
-        {
-            return CreateInstitutionReturningUuid(HttpClient, input);
-        }
-
-        internal static async Task<Guid> CreateInstitutionReturningUuid(
-            HttpClient httpClient,
-            CreateInstitutionInput input
-        )
-        {
-            var response = await CreateInstitutionAsJson(httpClient, input).ConfigureAwait(false);
-            return new Guid(
-                ExtractString(
-                    "$.data.createInstitution.institution.uuid",
-                    response
-                )
-            );
-        }
-
-        internal static async Task<Guid> CreateAndVerifyInstitutionReturningUuid(
-            HttpClient httpClient,
-            CreateInstitutionInput input
-        )
-        {
-            var uuid = await CreateInstitutionReturningUuid(httpClient, input).ConfigureAwait(false);
-            await VerifyInstitutionByVerifierUser(httpClient, uuid).ConfigureAwait(false);
-            return uuid;
-        }
-
-        protected async Task<(string, string)> CreateInstitutionReturningIdAndUuid(
-            CreateInstitutionInput input
-        )
-        {
-            var response = await CreateInstitutionAsJson(input).ConfigureAwait(false);
-            return (
-                ExtractString(
-                    "$.data.createInstitution.institution.id",
-                    response
-                ),
-                ExtractString(
-                    "$.data.createInstitution.institution.uuid",
-                    response
-                )
-            );
-        }
-
-        internal static Task<string> VerifyInstitutionByVerifierUser(
-            HttpClient httpClient,
-            Guid institutionId
-        )
-        {
-            return AsUser(
-                httpClient,
-                email: Data.DbSeeder.VerifierUser.EmailAddress,
-                password: Data.DbSeeder.VerifierUser.Password,
-                task: (httpClient) =>
-                {
-                    return SuccessfullyQueryGraphQlContentAsString(
-                        httpClient,
-                        File.ReadAllText("Integration/GraphQl/Institutions/VerifyInstitution.graphql"),
-                        variables: new Dictionary<string, object?>
-                        {
-                            ["institutionId"] = institutionId
-                        }
-                    );
-                }
-            );
-        }
+    internal static Task<string> VerifyInstitutionByVerifierUser(
+        HttpClient httpClient,
+        Guid institutionId
+    )
+    {
+        return AsUser(
+            httpClient,
+            Data.DbSeeder.VerifierUser.EmailAddress,
+            Data.DbSeeder.VerifierUser.Password,
+            (httpClient) =>
+            {
+                return SuccessfullyQueryGraphQlContentAsString(
+                    httpClient,
+                    File.ReadAllText("Integration/GraphQl/Institutions/VerifyInstitution.graphql"),
+                    variables: new Dictionary<string, object?>
+                    {
+                        ["institutionId"] = institutionId
+                    }
+                );
+            }
+        );
     }
 }

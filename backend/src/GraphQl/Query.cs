@@ -1,6 +1,5 @@
-namespace Metabase.GraphQl
+namespace Metabase.GraphQl;
+
+public sealed class Query
 {
-    public sealed class Query
-    {
-    }
 }

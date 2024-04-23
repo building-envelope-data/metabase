@@ -1,13 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Metabase.GraphQl.Institutions
+namespace Metabase.GraphQl.Institutions;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum DeleteInstitutionErrorCode
 {
-    [SuppressMessage("Naming", "CA1707")]
-    public enum DeleteInstitutionErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_INSTITUTION,
-        UNAUTHORIZED,
-        MANAGING
-    }
+    UNKNOWN,
+    UNKNOWN_INSTITUTION,
+    UNAUTHORIZED,
+    MANAGING
 }

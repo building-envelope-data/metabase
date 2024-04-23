@@ -1,17 +1,16 @@
 using System.Collections.Generic;
 
-namespace Metabase.GraphQl.InstitutionMethodDevelopers
+namespace Metabase.GraphQl.InstitutionMethodDevelopers;
+
+public sealed class ConfirmInstitutionMethodDeveloperError
+    : UserErrorBase<ConfirmInstitutionMethodDeveloperErrorCode>
 {
-    public sealed class ConfirmInstitutionMethodDeveloperError
-        : UserErrorBase<ConfirmInstitutionMethodDeveloperErrorCode>
+    public ConfirmInstitutionMethodDeveloperError(
+        ConfirmInstitutionMethodDeveloperErrorCode code,
+        string message,
+        IReadOnlyList<string> path
+    )
+        : base(code, message, path)
     {
-        public ConfirmInstitutionMethodDeveloperError(
-            ConfirmInstitutionMethodDeveloperErrorCode code,
-            string message,
-            IReadOnlyList<string> path
-        )
-            : base(code, message, path)
-        {
-        }
     }
 }

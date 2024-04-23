@@ -1,15 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Metabase.GraphQl.Databases
+namespace Metabase.GraphQl.Databases;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum VerifyDatabaseErrorCode
 {
-    [SuppressMessage("Naming", "CA1707")]
-    public enum VerifyDatabaseErrorCode
-    {
-        UNKNOWN,
-        UNAUTHORIZED,
-        UNKNOWN_DATABASE,
-        WRONG_VERIFICATION_CODE,
-        REQUEST_FAILED,
-        DESERIALIZATION_FAILED
-    }
+    UNKNOWN,
+    UNAUTHORIZED,
+    UNKNOWN_DATABASE,
+    WRONG_VERIFICATION_CODE,
+    REQUEST_FAILED,
+    DESERIALIZATION_FAILED
 }

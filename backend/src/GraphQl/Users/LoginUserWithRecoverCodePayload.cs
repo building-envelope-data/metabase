@@ -1,20 +1,19 @@
-namespace Metabase.GraphQl.Users
-{
-    public sealed class LoginUserWithRecoveryCodePayload
-        : UserPayload<LoginUserWithRecoveryCodeError>
-    {
-        public LoginUserWithRecoveryCodePayload(
-            Data.User user
-        )
-            : base(user)
-        {
-        }
+namespace Metabase.GraphQl.Users;
 
-        public LoginUserWithRecoveryCodePayload(
-            LoginUserWithRecoveryCodeError error
-        )
-            : base(error)
-        {
-        }
+public sealed class LoginUserWithRecoveryCodePayload
+    : UserPayload<LoginUserWithRecoveryCodeError>
+{
+    public LoginUserWithRecoveryCodePayload(
+        Data.User user
+    )
+        : base(user)
+    {
+    }
+
+    public LoginUserWithRecoveryCodePayload(
+        LoginUserWithRecoveryCodeError error
+    )
+        : base(error)
+    {
     }
 }

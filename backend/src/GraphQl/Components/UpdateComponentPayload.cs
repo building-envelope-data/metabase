@@ -1,29 +1,28 @@
 using System.Collections.Generic;
 
-namespace Metabase.GraphQl.Components
+namespace Metabase.GraphQl.Components;
+
+public sealed class UpdateComponentPayload
+    : ComponentPayload<UpdateComponentError>
 {
-    public sealed class UpdateComponentPayload
-        : ComponentPayload<UpdateComponentError>
+    public UpdateComponentPayload(
+        Data.Component component
+    )
+        : base(component)
     {
-        public UpdateComponentPayload(
-            Data.Component component
-        )
-            : base(component)
-        {
-        }
+    }
 
-        public UpdateComponentPayload(
-            UpdateComponentError error
-        )
-            : base(error)
-        {
-        }
+    public UpdateComponentPayload(
+        UpdateComponentError error
+    )
+        : base(error)
+    {
+    }
 
-        public UpdateComponentPayload(
-            IReadOnlyCollection<UpdateComponentError> errors
-        )
-            : base(errors)
-        {
-        }
+    public UpdateComponentPayload(
+        IReadOnlyCollection<UpdateComponentError> errors
+    )
+        : base(errors)
+    {
     }
 }

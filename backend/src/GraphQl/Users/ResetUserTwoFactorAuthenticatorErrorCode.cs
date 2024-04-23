@@ -1,13 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum ResetUserTwoFactorAuthenticatorErrorCode
 {
-    [SuppressMessage("Naming", "CA1707")]
-    public enum ResetUserTwoFactorAuthenticatorErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_USER,
-        DISABLING_FAILED,
-        RESETTING_FAILED,
-    }
+    UNKNOWN,
+    UNKNOWN_USER,
+    DISABLING_FAILED,
+    RESETTING_FAILED
 }

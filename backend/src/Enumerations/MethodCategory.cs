@@ -1,8 +1,7 @@
-namespace Metabase.Enumerations
+namespace Metabase.Enumerations;
+
+public enum MethodCategory
 {
-    public enum MethodCategory
-    {
-        MEASUREMENT,
-        CALCULATION
-    }
+    MEASUREMENT,
+    CALCULATION
 }

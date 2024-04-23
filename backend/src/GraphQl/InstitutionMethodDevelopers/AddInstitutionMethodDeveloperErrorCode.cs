@@ -1,14 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Metabase.GraphQl.InstitutionMethodDevelopers
+namespace Metabase.GraphQl.InstitutionMethodDevelopers;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum AddInstitutionMethodDeveloperErrorCode
 {
-    [SuppressMessage("Naming", "CA1707")]
-    public enum AddInstitutionMethodDeveloperErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_METHOD,
-        UNKNOWN_INSTITUTION,
-        UNAUTHORIZED,
-        DUPLICATE
-    }
+    UNKNOWN,
+    UNKNOWN_METHOD,
+    UNKNOWN_INSTITUTION,
+    UNAUTHORIZED,
+    DUPLICATE
 }

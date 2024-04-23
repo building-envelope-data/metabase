@@ -1,14 +1,13 @@
-namespace Metabase.GraphQl.Institutions
-{
-    public sealed class InstitutionOperatedDatabaseEdge
-    {
-        public Data.Database Node { get; }
+namespace Metabase.GraphQl.Institutions;
 
-        public InstitutionOperatedDatabaseEdge(
-            Data.Database node
-        )
-        {
-            Node = node;
-        }
+public sealed class InstitutionOperatedDatabaseEdge
+{
+    public Data.Database Node { get; }
+
+    public InstitutionOperatedDatabaseEdge(
+        Data.Database node
+    )
+    {
+        Node = node;
     }
 }

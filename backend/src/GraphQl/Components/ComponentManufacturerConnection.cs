@@ -6,40 +6,39 @@ using Metabase.Authorization;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace Metabase.GraphQl.Components
-{
-    public sealed class ComponentManufacturerConnection
-        : ForkingConnection<Data.Component, Data.ComponentManufacturer,
-            PendingComponentManufacturersByComponentIdDataLoader, ComponentManufacturersByComponentIdDataLoader,
-            ComponentManufacturerEdge>
-    {
-        public ComponentManufacturerConnection(
-            Data.Component subject,
-            bool pending
-        )
-            : base(
-                subject,
-                pending,
-                x => new ComponentManufacturerEdge(x)
-            )
-        {
-        }
+namespace Metabase.GraphQl.Components;
 
-        [UseUserManager]
-        public Task<bool> CanCurrentUserAddEdgeAsync(
-            ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
-            CancellationToken cancellationToken
+public sealed class ComponentManufacturerConnection
+    : ForkingConnection<Data.Component, Data.ComponentManufacturer,
+        PendingComponentManufacturersByComponentIdDataLoader, ComponentManufacturersByComponentIdDataLoader,
+        ComponentManufacturerEdge>
+{
+    public ComponentManufacturerConnection(
+        Data.Component subject,
+        bool pending
+    )
+        : base(
+            subject,
+            pending,
+            x => new ComponentManufacturerEdge(x)
         )
-        {
-            return ComponentManufacturerAuthorization.IsAuthorizedToAdd(
-                claimsPrincipal,
-                Subject.Id,
-                userManager,
-                context,
-                cancellationToken
-            );
-        }
+    {
+    }
+
+    [UseUserManager]
+    public Task<bool> CanCurrentUserAddEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
+        Data.ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        return ComponentManufacturerAuthorization.IsAuthorizedToAdd(
+            claimsPrincipal,
+            Subject.Id,
+            userManager,
+            context,
+            cancellationToken
+        );
     }
 }

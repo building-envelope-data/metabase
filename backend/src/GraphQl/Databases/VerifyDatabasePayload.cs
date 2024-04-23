@@ -1,20 +1,19 @@
-namespace Metabase.GraphQl.Databases
-{
-    public sealed class VerifyDatabasePayload
-        : DatabasePayload<VerifyDatabaseError>
-    {
-        public VerifyDatabasePayload(
-            Data.Database database
-        )
-            : base(database)
-        {
-        }
+namespace Metabase.GraphQl.Databases;
 
-        public VerifyDatabasePayload(
-            VerifyDatabaseError error
-        )
-            : base(error)
-        {
-        }
+public sealed class VerifyDatabasePayload
+    : DatabasePayload<VerifyDatabaseError>
+{
+    public VerifyDatabasePayload(
+        Data.Database database
+    )
+        : base(database)
+    {
+    }
+
+    public VerifyDatabasePayload(
+        VerifyDatabaseError error
+    )
+        : base(error)
+    {
     }
 }
