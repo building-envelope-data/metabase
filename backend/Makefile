@@ -110,8 +110,17 @@ dos2unix : ## Strip the byte-order mark, also known as, BOM, and remove carriage
 .PHONY : dos2unix
 
 format : ## Format code
-	dotnet tool run jb cleanupcode --profile="Built-in: Reformat Code" Metabase.sln
+	dotnet tool run jb cleanupcode --profile="Built-in: Reformat Code" ./Metabase.sln
 .PHONY : format
+
+syntax : ## Apply syntax style
+	dotnet tool run jb cleanupcode --profile="Built-in: Reformat & Apply Syntax Style" ./Metabase.sln
+.PHONY : syntax
+
+# Built-in: Full Cleanup
+cleanup : ## Clean-up code
+	dotnet tool run jb cleanupcode ./Metabase.sln
+.PHONY : cleanup
 
 update-packages : ## Update packages
 	for subproject in src test ; do ( \
