@@ -2,14 +2,13 @@ using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace Metabase.Tests
+namespace Metabase.Tests;
+
+public sealed class Play
 {
-    public sealed class Play
+    [Test]
+    public async Task Do()
     {
-        [Test]
-        public async Task Do()
-        {
-            Console.WriteLine("Do play!");
-        }
+        Console.WriteLine("Do play!");
     }
 }

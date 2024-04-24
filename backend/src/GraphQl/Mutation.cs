@@ -1,6 +1,5 @@
-namespace Metabase.GraphQl
+namespace Metabase.GraphQl;
+
+public sealed class Mutation
 {
-    public sealed class Mutation
-    {
-    }
 }

@@ -1,17 +1,16 @@
-namespace Metabase.GraphQl.DataX
-{
-    public sealed class DataEdge
+namespace Metabase.GraphQl.DataX;
+
+public sealed class DataEdge
     : DataEdgeBase<IData>
-    {
-        public DataEdge(
+{
+    public DataEdge(
         string cursor,
         IData node
-        )
+    )
         : base(
             cursor,
             node
         )
-        {
-        }
+    {
     }
 }

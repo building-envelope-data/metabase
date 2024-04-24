@@ -1,11 +1,13 @@
-namespace Metabase.GraphQl.InstitutionRepresentatives
+using System.Diagnostics.CodeAnalysis;
+
+namespace Metabase.GraphQl.InstitutionRepresentatives;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum ConfirmInstitutionRepresentativeErrorCode
 {
-    public enum ConfirmInstitutionRepresentativeErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_INSTITUTION,
-        UNKNOWN_USER,
-        UNAUTHORIZED,
-        UNKNOWN_REPRESENTATIVE,
-    }
+    UNKNOWN,
+    UNKNOWN_INSTITUTION,
+    UNKNOWN_USER,
+    UNAUTHORIZED,
+    UNKNOWN_REPRESENTATIVE
 }

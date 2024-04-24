@@ -1,8 +1,7 @@
-namespace Metabase.Enumerations
+namespace Metabase.Enumerations;
+
+public enum InstitutionState
 {
-    public enum InstitutionState
-    {
-        PENDING,
-        VERIFIED,
-    }
+    PENDING,
+    VERIFIED
 }

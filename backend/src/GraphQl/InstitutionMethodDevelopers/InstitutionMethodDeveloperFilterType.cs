@@ -1,18 +1,18 @@
 using HotChocolate.Data.Filters;
+using Metabase.Data;
 
-namespace Metabase.GraphQl.InstitutionMethodDevelopers
+namespace Metabase.GraphQl.InstitutionMethodDevelopers;
+
+public sealed class InstitutionMethodDeveloperFilterType
+    : FilterInputType<InstitutionMethodDeveloper>
 {
-    public sealed class InstitutionMethodDeveloperFilterType
-      : FilterInputType<Data.InstitutionMethodDeveloper>
+    protected override void Configure(
+        IFilterInputTypeDescriptor<InstitutionMethodDeveloper> descriptor
+    )
     {
-        protected override void Configure(
-          IFilterInputTypeDescriptor<Data.InstitutionMethodDeveloper> descriptor
-          )
-        {
-            descriptor.BindFieldsExplicitly();
-            descriptor.Field(x => x.Method);
-            descriptor.Field(x => x.Institution);
-            descriptor.Field(x => x.Pending);
-        }
+        descriptor.BindFieldsExplicitly();
+        descriptor.Field(x => x.Method);
+        descriptor.Field(x => x.Institution);
+        descriptor.Field(x => x.Pending);
     }
 }

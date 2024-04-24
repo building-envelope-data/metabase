@@ -1,8 +1,7 @@
-namespace Metabase.Enumerations
+namespace Metabase.Enumerations;
+
+public enum DatabaseVerificationState
 {
-    public enum DatabaseVerificationState
-    {
-        PENDING,
-        VERIFIED,
-    }
+    PENDING,
+    VERIFIED
 }

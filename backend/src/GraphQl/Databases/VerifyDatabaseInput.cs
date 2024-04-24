@@ -1,8 +1,7 @@
 using System;
 
-namespace Metabase.GraphQl.Databases
-{
-    public sealed record VerifyDatabaseInput(
-          Guid DatabaseId
-        );
-}
+namespace Metabase.GraphQl.Databases;
+
+public sealed record VerifyDatabaseInput(
+    Guid DatabaseId
+);

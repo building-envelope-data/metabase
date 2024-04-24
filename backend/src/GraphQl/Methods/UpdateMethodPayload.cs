@@ -1,20 +1,21 @@
-namespace Metabase.GraphQl.Methods
-{
-    public sealed class UpdateMethodPayload
-      : MethodPayload<UpdateMethodError>
-    {
-        public UpdateMethodPayload(
-            Data.Method method
-            )
-              : base(method)
-        {
-        }
+using Metabase.Data;
 
-        public UpdateMethodPayload(
-            UpdateMethodError error
-            )
-              : base(error)
-        {
-        }
+namespace Metabase.GraphQl.Methods;
+
+public sealed class UpdateMethodPayload
+    : MethodPayload<UpdateMethodError>
+{
+    public UpdateMethodPayload(
+        Method method
+    )
+        : base(method)
+    {
+    }
+
+    public UpdateMethodPayload(
+        UpdateMethodError error
+    )
+        : base(error)
+    {
     }
 }

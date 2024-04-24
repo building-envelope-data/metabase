@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+public sealed class LogoutUserPayload
 {
-    public sealed class LogoutUserPayload
-    {
-        public Data.User? User { get; }
-        public IReadOnlyCollection<LogoutUserError>? Errors { get; }
-    }
+    public User? User { get; }
+    public IReadOnlyCollection<LogoutUserError>? Errors { get; }
 }

@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
   database: # https://hub.docker.com/_/postgres
     restart: always

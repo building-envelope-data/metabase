@@ -1,24 +1,25 @@
-namespace Metabase.GraphQl.Users
+using Metabase.Data;
+
+namespace Metabase.GraphQl.Users;
+
+public sealed class LoginUserPayload
+    : UserPayload<LoginUserError>
 {
-    public sealed class LoginUserPayload
-      : UserPayload<LoginUserError>
+    public LoginUserPayload(
+        User user,
+        bool requiresTwoFactor
+    )
+        : base(user)
     {
-        public bool? RequiresTwoFactor { get; }
-
-        public LoginUserPayload(
-            Data.User user,
-            bool requiresTwoFactor
-            )
-          : base(user)
-        {
-            RequiresTwoFactor = requiresTwoFactor;
-        }
-
-        public LoginUserPayload(
-            LoginUserError error
-            )
-          : base(error)
-        {
-        }
+        RequiresTwoFactor = requiresTwoFactor;
     }
+
+    public LoginUserPayload(
+        LoginUserError error
+    )
+        : base(error)
+    {
+    }
+
+    public bool? RequiresTwoFactor { get; }
 }

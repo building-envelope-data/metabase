@@ -1,10 +1,12 @@
-namespace Metabase.GraphQl.Users
+using System.Diagnostics.CodeAnalysis;
+
+namespace Metabase.GraphQl.Users;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum ChangeUserEmailErrorCode
 {
-    public enum ChangeUserEmailErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_USER,
-        UNCHANGED_EMAIL,
-        UNKNOWN_CURRENT_EMAIL
-    }
+    UNKNOWN,
+    UNKNOWN_USER,
+    UNCHANGED_EMAIL,
+    UNKNOWN_CURRENT_EMAIL
 }

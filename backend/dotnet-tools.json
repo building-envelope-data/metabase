@@ -26,12 +26,6 @@
         "dotnet-ef"
       ]
     },
-    "dotnet-format": {
-      "version": "5.1.250801",
-      "commands": [
-        "dotnet-format"
-      ]
-    },
     "dotnet-script": {
       "version": "1.5.0",
       "commands": [

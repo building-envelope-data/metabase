@@ -1,40 +1,40 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+public sealed class AddUserRolePayload
 {
-    public sealed class AddUserRolePayload
+    public AddUserRolePayload(
+        User user
+    )
     {
-        public Data.User? User { get; }
-        public IReadOnlyCollection<AddUserRoleError>? Errors { get; }
-
-        public AddUserRolePayload(
-            Data.User user
-            )
-        {
-            User = user;
-        }
-
-        public AddUserRolePayload(
-            IReadOnlyCollection<AddUserRoleError> errors
-            )
-        {
-            Errors = errors;
-        }
-
-        public AddUserRolePayload(
-            Data.User user,
-            IReadOnlyCollection<AddUserRoleError> errors
-            )
-        {
-            User = user;
-            Errors = errors;
-        }
-
-        public AddUserRolePayload(
-            AddUserRoleError error
-            )
-            : this(new[] { error })
-        {
-        }
+        User = user;
     }
+
+    public AddUserRolePayload(
+        IReadOnlyCollection<AddUserRoleError> errors
+    )
+    {
+        Errors = errors;
+    }
+
+    public AddUserRolePayload(
+        User user,
+        IReadOnlyCollection<AddUserRoleError> errors
+    )
+    {
+        User = user;
+        Errors = errors;
+    }
+
+    public AddUserRolePayload(
+        AddUserRoleError error
+    )
+        : this(new[] { error })
+    {
+    }
+
+    public User? User { get; }
+    public IReadOnlyCollection<AddUserRoleError>? Errors { get; }
 }

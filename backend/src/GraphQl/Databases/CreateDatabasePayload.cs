@@ -1,20 +1,21 @@
-namespace Metabase.GraphQl.Databases
-{
-    public sealed class CreateDatabasePayload
-      : DatabasePayload<CreateDatabaseError>
-    {
-        public CreateDatabasePayload(
-            Data.Database database
-            )
-              : base(database)
-        {
-        }
+using Metabase.Data;
 
-        public CreateDatabasePayload(
-            CreateDatabaseError error
-            )
-              : base(error)
-        {
-        }
+namespace Metabase.GraphQl.Databases;
+
+public sealed class CreateDatabasePayload
+    : DatabasePayload<CreateDatabaseError>
+{
+    public CreateDatabasePayload(
+        Database database
+    )
+        : base(database)
+    {
+    }
+
+    public CreateDatabasePayload(
+        CreateDatabaseError error
+    )
+        : base(error)
+    {
     }
 }

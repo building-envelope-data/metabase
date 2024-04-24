@@ -1,9 +1,11 @@
-namespace Metabase.GraphQl.Components
+using System.Diagnostics.CodeAnalysis;
+
+namespace Metabase.GraphQl.Components;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum CreateComponentErrorCode
 {
-    public enum CreateComponentErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_MANUFACTURER,
-        UNAUTHORIZED
-    }
+    UNKNOWN,
+    UNKNOWN_MANUFACTURER,
+    UNAUTHORIZED
 }

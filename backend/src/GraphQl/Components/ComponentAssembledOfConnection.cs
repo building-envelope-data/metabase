@@ -3,39 +3,40 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace Metabase.GraphQl.Components
-{
-    public sealed class ComponentAssembledOfConnection
-        : Connection<Data.Component, Data.ComponentAssembly, ComponentPartsByComponentIdDataLoader, ComponentAssembledOfEdge>
-    {
-        public ComponentAssembledOfConnection(
-            Data.Component subject
-        )
-            : base(
-                subject,
-                x => new ComponentAssembledOfEdge(x)
-                )
-        {
-        }
+namespace Metabase.GraphQl.Components;
 
-        [UseUserManager]
-        public Task<bool> CanCurrentUserAddEdgeAsync(
-            ClaimsPrincipal claimsPrincipal,
-            [Service(ServiceKind.Resolver)] UserManager<Data.User> userManager,
-            Data.ApplicationDbContext context,
-            CancellationToken cancellationToken
+public sealed class ComponentAssembledOfConnection
+    : Connection<Component, ComponentAssembly, ComponentPartsByComponentIdDataLoader,
+        ComponentAssembledOfEdge>
+{
+    public ComponentAssembledOfConnection(
+        Component subject
+    )
+        : base(
+            subject,
+            x => new ComponentAssembledOfEdge(x)
         )
-        {
-            return ComponentAssemblyAuthorization.IsAuthorizedToAdd(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
-        }
+    {
+    }
+
+    [UseUserManager]
+    public Task<bool> CanCurrentUserAddEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        return ComponentAssemblyAuthorization.IsAuthorizedToAdd(
+            claimsPrincipal,
+            Subject.Id,
+            userManager,
+            context,
+            cancellationToken
+        );
     }
 }

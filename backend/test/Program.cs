@@ -1,14 +1,13 @@
 using NUnitLite;
 
-namespace Metabase.Tests
+namespace Metabase.Tests;
+
+public static class Program
 {
-    public static class Program
+    public static int Main(
+        string[] commandLineArguments
+    )
     {
-        public static int Main(
-            string[] commandLineArguments
-        )
-        {
-            return new AutoRun().Execute(commandLineArguments);
-        }
+        return new AutoRun().Execute(commandLineArguments);
     }
 }

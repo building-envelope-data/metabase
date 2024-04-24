@@ -1,7 +1,9 @@
-namespace Metabase.GraphQl.Users
+using System.Diagnostics.CodeAnalysis;
+
+namespace Metabase.GraphQl.Users;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum LogoutUserErrorCode
 {
-    public enum LogoutUserErrorCode
-    {
-        UNKNOWN
-    }
+    UNKNOWN
 }

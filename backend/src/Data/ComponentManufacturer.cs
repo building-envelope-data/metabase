@@ -1,17 +1,16 @@
 using System;
 
-namespace Metabase.Data
+namespace Metabase.Data;
+
+public sealed class ComponentManufacturer
 {
-    public sealed class ComponentManufacturer
-    {
-        public Guid ComponentId { get; set; }
-        public Component Component { get; set; } = default!;
+    public Guid ComponentId { get; set; }
+    public Component Component { get; set; } = default!;
 
-        public Guid InstitutionId { get; set; }
-        public Institution Institution { get; set; } = default!;
+    public Guid InstitutionId { get; set; }
+    public Institution Institution { get; set; } = default!;
 
-        // TODO public Enumerations.ComponentManufacturerMarketingInformation? MarketingInformation { get; }
+    // TODO public Enumerations.ComponentManufacturerMarketingInformation? MarketingInformation { get; }
 
-        public bool Pending { get; set; } = true;
-    }
+    public bool Pending { get; set; } = true;
 }
