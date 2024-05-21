@@ -1,14 +1,14 @@
 using HotChocolate.Types;
+using Metabase.Data;
 
-namespace Metabase.GraphQl.Publications
+namespace Metabase.GraphQl.Publications;
+
+public sealed class PublicationType
+    : ObjectType<Publication>
 {
-    public sealed class PublicationType
-      : ObjectType<Data.Publication>
+    protected override void Configure(
+        IObjectTypeDescriptor<Publication> descriptor
+    )
     {
-        protected override void Configure(
-            IObjectTypeDescriptor<Data.Publication> descriptor
-            )
-        {
-        }
     }
 }

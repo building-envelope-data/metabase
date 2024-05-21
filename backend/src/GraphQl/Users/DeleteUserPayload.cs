@@ -1,38 +1,38 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+public sealed class DeleteUserPayload
+    : UserPayload<DeleteUserError>
 {
-    public sealed class DeleteUserPayload
-      : UserPayload<DeleteUserError>
+    public DeleteUserPayload(
+        User user
+    )
+        : base(user)
     {
-        public DeleteUserPayload(
-            Data.User user
-            )
-          : base(user)
-        {
-        }
+    }
 
-        public DeleteUserPayload(
-            DeleteUserError error
-            )
-          : base(error)
-        {
-        }
+    public DeleteUserPayload(
+        DeleteUserError error
+    )
+        : base(error)
+    {
+    }
 
-        public DeleteUserPayload(
-            Data.User user,
-            IReadOnlyCollection<DeleteUserError> errors
-            )
-          : base(user, errors)
-        {
-        }
+    public DeleteUserPayload(
+        User user,
+        IReadOnlyCollection<DeleteUserError> errors
+    )
+        : base(user, errors)
+    {
+    }
 
-        public DeleteUserPayload(
-            Data.User user,
-            DeleteUserError error
-            )
-          : base(user, error)
-        {
-        }
+    public DeleteUserPayload(
+        User user,
+        DeleteUserError error
+    )
+        : base(user, error)
+    {
     }
 }

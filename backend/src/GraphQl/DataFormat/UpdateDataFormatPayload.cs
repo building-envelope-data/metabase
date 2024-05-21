@@ -1,20 +1,21 @@
-namespace Metabase.GraphQl.DataFormats
-{
-    public sealed class UpdateDataFormatPayload
-      : DataFormatPayload<UpdateDataFormatError>
-    {
-        public UpdateDataFormatPayload(
-            Data.DataFormat standard
-            )
-              : base(standard)
-        {
-        }
+using Metabase.Data;
 
-        public UpdateDataFormatPayload(
-          UpdateDataFormatError error
-        )
+namespace Metabase.GraphQl.DataFormats;
+
+public sealed class UpdateDataFormatPayload
+    : DataFormatPayload<UpdateDataFormatError>
+{
+    public UpdateDataFormatPayload(
+        DataFormat standard
+    )
+        : base(standard)
+    {
+    }
+
+    public UpdateDataFormatPayload(
+        UpdateDataFormatError error
+    )
         : base(error)
-        {
-        }
+    {
     }
 }

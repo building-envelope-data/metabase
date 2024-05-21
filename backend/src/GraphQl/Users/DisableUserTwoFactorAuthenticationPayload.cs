@@ -1,20 +1,21 @@
-namespace Metabase.GraphQl.Users
-{
-    public sealed class DisableUserTwoFactorAuthenticationPayload
-      : UserPayload<DisableUserTwoFactorAuthenticationError>
-    {
-        public DisableUserTwoFactorAuthenticationPayload(
-            Data.User user
-            )
-          : base(user)
-        {
-        }
+using Metabase.Data;
 
-        public DisableUserTwoFactorAuthenticationPayload(
-            DisableUserTwoFactorAuthenticationError error
-            )
-          : base(error)
-        {
-        }
+namespace Metabase.GraphQl.Users;
+
+public sealed class DisableUserTwoFactorAuthenticationPayload
+    : UserPayload<DisableUserTwoFactorAuthenticationError>
+{
+    public DisableUserTwoFactorAuthenticationPayload(
+        User user
+    )
+        : base(user)
+    {
+    }
+
+    public DisableUserTwoFactorAuthenticationPayload(
+        DisableUserTwoFactorAuthenticationError error
+    )
+        : base(error)
+    {
     }
 }

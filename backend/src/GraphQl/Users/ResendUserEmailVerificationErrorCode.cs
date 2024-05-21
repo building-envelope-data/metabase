@@ -1,9 +1,11 @@
-namespace Metabase.GraphQl.Users
+using System.Diagnostics.CodeAnalysis;
+
+namespace Metabase.GraphQl.Users;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum ResendUserEmailVerificationErrorCode
 {
-    public enum ResendUserEmailVerificationErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_USER,
-        UNKNOWN_EMAIL
-    }
+    UNKNOWN,
+    UNKNOWN_USER,
+    UNKNOWN_EMAIL
 }

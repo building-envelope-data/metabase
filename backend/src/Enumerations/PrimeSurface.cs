@@ -1,8 +1,7 @@
-namespace Metabase.Enumerations
+namespace Metabase.Enumerations;
+
+public enum PrimeSurface
 {
-    public enum PrimeSurface
-    {
-        INSIDE,
-        OUTSIDE
-    }
+    INSIDE,
+    OUTSIDE
 }

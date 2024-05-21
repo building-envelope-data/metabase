@@ -1,35 +1,35 @@
 using System.Collections.Generic;
-using Metabase.GraphQl.Methods;
+using Metabase.Data;
 using Metabase.GraphQl.Institutions;
+using Metabase.GraphQl.Methods;
 
-namespace Metabase.GraphQl.InstitutionMethodDevelopers
+namespace Metabase.GraphQl.InstitutionMethodDevelopers;
+
+public sealed class ConfirmInstitutionMethodDeveloperPayload
 {
-    public sealed class ConfirmInstitutionMethodDeveloperPayload
+    public ConfirmInstitutionMethodDeveloperPayload(
+        InstitutionMethodDeveloper institutionMethodDeveloper
+    )
     {
-        public InstitutionDevelopedMethodEdge? DevelopedMethodEdge { get; }
-        public InstitutionMethodDeveloperEdge? MethodDeveloperEdge { get; }
-        public IReadOnlyCollection<ConfirmInstitutionMethodDeveloperError>? Errors { get; }
-
-        public ConfirmInstitutionMethodDeveloperPayload(
-            Data.InstitutionMethodDeveloper institutionMethodDeveloper
-            )
-        {
-            DevelopedMethodEdge = new InstitutionDevelopedMethodEdge(institutionMethodDeveloper);
-            MethodDeveloperEdge = new InstitutionMethodDeveloperEdge(institutionMethodDeveloper);
-        }
-
-        public ConfirmInstitutionMethodDeveloperPayload(
-            IReadOnlyCollection<ConfirmInstitutionMethodDeveloperError> errors
-            )
-        {
-            Errors = errors;
-        }
-
-        public ConfirmInstitutionMethodDeveloperPayload(
-            ConfirmInstitutionMethodDeveloperError error
-            )
-            : this(new[] { error })
-        {
-        }
+        DevelopedMethodEdge = new InstitutionDevelopedMethodEdge(institutionMethodDeveloper);
+        MethodDeveloperEdge = new InstitutionMethodDeveloperEdge(institutionMethodDeveloper);
     }
+
+    public ConfirmInstitutionMethodDeveloperPayload(
+        IReadOnlyCollection<ConfirmInstitutionMethodDeveloperError> errors
+    )
+    {
+        Errors = errors;
+    }
+
+    public ConfirmInstitutionMethodDeveloperPayload(
+        ConfirmInstitutionMethodDeveloperError error
+    )
+        : this(new[] { error })
+    {
+    }
+
+    public InstitutionDevelopedMethodEdge? DevelopedMethodEdge { get; }
+    public InstitutionMethodDeveloperEdge? MethodDeveloperEdge { get; }
+    public IReadOnlyCollection<ConfirmInstitutionMethodDeveloperError>? Errors { get; }
 }

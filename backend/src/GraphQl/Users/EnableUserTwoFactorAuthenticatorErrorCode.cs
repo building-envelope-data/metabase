@@ -1,11 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum EnableUserTwoFactorAuthenticatorErrorCode
 {
-    public enum EnableUserTwoFactorAuthenticatorErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_USER,
-        ENABLING_FAILED,
-        INVALID_VERIFICATION_CODE
-    }
+    UNKNOWN,
+    UNKNOWN_USER,
+    ENABLING_FAILED,
+    INVALID_VERIFICATION_CODE
 }

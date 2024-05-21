@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Guid = System.Guid;
 
-namespace Metabase.Data
+namespace Metabase.Data;
+
+public sealed class UserClaim : IdentityUserClaim<Guid>
 {
-    public sealed class UserClaim : IdentityUserClaim<Guid>
-    {
-        // public User User { get; set; } = default!;
-    }
+    // public User User { get; set; } = default!;
 }

@@ -1,20 +1,21 @@
-namespace Metabase.GraphQl.Users
-{
-    public sealed class LoginUserWithTwoFactorCodePayload
-      : UserPayload<LoginUserWithTwoFactorCodeError>
-    {
-        public LoginUserWithTwoFactorCodePayload(
-            Data.User user
-            )
-          : base(user)
-        {
-        }
+using Metabase.Data;
 
-        public LoginUserWithTwoFactorCodePayload(
-            LoginUserWithTwoFactorCodeError error
-            )
-          : base(error)
-        {
-        }
+namespace Metabase.GraphQl.Users;
+
+public sealed class LoginUserWithTwoFactorCodePayload
+    : UserPayload<LoginUserWithTwoFactorCodeError>
+{
+    public LoginUserWithTwoFactorCodePayload(
+        User user
+    )
+        : base(user)
+    {
+    }
+
+    public LoginUserWithTwoFactorCodePayload(
+        LoginUserWithTwoFactorCodeError error
+    )
+        : base(error)
+    {
     }
 }

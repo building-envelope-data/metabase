@@ -1,17 +1,16 @@
 using System.Collections.Generic;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+public sealed class AddUserRoleError
+    : UserErrorBase<AddUserRoleErrorCode>
 {
-    public sealed class AddUserRoleError
-      : UserErrorBase<AddUserRoleErrorCode>
+    public AddUserRoleError(
+        AddUserRoleErrorCode code,
+        string message,
+        IReadOnlyList<string> path
+    )
+        : base(code, message, path)
     {
-        public AddUserRoleError(
-            AddUserRoleErrorCode code,
-            string message,
-            IReadOnlyList<string> path
-            )
-          : base(code, message, path)
-        {
-        }
     }
 }

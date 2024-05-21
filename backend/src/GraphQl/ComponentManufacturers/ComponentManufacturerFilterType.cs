@@ -1,18 +1,18 @@
 using HotChocolate.Data.Filters;
+using Metabase.Data;
 
-namespace Metabase.GraphQl.ComponentManufacturers
+namespace Metabase.GraphQl.ComponentManufacturers;
+
+public sealed class ComponentManufacturerFilterType
+    : FilterInputType<ComponentManufacturer>
 {
-    public sealed class ComponentManufacturerFilterType
-      : FilterInputType<Data.ComponentManufacturer>
+    protected override void Configure(
+        IFilterInputTypeDescriptor<ComponentManufacturer> descriptor
+    )
     {
-        protected override void Configure(
-          IFilterInputTypeDescriptor<Data.ComponentManufacturer> descriptor
-          )
-        {
-            descriptor.BindFieldsExplicitly();
-            descriptor.Field(x => x.Component);
-            descriptor.Field(x => x.Institution);
-            descriptor.Field(x => x.Pending);
-        }
+        descriptor.BindFieldsExplicitly();
+        descriptor.Field(x => x.Component);
+        descriptor.Field(x => x.Institution);
+        descriptor.Field(x => x.Pending);
     }
 }

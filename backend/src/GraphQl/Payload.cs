@@ -1,6 +1,5 @@
-namespace Metabase.GraphQl
+namespace Metabase.GraphQl;
+
+public abstract class Payload
 {
-    public abstract class Payload
-    {
-    }
 }

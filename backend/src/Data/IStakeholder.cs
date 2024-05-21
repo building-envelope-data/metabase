@@ -1,7 +1,6 @@
-namespace Metabase.Data
+namespace Metabase.Data;
+
+public interface IStakeholder
 {
-    public interface IStakeholder
-    {
-        public string Name { get; }
-    }
+    public string Name { get; }
 }

@@ -1,14 +1,14 @@
 using HotChocolate.Types;
+using Metabase.Data;
 
-namespace Metabase.GraphQl.Standards
+namespace Metabase.GraphQl.Standards;
+
+public sealed class StandardType
+    : ObjectType<Standard>
 {
-    public sealed class StandardType
-      : ObjectType<Data.Standard>
+    protected override void Configure(
+        IObjectTypeDescriptor<Standard> descriptor
+    )
     {
-        protected override void Configure(
-            IObjectTypeDescriptor<Data.Standard> descriptor
-            )
-        {
-        }
     }
 }

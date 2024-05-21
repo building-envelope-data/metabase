@@ -1,18 +1,18 @@
 using HotChocolate.Data.Filters;
+using Metabase.Data;
 
-namespace Metabase.GraphQl.UserMethodDevelopers
+namespace Metabase.GraphQl.UserMethodDevelopers;
+
+public sealed class UserMethodDeveloperFilterType
+    : FilterInputType<UserMethodDeveloper>
 {
-    public sealed class UserMethodDeveloperFilterType
-      : FilterInputType<Data.UserMethodDeveloper>
+    protected override void Configure(
+        IFilterInputTypeDescriptor<UserMethodDeveloper> descriptor
+    )
     {
-        protected override void Configure(
-          IFilterInputTypeDescriptor<Data.UserMethodDeveloper> descriptor
-          )
-        {
-            descriptor.BindFieldsExplicitly();
-            descriptor.Field(x => x.Method);
-            descriptor.Field(x => x.User);
-            descriptor.Field(x => x.Pending);
-        }
+        descriptor.BindFieldsExplicitly();
+        descriptor.Field(x => x.Method);
+        descriptor.Field(x => x.User);
+        descriptor.Field(x => x.Pending);
     }
 }

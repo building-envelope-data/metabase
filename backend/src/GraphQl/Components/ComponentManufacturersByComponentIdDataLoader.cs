@@ -1,29 +1,29 @@
-using System;
 using System.Linq;
 using GreenDonut;
+using Metabase.Data;
+using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Metabase.GraphQl.Components
+namespace Metabase.GraphQl.Components;
+
+public sealed class ComponentManufacturersByComponentIdDataLoader
+    : AssociationsByAssociateIdDataLoader<ComponentManufacturer>
 {
-    public sealed class ComponentManufacturersByComponentIdDataLoader
-      : Entities.AssociationsByAssociateIdDataLoader<Data.ComponentManufacturer>
+    public ComponentManufacturersByComponentIdDataLoader(
+        IBatchScheduler batchScheduler,
+        DataLoaderOptions options,
+        IDbContextFactory<ApplicationDbContext> dbContextFactory
+    )
+        : base(
+            batchScheduler,
+            options,
+            dbContextFactory,
+            (dbContext, ids) =>
+                dbContext.ComponentManufacturers.AsQueryable().Where(x =>
+                    !x.Pending && ids.Contains(x.ComponentId)
+                ),
+            x => x.ComponentId
+        )
     {
-        public ComponentManufacturersByComponentIdDataLoader(
-            IBatchScheduler batchScheduler,
-            DataLoaderOptions options,
-            IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
-            )
-            : base(
-                batchScheduler,
-                options,
-                dbContextFactory,
-                (dbContext, ids) =>
-                    dbContext.ComponentManufacturers.AsQueryable().Where(x =>
-                        !x.Pending && ids.Contains(x.ComponentId)
-                    ),
-                x => x.ComponentId
-                )
-        {
-        }
     }
 }

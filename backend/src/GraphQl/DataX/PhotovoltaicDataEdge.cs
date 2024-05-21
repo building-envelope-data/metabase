@@ -1,17 +1,16 @@
-namespace Metabase.GraphQl.DataX
-{
-    public sealed class PhotovoltaicDataEdge
+namespace Metabase.GraphQl.DataX;
+
+public sealed class PhotovoltaicDataEdge
     : DataEdgeBase<PhotovoltaicData>
-    {
-        public PhotovoltaicDataEdge(
+{
+    public PhotovoltaicDataEdge(
         string cursor,
         PhotovoltaicData node
-        )
+    )
         : base(
             cursor,
             node
         )
-        {
-        }
+    {
     }
 }

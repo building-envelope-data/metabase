@@ -1,9 +1,11 @@
-namespace Metabase.GraphQl.Users
+using System.Diagnostics.CodeAnalysis;
+
+namespace Metabase.GraphQl.Users;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum DeleteUserErrorCode
 {
-    public enum DeleteUserErrorCode
-    {
-        UNKNOWN,
-        UNKNOWN_USER,
-        UNAUTHORIZED,
-    }
+    UNKNOWN,
+    UNKNOWN_USER,
+    UNAUTHORIZED
 }

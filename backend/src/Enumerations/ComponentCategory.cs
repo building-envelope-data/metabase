@@ -1,9 +1,8 @@
-namespace Metabase.Enumerations
+namespace Metabase.Enumerations;
+
+public enum ComponentCategory
 {
-    public enum ComponentCategory
-    {
-        MATERIAL,
-        LAYER,
-        UNIT
-    }
+    MATERIAL,
+    LAYER,
+    UNIT
 }
