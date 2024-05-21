@@ -348,7 +348,9 @@ namespace Metabase.GraphQl.Institutions
                       )
                       );
             }
-            context.Institutions.Remove(institution);
+            // context.Institutions.Remove(institution);
+            institution.OperatingState = Enumerations.InstitutionOperatingState.NOTOPERATING;
+            
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return new DeleteInstitutionPayload();
         }

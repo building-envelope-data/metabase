@@ -29,7 +29,7 @@ namespace Metabase.Data
         [Required]
         public Enumerations.InstitutionState State { get; private set; }
 
-        public Enumerations.InstitutionOperatingState OperatingState { get; private set; }
+        public Enumerations.InstitutionOperatingState OperatingState { get; set; }
 
         public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } = new List<InstitutionMethodDeveloper>();
         public ICollection<Method> DevelopedMethods { get; } = new List<Method>();
@@ -79,7 +79,7 @@ namespace Metabase.Data
             Description = description;
             WebsiteLocator = websiteLocator;
             PublicKey = publicKey;
-            Operating = operating;
+            State = state;
             OperatingState = operatingState;
         }
 
