@@ -170,13 +170,21 @@ list : ## List all containers with health status
 		--all
 .PHONY : list
 
-createdb : ## Create databases
+createdb : ## Create database
 	${docker_compose} exec \
 		database \
 		bash -c " \
 			createdb --username postgres xbase_development ; \
 		"
 .PHONY : createdb
+
+dropdb : ## Drop database
+	${docker_compose} exec \
+		database \
+		bash -c " \
+			dropdb --username postgres xbase_development ; \
+		"
+.PHONY : dropdb
 
 begin-maintenance : ## Begin maintenance
 	cp \
