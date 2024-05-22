@@ -3,76 +3,88 @@
   "isRoot": true,
   "tools": {
     "dotnet-aspnet-codegenerator": {
-      "version": "8.0.0",
+      "version": "8.0.2",
       "commands": [
         "dotnet-aspnet-codegenerator"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-counters": {
-      "version": "8.0.505301",
+      "version": "8.0.510501",
       "commands": [
         "dotnet-counters"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-dump": {
-      "version": "8.0.505301",
+      "version": "8.0.510501",
       "commands": [
         "dotnet-dump"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-ef": {
-      "version": "8.0.1",
+      "version": "8.0.5",
       "commands": [
         "dotnet-ef"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-script": {
       "version": "1.5.0",
       "commands": [
         "dotnet-script"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-trace": {
-      "version": "8.0.505301",
+      "version": "8.0.510501",
       "commands": [
         "dotnet-trace"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-gcdump": {
-      "version": "8.0.505301",
+      "version": "8.0.510501",
       "commands": [
         "dotnet-gcdump"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-sos": {
-      "version": "8.0.505301",
+      "version": "8.0.510501",
       "commands": [
         "dotnet-sos"
-      ]
+      ],
+      "rollForward": false
     },
     "roslynator.dotnet.cli": {
-      "version": "0.8.2",
+      "version": "0.8.8",
       "commands": [
         "roslynator"
-      ]
+      ],
+      "rollForward": false
     },
     "jetbrains.resharper.globaltools": {
-      "version": "2023.3.2",
+      "version": "2024.1.2",
       "commands": [
         "jb"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-project-licenses": {
       "version": "2.7.1",
       "commands": [
         "dotnet-project-licenses"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-certificate-tool": {
       "version": "3.1.0",
       "commands": [
         "certificate-tool"
-      ]
+      ],
+      "rollForward": false
     }
   }
 }
