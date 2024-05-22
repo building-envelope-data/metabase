@@ -40,11 +40,11 @@ public sealed class Standard
     [Required] public Standardizer[] Standardizers { get; private set; }
 
     [Url] public Uri? Locator { get; private set; }
-    [MinLength(1)] public string? Title { get; }
+    [MinLength(1)] public string? Title { get; private set; }
 
-    [MinLength(1)] public string? Abstract { get; }
+    [MinLength(1)] public string? Abstract { get; private set; }
 
     [MinLength(1)]
     [GraphQLDescription("The section of the standard to which the reference refers to.")]
-    public string? Section { get; }
+    public string? Section { get; private set; }
 }
