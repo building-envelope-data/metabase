@@ -63,7 +63,7 @@ public sealed class Program
             application.Run();
             return 0;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not HostAbortedException && ex.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
         {
             Log.Fatal(ex, "Host terminated unexpectedly");
             return 1;

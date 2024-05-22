@@ -788,6 +788,14 @@ namespace Metabase.Migrations
             migrationBuilder.DropTable(
                 name: "OpenIddictApplications",
                 schema: "metabase");
+
+            migrationBuilder.AlterDatabase()
+                .OldAnnotation("Npgsql:Enum:public.component_category", "material,layer,unit")
+                .OldAnnotation("Npgsql:Enum:public.institution_representative_role", "owner,maintainer,assistant")
+                .OldAnnotation("Npgsql:Enum:public.institution_state", "unknown,operative,inoperative")
+                .OldAnnotation("Npgsql:Enum:public.method_category", "measurement,calculation")
+                .OldAnnotation("Npgsql:Enum:public.standardizer", "aerc,agi,ashrae,breeam,bs,bsi,cen,cie,dgnb,din,dvwg,iec,ies,ift,iso,jis,leed,nfrc,riba,ul,unece,vdi,vff,well")
+                .OldAnnotation("Npgsql:PostgresExtension:pgcrypto", ",,");
         }
     }
 }

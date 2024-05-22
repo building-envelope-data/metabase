@@ -45,7 +45,7 @@ public sealed class ApplicationDbContext
     public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
     public DbSet<Method> Methods { get; private set; } = default!;
     public DbSet<UserMethodDeveloper> UserMethodDevelopers { get; private set; } = default!;
-    public DbSet<DataProtectionKey> DataProtectionKeys { get; } = default!;
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
 
     private static void CreateEnumerations(ModelBuilder builder)
     {

@@ -70,11 +70,12 @@ public static partial class Log
     [LoggerMessage(
         EventId = 5,
         Level = LogLevel.Error,
-        Message = "Failed processing the task {Task} with the error {Error}.")]
+        Message = "Failed processing the task of kind {Kind} with status {Status} with the error {Error}.")]
     public static partial void FailedTask(
         this ILogger logger,
         Exception? exception,
-        IExecutionTask task,
+        ExecutionTaskKind kind,
+        ExecutionTaskStatus status,
         string error
     );
 
@@ -151,7 +152,7 @@ public sealed class LoggingDiagnosticEventListener
         IError error
     )
     {
-        _logger.FailedTask(error.Exception, task, ConvertErrorToString(error));
+        _logger.FailedTask(error.Exception, task.Kind, task.Status, ConvertErrorToString(error));
     }
 
     public override void ValidationErrors(
