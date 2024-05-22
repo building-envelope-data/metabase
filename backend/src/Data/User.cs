@@ -57,10 +57,10 @@ public sealed class User
 
     public ICollection<Institution> RepresentedInstitutions { get; } = new List<Institution>();
 
-    public uint Version { get; } // https://www.npgsql.org/efcore/modeling/concurrency.html
+    public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
 
     [GraphQLDescription("Full name")]
     [ProtectedPersonalData]
     [PersonalData]
-    public string Name { get; }
+    public string Name { get; private set; }
 }
