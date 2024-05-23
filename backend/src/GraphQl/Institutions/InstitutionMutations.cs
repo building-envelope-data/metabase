@@ -344,9 +344,7 @@ public sealed class InstitutionMutations
                 )
             );
 
-        // context.Institutions.Remove(institution);
-            institution.OperatingState = InstitutionOperatingState.NOTOPERATING;
-            
+        context.Institutions.Remove(institution);  
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new DeleteInstitutionPayload();
     }

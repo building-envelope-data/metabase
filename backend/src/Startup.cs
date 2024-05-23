@@ -127,7 +127,7 @@ public sealed class Startup
                 dataSourceBuilder.MapEnum<DatabaseVerificationState>();
                 dataSourceBuilder.MapEnum<InstitutionRepresentativeRole>();
                 dataSourceBuilder.MapEnum<InstitutionState>();
-                    dataSourceBuilder.MapEnum<Enumerations.InstitutionOperatingState>();
+                dataSourceBuilder.MapEnum<InstitutionOperatingState>();
                 dataSourceBuilder.MapEnum<MethodCategory>();
                 dataSourceBuilder.MapEnum<PrimeSurface>();
                 dataSourceBuilder.MapEnum<Standardizer>();

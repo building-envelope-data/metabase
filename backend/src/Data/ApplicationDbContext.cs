@@ -56,7 +56,7 @@ public sealed class ApplicationDbContext
         builder.HasPostgresEnum<DatabaseVerificationState>("public");
         builder.HasPostgresEnum<InstitutionRepresentativeRole>("public");
         builder.HasPostgresEnum<InstitutionState>("public");
-            builder.HasPostgresEnum<Enumerations.InstitutionOperatingState>("public");
+        builder.HasPostgresEnum<InstitutionOperatingState>("public");
         builder.HasPostgresEnum<MethodCategory>("public");
         builder.HasPostgresEnum<PrimeSurface>("public");
         builder.HasPostgresEnum<Standardizer>("public");
