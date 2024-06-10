@@ -101,4 +101,9 @@ public sealed class Institution
     {
         State = InstitutionState.VERIFIED;
     }
+
+    public void ChangeOperatingState()
+    {
+        OperatingState = InstitutionOperatingState.NOT_OPERATING;
+    }
 }

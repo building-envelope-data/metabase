@@ -174,6 +174,9 @@ export default function Institution({ institutionId }: InstitutionProps) {
           <Tag key={institution.state} color="magenta">
             {institution.state}
           </Tag>,
+          <Tag key={institution.operatingState} color="magenta">
+          {institution.operatingState}
+        </Tag>,
         ]}
         extra={([] as ReactNode[])
           .concat(

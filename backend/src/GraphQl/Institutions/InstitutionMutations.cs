@@ -182,7 +182,7 @@ public sealed class InstitutionMutations
                 userManager
             ).ConfigureAwait(false)
            )
-            return new VerifyInstitutionPayload(
+            return new VerifyInstitutionPayload(    
                 new VerifyInstitutionError(
                     VerifyInstitutionErrorCode.UNAUTHORIZED,
                     "You are not authorized to verify institutions.",
@@ -347,5 +347,46 @@ public sealed class InstitutionMutations
         context.Institutions.Remove(institution);  
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new DeleteInstitutionPayload();
+    }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    public async Task<ChangeInstitutionOperatingStatePayload> ChangeInstitutionOperatingStateAsync(
+        ChangeInstitutionOperatingStateInput input,
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        if (!await InstitutionAuthorization.IsAuthorizedToChangeInstitutionOperatingState(
+                claimsPrincipal,
+                userManager
+            ).ConfigureAwait(false)
+           )
+            return new ChangeInstitutionOperatingStatePayload(
+                new ChangeInstitutionOperatingStateError(
+                    ChangeInstitutionOperatingStateErrorCode.UNAUTHORIZED,
+                    "You are not authorized to change institution operating state.",
+                    Array.Empty<string>()
+                )
+            );
+
+        var institution =
+            await context.Institutions.AsQueryable()
+                .Where(i => i.Id == input.InstitutionId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+        if (institution is null)
+            return new ChangeInstitutionOperatingStatePayload(
+                new ChangeInstitutionOperatingStateError(
+                    ChangeInstitutionOperatingStateErrorCode.UNKNOWN_INSTITUTION,
+                    "Unknown institution.",
+                    new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                )
+            );
+        institution.ChangeOperatingState();
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return new ChangeInstitutionOperatingStatePayload(institution);
     }
 }

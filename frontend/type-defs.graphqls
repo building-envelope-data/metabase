@@ -727,6 +727,7 @@ type Institution implements Node & Stakeholder {
   publicKey: String
   representatives(pending: Boolean! = false): InstitutionRepresentativeConnection!
   state: InstitutionState!
+  operatingState: OperatingState!
   uuid: Uuid!
   websiteLocator: Url
 }
@@ -2897,6 +2898,11 @@ enum InstitutionRepresentativeRole {
 enum InstitutionState {
   PENDING
   VERIFIED
+}
+
+enum OperatingState {
+  OPERATING
+  NOT_OPERATING
 }
 
 enum LoginUserErrorCode {

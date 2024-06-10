@@ -75,4 +75,17 @@ public static class InstitutionAuthorization
                    userManager
                );
     }
+
+      internal static async Task<bool> IsAuthorizedToChangeInstitutionOperatingState(
+        ClaimsPrincipal claimsPrincipal,
+        UserManager<User> userManager
+    )
+    {
+        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        return user is not null
+               && await CommonAuthorization.IsVerifier(
+                   user,
+                   userManager
+               );
+    }
 }

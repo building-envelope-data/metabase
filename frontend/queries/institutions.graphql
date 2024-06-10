@@ -6,6 +6,7 @@ fragment InstitutionPartial on Institution {
   description
   websiteLocator
   state
+  operatingState
 }
 
 query Institutions {
@@ -95,6 +96,15 @@ mutation VerifyInstitution($institutionId: Uuid!) {
 
 mutation DeleteInstitution($institutionId: Uuid!) {
   deleteInstitution(input: { institutionId: $institutionId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+mutation ChangeInstitutionOperatingState($institutionId: Uuid!) {
+  changeInstitutionOperatingState(input: { institutionId: $institutionId }) {
     errors {
       code
       message
