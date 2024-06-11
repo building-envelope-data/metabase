@@ -4,7 +4,7 @@ import { useState } from "react";
 import paths from "../../paths";
 import {
   InstitutionsDocument,
-  useDeleteInstitutionMutation,
+  useChangeInstitutionOperatingStateMutation,
 } from "../../queries/institutions.graphql";
 import { Scalars } from "../../__generated__/__types__";
 
@@ -18,25 +18,33 @@ export default function ChangeInstitutionOperatingState({
   const router = useRouter();
   const [notOperating, setNotOperating] = useState(false);
 
+  const [changeInstitutionOperatingStateMutation] = useChangeInstitutionOperatingStateMutation({
+    refetchQueries: [
+      {
+        query: InstitutionsDocument,
+      },
+    ],
+  });
+
   const changeOperatingState = async () => {
     try {
       setNotOperating(true);
-      // const { errors, data } = await deleteInstitutionMutation({
-      //   variables: {
-      //     institutionId: institutionId,
-      //   },
-      // });
-      // if (errors) {
-      //   console.log(errors);
-      // } else if (data?.changeOperatingState?.errors) {
-      //   message.error(
-      //     data?.changeOperatingState?.errors
-      //       .map((error: { message: any; }) => error.message)
-      //       .join(" ")
-      //   );
-      // } else {
-      //   await router.push(paths.institutions);
-      // }
+      const { errors, data } = await changeInstitutionOperatingStateMutation({
+        variables: {
+          institutionId: institutionId,
+        },
+      });
+      if (errors) {
+        console.log(errors);
+      } else if (data?.changeOperatingState?.errors) {
+        message.error(
+          data?.changeOperatingState?.errors
+            .map((error: { message: any; }) => error.message)
+            .join(" ")
+        );
+      } else {
+        await router.push(paths.institutions);
+      }
     } finally {
       setNotOperating(false);
     }
@@ -50,7 +58,7 @@ export default function ChangeInstitutionOperatingState({
       onClick={changeOperatingState}
       loading={notOperating}
     >
-      Delete
+      MODIFY STATE
     </Button>
   );
 

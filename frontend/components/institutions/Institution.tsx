@@ -35,6 +35,7 @@ import MethodTable from "../methods/MethodTable";
 import { messageApolloError } from "../../lib/apollo";
 import UpdateInstitution from "./UpdateInstitution";
 import DeleteInstitution from "./DeleteInstitution";
+import ChangeInstitutionOperatingState from "./ChangeInstitutionOperatingState";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -198,6 +199,16 @@ export default function Institution({ institutionId }: InstitutionProps) {
               ? [
                   <DeleteInstitution
                     key="deleteInstitution"
+                    institutionId={institution.uuid}
+                  />,
+                ]
+              : []
+          )
+          .concat(
+            institution.canCurrentUserDeleteNode
+              ? [
+                  <ChangeInstitutionOperatingState
+                    key="changeInstitutionOperatingState"
                     institutionId={institution.uuid}
                   />,
                 ]

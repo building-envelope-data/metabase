@@ -349,8 +349,7 @@ public sealed class InstitutionMutations
         return new DeleteInstitutionPayload();
     }
 
-    [UseUserManager]
-    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+   
     public async Task<ChangeInstitutionOperatingStatePayload> ChangeInstitutionOperatingStateAsync(
         ChangeInstitutionOperatingStateInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -359,18 +358,18 @@ public sealed class InstitutionMutations
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionAuthorization.IsAuthorizedToChangeInstitutionOperatingState(
-                claimsPrincipal,
-                userManager
-            ).ConfigureAwait(false)
-           )
-            return new ChangeInstitutionOperatingStatePayload(
-                new ChangeInstitutionOperatingStateError(
-                    ChangeInstitutionOperatingStateErrorCode.UNAUTHORIZED,
-                    "You are not authorized to change institution operating state.",
-                    Array.Empty<string>()
-                )
-            );
+        // if (!await InstitutionAuthorization.IsAuthorizedToChangeInstitutionOperatingState(
+        //         claimsPrincipal,
+        //         userManager
+        //     ).ConfigureAwait(false)
+        //    )
+        //     return new ChangeInstitutionOperatingStatePayload(
+        //         new ChangeInstitutionOperatingStateError(
+        //             ChangeInstitutionOperatingStateErrorCode.UNAUTHORIZED,
+        //             "You are not authorized to change institution operating state.",
+        //             Array.Empty<string>()
+        //         )
+        //     );
 
         var institution =
             await context.Institutions.AsQueryable()
