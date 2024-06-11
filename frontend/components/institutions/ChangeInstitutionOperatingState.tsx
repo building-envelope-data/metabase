@@ -58,7 +58,7 @@ export default function ChangeInstitutionOperatingState({
       onClick={changeOperatingState}
       loading={notOperating}
     >
-      MODIFY STATE
+      Modify Operating State
     </Button>
   );
 
