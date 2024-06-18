@@ -6,12 +6,46 @@ namespace Metabase.GraphQl.DataX;
 public sealed class OpticalData
     : Data
 {
+    private const string IGSDB_LOCALE = "en-US";
+    private const string IGSDB_DATABASE_ID = "48994b60-670d-488d-aaf7-53333a64f1d6";
+    private const string IGSDB_INSTITUTION_ID = "c17af5ef-2f1d-4c73-bcc9-fcfb722420f3";
+    private const string IGSDB_METHOD_ID = "35e98d58-9627-4bdf-bf9f-f265471c1f24";
+
+    internal static OpticalData From(OpticalDataIgsdb node)
+    {
+        return new OpticalData(
+            node.Id,
+            node.Uuid ?? Guid.Empty, // TODO Have IGSDB always return UUIDs!
+            node.Timestamp,
+            IGSDB_LOCALE,
+            new Guid(IGSDB_DATABASE_ID),
+            node.ComponentId,
+            node.Name,
+            node.Description,
+            Array.Empty<string>().AsReadOnly(),
+            new Guid(IGSDB_INSTITUTION_ID),
+            DateTime.UtcNow,
+            new AppliedMethod(new Guid(IGSDB_METHOD_ID)),
+            [GetHttpsResource.From(node.ResourceTree.Root.Value)],
+            GetHttpsResourceTree.From(node.ResourceTree),
+            // node.Approvals
+            // node.Approval
+            node.NearnormalHemisphericalVisibleTransmittances,
+            node.NearnormalHemisphericalVisibleReflectances,
+            node.NearnormalHemisphericalSolarTransmittances,
+            node.NearnormalHemisphericalSolarReflectances,
+            node.InfraredEmittances,
+            Array.Empty<double>().AsReadOnly(),
+            Array.Empty<CielabColor>().AsReadOnly()
+        );
+    }
+
     public OpticalData(
         string id,
         Guid uuid,
         DateTime timestamp,
         string locale,
-        // Guid databaseId,
+        Guid databaseId,
         Guid componentId,
         string? name,
         string? description,
@@ -27,14 +61,15 @@ public sealed class OpticalData
         IReadOnlyList<double> nearnormalHemisphericalVisibleReflectances,
         IReadOnlyList<double> nearnormalHemisphericalSolarTransmittances,
         IReadOnlyList<double> nearnormalHemisphericalSolarReflectances,
-        IReadOnlyList<double> infraredEmittances
-        // IReadOnlyList<double> colorRenderingIndices,
-        // IReadOnlyList<CielabColor> cielabColors
+        IReadOnlyList<double> infraredEmittances,
+        IReadOnlyList<double> colorRenderingIndices,
+        IReadOnlyList<CielabColor> cielabColors
     ) : base(
         id,
         uuid,
         timestamp,
         locale,
+        databaseId,
         componentId,
         name,
         description,
@@ -51,8 +86,8 @@ public sealed class OpticalData
         NearnormalHemisphericalSolarTransmittances = nearnormalHemisphericalSolarTransmittances;
         NearnormalHemisphericalSolarReflectances = nearnormalHemisphericalSolarReflectances;
         InfraredEmittances = infraredEmittances;
-        // ColorRenderingIndices = colorRenderingIndices;
-        // CielabColors = cielabColors;
+        ColorRenderingIndices = colorRenderingIndices;
+        CielabColors = cielabColors;
     }
 
     public IReadOnlyList<double> NearnormalHemisphericalVisibleTransmittances { get; }
@@ -61,6 +96,7 @@ public sealed class OpticalData
     public IReadOnlyList<double> NearnormalHemisphericalSolarReflectances { get; }
 
     public IReadOnlyList<double> InfraredEmittances { get; }
-    // public IReadOnlyList<double> ColorRenderingIndices { get; }
-    // public IReadOnlyList<CielabColor> CielabColors { get; }
+
+    public IReadOnlyList<double> ColorRenderingIndices { get; }
+    public IReadOnlyList<CielabColor> CielabColors { get; }
 }

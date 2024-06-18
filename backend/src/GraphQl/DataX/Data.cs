@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
 using Metabase.GraphQl.Components;
+using Metabase.GraphQl.Databases;
 using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.DataX;
@@ -23,7 +24,7 @@ public abstract class Data
         Guid uuid,
         DateTime timestamp,
         string locale,
-        // Guid databaseId,
+        Guid databaseId,
         Guid componentId,
         string? name,
         string? description,
@@ -41,7 +42,7 @@ public abstract class Data
         Uuid = uuid;
         Timestamp = timestamp;
         Locale = locale;
-        // DatabaseId = databaseId;
+        DatabaseId = databaseId;
         ComponentId = componentId;
         Name = name;
         Description = description;
@@ -64,25 +65,23 @@ public abstract class Data
     public IReadOnlyList<GetHttpsResource> Resources { get; }
     public Guid Uuid { get; }
     public DateTime Timestamp { get; }
-
-    // public Guid DatabaseId { get; }
+    public Guid DatabaseId { get; }
     public Guid ComponentId { get; }
     public string? Name { get; }
     public string? Description { get; }
     public AppliedMethod AppliedMethod { get; }
-
     public GetHttpsResourceTree ResourceTree { get; }
 
-    // public Task<Metabase.Data.Database?> GetDatabaseAsync(
-    //         DatabaseByIdDataLoader databaseById,
-    //         CancellationToken cancellationToken
-    // )
-    // {
-    //     return databaseById.LoadAsync(
-    //         DatabaseId,
-    //         cancellationToken
-    //         );
-    // }
+    public Task<Database?> GetDatabaseAsync(
+            DatabaseByIdDataLoader databaseById,
+            CancellationToken cancellationToken
+    )
+    {
+        return databaseById.LoadAsync(
+            DatabaseId,
+            cancellationToken
+            );
+    }
 
     public Task<Component?> GetComponentAsync(
         ComponentByIdDataLoader componentById,

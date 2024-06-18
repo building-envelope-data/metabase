@@ -22,9 +22,6 @@ query AllHygrothermalData(
         ...HygrothermalDataFields
       }
     }
-    nodes {
-      ...HygrothermalDataFields
-    }
     totalCount
     pageInfo {
       ...PageInfoFields

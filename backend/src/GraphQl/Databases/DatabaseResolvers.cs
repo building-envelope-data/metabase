@@ -111,8 +111,7 @@ public sealed class DatabaseResolvers
 
     private static readonly string[] _igsdbAllDataFileNames =
     {
-        "DataFields.graphql",
-        "AllDataX.graphql"
+        "AllDataIgsdb.graphql"
     };
 
     private static readonly string[] _allDataFileNames =
@@ -124,9 +123,7 @@ public sealed class DatabaseResolvers
 
     private static readonly string[] _igsdbAllOpticalDataFileNames =
     {
-        "DataFields.graphql",
-        "OpticalDataFields.graphql",
-        "AllOpticalDataX.graphql"
+        "AllOpticalDataIgsdb.graphql"
     };
 
     private static readonly string[] _allOpticalDataFileNames =
@@ -263,6 +260,7 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
+        Console.WriteLine("qqqqqqqqqqqqqqq");
         return (await QueryDatabase<OpticalDataData>(
                     database,
                     new GraphQLRequest(
@@ -391,13 +389,30 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
-        var dataConnection = (await QueryDatabase<AllDataData>(
+        if (database.Locator.AbsoluteUri == IgsdbUrl)
+        {
+            return DataConnection.From(
+                (await QueryDatabase<AllDataDataIgsdb>(
+                        database,
+                        new GraphQLRequest(
+                            await QueryingDatabases.ConstructQuery(_igsdbAllDataFileNames).ConfigureAwait(false),
+                            new
+                            {
+                                where = RewriteDataPropositionInput(where, database)
+                            },
+                            "AllData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllData
+            );
+        }
+        return (await QueryDatabase<AllDataData>(
                     database,
                     new GraphQLRequest(
-                        await QueryingDatabases.ConstructQuery(
-                            database.Locator.AbsoluteUri == IgsdbUrl
-                                ? _igsdbAllDataFileNames
-                                : _allDataFileNames).ConfigureAwait(false),
+                        await QueryingDatabases.ConstructQuery(_allDataFileNames).ConfigureAwait(false),
                         new
                         {
                             where = RewriteDataPropositionInput(where, database),
@@ -415,14 +430,6 @@ public sealed class DatabaseResolvers
                     cancellationToken
                 ).ConfigureAwait(false)
             )?.AllData;
-        return dataConnection is null
-            ? null
-            : new DataConnection(
-                dataConnection.Edges,
-                dataConnection.Nodes,
-                dataConnection.TotalCount,
-                dataConnection.Timestamp
-            );
     }
 
     private static DataPropositionInput? RewriteDataPropositionInput(
@@ -431,8 +438,7 @@ public sealed class DatabaseResolvers
     )
     {
         return database.Locator.AbsoluteUri == IgsdbUrl
-            ? where ?? new DataPropositionInput(null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null)
+            ? where ?? new DataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null)
             : where;
     }
 
@@ -450,16 +456,35 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
+        if (database.Locator.AbsoluteUri == IgsdbUrl)
+        {
+            return OpticalDataConnection.From(
+                (await QueryDatabase<AllOpticalDataDataIgsdb>(
+                        database,
+                        new GraphQLRequest(
+                            await QueryingDatabases.ConstructQuery(
+                                _igsdbAllOpticalDataFileNames).ConfigureAwait(false),
+                            new
+                            {
+                                where = RewriteOpticalDataPropositionInput(where, database)
+                            },
+                            "AllOpticalData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllOpticalData
+            );
+        }
         return (await QueryDatabase<AllOpticalDataData>(
                     database,
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
-                            database.Locator.AbsoluteUri == IgsdbUrl
-                                ? _igsdbAllOpticalDataFileNames
-                                : _allOpticalDataFileNames).ConfigureAwait(false),
+                            _allOpticalDataFileNames).ConfigureAwait(false),
                         new
                         {
-                            where = RewriteOpticalDataPropositionInput(where, database),
+                            where,
                             timestamp,
                             locale,
                             first,
@@ -482,8 +507,7 @@ public sealed class DatabaseResolvers
     )
     {
         return database.Locator.AbsoluteUri == IgsdbUrl
-            ? where ?? new OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null,
-                null, null, null)
+            ? where ?? new OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null)
             : where;
     }
 
@@ -881,7 +905,22 @@ public sealed class DatabaseResolvers
         public DataConnection AllData { get; } = default!;
     }
 
+    private sealed class AllDataDataIgsdb
+    {
+        public DataConnectionIgsdb AllData { get; } = default!;
+    }
+
     private sealed class AllOpticalDataData
+    {
+        public OpticalDataConnection AllOpticalData { get; } = default!;
+    }
+
+    private sealed class AllOpticalDataDataIgsdb
+    {
+        public OpticalDataConnectionIgsdb AllOpticalData { get; } = default!;
+    }
+
+    private sealed class AllOpticalDataIgsdbData
     {
         public OpticalDataConnection AllOpticalData { get; } = default!;
     }

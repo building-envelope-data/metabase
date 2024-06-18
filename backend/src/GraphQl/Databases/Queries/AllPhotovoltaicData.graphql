@@ -22,9 +22,6 @@ query AllPhotovoltaicData(
         ...PhotovoltaicDataFields
       }
     }
-    nodes {
-      ...PhotovoltaicDataFields
-    }
     totalCount
     pageInfo {
       ...PageInfoFields
