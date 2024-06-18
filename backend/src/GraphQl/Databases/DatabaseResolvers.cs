@@ -244,7 +244,7 @@ public sealed class DatabaseResolvers
                             timestamp,
                             locale
                         },
-                        "Data"
+                        nameof(Data)
                     ),
                     httpContextAccessor,
                     resolverContext,
@@ -275,7 +275,7 @@ public sealed class DatabaseResolvers
                             timestamp,
                             locale
                         },
-                        "OpticalData"
+                        nameof(OpticalData)
                     ),
                     httpContextAccessor,
                     resolverContext,
@@ -306,7 +306,7 @@ public sealed class DatabaseResolvers
                             timestamp,
                             locale
                         },
-                        "HygrothermalData"
+                        nameof(HygrothermalData)
                     ),
                     httpContextAccessor,
                     resolverContext,
@@ -337,7 +337,7 @@ public sealed class DatabaseResolvers
                             timestamp,
                             locale
                         },
-                        "CalorimetricData"
+                        nameof(CalorimetricData)
                     ),
                     httpContextAccessor,
                     resolverContext,
@@ -368,7 +368,7 @@ public sealed class DatabaseResolvers
                             timestamp,
                             locale
                         },
-                        "PhotovoltaicData"
+                        nameof(PhotovoltaicData)
                     ),
                     httpContextAccessor,
                     resolverContext,
