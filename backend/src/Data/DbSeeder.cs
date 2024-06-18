@@ -51,7 +51,7 @@ public static partial class Log
     );
 
     [LoggerMessage(
-        EventId = 1,
+        EventId = 4,
         Level = LogLevel.Debug,
         Message = "Creating scope '{Scope}'")]
     public static partial void CreatingScope(
