@@ -29,14 +29,20 @@ public sealed class QueryingDatabases
         new()
         {
             Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false) },
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            IgnoreReadOnlyFields = true,
+            IgnoreReadOnlyProperties = false,
+            IncludeFields = false,
             NumberHandling = JsonNumberHandling.Strict,
+            PreferredObjectCreationHandling = JsonObjectCreationHandling.Replace,
             PropertyNameCaseInsensitive = false,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             ReadCommentHandling = JsonCommentHandling.Disallow,
-            IncludeFields = false,
-            IgnoreReadOnlyProperties = false,
-            IgnoreReadOnlyFields = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            // RespectNullableAnnotations = true,
+            UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+            WriteIndented = false
         }; //.SetupImmutableConverter();
 
     internal static readonly JsonSerializerOptions SerializerOptions =
@@ -47,14 +53,20 @@ public sealed class QueryingDatabases
                 new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
                 new DataConverterWithTypeDiscriminatorProperty(NonDataSerializerOptions)
             },
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            IgnoreReadOnlyFields = true,
+            IgnoreReadOnlyProperties = false,
+            IncludeFields = false,
             NumberHandling = JsonNumberHandling.Strict,
+            PreferredObjectCreationHandling = JsonObjectCreationHandling.Replace,
             PropertyNameCaseInsensitive = false,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             ReadCommentHandling = JsonCommentHandling.Disallow,
-            IncludeFields = false,
-            IgnoreReadOnlyProperties = false,
-            IgnoreReadOnlyFields = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            // RespectNullableAnnotations = true,
+            UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+            WriteIndented = false
         }; //.SetupImmutableConverter();
 
     public static async Task<string> ConstructQuery(
@@ -135,6 +147,12 @@ public sealed class QueryingDatabases
                 $"The status code is not {HttpStatusCode.OK} but {httpResponseMessage.StatusCode}.", null,
                 httpResponseMessage.StatusCode);
 
+        // For debugging, the following lines of code write the response to standard output.
+        // var graphQlResponseString =
+        //     await httpResponseMessage.Content
+        //         .ReadAsStringAsync(cancellationToken)
+        //         .ConfigureAwait(false);
+        // Console.WriteLine(graphQlResponseString);
         // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
         using var graphQlResponseStream =
             await httpResponseMessage.Content
