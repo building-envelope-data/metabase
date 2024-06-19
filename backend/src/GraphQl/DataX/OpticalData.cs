@@ -15,7 +15,7 @@ public sealed class OpticalData
     {
         return new OpticalData(
             node.Id,
-            node.ComponentId, // IGSDB has open data set per component.
+            node.Uuid ?? node.ComponentId, // The IGSDB has one data set per component.
             node.Timestamp,
             IgsdbLocale,
             new Guid(IgsdbDatabaseId),
