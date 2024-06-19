@@ -4,19 +4,15 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.DataX;
 
 public sealed class OpticalDataConnectionIgsdb
-    : DataConnectionBase<OpticalDataEdgeIgsdb, OpticalDataIgsdb>
+    : DataConnectionBase<OpticalDataEdgeIgsdb>
 {
     public OpticalDataConnectionIgsdb(
-        IReadOnlyList<OpticalDataEdgeIgsdb> edges,
-        IReadOnlyList<OpticalDataIgsdb> nodes,
-        uint totalCount,
-        DateTime timestamp
+        IReadOnlyList<OpticalDataEdgeIgsdb> edges
     )
         : base(
             edges,
-            nodes,
-            totalCount,
-            timestamp
+            Convert.ToUInt32(edges.Count),
+            DateTime.UtcNow
         )
     {
     }

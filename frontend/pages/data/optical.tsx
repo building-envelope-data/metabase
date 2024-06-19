@@ -330,7 +330,7 @@ function Page() {
         // TODO Add `edge.node.databaseId to nodes?
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allOpticalData?.nodes || []
+            (edge) => edge?.node?.allOpticalData?.edges?.map((e) => e.node) || []
           ) || [];
         const flatData = ([] as PartialOpticalData[]).concat(...nestedData);
         setData(flatData);

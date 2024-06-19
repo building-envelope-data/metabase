@@ -154,7 +154,7 @@ function Page() {
         // TODO Casting to `Data` is wrong and error prone!
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allData?.nodes || []
+            (edge) => edge?.node?.allData?.edges?.map((e) => e.node) || []
           ) || [];
         const flatData = ([] as Data[]).concat(...nestedData);
         setData(flatData);
