@@ -61,13 +61,14 @@ services:
     # user: 1000:1000
     command: [
       "dotnet", "watch",
-      "--project", "./src/Metabase.csproj",
+      "--non-interactive",
+      "--no-hot-reload", # as of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803
+      "--project", "/app/src/Metabase.csproj",
       "--",
       "run",
-      "--no-launch-profile"
+      "--no-launch-profile",
+      "--project", "/app/src/Metabase.csproj"
       ]
-      # "--no-restore",
-      # ["dotnet", "watch", "run", "--no-restore"]
     healthcheck:
       # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
       test: ["CMD-SHELL", "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1"]
@@ -106,6 +107,7 @@ services:
       - XBASE_Email__SmtpPort=${SMTP_PORT}
       - XBASE_TestlabSolarFacadesHost=https://${TESTLAB_SOLAR_FACADES_HOST}:${TESTLAB_SOLAR_FACADES_HOST_HTTPS_PORT}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
+      # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       # - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_CERTIFICATE_PASSWORD}
