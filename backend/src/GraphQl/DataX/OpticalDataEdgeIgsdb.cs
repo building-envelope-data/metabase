@@ -1,14 +1,15 @@
+using System;
+
 namespace Metabase.GraphQl.DataX;
 
 public sealed class OpticalDataEdgeIgsdb
     : DataEdgeBase<OpticalDataIgsdb>
 {
     public OpticalDataEdgeIgsdb(
-        string cursor,
         OpticalDataIgsdb node
     )
         : base(
-            cursor,
+            Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(node.Id)),
             node
         )
     {
