@@ -6,26 +6,26 @@ namespace Metabase.GraphQl.DataX;
 public sealed class OpticalData
     : Data
 {
-    private const string IGSDB_LOCALE = "en-US";
-    private const string IGSDB_DATABASE_ID = "48994b60-670d-488d-aaf7-53333a64f1d6";
-    private const string IGSDB_INSTITUTION_ID = "c17af5ef-2f1d-4c73-bcc9-fcfb722420f3";
-    private const string IGSDB_METHOD_ID = "35e98d58-9627-4bdf-bf9f-f265471c1f24";
+    private const string IgsdbLocale = "en-US";
+    private const string IgsdbDatabaseId = "48994b60-670d-488d-aaf7-53333a64f1d6";
+    private const string IgsdbInstitutionId = "c17af5ef-2f1d-4c73-bcc9-fcfb722420f3";
+    private const string IgsdbMethodId = "35e98d58-9627-4bdf-bf9f-f265471c1f24";
 
     internal static OpticalData From(OpticalDataIgsdb node)
     {
         return new OpticalData(
             node.Id,
-            node.Uuid ?? Guid.Empty, // TODO Have IGSDB always return UUIDs!
+            node.ComponentId, // IGSDB has open data set per component.
             node.Timestamp,
-            IGSDB_LOCALE,
-            new Guid(IGSDB_DATABASE_ID),
+            IgsdbLocale,
+            new Guid(IgsdbDatabaseId),
             node.ComponentId,
             node.Name,
             node.Description,
             Array.Empty<string>().AsReadOnly(),
-            new Guid(IGSDB_INSTITUTION_ID),
-            DateTime.UtcNow,
-            new AppliedMethod(new Guid(IGSDB_METHOD_ID)),
+            new Guid(IgsdbInstitutionId), // We suppose that LBNL created the data set.
+            DateTime.UtcNow, // That is the best date-time information we have.
+            new AppliedMethod(new Guid(IgsdbMethodId)),
             [GetHttpsResource.From(node.ResourceTree.Root.Value)],
             GetHttpsResourceTree.From(node.ResourceTree),
             // node.Approvals
