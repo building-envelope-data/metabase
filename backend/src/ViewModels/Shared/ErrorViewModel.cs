@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Metabase.ViewModels.Common;
+namespace Metabase.ViewModels.Shared;
 
 public sealed class ErrorViewModel
 {
