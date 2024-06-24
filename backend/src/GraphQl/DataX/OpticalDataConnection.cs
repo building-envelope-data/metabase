@@ -14,8 +14,8 @@ public sealed class OpticalDataConnection
         }
         return new OpticalDataConnection(
             allOpticalData.Edges.Select(OpticalDataEdge.From).ToList().AsReadOnly(),
-            allOpticalData.TotalCount,
-            allOpticalData.Timestamp
+            Convert.ToUInt32(allOpticalData.Edges.Count),
+            DateTime.UtcNow
         );
     }
 
