@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -25,10 +27,35 @@ public sealed class QueryingDatabases
 {
     public const string DatabaseHttpClient = "Database";
 
+    // Inspired by https://learn.microsoft.com/en-us/dotnet/standard/datetime/system-text-json-support#use-datetimeoffsetparse-as-a-fallback
+    private sealed class DateTimeConverterUsingDateTimeParseAsFallback : JsonConverter<DateTime>
+    {
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            Debug.Assert(typeToConvert == typeof(DateTime));
+            if (!reader.TryGetDateTime(out DateTime value))
+            {
+                value = DateTime.Parse(reader.GetString()!, CultureInfo.InvariantCulture);
+            }
+            return value;
+        }
+
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        {
+            // For information on the format specifier `o`, see
+            // https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings#the-round-trip-o-o-format-specifier
+            writer.WriteStringValue(value.ToString("o", CultureInfo.InvariantCulture));
+        }
+    }
+
     private static readonly JsonSerializerOptions NonDataSerializerOptions =
         new()
         {
-            Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false) },
+            Converters =
+            {
+                new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
+                new DateTimeConverterUsingDateTimeParseAsFallback()
+            },
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             IgnoreReadOnlyFields = true,
             IgnoreReadOnlyProperties = false,
@@ -45,12 +72,13 @@ public sealed class QueryingDatabases
             WriteIndented = false
         }; //.SetupImmutableConverter();
 
-    internal static readonly JsonSerializerOptions SerializerOptions =
+    public static readonly JsonSerializerOptions SerializerOptions =
         new()
         {
             Converters =
             {
                 new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
+                new DateTimeConverterUsingDateTimeParseAsFallback(),
                 new DataConverterWithTypeDiscriminatorProperty(NonDataSerializerOptions)
             },
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
