@@ -22,9 +22,6 @@ query AllCalorimetricData(
         ...CalorimetricDataFields
       }
     }
-    nodes {
-      ...CalorimetricDataFields
-    }
     totalCount
     pageInfo {
       ...PageInfoFields

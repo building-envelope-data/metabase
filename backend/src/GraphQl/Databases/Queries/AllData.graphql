@@ -23,10 +23,6 @@ query AllData(
         ...DataFields
       }
     }
-    nodes {
-      __typename
-      ...DataFields
-    }
     totalCount
     pageInfo {
       ...PageInfoFields
