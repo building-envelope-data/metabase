@@ -176,11 +176,11 @@ public sealed class QueryingDatabases
                 httpResponseMessage.StatusCode);
 
         // For debugging, the following lines of code write the response to standard output.
-        // var graphQlResponseString =
-        //     await httpResponseMessage.Content
-        //         .ReadAsStringAsync(cancellationToken)
-        //         .ConfigureAwait(false);
-        // Console.WriteLine(graphQlResponseString);
+        var graphQlResponseString =
+            await httpResponseMessage.Content
+                .ReadAsStringAsync(cancellationToken)
+                .ConfigureAwait(false);
+        Console.WriteLine(graphQlResponseString);
         // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
         using var graphQlResponseStream =
             await httpResponseMessage.Content

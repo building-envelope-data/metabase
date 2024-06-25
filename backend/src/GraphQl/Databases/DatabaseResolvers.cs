@@ -117,7 +117,7 @@ public sealed class DatabaseResolvers
     private static readonly string[] _allDataFileNames =
     {
         "DataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllData.graphql"
     };
 
@@ -130,7 +130,7 @@ public sealed class DatabaseResolvers
     {
         "DataFields.graphql",
         "OpticalDataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllOpticalData.graphql"
     };
 
@@ -138,7 +138,7 @@ public sealed class DatabaseResolvers
     {
         "DataFields.graphql",
         "HygrothermalDataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllHygrothermalData.graphql"
     };
 
@@ -146,7 +146,7 @@ public sealed class DatabaseResolvers
     {
         "DataFields.graphql",
         "CalorimetricDataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllCalorimetricData.graphql"
     };
 
@@ -154,7 +154,7 @@ public sealed class DatabaseResolvers
     {
         "DataFields.graphql",
         "PhotovoltaicDataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllPhotovoltaicData.graphql"
     };
 
