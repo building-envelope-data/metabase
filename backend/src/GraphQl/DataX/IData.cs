@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HotChocolate.Types;
 
 namespace Metabase.GraphQl.DataX;
@@ -10,17 +11,15 @@ public interface IData
     DateTime Timestamp { get; }
     Guid ComponentId { get; }
     string? Name { get; }
-
+    Guid DatabaseId { get; }
     string? Description { get; }
-
-    // IReadOnlyList<string> Warnings { get; }
-    // Guid CreatorId { get; }
-    // DateTime CreatedAt { get; }
+    IReadOnlyList<string> Warnings { get; }
+    Guid CreatorId { get; }
+    DateTime CreatedAt { get; }
     AppliedMethod AppliedMethod { get; }
-
     // IReadOnlyList<DataApproval> Approvals { get; }
-    // IReadOnlyList<GetHttpsResource> Resources { get; }
+    IReadOnlyList<GetHttpsResource> Resources { get; }
     GetHttpsResourceTree ResourceTree { get; }
     // ResponseApproval Approval { get; }
-    // string Locale { get; }
+    string Locale { get; }
 }

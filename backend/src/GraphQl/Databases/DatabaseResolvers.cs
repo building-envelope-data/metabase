@@ -111,29 +111,26 @@ public sealed class DatabaseResolvers
 
     private static readonly string[] _igsdbAllDataFileNames =
     {
-        "DataFields.graphql",
-        "AllDataX.graphql"
+        "AllDataIgsdb.graphql"
     };
 
     private static readonly string[] _allDataFileNames =
     {
         "DataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllData.graphql"
     };
 
     private static readonly string[] _igsdbAllOpticalDataFileNames =
     {
-        "DataFields.graphql",
-        "OpticalDataFields.graphql",
-        "AllOpticalDataX.graphql"
+        "AllOpticalDataIgsdb.graphql"
     };
 
     private static readonly string[] _allOpticalDataFileNames =
     {
         "DataFields.graphql",
         "OpticalDataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllOpticalData.graphql"
     };
 
@@ -141,7 +138,7 @@ public sealed class DatabaseResolvers
     {
         "DataFields.graphql",
         "HygrothermalDataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllHygrothermalData.graphql"
     };
 
@@ -149,7 +146,7 @@ public sealed class DatabaseResolvers
     {
         "DataFields.graphql",
         "CalorimetricDataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllCalorimetricData.graphql"
     };
 
@@ -157,7 +154,7 @@ public sealed class DatabaseResolvers
     {
         "DataFields.graphql",
         "PhotovoltaicDataFields.graphql",
-        "PageInfoFields.graphql",
+        // "PageInfoFields.graphql",
         "AllPhotovoltaicData.graphql"
     };
 
@@ -263,6 +260,7 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
+        Console.WriteLine("qqqqqqqqqqqqqqq");
         return (await QueryDatabase<OpticalDataData>(
                     database,
                     new GraphQLRequest(
@@ -391,13 +389,30 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
-        var dataConnection = (await QueryDatabase<AllDataData>(
+        if (database.Locator.AbsoluteUri == IgsdbUrl)
+        {
+            return DataConnection.From(
+                (await QueryDatabase<AllDataDataIgsdb>(
+                        database,
+                        new GraphQLRequest(
+                            await QueryingDatabases.ConstructQuery(_igsdbAllDataFileNames).ConfigureAwait(false),
+                            new
+                            {
+                                where = RewriteDataPropositionInput(where, database)
+                            },
+                            "AllData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllData
+            );
+        }
+        return (await QueryDatabase<AllDataData>(
                     database,
                     new GraphQLRequest(
-                        await QueryingDatabases.ConstructQuery(
-                            database.Locator.AbsoluteUri == IgsdbUrl
-                                ? _igsdbAllDataFileNames
-                                : _allDataFileNames).ConfigureAwait(false),
+                        await QueryingDatabases.ConstructQuery(_allDataFileNames).ConfigureAwait(false),
                         new
                         {
                             where = RewriteDataPropositionInput(where, database),
@@ -415,14 +430,6 @@ public sealed class DatabaseResolvers
                     cancellationToken
                 ).ConfigureAwait(false)
             )?.AllData;
-        return dataConnection is null
-            ? null
-            : new DataConnection(
-                dataConnection.Edges,
-                dataConnection.Nodes,
-                dataConnection.TotalCount,
-                dataConnection.Timestamp
-            );
     }
 
     private static DataPropositionInput? RewriteDataPropositionInput(
@@ -431,8 +438,7 @@ public sealed class DatabaseResolvers
     )
     {
         return database.Locator.AbsoluteUri == IgsdbUrl
-            ? where ?? new DataPropositionInput(null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null)
+            ? where ?? new DataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null)
             : where;
     }
 
@@ -450,16 +456,35 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
+        if (database.Locator.AbsoluteUri == IgsdbUrl)
+        {
+            return OpticalDataConnection.From(
+                (await QueryDatabase<AllOpticalDataDataIgsdb>(
+                        database,
+                        new GraphQLRequest(
+                            await QueryingDatabases.ConstructQuery(
+                                _igsdbAllOpticalDataFileNames).ConfigureAwait(false),
+                            new
+                            {
+                                where = RewriteOpticalDataPropositionInput(where, database)
+                            },
+                            "AllOpticalData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllOpticalData
+            );
+        }
         return (await QueryDatabase<AllOpticalDataData>(
                     database,
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
-                            database.Locator.AbsoluteUri == IgsdbUrl
-                                ? _igsdbAllOpticalDataFileNames
-                                : _allOpticalDataFileNames).ConfigureAwait(false),
+                            _allOpticalDataFileNames).ConfigureAwait(false),
                         new
                         {
-                            where = RewriteOpticalDataPropositionInput(where, database),
+                            where,
                             timestamp,
                             locale,
                             first,
@@ -482,8 +507,7 @@ public sealed class DatabaseResolvers
     )
     {
         return database.Locator.AbsoluteUri == IgsdbUrl
-            ? where ?? new OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null,
-                null, null, null)
+            ? where ?? new OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null)
             : where;
     }
 
@@ -851,78 +875,22 @@ public sealed class DatabaseResolvers
         }
     }
 
-    private sealed class DataData
-    {
-        public DataX.Data Data { get; } = default!;
-    }
-
-    private sealed class OpticalDataData
-    {
-        public OpticalData OpticalData { get; } = default!;
-    }
-
-    private sealed class HygrothermalDataData
-    {
-        public HygrothermalData HygrothermalData { get; } = default!;
-    }
-
-    private sealed class CalorimetricDataData
-    {
-        public CalorimetricData CalorimetricData { get; } = default!;
-    }
-
-    private sealed class PhotovoltaicDataData
-    {
-        public PhotovoltaicData PhotovoltaicData { get; } = default!;
-    }
-
-    private sealed class AllDataData
-    {
-        public DataConnection AllData { get; } = default!;
-    }
-
-    private sealed class AllOpticalDataData
-    {
-        public OpticalDataConnection AllOpticalData { get; } = default!;
-    }
-
-    private sealed class AllHygrothermalDataData
-    {
-        public HygrothermalDataConnection AllHygrothermalData { get; } = default!;
-    }
-
-    private sealed class AllCalorimetricDataData
-    {
-        public CalorimetricDataConnection AllCalorimetricData { get; } = default!;
-    }
-
-    private sealed class AllPhotovoltaicDataData
-    {
-        public PhotovoltaicDataConnection AllPhotovoltaicData { get; } = default!;
-    }
-
-    private sealed class HasDataData
-    {
-        public bool HasData { get; }
-    }
-
-    private sealed class HasOpticalDataData
-    {
-        public bool HasOpticalData { get; }
-    }
-
-    private sealed class HasCalorimetricDataData
-    {
-        public bool HasCalorimetricData { get; }
-    }
-
-    private sealed class HasHygrothermalDataData
-    {
-        public bool HasHygrothermalData { get; }
-    }
-
-    private sealed class HasPhotovoltaicDataData
-    {
-        public bool HasPhotovoltaicData { get; }
-    }
+    private sealed record DataData(DataX.Data Data);
+    private sealed record OpticalDataData(OpticalData OpticalData);
+    private sealed record HygrothermalDataData(HygrothermalData HygrothermalData);
+    private sealed record CalorimetricDataData(CalorimetricData CalorimetricData);
+    private sealed record PhotovoltaicDataData(PhotovoltaicData PhotovoltaicData);
+    private sealed record AllDataData(DataConnection AllData);
+    private sealed record AllDataDataIgsdb(DataConnectionIgsdb AllData);
+    private sealed record AllOpticalDataData(OpticalDataConnection AllOpticalData);
+    private sealed record AllOpticalDataDataIgsdb(OpticalDataConnectionIgsdb AllOpticalData);
+    private sealed record AllOpticalDataIgsdbData(OpticalDataConnection AllOpticalData);
+    private sealed record AllHygrothermalDataData(HygrothermalDataConnection AllHygrothermalData);
+    private sealed record AllCalorimetricDataData(CalorimetricDataConnection AllCalorimetricData);
+    private sealed record AllPhotovoltaicDataData(PhotovoltaicDataConnection AllPhotovoltaicData);
+    private sealed record HasDataData(bool HasData);
+    private sealed record HasOpticalDataData(bool HasOpticalData);
+    private sealed record HasCalorimetricDataData(bool HasCalorimetricData);
+    private sealed record HasHygrothermalDataData(bool HasHygrothermalData);
+    private sealed record HasPhotovoltaicDataData(bool HasPhotovoltaicData);
 }

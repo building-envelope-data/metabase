@@ -24,7 +24,7 @@
       "rollForward": false
     },
     "dotnet-ef": {
-      "version": "8.0.5",
+      "version": "8.0.6",
       "commands": [
         "dotnet-ef"
       ],
@@ -59,14 +59,14 @@
       "rollForward": false
     },
     "roslynator.dotnet.cli": {
-      "version": "0.8.8",
+      "version": "0.8.9",
       "commands": [
         "roslynator"
       ],
       "rollForward": false
     },
     "jetbrains.resharper.globaltools": {
-      "version": "2024.1.2",
+      "version": "2024.1.4",
       "commands": [
         "jb"
       ],

@@ -23,40 +23,41 @@
     <!-- <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" /> -->
     <PackageReference Include="GraphQL.Client" Version="6.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
-    <PackageReference Include="HotChocolate" Version="13.9.4" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="13.9.4" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="13.9.4" />
-    <PackageReference Include="HotChocolate.Data" Version="13.9.4" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.9.4" />
-    <PackageReference Include="HotChocolate.PersistedQueries.InMemory" Version="13.9.4" />
-    <PackageReference Include="HotChocolate.Types.Scalars" Version="13.9.4" />
+    <PackageReference Include="HotChocolate" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.Data" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.PersistedQueries.InMemory" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.Types.Scalars" Version="13.9.6" />
     <PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="MailKit" Version="4.6.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.5">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.5" />
-    <PackageReference Include="Microsoft.Extensions.Telemetry.Abstractions" Version="8.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Telemetry.Abstractions" Version="8.6.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <!-- <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="5.0.0" /> -->
     <!-- <PackageReference Include="StyleCop.Analyzers" Version="1.1.118"> -->
     <!--   <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets> -->
     <!--   <PrivateAssets>all</PrivateAssets> -->
     <!-- </PackageReference> -->
-    <PackageReference Include="OpenIddict.AspNetCore" Version="5.6.0" />
-    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="5.6.0" />
-    <PackageReference Include="OpenIddict.Quartz" Version="5.6.0" />
+    <PackageReference Include="OpenIddict.AspNetCore" Version="5.7.0" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="5.7.0" />
+    <PackageReference Include="OpenIddict.Quartz" Version="5.7.0" />
     <PackageReference Include="Quartz" Version="3.9.0" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.9.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
-    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 

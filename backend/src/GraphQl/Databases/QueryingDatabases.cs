@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -25,36 +27,74 @@ public sealed class QueryingDatabases
 {
     public const string DatabaseHttpClient = "Database";
 
-    private static readonly JsonSerializerOptions NonDataSerializerOptions =
-        new()
+    // Inspired by https://learn.microsoft.com/en-us/dotnet/standard/datetime/system-text-json-support#use-datetimeoffsetparse-as-a-fallback
+    private sealed class DateTimeConverterUsingDateTimeParseAsFallback : JsonConverter<DateTime>
+    {
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Converters = { new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false) },
-            NumberHandling = JsonNumberHandling.Strict,
-            PropertyNameCaseInsensitive = false,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            ReadCommentHandling = JsonCommentHandling.Disallow,
-            IncludeFields = false,
-            IgnoreReadOnlyProperties = false,
-            IgnoreReadOnlyFields = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        }; //.SetupImmutableConverter();
+            Debug.Assert(typeToConvert == typeof(DateTime));
+            if (!reader.TryGetDateTime(out DateTime value))
+            {
+                value = DateTime.Parse(reader.GetString()!, CultureInfo.InvariantCulture);
+            }
+            return value;
+        }
 
-    internal static readonly JsonSerializerOptions SerializerOptions =
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        {
+            // For information on the format specifier `o`, see
+            // https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings#the-round-trip-o-o-format-specifier
+            writer.WriteStringValue(value.ToString("o", CultureInfo.InvariantCulture));
+        }
+    }
+
+    private static readonly JsonSerializerOptions NonDataSerializerOptions =
         new()
         {
             Converters =
             {
                 new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
-                new DataConverterWithTypeDiscriminatorProperty(NonDataSerializerOptions)
+                new DateTimeConverterUsingDateTimeParseAsFallback()
             },
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            IgnoreReadOnlyFields = true,
+            IgnoreReadOnlyProperties = false,
+            IncludeFields = false,
             NumberHandling = JsonNumberHandling.Strict,
+            PreferredObjectCreationHandling = JsonObjectCreationHandling.Replace,
             PropertyNameCaseInsensitive = false,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             ReadCommentHandling = JsonCommentHandling.Disallow,
-            IncludeFields = false,
-            IgnoreReadOnlyProperties = false,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            // RespectNullableAnnotations = true,
+            UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+            WriteIndented = false
+        }; //.SetupImmutableConverter();
+
+    public static readonly JsonSerializerOptions SerializerOptions =
+        new()
+        {
+            Converters =
+            {
+                new JsonStringEnumConverter(new ConstantCaseJsonNamingPolicy(), false),
+                new DateTimeConverterUsingDateTimeParseAsFallback(),
+                new DataConverterWithTypeDiscriminatorProperty(NonDataSerializerOptions)
+            },
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             IgnoreReadOnlyFields = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            IgnoreReadOnlyProperties = false,
+            IncludeFields = false,
+            NumberHandling = JsonNumberHandling.Strict,
+            PreferredObjectCreationHandling = JsonObjectCreationHandling.Replace,
+            PropertyNameCaseInsensitive = false,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            ReadCommentHandling = JsonCommentHandling.Disallow,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            // RespectNullableAnnotations = true,
+            UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+            WriteIndented = false
         }; //.SetupImmutableConverter();
 
     public static async Task<string> ConstructQuery(
@@ -135,6 +175,12 @@ public sealed class QueryingDatabases
                 $"The status code is not {HttpStatusCode.OK} but {httpResponseMessage.StatusCode}.", null,
                 httpResponseMessage.StatusCode);
 
+        // For debugging, the following lines of code write the response to standard output.
+        var graphQlResponseString =
+            await httpResponseMessage.Content
+                .ReadAsStringAsync(cancellationToken)
+                .ConfigureAwait(false);
+        Console.WriteLine(graphQlResponseString);
         // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
         using var graphQlResponseStream =
             await httpResponseMessage.Content

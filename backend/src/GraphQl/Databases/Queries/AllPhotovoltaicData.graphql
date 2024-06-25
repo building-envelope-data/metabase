@@ -22,13 +22,10 @@ query AllPhotovoltaicData(
         ...PhotovoltaicDataFields
       }
     }
-    nodes {
-      ...PhotovoltaicDataFields
-    }
     totalCount
-    pageInfo {
-      ...PageInfoFields
-    }
+    # pageInfo {
+    #   ...PageInfoFields
+    # }
     # TODO timestamp
   }
 }

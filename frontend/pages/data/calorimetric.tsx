@@ -240,7 +240,7 @@ function Page() {
         }
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allCalorimetricData?.nodes || []
+            (edge) => edge?.node?.allCalorimetricData?.edges?.map((e) => e.node) || []
           ) || [];
         const flatData = ([] as PartialCalorimetricData[]).concat(
           ...nestedData
