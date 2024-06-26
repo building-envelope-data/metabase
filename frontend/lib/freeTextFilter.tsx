@@ -4,7 +4,7 @@ import {
   FilterConfirmProps,
   FilterDropdownProps,
 } from "antd/lib/table/interface";
-import { Dispatch, Key, SetStateAction } from "react";
+import React, { Dispatch, Key, SetStateAction } from "react";
 
 export function setMapValue(
   map: Map<string, string>,
@@ -23,7 +23,7 @@ export function setMapValue(
 
 export function doesFieldIncludeFilterValue(
   field: string,
-  value: string | number | boolean
+  value: React.Key | boolean
 ) {
   return field.toLowerCase().includes(value.toString().toLowerCase());
 }
@@ -94,7 +94,7 @@ export function getFreeTextFilterProps<RecordType>(
     filterIcon: (filtered: boolean) => (
       <FilterFilled style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
-    onFilter: (value: string | number | boolean, record: RecordType) => {
+    onFilter: (value: React.Key | boolean, record: RecordType) => {
       const field = getField(record);
       return field ? doesFieldIncludeFilterValue(field, value) : false;
     },

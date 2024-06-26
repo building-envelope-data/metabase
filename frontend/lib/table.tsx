@@ -288,7 +288,7 @@ export function getFilterableEnumListColumnProps<
       text: key,
       value: value,
     })),
-    onFilter: (value: string | number | boolean, record: RecordType) => {
+    onFilter: (value: React.Key | boolean, record: RecordType) => {
       const values = getValues(record);
       if (
         typeof value === "string" &&
