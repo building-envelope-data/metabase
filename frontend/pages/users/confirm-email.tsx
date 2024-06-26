@@ -41,7 +41,7 @@ function ConfirmUserEmail() {
       }
     };
     confirmUserEmail();
-  }, [email, confirmationCode, router, confirmUserEmailMutation]);
+  }, [email, confirmationCode, returnTo, router, confirmUserEmailMutation]);
 
   return (
     <Layout>
