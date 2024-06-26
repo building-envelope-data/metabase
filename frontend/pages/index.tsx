@@ -77,8 +77,10 @@ function Page() {
         <Image
           src={overviewImage}
           alt="Schematic depiction of how users like architects, planners, or engineers can use the metabase to find products and data in and across databases."
-          style={{ maxWidth: "100%", height: "auto" }}
-        />
+          style={{
+            maxWidth: "100%",
+            height: "auto",
+          }} />
         <Typography.Title level={2}>Acknowledgements</Typography.Title>
         <Typography.Paragraph>
           This work was funded by the German Federal Ministry for Economic Affairs and Climate Action under Grants 03ET1560A and 03EN1070A, based on a decision by the German Bundestag, by a Fraunhofer ICON Grant and by the Assistant Secretary for Energy Efficiency and Renewable Energy, Building Technologies Program, of the U.S. Department of Energy, under Contract No. DE-AC02-05CH11231.
@@ -86,8 +88,10 @@ function Page() {
         <Image
           src={germanFederalMinistry}
           alt="Coat of arms of Germany with the text: Supported by the German Federal Ministry for Economic Affairs and Climate Action on the basis of a decision by the German Bundestag."
-          style={{ maxWidth: "50%", height: "auto" }}
-        />
+          style={{
+            maxWidth: "50%",
+            height: "auto",
+          }} />
       </div>
     </Layout>
   );
