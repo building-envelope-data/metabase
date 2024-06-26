@@ -70,7 +70,7 @@ export default function PendingInstitutions({}: PendingInstitutionsProps) {
       dataSource={data?.pendingInstitutions?.nodes || []}
       renderItem={(item) => (
         <List.Item>
-          <Link href={paths.institution(item?.uuid)}>{item?.name}</Link>
+          <Link href={paths.institution(item?.uuid)} legacyBehavior>{item?.name}</Link>
           <Button
             onClick={() => verifyInstitution(item?.uuid)}
             loading={verifyingInstitution}
