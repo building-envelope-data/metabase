@@ -7,7 +7,7 @@
   "scripts": {
     "codegen": "graphql-let && graphql-codegen --config codegen.yml",
     "dev": "yarn codegen && NODE_OPTIONS='--use-openssl-ca' next -p 8080",
-    "build": "yarn codegen && next build",
+    "build": "yarn codegen && NODE_ENV=production next build",
     "test": "yarn codegen && NODE_OPTIONS='--use-openssl-ca' jest",
     "start": "next start -p 8080"
   },
