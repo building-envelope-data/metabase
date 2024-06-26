@@ -89,9 +89,7 @@ public sealed class Startup
                         .AllowAnyMethod()
             )
         );
-        services
-            .AddControllersWithViews()
-            .AddRazorRuntimeCompilation();
+        services.AddControllersWithViews();
     }
 
     private void ConfigureMessageSenderServices(IServiceCollection services)
