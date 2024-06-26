@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
@@ -8,17 +9,20 @@ namespace Metabase.GraphQl.DataX;
 
 public sealed class AppliedMethod
 {
-    // public IReadOnlyList<NamedMethodArgument> Arguments { get; }
-    // public IReadOnlyList<NamedMethodSource> Sources { get; }
-
     public AppliedMethod(
-        Guid methodId
+        Guid methodId,
+        IReadOnlyList<NamedMethodArgument> arguments,
+        IReadOnlyList<NamedMethodSource> sources
     )
     {
         MethodId = methodId;
+        Arguments = arguments;
+        Sources = sources;
     }
 
     public Guid MethodId { get; }
+    public IReadOnlyList<NamedMethodArgument> Arguments { get; }
+    public IReadOnlyList<NamedMethodSource> Sources { get; }
 
     public Task<Method?> GetMethodAsync(
         MethodByIdDataLoader methodById,
