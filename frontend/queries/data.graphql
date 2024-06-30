@@ -24,8 +24,10 @@ query AllData($where: DataPropositionInput) {
     edges {
       node {
         allData(where: $where) {
-          nodes {
-            ...DataPartial
+          edges {
+            node {
+              ...DataPartial
+            }
           }
         }
       }
@@ -54,8 +56,10 @@ query AllCalorimetricData($where: CalorimetricDataPropositionInput) {
     edges {
       node {
         allCalorimetricData(where: $where) {
-          nodes {
-            ...CalorimetricDataPartial
+          edges {
+            node {
+              ...CalorimetricDataPartial
+            }
           }
         }
       }
@@ -82,8 +86,10 @@ query AllHygrothermalData($where: HygrothermalDataPropositionInput) {
     edges {
       node {
         allHygrothermalData(where: $where) {
-          nodes {
-            ...HygrothermalDataPartial
+          edges {
+            node {
+              ...HygrothermalDataPartial
+            }
           }
         }
       }
@@ -115,8 +121,10 @@ query AllOpticalData($where: OpticalDataPropositionInput) {
     edges {
       node {
         allOpticalData(where: $where) {
-          nodes {
-            ...OpticalDataPartial
+          edges {
+            node {
+              ...OpticalDataPartial
+            }
           }
         }
       }
@@ -143,8 +151,10 @@ query AllPhotovoltaicData($where: PhotovoltaicDataPropositionInput) {
     edges {
       node {
         allPhotovoltaicData(where: $where) {
-          nodes {
-            ...PhotovoltaicDataPartial
+          edges {
+            node {
+              ...PhotovoltaicDataPartial
+            }
           }
         }
       }

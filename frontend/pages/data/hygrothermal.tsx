@@ -178,7 +178,7 @@ function Page() {
         }
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allHygrothermalData?.nodes || []
+            (edge) => edge?.node?.allHygrothermalData?.edges?.map((e) => e.node) || []
           ) || [];
         const flatData = ([] as PartialHygrothermalData[]).concat(
           ...nestedData

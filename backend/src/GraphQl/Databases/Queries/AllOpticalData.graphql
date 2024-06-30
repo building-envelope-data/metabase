@@ -22,13 +22,10 @@ query AllOpticalData(
         ...OpticalDataFields
       }
     }
-    nodes {
-      ...OpticalDataFields
-    }
     totalCount
-    pageInfo {
-      ...PageInfoFields
-    }
+    # pageInfo {
+    #   ...PageInfoFields
+    # }
     # TODO timestamp
   }
 }

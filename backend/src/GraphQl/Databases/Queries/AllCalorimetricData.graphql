@@ -22,13 +22,10 @@ query AllCalorimetricData(
         ...CalorimetricDataFields
       }
     }
-    nodes {
-      ...CalorimetricDataFields
-    }
     totalCount
-    pageInfo {
-      ...PageInfoFields
-    }
+    # pageInfo {
+    #   ...PageInfoFields
+    # }
     # TODO timestamp
   }
 }

@@ -565,7 +565,6 @@ public abstract partial class IntegrationTests
             JsonPath.Parse(jsonPath).Evaluate(
                 JsonObject.Create(jsonElement)
             );
-        if (pathResult.Error is not null) throw new ArgumentException(pathResult.Error);
 
         return pathResult.Matches?.Single()?.Value?.GetValue<string>()
                ?? throw new ArgumentException("String is null");

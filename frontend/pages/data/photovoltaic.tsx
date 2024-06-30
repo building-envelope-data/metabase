@@ -179,7 +179,7 @@ function Page() {
         // TODO Casting to `PhotovoltaicData` is wrong and error prone!
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allPhotovoltaicData?.nodes || []
+            (edge) => edge?.node?.allPhotovoltaicData?.edges?.map((e) => e.node) || []
           ) || [];
         const flatData = ([] as PartialPhotovoltaicData[]).concat(
           ...nestedData

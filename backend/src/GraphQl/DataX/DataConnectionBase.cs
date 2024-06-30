@@ -5,24 +5,20 @@ using HotChocolate.Types;
 
 namespace Metabase.GraphQl.DataX;
 
-public abstract class DataConnectionBase<TDataEdge, TData>
+public abstract class DataConnectionBase<TDataEdge>
 {
     protected DataConnectionBase(
         IReadOnlyList<TDataEdge> edges,
-        IReadOnlyList<TData> nodes,
         uint totalCount,
         DateTime timestamp
     )
     {
         Edges = edges;
-        Nodes = nodes;
         TotalCount = totalCount;
         Timestamp = timestamp;
     }
 
     public IReadOnlyList<TDataEdge> Edges { get; }
-
-    public IReadOnlyList<TData> Nodes { get; }
 
     [GraphQLType<NonNegativeIntType>] public uint TotalCount { get; }
 
