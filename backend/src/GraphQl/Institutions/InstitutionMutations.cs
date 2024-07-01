@@ -182,7 +182,7 @@ public sealed class InstitutionMutations
                 userManager
             ).ConfigureAwait(false)
            )
-            return new VerifyInstitutionPayload(    
+            return new VerifyInstitutionPayload(
                 new VerifyInstitutionError(
                     VerifyInstitutionErrorCode.UNAUTHORIZED,
                     "You are not authorized to verify institutions.",
