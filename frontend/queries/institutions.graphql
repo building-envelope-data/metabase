@@ -118,6 +118,7 @@ query Institution($uuid: Uuid!) {
     ...InstitutionPartial
     canCurrentUserUpdateNode
     canCurrentUserDeleteNode
+    canCurrentUserSwitchOperatingStateOfNode
     manufacturedComponents {
       edges {
         node {

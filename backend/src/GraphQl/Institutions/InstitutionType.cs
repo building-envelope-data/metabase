@@ -119,6 +119,12 @@ public sealed class InstitutionType
                 InstitutionResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!,
                     default!))
             .UseUserManager();
+        descriptor
+            .Field("canCurrentUserSwitchOperatingStateOfNode")
+            .ResolveWith<InstitutionResolvers>(x =>
+                InstitutionResolvers.GetCanCurrentUserSwitchOperatingStateOfNodeAsync(default!, default!, default!, default!,
+                    default!))
+            .UseUserManager();
     }
 
     private sealed class InstitutionResolvers
@@ -144,6 +150,18 @@ public sealed class InstitutionType
         )
         {
             return InstitutionAuthorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id,
+                userManager, context, cancellationToken);
+        }
+
+        public static Task<bool> GetCanCurrentUserSwitchOperatingStateOfNodeAsync(
+            [Parent] Institution institution,
+            ClaimsPrincipal claimsPrincipal,
+            [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+            ApplicationDbContext context,
+            CancellationToken cancellationToken
+        )
+        {
+            return InstitutionAuthorization.IsAuthorizedToSwitchInstitutionOperatingState(claimsPrincipal, institution.Id,
                 userManager, context, cancellationToken);
         }
     }

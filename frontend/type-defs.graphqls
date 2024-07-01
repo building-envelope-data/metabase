@@ -725,6 +725,7 @@ type Institution implements Node & Stakeholder {
   abbreviation: String
   canCurrentUserDeleteNode: Boolean!
   canCurrentUserUpdateNode: Boolean!
+  canCurrentUserSwitchOperatingStateOfNode: Boolean!
   description: String!
   developedMethods(pending: Boolean! = false): InstitutionDevelopedMethodConnection!
   id: ID!

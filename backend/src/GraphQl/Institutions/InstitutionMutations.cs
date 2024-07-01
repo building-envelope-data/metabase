@@ -344,12 +344,13 @@ public sealed class InstitutionMutations
                 )
             );
 
-        context.Institutions.Remove(institution);  
+        context.Institutions.Remove(institution);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new DeleteInstitutionPayload();
     }
 
-   
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<SwitchInstitutionOperatingStatePayload> SwitchInstitutionOperatingStateAsync(
         SwitchInstitutionOperatingStateInput input,
         ClaimsPrincipal claimsPrincipal,
@@ -358,18 +359,21 @@ public sealed class InstitutionMutations
         CancellationToken cancellationToken
     )
     {
-        // if (!await InstitutionAuthorization.IsAuthorizedToSwitchInstitutionOperatingState(
-        //         claimsPrincipal,
-        //         userManager
-        //     ).ConfigureAwait(false)
-        //    )
-        //     return new SwitchInstitutionOperatingStatePayload(
-        //         new SwitchInstitutionOperatingStateError(
-        //             SwitchInstitutionOperatingStateErrorCode.UNAUTHORIZED,
-        //             "You are not authorized to change institution operating state.",
-        //             Array.Empty<string>()
-        //         )
-        //     );
+        if (!await InstitutionAuthorization.IsAuthorizedToSwitchInstitutionOperatingState(
+                claimsPrincipal,
+                input.InstitutionId,
+                userManager,
+                context,
+                cancellationToken
+            ).ConfigureAwait(false)
+           )
+            return new SwitchInstitutionOperatingStatePayload(
+                new SwitchInstitutionOperatingStateError(
+                    SwitchInstitutionOperatingStateErrorCode.UNAUTHORIZED,
+                    "You are not authorized to change institution operating state.",
+                    Array.Empty<string>()
+                )
+            );
 
         var institution =
             await context.Institutions.AsQueryable()

@@ -205,7 +205,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
               : []
           )
           .concat(
-            institution.canCurrentUserDeleteNode
+            institution.canCurrentUserSwitchOperatingStateOfNode
               ? [
                   <SwitchInstitutionOperatingState
                     key="switchInstitutionOperatingState"
