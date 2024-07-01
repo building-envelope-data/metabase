@@ -384,7 +384,7 @@ public sealed class InstitutionMutations
                     new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
                 )
             );
-        institution.SwitchOperatingState(institution.operatingState);
+        institution.SwitchOperatingState(institution.OperatingState);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new SwitchInstitutionOperatingStatePayload(institution);
     }

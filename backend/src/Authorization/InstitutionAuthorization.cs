@@ -75,17 +75,22 @@ public static class InstitutionAuthorization
                    userManager
                );
     }
-
-      internal static async Task<bool> IsAuthorizedToSwitchInstitutionOperatingState(
+    
+    internal static async Task<bool> IsAuthorizedToSwitchInstitutionOperatingState(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager
+        Guid institutionId,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
     )
     {
         var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
         return user is not null
                && await CommonAuthorization.IsOwner(
                    user,
-                   userManager
+                   institutionId,
+                   context,
+                   cancellationToken
                );
     }
 }
