@@ -567,14 +567,14 @@ type DeleteInstitutionPayload {
   query: Query!
 }
 
-type ChangeInstitutionOperatingStateError {
-  code: ChangeInstitutionOperatingStateErrorCode!
+type SwitchInstitutionOperatingStateError {
+  code: SwitchInstitutionOperatingStateErrorCode!
   message: String!
   path: [String!]!
 }
 
-type ChangeInstitutionOperatingStatePayload {
-  errors: [ChangeInstitutionOperatingStateError!]
+type SwitchInstitutionOperatingStatePayload {
+  errors: [SwitchInstitutionOperatingStateError!]
   query: Query!
 }
 
@@ -962,7 +962,7 @@ type Mutation {
   createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(policy: "Write")
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(policy: "Write")
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(policy: "Write")
-  changeInstitutionOperatingState(input: ChangeInstitutionOperatingStateInput!): ChangeInstitutionOperatingStatePayload! @authorize(policy: "Write")
+  switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload! @authorize(policy: "Write")
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(policy: "ManageUser")
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(policy: "ManageUser")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(policy: "ManageUser")
@@ -1970,7 +1970,7 @@ input DeleteInstitutionInput {
   institutionId: Uuid!
 }
 
-input ChangeInstitutionOperatingStateInput {
+input SwitchInstitutionOperatingStateInput {
   institutionId: Uuid!
 }
 
@@ -2861,7 +2861,7 @@ enum DeleteInstitutionErrorCode {
   MANAGING
 }
 
-enum ChangeInstitutionOperatingStateErrorCode {
+enum SwitchInstitutionOperatingStateErrorCode {
   UNKNOWN
   UNKNOWN_INSTITUTION
   UNAUTHORIZED

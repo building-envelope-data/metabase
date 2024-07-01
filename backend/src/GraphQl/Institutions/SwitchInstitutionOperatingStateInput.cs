@@ -2,6 +2,6 @@ using System;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed record ChangeInstitutionOperatingStateInput(
+public sealed record SwitchInstitutionOperatingStateInput(
     Guid InstitutionId
 );

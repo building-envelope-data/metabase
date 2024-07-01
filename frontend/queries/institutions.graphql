@@ -103,8 +103,8 @@ mutation DeleteInstitution($institutionId: Uuid!) {
     }
   }
 }
-mutation ChangeInstitutionOperatingState($institutionId: Uuid!) {
-  changeInstitutionOperatingState(input: { institutionId: $institutionId }) {
+mutation SwitchInstitutionOperatingState($institutionId: Uuid!) {
+  switchInstitutionOperatingState(input: { institutionId: $institutionId }) {
     errors {
       code
       message

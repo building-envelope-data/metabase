@@ -102,8 +102,13 @@ public sealed class Institution
         State = InstitutionState.VERIFIED;
     }
 
-    public void ChangeOperatingState()
+    public void SwitchOperatingState(InstitutionOperatingState currentState)
     {
-        OperatingState = InstitutionOperatingState.NOT_OPERATING;
+        if(currentState == InstitutionOperatingState.NOT_OPERATING){
+            OperatingState = InstitutionOperatingState.OPERATING;
+        }
+        else{
+            OperatingState = InstitutionOperatingState.NOT_OPERATING;
+        }
     }
 }

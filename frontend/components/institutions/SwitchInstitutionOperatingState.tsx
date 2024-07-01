@@ -4,21 +4,21 @@ import { useState } from "react";
 import paths from "../../paths";
 import {
   InstitutionsDocument,
-  useChangeInstitutionOperatingStateMutation,
+  useSwitchInstitutionOperatingStateMutation,
 } from "../../queries/institutions.graphql";
 import { Scalars } from "../../__generated__/__types__";
 
-export type changeInstitutionOperatingStateProps = {
+export type switchInstitutionOperatingStateProps = {
   institutionId: Scalars["Uuid"];
 };
 
-export default function ChangeInstitutionOperatingState({
+export default function SwitchInstitutionOperatingState({
   institutionId,
-}: changeInstitutionOperatingStateProps) {
+}: switchInstitutionOperatingStateProps) {
   const router = useRouter();
   const [notOperating, setNotOperating] = useState(false);
 
-  const [changeInstitutionOperatingStateMutation] = useChangeInstitutionOperatingStateMutation({
+  const [switchInstitutionOperatingStateMutation] = useSwitchInstitutionOperatingStateMutation({
     refetchQueries: [
       {
         query: InstitutionsDocument,
@@ -26,19 +26,19 @@ export default function ChangeInstitutionOperatingState({
     ],
   });
 
-  const changeOperatingState = async () => {
+  const switchOperatingState = async () => {
     try {
       setNotOperating(true);
-      const { errors, data } = await changeInstitutionOperatingStateMutation({
+      const { errors, data } = await switchInstitutionOperatingStateMutation({
         variables: {
           institutionId: institutionId,
         },
       });
       if (errors) {
         console.log(errors);
-      } else if (data?.changeOperatingState?.errors) {
+      } else if (data?.switchOperatingState?.errors) {
         message.error(
-          data?.changeOperatingState?.errors
+          data?.switchOperatingState?.errors
             .map((error: { message: any; }) => error.message)
             .join(" ")
         );
@@ -55,10 +55,10 @@ export default function ChangeInstitutionOperatingState({
     <Button
       danger
       type="primary"
-      onClick={changeOperatingState}
+      onClick={switchOperatingState}
       loading={notOperating}
     >
-      Modify Operating State
+      Switch Operating State
     </Button>
   );
 
