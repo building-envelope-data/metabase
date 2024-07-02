@@ -25,7 +25,6 @@ public sealed class Institution
         string? publicKey,
         InstitutionState state,
         InstitutionOperatingState operatingState
-        
     )
     {
         Name = name;
