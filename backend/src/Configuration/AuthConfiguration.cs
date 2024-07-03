@@ -317,7 +317,7 @@ public abstract class AuthConfiguration
                         .EnableTokenEndpointPassthrough()
                         .EnableUserinfoEndpointPassthrough()
                         .EnableVerificationEndpointPassthrough()
-                        .DisableTransportSecurityRequirement();
+                        .DisableTransportSecurityRequirement(); // TODO Why is `UseForwardedHeaders` with the set `ForwardedHeaders` in `Startup.cs` not sufficient to leave the security requirement enabled in production?
                     // .EnableStatusCodePagesIntegration();
                     // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending
@@ -403,7 +403,7 @@ public abstract class AuthConfiguration
                     .EnableStatusCodePagesIntegration()
                     .EnableRedirectionEndpointPassthrough()
                     .EnablePostLogoutRedirectionEndpointPassthrough()
-                    .DisableTransportSecurityRequirement();
+                    .DisableTransportSecurityRequirement(); // TODO Why is `UseForwardedHeaders` with the set `ForwardedHeaders` in `Startup.cs` not sufficient to leave the security requirement enabled in production?
 
                 // Register the System.Net.Http integration and use the identity of the current
                 // assembly as a more specific user agent, which can be useful when dealing with
