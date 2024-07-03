@@ -316,9 +316,9 @@ public abstract class AuthConfiguration
                         .EnableLogoutEndpointPassthrough()
                         .EnableTokenEndpointPassthrough()
                         .EnableUserinfoEndpointPassthrough()
-                        .EnableVerificationEndpointPassthrough();
+                        .EnableVerificationEndpointPassthrough()
+                        .DisableTransportSecurityRequirement();
                     // .EnableStatusCodePagesIntegration();
-                    // .DisableTransportSecurityRequirement();
                     // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending
                     // a token or revocation request, uncomment the following line:
@@ -402,8 +402,8 @@ public abstract class AuthConfiguration
                 _.UseAspNetCore()
                     .EnableStatusCodePagesIntegration()
                     .EnableRedirectionEndpointPassthrough()
-                    .EnablePostLogoutRedirectionEndpointPassthrough();
-                // .DisableTransportSecurityRequirement();
+                    .EnablePostLogoutRedirectionEndpointPassthrough()
+                    .DisableTransportSecurityRequirement();
 
                 // Register the System.Net.Http integration and use the identity of the current
                 // assembly as a more specific user agent, which can be useful when dealing with
