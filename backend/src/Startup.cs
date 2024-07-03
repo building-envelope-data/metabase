@@ -89,7 +89,16 @@ public sealed class Startup
                         .AllowAnyMethod()
             )
         );
-        services.AddControllersWithViews();
+        services.AddControllersWithViews()
+        .AddRazorOptions(_ =>
+            {
+                // _.ViewLocationFormats.Add("/Views/{1}/{0}.cshtml");
+                // _.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+                // _.ViewLocationFormats.Add("/{1}/{0}.cshtml");
+                // _.ViewLocationFormats.Add("/Shared/{0}.cshtml");
+                _.ViewLocationFormats.Add("/{0}.cshtml");
+            }
+        );
     }
 
     private void ConfigureMessageSenderServices(IServiceCollection services)
