@@ -276,6 +276,7 @@ public abstract class AuthConfiguration
             // Register the OpenIddict server components.
             .AddServer(_ =>
                 {
+                    _.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
                     _.SetAuthorizationEndpointUris("connect/authorize")
                         .SetDeviceEndpointUris("connect/device")
                         .SetLogoutEndpointUris("connect/logout")
