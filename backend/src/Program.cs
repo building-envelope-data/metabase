@@ -131,7 +131,7 @@ public sealed class Program
             new WebApplicationOptions
             {
                 Args = commandLineArguments,
-                ContentRootPath = Directory.GetCurrentDirectory()
+                ContentRootPath = Directory.GetCurrentDirectory() // PlatformServices.Default.Application.ApplicationBasePath
             }
         );
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/
