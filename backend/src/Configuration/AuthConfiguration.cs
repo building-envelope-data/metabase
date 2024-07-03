@@ -366,7 +366,7 @@ public abstract class AuthConfiguration
             // Register the OpenIddict validation components.
             .AddValidation(_ =>
             {
-                _.SetIssuer(appSettings.Host);
+                _.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
                 // Configure the audience accepted by this resource server.
                 _.AddAudiences(Audience);
                 // Import the configuration from the local OpenIddict server instance: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-the-optionsuselocalserver-integration
