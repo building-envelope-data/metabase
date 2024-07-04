@@ -97,7 +97,7 @@ public abstract partial class IntegrationTests
             new WebApplicationFactoryClientOptions
             {
                 AllowAutoRedirect = allowAutoRedirect,
-                BaseAddress = new Uri("http://localhost"),
+                BaseAddress = new Uri("http://localhost", UriKind.Absolute),
                 HandleCookies = true,
                 MaxAutomaticRedirections = 3
             }

@@ -186,13 +186,15 @@ public sealed class DbSeeder
                     {
                         new Uri(environment.IsEnvironment("test")
                             ? "urn:test"
-                            : $"{host}/connect/callback/login/metabase")
+                            : $"{host}/connect/callback/login/metabase",
+                            UriKind.Absolute)
                     },
                     PostLogoutRedirectUris =
                     {
                         new Uri(environment.IsEnvironment("test")
                             ? "urn:test"
-                            : $"{host}/connect/callback/logout/metabase")
+                            : $"{host}/connect/callback/logout/metabase",
+                            UriKind.Absolute)
                     },
                     Permissions =
                     {
@@ -250,11 +252,11 @@ public sealed class DbSeeder
                     },
                     RedirectUris =
                     {
-                        new Uri($"{host}/connect/callback/login/metabase")
+                        new Uri($"{host}/connect/callback/login/metabase", UriKind.Absolute)
                     },
                     PostLogoutRedirectUris =
                     {
-                        new Uri($"{host}/connect/callback/logout/metabase")
+                        new Uri($"{host}/connect/callback/logout/metabase", UriKind.Absolute)
                     },
                     Permissions =
                     {

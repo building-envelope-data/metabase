@@ -227,7 +227,7 @@ public static class GraphQlConfiguration
             : base(name, description, defaultFormat, enforceFormat,
                 bind)
         {
-            SpecifiedBy = new Uri(_specifiedBy);
+            SpecifiedBy = new Uri(_specifiedBy, UriKind.Absolute);
         }
     }
 
@@ -241,7 +241,7 @@ public static class GraphQlConfiguration
             BindingBehavior bind = BindingBehavior.Explicit)
             : base(name, description, bind)
         {
-            SpecifiedBy = new Uri(_specifiedBy);
+            SpecifiedBy = new Uri(_specifiedBy, UriKind.Absolute);
         }
     }
 }
