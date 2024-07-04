@@ -66,20 +66,18 @@ public sealed class DbSeeder
     public const string MetabaseClientId = "metabase";
     public const string TestlabSolarFacadesClientId = "testlab-solar-facades";
 
-    public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password,
-        Enumerations.UserRole Role)> Users =
+    public static readonly ReadOnlyCollection<(string Name, string EmailAddress, Enumerations.UserRole Role)> Users =
         Role.AllEnum.Select(role => (
             Role.EnumToName(role),
             $"{Role.EnumToName(role).ToLowerInvariant()}@buildingenvelopedata.org",
-            "abcABC123@",
             role
         )).ToList().AsReadOnly();
 
-    public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role)
+    public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         AdministratorUser =
             Users.First(x => x.Role == Enumerations.UserRole.ADMINISTRATOR);
 
-    public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role)
+    public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         VerifierUser =
             Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
 
@@ -92,7 +90,7 @@ public sealed class DbSeeder
         var environment = services.GetRequiredService<IWebHostEnvironment>();
         var appSettings = services.GetRequiredService<AppSettings>();
         await CreateRolesAsync(services, logger).ConfigureAwait(false);
-        await CreateUsersAsync(services, environment, logger).ConfigureAwait(false);
+        await CreateUsersAsync(services, environment, appSettings, logger).ConfigureAwait(false);
         await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
         await RegisterScopesAsync(services, logger).ConfigureAwait(false);
     }
@@ -116,6 +114,7 @@ public sealed class DbSeeder
     private static async Task CreateUsersAsync(
         IServiceProvider services,
         IWebHostEnvironment environment,
+        AppSettings appSettings,
         ILogger<DbSeeder> logger
     )
     {
@@ -124,20 +123,21 @@ public sealed class DbSeeder
         {
             if ((await manager.GetUsersInRoleAsync(Role.Administrator).ConfigureAwait(false)).IsNullOrEmpty())
             {
-                await CreateUserAsync(manager, AdministratorUser, logger).ConfigureAwait(false);
+                await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger).ConfigureAwait(false);
             }
         } else {
             foreach (var userInfo in Users)
                 if (await manager.FindByEmailAsync(userInfo.EmailAddress).ConfigureAwait(false) is null)
                 {
-                    await CreateUserAsync(manager, userInfo, logger).ConfigureAwait(false);
+                    await CreateUserAsync(manager, userInfo, appSettings.BootstrapUserPassword, logger).ConfigureAwait(false);
                 }
         }
     }
 
     private static async Task CreateUserAsync(
         UserManager<User> manager,
-        (string Name, string EmailAddress, string Password, Enumerations.UserRole Role) userInfo,
+        (string Name, string EmailAddress, Enumerations.UserRole Role) userInfo,
+        string Password,
         ILogger<DbSeeder> logger
     )
     {
@@ -145,7 +145,7 @@ public sealed class DbSeeder
         var user = new User(userInfo.Name, userInfo.EmailAddress, null, null);
         await manager.CreateAsync(
             user,
-            userInfo.Password
+            Password
         ).ConfigureAwait(false);
         var confirmationToken =
             await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
