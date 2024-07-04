@@ -55,9 +55,8 @@ public sealed class Program
             startup.Configure(application);
             using (var scope = application.Services.CreateScope())
             {
-                if (application.Environment.IsDevelopment())
-                    // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
-                    await CreateAndSeedDb(scope.ServiceProvider).ConfigureAwait(false);
+                // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
+                await CreateAndSeedDb(scope.ServiceProvider).ConfigureAwait(false);
             }
 
             application.Run();
