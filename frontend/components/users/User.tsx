@@ -297,7 +297,7 @@ export default function User({ userId }: UserProps) {
         dataSource={user.representedInstitutions.edges}
         renderItem={(item) => (
           <List.Item key={item.node.uuid}>
-            <Link href={paths.institution(item.node.uuid)}>
+            <Link href={paths.institution(item.node.uuid)} legacyBehavior>
               {item.node.name}
             </Link>
           </List.Item>
@@ -311,7 +311,7 @@ export default function User({ userId }: UserProps) {
             dataSource={user.pendingRepresentedInstitutions.edges}
             renderItem={(item) => (
               <List.Item key={item.node.uuid}>
-                <Link href={paths.institution(item.node.uuid)}>
+                <Link href={paths.institution(item.node.uuid)} legacyBehavior>
                   {item.node.name}
                 </Link>
                 <Button
@@ -334,7 +334,7 @@ export default function User({ userId }: UserProps) {
         dataSource={user.developedMethods.edges}
         renderItem={(item) => (
           <List.Item key={item.node.uuid}>
-            <Link href={paths.method(item.node.uuid)}>{item.node.name}</Link>
+            <Link href={paths.method(item.node.uuid)} legacyBehavior>{item.node.name}</Link>
           </List.Item>
         )}
       />
@@ -346,7 +346,7 @@ export default function User({ userId }: UserProps) {
             dataSource={user.pendingDevelopedMethods.edges}
             renderItem={(item) => (
               <List.Item key={item.node.uuid}>
-                <Link href={paths.method(item.node.uuid)}>
+                <Link href={paths.method(item.node.uuid)} legacyBehavior>
                   {item.node.name}
                 </Link>
                 <Button

@@ -76,7 +76,7 @@ export default function ManageLayout({ children }: ManageLayoutProps) {
           >
             {navItems.map(({ path, label }) => (
               <Menu.Item key={path}>
-                <Link href={path}>{label}</Link>
+                <Link href={path} legacyBehavior>{label}</Link>
               </Menu.Item>
             ))}
             {currentUser.hasPassword ? (

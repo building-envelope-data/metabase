@@ -55,9 +55,8 @@ public sealed class Program
             startup.Configure(application);
             using (var scope = application.Services.CreateScope())
             {
-                if (application.Environment.IsDevelopment())
-                    // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
-                    await CreateAndSeedDbIfNotExists(scope.ServiceProvider).ConfigureAwait(false);
+                // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
+                await CreateAndSeedDb(scope.ServiceProvider).ConfigureAwait(false);
             }
 
             application.Run();
@@ -104,7 +103,7 @@ public sealed class Program
         if (environment != "production") configuration.WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture);
     }
 
-    private static async Task CreateAndSeedDbIfNotExists(
+    private static async Task CreateAndSeedDb(
         IServiceProvider services
     )
     {
@@ -113,7 +112,8 @@ public sealed class Program
             using var dbContext =
                 services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
                     .CreateDbContext();
-            if (dbContext.Database.EnsureCreated()) await DbSeeder.DoAsync(services).ConfigureAwait(false);
+            dbContext.Database.EnsureCreated();
+            await DbSeeder.DoAsync(services).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -131,7 +131,7 @@ public sealed class Program
             new WebApplicationOptions
             {
                 Args = commandLineArguments,
-                ContentRootPath = Directory.GetCurrentDirectory()
+                ContentRootPath = Directory.GetCurrentDirectory() // PlatformServices.Default.Application.ApplicationBasePath
             }
         );
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/

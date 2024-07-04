@@ -45,9 +45,11 @@ public abstract partial class IntegrationTests
         HttpClient = CreateHttpClient();
     }
 
-    protected CustomWebApplicationFactory Factory { get; }
+    private CustomWebApplicationFactory Factory { get; }
 
     protected CollectingEmailSender EmailSender => Factory.EmailSender;
+
+    protected AppSettings AppSettings => Factory.AppSettings;
 
     protected HttpClient HttpClient { get; }
 
@@ -95,7 +97,7 @@ public abstract partial class IntegrationTests
             new WebApplicationFactoryClientOptions
             {
                 AllowAutoRedirect = allowAutoRedirect,
-                BaseAddress = new Uri("http://localhost"),
+                BaseAddress = new Uri("http://localhost", UriKind.Absolute),
                 HandleCookies = true,
                 MaxAutomaticRedirections = 3
             }

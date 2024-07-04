@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchemaNameOptionsExtension = Metabase.Data.Extensions.SchemaNameOptionsExtension;
 
 namespace Metabase.Data;
@@ -25,7 +26,6 @@ public sealed class ApplicationDbContext
         var schemaNameOptions = options.FindExtension<SchemaNameOptionsExtension>();
         _schemaName = schemaNameOptions is null ? "metabase" : schemaNameOptions.SchemaName;
     }
-
     // https://docs.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
     public DbSet<Component> Components { get; private set; } = default!;
     public DbSet<ComponentAssembly> ComponentAssemblies { get; private set; } = default!;
@@ -46,6 +46,28 @@ public sealed class ApplicationDbContext
     public DbSet<Method> Methods { get; private set; } = default!;
     public DbSet<UserMethodDeveloper> UserMethodDevelopers { get; private set; } = default!;
     public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
+
+    // Inspired by https://github.com/openiddict/openiddict-core/issues/1376#issuecomment-1151275376
+    // It is needed to fix the following error that occurred when trying to redeem OpenId Connect tokens in production:
+    // `Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported (...)`
+    // See also https://github.com/openiddict/openiddict-core/issues/1376
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>().HaveConversion<UtcValueConverter>();
+        configurationBuilder.Properties<DateTime?>().HaveConversion<UtcValueConverter>();
+        base.ConfigureConventions(configurationBuilder);
+    }
+
+    private sealed class UtcValueConverter : ValueConverter<DateTime, DateTime>
+    {
+        public UtcValueConverter()
+            : base(
+                v => v,
+                v => v.Kind != DateTimeKind.Unspecified ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            )
+        {
+        }
+    }
 
     private static void CreateEnumerations(ModelBuilder builder)
     {

@@ -66,12 +66,13 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=production
       - XBASE_Host=https://${HOST}
+      - XBASE_BootstrapUserPassword=${BOOTSTRAP_USER_PASSWORD}
       - XBASE_OpenIdConnectClientSecret=${OPEN_ID_CONNECT_CLIENT_SECRET}
       - XBASE_JsonWebToken__EncryptionCertificatePassword=${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD}
       - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
       - XBASE_Email__SmtpHost=${SMTP_HOST}
       - XBASE_Email__SmtpPort=${SMTP_PORT}
-      - XBASE_TestlabSolarFacadesHost=${TESTLAB_SOLAR_FACADES_HOST}
+      - XBASE_TestlabSolarFacadesHost=https://${TESTLAB_SOLAR_FACADES_HOST}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
     volumes:
       - backend_logs:/app/logs
