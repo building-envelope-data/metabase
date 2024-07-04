@@ -57,7 +57,7 @@ public sealed class Program
             {
                 if (application.Environment.IsDevelopment())
                     // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
-                    await CreateAndSeedDbIfNotExists(scope.ServiceProvider).ConfigureAwait(false);
+                    await CreateAndSeedDb(scope.ServiceProvider).ConfigureAwait(false);
             }
 
             application.Run();
@@ -104,7 +104,7 @@ public sealed class Program
         if (environment != "production") configuration.WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture);
     }
 
-    private static async Task CreateAndSeedDbIfNotExists(
+    private static async Task CreateAndSeedDb(
         IServiceProvider services
     )
     {
@@ -113,7 +113,8 @@ public sealed class Program
             using var dbContext =
                 services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
                     .CreateDbContext();
-            if (dbContext.Database.EnsureCreated()) await DbSeeder.DoAsync(services).ConfigureAwait(false);
+            dbContext.Database.EnsureCreated();
+            await DbSeeder.DoAsync(services).ConfigureAwait(false);
         }
         catch (Exception exception)
         {

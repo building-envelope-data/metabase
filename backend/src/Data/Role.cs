@@ -7,7 +7,7 @@ namespace Metabase.Data;
 
 public sealed class Role : IdentityRole<Guid>
 {
-    private const string Administrator = "Administrator";
+    public const string Administrator = "Administrator";
     private const string Verifier = "Verifier";
 
     public static readonly ReadOnlyCollection<Enumerations.UserRole> AllEnum =

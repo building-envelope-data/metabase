@@ -58,7 +58,7 @@ public sealed class ApplicationDbContext
         base.ConfigureConventions(configurationBuilder);
     }
 
-    private class UtcValueConverter : ValueConverter<DateTime, DateTime>
+    private sealed class UtcValueConverter : ValueConverter<DateTime, DateTime>
     {
         public UtcValueConverter()
             : base(

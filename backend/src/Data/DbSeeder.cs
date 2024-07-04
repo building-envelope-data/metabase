@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 
 namespace Metabase.Data;
@@ -91,7 +92,7 @@ public sealed class DbSeeder
         var environment = services.GetRequiredService<IWebHostEnvironment>();
         var appSettings = services.GetRequiredService<AppSettings>();
         await CreateRolesAsync(services, logger).ConfigureAwait(false);
-        await CreateUsersAsync(services, logger).ConfigureAwait(false);
+        await CreateUsersAsync(services, environment, logger).ConfigureAwait(false);
         await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
         await RegisterScopesAsync(services, logger).ConfigureAwait(false);
     }
@@ -114,24 +115,42 @@ public sealed class DbSeeder
 
     private static async Task CreateUsersAsync(
         IServiceProvider services,
+        IWebHostEnvironment environment,
         ILogger<DbSeeder> logger
     )
     {
         var manager = services.GetRequiredService<UserManager<User>>();
-        foreach (var (Name, EmailAddress, Password, Role) in Users)
-            if (await manager.FindByNameAsync(Name).ConfigureAwait(false) is null)
+        if (environment.IsProduction())
+        {
+            if ((await manager.GetUsersInRoleAsync(Role.Administrator).ConfigureAwait(false)).IsNullOrEmpty())
             {
-                logger.CreatingUser(Name);
-                var user = new User(Name, EmailAddress, null, null);
-                await manager.CreateAsync(
-                    user,
-                    Password
-                ).ConfigureAwait(false);
-                var confirmationToken =
-                    await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
-                await manager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
-                await manager.AddToRoleAsync(user, Data.Role.EnumToName(Role)).ConfigureAwait(false);
+                await CreateUserAsync(manager, AdministratorUser, logger).ConfigureAwait(false);
             }
+        } else {
+            foreach (var userInfo in Users)
+                if (await manager.FindByEmailAsync(userInfo.EmailAddress).ConfigureAwait(false) is null)
+                {
+                    await CreateUserAsync(manager, userInfo, logger).ConfigureAwait(false);
+                }
+        }
+    }
+
+    private static async Task CreateUserAsync(
+        UserManager<User> manager,
+        (string Name, string EmailAddress, string Password, Enumerations.UserRole Role) userInfo,
+        ILogger<DbSeeder> logger
+    )
+    {
+        logger.CreatingUser(userInfo.Name);
+        var user = new User(userInfo.Name, userInfo.EmailAddress, null, null);
+        await manager.CreateAsync(
+            user,
+            userInfo.Password
+        ).ConfigureAwait(false);
+        var confirmationToken =
+            await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+        await manager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
+        await manager.AddToRoleAsync(user, Role.EnumToName(userInfo.Role)).ConfigureAwait(false);
     }
 
     private static async Task RegisterApplicationsAsync(
