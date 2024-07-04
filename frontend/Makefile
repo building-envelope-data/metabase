@@ -13,6 +13,18 @@ help : ## Print this help
 # Tasks to run, for example, in a Docker container #
 # ------------------------------------------------ #
 
+build : ## Build the project
+	yarn run build
+.PHONY : build
+
+test : ## Run tests
+	yarn run test
+.PHONY : test
+
+graphql : ## Generate TypeScript code from the GraphQL queries ./queries/*.graphql
+	yarn run codegen
+.PHONY : graphql
+
 install : ## Install packages (without touching the lockfile)
 	yarn install --pure-lockfile
 .PHONY : install
@@ -28,6 +40,20 @@ outdated : ## Show outdated packages
 lint : ## Lint code
 	next lint
 .PHONY : lint
+
+format : ## Format the code
+	yarn run \
+		prettier --write .
+.PHONY : format
+
+licenses : ## Print licenses
+	yarn run \
+		license-checker \
+			--unknown \
+			--direct \
+			--summary
+			# --failOn
+			# --onlyAllow
 
 update-schema : ## Update GraphQl schema
 	wget \

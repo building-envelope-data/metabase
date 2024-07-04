@@ -17,6 +17,12 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  name: string;
+  description: string;
+  locator: Scalars["Url"];
+};
+
 export type CreateDatabaseProps = {
   operatorId: Scalars["Uuid"];
 };
@@ -40,18 +46,10 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
 
-  const onFinish = ({
-    name,
-    description,
-    locator,
-  }: {
-    name: string;
-    description: string;
-    locator: Scalars["Url"];
-  }) => {
+  const onFinish = ({ name, description, locator }: FormValues) => {
     const create = async () => {
       try {
         setCreating(true);
@@ -72,7 +70,11 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.createDatabase?.errors) {
+        if (
+          !errors &&
+          !data?.createDatabase?.errors &&
+          data?.createDatabase?.database
+        ) {
           form.resetFields();
         }
       } catch (error) {

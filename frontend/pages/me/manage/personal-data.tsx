@@ -90,7 +90,7 @@ function Page() {
     <ManageLayout>
       <Typography.Paragraph>
         Your account contains personal data that you have given us. This page
-        allows you to download or delete that data in accordance with the
+        allows you to download or delete that data in accordance with the{" "}
         <Typography.Link href="https://gdpr.eu">
           General Data Protection Regulation (GDPR)
         </Typography.Link>

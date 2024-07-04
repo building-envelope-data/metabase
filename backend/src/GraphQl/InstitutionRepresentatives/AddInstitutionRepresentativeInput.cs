@@ -1,10 +1,10 @@
 using System;
+using Metabase.Enumerations;
 
-namespace Metabase.GraphQl.InstitutionRepresentatives
-{
-    public record AddInstitutionRepresentativeInput(
-          Guid InstitutionId,
-          Guid UserId,
-          Enumerations.InstitutionRepresentativeRole Role
-        );
-}
+namespace Metabase.GraphQl.InstitutionRepresentatives;
+
+public sealed record AddInstitutionRepresentativeInput(
+    Guid InstitutionId,
+    Guid UserId,
+    InstitutionRepresentativeRole Role
+);

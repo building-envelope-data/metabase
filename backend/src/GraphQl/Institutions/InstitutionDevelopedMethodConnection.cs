@@ -2,44 +2,44 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.Data;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace Metabase.GraphQl.Institutions
-{
-    public sealed class InstitutionDevelopedMethodConnection
-        : ForkingConnection<Data.Institution, Data.InstitutionMethodDeveloper, PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodEdge>
-    {
-        public InstitutionDevelopedMethodConnection(
-            Data.Institution institution,
-            bool pending
-        )
-            : base(
-                institution,
-                pending,
-                x => new InstitutionDevelopedMethodEdge(x)
-                )
-        {
-        }
+namespace Metabase.GraphQl.Institutions;
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
-        [UseUserManager]
-        public Task<bool> CanCurrentUserConfirmEdgeAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
-            CancellationToken cancellationToken
+public sealed class InstitutionDevelopedMethodConnection
+    : ForkingConnection<Institution, InstitutionMethodDeveloper,
+        PendingInstitutionDevelopedMethodsByInstitutionIdDataLoader,
+        InstitutionDevelopedMethodsByInstitutionIdDataLoader, InstitutionDevelopedMethodEdge>
+{
+    public InstitutionDevelopedMethodConnection(
+        Institution institution,
+        bool pending
+    )
+        : base(
+            institution,
+            pending,
+            x => new InstitutionDevelopedMethodEdge(x)
         )
-        {
-            return InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
-        }
+    {
+    }
+
+    [UseUserManager]
+    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        return InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(
+            claimsPrincipal,
+            Subject.Id,
+            userManager,
+            context,
+            cancellationToken
+        );
     }
 }

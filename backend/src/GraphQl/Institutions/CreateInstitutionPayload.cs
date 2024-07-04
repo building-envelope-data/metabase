@@ -1,20 +1,21 @@
-namespace Metabase.GraphQl.Institutions
-{
-    public sealed class CreateInstitutionPayload
-      : InstitutionPayload<CreateInstitutionError>
-    {
-        public CreateInstitutionPayload(
-            Data.Institution institution
-            )
-              : base(institution)
-        {
-        }
+using Metabase.Data;
 
-        public CreateInstitutionPayload(
-            CreateInstitutionError error
-            )
-              : base(error)
-        {
-        }
+namespace Metabase.GraphQl.Institutions;
+
+public sealed class CreateInstitutionPayload
+    : InstitutionPayload<CreateInstitutionError>
+{
+    public CreateInstitutionPayload(
+        Institution institution
+    )
+        : base(institution)
+    {
+    }
+
+    public CreateInstitutionPayload(
+        CreateInstitutionError error
+    )
+        : base(error)
+    {
     }
 }

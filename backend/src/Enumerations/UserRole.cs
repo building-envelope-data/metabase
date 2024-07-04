@@ -1,8 +1,7 @@
-namespace Metabase.Enumerations
+namespace Metabase.Enumerations;
+
+public enum UserRole
 {
-    public enum UserRole
-    {
-        ADMINISTRATOR,
-        VERIFIER
-    }
+    ADMINISTRATOR,
+    VERIFIER
 }

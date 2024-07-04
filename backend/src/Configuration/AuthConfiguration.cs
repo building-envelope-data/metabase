@@ -1,321 +1,326 @@
 using System;
-using System.IdentityModel.Tokens.Jwt;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Metabase.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
+using OpenIddict.Client;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Reflection;
-using System.Security;
-using System.IO;
 
-namespace Metabase.Configuration
+namespace Metabase.Configuration;
+
+public abstract class AuthConfiguration
 {
-    public abstract class AuthConfiguration
+    // `IdentityConstants.ApplicationScheme` is not a constant but only
+    // read-only. It can thus not be used in the `Authorize` attribute. See the corresponding issue
+    // https://github.com/dotnet/aspnetcore/issues/20122 and un-merged pull request
+    // https://github.com/dotnet/aspnetcore/pull/21343/files
+    public const string IdentityConstantsApplicationScheme = "Identity.Application";
+
+    public const string Audience = "metabase";
+    public const string ReadPolicy = "Read";
+    public const string WritePolicy = "Write";
+    public const string ManageUserPolicy = "ManageUser";
+    public const string ReadApiScope = "api:read";
+    public const string WriteApiScope = "api:write";
+    public const string ManageUserApiScope = "api:user:manage";
+
+    // Keep in sync with the scopes set in `OpenIddictClientRegistration`.
+    private static readonly HashSet<string> _clientScopes = new()
     {
-        // public const string JwtBearerAuthenticatedPolicy = "JwtBearerAuthenticated";
-        public const string ReadPolicy = "Read";
-        public const string WritePolicy = "Write";
-        public const string ManageUserPolicy = "ManageUser";
-        public static string ReadApiScope { get; } = "api:read";
-        public static string WriteApiScope { get; } = "api:write";
-        public static string ManageUserApiScope { get; } = "api:user:manage";
+        OpenIddictConstants.Scopes.Address,
+        OpenIddictConstants.Scopes.Email,
+        OpenIddictConstants.Scopes.Phone,
+        OpenIddictConstants.Scopes.Profile,
+        OpenIddictConstants.Scopes.Roles,
+        ReadApiScope,
+        WriteApiScope,
+        ManageUserApiScope
+    };
 
-        public static void ConfigureServices(
-            IServiceCollection services,
-            IWebHostEnvironment environment,
-            AppSettings appSettings
-            )
-        {
-            var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx", appSettings.JsonWebToken.EncryptionCertificatePassword);
-            var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx", appSettings.JsonWebToken.SigningCertificatePassword);
-            ConfigureIdentityServices(services);
-            ConfigureAuthenticiationAndAuthorizationServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
-            ConfigureTaskScheduling(services, environment);
-            ConfigureOpenIddictServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
-        }
+    public static void ConfigureServices(
+        IServiceCollection services,
+        IWebHostEnvironment environment,
+        AppSettings appSettings
+    )
+    {
+        var encryptionCertificate = LoadCertificate("jwt-encryption-certificate.pfx",
+            appSettings.JsonWebToken.EncryptionCertificatePassword);
+        var signingCertificate = LoadCertificate("jwt-signing-certificate.pfx",
+            appSettings.JsonWebToken.SigningCertificatePassword);
+        ConfigureIdentityServices(services);
+        ConfigureAuthenticationAndAuthorizationServices(services);
+        ConfigureTaskScheduling(services, environment);
+        ConfigureOpenIddictServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
+    }
 
-        private static X509Certificate2 LoadCertificate(
-            string fileName,
-            string password
-        )
-        {
-            if (string.IsNullOrEmpty(password))
+    private static X509Certificate2 LoadCertificate(
+        string fileName,
+        string password
+    )
+    {
+        if (string.IsNullOrEmpty(password)) throw new ArgumentException($"Empty password for certificate {fileName}.");
+
+        var stream =
+            Assembly.GetExecutingAssembly().GetManifestResourceStream($"Metabase.{fileName}")
+            ?? throw new ArgumentException($"Missing certificate {fileName}.");
+        using var buffer = new MemoryStream();
+        stream.CopyTo(buffer);
+        return new X509Certificate2(
+            buffer.ToArray(),
+            password,
+            X509KeyStorageFlags.EphemeralKeySet
+        );
+    }
+
+    private static void ConfigureIdentityServices(
+        IServiceCollection services
+    )
+    {
+        services.AddIdentity<User, Role>(_ =>
             {
-                throw new Exception($"Empty password for certificate {fileName}.");
-            }
-            var stream =
-                Assembly.GetExecutingAssembly().GetManifestResourceStream($"Metabase.{fileName}")
-                ?? throw new Exception($"Missing certificate {fileName}.");
-            using var buffer = new MemoryStream();
-            stream.CopyTo(buffer);
-            return new X509Certificate2(
-                buffer.ToArray(),
-                password,
-                X509KeyStorageFlags.EphemeralKeySet
-            );
-        }
-
-        private static void ConfigureIdentityServices(
-            IServiceCollection services
-            )
-        {
-            services.AddIdentity<Data.User, Data.Role>(_ =>
-                {
-                    _.SignIn.RequireConfirmedAccount = true;
-                    // Password settings.
-                    _.Password.RequireDigit = true;
-                    _.Password.RequireLowercase = true;
-                    _.Password.RequireNonAlphanumeric = true;
-                    _.Password.RequireUppercase = true;
-                    _.Password.RequiredLength = 8;
-                    _.Password.RequiredUniqueChars = 1;
-                    // Lockout settings.
-                    _.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                    _.Lockout.MaxFailedAccessAttempts = 5;
-                    _.Lockout.AllowedForNewUsers = true;
-                    // User settings.
-                    _.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                    _.User.RequireUniqueEmail = true;
-                    // Configure Identity to use the same JWT claims as
-                    // OpenIddict instead of the legacy WS-Federation claims it
-                    // uses by default (ClaimTypes), which saves you from doing
-                    // the mapping in your authorization controller.
-                    _.ClaimsIdentity.UserNameClaimType = OpenIddictConstants.Claims.Name;
-                    _.ClaimsIdentity.UserIdClaimType = OpenIddictConstants.Claims.Subject;
-                    _.ClaimsIdentity.RoleClaimType = OpenIddictConstants.Claims.Role;
-                })
-              .AddEntityFrameworkStores<Data.ApplicationDbContext>()
-              .AddDefaultTokenProviders();
-            services.ConfigureApplicationCookie(_ =>
+                _.SignIn.RequireConfirmedAccount = true;
+                // Password settings.
+                _.Password.RequireDigit = true;
+                _.Password.RequireLowercase = true;
+                _.Password.RequireNonAlphanumeric = true;
+                _.Password.RequireUppercase = true;
+                _.Password.RequiredLength = 8;
+                _.Password.RequiredUniqueChars = 1;
+                // Lockout settings.
+                _.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                _.Lockout.MaxFailedAccessAttempts = 5;
+                _.Lockout.AllowedForNewUsers = true;
+                // User settings.
+                _.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                _.User.RequireUniqueEmail = true;
+                // Configure Identity to use the same JWT claims as
+                // OpenIddict instead of the legacy WS-Federation claims it
+                // uses by default (ClaimTypes), which saves you from doing
+                // the mapping in your authorization controller.
+                _.ClaimsIdentity.UserNameClaimType = OpenIddictConstants.Claims.Name;
+                _.ClaimsIdentity.UserIdClaimType = OpenIddictConstants.Claims.Subject;
+                _.ClaimsIdentity.RoleClaimType = OpenIddictConstants.Claims.Role;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders(); // used to generate tokens for reset passwords, change email and change telephone number operations, and for two factor authentication token generation
+        // The application cookies is used by the metabase acting as
+        // authentication server through the authentication scheme
+        // `IdentityConstants.ApplicationScheme`, that is,
+        // "Identity.Application". See also the constant
+        // `IdentityConstantsApplicationScheme`.
+        services.ConfigureApplicationCookie(_ =>
             {
                 _.AccessDeniedPath = "/unauthorized";
                 _.LoginPath = "/users/login";
                 _.LogoutPath = "/me/logout";
                 _.ReturnUrlParameter = "returnTo";
+            }
+        );
+    }
+
+    private static void ConfigureAuthenticationAndAuthorizationServices(
+        IServiceCollection services
+    )
+    {
+        // Dot not use the single authentication scheme as the default scheme
+        // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-7.0#defaultscheme
+        AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.SuppressAutoDefaultScheme", true);
+        // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/
+        services.AddAuthentication(_ =>
+            {
+                // To make the various authentication control flows obvious, do
+                // not use default schemes for anything and always be explicit
+                // instead.
+                _.DefaultAuthenticateScheme = null;
+                _.DefaultChallengeScheme = null;
+                _.DefaultForbidScheme = null;
+                _.DefaultScheme = null;
+                _.DefaultSignInScheme = null;
+                _.DefaultSignOutScheme = null;
+            })
+            // The cookie is used by the metabase acting as its own client
+            // application through the authentication scheme
+            // `CookieAuthenticationDefaults.AuthenticationScheme`, that is,
+            // "Cookies".
+            .AddCookie(_ =>
+            {
+                _.AccessDeniedPath = "/unauthorized";
+                _.LoginPath = "/connect/client/login";
+                _.LogoutPath = "/connect/client/logout";
+                _.ReturnUrlParameter = "returnTo";
+                _.ExpireTimeSpan = TimeSpan.FromMinutes(50);
+                _.SlidingExpiration = false;
                 _.Events.OnValidatePrincipal = context =>
                 {
-                    // The metabase frontend uses application cookies for
-                    // user authentication and is allowed to read data,
-                    // write data, and manage users. The corresponding
-                    // policies use scopes, so we need to add them.
-                    var identity = new ClaimsIdentity();
-                    foreach (
-                        var claim in
-                            new[] {
-                                ReadApiScope,
-                                WriteApiScope,
-                                ManageUserApiScope
-                            }
-                    )
+                    if (context?.Principal is not null)
                     {
-                        identity.AddClaim(
-                            new Claim(
-                                OpenIddictConstants.Claims.Private.Scope,
-                                claim
-                                )
-                            );
+                        var identity = new ClaimsIdentity();
+                        // The metabase frontend uses the "Cookies" scheme for
+                        // user authentication and is allowed to show user data
+                        // for all standard scopes. The corresponding
+                        // authorization logic in `UserType` uses
+                        // `ClaimsPrincipal.HasScope`. And it is also allowed to
+                        // read data, write data, and manage users. The
+                        // corresponding policies `*Policy` use scopes, so we
+                        // need to add them.
+                        identity.SetScopes(_clientScopes);
+                        context.Principal.AddIdentity(identity);
                     }
-                    context?.Principal?.AddIdentity(identity);
+
                     return Task.CompletedTask;
                 };
-            }
-            );
-        }
-
-        private static void ConfigureAuthenticiationAndAuthorizationServices(
-            IServiceCollection services,
-            IWebHostEnvironment environment,
-            AppSettings appSettings,
-            X509Certificate2 encryptionCertificate,
-            X509Certificate2 signingCertificate
-            )
-        {
-            // https://openiddict.github.io/openiddict-documentation/configuration/token-setup-and-validation.html#jwt-validation
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
-            // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/
-            services.AddAuthentication()
-              .AddJwtBearer(_ =>
-                  {
-                      _.Audience = appSettings.Host;
-                      _.RequireHttpsMetadata = !environment.IsEnvironment("test");
-                      _.IncludeErrorDetails = true;
-                      _.SaveToken = true;
-                      _.TokenValidationParameters = new TokenValidationParameters()
-                      {
-                          NameClaimType = OpenIddictConstants.Claims.Subject,
-                          RoleClaimType = OpenIddictConstants.Claims.Role,
-                          ValidateIssuer = true,
-                          ValidIssuer = environment.IsEnvironment("test") ? "http://localhost/" : appSettings.Host,
-                          RequireAudience = true,
-                          ValidateAudience = true,
-                          ValidAudience = appSettings.Host,
-                          RequireExpirationTime = true,
-                          ValidateLifetime = true,
-                          ValidateIssuerSigningKey = true,
-                          RequireSignedTokens = true,
-                          TokenDecryptionKey = new X509SecurityKey(encryptionCertificate),
-                          IssuerSigningKey = new X509SecurityKey(signingCertificate)
-                      };
-                      // _.Events.OnAuthenticationFailed = _ =>
-                  });
-            services.AddAuthorization(_ =>
-            {
-                // _.AddPolicy(JwtBearerAuthenticatedPolicy, policy =>
-                // {
-                //     policy.AuthenticationSchemes = new[] { JwtBearerDefaults.AuthenticationScheme }; // For cookies it would be `IdentityConstants.ApplicationScheme`
-                //     policy.RequireAuthenticatedUser();
-                // }
-                // );
-                foreach (var (policyName, scope) in new[] {
-                     (ReadPolicy, ReadApiScope),
-                     (WritePolicy, WriteApiScope),
-                     (ManageUserPolicy, ManageUserApiScope)
-                     }
-                   )
-                {
-                    _.AddPolicy(policyName, policy =>
-                    {
-                        policy.AuthenticationSchemes = new[] {
-                            OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme
-                            };
-                        policy.RequireAuthenticatedUser();
-                        policy.RequireAssertion(context =>
-                        {
-                            // How the `HttpContext` can be accessed when the policies are used in GraphQL queries or mutations.
-                            // if (context.Resource is IResolverContext resolverContext)
-                            // {
-                            //     if (resolverContext.ContextData.ContainsKey(nameof(HttpContext)))
-                            //     {
-                            //         if (resolverContext.ContextData[nameof(HttpContext)] is HttpContext httpContext)
-                            //         {
-                            //             if (httpContext.Request.Headers.ContainsKey("Sec-Fetch-Site") &&
-                            //                 httpContext.Request.Headers.ContainsKey("Origin")
-                            //                 )
-                            //             {
-                            //                 // Note that CORS cannot serve as a security mechanism. Secure access from the frontend by some other means.
-                            //                 return httpContext.Request.Headers["Sec-Fetch-Site"] == "same-origin" &&
-                            //                     httpContext.Request.Host == httpContext.Request.Headers["Origin"]; // Comparison does not work because one includes the protocol HTTPS while the other does not.
-                            //             }
-                            //         }
-
-                            //     }
-                            // }
-                            return context.User.HasScope(scope);
-                        }
-                        );
-                    }
-                    );
-                }
-            }
-            );
-        }
-
-        private static void ConfigureTaskScheduling(
-          IServiceCollection services,
-            IWebHostEnvironment environment
-        )
-        {
-            // OpenIddict offers native integration with Quartz.NET to perform scheduled tasks
-            // (like pruning orphaned authorizations/tokens from the database) at regular intervals.
-            // For configuring Quartz see
-            // https://www.quartz-scheduler.net/documentation/quartz-3.x/packages/hosted-services-integration.html
-            services.AddQuartz(_ =>
-            {
-                _.SchedulerId = "metabase";
-                _.SchedulerName = "Metabase";
-                _.UseMicrosoftDependencyInjectionJobFactory();
-                _.UseSimpleTypeLoader();
-                _.UseInMemoryStore();
-                _.UseDefaultThreadPool(_ =>
-                    _.MaxConcurrency = 10
-                );
-                if (environment.IsEnvironment("test"))
-                {
-                    // See https://gitter.im/MassTransit/MassTransit?at=5db2d058f6db7f4f856fb404
-                    _.SchedulerName = Guid.NewGuid().ToString();
-                }
             });
-            // Register the Quartz.NET service and configure it to block shutdown until jobs are complete.
-            services.AddQuartzHostedService(_ =>
-                _.WaitForJobsToComplete = true
-                );
-        }
+        services.AddAuthorization(_ =>
+            {
+                foreach (var (policyName, scope) in new[]
+                         {
+                             (ReadPolicy, ReadApiScope),
+                             (WritePolicy, WriteApiScope),
+                             (ManageUserPolicy, ManageUserApiScope)
+                         }
+                        )
+                    _.AddPolicy(policyName, policy =>
+                        {
+                            policy.AuthenticationSchemes = new[]
+                            {
+                                OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme
+                            };
+                            policy.RequireAuthenticatedUser();
+                            policy.RequireAssertion(context =>
+                                {
+                                    // How the `HttpContext` can be accessed when the policies are used in GraphQL queries or mutations.
+                                    // if (context.Resource is IResolverContext resolverContext)
+                                    // {
+                                    //     if (resolverContext.ContextData.ContainsKey(nameof(HttpContext)))
+                                    //     {
+                                    //         if (resolverContext.ContextData[nameof(HttpContext)] is HttpContext httpContext)
+                                    //         {
+                                    //             if (httpContext.Request.Headers.ContainsKey("Sec-Fetch-Site") &&
+                                    //                 httpContext.Request.Headers.ContainsKey("Origin")
+                                    //                 )
+                                    //             {
+                                    //                 // Note that CORS cannot serve as a security mechanism. Secure access from the frontend by some other means.
+                                    //                 return httpContext.Request.Headers["Sec-Fetch-Site"] == "same-origin" &&
+                                    //                     httpContext.Request.Host == httpContext.Request.Headers["Origin"]; // Comparison does not work because one includes the protocol HTTPS while the other does not.
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // }
+                                    return context.User.HasScope(scope);
+                                }
+                            );
+                        }
+                    );
+            }
+        );
+    }
 
-        private static void ConfigureOpenIddictServices(
-            IServiceCollection services,
-            IWebHostEnvironment environment,
-            AppSettings appSettings,
-            X509Certificate2 encryptionCertificate,
-            X509Certificate2 signingCertificate
-            )
+    private static void ConfigureTaskScheduling(
+        IServiceCollection services,
+        IWebHostEnvironment environment
+    )
+    {
+        // OpenIddict offers native integration with Quartz.NET to perform scheduled tasks
+        // (like pruning orphaned authorizations/tokens from the database) at regular intervals.
+        // For configuring Quartz see
+        // https://www.quartz-scheduler.net/documentation/quartz-3.x/packages/hosted-services-integration.html
+        services.AddQuartz(_ =>
         {
-            services.AddOpenIddict()
-              // Register the OpenIddict core components.
-              .AddCore(_ =>
-                  {
-                      // Configure OpenIddict to use the Entity Framework Core stores and models.
-                      // Note: call ReplaceDefaultEntities() to replace the default OpenIddict entities.
-                      _.UseEntityFrameworkCore()
-                      .UseDbContext<Data.ApplicationDbContext>();
-                      // Enable Quartz.NET integration.
-                      _.UseQuartz();
-                  }
-                  )
+            _.SchedulerId = "metabase";
+            _.SchedulerName = "Metabase";
+            _.UseSimpleTypeLoader();
+            _.UseInMemoryStore();
+            _.UseDefaultThreadPool(_ =>
+                _.MaxConcurrency = 10
+            );
+            if (environment.IsEnvironment(Program.TestEnvironment))
+                // See https://gitter.im/MassTransit/MassTransit?at=5db2d058f6db7f4f856fb404
+                _.SchedulerName = Guid.NewGuid().ToString();
+        });
+        // Register the Quartz.NET service and configure it to block shutdown until jobs are complete.
+        services.AddQuartzHostedService(_ =>
+            _.WaitForJobsToComplete = true
+        );
+    }
+
+    private static void ConfigureOpenIddictServices(
+        IServiceCollection services,
+        IWebHostEnvironment environment,
+        AppSettings appSettings,
+        X509Certificate2 encryptionCertificate,
+        X509Certificate2 signingCertificate
+    )
+    {
+        services.AddOpenIddict()
+            // Register the OpenIddict core components.
+            .AddCore(_ =>
+                {
+                    // Configure OpenIddict to use the Entity Framework Core stores and models.
+                    // Note: call ReplaceDefaultEntities() to replace the default OpenIddict entities.
+                    _.UseEntityFrameworkCore()
+                        .UseDbContext<ApplicationDbContext>();
+                    // Enable Quartz.NET integration.
+                    _.UseQuartz();
+                }
+            )
             // Register the OpenIddict server components.
             .AddServer(_ =>
                 {
-                    _.SetAuthorizationEndpointUris("/connect/authorize")
-                               .SetDeviceEndpointUris("/connect/device")
-                               .SetLogoutEndpointUris("/connect/logout")
-                               .SetIntrospectionEndpointUris("/connect/introspect")
-                               // .SetRevocationEndpointUris("")
-                               // .SetCryptographyEndpointUris("")
-                               // .SetConfigurationEndpointUris("")
-                               .SetTokenEndpointUris("/connect/token")
-                               .SetUserinfoEndpointUris("/connect/userinfo")
-                               .SetVerificationEndpointUris("/connect/verify");
+                    _.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
+                    _.SetAuthorizationEndpointUris("connect/authorize")
+                        .SetDeviceEndpointUris("connect/device")
+                        .SetLogoutEndpointUris("connect/logout")
+                        .SetIntrospectionEndpointUris("connect/introspect")
+                        // .SetRevocationEndpointUris("")
+                        // .SetCryptographyEndpointUris("")
+                        // .SetConfigurationEndpointUris("")
+                        .SetTokenEndpointUris("connect/token")
+                        .SetUserinfoEndpointUris("connect/userinfo")
+                        .SetVerificationEndpointUris("connect/verify");
                     _.RegisterScopes(
+                        OpenIddictConstants.Scopes.Address,
                         OpenIddictConstants.Scopes.Email,
+                        OpenIddictConstants.Scopes.Phone,
                         OpenIddictConstants.Scopes.Profile,
                         OpenIddictConstants.Scopes.Roles,
                         ReadApiScope,
                         WriteApiScope,
                         ManageUserApiScope
-                        );
+                    );
                     _.AllowAuthorizationCodeFlow()
-                      .AllowDeviceCodeFlow()
-                      .AllowRefreshTokenFlow();
+                        .AllowDeviceCodeFlow()
+                        .AllowRefreshTokenFlow();
                     // .AllowHybridFlow()
-                    if (environment.IsEnvironment("test"))
-                    {
-                        _.AllowPasswordFlow();
-                    }
+                    if (environment.IsEnvironment("test")) _.AllowPasswordFlow();
+
                     // Register the signing and encryption credentials.
-                    // See https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
+                    // See https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#registering-a-certificate-recommended-for-production-ready-scenarios
+                    // and https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
                     _.AddEncryptionCertificate(encryptionCertificate)
-                    .AddSigningCertificate(signingCertificate);
-                    // Force client applications to use Proof Key for Code Exchange (PKCE).
+                        .AddSigningCertificate(signingCertificate);
+                    // Force client applications to use Proof Key for Code Exchange (PKCE): https://documentation.openiddict.com/configuration/proof-key-for-code-exchange.html#enabling-pkce-enforcement-at-the-global-level
                     _.RequireProofKeyForCodeExchange();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
-                    var aspNetCoreBuilder =
-                        _.UseAspNetCore()
-                               .EnableStatusCodePagesIntegration()
-                               .EnableAuthorizationEndpointPassthrough()
-                               .EnableLogoutEndpointPassthrough()
-                               .EnableTokenEndpointPassthrough()
-                               .EnableUserinfoEndpointPassthrough()
-                               .EnableVerificationEndpointPassthrough();
-                    aspNetCoreBuilder.DisableTransportSecurityRequirement();
+                    _.UseAspNetCore()
+                        .EnableStatusCodePagesIntegration()
+                        .EnableAuthorizationEndpointPassthrough()
+                        .EnableLogoutEndpointPassthrough()
+                        .EnableTokenEndpointPassthrough()
+                        .EnableUserinfoEndpointPassthrough()
+                        .EnableVerificationEndpointPassthrough();
+                    // .DisableTransportSecurityRequirement();
+                    // .EnableStatusCodePagesIntegration();
+                    // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending
                     // a token or revocation request, uncomment the following line:
                     // _.AcceptAnonymousClients();
@@ -359,26 +364,87 @@ namespace Metabase.Configuration
                     // ```
                 }
             )
-              // Register the OpenIddict validation components.
-              .AddValidation(_ =>
-                 {
-                     // Configure the audience accepted by this resource server.
-                     _.AddAudiences(appSettings.Host);
-                     // Import the configuration from the local OpenIddict server instance.
-                     _.UseLocalServer();
-                     // Register the ASP.NET Core host.
-                     _.UseAspNetCore();
-                     // Note: the validation handler uses OpenID Connect discovery
-                     // to retrieve the address of the introspection endpoint.
-                     //options.SetIssuer("http://localhost:12345/");
-                     // Configure the validation handler to use introspection and register the client
-                     // credentials used when communicating with the remote introspection endpoint.
-                     //options.UseIntrospection()
-                     //       .SetClientId("resource_server_1")
-                     //       .SetClientSecret("846B62D0-DEF9-4215-A99D-86E6B8DAB342");
-                     // Register the System.Net.Http integration.
-                     //options.UseSystemNetHttp();
-                 });
-        }
+            // Register the OpenIddict validation components.
+            .AddValidation(_ =>
+            {
+                _.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
+                // Configure the audience accepted by this resource server.
+                _.AddAudiences(Audience);
+                // Import the configuration from the local OpenIddict server instance: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-the-optionsuselocalserver-integration
+                // Alternatively, OpenId Connect discovery can be used: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-openid-connect-discovery-asymmetric-signing-keys-only
+                _.UseLocalServer();
+                // Register the ASP.NET Core host.
+                _.UseAspNetCore();
+                // Enable token entry validation: https://documentation.openiddict.com/configuration/token-storage.html#enabling-token-entry-validation-at-the-api-level
+                _.EnableTokenEntryValidation();
+                // Enable authorization entry validation: https://documentation.openiddict.com/configuration/authorization-storage.html#enabling-authorization-entry-validation-at-the-api-level
+                _.EnableAuthorizationEntryValidation();
+                // Note: the validation handler uses OpenID Connect discovery
+                // to retrieve the address of the introspection endpoint.
+                //options.SetIssuer("http://localhost:12345/");
+                // Configure the validation handler to use introspection and register the client
+                // credentials used when communicating with the remote introspection endpoint.
+                //options.UseIntrospection()
+                //       .SetClientId("resource_server_1")
+                //       .SetClientSecret("846B62D0-DEF9-4215-A99D-86E6B8DAB342");
+                // Register the System.Net.Http integration.
+                //options.UseSystemNetHttp();
+            })
+            .AddClient(_ =>
+            {
+                _.AllowAuthorizationCodeFlow();
+
+                // Register the signing and encryption credentials.
+                // See https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
+                _.AddEncryptionCertificate(encryptionCertificate)
+                    .AddSigningCertificate(signingCertificate);
+
+                // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
+                _.UseAspNetCore()
+                    .EnableStatusCodePagesIntegration()
+                    .EnableRedirectionEndpointPassthrough()
+                    .EnablePostLogoutRedirectionEndpointPassthrough();
+                // .DisableTransportSecurityRequirement();
+
+                // Register the System.Net.Http integration and use the identity of the current
+                // assembly as a more specific user agent, which can be useful when dealing with
+                // providers that use the user agent as a way to throttle requests (e.g Reddit).
+                _.UseSystemNetHttp()
+                    .SetProductInformation(typeof(Startup).Assembly);
+
+                // Add a client registration matching the client application definition in the server project.
+                _.AddRegistration(
+                    new OpenIddictClientRegistration
+                    {
+                        Issuer = new Uri(appSettings.Host, UriKind.Absolute),
+
+                        // Note: these settings must match the application details
+                        // inserted in the database at the server level.
+                        ClientId = DbSeeder.MetabaseClientId,
+                        ClientSecret = appSettings.OpenIdConnectClientSecret,
+
+                        // https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims
+                        Scopes =
+                        {
+                            // Keep in sync with `_clientScopes`.
+                            OpenIddictConstants.Scopes.Address,
+                            OpenIddictConstants.Scopes.Email,
+                            OpenIddictConstants.Scopes.Phone,
+                            OpenIddictConstants.Scopes.Profile,
+                            OpenIddictConstants.Scopes.Roles,
+                            ReadApiScope,
+                            WriteApiScope,
+                            ManageUserApiScope
+                        },
+
+                        // Note: to mitigate mix-up attacks, it's recommended to use a unique redirection endpoint
+                        // URI per provider, unless all the registered providers support returning a special "iss"
+                        // parameter containing their URL as part of authorization responses. For more information,
+                        // see https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.4.
+                        RedirectUri = new Uri("connect/callback/login/metabase", UriKind.Relative),
+                        PostLogoutRedirectUri = new Uri("connect/callback/logout/metabase", UriKind.Relative)
+                    }
+                );
+            });
     }
 }

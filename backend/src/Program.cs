@@ -1,220 +1,187 @@
 using System;
+using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+using Metabase.Data;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.IO;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
-using Microsoft.AspNetCore.Hosting.StaticWebAssets;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Log = Serilog.Log;
 
-namespace Metabase
+namespace Metabase;
+
+public static partial class LoggerExtensions
 {
-    public class Program
+    [LoggerMessage(
+        EventId = 0,
+        Level = LogLevel.Error,
+        Message = "An error occurred creating and seeding the database.")]
+    public static partial void FailedToCreateAndSeedDatabase(
+        this ILogger logger,
+        // The first exception is implicitly taken care of as detailed in
+        // https://learn.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator#log-method-anatomy
+        Exception exception
+    );
+}
+
+public sealed class Program
+{
+    public const string TestEnvironment = "test";
+
+    public static async Task<int> Main(
+        string[] commandLineArguments
+    )
     {
-        public static async Task<int> Main(
-            string[] commandLineArguments
-            )
+        var environment =
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            ?? throw new ArgumentException("Unknown enrivornment.");
+        // https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
+        ConfigureBootstrapLogging(environment);
+        try
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? throw new Exception("Unknown enrivornment.");
-            ConfigureBootstrapLogging(environment);
-            try
+            Log.Information("Starting web host");
+            // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/webapplication
+            var builder = CreateWebApplicationBuilder(commandLineArguments);
+            var startup = new Startup(builder.Environment, builder.Configuration);
+            startup.ConfigureServices(builder.Services);
+            var application = builder.Build();
+            startup.Configure(application);
+            using (var scope = application.Services.CreateScope())
             {
-                Log.Information("Starting web host");
-                var host = CreateHostBuilder(commandLineArguments).Build();
-                using var scope = host.Services.CreateScope();
-                var services = scope.ServiceProvider;
-                var webHostEnvironment = services.GetRequiredService<IWebHostEnvironment>();
-                if (webHostEnvironment.IsDevelopment())
-                {
-                    // https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
-                    await CreateAndSeedDbIfNotExists(services).ConfigureAwait(false);
-                }
-                host.Run();
-                return 0;
+                // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
+                await CreateAndSeedDb(scope.ServiceProvider).ConfigureAwait(false);
             }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "Host terminated unexpectedly");
-                return 1;
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
-        }
 
-        private static void ConfigureBootstrapLogging(
-            string environment
-        )
-        {
-            var configuration = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information);
-            ConfigureLogging(configuration, environment);
-            Log.Logger = configuration.CreateBootstrapLogger();
+            application.Run();
+            return 0;
         }
-
-        private static void ConfigureLogging(
-            LoggerConfiguration configuration,
-            string environment
-        )
+        catch (Exception ex) when (ex is not HostAbortedException && ex.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
         {
-            configuration
-                .Enrich.FromLogContext()
-                .Enrich.WithMachineName()
-                .Enrich.WithProperty("Environment", environment)
-                .WriteTo.Console()
-                .WriteTo.File(
-                    formatter: new CompactJsonFormatter(),
-                    path: "./logs/serilog.json",
-                    fileSizeLimitBytes: 1073741824, // 1 GB
-                    retainedFileCountLimit: 7,
-                    rollingInterval: RollingInterval.Day,
-                    rollOnFileSizeLimit: true
-                    );
-            if (environment != "production")
-            {
-                configuration.WriteTo.Debug();
-            }
+            Log.Fatal(ex, "Host terminated unexpectedly");
+            return 1;
         }
-
-        public static async Task CreateAndSeedDbIfNotExists(
-            IServiceProvider services
-            )
+        finally
         {
-            try
-            {
-                using var dbContext =
-                 services.GetRequiredService<IDbContextFactory<Data.ApplicationDbContext>>()
-                 .CreateDbContext();
-                if (dbContext.Database.EnsureCreated())
-                {
-                    await Data.DbSeeder.DoAsync(services).ConfigureAwait(false);
-                }
-            }
-            catch (Exception exception)
-            {
-                var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(exception, "An error occurred creating and seeding the database.");
-            }
+            Log.CloseAndFlush();
         }
+    }
 
-        // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
-        public static IHostBuilder CreateHostBuilder(
-            string[] commandLineArguments
-            )
+    private static void ConfigureBootstrapLogging(
+        string environment
+    )
+    {
+        var configuration = new LoggerConfiguration()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Information);
+        ConfigureLogging(configuration, environment);
+        Log.Logger = configuration.CreateBootstrapLogger();
+    }
+
+    private static void ConfigureLogging(
+        LoggerConfiguration configuration,
+        string environment
+    )
+    {
+        configuration
+            .Enrich.FromLogContext()
+            .Enrich.WithMachineName()
+            .Enrich.WithProperty("Environment", environment)
+            .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+            .WriteTo.File(
+                new CompactJsonFormatter(),
+                "./logs/serilog.json",
+                fileSizeLimitBytes: 1073741824, // 1 GB
+                rollingInterval: RollingInterval.Day,
+                rollOnFileSizeLimit: true,
+                retainedFileCountLimit: 7);
+        if (environment != "production") configuration.WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture);
+    }
+
+    private static async Task CreateAndSeedDb(
+        IServiceProvider services
+    )
+    {
+        try
         {
-            return new HostBuilder()
-            .UseContentRoot(
-                Directory.GetCurrentDirectory()
-                )
-            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host#host-configuration
-            .ConfigureHostConfiguration(configuration =>
-                {
-                    configuration.AddEnvironmentVariables(prefix: "DOTNET_");
-                    configuration.AddCommandLine(commandLineArguments);
-                }
-            )
-            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/
-            .ConfigureAppConfiguration((hostingContext, configuration) =>
-                ConfigureAppConfiguration(
-                    configuration,
-                    hostingContext.HostingEnvironment,
-                    commandLineArguments
-                    )
-                )
-            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/
-            .ConfigureLogging((_, loggingBuilder) =>
+            using var dbContext =
+                services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
+                    .CreateDbContext();
+            dbContext.Database.EnsureCreated();
+            await DbSeeder.DoAsync(services).ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.FailedToCreateAndSeedDatabase(exception);
+        }
+    }
+
+    // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
+    private static WebApplicationBuilder CreateWebApplicationBuilder(
+        string[] commandLineArguments
+    )
+    {
+        var builder = WebApplication.CreateBuilder(
+            new WebApplicationOptions
             {
-                loggingBuilder.Configure(options =>
-                {
-                    options.ActivityTrackingOptions = ActivityTrackingOptions.SpanId
-                                                        | ActivityTrackingOptions.TraceId
-                                                        | ActivityTrackingOptions.ParentId;
-                });
-            })
-            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection
-            .UseDefaultServiceProvider((context, options) =>
-            {
-                var isDevelopment = context.HostingEnvironment.IsDevelopment();
-                options.ValidateScopes = isDevelopment;
-                options.ValidateOnBuild = isDevelopment;
-            })
-            .UseSerilog((webHostBuilderContext, loggerConfiguration) =>
-                {
-                    ConfigureLogging(
-                        loggerConfiguration,
-                        webHostBuilderContext.HostingEnvironment.EnvironmentName
-                        );
-                    loggerConfiguration
-                        .ReadFrom.Configuration(webHostBuilderContext.Configuration);
-                }
-            )
-            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host
-            // https://github.com/dotnet/aspnetcore/blob/main/src/DefaultBuilder/src/WebHost.cs#L215
-            .ConfigureWebHost(_ =>
-                _
-                .ConfigureAppConfiguration((context, _) =>
-                {
-                    if (context.HostingEnvironment.IsDevelopment())
-                    {
-                        StaticWebAssetsLoader.UseStaticWebAssets(context.HostingEnvironment, context.Configuration);
-                    }
-                })
-                // Default web server https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel
-                .UseKestrel((context, options) =>
-                    options.Configure(context.Configuration.GetSection("Kestrel"), reloadOnChange: true)
-                    )
-                .ConfigureServices((context, services) =>
-                    {
-                        // Fallback
-                        // services.PostConfigure<HostFilteringOptions>(options =>
-                        // {
-                        //     if (options.AllowedHosts == null || options.AllowedHosts.Count == 0)
-                        //     {
-                        //         // "AllowedHosts": "localhost;127.0.0.1;[::1]"
-                        //         var hosts = context.Configuration["AllowedHosts"]?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                        //         // Fall back to "*" to disable.
-                        //         options.AllowedHosts = (hosts?.Length > 0 ? hosts : new[] { "*" });
-                        //     }
-                        // });
-                        // Change notification
-                        // services.AddSingleton<IOptionsChangeTokenSource<HostFilteringOptions>>(
-                        //     new ConfigurationChangeTokenSource<HostFilteringOptions>(context.Configuration));
-                        // services.AddTransient<IStartupFilter, HostFilteringStartupFilter>();
-                        services.AddRouting();
-                    })
-                // .UseIIS()
-                // .UseIISIntegration()
-                .UseStartup<Startup>()
+                Args = commandLineArguments,
+                ContentRootPath = Directory.GetCurrentDirectory() // PlatformServices.Default.Application.ApplicationBasePath
+            }
+        );
+        // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/
+        ConfigureAppConfiguration(
+            builder.Configuration,
+            builder.Environment,
+            commandLineArguments
+        );
+        // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection
+        // https://github.com/dotnet/aspnetcore/issues/38334#issuecomment-967709919
+        builder.Host.UseDefaultServiceProvider(_ =>
+        {
+            _.ValidateScopes = true;
+            _.ValidateOnBuild = true;
+        });
+        // https://github.com/serilog/serilog-aspnetcore#instructions
+        builder.Host.UseSerilog((webHostBuilderContext, loggerConfiguration) =>
+        {
+            ConfigureLogging(
+                loggerConfiguration,
+                webHostBuilderContext.HostingEnvironment.EnvironmentName
             );
-        }
+            loggerConfiguration
+                .ReadFrom.Configuration(webHostBuilderContext.Configuration);
+        });
+        return builder;
+    }
 
-        public static void ConfigureAppConfiguration(
-            IConfigurationBuilder configuration,
-            IHostEnvironment environment,
-            string[] commandLineArguments
+    public static void ConfigureAppConfiguration(
+        IConfigurationBuilder configuration,
+        IHostEnvironment environment,
+        string[] commandLineArguments
+    )
+    {
+        configuration.Sources.Clear();
+        configuration
+            .SetBasePath(environment.ContentRootPath)
+            .AddJsonFile(
+                "appsettings.json",
+                false,
+                !environment.IsEnvironment(TestEnvironment)
             )
-        {
-            configuration
-                .SetBasePath(environment.ContentRootPath)
-                .AddJsonFile(
-                    "appsettings.json",
-                    optional: false,
-                    reloadOnChange: !environment.IsEnvironment("test")
-                    )
-                .AddJsonFile(
-                    $"appsettings.{environment.EnvironmentName}.json",
-                    optional: false,
-                    reloadOnChange: !environment.IsEnvironment("test")
-                    )
-                .AddEnvironmentVariables()
-                .AddEnvironmentVariables(prefix: "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
-                .AddCommandLine(commandLineArguments);
-        }
+            .AddJsonFile(
+                $"appsettings.{environment.EnvironmentName}.json",
+                false,
+                !environment.IsEnvironment(TestEnvironment)
+            )
+            .AddEnvironmentVariables()
+            .AddEnvironmentVariables(
+                "XBASE_") // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#environment-variables
+            .AddCommandLine(commandLineArguments);
     }
 }

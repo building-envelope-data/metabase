@@ -1,19 +1,17 @@
-using System;
 using System.Reflection;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+public sealed class UseUserManagerAttribute : ObjectFieldDescriptorAttribute
 {
-    public sealed class UseUserManagerAttribute : ObjectFieldDescriptorAttribute
+    protected override void OnConfigure(
+        IDescriptorContext context,
+        IObjectFieldDescriptor descriptor,
+        MemberInfo member
+    )
     {
-        public override void OnConfigure(
-            IDescriptorContext context,
-            IObjectFieldDescriptor descriptor,
-            MemberInfo member
-            )
-        {
-            descriptor.UseUserManager();
-        }
+        descriptor.UseUserManager();
     }
 }

@@ -20,6 +20,13 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = {
+  name: string;
+  abbreviation: string;
+  description: string;
+  websiteLocator: string;
+};
+
 export type CreateInstitutionProps = {
   ownerIds?: Scalars["Uuid"][];
   managerId?: Scalars["Uuid"];
@@ -67,7 +74,7 @@ export default function CreateInstitution({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
@@ -81,12 +88,7 @@ export default function CreateInstitution({
     abbreviation,
     description,
     websiteLocator,
-  }: {
-    name: string;
-    abbreviation: string;
-    description: string;
-    websiteLocator: string;
-  }) => {
+  }: FormValues) => {
     const create = async () => {
       try {
         if (!currentUser) {

@@ -1,10 +1,12 @@
 import { Scalars } from "../../__generated__/__types__";
 import { useDataFormatQuery } from "../../queries/dataFormats.graphql";
-import { Skeleton, Result, PageHeader, Descriptions, Typography } from "antd";
+import { Skeleton, Result, Descriptions, Typography } from "antd";
+import { PageHeader } from "@ant-design/pro-layout";
 import { useEffect } from "react";
 import paths from "../../paths";
 import { Reference } from "../Reference";
 import { messageApolloError } from "../../lib/apollo";
+import UpdateDataFormat from "./UpdateDataFormat";
 
 export type DataFormatProps = {
   dataFormatId: Scalars["Uuid"];
@@ -42,6 +44,23 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
     <PageHeader
       title={dataFormat.name}
       subTitle={dataFormat.description}
+      extra={
+        dataFormat.canCurrentUserUpdateNode
+          ? [
+              <UpdateDataFormat
+                key="updateDataFormat"
+                dataFormatId={dataFormat.uuid}
+                name={dataFormat.name}
+                extension={dataFormat.extension}
+                description={dataFormat.description}
+                mediaType={dataFormat.mediaType}
+                schemaLocator={dataFormat.schemaLocator}
+                reference={dataFormat.reference}
+                managerId={dataFormat.manager.node.uuid}
+              />,
+            ]
+          : []
+      }
       backIcon={false}
     >
       <Descriptions size="small" column={1}>

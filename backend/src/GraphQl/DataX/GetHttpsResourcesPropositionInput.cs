@@ -1,8 +1,7 @@
-namespace Metabase.GraphQl.DataX
-{
-    public record GetHttpsResourcesPropositionInput(
-        GetHttpsResourcePropositionInput? All,
-        GetHttpsResourcePropositionInput? None,
-        GetHttpsResourcePropositionInput? Some
-    );
-}
+namespace Metabase.GraphQl.DataX;
+
+public sealed record GetHttpsResourcesPropositionInput(
+    GetHttpsResourcePropositionInput? All,
+    GetHttpsResourcePropositionInput? None,
+    GetHttpsResourcePropositionInput? Some
+);

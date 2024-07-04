@@ -1,6 +1,8 @@
-namespace Metabase.GraphQl.Users
-{
-    public record RequestUserPasswordResetInput(
-          string Email
-        );
-}
+using System;
+
+namespace Metabase.GraphQl.Users;
+
+public sealed record RequestUserPasswordResetInput(
+    string Email,
+    Uri? ReturnTo
+);

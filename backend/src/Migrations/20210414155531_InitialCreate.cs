@@ -8,6 +8,9 @@ namespace Metabase.Migrations
 {
     public partial class InitialCreate : Migration
     {
+        private static readonly string[] _openIddictAuthorizationsIndexByApplicationIdStatusSubjectTypeColumns = new[] { "ApplicationId", "Status", "Subject", "Type" };
+        private static readonly string[] _oppenIddictTokensIndexByApplicationIdStatusSubjectTypeColumns = new[] { "ApplicationId", "Status", "Subject", "Type" };
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
@@ -621,7 +624,7 @@ namespace Metabase.Migrations
                 name: "IX_OpenIddictAuthorizations_ApplicationId_Status_Subject_Type",
                 schema: "metabase",
                 table: "OpenIddictAuthorizations",
-                columns: new[] { "ApplicationId", "Status", "Subject", "Type" });
+                columns: _openIddictAuthorizationsIndexByApplicationIdStatusSubjectTypeColumns);
 
             migrationBuilder.CreateIndex(
                 name: "IX_OpenIddictScopes_Name",
@@ -634,7 +637,7 @@ namespace Metabase.Migrations
                 name: "IX_OpenIddictTokens_ApplicationId_Status_Subject_Type",
                 schema: "metabase",
                 table: "OpenIddictTokens",
-                columns: new[] { "ApplicationId", "Status", "Subject", "Type" });
+                columns: _oppenIddictTokensIndexByApplicationIdStatusSubjectTypeColumns);
 
             migrationBuilder.CreateIndex(
                 name: "IX_OpenIddictTokens_AuthorizationId",
@@ -785,6 +788,14 @@ namespace Metabase.Migrations
             migrationBuilder.DropTable(
                 name: "OpenIddictApplications",
                 schema: "metabase");
+
+            migrationBuilder.AlterDatabase()
+                .OldAnnotation("Npgsql:Enum:public.component_category", "material,layer,unit")
+                .OldAnnotation("Npgsql:Enum:public.institution_representative_role", "owner,maintainer,assistant")
+                .OldAnnotation("Npgsql:Enum:public.institution_state", "unknown,operative,inoperative")
+                .OldAnnotation("Npgsql:Enum:public.method_category", "measurement,calculation")
+                .OldAnnotation("Npgsql:Enum:public.standardizer", "aerc,agi,ashrae,breeam,bs,bsi,cen,cie,dgnb,din,dvwg,iec,ies,ift,iso,jis,leed,nfrc,riba,ul,unece,vdi,vff,well")
+                .OldAnnotation("Npgsql:PostgresExtension:pgcrypto", ",,");
         }
     }
 }

@@ -28,26 +28,27 @@ export function DatabaseTable({ loading, databases }: DatabaseTableProps) {
       loading={loading}
       columns={[
         {
-          ...getUuidColumnProps<typeof databases[0]>(
+          ...getUuidColumnProps<(typeof databases)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x),
             paths.database
           ),
         },
         {
-          ...getNameColumnProps<typeof databases[0]>(onFilterTextChange, (x) =>
-            filterText.get(x)
+          ...getNameColumnProps<(typeof databases)[0]>(
+            onFilterTextChange,
+            (x) => filterText.get(x)
           ),
         },
         {
-          ...getDescriptionColumnProps<typeof databases[0]>(
+          ...getDescriptionColumnProps<(typeof databases)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x)
           ),
         },
         {
           ...getExternallyLinkedFilterableLocatorColumnProps<
-            typeof databases[0]
+            (typeof databases)[0]
           >(
             "Locator",
             "locator",
@@ -58,7 +59,7 @@ export function DatabaseTable({ loading, databases }: DatabaseTableProps) {
         },
         {
           ...getInternallyLinkedFilterableStringColumnProps<
-            typeof databases[0]
+            (typeof databases)[0]
           >(
             "Operator",
             "operator",

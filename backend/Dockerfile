@@ -1,7 +1,12 @@
+# syntax=docker/dockerfile:1.6
+# The above line fixes the Dockerfile frontend used by BuildKit. For details
+# see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
+# Available versions are listed on https://hub.docker.com/r/docker/dockerfile
+
 # Inspired by https://github.com/dotnet/dotnet-docker/tree/master/samples/aspnetapp
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk
-FROM mcr.microsoft.com/dotnet/sdk:5.0-bullseye-slim-amd64
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-amd64
 
 ARG GROUP_ID
 ARG USER_ID
@@ -35,7 +40,7 @@ RUN \
 RUN \
   apt-get update && \
   apt-get install \
-    --yes \
+    --assume-yes \
     --no-install-recommends \
     curl \
     dumb-init \
@@ -54,7 +59,7 @@ RUN \
 RUN \
   apt-get update && \
   apt-get install \
-    --yes \
+    --assume-yes \
     --no-install-recommends \
     bash \
     jq \
@@ -76,6 +81,9 @@ RUN \
 ENV HOME=/home/me
 RUN \
   mkdir --parents ${HOME}/app && \
+  chown \
+    me:us \
+    ${HOME} && \
   chown \
     me:us \
     ${HOME}/app && \
@@ -100,9 +108,18 @@ WORKDIR /app
 COPY \
   --chown=me:us \
   ./dotnet-tools.json ./
+COPY \
+  --chown=me:us \
+  ./dotnet-certificate-tool ./dotnet-certificate-tool
 RUN \
+  # `dotnet pack` is run automatically by `dotnet build` because `GeneratePackageOnBuild` is set to `True`.
+  dotnet build \
+    ./dotnet-certificate-tool/src/GSoft.CertificateTool.csproj && \
   dotnet tool restore \
-    --tool-manifest ./dotnet-tools.json
+    --tool-manifest ./dotnet-tools.json \
+    --add-source ./dotnet-certificate-tool/src/nupkg && \
+  rm --recursive --force \
+    ./dotnet-certificate-tool
 
 RUN \
   mkdir ./src && \
@@ -285,6 +302,11 @@ RUN \
     ./test/obj && \
   mkdir --parents \
     ${HOME}/.vscode-server/extensions \
-    ${HOME}/.vscode-server-insiders/extensions
+    ${HOME}/.vscode-server-insiders/extensions && \
+  mkdir --parents \
+    ${HOME}/.nuget \
+    ${HOME}/.dotnet
+
+ENV SHELL=/bin/bash
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]

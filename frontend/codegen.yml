@@ -4,8 +4,8 @@ generates:
   # https://www.graphql-code-generator.com/docs/plugins/fragment-matcher
   __generated__/fragmentMatcherTypes.ts:
     plugins:
-      - 'fragment-matcher'
+      - "fragment-matcher"
     config:
-      module: 'es2015'
+      module: "es2015"
       apolloClientVersion: 3
       useExplicitTyping: false

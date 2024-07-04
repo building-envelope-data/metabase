@@ -1,8 +1,7 @@
-namespace Metabase.Enumerations
+namespace Metabase.Enumerations;
+
+public enum InstitutionRepresentativeRole
 {
-    public enum InstitutionRepresentativeRole
-    {
-        OWNER,
-        ASSISTANT
-    }
+    OWNER,
+    ASSISTANT
 }

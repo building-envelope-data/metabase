@@ -5,9 +5,9 @@
 /nginx/html/maintenance.html
 /commit
 /backup.gz
+/tags*
 
 .env
-.vscode
 
 # Compiled output
 dist
@@ -25,6 +25,8 @@ coverage
 
 # Backups
 *.bak
+/backup
 
-# Image Diagrams
-/diagrams/*.png
+# Structurizr diagrams
+/diagrams/structurizr/.structurizr/
+/diagrams/structurizr/*.json

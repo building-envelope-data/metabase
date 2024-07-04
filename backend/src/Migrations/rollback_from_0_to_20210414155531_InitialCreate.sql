@@ -42,6 +42,14 @@ DROP TABLE metabase."user";
 
 DROP TABLE metabase."OpenIddictApplications";
 
+DROP EXTENSION IF EXISTS pgcrypto;
+
+DROP TYPE public.component_category;
+DROP TYPE public.institution_representative_role;
+DROP TYPE public.institution_state;
+DROP TYPE public.method_category;
+DROP TYPE public.standardizer;
+
 DELETE FROM "__EFMigrationsHistory"
 WHERE "MigrationId" = '20210414155531_InitialCreate';
 

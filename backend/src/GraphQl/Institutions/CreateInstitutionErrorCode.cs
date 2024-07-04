@@ -1,11 +1,13 @@
-namespace Metabase.GraphQl.Institutions
+using System.Diagnostics.CodeAnalysis;
+
+namespace Metabase.GraphQl.Institutions;
+
+[SuppressMessage("Naming", "CA1707")]
+public enum CreateInstitutionErrorCode
 {
-    public enum CreateInstitutionErrorCode
-    {
-        UNKNOWN,
-        NEITHER_OWNER_NOR_MANAGER,
-        UNKNOWN_OWNERS,
-        UNKNOWN_MANAGER,
-        UNAUTHORIZED
-    }
+    UNKNOWN,
+    NEITHER_OWNER_NOR_MANAGER,
+    UNKNOWN_OWNERS,
+    UNKNOWN_MANAGER,
+    UNAUTHORIZED
 }

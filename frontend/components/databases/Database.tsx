@@ -1,10 +1,16 @@
-import { Scalars } from "../../__generated__/__types__";
+import {
+  DatabaseVerificationState,
+  Scalars,
+} from "../../__generated__/__types__";
 import { useDatabaseQuery } from "../../queries/databases.graphql";
-import { Skeleton, Result, PageHeader, Descriptions, Typography } from "antd";
-import { useEffect } from "react";
+import { Skeleton, Result, Descriptions, Typography, Tag } from "antd";
+import { PageHeader } from "@ant-design/pro-layout";
+import { ReactNode, useEffect } from "react";
 import Link from "next/link";
 import paths from "../../paths";
 import { messageApolloError } from "../../lib/apollo";
+import UpdateDatabase from "./UpdateDatabase";
+import VerifyDatabase from "./VerifyDatabase";
 
 export type DatabaseProps = {
   databaseId: Scalars["Uuid"];
@@ -38,10 +44,40 @@ export default function Database({ databaseId }: DatabaseProps) {
     );
   }
 
-  return (
+  return <>
     <PageHeader
       title={database.name}
       subTitle={database.description}
+      extra={([] as ReactNode[])
+        .concat(
+          database.canCurrentUserUpdateNode
+            ? [
+                <UpdateDatabase
+                  key="updateDatabase"
+                  databaseId={database.uuid}
+                  name={database.name}
+                  description={database.description}
+                  locator={database.locator}
+                />,
+              ]
+            : []
+        )
+        .concat(
+          database.canCurrentUserVerifyNode &&
+            database.verificationState == DatabaseVerificationState.Pending
+            ? [
+                <VerifyDatabase
+                  key="verifyDatabase"
+                  databaseId={database.uuid}
+                />,
+              ]
+            : []
+        )}
+      tags={[
+        <Tag key="verificationState" color="magenta">
+          {database.verificationState}
+        </Tag>,
+      ]}
       backIcon={false}
     >
       <Descriptions size="small" column={1}>
@@ -52,11 +88,24 @@ export default function Database({ databaseId }: DatabaseProps) {
           </Typography.Link>
         </Descriptions.Item>
         <Descriptions.Item label="Operated by">
-          <Link href={paths.database(database.operator.node.uuid)}>
+          <Link href={paths.database(database.operator.node.uuid)} legacyBehavior>
             {database.operator.node.name}
           </Link>
         </Descriptions.Item>
       </Descriptions>
     </PageHeader>
-  );
+    {database.canCurrentUserVerifyNode &&
+      database.verificationState == DatabaseVerificationState.Pending && (
+        <Typography.Paragraph>
+          Have your database&apos;s GraphQL endpoint return the verification
+          code &ldquo;
+          {database.verificationCode}&rdquo; (without the quotation marks),
+          when queried for the GraphQL query &ldquo;verificationCode&rdquo;.
+          Then, press the &ldquo;Verify&rdquo; button above to make the
+          metabase assert that the verification codes match which proves that
+          you control the GraphQL endpoint {database.locator}. Verified
+          databases are publicly listed and included in data searches.
+        </Typography.Paragraph>
+      )}
+  </>;
 }

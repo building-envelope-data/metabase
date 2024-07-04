@@ -1,24 +1,24 @@
 using GreenDonut;
+using Metabase.Data;
 using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Metabase.GraphQl.Institutions
+namespace Metabase.GraphQl.Institutions;
+
+public sealed class InstitutionByIdDataLoader
+    : EntityByIdDataLoader<Institution>
 {
-    public sealed class InstitutionByIdDataLoader
-      : EntityByIdDataLoader<Data.Institution>
+    public InstitutionByIdDataLoader(
+        IBatchScheduler batchScheduler,
+        DataLoaderOptions options,
+        IDbContextFactory<ApplicationDbContext> dbContextFactory
+    )
+        : base(
+            batchScheduler,
+            options,
+            dbContextFactory,
+            dbContext => dbContext.Institutions
+        )
     {
-        public InstitutionByIdDataLoader(
-            IBatchScheduler batchScheduler,
-            DataLoaderOptions options,
-            IDbContextFactory<Data.ApplicationDbContext> dbContextFactory
-            )
-            : base(
-                batchScheduler,
-                options,
-                dbContextFactory,
-                dbContext => dbContext.Institutions
-                )
-        {
-        }
     }
 }

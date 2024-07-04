@@ -1,9 +1,8 @@
 using DateTime = System.DateTime;
 
-namespace Metabase.GraphQl.Common
-{
-    public record OpenEndedDateTimeRangeInput(
-          DateTime? From,
-          DateTime? To
-        );
-}
+namespace Metabase.GraphQl.Common;
+
+public sealed record OpenEndedDateTimeRangeInput(
+    DateTime? From,
+    DateTime? To
+);

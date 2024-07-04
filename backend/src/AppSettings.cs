@@ -1,61 +1,60 @@
 // Inspired by https://weblog.west-wind.com/posts/2017/dec/12/easy-configuration-binding-in-aspnet-core-revisited
 
-namespace Metabase
+namespace Metabase;
+
+public sealed class AppSettings
 {
-    public sealed class AppSettings
+    public string Host { get; set; }
+        = "";
+
+    public string TestlabSolarFacadesHost { get; set; }
+        = "";
+
+    public LoggingSettings Logging { get; set; } = new();
+
+    public JsonWebTokenSettings JsonWebToken { get; set; } = new();
+
+    public EmailSettings Email { get; set; } = new();
+
+    public string BootstrapUserPassword { get; set; }
+        = "";
+
+    public string OpenIdConnectClientSecret { get; set; }
+        = "";
+
+    public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }
+        = "";
+
+    public DatabaseSettings Database { get; set; } = new();
+
+    public sealed class LoggingSettings
     {
-        public string Host { get; set; }
-        = "";
+        public bool EnableSensitiveDataLogging { get; set; }
+    }
 
-        public string TestlabSolarFacadesHost { get; set; }
-        = "";
-
-        public LoggingSettings Logging { get; set; }
-        = new LoggingSettings();
-
-        public sealed class LoggingSettings
-        {
-            public bool EnableSensitiveDataLogging { get; set; }
-            = false;
-        }
-
-        public JsonWebTokenSettings JsonWebToken { get; set; }
-        = new JsonWebTokenSettings();
-
-        public sealed class JsonWebTokenSettings
-        {
-            public string EncryptionCertificatePassword { get; set; }
+    public sealed class JsonWebTokenSettings
+    {
+        public string EncryptionCertificatePassword { get; set; }
             = "";
 
-            public string SigningCertificatePassword { get; set; }
+        public string SigningCertificatePassword { get; set; }
             = "";
-        }
+    }
 
-        public EmailSettings Email { get; set; }
-        = new EmailSettings();
-
-        public sealed class EmailSettings
-        {
-            public string SmtpHost { get; set; }
+    public sealed class EmailSettings
+    {
+        public string SmtpHost { get; set; }
             = "";
 
-            public int SmtpPort { get; set; }
-            = 0;
-        }
+        public int SmtpPort { get; set; }
+    }
 
-        public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }
-        = "";
-
-        public DatabaseSettings Database { get; set; }
-        = new DatabaseSettings();
-
-        public sealed class DatabaseSettings
-        {
-            public string ConnectionString { get; set; }
+    public sealed class DatabaseSettings
+    {
+        public string ConnectionString { get; set; }
             = "";
 
-            public string SchemaName { get; set; }
+        public string SchemaName { get; set; }
             = "";
-        }
     }
 }

@@ -1,8 +1,14 @@
 # Metabase
 
-The network of databases [buildingenvelopedata.org](https://www.buildingenvelopedata.org/) is based on [databases](https://github.com/building-envelope-data/database) and one metabase. This repository presents the source code of the metabase. Before deploying this repository, [machine](https://github.com/building-envelope-data/machine) can be used to set up the machine. Databases and metabase use this [API specification](https://github.com/building-envelope-data/api).
+The network of databases [buildingenvelopedata.org](https://www.buildingenvelopedata.org/) is based on [databases](https://github.com/building-envelope-data/database) and one metabase. This repository presents the source code of the metabase. Before deploying this repository, [machine](https://github.com/building-envelope-data/machine) can be used to set up the machine.
+
+The [API specification of the metabase](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql) is available in the repository [api](https://github.com/building-envelope-data/api). There is also a [visualization of the API of the metabase](https://graphql-kit.com/graphql-voyager/?url=https://www.buildingenvelopedata.org/graphql/). The current [development version of the API of the metabase](https://github.com/building-envelope-data/metabase/blob/develop/frontend/type-defs.graphqls) may not be deployed yet.
+
+You can try the queries of the [tutorial](https://github.com/building-envelope-data/api/blob/develop/queries/metabase/tutorial.graphql) at the [GraphQL endpoint of the metabase](https://www.buildingenvelopedata.org/graphql/).
 
 If you have a question for which you don't find the answer in this repository, please raise a [new issue](https://github.com/building-envelope-data/metabase/issues/new) and add the tag `question`! All ways to contribute are presented by [CONTRIBUTING.md](https://github.com/building-envelope-data/metabase/blob/develop/CONTRIBUTING.md). The basis for our collaboration is decribed by our [Code of Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF_CONDUCT.md).
+
+[![Watch the video introduction](https://img.youtube.com/vi/QsulJnpvuh0/maxresdefault.jpg)](https://www.youtube.com/watch?v=QsulJnpvuh0)
 
 ## Getting started
 
@@ -24,6 +30,9 @@ If you have a question for which you don't find the answer in this repository, p
 1. Clone the source code by running
    `git clone git@github.com:building-envelope-data/metabase.git` and navigate
    into the new directory `metabase` by running `cd metabase`.
+1. Initialize, fetch, and checkout possibly-nested submodules by running
+   `git submodule update --init --recursive`. An alternative would have been
+   passing `--recurse-submodules` to `git clone` above.
 1. Prepare your environment by running `cp .env.sample .env`,
    `cp frontend/.env.local.sample frontend/.env.local`, and adding the line
    `127.0.0.1 local.buildingenvelopedata.org` to your `/etc/hosts` file.
@@ -44,17 +53,21 @@ If you have a question for which you don't find the answer in this repository, p
 
 In another shell
 
-1. Drop into `ash` with the working directory `/app`, which is mounted to the
+1. Drop into `bash` with the working directory `/app`, which is mounted to the
    host's `./backend` directory, inside a fresh Docker container based on
    `./backend/Dockerfile` by running `make shellb`. If necessary, the Docker
    image is (re)built automatically, which takes a while the first time.
-2. List all backend GNU Make targets by running `make help`.
-3. For example, update packages and tools by running `make update`.
-4. Drop out of the container by running `exit` or pressing `Ctrl-D`.
+1. List all backend GNU Make targets by running `make help`.
+1. For example, update packages and tools by running `make update`.
+1. Drop out of the container by running `exit` or pressing `Ctrl-D`.
 
 The same works for frontend containers by running `make shellf`.
 
 ## Deployment
+
+For information on using Docker in production see
+[Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)
+and the pages following it.
 
 ### Setting up a Debian production machine
 
@@ -82,11 +95,17 @@ The same works for frontend containers by running `make shellf`.
 
 ### Creating a release
 
-1. [Draft a new release](https://github.com/building-envelope-data/metabase/actions/workflows/draft-new-release.yml)
-   with a new version according to [Semantic Versioning](https://semver.org) by
-   running the GitHub action which, in particular, creates a new branch named
-   `release/v*.*.*`, where `*.*.*` is the version, and a corresponding pull
-   request.
+1. Draft a new release with a new version according to
+   [Semantic Versioning](https://semver.org) by running the GitHub action
+   [Draft a new release](https://github.com/building-envelope-data/metabase/actions/workflows/draft-new-release.yml)
+   which, creates a new branch named `release/v*.*.*`,
+   creates a corresponding pull request, updates the
+   [Changelog](https://github.com/building-envelope-data/metabase/blob/develop/CHANGELOG.md),
+   and bumps the version in
+   [`package.json`](https://github.com/building-envelope-data/metabase/blob/develop/frontend/package.json),
+   where `*.*.*` is the version. Note that this is **not** the same as "Draft
+   a new release" on
+   [Releases](https://github.com/building-envelope-data/metabase/releases).
 1. Fetch the release branch by running `git fetch` and check it out by running
    `git checkout release/v*.*.*`, where `*.*.*` is the version.
 1. Prepare the release by running `make prepare-release` in your shell, review,
@@ -111,18 +130,77 @@ The same works for frontend containers by running `make shellf`.
    figure out what went wrong, apply the necessary fixes to the codebase,
    create a new release, and try to deploy that release instead.
 1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
-   running `cd ./machine && make deploy && cd ..` and test whether everything
-   works as expected and if that is the case, repeat all stages but this one in
-   the directory `/app/production` (instead of `/app/staging`). Note that in
-   the staging environment sent emails can be viewed in the web browser under
+   running `cd /app/machine && make deploy` and test whether everything works
+   as expected and if that is the case, repeat all stages but this one in the
+   directory `/app/production` (instead of `/app/staging`). Note that in the
+   staging environment sent emails can be viewed in the web browser under
    `https://staging.buildingenvelopedata.org/email/` and emails to addresses in
    the variable `RELAY_ALLOWED_EMAILS` in the `.env` file are delivered to the
    respective inboxes (the variable's value is a comma separated list of email
    addresses).
 
-For information on using Docker in production see
-[Configure and troubleshoot the Docker daemon](https://docs.docker.com/config/daemon/)
-and the pages following it.
+### Troubleshooting
+
+The file `Makefile.production` contains GNU Make targets to manage Docker
+containers like `up` and `down`, to follow Docker container logs with `logs`,
+to drop into shells inside running Docker containers like `shellb` for the
+backend service and `shellf` for the frontend service and `psql` for the
+databse service, and to list information about Docker like `list` and
+`list-services`.
+
+And the file contains GNU Make targets to deploy a new release or rollback it
+back as mentioned above. These targets depend on several smaller targets like
+`begin-maintenance` and `end-maintenance` to begin or end displaying
+maintenance information to end users that try to interact with the website, and
+`backup` to backup all data before deploying a new version, `migrate` to
+migrate the database, and `run-tests` to run tests.
+
+If for some reason the website displays the maintenance page without
+maintenance happening at the moment, then drop into a shell on the production
+machine, check all logs for information on what happened, fix issues if
+necessary, and end maintenance. It could for example happen that a cron job
+set-up by [machine](https://github.com/building-envelope-data/machine) begins
+maintenance, fails to do its actual job, and does not end maintenance
+afterwards. Whether failing to do its job is a problem for the inner workings
+of the website needs to be decided by some developer. If it for example backing
+up the database fails because the machine is out of memory at the time of doing
+the backup, the website itself should still working.
+
+If the database container restarts indefinitely and its logs say
+
+```
+LOG:  invalid resource manager ID in primary checkpoint record
+PANIC:  could not locate a valid checkpoint record
+```
+
+then the database is corrupt. For example, the write-ahead log (WAL) may be
+corrupt because the database was not shut down cleanly. One solution is to
+restore the database from a backup by running
+
+```
+make --file Makefile.production BACKUP_DIRECTORY=/app/data/backups/20XX-XX-XX_XX_XX_XX/ restore
+```
+
+where the `X`s need to be replaced by proper values. Another solution is to
+reset the transaction log by entering the database container with
+
+```
+docker compose --file docker-compose.production.yml --project-name metabase_production run database bash
+```
+
+and dry-running
+
+```
+gosu postgres pg_resetwal --dry-run /var/lib/postgresql/data
+```
+
+and, depending on the output, also running
+
+```
+gosu postgres pg_resetwal /var/lib/postgresql/data
+```
+
+Note that both solutions may cause data to be lost.
 
 ## Original Idea
 
@@ -157,6 +235,7 @@ We may add some error detection and correction capabilities by, for example, gen
 
 ## ...
 
+- [Designing GraphQL Mutations](https://www.apollographql.com/blog/graphql/basics/designing-graphql-mutations/)
 - [Updating Enum Values in PostgreSQL - The Safe and Easy Way](https://blog.yo1.dog/updating-enum-values-in-postgresql-the-safe-and-easy-way/)
 - [C# Coding Standards](https://www.dofactory.com/reference/csharp-coding-standards)
 - [Should You Use The Same Dockerfile For Dev, Staging And Production Builds?](https://vsupalov.com/same-dockerfile-dev-staging-production/)
@@ -170,7 +249,6 @@ We may add some error detection and correction capabilities by, for example, gen
 - [API design best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
   [API implementation best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-implementation)
   [Shallow Nesting](https://guides.rubyonrails.org/routing.html#shallow-nesting)
-- [Implicit Flow](https://auth0.com/docs/flows/concepts/implicit)
 - Our domain model is inspired by
   [AnemicDomainModels](https://github.com/vkhorikov/AnemicDomainModel/tree/master/After/src/Logic/Customers)
   and by
@@ -181,6 +259,8 @@ We may add some error detection and correction capabilities by, for example, gen
 - [Unit testing best practices](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices)
   and
   [Naming standards for unit tests](https://osherove.com/blog/2005/4/3/naming-standards-for-unit-tests.html)
+- [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce)
 - [OAuth 2.0 Simplified](https://www.oauth.com)
 - [Setting up an Authorization Server with OpenIddict](https://dev.to/robinvanderknaap/setting-up-an-authorization-server-with-openiddict-part-iv-authorization-code-flow-3eh8)
 - [Bearer Token Authentication in ASP.NET Core](https://devblogs.microsoft.com/aspnet/bearer-token-authentication-in-asp-net-core/)
+- [ID Token and Access Token: What's the difference?](https://auth0.com/blog/id-token-access-token-what-is-the-difference/)

@@ -1,7 +1,6 @@
-namespace Metabase.GraphQl.Users
-{
-    public record SetUserPasswordInput(
-          string Password,
-          string PasswordConfirmation
-        );
-}
+namespace Metabase.GraphQl.Users;
+
+public sealed record SetUserPasswordInput(
+    string Password,
+    string PasswordConfirmation
+);

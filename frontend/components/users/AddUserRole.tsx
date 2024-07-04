@@ -16,6 +16,8 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
+type FormValues = { role: UserRole };
+
 export type AddUserRoleProps = {
   userId: Scalars["Uuid"];
   roles: UserRole[];
@@ -38,10 +40,10 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
 
-  const onFinish = ({ role }: { role: UserRole }) => {
+  const onFinish = ({ role }: FormValues) => {
     const add = async () => {
       try {
         setAdding(true);

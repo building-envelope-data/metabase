@@ -1,15 +1,15 @@
+using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 
-namespace Metabase.GraphQl.Methods
+namespace Metabase.GraphQl.Methods;
+
+public sealed class MethodManagerEdge
+    : Edge<Institution, InstitutionByIdDataLoader>
 {
-    public sealed class MethodManagerEdge
-        : Edge<Data.Institution, InstitutionByIdDataLoader>
+    public MethodManagerEdge(
+        Method association
+    )
+        : base(association.ManagerId)
     {
-        public MethodManagerEdge(
-            Data.Method association
-        )
-            : base(association.ManagerId)
-        {
-        }
     }
 }

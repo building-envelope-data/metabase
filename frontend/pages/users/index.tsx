@@ -39,15 +39,15 @@ function Page() {
       <Table
         loading={loading}
         columns={[
-          getUuidColumnProps<typeof nodes[0]>(
+          getUuidColumnProps<(typeof nodes)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x),
             paths.user
           ),
-          getNameColumnProps<typeof nodes[0]>(onFilterTextChange, (x) =>
+          getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
             filterText.get(x)
           ),
-          getFilterableStringColumnProps<typeof nodes[0]>(
+          getFilterableStringColumnProps<(typeof nodes)[0]>(
             "Email",
             "email",
             (record) => record.email,

@@ -1,10 +1,10 @@
 using System;
+using Metabase.Enumerations;
 
-namespace Metabase.GraphQl.InstitutionRepresentatives
-{
-    public record ChangeInstitutionRepresentativeRoleInput(
-          Guid InstitutionId,
-          Guid UserId,
-          Enumerations.InstitutionRepresentativeRole NewRole
-        );
-}
+namespace Metabase.GraphQl.InstitutionRepresentatives;
+
+public sealed record ChangeInstitutionRepresentativeRoleInput(
+    Guid InstitutionId,
+    Guid UserId,
+    InstitutionRepresentativeRole Role
+);

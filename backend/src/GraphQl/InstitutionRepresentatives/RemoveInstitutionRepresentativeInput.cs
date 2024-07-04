@@ -1,9 +1,8 @@
 using System;
 
-namespace Metabase.GraphQl.InstitutionRepresentatives
-{
-    public record RemoveInstitutionRepresentativeInput(
-          Guid InstitutionId,
-          Guid UserId
-        );
-}
+namespace Metabase.GraphQl.InstitutionRepresentatives;
+
+public sealed record RemoveInstitutionRepresentativeInput(
+    Guid InstitutionId,
+    Guid UserId
+);

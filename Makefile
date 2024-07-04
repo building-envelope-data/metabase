@@ -4,7 +4,7 @@
 include .env
 
 docker_compose = \
-	docker-compose \
+	docker compose \
 		--file docker-compose.yml \
 		--project-name ${NAME}
 
@@ -16,7 +16,7 @@ help : ## Print this help
 .PHONY : help
 .DEFAULT_GOAL := help
 
-name : ## Print value of variable `${NAME}`
+name : ## Print value of variable `NAME`
 	@echo ${NAME}
 .PHONY : name
 
@@ -24,29 +24,42 @@ name : ## Print value of variable `${NAME}`
 # Interface with Docker Compose #
 # ----------------------------- #
 
-build : ## Build images
-	${docker_compose} pull
-	${docker_compose} build \
-		--pull \
-		--build-arg GROUP_ID=$(shell id --group) \
-		--build-arg USER_ID=$(shell id --user)
+pull : ## Pull images
+	COMPOSE_DOCKER_CLI_BUILD=1 \
+		DOCKER_BUILDKIT=1 \
+			${docker_compose} pull
+.PHONY : pull
+
+# To debug errors during build add `--progress plain \` to get additional
+# output.
+build : pull ## Build images
+	COMPOSE_DOCKER_CLI_BUILD=1 \
+		DOCKER_BUILDKIT=1 \
+			${docker_compose} build \
+				--pull \
+				--build-arg GROUP_ID=$(shell id --group) \
+				--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
-show-backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
-	docker build \
-		--pull \
-		--no-cache \
-		--file Dockerfile-show-build-context \
-		./backend
-.PHONY : show-backend-build-context
+backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
+	DOCKER_BUILDKIT=1 \
+		docker build \
+			--pull \
+			--no-cache \
+			--progress plain \
+			--file Dockerfile-show-build-context \
+			./backend
+.PHONY : backend-build-context
 
-show-frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
-	docker build \
-		--pull \
-		--no-cache \
-		--file Dockerfile-show-build-context \
-		./frontend
-.PHONY : show-frontend-build-context
+frontend-build-context : ## Show the build context configured by `./frontend/.dockerignore`
+	DOCKER_BUILDKIT=1 \
+		docker build \
+			--pull \
+			--no-cache \
+			--progress plain \
+			--file Dockerfile-show-build-context \
+			./frontend
+.PHONY : frontend-build-context
 
 remove : ## Remove stopped containers
 	${docker_compose} rm
@@ -57,7 +70,7 @@ remove-data : ## Remove data volumes
 		${NAME}_data
 .PHONY : remove-data
 
-# TODO `docker-compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
+# TODO `docker compose up` does not support `--user`, see https://github.com/docker/compose/issues/1532
 up : build ## (Re)create, and start containers (after building images if necessary)
 	${docker_compose} up \
 		--remove-orphans \
@@ -109,7 +122,7 @@ runb : CONTAINER = backend
 runb : run ## runute the one-time command `${COMMAND}` against a fresh `backend` container (after starting all containers if necessary)
 .PHONY : runb
 
-shellf : COMMAND = bash -c "make install && exec bash"
+shellf : COMMAND = bash
 shellf : execf ## Enter shell in an existing `frontend` container (after starting all containers if necessary)
 .PHONY : shellf
 
@@ -131,6 +144,12 @@ traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for examp
 				"
 .PHONY : traceb
 
+shelln : up ## Enter shell in an existing `nginx` container (after starting all containers if necessary)
+	${docker_compose} exec \
+		nginx \
+		bash
+.PHONY : shelln
+
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
 	${docker_compose} exec \
 		database \
@@ -145,7 +164,13 @@ shelld : up ## Enter shell in an existing `database` container (after starting a
 		bash
 .PHONY : shelld
 
-createdb : ## Create databases
+list : ## List all containers with health status
+	${docker_compose} ps \
+		--no-trunc \
+		--all
+.PHONY : list
+
+createdb : ## Create database
 	${docker_compose} exec \
 		database \
 		bash -c " \
@@ -153,10 +178,13 @@ createdb : ## Create databases
 		"
 .PHONY : createdb
 
-list : ## List all containers with health status
-	${docker_compose} ps \
-		--all
-.PHONY : list
+dropdb : ## Drop database
+	${docker_compose} exec \
+		database \
+		bash -c " \
+			dropdb --username postgres xbase_development ; \
+		"
+.PHONY : dropdb
 
 begin-maintenance : ## Begin maintenance
 	cp \
@@ -175,20 +203,31 @@ prepare-release : ## Prepare release
 		make prepare-release
 .PHONY : prepare-release
 
+diagrams-plantuml : ## Draw images from textual UML diagrams
+	plantuml diagrams/plantuml/*.puml
+.PHONY : diagrams
+
+# `diagrams-structurizr starts a server which can be accessed with a browser at localhost:9090. The diagrams can be downloaded manually from there.
+diagrams-structurizr : ## Serve diagrams to browser localhost Port 9090
+	docker run -it --rm -p 9090:8080 -v $(shell pwd)/diagrams/structurizr:/usr/local/structurizr structurizr/lite
+.PHONY : diagrams-structurizr
+
 # --------------------- #
 # Generate Certificates #
 # --------------------- #
 
 # TODO Pass passwords in a more secure way!
 jwt-certificates : ## Create JWT encryption and signing certificates if necessary
-	docker build \
-		--pull \
-		--build-arg GROUP_ID=$(shell id --group) \
-		--build-arg USER_ID=$(shell id --user) \
-		--tag ${NAME}_bootstrap \
-		--file ./backend/Dockerfile-bootstrap \
-		./backend
+	DOCKER_BUILDKIT=1 \
+		docker build \
+			--pull \
+			--build-arg GROUP_ID=$(shell id --group) \
+			--build-arg USER_ID=$(shell id --user) \
+			--tag ${NAME}_bootstrap \
+			--file ./backend/Dockerfile-bootstrap \
+			./backend
 	docker run \
+		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/backend",target=/app \
 		${NAME}_bootstrap \
@@ -199,7 +238,7 @@ jwt-certificates : ## Create JWT encryption and signing certificates if necessar
 				${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD} \
 				${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD} \
 		"
-.PHONY : certificates
+.PHONY : jwt-certificates
 
 # For an introduction to how HTTPS works see https://howhttps.works
 ssl : ## Generate and trust certificate authority, and generate SSL certificates
@@ -215,9 +254,10 @@ ssl : ## Generate and trust certificate authority, and generate SSL certificates
 generate-certificate-authority : ## Generate certificate authority ECDSA private key and self-signed certificate
 	mkdir --parents ./ssl/
 		docker run \
+		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
-		nginx:1.19.9 \
+		nginx:1.25-bookworm \
 		bash -cx " \
 			echo \"# Generate the elliptic curve (EC) private key '/ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
@@ -322,9 +362,10 @@ trust-certificate-authority : ## Trust the authority's SSL certificate
 generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate signed by our certificate authority
 	mkdir --parents ./ssl/
 	docker run \
+		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/ssl",target=/ssl \
-		nginx:1.19.9 \
+		nginx:1.25-bookworm \
 		bash -cx " \
 			echo \"# Generate the elliptic curve (EC) private key '/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.key' with parameters 'secp384r1', that is, a NIST/SECG curve over a 384 bit prime field as said in the output of the command 'openssl ecparam -list_curves'\" && \
 			openssl ecparam \
@@ -410,3 +451,11 @@ generate-ssl-certificate : ## Generate ECDSA private key and SSL certificate sig
 fetch-ssl-certificate : ## Fetch the SSL certificate of the server
 	openssl s_client ${HOST}:${HTTPS_PORT}
 .PHONY : fetch-ssl-certificate
+
+ssl-certificate : ## Print the SSL certificate
+	openssl x509 -text -noout -in ./ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.crt
+.PHONY : ssl-certificate
+
+certificate-authority : ## View the certificate authority
+	openssl x509 -text -noout -in ./ssl/${CERTIFICATE_AUTHORITY_BASE_FILE_NAME}.crt
+.PHONY : certificate-authority

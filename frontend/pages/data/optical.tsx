@@ -10,7 +10,6 @@ import {
 } from "antd";
 import { useAllOpticalDataQuery } from "../../queries/data.graphql";
 import {
-  OpticalData,
   Scalars,
   OpticalDataPropositionInput,
 } from "../../__generated__/__types__";
@@ -85,13 +84,44 @@ const conjunct = (
 //   return { or: propositions };
 // };
 
+type PartialOpticalData = {
+  __typename?: "OpticalData";
+  infraredEmittances: Array<number>;
+  nearnormalHemisphericalSolarReflectances: Array<number>;
+  nearnormalHemisphericalSolarTransmittances: Array<number>;
+  nearnormalHemisphericalVisibleReflectances: Array<number>;
+  nearnormalHemisphericalVisibleTransmittances: Array<number>;
+  uuid: any;
+  timestamp: any;
+  componentId: any;
+  name?: string | null | undefined;
+  description?: string | null | undefined;
+  appliedMethod: {
+    __typename?: "AppliedMethod";
+    methodId: any;
+  };
+  resourceTree: {
+    __typename?: "GetHttpsResourceTree";
+    root: {
+      __typename?: "GetHttpsResourceTreeRoot";
+      value: {
+        __typename?: "GetHttpsResource";
+        description: string;
+        hashValue: string;
+        locator: any;
+        dataFormatId: any;
+      };
+    };
+  };
+};
+
 function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [data, setData] = useState<OpticalData[]>([]);
+  const [data, setData] = useState<PartialOpticalData[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
@@ -300,9 +330,9 @@ function Page() {
         // TODO Add `edge.node.databaseId to nodes?
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allOpticalData?.nodes || []
+            (edge) => edge?.node?.allOpticalData?.edges?.map((e) => e.node) || []
           ) || [];
-        const flatData = ([] as OpticalData[]).concat(...nestedData);
+        const flatData = ([] as PartialOpticalData[]).concat(...nestedData);
         setData(flatData);
       } catch (error) {
         // TODO Handle properly.
@@ -370,28 +400,28 @@ function Page() {
         loading={filtering}
         columns={[
           {
-            ...getUuidColumnProps<typeof data[0]>(
+            ...getUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
               (_uuid) => "/" // TODO Link somewhere useful!
             ),
           },
           {
-            ...getNameColumnProps<typeof data[0]>(onFilterTextChange, (x) =>
+            ...getNameColumnProps<(typeof data)[0]>(onFilterTextChange, (x) =>
               filterText.get(x)
             ),
           },
           {
-            ...getDescriptionColumnProps<typeof data[0]>(
+            ...getDescriptionColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getTimestampColumnProps<typeof data[0]>(),
+            ...getTimestampColumnProps<(typeof data)[0]>(),
           },
           {
-            ...getComponentUuidColumnProps<typeof data[0]>(
+            ...getComponentUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
@@ -407,13 +437,13 @@ function Page() {
           //   ),
           // },
           {
-            ...getAppliedMethodColumnProps<typeof data[0]>(
+            ...getAppliedMethodColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),
           },
           {
-            ...getResourceTreeColumnProps<typeof data[0]>(
+            ...getResourceTreeColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x)
             ),

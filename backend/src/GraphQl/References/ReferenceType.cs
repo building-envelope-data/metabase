@@ -1,14 +1,13 @@
-
 using HotChocolate.Types;
+using Metabase.Data;
 
-namespace Metabase.GraphQl.References
+namespace Metabase.GraphQl.References;
+
+public sealed class ReferenceType
+    : InterfaceType<IReference>
 {
-    public class ReferenceType
-        : InterfaceType<Data.IReference>
+    protected override void Configure(IInterfaceTypeDescriptor<IReference> descriptor)
     {
-        protected override void Configure(IInterfaceTypeDescriptor<Data.IReference> descriptor)
-        {
-            descriptor.Name(nameof(Data.IReference)[1..]);
-        }
+        descriptor.Name(nameof(IReference)[1..]);
     }
 }

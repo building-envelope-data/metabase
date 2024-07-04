@@ -31,13 +31,26 @@ query Component($uuid: Uuid!) {
       from
       to
     }
-    manufacturers {
+    manufacturers(pending: false) {
+      edges {
+        node {
+          id
+          uuid
+          name
+          description
+        }
+        canCurrentUserRemoveEdge
+      }
+      canCurrentUserAddEdge
+    }
+    pendingManufacturers: manufacturers(pending: true) {
       edges {
         node {
           id
           uuid
           name
         }
+        canCurrentUserRemoveEdge
       }
     }
     assembledOf {
@@ -46,8 +59,14 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        index
+        primeSurface
+        canCurrentUserUpdateEdge
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
     partOf {
       edges {
@@ -55,8 +74,14 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        index
+        primeSurface
+        canCurrentUserUpdateEdge
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
     concretizationOf {
       edges {
@@ -64,8 +89,11 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
     generalizationOf {
       edges {
@@ -73,8 +101,11 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
     variantOf {
       edges {
@@ -82,9 +113,13 @@ query Component($uuid: Uuid!) {
           id
           uuid
           name
+          description
         }
+        canCurrentUserRemoveEdge
       }
+      canCurrentUserAddEdge
     }
+    canCurrentUserUpdateNode
   }
 }
 
@@ -95,12 +130,6 @@ mutation CreateComponent(
   $categories: [ComponentCategory!]!
   $availability: OpenEndedDateTimeRangeInput
   $manufacturerId: Uuid!
-  $furtherManufacturerIds: [Uuid!]!
-  $assembledOfIds: [Uuid!]!
-  $partOfIds: [Uuid!]!
-  $concretizationOfIds: [Uuid!]!
-  $generalizationOfIds: [Uuid!]!
-  $variantOfIds: [Uuid!]!
 ) {
   createComponent(
     input: {
@@ -110,12 +139,35 @@ mutation CreateComponent(
       categories: $categories
       availability: $availability
       manufacturerId: $manufacturerId
-      furtherManufacturerIds: $furtherManufacturerIds
-      assembledOfIds: $assembledOfIds
-      partOfIds: $partOfIds
-      concretizationOfIds: $concretizationOfIds
-      generalizationOfIds: $generalizationOfIds
-      variantOfIds: $variantOfIds
+    }
+  ) {
+    component {
+      ...ComponentPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateComponent(
+  $componentId: Uuid!
+  $name: String!
+  $abbreviation: String
+  $description: String!
+  $categories: [ComponentCategory!]!
+  $availability: OpenEndedDateTimeRangeInput
+) {
+  updateComponent(
+    input: {
+      componentId: $componentId
+      name: $name
+      abbreviation: $abbreviation
+      description: $description
+      categories: $categories
+      availability: $availability
     }
   ) {
     component {

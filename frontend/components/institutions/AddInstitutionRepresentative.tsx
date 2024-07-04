@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Select, Alert, Form, Button } from "antd";
-import { useAddInstitutionRepresentativeMutation } from "../../queries/institutions.graphql";
+import { useAddInstitutionRepresentativeMutation } from "../../queries/institutionRepresentatives.graphql";
 import { InstitutionRepresentativeRole } from "../../__generated__/__types__";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
@@ -14,6 +14,11 @@ const layout = {
 };
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
+};
+
+type FormValues = {
+  userId: Scalars["Uuid"];
+  role: InstitutionRepresentativeRole;
 };
 
 export type AddInstitutionRepresentativeProps = {
@@ -39,16 +44,10 @@ export default function AddInstitutionRepresentative({
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
 
-  const onFinish = ({
-    userId,
-    role,
-  }: {
-    userId: Scalars["Uuid"];
-    role: InstitutionRepresentativeRole;
-  }) => {
+  const onFinish = ({ userId, role }: FormValues) => {
     const add = async () => {
       try {
         setAdding(true);

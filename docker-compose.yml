@@ -1,8 +1,6 @@
-version: '3.3'
-
 services:
   database: # https://hub.docker.com/_/postgres
-    image: postgres:13.5-bullseye
+    image: postgres:13.13-bookworm
     # ports:
     #   - 5432:5432
     # For possible command-line arguments see
@@ -63,13 +61,14 @@ services:
     # user: 1000:1000
     command: [
       "dotnet", "watch",
-      "--project", "./src/Metabase.csproj",
+      "--non-interactive",
+      "--no-hot-reload", # as of this writing, HotChocolate does not work with hot reload, see https://github.com/ChilliCream/graphql-platform/issues/5803
+      "--project", "/app/src/Metabase.csproj",
       "--",
       "run",
-      "--no-launch-profile"
+      "--no-launch-profile",
+      "--project", "/app/src/Metabase.csproj"
       ]
-      # "--no-restore",
-      # ["dotnet", "watch", "run", "--no-restore"]
     healthcheck:
       # https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#docker-example
       test: ["CMD-SHELL", "curl --silent --fail --output /dev/null http://backend:8080/health || exit 1"]
@@ -80,11 +79,12 @@ services:
       - ./backend:/app
       - backend_vscode_server_extensions:/home/me/.vscode-server/extensions
       - backend_vscode_server_insiders_extensions:/home/me/.vscode-server-insiders/extensions
-      # - backend_node_modules:/app/node_modules
       # The following items make the engine create anonymous volumes for the
       # specified path with the effect that the service does not write
       # temporary files into the corresponding directory on the host file
       # system that was bound by the `/app` binding.
+      # - /app/node_modules
+      # - /app/src/logs
       - /app/src/bin
       - /app/src/obj
       - /app/test/bin
@@ -100,12 +100,15 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:8080
       - ASPNETCORE_ENVIRONMENT=development
       - XBASE_Host=https://${HOST}:${HTTPS_PORT}
+      - XBASE_BootstrapUserPassword=${BOOTSTRAP_USER_PASSWORD}
+      - XBASE_OpenIdConnectClientSecret=${OPEN_ID_CONNECT_CLIENT_SECRET}
       - XBASE_JsonWebToken__EncryptionCertificatePassword=${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD}
       - XBASE_JsonWebToken__SigningCertificatePassword=${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD}
       - XBASE_Email__SmtpHost=${SMTP_HOST}
       - XBASE_Email__SmtpPort=${SMTP_PORT}
-      - XBASE_TestlabSolarFacadesHost=${TESTLAB_SOLAR_FACADES_HOST}:${TESTLAB_SOLAR_FACADES_HOST_HTTPS_PORT}
+      - XBASE_TestlabSolarFacadesHost=https://${TESTLAB_SOLAR_FACADES_HOST}:${TESTLAB_SOLAR_FACADES_HOST_HTTPS_PORT}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
+      # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       # - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_CERTIFICATE_PASSWORD}
@@ -137,7 +140,11 @@ services:
       retries: 3
     volumes:
       - ./frontend:/app
-      - frontend_node_modules:/app/node_modules
+      # The following items make the engine create anonymous volumes for the
+      # specified path with the effect that the service does not write
+      # temporary files into the corresponding directory on the host file
+      # system that was bound by the `/app` binding.
+      - /app/node_modules
     extra_hosts:
       - ${HOST}:host-gateway
     environment:
@@ -146,7 +153,7 @@ services:
       - backend
 
   nginx: # https://hub.docker.com/_/nginx
-    image: nginx:1.21
+    image: nginx:1.25-bookworm
     command: [
       "nginx-debug",
       "-g", "daemon off;"
@@ -178,7 +185,5 @@ services:
 volumes:
   data:
   emails:
-  # backend_node_modules:
   backend_vscode_server_extensions:
   backend_vscode_server_insiders_extensions:
-  frontend_node_modules:

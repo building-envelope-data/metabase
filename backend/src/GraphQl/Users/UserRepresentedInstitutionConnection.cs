@@ -1,39 +1,39 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.Data;
 using Metabase.Authorization;
+using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 
-namespace Metabase.GraphQl.Users
-{
-    public sealed class UserRepresentedInstitutionConnection
-        : ForkingConnection<Data.User, Data.InstitutionRepresentative, PendingUserRepresentedInstitutionsByUserIdDataLoader, UserRepresentedInstitutionsByUserIdDataLoader, UserRepresentedInstitutionEdge>
-    {
-        public UserRepresentedInstitutionConnection(
-            Data.User subject,
-            bool pending
-        )
-            : base(
-                subject,
-                pending,
-                x => new UserRepresentedInstitutionEdge(x)
-                )
-        {
-        }
+namespace Metabase.GraphQl.Users;
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
-        [UseUserManager]
-        public Task<bool> CanCurrentUserConfirmEdgeAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager
+public sealed class UserRepresentedInstitutionConnection
+    : ForkingConnection<User, InstitutionRepresentative,
+        PendingUserRepresentedInstitutionsByUserIdDataLoader, UserRepresentedInstitutionsByUserIdDataLoader,
+        UserRepresentedInstitutionEdge>
+{
+    public UserRepresentedInstitutionConnection(
+        User subject,
+        bool pending
+    )
+        : base(
+            subject,
+            pending,
+            x => new UserRepresentedInstitutionEdge(x)
         )
-        {
-            return InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager
-                 );
-        }
+    {
+    }
+
+    [UseUserManager]
+    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager
+    )
+    {
+        return InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(
+            claimsPrincipal,
+            Subject.Id,
+            userManager
+        );
     }
 }

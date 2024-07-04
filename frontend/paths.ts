@@ -1,5 +1,6 @@
 export default {
   home: "/",
+  antiforgeryToken: "/antiforgery/token",
   legalNotice: "/legal-notice",
   dataProtectionInformation: "/data-protection-information",
   databases: "/databases",
@@ -29,13 +30,18 @@ export default {
     },
   },
   personalUserData: "/personal-user-data",
+  openIdConnectClientLogin: "/connect/client/login",
+  openIdConnectClientLogout: "/connect/client/logout",
   userLogin: "/users/login",
   userRegister: "/users/register",
   userConfirmEmail: "/users/confirm-email",
   userForgotPassword: "/users/forgot-password",
   userLoginWithTwoFactorCode: "/users/login-with-two-factor-code",
   userLoginWithRecoveryCode: "/users/login-with-recovery-code",
-  userCheckYourInbox: "/users/check-your-inbox",
+  userCheckYourInboxAfterRegistration:
+    "/users/check-your-inbox-after-registration",
+  userCheckYourInboxAfterPasswordResetRequest:
+    "/users/check-your-inbox-after-password-reset-request",
   dataFormats: "/data-formats",
   dataFormat(uuid: string) {
     return `/data-formats/${encodeURIComponent(uuid)}`;

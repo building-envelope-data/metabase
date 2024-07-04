@@ -2,42 +2,41 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.Data;
 using Metabase.Authorization;
+using Metabase.Data;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace Metabase.GraphQl.Institutions
-{
-    public sealed class InstitutionOperatedDatabaseConnection
-        : Connection<Data.Institution, Data.Database, InstitutionOperatedDatabasesByInstitutionIdDataLoader, InstitutionOperatedDatabaseEdge>
-    {
-        public InstitutionOperatedDatabaseConnection(
-            Data.Institution institution
-        )
-            : base(
-                institution,
-                x => new InstitutionOperatedDatabaseEdge(x)
-                )
-        {
-        }
+namespace Metabase.GraphQl.Institutions;
 
-        [UseDbContext(typeof(Data.ApplicationDbContext))]
-        [UseUserManager]
-        public Task<bool> CanCurrentUserAddEdgeAsync(
-            [GlobalState(nameof(ClaimsPrincipal))] ClaimsPrincipal claimsPrincipal,
-            [ScopedService] UserManager<Data.User> userManager,
-            [ScopedService] Data.ApplicationDbContext context,
-            CancellationToken cancellationToken
+public sealed class InstitutionOperatedDatabaseConnection
+    : Connection<Institution, Database, InstitutionOperatedDatabasesByInstitutionIdDataLoader,
+        InstitutionOperatedDatabaseEdge>
+{
+    public InstitutionOperatedDatabaseConnection(
+        Institution institution
+    )
+        : base(
+            institution,
+            x => new InstitutionOperatedDatabaseEdge(x)
         )
-        {
-            return DatabaseAuthorization.IsAuthorizedToCreateDatabaseForInstitution(
-                 claimsPrincipal,
-                 Subject.Id,
-                 userManager,
-                 context,
-                 cancellationToken
-                 );
-        }
+    {
+    }
+
+    [UseUserManager]
+    public Task<bool> CanCurrentUserAddEdgeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        return DatabaseAuthorization.IsAuthorizedToCreateDatabaseForInstitution(
+            claimsPrincipal,
+            Subject.Id,
+            userManager,
+            context,
+            cancellationToken
+        );
     }
 }

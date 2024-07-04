@@ -41,6 +41,7 @@ function Page() {
     string | null | undefined
   >(undefined);
 
+  const [messageApi, contextHolder] = message.useMessage();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -104,7 +105,7 @@ function Page() {
         const { errors, data } =
           await generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
         if (errors) {
-          message.error(errors);
+          messageApi.error(errors.map((error) => error.message));
         }
         if (data) {
           setSharedKey(
@@ -119,7 +120,11 @@ function Page() {
       }
     };
     generate();
-  }, [router, generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation]);
+  }, [
+    router,
+    generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation,
+    messageApi,
+  ]);
 
   if (!sharedKey || !authenticatorUri) {
     return (
@@ -130,71 +135,75 @@ function Page() {
   }
 
   return (
-    <ManageLayout>
-      <Typography.Title level={3}>Configure</Typography.Title>
-      <Typography.Paragraph>
-        To use an authenticator app go through the following steps:
-      </Typography.Paragraph>
-      <List>
+    <>
+      {contextHolder}
+      <ManageLayout>
+        <Typography.Title level={3}>Configure</Typography.Title>
+        <Typography.Paragraph>
+          To use an authenticator app go through the following steps:
+        </Typography.Paragraph>
         <List>
-          <Typography.Paragraph>
-            Download a two-factor authenticator app like{" "}
-            <a href="https://freeotp.github.io/">FreeOTP</a> or{" "}
-            <a href="https://www.microsoft.com/en-us/account/authenticator">
-              Microsoft Authenticator
-            </a>{" "}
-            or{" "}
-            <a href="https://support.google.com/accounts/answer/1066447">
-              Google Authenticator
-            </a>
-            .
-          </Typography.Paragraph>
-        </List>
-        <List>
-          <Typography.Paragraph>
-            Scan the QR Code or enter this key <kbd>{sharedKey}</kbd> into your
-            two factor authenticator app. Spaces and casing do not matter.
-          </Typography.Paragraph>
-          <QRCode value={authenticatorUri} />
-        </List>
-        <List>
-          <Typography.Paragraph>
-            Once you have scanned the QR code or input the key above, your two
-            factor authentication app will provide you with a unique code. Enter
-            the code in the confirmation box below.
-          </Typography.Paragraph>
-          {globalErrorMessages.length > 0 ? (
-            <Alert type="error" message={globalErrorMessages.join(" ")} />
-          ) : (
-            <></>
-          )}
-          <Form
-            {...layout}
-            form={form}
-            name="basic"
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          >
-            <Form.Item
-              label="Verification Code"
-              name="verificationCode"
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
+          <List>
+            <Typography.Paragraph>
+              Download a two-factor authenticator app like{" "}
+              <a href="https://freeotp.github.io/">FreeOTP</a> or{" "}
+              <a href="https://www.microsoft.com/en-us/account/authenticator">
+                Microsoft Authenticator
+              </a>{" "}
+              or{" "}
+              <a href="https://support.google.com/accounts/answer/1066447">
+                Google Authenticator
+              </a>
+              .
+            </Typography.Paragraph>
+          </List>
+          <List>
+            <Typography.Paragraph>
+              Scan the QR Code or enter this key <kbd>{sharedKey}</kbd> into
+              your two factor authenticator app. Spaces and casing do not
+              matter.
+            </Typography.Paragraph>
+            <QRCode value={authenticatorUri} />
+          </List>
+          <List>
+            <Typography.Paragraph>
+              Once you have scanned the QR code or input the key above, your two
+              factor authentication app will provide you with a unique code.
+              Enter the code in the confirmation box below.
+            </Typography.Paragraph>
+            {globalErrorMessages.length > 0 ? (
+              <Alert type="error" message={globalErrorMessages.join(" ")} />
+            ) : (
+              <></>
+            )}
+            <Form
+              {...layout}
+              form={form}
+              name="basic"
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
             >
-              <Input />
-            </Form.Item>
-            <Form.Item {...tailLayout}>
-              <Button type="primary" htmlType="submit" loading={enabling}>
-                Verify
-              </Button>
-            </Form.Item>
-          </Form>
+              <Form.Item
+                label="Verification Code"
+                name="verificationCode"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item {...tailLayout}>
+                <Button type="primary" htmlType="submit" loading={enabling}>
+                  Verify
+                </Button>
+              </Form.Item>
+            </Form>
+          </List>
         </List>
-      </List>
-    </ManageLayout>
+      </ManageLayout>
+    </>
   );
 }
 

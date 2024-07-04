@@ -1,3 +1,27 @@
+mutation AddInstitutionRepresentative(
+  $institutionId: Uuid!
+  $userId: Uuid!
+  $role: InstitutionRepresentativeRole!
+) {
+  addInstitutionRepresentative(
+    input: { institutionId: $institutionId, userId: $userId, role: $role }
+  ) {
+    institutionRepresentativeEdge {
+      node {
+        id
+        uuid
+        name
+      }
+      role
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 mutation ConfirmInstitutionRepresentative(
   $institutionId: Uuid!
   $userId: Uuid!

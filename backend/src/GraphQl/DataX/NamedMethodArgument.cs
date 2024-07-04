@@ -1,17 +1,18 @@
-namespace Metabase.GraphQl.DataX
-{
-    public sealed class NamedMethodArgument
-    {
-        public NamedMethodArgument(
-        string name,
-        object value
-        )
-        {
-            Name = name;
-            Value = value;
-        }
+using System.Text.Json;
 
-        public string Name { get; }
-        public object Value { get; }
+namespace Metabase.GraphQl.DataX;
+
+public sealed class NamedMethodArgument
+{
+    public NamedMethodArgument(
+        string name,
+        JsonElement value
+    )
+    {
+        Name = name;
+        Value = value;
     }
+
+    public string Name { get; }
+    public JsonElement Value { get; }
 }

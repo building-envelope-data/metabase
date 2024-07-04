@@ -1,0 +1,35 @@
+mutation AddComponentGeneralization(
+  $generalComponentId: Uuid!
+  $concreteComponentId: Uuid!
+) {
+  addComponentGeneralization(
+    input: {
+      generalComponentId: $generalComponentId
+      concreteComponentId: $concreteComponentId
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RemoveComponentGeneralization(
+  $generalComponentId: Uuid!
+  $concreteComponentId: Uuid!
+) {
+  removeComponentGeneralization(
+    input: {
+      generalComponentId: $generalComponentId
+      concreteComponentId: $concreteComponentId
+    }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

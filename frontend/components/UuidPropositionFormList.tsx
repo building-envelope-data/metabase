@@ -34,7 +34,7 @@ export function UuidPropositionFormList({
                   {...restField}
                   key={`negator${key}`}
                   name={[name, "negator"]}
-                  fieldKey={[fieldKey, "negator"]}
+                  fieldKey={[fieldKey ?? -1, "negator"]}
                   noStyle
                   initialValue={Negator.Is}
                 >
@@ -47,7 +47,7 @@ export function UuidPropositionFormList({
                   {...restField}
                   key={`comparator${key}`}
                   name={[name, "comparator"]}
-                  fieldKey={[fieldKey, "comparator"]}
+                  fieldKey={[fieldKey ?? -1, "comparator"]}
                   noStyle
                   initialValue={UuidPropositionComparator.EqualTo}
                 >
@@ -65,10 +65,16 @@ export function UuidPropositionFormList({
                   {...restField}
                   key={`value${key}`}
                   name={[name, "value"]}
-                  fieldKey={[fieldKey, "value"]}
+                  fieldKey={[fieldKey ?? -1, "value"]}
                   noStyle
                 >
-                  <Input style={{ float: "none", display: "inline-block", width: "60%" }} />
+                  <Input
+                    style={{
+                      float: "none",
+                      display: "inline-block",
+                      width: "60%",
+                    }}
+                  />
                 </Form.Item>
                 <MinusCircleOutlined
                   style={{ width: "10%" }}

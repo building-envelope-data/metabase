@@ -10,6 +10,8 @@ fragment DatabasePartial on Database {
       name
     }
   }
+  verificationState
+  verificationCode
 }
 
 query Databases {
@@ -20,9 +22,20 @@ query Databases {
   }
 }
 
+query PendingDatabases {
+  pendingDatabases {
+    nodes {
+      ...DatabasePartial
+      canCurrentUserVerifyNode
+    }
+  }
+}
+
 query Database($uuid: Uuid!) {
   database(uuid: $uuid) {
     ...DatabasePartial
+    canCurrentUserUpdateNode
+    canCurrentUserVerifyNode
   }
 }
 
@@ -40,6 +53,44 @@ mutation CreateDatabase(
       operatorId: $operatorId
     }
   ) {
+    database {
+      ...DatabasePartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateDatabase(
+  $databaseId: Uuid!
+  $name: String!
+  $description: String!
+  $locator: Url!
+) {
+  updateDatabase(
+    input: {
+      databaseId: $databaseId
+      name: $name
+      description: $description
+      locator: $locator
+    }
+  ) {
+    database {
+      ...DatabasePartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation VerifyDatabase($databaseId: Uuid!) {
+  verifyDatabase(input: { databaseId: $databaseId }) {
     database {
       ...DatabasePartial
     }

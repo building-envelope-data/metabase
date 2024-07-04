@@ -1,8 +1,6 @@
-namespace Metabase.GraphQl.Users
-{
-    public record LoginUserWithTwoFactorCodeInput(
-          string AuthenticatorCode,
-          bool RememberMe,
-          bool RememberMachine
-        );
-}
+namespace Metabase.GraphQl.Users;
+
+public sealed record LoginUserWithTwoFactorCodeInput(
+    string AuthenticatorCode,
+    bool RememberMachine
+);

@@ -1,6 +1,5 @@
-namespace Metabase.GraphQl.Users
-{
-    public record LoginUserWithRecoveryCodeInput(
-          string RecoveryCode
-        );
-}
+namespace Metabase.GraphQl.Users;
+
+public sealed record LoginUserWithRecoveryCodeInput(
+    string RecoveryCode
+);

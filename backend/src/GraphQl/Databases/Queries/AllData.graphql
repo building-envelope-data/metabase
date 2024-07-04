@@ -19,17 +19,14 @@ query AllData(
     edges {
       cursor
       node {
+        __typename
         ...DataFields
       }
     }
-    nodes {
-      __typename
-      ...DataFields
-    }
     totalCount
-    pageInfo {
-      ...PageInfoFields
-    }
+    # pageInfo {
+    #   ...PageInfoFields
+    # }
     # TODO timestamp
   }
 }

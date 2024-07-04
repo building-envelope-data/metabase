@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
+namespace Metabase.GraphQl.DataX;
 
-namespace Metabase.GraphQl.DataX
-{
-    public record ClosedIntervalInput(
-        double LowerBound,
-        double UpperBound
-        );
-}
+public sealed record ClosedIntervalInput(
+    double LowerBound,
+    double UpperBound
+);

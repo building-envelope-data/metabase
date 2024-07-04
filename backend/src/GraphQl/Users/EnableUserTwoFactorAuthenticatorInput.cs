@@ -1,6 +1,5 @@
-namespace Metabase.GraphQl.Users
-{
-    public record EnableUserTwoFactorAuthenticatorInput(
-          string VerificationCode
-        );
-}
+namespace Metabase.GraphQl.Users;
+
+public sealed record EnableUserTwoFactorAuthenticatorInput(
+    string VerificationCode
+);

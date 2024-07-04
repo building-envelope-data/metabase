@@ -12,16 +12,16 @@ import {
   Card,
   Typography,
 } from "antd";
-import Layout from "../../components/Layout";
+import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import Link from "next/link";
 import paths from "../../paths";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
+import { isLocalUrl } from "../../lib/url";
 
 function LoginWithTwoFactorCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const rememberMe = router.query.rememberMe;
   const apolloClient = initializeApollo();
   const [loginUserWithTwoFactorCodeMutation] =
     useLoginUserWithTwoFactorCodeMutation();
@@ -45,7 +45,6 @@ function LoginWithTwoFactorCode() {
           variables: {
             authenticatorCode: authenticatorCode,
             rememberMachine: rememberMachine,
-            rememberMe: rememberMe === "true",
           },
         });
         handleFormErrors(
@@ -62,8 +61,11 @@ function LoginWithTwoFactorCode() {
           data?.loginUserWithTwoFactorCode?.user
         ) {
           await apolloClient.resetStore();
+          await fetch(paths.antiforgeryToken);
           await router.push(
-            typeof returnTo === "string" ? returnTo : paths.home
+            typeof returnTo === "string" && isLocalUrl(returnTo)
+              ? returnTo
+              : paths.home
           );
         }
       } catch (error) {
@@ -81,7 +83,7 @@ function LoginWithTwoFactorCode() {
   };
 
   return (
-    <Layout>
+    <SingleSignOnLayout>
       <Row justify="center">
         <Col>
           <Card title="Login">
@@ -142,7 +144,7 @@ function LoginWithTwoFactorCode() {
           </Card>
         </Col>
       </Row>
-    </Layout>
+    </SingleSignOnLayout>
   );
 }
 

@@ -1,33 +1,37 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Metabase.GraphQl.Methods;
 using System.Threading;
+using System.Threading.Tasks;
+using Metabase.Data;
+using Metabase.GraphQl.Methods;
 
-namespace Metabase.GraphQl.DataX
+namespace Metabase.GraphQl.DataX;
+
+public sealed class AppliedMethod
 {
-    public sealed class AppliedMethod
+    public AppliedMethod(
+        Guid methodId,
+        IReadOnlyList<NamedMethodArgument> arguments,
+        IReadOnlyList<NamedMethodSource> sources
+    )
     {
-        public Guid MethodId { get; }
-        // public IReadOnlyList<NamedMethodArgument> Arguments { get; }
-        // public IReadOnlyList<NamedMethodSource> Sources { get; }
+        MethodId = methodId;
+        Arguments = arguments;
+        Sources = sources;
+    }
 
-        public AppliedMethod(
-          Guid methodId
-        )
-        {
-            MethodId = methodId;
-        }
+    public Guid MethodId { get; }
+    public IReadOnlyList<NamedMethodArgument> Arguments { get; }
+    public IReadOnlyList<NamedMethodSource> Sources { get; }
 
-        public Task<Metabase.Data.Method?> GetMethodAsync(
-                MethodByIdDataLoader methodById,
-                CancellationToken cancellationToken
-        )
-        {
-            return methodById.LoadAsync(
-                MethodId,
-                cancellationToken
-                );
-        }
+    public Task<Method?> GetMethodAsync(
+        MethodByIdDataLoader methodById,
+        CancellationToken cancellationToken
+    )
+    {
+        return methodById.LoadAsync(
+            MethodId,
+            cancellationToken
+        );
     }
 }

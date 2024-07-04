@@ -49,6 +49,7 @@ function Register() {
             email: email,
             password: password,
             passwordConfirmation: passwordConfirmation,
+            returnTo: returnTo,
           },
         });
         handleFormErrors(
@@ -64,10 +65,10 @@ function Register() {
           !data?.registerUser?.errors &&
           data?.registerUser?.user
         ) {
-          // TODO return to does not work like this because user is not automatically logged-in after registering. Return-to would need to be in the confirmation link sent via email ...
-          await router.push(
-            typeof returnTo === "string" ? returnTo : paths.userCheckYourInbox
-          );
+          await router.push({
+            pathname: paths.userCheckYourInboxAfterRegistration,
+            query: returnTo ? { returnTo: returnTo } : {},
+          });
         }
       } catch (error) {
         // TODO Handle properly.
@@ -184,15 +185,6 @@ function Register() {
                 </Button>
               </Form.Item>
             </Form>
-            <Typography.Paragraph style={{ maxWidth: 768 }}>
-              With sufficient privileges, the{" "}
-              <Typography.Link
-                href={`${process.env.NEXT_PUBLIC_METABASE_URL}/graphql/`}
-              >
-                GraphQL endpoint
-              </Typography.Link>{" "}
-              can also be used to register users.
-            </Typography.Paragraph>
           </Card>
         </Col>
       </Row>

@@ -7,7 +7,7 @@ import { message, Typography } from "antd";
 
 function ConfirmUserEmail() {
   const router = useRouter();
-  const { email, confirmationCode } = router.query;
+  const { email, confirmationCode, returnTo } = router.query;
   const [confirmUserEmailMutation] = useConfirmUserEmailMutation();
 
   useEffect(() => {
@@ -32,13 +32,16 @@ function ConfirmUserEmail() {
             );
           } else {
             message.success("Email address confirmed!");
-            await router.push(paths.userLogin);
+            await router.push({
+              pathname: paths.userLogin,
+              query: returnTo ? { returnTo: returnTo } : {},
+            });
           }
         }
       }
     };
     confirmUserEmail();
-  }, [email, confirmationCode, router, confirmUserEmailMutation]);
+  }, [email, confirmationCode, returnTo, router, confirmUserEmailMutation]);
 
   return (
     <Layout>

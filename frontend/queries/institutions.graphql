@@ -8,8 +8,16 @@ fragment InstitutionPartial on Institution {
   state
 }
 
-query Institutions($state: InstitutionState! = VERIFIED) {
-  institutions(where: { state: { eq: $state } }) {
+query Institutions {
+  institutions {
+    nodes {
+      ...InstitutionPartial
+    }
+  }
+}
+
+query PendingInstitutions {
+  pendingInstitutions {
     nodes {
       ...InstitutionPartial
     }
@@ -85,9 +93,21 @@ mutation VerifyInstitution($institutionId: Uuid!) {
   }
 }
 
+mutation DeleteInstitution($institutionId: Uuid!) {
+  deleteInstitution(input: { institutionId: $institutionId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 query Institution($uuid: Uuid!) {
   institution(uuid: $uuid) {
     ...InstitutionPartial
+    canCurrentUserUpdateNode
+    canCurrentUserDeleteNode
     manufacturedComponents {
       edges {
         node {
@@ -276,30 +296,6 @@ query Institution($uuid: Uuid!) {
         }
       }
       canCurrentUserAddEdge
-    }
-  }
-}
-
-mutation AddInstitutionRepresentative(
-  $institutionId: Uuid!
-  $userId: Uuid!
-  $role: InstitutionRepresentativeRole!
-) {
-  addInstitutionRepresentative(
-    input: { institutionId: $institutionId, userId: $userId, role: $role }
-  ) {
-    institutionRepresentativeEdge {
-      node {
-        id
-        uuid
-        name
-      }
-      role
-    }
-    errors {
-      code
-      message
-      path
     }
   }
 }

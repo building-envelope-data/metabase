@@ -53,6 +53,17 @@ assets : ## Build assets
 	npm run all
 .PHONY : assets
 
+# For usage information see https://github.com/tomchavakis/nuget-license#usage
+# or run `dotnet tool run dotnet-project-licenses -- --help`
+licenses : ## Print licenses
+	dotnet tool run \
+		dotnet-project-licenses \
+			-i ./Metabase.sln
+			# --json
+			# --allowed-license-types ...
+			# --forbidden-license-types ...
+.PHONY : licenses
+
 # https://github.com/dotnet/diagnostics/blob/master/documentation/dotnet-trace-instructions.md#using-dotnet-trace
 trace : ## Trace the dotnet process `Metabase`
 	dotnet tool run \
@@ -72,6 +83,11 @@ update-schema : ## Update GraphQl schema
 analyze : ## Analyze with Roslynator
 	dotnet tool run roslynator analyze
 .PHONY : analyze
+
+# https://www.jetbrains.com/help/resharper/ReSharper_Command_Line_Tools.html#install-and-use-resharper-command-line-tools-as-net-core-tools
+inspect : ## Inspect with ReSharper, for example, `make OUTPUT=./inspection.xml inspect`
+	dotnet tool run jb inspectcode --build ./Metabase.sln -o ${OUTPUT}
+.PHONY : inspect
 
 play : ## Run tests in `Metabase.Tests.Play` (semi-alternative to the buggy `dotnet script` REPL)
 	dotnet test --filter "FullyQualifiedName~Metabase.Tests.Play"
@@ -93,18 +109,19 @@ dos2unix : ## Strip the byte-order mark, also known as, BOM, and remove carriage
 	# find . -type f -exec dos2unix {} \;
 .PHONY : dos2unix
 
-# TODO We run `dotnet-format` three times because subsequent runs sometimes
-# still make changes. It would be best if we'd check the output to figure out
-# whether changes have been made or not and run it again and again until no
-# more changes are made.
-dosformat : ## Format code and add byte-order marks
-	dotnet tool run dotnet-format && \
-	dotnet tool run dotnet-format && \
-	dotnet tool run dotnet-format
-.PHONY : dosformat
-
-format : dosformat dos2unix ## Format code
+format : ## Format code
+	dotnet tool run jb cleanupcode --profile="Built-in: Reformat Code" ./Metabase.sln
 .PHONY : format
+
+syntax : ## Apply syntax style
+	dotnet tool run jb cleanupcode --profile="Built-in: Reformat & Apply Syntax Style" ./Metabase.sln
+.PHONY : syntax
+
+# The profile `Built-in: Full Cleanup` does not update file headers.
+# See https://www.jetbrains.com/help/resharper/Code_Cleanup__Index.html#profiles
+cleanup : ## Clean-up code
+	dotnet tool run jb cleanupcode ./Metabase.sln
+.PHONY : cleanup
 
 update-packages : ## Update packages
 	for subproject in src test ; do ( \
@@ -119,6 +136,7 @@ update-tools : ## Update tools
 	dotnet tool list | \
 		tail -n +3 | \
 		awk '{print $$1}' | \
+		awk '!/dotnet-certificate-tool/' | \
 		xargs -n 1 dotnet tool update
 	dotnet tool run dotnet-sos install
 .PHONY : update-tools
@@ -145,10 +163,6 @@ dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for exampl
 						{ print } \
 					}"
 .PHONY : dedup
-
-diagrams : ## Draw images from textual UML diagrams
-	plantuml diagrams/*.puml
-.PHONY : diagrams
 
 # See https://github.com/hasura/graphqurl#export-schema
 schema : ## Fetch GraphQL schema using `hasura/graphqurl`

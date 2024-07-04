@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useResetUserPasswordMutation } from "../../queries/users.graphql";
-import Layout from "../../components/Layout";
+import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import paths from "../../paths";
 import { Button, Alert, Form, Input, message, Card, Col, Row } from "antd";
 import { useState } from "react";
@@ -10,13 +10,13 @@ const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
 };
-const tailLayout = {
+const tailSingleSignOnLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
 function Page() {
   const router = useRouter();
-  const { resetCode } = router.query;
+  const { resetCode, returnTo } = router.query;
   const [resetUserPasswordMutation] = useResetUserPasswordMutation();
 
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
@@ -57,7 +57,10 @@ function Page() {
           );
           if (!errors && !data?.resetUserPassword?.errors) {
             message.success("Your password was reset.");
-            await router.push(paths.userLogin);
+            await router.push({
+              pathname: paths.userLogin,
+              query: returnTo ? { returnTo: returnTo } : {},
+            });
           }
         } catch (error) {
           // TODO Handle properly.
@@ -75,7 +78,7 @@ function Page() {
   };
 
   return (
-    <Layout>
+    <SingleSignOnLayout>
       <Row justify="center">
         <Col>
           <Card title="Register">
@@ -146,7 +149,7 @@ function Page() {
                 <Input.Password />
               </Form.Item>
 
-              <Form.Item {...tailLayout}>
+              <Form.Item {...tailSingleSignOnLayout}>
                 <Button type="primary" htmlType="submit" loading={resetting}>
                   Reset password
                 </Button>
@@ -155,7 +158,7 @@ function Page() {
           </Card>
         </Col>
       </Row>
-    </Layout>
+    </SingleSignOnLayout>
   );
 }
 

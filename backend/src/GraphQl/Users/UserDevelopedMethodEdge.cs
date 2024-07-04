@@ -1,15 +1,15 @@
+using Metabase.Data;
 using Metabase.GraphQl.Methods;
 
-namespace Metabase.GraphQl.Users
+namespace Metabase.GraphQl.Users;
+
+public sealed class UserDevelopedMethodEdge
+    : Edge<Method, MethodByIdDataLoader>
 {
-    public sealed class UserDevelopedMethodEdge
-        : Edge<Data.Method, MethodByIdDataLoader>
+    public UserDevelopedMethodEdge(
+        UserMethodDeveloper association
+    )
+        : base(association.MethodId)
     {
-        public UserDevelopedMethodEdge(
-            Data.UserMethodDeveloper association
-        )
-            : base(association.MethodId)
-        {
-        }
     }
 }
