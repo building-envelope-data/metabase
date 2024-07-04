@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Metabase.Tests.Integration.GraphQl.Institutions;
 
@@ -130,11 +131,12 @@ public abstract class InstitutionIntegrationTests
 
     internal static async Task<Guid> CreateAndVerifyInstitutionReturningUuid(
         HttpClient httpClient,
+        string verifierPassword,
         CreateInstitutionInput input
     )
     {
         var uuid = await CreateInstitutionReturningUuid(httpClient, input).ConfigureAwait(false);
-        await VerifyInstitutionByVerifierUser(httpClient, uuid).ConfigureAwait(false);
+        await VerifyInstitutionByVerifierUser(httpClient, verifierPassword, uuid).ConfigureAwait(false);
         return uuid;
     }
 
@@ -157,13 +159,14 @@ public abstract class InstitutionIntegrationTests
 
     internal static Task<string> VerifyInstitutionByVerifierUser(
         HttpClient httpClient,
+        string verifierPassword,
         Guid institutionId
     )
     {
         return AsUser(
             httpClient,
             DbSeeder.VerifierUser.EmailAddress,
-            DbSeeder.VerifierUser.Password,
+            verifierPassword,
             httpClient =>
             {
                 return SuccessfullyQueryGraphQlContentAsString(

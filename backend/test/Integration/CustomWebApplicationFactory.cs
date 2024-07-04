@@ -38,6 +38,12 @@ public sealed class CustomWebApplicationFactory
         what(scope.ServiceProvider);
     }
 
+    private T Get<T>(Func<IServiceProvider, T> what)
+    {
+        using var scope = Services.CreateScope();
+        return what(scope.ServiceProvider);
+    }
+
     private async Task DoAsync(Func<IServiceProvider, Task> what)
     {
         using var scope = Services.CreateScope();
@@ -50,16 +56,16 @@ public sealed class CustomWebApplicationFactory
     //     return what(scope.ServiceProvider);
     // }
 
-    // private AppSettings AppSettings
-    // {
-    //     get
-    //     {
-    //         return Get(
-    //                 services =>
-    //                     services.GetRequiredService<AppSettings>()
-    //             );
-    //     }
-    // }
+    public AppSettings AppSettings
+    {
+        get
+        {
+            return Get(
+                    services =>
+                        services.GetRequiredService<AppSettings>()
+                );
+        }
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -108,8 +114,7 @@ public sealed class CustomWebApplicationFactory
     private async Task SeedDatabase()
     {
         await DoAsync(
-            async services =>
-                await DbSeeder.DoAsync(services).ConfigureAwait(false)
+            DbSeeder.DoAsync
         ).ConfigureAwait(false);
     }
 

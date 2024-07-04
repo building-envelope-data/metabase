@@ -45,9 +45,11 @@ public abstract partial class IntegrationTests
         HttpClient = CreateHttpClient();
     }
 
-    protected CustomWebApplicationFactory Factory { get; }
+    private CustomWebApplicationFactory Factory { get; }
 
     protected CollectingEmailSender EmailSender => Factory.EmailSender;
+
+    protected AppSettings AppSettings => Factory.AppSettings;
 
     protected HttpClient HttpClient { get; }
 
