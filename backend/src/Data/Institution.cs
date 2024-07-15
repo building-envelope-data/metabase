@@ -46,7 +46,7 @@ public sealed class Institution
 
     [Required] public InstitutionState State { get; private set; }
 
-    public InstitutionOperatingState OperatingState { get; set; }
+    public InstitutionOperatingState OperatingState { get; private set; }
 
     public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } =
         new List<InstitutionMethodDeveloper>();
@@ -101,8 +101,8 @@ public sealed class Institution
         State = InstitutionState.VERIFIED;
     }
 
-    public void SwitchOperatingState(InstitutionOperatingState currentState)
+    public void SwitchOperatingState(InstitutionOperatingState newState)
     {
-        OperatingState = currentState;
+        OperatingState = newState;
     }
 }
