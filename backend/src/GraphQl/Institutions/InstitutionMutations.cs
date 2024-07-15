@@ -388,10 +388,16 @@ public sealed class InstitutionMutations
                     new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
                 )
             );
-        if(institution.OperatingState == InstitutionOperatingState.NOT_OPERATING)
-            institution.SwitchOperatingState(InstitutionOperatingState.OPERATING);
-        else{
-            institution.SwitchOperatingState(InstitutionOperatingState.NOT_OPERATING);
+        switch (institution.OperatingState)
+        {
+            case InstitutionOperatingState.NOT_OPERATING:
+                institution.SwitchOperatingState(InstitutionOperatingState.OPERATING);
+                break;
+            case InstitutionOperatingState.OPERATING:
+                institution.SwitchOperatingState(InstitutionOperatingState.NOT_OPERATING);
+                break;
+            default:
+                throw new ArgumentException($"The operating state {institution.OperatingState} is not supported.");
         }
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new SwitchInstitutionOperatingStatePayload(institution);
