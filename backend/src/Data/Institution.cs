@@ -103,11 +103,6 @@ public sealed class Institution
 
     public void SwitchOperatingState(InstitutionOperatingState currentState)
     {
-        if(currentState == InstitutionOperatingState.NOT_OPERATING){
-            OperatingState = InstitutionOperatingState.OPERATING;
-        }
-        else{
-            OperatingState = InstitutionOperatingState.NOT_OPERATING;
-        }
+        OperatingState = currentState;
     }
 }

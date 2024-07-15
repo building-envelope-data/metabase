@@ -370,7 +370,7 @@ public sealed class InstitutionMutations
             return new SwitchInstitutionOperatingStatePayload(
                 new SwitchInstitutionOperatingStateError(
                     SwitchInstitutionOperatingStateErrorCode.UNAUTHORIZED,
-                    "You are not authorized to change institution operating state.",
+                    "You are not authorized to switch institution operating state.",
                     Array.Empty<string>()
                 )
             );
@@ -388,7 +388,11 @@ public sealed class InstitutionMutations
                     new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
                 )
             );
-        institution.SwitchOperatingState(institution.OperatingState);
+        if(institution.OperatingState == InstitutionOperatingState.NOT_OPERATING)
+            institution.SwitchOperatingState(InstitutionOperatingState.OPERATING);
+        else{
+            institution.SwitchOperatingState(InstitutionOperatingState.NOT_OPERATING);
+        }
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new SwitchInstitutionOperatingStatePayload(institution);
     }
