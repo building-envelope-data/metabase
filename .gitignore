@@ -25,6 +25,7 @@ coverage
 
 # Backups
 *.bak
+/backup
 
 # Structurizr diagrams
 /diagrams/structurizr/.structurizr/

@@ -32,6 +32,7 @@ public sealed class GetComponentsTests
         var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
         var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
             HttpClient,
+            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
                 OwnerIds = new[] { userId }
@@ -67,6 +68,7 @@ public sealed class GetComponentsTests
         var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
         var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
             HttpClient,
+            AppSettings.BootstrapUserPassword,
             InstitutionIntegrationTests.PendingInstitutionInput with
             {
                 OwnerIds = new[] { userId }

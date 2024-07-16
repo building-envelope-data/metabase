@@ -16,6 +16,9 @@ public sealed class AppSettings
 
     public EmailSettings Email { get; set; } = new();
 
+    public string BootstrapUserPassword { get; set; }
+        = "";
+
     public string OpenIdConnectClientSecret { get; set; }
         = "";
 

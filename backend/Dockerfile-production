@@ -29,10 +29,15 @@ WORKDIR /app
 
 RUN \
   dotnet restore
+# `dotnet publish` writes its output to
+# [project_file_folder]/bin/[configuration]/[framework]/publish/
+# as told in the description of the option `--output` on
+# https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish#options
+# We cannot use this option though to specify a custom folder as explained on
+# https://learn.microsoft.com/en-us/dotnet/core/compatibility/sdk/7.0/solution-level-output-no-longer-valid
 RUN \
   dotnet publish \
     --configuration release \
-    --output out \
     --self-contained false \
     --no-restore
 
@@ -59,7 +64,7 @@ WORKDIR /app
 
 COPY \
   --from=build \
-  /app/out \
+  /app/src/bin/Release/net8.0/publish \
   ./
 
 RUN \

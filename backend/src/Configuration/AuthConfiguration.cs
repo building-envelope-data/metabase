@@ -276,6 +276,7 @@ public abstract class AuthConfiguration
             // Register the OpenIddict server components.
             .AddServer(_ =>
                 {
+                    _.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
                     _.SetAuthorizationEndpointUris("connect/authorize")
                         .SetDeviceEndpointUris("connect/device")
                         .SetLogoutEndpointUris("connect/logout")
@@ -317,8 +318,8 @@ public abstract class AuthConfiguration
                         .EnableTokenEndpointPassthrough()
                         .EnableUserinfoEndpointPassthrough()
                         .EnableVerificationEndpointPassthrough();
-                    // .EnableStatusCodePagesIntegration();
                     // .DisableTransportSecurityRequirement();
+                    // .EnableStatusCodePagesIntegration();
                     // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending
                     // a token or revocation request, uncomment the following line:
@@ -366,7 +367,7 @@ public abstract class AuthConfiguration
             // Register the OpenIddict validation components.
             .AddValidation(_ =>
             {
-                _.SetIssuer(appSettings.Host);
+                _.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
                 // Configure the audience accepted by this resource server.
                 _.AddAudiences(Audience);
                 // Import the configuration from the local OpenIddict server instance: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-the-optionsuselocalserver-integration

@@ -25,7 +25,11 @@ public sealed class OpticalData
             Array.Empty<string>().AsReadOnly(),
             new Guid(IgsdbInstitutionId), // We suppose that LBNL created the data set.
             DateTime.UtcNow, // That is the best date-time information we have.
-            new AppliedMethod(new Guid(IgsdbMethodId)),
+            new AppliedMethod(
+                new Guid(IgsdbMethodId),
+                Array.Empty<NamedMethodArgument>().AsReadOnly(),
+                Array.Empty<NamedMethodSource>().AsReadOnly()
+            ),
             [GetHttpsResource.From(node.ResourceTree.Root.Value)],
             GetHttpsResourceTree.From(node.ResourceTree),
             // node.Approvals

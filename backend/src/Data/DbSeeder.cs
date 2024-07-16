@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 
 namespace Metabase.Data;
@@ -65,20 +66,18 @@ public sealed class DbSeeder
     public const string MetabaseClientId = "metabase";
     public const string TestlabSolarFacadesClientId = "testlab-solar-facades";
 
-    public static readonly ReadOnlyCollection<(string Name, string EmailAddress, string Password,
-        Enumerations.UserRole Role)> Users =
+    public static readonly ReadOnlyCollection<(string Name, string EmailAddress, Enumerations.UserRole Role)> Users =
         Role.AllEnum.Select(role => (
             Role.EnumToName(role),
             $"{Role.EnumToName(role).ToLowerInvariant()}@buildingenvelopedata.org",
-            "abcABC123@",
             role
         )).ToList().AsReadOnly();
 
-    public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role)
+    public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         AdministratorUser =
             Users.First(x => x.Role == Enumerations.UserRole.ADMINISTRATOR);
 
-    public static readonly (string Name, string EmailAddress, string Password, Enumerations.UserRole Role)
+    public static readonly (string Name, string EmailAddress, Enumerations.UserRole Role)
         VerifierUser =
             Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
 
@@ -91,7 +90,7 @@ public sealed class DbSeeder
         var environment = services.GetRequiredService<IWebHostEnvironment>();
         var appSettings = services.GetRequiredService<AppSettings>();
         await CreateRolesAsync(services, logger).ConfigureAwait(false);
-        await CreateUsersAsync(services, logger).ConfigureAwait(false);
+        await CreateUsersAsync(services, environment, appSettings, logger).ConfigureAwait(false);
         await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
         await RegisterScopesAsync(services, logger).ConfigureAwait(false);
     }
@@ -114,24 +113,44 @@ public sealed class DbSeeder
 
     private static async Task CreateUsersAsync(
         IServiceProvider services,
+        IWebHostEnvironment environment,
+        AppSettings appSettings,
         ILogger<DbSeeder> logger
     )
     {
         var manager = services.GetRequiredService<UserManager<User>>();
-        foreach (var (Name, EmailAddress, Password, Role) in Users)
-            if (await manager.FindByNameAsync(Name).ConfigureAwait(false) is null)
+        if (environment.IsProduction())
+        {
+            if ((await manager.GetUsersInRoleAsync(Role.Administrator).ConfigureAwait(false)).IsNullOrEmpty())
             {
-                logger.CreatingUser(Name);
-                var user = new User(Name, EmailAddress, null, null);
-                await manager.CreateAsync(
-                    user,
-                    Password
-                ).ConfigureAwait(false);
-                var confirmationToken =
-                    await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
-                await manager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
-                await manager.AddToRoleAsync(user, Data.Role.EnumToName(Role)).ConfigureAwait(false);
+                await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger).ConfigureAwait(false);
             }
+        } else {
+            foreach (var userInfo in Users)
+                if (await manager.FindByEmailAsync(userInfo.EmailAddress).ConfigureAwait(false) is null)
+                {
+                    await CreateUserAsync(manager, userInfo, appSettings.BootstrapUserPassword, logger).ConfigureAwait(false);
+                }
+        }
+    }
+
+    private static async Task CreateUserAsync(
+        UserManager<User> manager,
+        (string Name, string EmailAddress, Enumerations.UserRole Role) userInfo,
+        string Password,
+        ILogger<DbSeeder> logger
+    )
+    {
+        logger.CreatingUser(userInfo.Name);
+        var user = new User(userInfo.Name, userInfo.EmailAddress, null, null);
+        await manager.CreateAsync(
+            user,
+            Password
+        ).ConfigureAwait(false);
+        var confirmationToken =
+            await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+        await manager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
+        await manager.AddToRoleAsync(user, Role.EnumToName(userInfo.Role)).ConfigureAwait(false);
     }
 
     private static async Task RegisterApplicationsAsync(
@@ -167,13 +186,15 @@ public sealed class DbSeeder
                     {
                         new Uri(environment.IsEnvironment("test")
                             ? "urn:test"
-                            : $"{host}/connect/callback/login/metabase")
+                            : $"{host}/connect/callback/login/metabase",
+                            UriKind.Absolute)
                     },
                     PostLogoutRedirectUris =
                     {
                         new Uri(environment.IsEnvironment("test")
                             ? "urn:test"
-                            : $"{host}/connect/callback/logout/metabase")
+                            : $"{host}/connect/callback/logout/metabase",
+                            UriKind.Absolute)
                     },
                     Permissions =
                     {
@@ -231,11 +252,11 @@ public sealed class DbSeeder
                     },
                     RedirectUris =
                     {
-                        new Uri($"{host}/connect/callback/login/metabase")
+                        new Uri($"{host}/connect/callback/login/metabase", UriKind.Absolute)
                     },
                     PostLogoutRedirectUris =
                     {
-                        new Uri($"{host}/connect/callback/logout/metabase")
+                        new Uri($"{host}/connect/callback/logout/metabase", UriKind.Absolute)
                     },
                     Permissions =
                     {
