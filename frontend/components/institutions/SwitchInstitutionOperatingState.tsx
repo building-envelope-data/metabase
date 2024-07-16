@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import paths from "../../paths";
 import {
+  InstitutionDocument,
   InstitutionsDocument,
   useSwitchInstitutionOperatingStateMutation,
 } from "../../queries/institutions.graphql";
@@ -16,47 +17,48 @@ export default function SwitchInstitutionOperatingState({
   institutionId,
 }: switchInstitutionOperatingStateProps) {
   const router = useRouter();
-  const [notOperating, setNotOperating] = useState(false);
+  const [switching, setSwitching] = useState(false);
 
-  const [switchInstitutionOperatingStateMutation] = useSwitchInstitutionOperatingStateMutation({
-    refetchQueries: [
-      {
-        query: InstitutionsDocument,
-      },
-    ],
-  });
+  const [switchInstitutionOperatingStateMutation] = useSwitchInstitutionOperatingStateMutation();
 
-  const switchOperatingState = async () => {
+  const switchInstitutionOperatingState = async () => {
     try {
-      setNotOperating(true);
+      setSwitching(true);
       const { errors, data } = await switchInstitutionOperatingStateMutation({
         variables: {
           institutionId: institutionId,
         },
+        refetchQueries: [
+          {
+            query: InstitutionsDocument,
+          },
+          {
+            query: InstitutionDocument,
+            variables: {
+              uuid: institutionId,
+            },
+          },
+        ],
       });
       if (errors) {
         console.log(errors);
-      } else if (data?.switchOperatingState?.errors) {
+      } else if (data?.switchInstitutionOperatingState?.errors) {
         message.error(
-          data?.switchOperatingState?.errors
+          data?.switchInstitutionOperatingState?.errors
             .map((error: { message: any; }) => error.message)
             .join(" ")
         );
-      } else {
-        await router.push(paths.institutions);
       }
     } finally {
-      setNotOperating(false);
+      setSwitching(false);
     }
-
   };
 
   return (
     <Button
-      danger
       type="primary"
-      onClick={switchOperatingState}
-      loading={notOperating}
+      onClick={switchInstitutionOperatingState}
+      loading={switching}
     >
       Switch Operating State
     </Button>
