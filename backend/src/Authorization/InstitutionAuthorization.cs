@@ -75,7 +75,7 @@ public static class InstitutionAuthorization
                    userManager
                );
     }
-    
+
     internal static async Task<bool> IsAuthorizedToSwitchInstitutionOperatingState(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
