@@ -106,9 +106,7 @@ public sealed class CustomWebApplicationFactory
         databaseCreator.EnsureDeleted();
         databaseCreator.Create();
         databaseCreator.CreateTables();
-        Task.Run(async () =>
-            await SeedDatabase().ConfigureAwait(false)
-        ).GetAwaiter().GetResult();
+        Task.Run(SeedDatabase).GetAwaiter().GetResult();
     }
 
     private async Task SeedDatabase()

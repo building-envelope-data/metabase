@@ -88,6 +88,7 @@ restart : ## Restart all stopped and running containers
 
 logs : ## Follow logs
 	${docker_compose} logs \
+		--since=24h \
 		--follow
 .PHONY : logs
 

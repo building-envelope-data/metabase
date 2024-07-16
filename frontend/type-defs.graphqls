@@ -1,4 +1,4 @@
-﻿schema {
+schema {
   query: Query
   mutation: Mutation
 }
@@ -6,11 +6,17 @@
 interface Data {
   appliedMethod: AppliedMethod!
   componentId: Uuid!
+  createdAt: DateTime!
+  creatorId: Uuid!
+  databaseId: Uuid!
   description: String
+  locale: String!
   name: String
+  resources: [GetHttpsResource!]!
   resourceTree: GetHttpsResourceTree!
   timestamp: DateTime!
   uuid: Uuid!
+  warnings: [String!]!
 }
 
 "The node interface is implemented by entities that have a global unique identifier."
@@ -132,8 +138,10 @@ type AddUserRolePayload {
 }
 
 type AppliedMethod {
+  arguments: [NamedMethodArgument!]!
   method: Method
   methodId: Uuid!
+  sources: [NamedMethodSource!]!
 }
 
 type CalorimetricData implements Data {
@@ -143,6 +151,8 @@ type CalorimetricData implements Data {
   createdAt: DateTime!
   creator: Institution
   creatorId: Uuid!
+  database: Database
+  databaseId: Uuid!
   description: String
   gValues: [Float!]!
   id: String!
@@ -158,7 +168,6 @@ type CalorimetricData implements Data {
 
 type CalorimetricDataConnection {
   edges: [CalorimetricDataEdge!]!
-  nodes: [CalorimetricData!]!
   timestamp: DateTime!
   totalCount: NonNegativeInt
 }
@@ -203,6 +212,12 @@ type ChangeUserPasswordPayload {
   errors: [ChangeUserPasswordError!]
   query: Query!
   user: User
+}
+
+type CielabColor {
+  aStar: Float!
+  bStar: Float!
+  lStar: Float!
 }
 
 type Component implements Node {
@@ -445,6 +460,14 @@ type CreateMethodPayload {
   query: Query!
 }
 
+type CrossDatabaseDataReference {
+  database: Institution
+  databaseId: Uuid!
+  dataId: Uuid!
+  dataKind: DataKind!
+  dataTimestamp: DateTime!
+}
+
 type DataApproval {
   approver: Institution
   approverId: Uuid!
@@ -457,7 +480,6 @@ type DataApproval {
 
 type DataConnection {
   edges: [DataEdge!]!
-  nodes: [Data!]!
   timestamp: DateTime!
   totalCount: NonNegativeInt
 }
@@ -618,6 +640,12 @@ type EnableUserTwoFactorAuthenticatorPayload {
   user: User
 }
 
+type FileMetaInformation {
+  dataFormat: DataFormat
+  dataFormatId: Uuid!
+  path: [String!]!
+}
+
 type ForgetUserTwoFactorAuthenticationClientError {
   code: ForgetUserTwoFactorAuthenticationClientErrorCode!
   message: String!
@@ -658,6 +686,7 @@ type GenerateUserTwoFactorRecoveryCodesPayload {
 }
 
 type GetHttpsResource {
+  archivedFilesMetaInformation: [FileMetaInformation!]!
   dataFormat: DataFormat
   dataFormatId: Uuid!
   description: String!
@@ -666,6 +695,7 @@ type GetHttpsResource {
 }
 
 type GetHttpsResourceTree {
+  nonRootVertices: [GetHttpsResourceTreeNonRootVertex!]!
   root: GetHttpsResourceTreeRoot!
 }
 
@@ -678,6 +708,7 @@ type GetHttpsResourceTreeNonRootVertex {
 
 type GetHttpsResourceTreeRoot {
   value: GetHttpsResource!
+  vertexId: String!
 }
 
 type HygrothermalData implements Data {
@@ -687,6 +718,8 @@ type HygrothermalData implements Data {
   createdAt: DateTime!
   creator: Institution
   creatorId: Uuid!
+  database: Database
+  databaseId: Uuid!
   description: String
   id: String!
   locale: String!
@@ -700,7 +733,6 @@ type HygrothermalData implements Data {
 
 type HygrothermalDataConnection {
   edges: [HygrothermalDataEdge!]!
-  nodes: [HygrothermalData!]!
   timestamp: DateTime!
   totalCount: NonNegativeInt
 }
@@ -992,6 +1024,11 @@ type NamedMethodArgument {
   value: Any!
 }
 
+type NamedMethodSource {
+  name: String!
+  value: CrossDatabaseDataReference!
+}
+
 type Numeration {
   mainNumber: String!
   prefix: String
@@ -1067,11 +1104,15 @@ type OpenIdConnectToken {
 
 type OpticalData implements Data {
   appliedMethod: AppliedMethod!
+  cielabColors: [CielabColor!]!
+  colorRenderingIndices: [Float!]!
   component: Component
   componentId: Uuid!
   createdAt: DateTime!
   creator: Institution
   creatorId: Uuid!
+  database: Database
+  databaseId: Uuid!
   description: String
   id: String!
   infraredEmittances: [Float!]!
@@ -1090,7 +1131,6 @@ type OpticalData implements Data {
 
 type OpticalDataConnection {
   edges: [OpticalDataEdge!]!
-  nodes: [OpticalData!]!
   timestamp: DateTime!
   totalCount: NonNegativeInt
 }
@@ -1159,6 +1199,8 @@ type PhotovoltaicData implements Data {
   createdAt: DateTime!
   creator: Institution
   creatorId: Uuid!
+  database: Database
+  databaseId: Uuid!
   description: String
   id: String!
   locale: String!
@@ -1172,7 +1214,6 @@ type PhotovoltaicData implements Data {
 
 type PhotovoltaicDataConnection {
   edges: [PhotovoltaicDataEdge!]!
-  nodes: [PhotovoltaicData!]!
   timestamp: DateTime!
   totalCount: NonNegativeInt
 }
@@ -2064,7 +2105,6 @@ input InstitutionRepresentativeRoleOperationFilterInput {
 }
 
 input InstitutionSortInput {
-  name: SortEnumType
   abbreviation: SortEnumType
   description: SortEnumType
   websiteLocator: UriSortInput
@@ -2072,6 +2112,7 @@ input InstitutionSortInput {
   state: SortEnumType
   managerId: SortEnumType
   manager: InstitutionSortInput
+  name: SortEnumType
   id: SortEnumType
   version: SortEnumType
 }
@@ -2308,10 +2349,6 @@ input PhotovoltaicDataPropositionInput {
 input PublicationFilterInput {
   and: [PublicationFilterInput!]
   or: [PublicationFilterInput!]
-  title: StringOperationFilterInput
-  abstract: StringOperationFilterInput
-  "Referenced section"
-  section: StringOperationFilterInput
   authors: ListStringOperationFilterInput
   "The Digital Object Identifier (DOI) is a very important persistent identifier for publications. It MUST be defined here if it is available for a publication."
   doi: StringOperationFilterInput
@@ -2321,13 +2358,13 @@ input PublicationFilterInput {
   urn: StringOperationFilterInput
   "If a persistent identifiert like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long."
   webAddress: UrlOperationFilterInput
+  title: StringOperationFilterInput
+  abstract: StringOperationFilterInput
+  "Referenced section"
+  section: StringOperationFilterInput
 }
 
 input PublicationSortInput {
-  title: SortEnumType
-  abstract: SortEnumType
-  "Referenced section"
-  section: SortEnumType
   "The Digital Object Identifier (DOI) is a very important persistent identifier for publications. It MUST be defined here if it is available for a publication."
   doi: SortEnumType
   "The website arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
@@ -2336,6 +2373,10 @@ input PublicationSortInput {
   urn: SortEnumType
   "If a persistent identifiert like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long."
   webAddress: UriSortInput
+  title: SortEnumType
+  abstract: SortEnumType
+  "Referenced section"
+  section: SortEnumType
 }
 
 input RegisterUserInput {
@@ -2415,27 +2456,27 @@ input SetUserPhoneNumberInput {
 input StandardFilterInput {
   and: [StandardFilterInput!]
   or: [StandardFilterInput!]
-  title: StringOperationFilterInput
-  abstract: StringOperationFilterInput
-  "The section of the standard to which the reference refers to."
-  section: StringOperationFilterInput
   "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
   year: IntOperationFilterInput
   numeration: NumerationFilterInput
   standardizers: ListStandardizerOperationFilterInput
   locator: UrlOperationFilterInput
+  title: StringOperationFilterInput
+  abstract: StringOperationFilterInput
+  "The section of the standard to which the reference refers to."
+  section: StringOperationFilterInput
 }
 
 "`ISO 52022` is an example of the abbreviation of a standardizer and the main number of the identifier."
 input StandardSortInput {
-  title: SortEnumType
-  abstract: SortEnumType
-  "The section of the standard to which the reference refers to."
-  section: SortEnumType
   "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
   year: SortEnumType
   numeration: NumerationSortInput
   locator: UriSortInput
+  title: SortEnumType
+  abstract: SortEnumType
+  "The section of the standard to which the reference refers to."
+  section: SortEnumType
 }
 
 input StandardizerOperationFilterInput {
@@ -2600,11 +2641,11 @@ input UserMethodDeveloperFilterInput {
 }
 
 input UserSortInput {
-  "Full name"
-  name: SortEnumType
   postalAddress: SortEnumType
   websiteLocator: UriSortInput
   version: SortEnumType
+  "Full name"
+  name: SortEnumType
   id: SortEnumType
   userName: SortEnumType
   normalizedUserName: SortEnumType
@@ -2830,6 +2871,13 @@ enum CreateMethodErrorCode {
   UNKNOWN_INSTITUTION_DEVELOPERS
   UNKNOWN_USER_DEVELOPERS
   UNAUTHORIZED
+}
+
+enum DataKind {
+  CALORIMETRICDATA
+  HYGROTHERMALDATA
+  OPTICALDATA
+  PHOTOVOLTAICDATA
 }
 
 enum DatabaseVerificationState {
