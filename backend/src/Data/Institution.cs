@@ -23,7 +23,8 @@ public sealed class Institution
         string description,
         Uri? websiteLocator,
         string? publicKey,
-        InstitutionState state
+        InstitutionState state,
+        InstitutionOperatingState operatingState
     )
     {
         Name = name;
@@ -32,6 +33,7 @@ public sealed class Institution
         WebsiteLocator = websiteLocator;
         PublicKey = publicKey;
         State = state;
+        OperatingState = operatingState;
     }
 
     [MinLength(1)] public string? Abbreviation { get; private set; }
@@ -43,6 +45,8 @@ public sealed class Institution
     [MinLength(1)] public string? PublicKey { get; private set; }
 
     [Required] public InstitutionState State { get; private set; }
+
+    public InstitutionOperatingState OperatingState { get; private set; }
 
     public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } =
         new List<InstitutionMethodDeveloper>();
@@ -95,5 +99,10 @@ public sealed class Institution
     public void Verify()
     {
         State = InstitutionState.VERIFIED;
+    }
+
+    public void SwitchOperatingState(InstitutionOperatingState newState)
+    {
+        OperatingState = newState;
     }
 }

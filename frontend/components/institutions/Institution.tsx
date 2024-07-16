@@ -35,6 +35,7 @@ import MethodTable from "../methods/MethodTable";
 import { messageApolloError } from "../../lib/apollo";
 import UpdateInstitution from "./UpdateInstitution";
 import DeleteInstitution from "./DeleteInstitution";
+import SwitchInstitutionOperatingState from "./SwitchInstitutionOperatingState";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -173,6 +174,9 @@ export default function Institution({ institutionId }: InstitutionProps) {
         <Tag key={institution.state} color="magenta">
           {institution.state}
         </Tag>,
+        <Tag key={institution.operatingState} color="blue">
+          {institution.operatingState}
+        </Tag>,
       ]}
       extra={([] as ReactNode[])
         .concat(
@@ -194,6 +198,16 @@ export default function Institution({ institutionId }: InstitutionProps) {
             ? [
                 <DeleteInstitution
                   key="deleteInstitution"
+                  institutionId={institution.uuid}
+                />,
+              ]
+            : []
+        )
+        .concat(
+          institution.canCurrentUserSwitchOperatingStateOfNode
+            ? [
+                <SwitchInstitutionOperatingState
+                  key="switchInstitutionOperatingState"
                   institutionId={institution.uuid}
                 />,
               ]

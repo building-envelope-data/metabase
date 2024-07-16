@@ -589,6 +589,17 @@ type DeleteInstitutionPayload {
   query: Query!
 }
 
+type SwitchInstitutionOperatingStateError {
+  code: SwitchInstitutionOperatingStateErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type SwitchInstitutionOperatingStatePayload {
+  errors: [SwitchInstitutionOperatingStateError!]
+  query: Query!
+}
+
 type DeletePersonalUserDataError {
   code: DeletePersonalUserDataErrorCode!
   message: String!
@@ -746,6 +757,7 @@ type Institution implements Node & Stakeholder {
   abbreviation: String
   canCurrentUserDeleteNode: Boolean!
   canCurrentUserUpdateNode: Boolean!
+  canCurrentUserSwitchOperatingStateOfNode: Boolean!
   description: String!
   developedMethods(pending: Boolean! = false): InstitutionDevelopedMethodConnection!
   id: ID!
@@ -759,6 +771,7 @@ type Institution implements Node & Stakeholder {
   publicKey: String
   representatives(pending: Boolean! = false): InstitutionRepresentativeConnection!
   state: InstitutionState!
+  operatingState: OperatingState!
   uuid: Uuid!
   websiteLocator: Url
 }
@@ -982,6 +995,7 @@ type Mutation {
   createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(policy: "Write")
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(policy: "Write")
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(policy: "Write")
+  switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload! @authorize(policy: "Write")
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(policy: "ManageUser")
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(policy: "ManageUser")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(policy: "ManageUser")
@@ -1998,6 +2012,10 @@ input DeleteInstitutionInput {
   institutionId: Uuid!
 }
 
+input SwitchInstitutionOperatingStateInput {
+  institutionId: Uuid!
+}
+
 input DeletePersonalUserDataInput {
   password: String
 }
@@ -2892,6 +2910,12 @@ enum DeleteInstitutionErrorCode {
   MANAGING
 }
 
+enum SwitchInstitutionOperatingStateErrorCode {
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
+}
+
 enum DeletePersonalUserDataErrorCode {
   UNKNOWN
   UNKNOWN_USER
@@ -2945,6 +2969,11 @@ enum InstitutionRepresentativeRole {
 enum InstitutionState {
   PENDING
   VERIFIED
+}
+
+enum OperatingState {
+  OPERATING
+  NOT_OPERATING
 }
 
 enum LoginUserErrorCode {

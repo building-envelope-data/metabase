@@ -109,7 +109,8 @@ public sealed class InstitutionMutations
             input.Description,
             input.WebsiteLocator,
             input.PublicKey,
-            await GetInitialInstitutionState(input, user, userManager).ConfigureAwait(false)
+            await GetInitialInstitutionState(input, user, userManager).ConfigureAwait(false),
+            InstitutionOperatingState.OPERATING
         )
         {
             ManagerId = input.ManagerId
@@ -346,5 +347,59 @@ public sealed class InstitutionMutations
         context.Institutions.Remove(institution);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new DeleteInstitutionPayload();
+    }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    public async Task<SwitchInstitutionOperatingStatePayload> SwitchInstitutionOperatingStateAsync(
+        SwitchInstitutionOperatingStateInput input,
+        ClaimsPrincipal claimsPrincipal,
+        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        if (!await InstitutionAuthorization.IsAuthorizedToSwitchInstitutionOperatingState(
+                claimsPrincipal,
+                input.InstitutionId,
+                userManager,
+                context,
+                cancellationToken
+            ).ConfigureAwait(false)
+           )
+            return new SwitchInstitutionOperatingStatePayload(
+                new SwitchInstitutionOperatingStateError(
+                    SwitchInstitutionOperatingStateErrorCode.UNAUTHORIZED,
+                    "You are not authorized to switch institution operating state.",
+                    Array.Empty<string>()
+                )
+            );
+
+        var institution =
+            await context.Institutions.AsQueryable()
+                .Where(i => i.Id == input.InstitutionId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+        if (institution is null)
+            return new SwitchInstitutionOperatingStatePayload(
+                new SwitchInstitutionOperatingStateError(
+                    SwitchInstitutionOperatingStateErrorCode.UNKNOWN_INSTITUTION,
+                    "Unknown institution.",
+                    new[] { nameof(input), nameof(input.InstitutionId).FirstCharToLower() }
+                )
+            );
+        switch (institution.OperatingState)
+        {
+            case InstitutionOperatingState.NOT_OPERATING:
+                institution.SwitchOperatingState(InstitutionOperatingState.OPERATING);
+                break;
+            case InstitutionOperatingState.OPERATING:
+                institution.SwitchOperatingState(InstitutionOperatingState.NOT_OPERATING);
+                break;
+            default:
+                throw new ArgumentException($"The operating state {institution.OperatingState} is not supported.");
+        }
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return new SwitchInstitutionOperatingStatePayload(institution);
     }
 }

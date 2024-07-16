@@ -6,6 +6,7 @@ fragment InstitutionPartial on Institution {
   description
   websiteLocator
   state
+  operatingState
 }
 
 query Institutions {
@@ -102,12 +103,22 @@ mutation DeleteInstitution($institutionId: Uuid!) {
     }
   }
 }
+mutation SwitchInstitutionOperatingState($institutionId: Uuid!) {
+  switchInstitutionOperatingState(input: { institutionId: $institutionId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
 
 query Institution($uuid: Uuid!) {
   institution(uuid: $uuid) {
     ...InstitutionPartial
     canCurrentUserUpdateNode
     canCurrentUserDeleteNode
+    canCurrentUserSwitchOperatingStateOfNode
     manufacturedComponents {
       edges {
         node {
