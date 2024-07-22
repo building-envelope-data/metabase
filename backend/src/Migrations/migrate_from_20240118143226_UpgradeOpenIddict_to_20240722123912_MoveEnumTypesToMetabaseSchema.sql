@@ -104,7 +104,9 @@ ALTER TABLE metabase.institution ALTER COLUMN "OperatingState" DROP DEFAULT;
 ALTER TABLE metabase.institution ALTER COLUMN "OperatingState" TYPE metabase.institution_operating_state USING "OperatingState"::text::metabase.institution_operating_state;
 ALTER TABLE metabase.institution ALTER COLUMN "OperatingState" SET DEFAULT 'operating'::metabase.institution_operating_state;
 
+ALTER TABLE metabase.database ALTER COLUMN "VerificationState" DROP DEFAULT;
 ALTER TABLE metabase.database ALTER COLUMN "VerificationState" TYPE metabase.database_verification_state USING "VerificationState"::text::metabase.database_verification_state;
+ALTER TABLE metabase.database ALTER COLUMN "VerificationState" SET DEFAULT 'pending'::metabase.database_verification_state;
 
 ALTER TABLE metabase.data_format ALTER COLUMN "Standard_Standardizers" TYPE metabase.standardizer[] USING "Standard_Standardizers"::text::metabase.standardizer[];
 
