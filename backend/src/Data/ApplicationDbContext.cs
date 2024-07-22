@@ -86,7 +86,10 @@ public sealed class ApplicationDbContext
     {
         // https://www.npgsql.org/efcore/mapping/enum.html?tabs=with-datasource#mapping-your-enum
         // Create enumerations in the same schema used by
-        // `NpgsqlDataSourceBuilder.MapEnum` in `Startup`.
+        // `NpgsqlDataSourceBuilder.MapEnum` in `Startup`. The format of how to
+        // specify the type name here and in `Startup` differ slightly. This
+        // was complained about in
+        // https://github.com/npgsql/efcore.pg/issues/2963#issuecomment-1818866360
         builder.HasPostgresEnum<ComponentCategory>(schemaName, ComponentCategoryTypeName);
         builder.HasPostgresEnum<DatabaseVerificationState>(schemaName, DatabaseVerificationStateTypeName);
         builder.HasPostgresEnum<InstitutionRepresentativeRole>(schemaName, InstitutionRepresentativeRoleTypeName);
