@@ -16,16 +16,29 @@ public sealed class ApplicationDbContext
     : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>,
         IDataProtectionKeyContext
 {
+    private const string DefaultSchemaName = "metabase";
     private readonly string _schemaName;
+
+    internal const string ComponentCategoryTypeName = "component_category";
+    internal const string DatabaseVerificationStateTypeName = "database_verification_state";
+    internal const string InstitutionRepresentativeRoleTypeName = "institution_representative_role";
+    internal const string InstitutionStateTypeName = "institution_state";
+    internal const string InstitutionOperatingStateTypeName = "institution_operating_state";
+    internal const string MethodCategoryTypeName = "method_category";
+    internal const string PrimeSurfaceTypeName = "prime_surface";
+    internal const string StandardizerTypeName = "standardizer";
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options
     )
         : base(options)
     {
+        // The schema-name option is set in `Metabase.Startup` by an invocation
+        // of `UseSchemaName` on a `DbContextOptionsBuilder` instance.
         var schemaNameOptions = options.FindExtension<SchemaNameOptionsExtension>();
-        _schemaName = schemaNameOptions is null ? "metabase" : schemaNameOptions.SchemaName;
+        _schemaName = schemaNameOptions is null ? DefaultSchemaName : schemaNameOptions.SchemaName;
     }
+
     // https://docs.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
     public DbSet<Component> Components { get; private set; } = default!;
     public DbSet<ComponentAssembly> ComponentAssemblies { get; private set; } = default!;
@@ -69,19 +82,19 @@ public sealed class ApplicationDbContext
         }
     }
 
-    private static void CreateEnumerations(ModelBuilder builder)
+    private static void CreateEnumerations(ModelBuilder builder, string schemaName)
     {
-        // https://www.npgsql.org/efcore/mapping/enum.html#creating-your-database-enum
-        // Create enumerations in public schema because that is where
-        // `NpgsqlDataSourceBuilder.MapEnum` expects them to be by default.
-        builder.HasPostgresEnum<ComponentCategory>("public");
-        builder.HasPostgresEnum<DatabaseVerificationState>("public");
-        builder.HasPostgresEnum<InstitutionRepresentativeRole>("public");
-        builder.HasPostgresEnum<InstitutionState>("public");
-        builder.HasPostgresEnum<InstitutionOperatingState>("public");
-        builder.HasPostgresEnum<MethodCategory>("public");
-        builder.HasPostgresEnum<PrimeSurface>("public");
-        builder.HasPostgresEnum<Standardizer>("public");
+        // https://www.npgsql.org/efcore/mapping/enum.html?tabs=with-datasource#mapping-your-enum
+        // Create enumerations in the same schema used by
+        // `NpgsqlDataSourceBuilder.MapEnum` in `Startup`.
+        builder.HasPostgresEnum<ComponentCategory>(schemaName, ComponentCategoryTypeName);
+        builder.HasPostgresEnum<DatabaseVerificationState>(schemaName, DatabaseVerificationStateTypeName);
+        builder.HasPostgresEnum<InstitutionRepresentativeRole>(schemaName, InstitutionRepresentativeRoleTypeName);
+        builder.HasPostgresEnum<InstitutionState>(schemaName, InstitutionStateTypeName);
+        builder.HasPostgresEnum<InstitutionOperatingState>(schemaName, InstitutionOperatingStateTypeName);
+        builder.HasPostgresEnum<MethodCategory>(schemaName, MethodCategoryTypeName);
+        builder.HasPostgresEnum<PrimeSurface>(schemaName, PrimeSurfaceTypeName);
+        builder.HasPostgresEnum<Standardizer>(schemaName, StandardizerTypeName);
     }
 
     private static
@@ -319,7 +332,7 @@ public sealed class ApplicationDbContext
         builder.HasDefaultSchema(_schemaName);
         builder.HasPostgresExtension(
             "pgcrypto"); // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
-        CreateEnumerations(builder);
+        CreateEnumerations(builder, _schemaName);
         ConfigureIdentityEntities(builder);
         ConfigureEntity(
                 builder.Entity<Component>()

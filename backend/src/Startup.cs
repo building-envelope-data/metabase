@@ -150,14 +150,15 @@ public sealed class Startup
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(_appSettings.Database.ConnectionString);
                 // https://www.npgsql.org/efcore/mapping/enum.html#mapping-your-enum
-                dataSourceBuilder.MapEnum<ComponentCategory>();
-                dataSourceBuilder.MapEnum<DatabaseVerificationState>();
-                dataSourceBuilder.MapEnum<InstitutionRepresentativeRole>();
-                dataSourceBuilder.MapEnum<InstitutionState>();
-                dataSourceBuilder.MapEnum<InstitutionOperatingState>();
-                dataSourceBuilder.MapEnum<MethodCategory>();
-                dataSourceBuilder.MapEnum<PrimeSurface>();
-                dataSourceBuilder.MapEnum<Standardizer>();
+                // Keep in sync with `ApplicationDbContext.CreateEnumerations`.
+                dataSourceBuilder.MapEnum<ComponentCategory>($"{_appSettings.Database.SchemaName}.{ApplicationDbContext.ComponentCategoryTypeName}");
+                dataSourceBuilder.MapEnum<DatabaseVerificationState>($"{_appSettings.Database.SchemaName}.{ApplicationDbContext.DatabaseVerificationStateTypeName}");
+                dataSourceBuilder.MapEnum<InstitutionRepresentativeRole>($"{_appSettings.Database.SchemaName}.{ApplicationDbContext.InstitutionRepresentativeRoleTypeName}");
+                dataSourceBuilder.MapEnum<InstitutionState>($"{_appSettings.Database.SchemaName}.{ApplicationDbContext.InstitutionStateTypeName}");
+                dataSourceBuilder.MapEnum<InstitutionOperatingState>($"{_appSettings.Database.SchemaName}.{ApplicationDbContext.InstitutionOperatingStateTypeName}");
+                dataSourceBuilder.MapEnum<MethodCategory>($"{_appSettings.Database.SchemaName}.{ApplicationDbContext.MethodCategoryTypeName}");
+                dataSourceBuilder.MapEnum<PrimeSurface>($"{_appSettings.Database.SchemaName}.{ApplicationDbContext.PrimeSurfaceTypeName}");
+                dataSourceBuilder.MapEnum<Standardizer>($"{_appSettings.Database.SchemaName}.{ApplicationDbContext.StandardizerTypeName}");
                 options
                     .UseNpgsql(dataSourceBuilder.Build() /*, optionsBuilder => optionsBuilder.UseNodaTime() */)
                     .UseSchemaName(_appSettings.Database.SchemaName)
