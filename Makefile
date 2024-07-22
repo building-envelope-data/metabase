@@ -171,19 +171,21 @@ list : ## List all containers with health status
 		--all
 .PHONY : list
 
-createdb : ## Create database
+createdb : DBNAME = xbase_development
+createdb : ## Create database with name `${DBNAME}` defaulting to `xbase_development`
 	${docker_compose} exec \
 		database \
 		bash -c " \
-			createdb --username postgres xbase_development ; \
+			createdb --username postgres ${DBNAME} ; \
 		"
 .PHONY : createdb
 
-dropdb : ## Drop database
+dropdb : DBNAME = xbase_development
+dropdb : ## Drop database with name `${DBNAME}` defaulting to `xbase_development`
 	${docker_compose} exec \
 		database \
 		bash -c " \
-			dropdb --username postgres xbase_development ; \
+			dropdb --username postgres ${DBNAME} ; \
 		"
 .PHONY : dropdb
 
