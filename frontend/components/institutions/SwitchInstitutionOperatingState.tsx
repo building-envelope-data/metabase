@@ -1,7 +1,5 @@
 import { Button, message } from "antd";
-import { useRouter } from "next/router";
 import { useState } from "react";
-import paths from "../../paths";
 import {
   InstitutionDocument,
   InstitutionsDocument,
@@ -16,7 +14,6 @@ export type switchInstitutionOperatingStateProps = {
 export default function SwitchInstitutionOperatingState({
   institutionId,
 }: switchInstitutionOperatingStateProps) {
-  const router = useRouter();
   const [switching, setSwitching] = useState(false);
 
   const [switchInstitutionOperatingStateMutation] = useSwitchInstitutionOperatingStateMutation();
