@@ -2,7 +2,6 @@ import Layout from "../../components/Layout";
 import { Table, message, Form, Button, Alert, Typography } from "antd";
 import { useAllDataQuery } from "../../queries/data.graphql";
 import {
-  Data,
   Scalars,
   DataPropositionInput,
 } from "../../__generated__/__types__";
@@ -21,6 +20,32 @@ import {
   UuidPropositionComparator,
   UuidPropositionFormList,
 } from "../../components/UuidPropositionFormList";
+
+type PartialData = {
+  // __typename?: "CalorimetricData";
+  uuid: Scalars["Uuid"];
+  timestamp: Scalars["DateTime"];
+  componentId: Scalars["Uuid"];
+  name?: string | null | undefined;
+  description?: string | null | undefined;
+  appliedMethod: {
+    __typename?: "AppliedMethod";
+    methodId: Scalars["Uuid"];
+  };
+  resourceTree: {
+    __typename?: "GetHttpsResourceTree";
+    root: {
+      __typename?: "GetHttpsResourceTreeRoot";
+      value: {
+        __typename?: "GetHttpsResource";
+        description: string;
+        hashValue: string;
+        locator: Scalars["Url"];
+        dataFormatId: Scalars["Uuid"];
+      };
+    };
+  };
+};
 
 const layout = {
   labelCol: { span: 8 },
@@ -78,7 +103,7 @@ function Page() {
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [data, setData] = useState<Data[]>([]);
+  const [data, setData] = useState<PartialData[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
@@ -156,7 +181,7 @@ function Page() {
           data?.databases?.edges?.map(
             (edge) => edge?.node?.allData?.edges?.map((e) => e.node) || []
           ) || [];
-        const flatData = ([] as Data[]).concat(...nestedData);
+        const flatData = ([] as PartialData[]).concat(...nestedData);
         setData(flatData);
       } catch (error) {
         // TODO Handle properly.
@@ -174,7 +199,7 @@ function Page() {
 
   return (
     <Layout>
-      <Typography.Title> Data</Typography.Title>
+      <Typography.Title>Data</Typography.Title>
       {/* TODO Display error messages in a list? */}
       {globalErrorMessages.length > 0 && (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
