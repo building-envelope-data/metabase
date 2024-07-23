@@ -6,8 +6,6 @@ import {
 } from "./freeTextFilter";
 import Link from "next/link";
 import {
-  AppliedMethod,
-  GetHttpsResourceTree,
   Publication,
   Scalars,
   Standard,
@@ -561,7 +559,7 @@ export function getComponentUuidColumnProps<
 }
 
 export function getAppliedMethodColumnProps<
-  RecordType extends { appliedMethod: AppliedMethod }
+  RecordType extends { appliedMethod: { methodId: Scalars["Uuid"] } }
 >(
   onFilterTextChange: (
     key: keyof RecordType
@@ -598,7 +596,7 @@ export function getAppliedMethodColumnProps<
 }
 
 export function getResourceTreeColumnProps<
-  RecordType extends { resourceTree: GetHttpsResourceTree }
+  RecordType extends { resourceTree: { root: { value: { description: string, hashValue: string, locator: Scalars["Url"], dataFormatId: Scalars["Uuid"] }}} }
 >(
   onFilterTextChange: (
     key: keyof RecordType
