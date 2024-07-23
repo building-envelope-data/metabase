@@ -89,9 +89,11 @@ and the pages following it.
       dummy passwords in the copies by newly generated ones, where random
       passwords may be generated running `openssl rand -base64 32`.
    1. Prepare PostgreSQL by generating new password files by running
-      `make --file Makefile.production postgres_passwords`
+      `make --file=Makefile.production postgres_passwords`
       and creating the database by running
-      `make --file Makefile.production createdb`.
+      `make --file=Makefile.production createdb`.
+   1. Generate JSON Web Token (JWT) encryption and signing certificates by running
+      `make --file=Makefile.production jwt-certificates`.
 
 ### Creating a release
 
@@ -123,10 +125,10 @@ and the pages following it.
 1. Enter a shell on the production machine using `ssh`.
 1. Change to the staging envrionment by running `cd /app/staging`.
 1. Deploy the new release in the staging environment by running
-   `make --file Makefile.production deploy`.
+   `make --file=Makefile.production deploy`.
 1. If it fails _after_ the database backup was made, rollback to the previous
    state by running
-   `make --file Makefile.production rollback`,
+   `make --file=Makefile.production rollback`,
    figure out what went wrong, apply the necessary fixes to the codebase,
    create a new release, and try to deploy that release instead.
 1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
@@ -178,7 +180,7 @@ corrupt because the database was not shut down cleanly. One solution is to
 restore the database from a backup by running
 
 ```
-make --file Makefile.production BACKUP_DIRECTORY=/app/data/backups/20XX-XX-XX_XX_XX_XX/ restore
+make --file=Makefile.production BACKUP_DIRECTORY=/app/data/backups/20XX-XX-XX_XX_XX_XX/ restore
 ```
 
 where the `X`s need to be replaced by proper values. Another solution is to

@@ -266,3 +266,27 @@ deploy-services : ## Deploy services
 run-tests : COMMAND = true
 run-tests : execb ## Run tests
 .PHONY : run-tests
+
+# TODO Pass passwords in a more secure way!
+jwt-certificates : ## Create JWT encryption and signing certificates if necessary
+	DOCKER_BUILDKIT=1 \
+		docker build \
+			--pull \
+			--build-arg GROUP_ID=$(shell id --group) \
+			--build-arg USER_ID=$(shell id --user) \
+			--tag ${NAME}_bootstrap \
+			--file ./backend/Dockerfile-bootstrap \
+			./backend
+	docker run \
+		--rm \
+		--user $(shell id --user):$(shell id --group) \
+		--mount type=bind,source="$(shell pwd)/backend",target=/app \
+		${NAME}_bootstrap \
+		bash -cx " \
+			dotnet-script \
+				./create-certificates.csx \
+				-- \
+				${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD} \
+				${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD} \
+		"
+.PHONY : jwt-certificates
