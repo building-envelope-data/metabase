@@ -73,14 +73,14 @@ const conjunct = (
 
 type PartialPhotovoltaicData = {
   __typename?: "PhotovoltaicData";
-  uuid: any;
-  timestamp: any;
-  componentId: any;
+  uuid: Scalars["Uuid"];
+  timestamp: Scalars["DateTime"];
+  componentId: Scalars["Uuid"];
   name?: string | null | undefined;
   description?: string | null | undefined;
   appliedMethod: {
     __typename?: "AppliedMethod";
-    methodId: any;
+    methodId: Scalars["Uuid"];
   };
   resourceTree: {
     __typename?: "GetHttpsResourceTree";
@@ -90,8 +90,8 @@ type PartialPhotovoltaicData = {
         __typename?: "GetHttpsResource";
         description: string;
         hashValue: string;
-        locator: any;
-        dataFormatId: any;
+        locator: Scalars["Url"];
+        dataFormatId: Scalars["Uuid"];
       };
     };
   };
