@@ -236,7 +236,7 @@ jwt-certificates : ## Create JWT encryption and signing certificates if necessar
 		${NAME}_bootstrap \
 		bash -cx " \
 			dotnet-script \
-				create-certificates.csx \
+				./create-certificates.csx \
 				-- \
 				${JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD} \
 				${JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD} \
