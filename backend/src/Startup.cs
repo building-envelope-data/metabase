@@ -169,7 +169,9 @@ public sealed class Startup
                         .EnableDetailedErrors();
             }
         );
-        // Database context as services are used by `Identity` and `OpenIddict`.
+        // Database context as services are used by `Identity` and
+        // `OpenIddict`, see in particular `AuthConfiguration`,
+        // `UseUserManagerAttribute` and `UseSignInManagerAttribute`.
         services.AddDbContext<ApplicationDbContext>(
             (services, options) =>
             {
