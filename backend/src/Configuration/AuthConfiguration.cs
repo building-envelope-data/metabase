@@ -112,6 +112,7 @@ public abstract class AuthConfiguration
                 _.ClaimsIdentity.RoleClaimType = OpenIddictConstants.Claims.Role;
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddUserStore<ApplicationUserStore>()
             .AddDefaultTokenProviders(); // used to generate tokens for reset passwords, change email and change telephone number operations, and for two factor authentication token generation
         // The application cookies is used by the metabase acting as
         // authentication server through the authentication scheme

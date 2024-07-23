@@ -5,11 +5,9 @@ using Metabase.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Guid = System.Guid;
 using InvalidOperationException = System.InvalidOperationException;
 using IServiceProvider = System.IServiceProvider;
 
@@ -32,11 +30,7 @@ public static class UserObjectFieldDescriptorExtensions
         {
             var services = context.Service<IServiceProvider>();
             var userManager = new UserManager<User>(
-                new UserStore<User, Role, ApplicationDbContext, Guid, UserClaim, UserRole,
-                    UserLogin, UserToken, RoleClaim>(
-                    context.Service<ApplicationDbContext>()
-                    ?? throw new InvalidOperationException("Application database context is null.")
-                ),
+                new ApplicationUserStore(services.GetRequiredService<ApplicationDbContext>()),
                 services.GetRequiredService<IOptions<IdentityOptions>>(),
                 services.GetRequiredService<IPasswordHasher<User>>(),
                 /* new PasswordHasher<Data.User>( */
