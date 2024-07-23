@@ -18,7 +18,8 @@ public sealed class AntiforgeryController : Controller
     private readonly CookieOptions XsrfCookieOptions =
         new()
         {
-            HttpOnly = false
+            HttpOnly = false,
+            SameSite = SameSiteMode.Strict
         };
 
     public AntiforgeryController(IAntiforgery antiforgeryService)
