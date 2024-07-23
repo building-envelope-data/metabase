@@ -1,9 +1,14 @@
 fragment DataPartial on Data {
   uuid
+  locale
   timestamp
   componentId
+  databaseId
   name
   description
+  warnings
+  createdAt
+  creatorId
   appliedMethod {
     methodId
     arguments {
@@ -27,6 +32,10 @@ fragment DataPartial on Data {
         hashValue
         locator
         dataFormatId
+        archivedFilesMetaInformation {
+          dataFormatId
+          path
+        }
       }
     }
   }
