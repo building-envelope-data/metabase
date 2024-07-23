@@ -6,6 +6,19 @@ fragment DataPartial on Data {
   description
   appliedMethod {
     methodId
+    arguments {
+      name
+      value
+    }
+    sources {
+      name
+      value {
+        databaseId
+        dataId
+        dataKind
+        dataTimestamp
+      }
+    }
   }
   resourceTree {
     root {
