@@ -74,9 +74,7 @@ public static class GraphQlConfiguration
                 {
                     // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Execution/Options/RequestExecutorOptions.cs
                     /* options.ExecutionTimeout = ...; */
-                    options.IncludeExceptionDetails =
-                        environment.IsDevelopment()
-                        || environment.IsEnvironment(Program.TestEnvironment); // Default is `Debugger.IsAttached`.
+                    options.IncludeExceptionDetails = !environment.IsProduction(); // Default is `Debugger.IsAttached`.
                     /* options.QueryCacheSize = ...; */
                     /* options.UseComplexityMultipliers = ...; */
                 }
