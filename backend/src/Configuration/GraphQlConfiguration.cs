@@ -75,11 +75,13 @@ public static class GraphQlConfiguration
                     // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Execution/Options/RequestExecutorOptions.cs
                     /* options.ExecutionTimeout = ...; */
                     options.IncludeExceptionDetails =
-                        environment.IsDevelopment(); // Default is `Debugger.IsAttached`.
+                        environment.IsDevelopment()
+                        || environment.IsEnvironment(Program.TestEnvironment); // Default is `Debugger.IsAttached`.
                     /* options.QueryCacheSize = ...; */
                     /* options.UseComplexityMultipliers = ...; */
                 }
             )
+            // Configure `https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Validation/Options/ValidationOptions.cs`. But how?
             // Subscriptions
             /* .AddInMemorySubscriptions() */
             // Persisted queries
