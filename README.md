@@ -196,13 +196,14 @@ the backup, the website itself should still working.
 If the database container restarts indefinitely and its logs say
 
 ```
-LOG:  invalid resource manager ID in primary checkpoint record
 PANIC:  could not locate a valid checkpoint record
 ```
 
-then the database is corrupt. For example, the write-ahead log (WAL) may be
-corrupt because the database was not shut down cleanly. One solution is to
-restore the database from a backup by running
+for example preceded by `LOG:  invalid resource manager ID in primary
+checkpoint record` or `LOG:  invalid primary checkpoint record`, then the
+database is corrupt. For example, the write-ahead log (WAL) may be corrupt
+because the database was not shut down cleanly. One solution is to restore the
+database from a backup by running
 
 ```
 make --file=Makefile.production BACKUP_DIRECTORY=/app/data/backups/20XX-XX-XX_XX_XX_XX/ restore
@@ -212,7 +213,7 @@ where the `X`s need to be replaced by proper values. Another solution is to
 reset the transaction log by entering the database container with
 
 ```
-docker compose --file docker-compose.production.yml --project-name metabase_production run database bash
+docker compose --file=docker-compose.production.yml --project-name metabase_production run database bash
 ```
 
 and dry-running
