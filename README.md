@@ -123,9 +123,16 @@ and the pages following it.
 ### Deploying a release
 
 1. Enter a shell on the production machine using `ssh`.
-1. Change to the staging envrionment by running `cd /app/staging`.
+1. Back up the production database by running
+   `make --directory /app/production --file=Makefile.production BACKUP_DIRECTORY=/app/production/backup backup`.
+1. Change to the staging environment by running `cd /app/staging`.
+1. Restore the staging database from the production backup by running
+   `make --file=Makefile.production BACKUP_DIRECTORY=/app/production/backup restore`.
+1. Adapt the environment file `./.env` if necessary by comparing it with the
+   `./.env.staging.sample` file of the release to be deployed.
 1. Deploy the new release in the staging environment by running
-   `make --file=Makefile.production deploy`.
+   `make --file=Makefile.production TARGET=${TAG} deploy`, where `${TAG}` is
+   the release tag to be deployed, for example, `v1.0.0`.
 1. If it fails _after_ the database backup was made, rollback to the previous
    state by running
    `make --file=Makefile.production rollback`,
@@ -133,13 +140,31 @@ and the pages following it.
    create a new release, and try to deploy that release instead.
 1. If it succeeds, deploy the new reverse proxy that handles sub-domains by
    running `cd /app/machine && make deploy` and test whether everything works
-   as expected and if that is the case, repeat all stages but this one in the
-   directory `/app/production` (instead of `/app/staging`). Note that in the
+   as expected and if that is the case, continue. Note that in the
    staging environment sent emails can be viewed in the web browser under
    `https://staging.buildingenvelopedata.org/email/` and emails to addresses in
    the variable `RELAY_ALLOWED_EMAILS` in the `.env` file are delivered to the
    respective inboxes (the variable's value is a comma separated list of email
-   addresses).
+   addresses). Note that in order for OpenId Connect to work as expected in
+   staging, make sure that the redirect URIs use the sub-domain `staging`
+   (instead of `www`) by entering `psql` with `make --file=Makefile.production
+   psql`, expecting the output of the SQL statement `select * from
+   metabase."OpenIddictApplications";`, and if necessary executing SQL
+   statements along the lines
+   `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.buildingenvelopedata.org/connect/callback/logout/metabase"]' where "Id"='2f61279d-25db-4fef-bd19-ba840ba13114';`
+   and
+   `update metabase."OpenIddictApplications" set "RedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/login/metabase"]', "PostLogoutRedirectUris"='["https://staging.solarbuildingenvelopes.com/connect/callback/logout/metabase"]' where "Id"='eaa8ddfa-abd0-43ac-b048-cc1ff3aad2e5';`
+1. Change to the production environment by running `cd /app/production`.
+1. Adapt the environment file `./.env` if necessary by comparing it with the
+   `./.env.staging.sample` file of the release to be deployed.
+1. Deploy the new release in the production environment by running
+   `make --file=Makefile.production TARGET=${TAG} deploy`, where `${TAG}` is
+   the release tag to be deployed, for example, `v1.0.0`.
+1. If it fails _after_ the database backup was made, rollback to the previous
+   state by running
+   `make --file=Makefile.production rollback`,
+   figure out what went wrong, apply the necessary fixes to the codebase,
+   create a new release, and try to deploy that release instead.
 
 ### Troubleshooting
 
