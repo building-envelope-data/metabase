@@ -1,6 +1,6 @@
-mutation loginUser($email: String!, $password: String!, $rememberMe: Boolean!) {
+mutation loginUser($email: String!, $password: String!) {
   loginUser(
-    input: { email: $email, password: $password, rememberMe: $rememberMe }
+    input: { email: $email, password: $password }
   ) {
     requiresTwoFactor
     user {

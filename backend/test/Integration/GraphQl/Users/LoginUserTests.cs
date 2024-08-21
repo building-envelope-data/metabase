@@ -27,7 +27,6 @@ public sealed class LoginUserTests
             {
                 ["email"] = email,
                 ["password"] = password,
-                ["rememberMe"] = false
             }
         ).ConfigureAwait(false);
         // Assert
