@@ -174,7 +174,7 @@ public sealed class DbSeeder
                     // metabase client, see `OPEN_ID_CONNECT_CLIENT_SECRET`
                     // in `.env.*`.
                     ClientSecret = appSettings.OpenIdConnectClientSecret,
-                    ConsentType = environment.IsEnvironment("test")
+                    ConsentType = environment.IsEnvironment(Program.TestEnvironment)
                         ? OpenIddictConstants.ConsentTypes.Systematic
                         : OpenIddictConstants.ConsentTypes.Explicit,
                     DisplayName = "Metabase client application",
@@ -184,14 +184,14 @@ public sealed class DbSeeder
                     },
                     RedirectUris =
                     {
-                        new Uri(environment.IsEnvironment("test")
+                        new Uri(environment.IsEnvironment(Program.TestEnvironment)
                             ? "urn:test"
                             : $"{host}/connect/callback/login/metabase",
                             UriKind.Absolute)
                     },
                     PostLogoutRedirectUris =
                     {
-                        new Uri(environment.IsEnvironment("test")
+                        new Uri(environment.IsEnvironment(Program.TestEnvironment)
                             ? "urn:test"
                             : $"{host}/connect/callback/logout/metabase",
                             UriKind.Absolute)
@@ -204,13 +204,13 @@ public sealed class DbSeeder
                         OpenIddictConstants.Permissions.Endpoints.Logout,
                         OpenIddictConstants.Permissions.Endpoints.Revocation,
                         OpenIddictConstants.Permissions.Endpoints.Token,
-                        environment.IsEnvironment("test")
+                        environment.IsEnvironment(Program.TestEnvironment)
                             ? OpenIddictConstants.Permissions.GrantTypes.Password
                             : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                         // OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
                         // OpenIddictConstants.Permissions.GrantTypes.DeviceCode,
                         OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                        environment.IsEnvironment("test")
+                        environment.IsEnvironment(Program.TestEnvironment)
                             ? OpenIddictConstants.Permissions.ResponseTypes.Token
                             : OpenIddictConstants.Permissions.ResponseTypes.Code,
                         OpenIddictConstants.Permissions.Scopes.Address,
