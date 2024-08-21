@@ -44,7 +44,7 @@ public sealed class GetComponentsTests
                 ManufacturerId = institutionId
             }
         ).ConfigureAwait(false);
-        LogoutUser();
+        await LogoutUser().ConfigureAwait(false);
         // Act
         var response = await GetComponents().ConfigureAwait(false);
         // Assert
@@ -85,7 +85,7 @@ public sealed class GetComponentsTests
                 ).ConfigureAwait(false)
             );
 
-        LogoutUser();
+        await LogoutUser().ConfigureAwait(false);
         // Act
         var response = await GetComponents().ConfigureAwait(false);
         // Assert

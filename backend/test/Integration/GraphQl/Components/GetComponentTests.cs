@@ -45,7 +45,7 @@ public sealed class GetComponentTests
                 ManufacturerId = institutionId
             }
         ).ConfigureAwait(false);
-        LogoutUser();
+        await LogoutUser().ConfigureAwait(false);
         // Act
         // There is some tiny probability that the hard-coded identifier is
         // the one of the component in which case this test fails.
@@ -81,7 +81,7 @@ public sealed class GetComponentTests
                 ).ConfigureAwait(false)
             );
 
-        LogoutUser();
+        await LogoutUser().ConfigureAwait(false);
         // Act
         var response = await GetComponent(componentIdsAndUuids[1].Item2).ConfigureAwait(false);
         // Assert

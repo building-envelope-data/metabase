@@ -17,7 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Metabase.Tests.Integration;
 
 public sealed class CustomWebApplicationFactory
-    : WebApplicationFactory<Startup>
+    : WebApplicationFactory<Metabase.Program>
 {
     private bool _disposed;
 
@@ -69,7 +69,7 @@ public sealed class CustomWebApplicationFactory
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("test");
+        builder.UseEnvironment(Metabase.Program.TestEnvironment);
         builder.ConfigureAppConfiguration((webHostBuilderContext, configurationBuilder) =>
             {
                 configurationBuilder.Sources.Clear();
@@ -103,8 +103,23 @@ public sealed class CustomWebApplicationFactory
     {
         // https://docs.microsoft.com/en-us/ef/core/managing-schemas/ensure-created#multiple-dbcontext-classes
         var databaseCreator = dbContext.Database.GetService<IRelationalDatabaseCreator>();
-        databaseCreator.EnsureDeleted();
-        databaseCreator.Create();
+        try
+        {
+            databaseCreator.EnsureDeleted();
+            databaseCreator.EnsureCreated();
+        }
+        catch (Npgsql.PostgresException exception)
+        {
+            if (exception.Message == "57P01: terminating connection due to administrator command")
+            {
+                // TODO Instead of ignoring the exception, change the code such that it is not thrown in the first place.
+                Console.WriteLine($"Caught and ignored 'Npgsql.PostgresException' exception '{exception.Message}'.");
+            }
+            else
+            {
+                throw;
+            }
+        }
         databaseCreator.CreateTables();
         Task.Run(SeedDatabase).GetAwaiter().GetResult();
     }

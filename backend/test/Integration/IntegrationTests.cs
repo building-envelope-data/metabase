@@ -88,12 +88,45 @@ public abstract partial class IntegrationTests
         }
     }
 
+    private static IEnumerable<Cookie> ExtractCookies(HttpResponseMessage response)
+    {
+        if (!response.Headers.TryGetValues("Set-Cookie", out var cookieEntries))
+        {
+            return Enumerable.Empty<Cookie>();
+        }
+        var uri = response.RequestMessage?.RequestUri ?? throw new ArgumentException($"The request URI cannot be extracted from the given response {response}.");
+        var cookieContainer = new CookieContainer();
+        foreach (var cookieEntry in cookieEntries)
+        {
+            cookieContainer.SetCookies(uri, cookieEntry);
+        }
+        return cookieContainer.GetCookies(uri).Cast<Cookie>();
+    }
+
+    private static async Task UpdateAntiforgeryCookieAndToken(
+        HttpClient httpClient
+    )
+    {
+        // Get the antiforgery token in the cookie "XSRF-TOKEN" and set it
+        // permanently on the HTTP client by requesting /antiforgery/token
+        // synchronously.
+        var response = await httpClient.GetAsync("/antiforgery/token").ConfigureAwait(false);
+        // Add the antiforgery token as the default request header "X-XSRF-TOKEN".
+        var xsrfToken =
+            ExtractCookies(response)
+            .SingleOrDefault(cookie => cookie.Name == "XSRF-TOKEN")
+            ?.Value
+            ?? throw new ArgumentException("The `XSRF-TOKEN` cookie is missing in the response of a request to /antiforgery/token");
+        httpClient.DefaultRequestHeaders.Remove("X-XSRF-TOKEN");
+        httpClient.DefaultRequestHeaders.Add("X-XSRF-TOKEN", xsrfToken);
+    }
+
     protected static HttpClient CreateHttpClient(
         CustomWebApplicationFactory factory,
         bool allowAutoRedirect = true
     )
     {
-        return factory.CreateClient(
+        var httpClient = factory.CreateClient(
             new WebApplicationFactoryClientOptions
             {
                 AllowAutoRedirect = allowAutoRedirect,
@@ -102,6 +135,8 @@ public abstract partial class IntegrationTests
                 MaxAutomaticRedirections = 3
             }
         );
+        Task.Run(() => UpdateAntiforgeryCookieAndToken(httpClient)).Wait();
+        return httpClient;
     }
 
     protected HttpClient CreateHttpClient(
@@ -133,7 +168,7 @@ public abstract partial class IntegrationTests
                     }
                 )
                 .ConfigureAwait(false);
-        if (response.IsError) throw new HttpRequestException(response.Error);
+        if (response.IsError) throw new HttpRequestException($"Error {response.Error} of type {response.ErrorType} with description {response.ErrorDescription}");
 
         return response;
     }
@@ -166,6 +201,7 @@ public abstract partial class IntegrationTests
         httpClient.SetBearerToken(tokenResponse.AccessToken ??
                                   throw new InvalidOperationException(
                                       $"The auth-token request to {httpClient.BaseAddress} with email address {email} and password {password} returned `null` as access token."));
+        await UpdateAntiforgeryCookieAndToken(httpClient).ConfigureAwait(false);
     }
 
     protected Task LoginUser(
@@ -180,16 +216,17 @@ public abstract partial class IntegrationTests
         );
     }
 
-    protected static void LogoutUser(
+    protected static async Task LogoutUser(
         HttpClient httpClient
     )
     {
         httpClient.SetBearerToken("");
+        await UpdateAntiforgeryCookieAndToken(httpClient).ConfigureAwait(false);
     }
 
-    protected void LogoutUser()
+    protected Task LogoutUser()
     {
-        LogoutUser(HttpClient);
+        return LogoutUser(HttpClient);
     }
 
     protected static async Task<TResult> AsUser<TResult>(
@@ -214,7 +251,7 @@ public abstract partial class IntegrationTests
                 password
             ).ConfigureAwait(false);
             var result = await task(httpClient).ConfigureAwait(false);
-            LogoutUser(httpClient);
+            await LogoutUser(httpClient).ConfigureAwait(false);
             return result;
         }
         finally
