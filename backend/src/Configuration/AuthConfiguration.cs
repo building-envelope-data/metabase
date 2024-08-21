@@ -302,8 +302,10 @@ public abstract class AuthConfiguration
                         .AllowDeviceCodeFlow()
                         .AllowRefreshTokenFlow();
                     // .AllowHybridFlow()
-                    if (environment.IsEnvironment("test")) _.AllowPasswordFlow();
-
+                    if (environment.IsEnvironment(Program.TestEnvironment))
+                    {
+                        _.AllowPasswordFlow();
+                    }
                     // Register the signing and encryption credentials.
                     // See https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#registering-a-certificate-recommended-for-production-ready-scenarios
                     // and https://stackoverflow.com/questions/50862755/signing-keys-certificates-and-client-secrets-confusion/50932120#50932120
@@ -312,15 +314,18 @@ public abstract class AuthConfiguration
                     // Force client applications to use Proof Key for Code Exchange (PKCE): https://documentation.openiddict.com/configuration/proof-key-for-code-exchange.html#enabling-pkce-enforcement-at-the-global-level
                     _.RequireProofKeyForCodeExchange();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
-                    _.UseAspNetCore()
+                    var builder = _.UseAspNetCore()
                         .EnableStatusCodePagesIntegration()
                         .EnableAuthorizationEndpointPassthrough()
                         .EnableLogoutEndpointPassthrough()
                         .EnableTokenEndpointPassthrough()
                         .EnableUserinfoEndpointPassthrough()
                         .EnableVerificationEndpointPassthrough();
-                    // .DisableTransportSecurityRequirement();
                     // .EnableStatusCodePagesIntegration();
+                    if (environment.IsEnvironment(Program.TestEnvironment))
+                    {
+                        builder.DisableTransportSecurityRequirement();
+                    }
                     // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending
                     // a token or revocation request, uncomment the following line:
@@ -347,7 +352,7 @@ public abstract class AuthConfiguration
                     //     {
                     //         IssuerSigningKey = signingKey,
                     //         TokenDecryptionKey = encryptionKey,
-                    //         // ValidIssuer = environment.IsEnvironment("test") ? "http://localhost/" : appSettings.Host,
+                    //         // ValidIssuer = environment.IsEnvironment(Program.TestEnvironment) ? "http://localhost/" : appSettings.Host,
                     //         ValidateActor = false,
                     //         ValidateAudience = false,
                     //         ValidateIssuer = false,
