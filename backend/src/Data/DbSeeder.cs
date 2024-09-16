@@ -121,7 +121,7 @@ public sealed class DbSeeder
         var manager = services.GetRequiredService<UserManager<User>>();
         if (environment.IsProduction())
         {
-            if ((await manager.GetUsersInRoleAsync(Role.Administrator).ConfigureAwait(false)).IsNullOrEmpty())
+            if ((await manager.GetUsersInRoleAsync(Role.Administrator).ConfigureAwait(false)).Count == 0)
             {
                 await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger).ConfigureAwait(false);
             }
