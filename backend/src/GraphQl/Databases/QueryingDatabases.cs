@@ -143,7 +143,8 @@ public sealed class QueryingDatabases
             GraphQLRequest request,
             IHttpClientFactory httpClientFactory,
             IHttpContextAccessor httpContextAccessor,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            string? apiToken = null
         )
         where TGraphQlResponse : class
     {
@@ -159,8 +160,20 @@ public sealed class QueryingDatabases
         //    )
         //   .AsGraphQLHttpResponse();
         using var httpClient = httpClientFactory.CreateClient(DatabaseHttpClient);
-        var bearerToken = await ExtractBearerToken(httpContextAccessor).ConfigureAwait(false);
-        if (bearerToken is not null) httpClient.SetBearerToken(bearerToken);
+        // Set the authorization header to a given API token or the bearer token
+        // from the original HTTP request.
+        if (apiToken is not null)
+        {
+            httpClient.SetToken("Token", apiToken);
+        }
+        else {
+            // We extract and set the bearer token below. Alternatively, we could
+            // add a named client to the factory and set the bearer token there as
+            // detailed in
+            // https://stackoverflow.com/questions/51358870/configure-httpclientfactory-to-use-data-from-the-current-request-context/51460160#51460160
+            var bearerToken = await ExtractBearerToken(httpContextAccessor).ConfigureAwait(false);
+            if (bearerToken is not null) httpClient.SetBearerToken(bearerToken);
+        }
 
         // For some reason `httpClient.PostAsJsonAsync` without `MakeJsonHttpContent` but with `SerializerOptions` results in `BadRequest` status code. It has to do with `JsonContent.Create` used within `PostAsJsonAsync` --- we also cannot use `JsonContent.Create` in `MakeJsonHttpContent`. What is happening here?
         using var jsonHttpContent = MakeJsonHttpContent(request);

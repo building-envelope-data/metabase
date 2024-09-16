@@ -111,6 +111,7 @@ services:
       - XBASE_Email__SmtpPort=${SMTP_PORT}
       - XBASE_TestlabSolarFacadesHost=https://${TESTLAB_SOLAR_FACADES_HOST}:${TESTLAB_SOLAR_FACADES_HOST_HTTPS_PORT}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
+      - XBASE_IgsdbApiToken=${IGSDB_API_TOKEN}
       # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose

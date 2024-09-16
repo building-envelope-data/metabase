@@ -183,14 +183,17 @@ public sealed class DatabaseResolvers
         "HasPhotovoltaicData.graphql"
     };
 
+    private readonly AppSettings _appSettings;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<DatabaseResolvers> _logger;
 
     public DatabaseResolvers(
+        AppSettings appSettings,
         IHttpClientFactory httpClientFactory,
         ILogger<DatabaseResolvers> logger
     )
     {
+        _appSettings = appSettings;
         _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
@@ -801,7 +804,8 @@ public sealed class DatabaseResolvers
                     request,
                     _httpClientFactory,
                     httpContextAccessor,
-                    cancellationToken
+                    cancellationToken,
+                    database.Locator.AbsoluteUri == IgsdbUrl ? _appSettings.IgsdbApiToken : null
                 );
             if (deserializedGraphQlResponse.Errors?.Length >= 1)
             {
