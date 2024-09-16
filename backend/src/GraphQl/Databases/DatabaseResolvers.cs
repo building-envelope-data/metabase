@@ -260,7 +260,6 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
-        Console.WriteLine("qqqqqqqqqqqqqqq");
         return (await QueryDatabase<OpticalDataData>(
                     database,
                     new GraphQLRequest(
