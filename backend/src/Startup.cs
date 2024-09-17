@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -145,6 +146,21 @@ public sealed class Startup
         });
     }
 
+    private static void ConfigureDatabaseContext(
+        DbContextOptionsBuilder options,
+        IWebHostEnvironment environment
+        )
+    {
+        if (!environment.IsProduction())
+            options
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors();
+        if (environment.IsEnvironment(Program.TestEnvironment))
+            options.ConfigureWarnings(x =>
+                x.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)
+            );
+    }
+
     private void ConfigureDatabaseServices(IServiceCollection services)
     {
         services.AddPooledDbContextFactory<ApplicationDbContext>(options =>
@@ -164,10 +180,7 @@ public sealed class Startup
                     .UseNpgsql(dataSourceBuilder.Build() /*, optionsBuilder => optionsBuilder.UseNodaTime() */)
                     .UseSchemaName(_appSettings.Database.SchemaName)
                     .UseOpenIddict();
-                if (!_environment.IsProduction())
-                    options
-                        .EnableSensitiveDataLogging()
-                        .EnableDetailedErrors();
+                ConfigureDatabaseContext(options, _environment);
             }
         );
         // Database context as services are used by `Identity` and
@@ -176,11 +189,7 @@ public sealed class Startup
         services.AddDbContext<ApplicationDbContext>(
             (services, options) =>
             {
-                if (!_environment.IsProduction())
-                    options
-                        .EnableSensitiveDataLogging()
-                        .EnableDetailedErrors();
-
+                ConfigureDatabaseContext(options, _environment);
                 services
                     .GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
                     .CreateDbContext();
