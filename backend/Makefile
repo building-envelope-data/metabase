@@ -15,20 +15,9 @@ help : ## Print this help
 
 # List of dotnet commands
 # https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet
-# TODO Shortcuts for `dotnet aspnet-codegenerator`?
 
 # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
-# Sadly `--list-tests` ignores `--filter` which was reported in 2017 and has
-# not yet been fixed, see https://github.com/dotnet/sdk/issues/8643
-# This makes the following code snippet obsolete
-# ```
-# echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
-# echo "Test list for file $${x}" && \
-# echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
-# dotnet test \
-# 	--filter "FullyQualifiedName~$${x}" \
-# 	--list-tests
-# ```
+# dotnet test --filter "FullyQualifiedName~${x}" --verbosity minimal
 test : ## Run tests
 	@echo "--------------------------------------------------"
 	@echo "Complete test list"
@@ -38,15 +27,8 @@ test : ## Run tests
 	@echo "--------------------------------------------------"
 	@echo "All test runs"
 	@echo "--------------------------------------------------"
-	for x in $$(find ./test/ -type f -name "*Tests.cs" -exec basename {} '.cs' \;) ; do \
-		echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
-		echo "Test runs for file '$${x}'" && \
-		echo "- - - - - - - - - - - - - - - - - - - - - - - - - " && \
-		dotnet test \
-			--filter "FullyQualifiedName~$${x}" \
-			--collect:"XPlat Code Coverage" \
-			--verbosity minimal ; \
-	done
+	dotnet test \
+		--collect:"XPlat Code Coverage"
 .PHONY : test
 
 assets : ## Build assets
