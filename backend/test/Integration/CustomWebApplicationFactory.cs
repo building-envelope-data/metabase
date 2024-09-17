@@ -105,6 +105,8 @@ public sealed class CustomWebApplicationFactory
         var databaseCreator = dbContext.Database.GetService<IRelationalDatabaseCreator>();
         try
         {
+            // There are faster ways to reset databases than below. For details see
+            // https://www.mikee.se/posts/fastest_way_to_reset_database_with_ef_core_20220103
             databaseCreator.EnsureDeleted();
             databaseCreator.EnsureCreated();
         }
