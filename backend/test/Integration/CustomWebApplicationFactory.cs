@@ -115,6 +115,8 @@ public sealed class CustomWebApplicationFactory
             if (exception.Message == "57P01: terminating connection due to administrator command")
             {
                 // TODO Instead of ignoring the exception, change the code such that it is not thrown in the first place.
+                // For reasons on why this exception may occur see
+                // https://github.com/npgsql/efcore.pg/issues/1926
                 Console.WriteLine($"Caught and ignored 'Npgsql.PostgresException' exception '{exception.Message}'.");
             }
             else
