@@ -190,6 +190,38 @@ type ChangeInstitutionRepresentativeRolePayload {
   representedInstitutionEdge: UserRepresentedInstitutionEdge
 }
 
+type GeometricData implements Data {
+  appliedMethod: AppliedMethod!
+  component: Component
+  componentId: Uuid!
+  createdAt: DateTime!
+  creator: Institution
+  creatorId: Uuid!
+  database: Database
+  databaseId: Uuid!
+  description: String
+  id: String!
+  locale: String!
+  name: String
+  resources: [GetHttpsResource!]!
+  resourceTree: GetHttpsResourceTree!
+  timestamp: DateTime!
+  uuid: Uuid!
+  thicknesses: [Float!]!
+  warnings: [String!]!
+}
+
+type GeometricDataConnection {
+  edges: [GeometricDataEdge!]!
+  timestamp: DateTime!
+  totalCount: NonNegativeInt
+}
+
+type GeometricDataEdge {
+  cursor: String!
+  node: GeometricData!
+}
+
 type ChangeUserEmailError {
   code: ChangeUserEmailErrorCode!
   message: String!
@@ -532,6 +564,7 @@ type Database implements Node {
   allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: HygrothermalDataPropositionInput): HygrothermalDataConnection @cost(weight: "10")
   allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput): OpticalDataConnection @cost(weight: "10")
   allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection @cost(weight: "10")
+  allGeometricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: GeometricDataPropositionInput): GeometricDataConnection @cost(weight: "10")
   calorimetricData(id: Uuid! locale: String timestamp: DateTime): CalorimetricData @cost(weight: "10")
   canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   canCurrentUserVerifyNode: Boolean! @cost(weight: "10")
@@ -542,6 +575,7 @@ type Database implements Node {
   hasHygrothermalData(locale: String timestamp: DateTime where: HygrothermalDataPropositionInput): Boolean @cost(weight: "10")
   hasOpticalData(locale: String timestamp: DateTime where: OpticalDataPropositionInput): Boolean @cost(weight: "10")
   hasPhotovoltaicData(locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): Boolean @cost(weight: "10")
+  hasGeometricData(locale: String timestamp: DateTime where: GeometricDataPropositionInput): Boolean @cost(weight: "10")
   hygrothermalData(id: Uuid! locale: String timestamp: DateTime): HygrothermalData @cost(weight: "10")
   id: ID!
   locator: Url!
@@ -552,6 +586,7 @@ type Database implements Node {
   uuid: Uuid! @cost(weight: "10")
   verificationCode: String!
   verificationState: DatabaseVerificationState!
+  geometricData(id: Uuid! locale: String timestamp: DateTime): GeometricData @cost(weight: "10")
 }
 
 type DatabaseOperatorEdge {
@@ -1775,6 +1810,15 @@ input CielabColorsPropositionInput {
   some: CielabColorPropositionInput
 }
 
+input GeometricDataPropositionInput {
+  and: [GeometricDataPropositionInput!]
+  componentId: UuidPropositionInput
+  thicknesses: FloatsPropositionInput
+  not: GeometricDataPropositionInput
+  or: [GeometricDataPropositionInput!]
+  resources: GetHttpsResourcesPropositionInput
+}
+
 input ClosedIntervalInput {
   lowerBound: Float!
   upperBound: Float!
@@ -2902,6 +2946,7 @@ enum DataKind {
   HYGROTHERMALDATA
   OPTICALDATA
   PHOTOVOLTAICDATA
+  GEOMETRICDATA
 }
 
 enum DatabaseVerificationState {
