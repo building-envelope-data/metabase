@@ -162,7 +162,7 @@ public abstract partial class IntegrationTests
                         Address = "http://localhost/connect/token",
                         ClientId = "metabase",
                         ClientSecret = "secret",
-                        Scope = "api:read api:write api:user:manage",
+                        Scope = "address email phone profile roles api:read api:write api:user:manage",
                         UserName = emailAddress,
                         Password = password
                     }
