@@ -74,6 +74,7 @@ public static partial class Log
 public sealed class DatabaseResolvers
 {
     private const string IgsdbUrl = "https://igsdb-v2.herokuapp.com/graphql/";
+    private const string IgsdbStagingUrl = "https://igsdb-v2-staging.herokuapp.com/graphql/";
 
     private static readonly string[] _dataFileNames =
     {
@@ -196,6 +197,12 @@ public sealed class DatabaseResolvers
         _appSettings = appSettings;
         _httpClientFactory = httpClientFactory;
         _logger = logger;
+    }
+
+    private static bool IsIgsdbDatabase(Database database)
+    {
+        return new[] {IgsdbUrl, IgsdbStagingUrl}
+            .Contains(database.Locator.AbsoluteUri);
     }
 
     public Task<bool> GetCanCurrentUserUpdateNodeAsync(
@@ -391,7 +398,7 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
-        if (database.Locator.AbsoluteUri == IgsdbUrl)
+        if (IsIgsdbDatabase(database))
         {
             return DataConnection.From(
                 (await QueryDatabase<AllDataDataIgsdb>(
@@ -439,7 +446,7 @@ public sealed class DatabaseResolvers
         Database database
     )
     {
-        return database.Locator.AbsoluteUri == IgsdbUrl
+        return IsIgsdbDatabase(database)
             ? where ?? new DataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null)
             : where;
     }
@@ -458,7 +465,7 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
-        if (database.Locator.AbsoluteUri == IgsdbUrl)
+        if (IsIgsdbDatabase(database))
         {
             return OpticalDataConnection.From(
                 (await QueryDatabase<AllOpticalDataDataIgsdb>(
@@ -508,7 +515,7 @@ public sealed class DatabaseResolvers
         Database database
     )
     {
-        return database.Locator.AbsoluteUri == IgsdbUrl
+        return IsIgsdbDatabase(database)
             ? where ?? new OpticalDataPropositionInput(null, null, null, null, null, null, null, null, null, null, null, null)
             : where;
     }
@@ -805,7 +812,7 @@ public sealed class DatabaseResolvers
                     _httpClientFactory,
                     httpContextAccessor,
                     cancellationToken,
-                    database.Locator.AbsoluteUri == IgsdbUrl ? _appSettings.IgsdbApiToken : null
+                    IsIgsdbDatabase(database) ? _appSettings.IgsdbApiToken : null
                 );
             if (deserializedGraphQlResponse.Errors?.Length >= 1)
             {
