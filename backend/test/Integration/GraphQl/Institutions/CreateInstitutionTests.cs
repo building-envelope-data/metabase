@@ -94,17 +94,17 @@ public sealed class CreateInstitutionTests
                 OwnerIds = new[] { userId }
             }
         ).ConfigureAwait(false);
-        var response = await GetInstitutions().ConfigureAwait(false);
+        var response = await GetPendingInstitutions().ConfigureAwait(false);
         // Assert
         Snapshot.Match(
             response,
             testName,
             matchOptions => matchOptions
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<string>("data.institutions.edges[*].node.id").Should().Be(institutionId)
+                    fieldOptions.Field<string>("data.pendingInstitutions.edges[*].node.id").Should().Be(institutionId)
                 )
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<Guid>("data.institutions.edges[*].node.uuid").Should().Be(institutionUuid)
+                    fieldOptions.Field<Guid>("data.pendingInstitutions.edges[*].node.uuid").Should().Be(institutionUuid)
                 )
         );
     }

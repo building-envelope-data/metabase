@@ -48,6 +48,21 @@ public abstract class InstitutionIntegrationTests
         );
     }
 
+    protected Task<string> GetPendingInstitutions()
+    {
+        return GetPendingInstitutions(HttpClient);
+    }
+
+    internal static Task<string> GetPendingInstitutions(
+        HttpClient httpClient
+    )
+    {
+        return SuccessfullyQueryGraphQlContentAsString(
+            httpClient,
+            File.ReadAllText("Integration/GraphQl/Institutions/GetPendingInstitutions.graphql")
+        );
+    }
+
     protected Task<string> GetInstitution(
         string uuid
     )

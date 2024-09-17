@@ -1,0 +1,15 @@
+query institutions {
+  pendingInstitutions {
+    edges {
+      node {
+        id
+        uuid
+        name
+        abbreviation
+        description
+        websiteLocator
+        state
+      }
+    }
+  }
+}
