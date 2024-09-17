@@ -28,7 +28,7 @@ public sealed class RequestUserPasswordResetTests
         EmailsShouldContainSingle(
             (name, email),
             "Reset password",
-            @"^Please reset your password by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+\.$"
+            @"^Please reset your password by following the link https:\/\/local\.buildingenvelopedata\.org:4041\/users\/reset-password\?resetCode=\w+$"
         );
     }
 
