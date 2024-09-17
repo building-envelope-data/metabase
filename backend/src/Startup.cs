@@ -30,6 +30,7 @@ namespace Metabase;
 public sealed class Startup
 {
     private const string GraphQlCorsPolicy = "GraphQlCorsPolicy";
+    private const string AntiforgeryHeaderName = "X-XSRF-TOKEN";
     private readonly AppSettings _appSettings;
 
     private readonly IWebHostEnvironment _environment;
@@ -53,7 +54,7 @@ public sealed class Startup
         ConfigureMessageSenderServices(services);
         ConfigureRequestResponseServices(services);
         ConfigureSessionServices(services);
-        services.AddAntiforgery(_ => { _.HeaderName = "X-XSRF-TOKEN"; });
+        services.AddAntiforgery(_ => { _.HeaderName = AntiforgeryHeaderName; });
         services
             .AddDataProtection()
             .PersistKeysToDbContext<ApplicationDbContext>();
