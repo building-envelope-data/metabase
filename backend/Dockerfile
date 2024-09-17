@@ -48,7 +48,8 @@ RUN \
     lldb \
     make \
     # npm \
-    openssl && \
+    openssl \
+    procps && \
   rm \
     --recursive \
     --force \
