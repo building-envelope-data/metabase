@@ -190,6 +190,38 @@ type ChangeInstitutionRepresentativeRolePayload {
   representedInstitutionEdge: UserRepresentedInstitutionEdge
 }
 
+type GeometricData implements Data {
+  appliedMethod: AppliedMethod!
+  component: Component
+  componentId: Uuid!
+  createdAt: DateTime!
+  creator: Institution
+  creatorId: Uuid!
+  database: Database
+  databaseId: Uuid!
+  description: String
+  id: String!
+  locale: String!
+  name: String
+  resources: [GetHttpsResource!]!
+  resourceTree: GetHttpsResourceTree!
+  timestamp: DateTime!
+  uuid: Uuid!
+  thicknesses: [Float!]!
+  warnings: [String!]!
+}
+
+type GeometricDataConnection {
+  edges: [GeometricDataEdge!]!
+  timestamp: DateTime!
+  totalCount: NonNegativeInt
+}
+
+type GeometricDataEdge {
+  cursor: String!
+  node: GeometricData!
+}
+
 type ChangeUserEmailError {
   code: ChangeUserEmailErrorCode!
   message: String!
@@ -532,6 +564,7 @@ type Database implements Node {
   allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: HygrothermalDataPropositionInput): HygrothermalDataConnection
   allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: OpticalDataPropositionInput): OpticalDataConnection
   allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection
+  allGeometricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String timestamp: DateTime where: GeometricDataPropositionInput): GeometricDataConnection
   calorimetricData(id: Uuid! locale: String timestamp: DateTime): CalorimetricData
   canCurrentUserUpdateNode: Boolean!
   canCurrentUserVerifyNode: Boolean!
@@ -542,6 +575,7 @@ type Database implements Node {
   hasHygrothermalData(locale: String timestamp: DateTime where: HygrothermalDataPropositionInput): Boolean
   hasOpticalData(locale: String timestamp: DateTime where: OpticalDataPropositionInput): Boolean
   hasPhotovoltaicData(locale: String timestamp: DateTime where: PhotovoltaicDataPropositionInput): Boolean
+  hasGeometricData(locale: String timestamp: DateTime where: GeometricDataPropositionInput): Boolean
   hygrothermalData(id: Uuid! locale: String timestamp: DateTime): HygrothermalData
   id: ID!
   locator: Url!
@@ -552,6 +586,7 @@ type Database implements Node {
   uuid: Uuid!
   verificationCode: String!
   verificationState: DatabaseVerificationState!
+  geometricData(id: Uuid! locale: String timestamp: DateTime): GeometricData
 }
 
 type DatabaseOperatorEdge {
@@ -1775,6 +1810,15 @@ input CielabColorsPropositionInput {
   some: CielabColorPropositionInput
 }
 
+input GeometricDataPropositionInput {
+  and: [GeometricDataPropositionInput!]
+  componentId: UuidPropositionInput
+  thicknesses: FloatsPropositionInput
+  not: GeometricDataPropositionInput
+  or: [GeometricDataPropositionInput!]
+  resources: GetHttpsResourcesPropositionInput
+}
+
 input ClosedIntervalInput {
   lowerBound: Float!
   upperBound: Float!
@@ -2898,6 +2942,7 @@ enum DataKind {
   HYGROTHERMALDATA
   OPTICALDATA
   PHOTOVOLTAICDATA
+  GEOMETRICDATA
 }
 
 enum DatabaseVerificationState {

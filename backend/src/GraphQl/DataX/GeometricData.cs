@@ -21,8 +21,8 @@ public sealed class GeometricData
         AppliedMethod appliedMethod,
         IReadOnlyList<GetHttpsResource> resources,
         GetHttpsResourceTree resourceTree,
-        IReadOnlyList<DataApproval> approvals,
-        ResponseApproval approval,
+        // IReadOnlyList<DataApproval> approvals,
+        // ResponseApproval approval,
         IReadOnlyList<double> thicknesses
     ) : base (
         id,
@@ -38,9 +38,9 @@ public sealed class GeometricData
         createdAt,
         appliedMethod,
         resources,
-        resourceTree,
-        approvals,
-        approval
+        resourceTree
+        // approvals
+        // approval
     )
     {
         Thicknesses = thicknesses;
