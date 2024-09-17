@@ -589,17 +589,6 @@ type DeleteInstitutionPayload {
   query: Query!
 }
 
-type SwitchInstitutionOperatingStateError {
-  code: SwitchInstitutionOperatingStateErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type SwitchInstitutionOperatingStatePayload {
-  errors: [SwitchInstitutionOperatingStateError!]
-  query: Query!
-}
-
 type DeletePersonalUserDataError {
   code: DeletePersonalUserDataErrorCode!
   message: String!
@@ -756,8 +745,8 @@ type HygrothermalDataEdge {
 type Institution implements Node & Stakeholder {
   abbreviation: String
   canCurrentUserDeleteNode: Boolean!
-  canCurrentUserUpdateNode: Boolean!
   canCurrentUserSwitchOperatingStateOfNode: Boolean!
+  canCurrentUserUpdateNode: Boolean!
   description: String!
   developedMethods(pending: Boolean! = false): InstitutionDevelopedMethodConnection!
   id: ID!
@@ -768,10 +757,10 @@ type Institution implements Node & Stakeholder {
   manufacturedComponents(pending: Boolean! = false): InstitutionManufacturedComponentConnection!
   name: String!
   operatedDatabases: InstitutionOperatedDatabaseConnection!
+  operatingState: InstitutionOperatingState!
   publicKey: String
   representatives(pending: Boolean! = false): InstitutionRepresentativeConnection!
   state: InstitutionState!
-  operatingState: OperatingState!
   uuid: Uuid!
   websiteLocator: Url
 }
@@ -995,7 +984,6 @@ type Mutation {
   createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(policy: "Write")
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(policy: "Write")
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(policy: "Write")
-  switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload! @authorize(policy: "Write")
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(policy: "ManageUser")
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(policy: "ManageUser")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(policy: "ManageUser")
@@ -1023,6 +1011,7 @@ type Mutation {
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser")
+  switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload! @authorize(policy: "Write")
   updateComponent(input: UpdateComponentInput!): UpdateComponentPayload! @authorize(policy: "Write")
   updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "Write")
   updateDatabase(input: UpdateDatabaseInput!): UpdateDatabasePayload! @authorize(policy: "Write")
@@ -1494,6 +1483,18 @@ type Standard implements Reference {
   title: String
   "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
   year: Int
+}
+
+type SwitchInstitutionOperatingStateError {
+  code: SwitchInstitutionOperatingStateErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type SwitchInstitutionOperatingStatePayload {
+  errors: [SwitchInstitutionOperatingStateError!]
+  institution: Institution
+  query: Query!
 }
 
 type ToTreeVertexAppliedConversionMethod {
@@ -2012,10 +2013,6 @@ input DeleteInstitutionInput {
   institutionId: Uuid!
 }
 
-input SwitchInstitutionOperatingStateInput {
-  institutionId: Uuid!
-}
-
 input DeletePersonalUserDataInput {
   password: String
 }
@@ -2128,6 +2125,7 @@ input InstitutionSortInput {
   websiteLocator: UriSortInput
   publicKey: SortEnumType
   state: SortEnumType
+  operatingState: SortEnumType
   managerId: SortEnumType
   manager: InstitutionSortInput
   name: SortEnumType
@@ -2517,6 +2515,10 @@ input StringOperationFilterInput {
   nstartsWith: String
   endsWith: String
   nendsWith: String
+}
+
+input SwitchInstitutionOperatingStateInput {
+  institutionId: Uuid!
 }
 
 input UpdateComponentAssemblyInput {
@@ -2910,12 +2912,6 @@ enum DeleteInstitutionErrorCode {
   MANAGING
 }
 
-enum SwitchInstitutionOperatingStateErrorCode {
-  UNKNOWN
-  UNKNOWN_INSTITUTION
-  UNAUTHORIZED
-}
-
 enum DeletePersonalUserDataErrorCode {
   UNKNOWN
   UNKNOWN_USER
@@ -2961,6 +2957,11 @@ enum GenerateUserTwoFactorRecoveryCodesErrorCode {
   CODE_GENERATION_FAILED
 }
 
+enum InstitutionOperatingState {
+  OPERATING
+  NOT_OPERATING
+}
+
 enum InstitutionRepresentativeRole {
   OWNER
   ASSISTANT
@@ -2969,11 +2970,6 @@ enum InstitutionRepresentativeRole {
 enum InstitutionState {
   PENDING
   VERIFIED
-}
-
-enum OperatingState {
-  OPERATING
-  NOT_OPERATING
 }
 
 enum LoginUserErrorCode {
@@ -3170,6 +3166,12 @@ enum Standardizer {
   VDI
   VFF
   WELL
+}
+
+enum SwitchInstitutionOperatingStateErrorCode {
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
 }
 
 enum UpdateComponentAssemblyErrorCode {

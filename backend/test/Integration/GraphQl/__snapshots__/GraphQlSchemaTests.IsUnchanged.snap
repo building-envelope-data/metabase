@@ -745,6 +745,7 @@ type HygrothermalDataEdge {
 type Institution implements Node & Stakeholder {
   abbreviation: String
   canCurrentUserDeleteNode: Boolean!
+  canCurrentUserSwitchOperatingStateOfNode: Boolean!
   canCurrentUserUpdateNode: Boolean!
   description: String!
   developedMethods(pending: Boolean! = false): InstitutionDevelopedMethodConnection!
@@ -756,6 +757,7 @@ type Institution implements Node & Stakeholder {
   manufacturedComponents(pending: Boolean! = false): InstitutionManufacturedComponentConnection!
   name: String!
   operatedDatabases: InstitutionOperatedDatabaseConnection!
+  operatingState: InstitutionOperatingState!
   publicKey: String
   representatives(pending: Boolean! = false): InstitutionRepresentativeConnection!
   state: InstitutionState!
@@ -1009,6 +1011,7 @@ type Mutation {
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser")
+  switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload! @authorize(policy: "Write")
   updateComponent(input: UpdateComponentInput!): UpdateComponentPayload! @authorize(policy: "Write")
   updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "Write")
   updateDatabase(input: UpdateDatabaseInput!): UpdateDatabasePayload! @authorize(policy: "Write")
@@ -1480,6 +1483,18 @@ type Standard implements Reference {
   title: String
   "It is important to define the year in which the standard was issued because there can be relevant updates of one standard."
   year: Int
+}
+
+type SwitchInstitutionOperatingStateError {
+  code: SwitchInstitutionOperatingStateErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type SwitchInstitutionOperatingStatePayload {
+  errors: [SwitchInstitutionOperatingStateError!]
+  institution: Institution
+  query: Query!
 }
 
 type ToTreeVertexAppliedConversionMethod {
@@ -2110,6 +2125,7 @@ input InstitutionSortInput {
   websiteLocator: UriSortInput
   publicKey: SortEnumType
   state: SortEnumType
+  operatingState: SortEnumType
   managerId: SortEnumType
   manager: InstitutionSortInput
   name: SortEnumType
@@ -2499,6 +2515,10 @@ input StringOperationFilterInput {
   nstartsWith: String
   endsWith: String
   nendsWith: String
+}
+
+input SwitchInstitutionOperatingStateInput {
+  institutionId: Uuid!
 }
 
 input UpdateComponentAssemblyInput {
@@ -2937,6 +2957,11 @@ enum GenerateUserTwoFactorRecoveryCodesErrorCode {
   CODE_GENERATION_FAILED
 }
 
+enum InstitutionOperatingState {
+  OPERATING
+  NOT_OPERATING
+}
+
 enum InstitutionRepresentativeRole {
   OWNER
   ASSISTANT
@@ -3141,6 +3166,12 @@ enum Standardizer {
   VDI
   VFF
   WELL
+}
+
+enum SwitchInstitutionOperatingStateErrorCode {
+  UNKNOWN
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
 }
 
 enum UpdateComponentAssemblyErrorCode {
