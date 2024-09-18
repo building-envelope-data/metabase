@@ -202,30 +202,23 @@ public sealed class LoggingDiagnosticEventListener
                     {
                         stringBuilder.AppendFormat(CultureInfo.InvariantCulture,
                             $"Variables {Environment.NewLine}");
-                        try
+                        foreach (var variableValue in _context.Variables!)
                         {
-                            foreach (var variableValue in _context.Variables!)
+                            try
                             {
-                                static string PadRightHelper(string existingString, int lengthToPadTo)
-                                {
-                                    if (string.IsNullOrEmpty(existingString)) return "".PadRight(lengthToPadTo);
-
-                                    if (existingString.Length > lengthToPadTo) return existingString[..lengthToPadTo];
-
-                                    return existingString + " ".PadRight(lengthToPadTo - existingString.Length);
-                                }
-
                                 stringBuilder.AppendFormat(
                                     CultureInfo.InvariantCulture,
-                                    $"  {PadRightHelper(variableValue.Name, 20)} :  {PadRightHelper(variableValue.Value.ToString(), 20)}: {variableValue.Type}");
+                                    $"  {variableValue.Name} : ");
+                                stringBuilder.Append(variableValue.Value.ToString());
+                                stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $" : {variableValue.Type}");
                                 stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"{Environment.NewLine}");
                             }
-                        }
-                        catch
-                        {
-                            // all input type records will land here.
-                            stringBuilder.Append("  Formatting Variables Error. Continuing...");
-                            stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"{Environment.NewLine}");
+                            catch (Exception exception)
+                            {
+                                // all input type records will land here.
+                                stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"  Formatting the variable '{variableValue.Name}' failed with the exception '{exception}'.");
+                                stringBuilder.AppendFormat(CultureInfo.InvariantCulture, $"{Environment.NewLine}");
+                            }
                         }
                     }
                 }
