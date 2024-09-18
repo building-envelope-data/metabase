@@ -161,7 +161,13 @@ public sealed class QueryingDatabases
         //   .AsGraphQLHttpResponse();
         using var httpClient = httpClientFactory.CreateClient(DatabaseHttpClient);
         // Set the authorization header to a given API token or the bearer token
-        // from the original HTTP request.
+        // from the original HTTP request. Note that we cannot pass the API
+        // token as well as the bearer token in one request, neither with
+        // multiple HTTP authorization headers nor with one header with
+        // a comma-separated list of authentication scheme and value pairs.
+        // Both go against RFC 7230/7235, even though some web servers accept
+        // multiple schemes. For details see
+        // https://stackoverflow.com/questions/29282578/multiple-http-authorization-headers
         if (apiToken is not null)
         {
             httpClient.SetToken("Token", apiToken);
