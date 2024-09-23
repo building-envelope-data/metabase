@@ -66,6 +66,83 @@ In another shell
 
 The same works for frontend containers by running `make shellf`.
 
+### Developing with Visual Studio Code
+
+On the very first usage:
+
+1. Install [Visual Studio Code](https://code.visualstudio.com) and open it.
+   Navigate to the Extensions pane (`Ctrl+Shift+X`). Add the extension
+   [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack).
+1. Navigate to the
+   [Remote Explorer](https://code.visualstudio.com/docs/devcontainers/containers#_managing-containers)
+   pane. Hover over the running `metabase-backend-*` container (if it is not
+   running, then run `make up` in a shell inside the project directory) and
+   click on the "Attach in Current Window" icon. In the Explorer pane, open the
+   directory `/app`, which is mounted to the host's `./backend` directory.
+   Navigate to the Extensions pane. Add the extensions
+   [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit),
+   [IntelliCode for C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.vscodeintellicode-csharp),
+   [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql),
+   and
+   [GitLens — Git supercharged](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens).
+1. Navigate to the
+   [Remote Explorer](https://code.visualstudio.com/docs/devcontainers/containers#_managing-containers)
+   pane. Hover over the running `metabase-frontend-*` container and click on
+   the "Attach in New Window" icon. In the Explorer pane, open the directory
+   `/app`, which is mounted to the host's `./frontend` directory. Navigate to
+   the Extensions pane. Add the extensions
+   [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql),
+   and
+   [GitLens — Git supercharged](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens).
+
+Note that the Docker containers are configured in `./docker-compose.yml` in
+such a way that Visual Studio Code extensions installed within containers are
+retained in Docker volumes and thus remain installed across `make down` and
+`make up` cycles.
+
+On subsequent usages: Open Visual Studio Code, navigate to the "Remote
+Explorer" pane, and attach to the container(s) you want to work in.
+
+The following Visual Studio Code docs may be of interest for productivity and
+debugging
+
+- [Developing inside a Container](https://code.visualstudio.com/docs/devcontainers/containers)
+- [Git](https://code.visualstudio.com/docs/sourcecontrol/overview)
+- [C#](https://code.visualstudio.com/docs/csharp/navigate-edit)
+- [TypeScript](https://code.visualstudio.com/docs/typescript/typescript-tutorial)
+
+#### Debugging
+
+To debug the
+[ASP.NET Core web application](https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core),
+attach Visual Studio Code to the `metabase-backend-*` container,
+[press `Ctrl+Shift+P`, select "Debug: Attach to a .NET 5+ or .NET Core process"](https://code.visualstudio.com/docs/csharp/debugging#_attaching-to-a-process),
+and choose the process `/app/src/bin/Debug/net8.0/Metabase run` titled
+`Metabase` or alternatively navigate to the "Run and Debug" pane
+(`Ctrl+Shift+D`), select the launch profile ".NET Core Attach", press the
+"Start Debugging" icon (`F5`), and select the same process as above. Then, for
+example, open some source files to set breakpoints, navigate through the
+website https://local.buildingenvelopedata.org:4041, which will stop at
+breakpoints, and inspect the information provided by the debugger at the
+breakpoints. For details on debugging C# in Visual Studio Code, see
+[Debugging](https://code.visualstudio.com/docs/csharp/debugging).
+
+Note that the debugger detaches after the
+[polling file watcher](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch#environment-variables)
+restarts the process, which happens for example after editing a source file
+because `dotnet watch` is configured in `./docker-compose.yml` with
+`DOTNET_USE_POLLING_FILE_WATCHER` set to `true`. As of this writing, there is
+an
+[open feature request to reattach the debugger automatically](https://github.com/dotnet/vscode-csharp/issues/4822).
+There also are multiple extensions like
+[.NET Watch Attach](https://marketplace.visualstudio.com/items?itemName=Trottero.dotnetwatchattach)
+and
+[.NET Stalker Debugger](https://marketplace.visualstudio.com/items?itemName=spencerjames.stalker-debugger)
+that attempt to solve that. Those extensions don't work in our case though, as
+they try to restart `dotnet watch` themselves, instead of waiting for the
+polling file watcher of `dotnet watch` to restart
+`/app/src/bin/Debug/net8.0/Metabase run` and attach to that process.
+
 ## Deployment
 
 For information on using Docker in production see
