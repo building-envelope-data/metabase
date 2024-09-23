@@ -112,8 +112,8 @@ services:
       - XBASE_TestlabSolarFacadesHost=https://${TESTLAB_SOLAR_FACADES_HOST}:${TESTLAB_SOLAR_FACADES_HOST_HTTPS_PORT}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
       - XBASE_IgsdbApiToken=${IGSDB_API_TOKEN}
-      # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch
-      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-watch#environment-variables
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
       # https://docs.microsoft.com/en-us/aspnet/core/security/docker-compose-https#starting-a-container-with-https-support-using-docker-compose
       # - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_CERTIFICATE_PASSWORD}
       # - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
