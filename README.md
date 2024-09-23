@@ -29,12 +29,12 @@ If you have a question for which you don't find the answer in this repository, p
    [Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 1. Clone the source code by running
    `git clone git@github.com:building-envelope-data/metabase.git` and navigate
-   into the new directory `metabase` by running `cd metabase`.
+   into the new directory `metabase` by running `cd ./metabase`.
 1. Initialize, fetch, and checkout possibly-nested submodules by running
    `git submodule update --init --recursive`. An alternative would have been
    passing `--recurse-submodules` to `git clone` above.
-1. Prepare your environment by running `cp .env.sample .env`,
-   `cp frontend/.env.local.sample frontend/.env.local`, and adding the line
+1. Prepare your environment by running `cp ./.env.sample ./.env`,
+   `cp ./frontend/.env.local.sample ./frontend/.env.local`, and adding the line
    `127.0.0.1 local.buildingenvelopedata.org` to your `/etc/hosts` file.
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop), and
    [GNU Make](https://www.gnu.org/software/make/).
@@ -84,8 +84,8 @@ and the pages following it.
 1. For each of the two environments staging and production referred to by
    `${environment}` below:
    1. Change into the clone `${environment}` by running `cd /app/${environment}`.
-   1. Prepare the environment by running `cp .env.${environment}.sample .env`,
-      `cp frontend/.env.local.sample frontend/.env.local`, and by replacing
+   1. Prepare the environment by running `cp ./.env.${environment}.sample ./.env`,
+      `cp ./frontend/.env.local.sample ./frontend/.env.local`, and by replacing
       dummy passwords in the copies by newly generated ones, where random
       passwords may be generated running `openssl rand -base64 32`.
    1. Prepare PostgreSQL by generating new password files by running
