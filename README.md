@@ -49,7 +49,10 @@ If you have a question for which you don't find the answer in this repository, p
    the GraphQL API navigate to
    `https://local.buildingenvelopedata.org:4041/graphql/`, and to see sent
    emails navigate to
-   `https://local.buildingenvelopedata.org:4041/email/`.
+   `https://local.buildingenvelopedata.org:4041/email/`. Note that the port is
+   `4041` by default. If you set the variable `HTTPS_PORT` within the `./.env`
+   to some other value though, you need to use that value instead within the
+   URL.
 
 In another shell
 
