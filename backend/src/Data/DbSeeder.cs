@@ -82,12 +82,12 @@ public sealed class DbSeeder
         VerifierUser =
             Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
 
-    private static readonly Uri FraunhoferInstitutionLocator = new Uri("https://www.ise.fraunhofer.de", UriKind.Absolute);
-    private static readonly Uri TestLabInstitutionLocator = new Uri("https://www.ise.fraunhofer.de/en/rd-infrastructure/accredited-labs/testlab-solar-facades.html", UriKind.Absolute);
-    private static readonly Uri LbnlInstitutionLocator = new Uri("https://www.lbl.gov", UriKind.Absolute);
+    private const string IseInstitutionName = "Fraunhofer ISE";
+    private const string TestlabInstitutionName = "TestLab Solar Facades";
+    private const string LbnlInstitutionName = "LBNL";
 
-    private static readonly Uri TestLabDatabaseLocator = new Uri("https://staging.solarbuildingenvelopes.com/graphql/", UriKind.Absolute);
-    private static readonly Uri IgsdbDatabaseLocator = new Uri("https://igsdb-v2-staging.herokuapp.com/graphql/", UriKind.Absolute);
+    private const string TestlabDatabaseName = "TestLab DB";
+    private const string IgsdbDatabaseName = "IGSDB";
 
     public static async Task DoAsync(
         IServiceProvider services
@@ -102,7 +102,7 @@ public sealed class DbSeeder
         await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
         await RegisterScopesAsync(services, logger).ConfigureAwait(false);
         await CreateInstitutionsAsync(services, logger, environment).ConfigureAwait(false);
-        await CreateDatabasesAsync(services, logger, environment).ConfigureAwait(false);
+        await CreateDatabasesAsync(services, logger, environment, appSettings).ConfigureAwait(false);
     }
 
     private static async Task CreateRolesAsync(
@@ -381,14 +381,14 @@ public sealed class DbSeeder
         var context = services.GetRequiredService<ApplicationDbContext>();
         if (environment.IsDevelopment())
         {
-            var iseInstitution = await context.Institutions.Where(x => x.WebsiteLocator == FraunhoferInstitutionLocator).SingleOrDefaultAsync().ConfigureAwait(false);
+            var iseInstitution = await context.Institutions.Where(x => x.Name == IseInstitutionName).SingleOrDefaultAsync().ConfigureAwait(false);
             if (iseInstitution is null)
             {
                 iseInstitution = new Institution(
-                    "Fraunhofer ISE",
+                    IseInstitutionName,
                     "ISE",
                     "Fraunhofer Institute for Solar Energy Systems (ISE)",
-                    FraunhoferInstitutionLocator,
+                    new Uri("https://www.ise.fraunhofer.de", UriKind.Absolute),
                     null,
                     InstitutionState.VERIFIED,
                     InstitutionOperatingState.OPERATING
@@ -404,13 +404,13 @@ public sealed class DbSeeder
                 context.Institutions.Add(iseInstitution);
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
-            if (!await context.Institutions.Where(x => x.WebsiteLocator == TestLabInstitutionLocator).AnyAsync().ConfigureAwait(false))
+            if (!await context.Institutions.Where(x => x.Name == TestlabInstitutionName).AnyAsync().ConfigureAwait(false))
             {
                 var institution = new Institution(
-                    "TestLab Solar Facades",
+                    TestlabInstitutionName,
                     "TLSF",
                     "This institution represents the TestLab Solar Facades of Fraunhofer ISE",
-                    TestLabInstitutionLocator,
+                    new Uri("https://www.ise.fraunhofer.de/en/rd-infrastructure/accredited-labs/testlab-solar-facades.html", UriKind.Absolute),
                     null,
                     InstitutionState.VERIFIED,
                     InstitutionOperatingState.OPERATING
@@ -421,13 +421,13 @@ public sealed class DbSeeder
                 context.Institutions.Add(institution);
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
-            if (!await context.Institutions.Where(x => x.WebsiteLocator == LbnlInstitutionLocator).AnyAsync().ConfigureAwait(false))
+            if (!await context.Institutions.Where(x => x.Name == LbnlInstitutionName).AnyAsync().ConfigureAwait(false))
             {
                 var institution = new Institution(
-                    "LBNL",
+                    LbnlInstitutionName,
                     "LBNL",
                     "Lawrence Berkeley National Laboratory or Berkeley Lab",
-                    LbnlInstitutionLocator,
+                    new Uri("https://www.lbl.gov", UriKind.Absolute),
                     null,
                     InstitutionState.VERIFIED,
                     InstitutionOperatingState.OPERATING
@@ -444,35 +444,38 @@ public sealed class DbSeeder
     private static async Task CreateDatabasesAsync(
         IServiceProvider services,
         ILogger<DbSeeder> logger,
-        IWebHostEnvironment environment
+        IWebHostEnvironment environment,
+        AppSettings appSettings
     )
     {
         if (environment.IsDevelopment())
         {
             var context = services.GetRequiredService<ApplicationDbContext>();
-            if (!await context.Databases.Where(x => x.Locator == TestLabDatabaseLocator).AnyAsync().ConfigureAwait(false))
+            if (!await context.Databases.Where(x => x.Name == TestlabDatabaseName).AnyAsync().ConfigureAwait(false))
             {
+                var uriBuilder = new UriBuilder(new Uri(appSettings.TestlabSolarFacadesHost, UriKind.Absolute));
+                uriBuilder.Path = "/graphql/";
                 var database = new Database(
-                    "TestLab DB",
+                    TestlabDatabaseName,
                     "The database of the TestLab Solar Facades of Fraunhofer ISE",
-                    TestLabDatabaseLocator
+                    uriBuilder.Uri
                 )
                 {
-                    OperatorId = (await context.Institutions.SingleAsync(x => x.WebsiteLocator == TestLabInstitutionLocator).ConfigureAwait(false)).Id
+                    OperatorId = (await context.Institutions.SingleAsync(x => x.Name == TestlabInstitutionName).ConfigureAwait(false)).Id
                 };
                 database.Verify();
                 context.Databases.Add(database);
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
-            if (!await context.Databases.Where(x => x.Locator == IgsdbDatabaseLocator).AnyAsync().ConfigureAwait(false))
+            if (!await context.Databases.Where(x => x.Name == IgsdbDatabaseName).AnyAsync().ConfigureAwait(false))
             {
                 var database = new Database(
-                    "IGSDB",
+                    IgsdbDatabaseName,
                     "The International Glazing and Shading Database (IGSDB)",
-                    IgsdbDatabaseLocator
+                    new Uri(environment.IsProduction() ? "https://igsdb-v2.herokuapp.com/graphql/" : "https://igsdb-v2-staging.herokuapp.com/graphql/", UriKind.Absolute)
                 )
                 {
-                    OperatorId = (await context.Institutions.SingleAsync(x => x.WebsiteLocator == LbnlInstitutionLocator).ConfigureAwait(false)).Id
+                    OperatorId = (await context.Institutions.SingleAsync(x => x.Name == LbnlInstitutionName).ConfigureAwait(false)).Id
                 };
                 database.Verify();
                 context.Databases.Add(database);
