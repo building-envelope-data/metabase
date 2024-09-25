@@ -253,9 +253,13 @@ migrate : ## Migrate database (note that other PostgreSQL instances using the sa
 # Note that NGINX is because of its dependencies taken down and up last and in
 # one go so the maintenance page is only down very shortly.
 deploy-services : ## Deploy services
-	${docker_compose} pull
-	${docker_compose} build \
-		--pull
+	COMPOSE_DOCKER_CLI_BUILD=1 \
+		DOCKER_BUILDKIT=1 \
+			${docker_compose} pull
+	COMPOSE_DOCKER_CLI_BUILD=1 \
+		DOCKER_BUILDKIT=1 \
+			${docker_compose} build \
+				--pull
 	${docker_compose} up \
 		--force-recreate \
 		--renew-anon-volumes \
