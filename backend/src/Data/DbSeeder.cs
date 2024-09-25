@@ -4,12 +4,13 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Metabase.Configuration;
+using Metabase.Enumerations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 
 namespace Metabase.Data;
@@ -81,6 +82,13 @@ public sealed class DbSeeder
         VerifierUser =
             Users.First(x => x.Role == Enumerations.UserRole.VERIFIER);
 
+    private static readonly Uri FraunhoferInstitutionLocator = new Uri("https://www.ise.fraunhofer.de", UriKind.Absolute);
+    private static readonly Uri TestLabInstitutionLocator = new Uri("https://www.ise.fraunhofer.de/en/rd-infrastructure/accredited-labs/testlab-solar-facades.html", UriKind.Absolute);
+    private static readonly Uri LbnlInstitutionLocator = new Uri("https://www.lbl.gov", UriKind.Absolute);
+
+    private static readonly Uri TestLabDatabaseLocator = new Uri("https://staging.solarbuildingenvelopes.com/graphql/", UriKind.Absolute);
+    private static readonly Uri IgsdbDatabaseLocator = new Uri("https://igsdb-v2-staging.herokuapp.com/graphql/", UriKind.Absolute);
+
     public static async Task DoAsync(
         IServiceProvider services
     )
@@ -93,6 +101,8 @@ public sealed class DbSeeder
         await CreateUsersAsync(services, environment, appSettings, logger).ConfigureAwait(false);
         await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
         await RegisterScopesAsync(services, logger).ConfigureAwait(false);
+        await CreateInstitutionsAsync(services, logger, environment).ConfigureAwait(false);
+        await CreateDatabasesAsync(services, logger, environment).ConfigureAwait(false);
     }
 
     private static async Task CreateRolesAsync(
@@ -125,7 +135,9 @@ public sealed class DbSeeder
             {
                 await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger).ConfigureAwait(false);
             }
-        } else {
+        }
+        else
+        {
             foreach (var userInfo in Users)
                 if (await manager.FindByEmailAsync(userInfo.EmailAddress).ConfigureAwait(false) is null)
                 {
@@ -357,6 +369,115 @@ public sealed class DbSeeder
                     }
                 }
             ).ConfigureAwait(false);
+        }
+    }
+
+    private static async Task CreateInstitutionsAsync(
+        IServiceProvider services,
+        ILogger<DbSeeder> logger,
+        IWebHostEnvironment environment
+    )
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        if (environment.IsDevelopment())
+        {
+            var iseInstitution = await context.Institutions.Where(x => x.WebsiteLocator == FraunhoferInstitutionLocator).SingleOrDefaultAsync().ConfigureAwait(false);
+            if (iseInstitution is null)
+            {
+                iseInstitution = new Institution(
+                    "Fraunhofer ISE",
+                    "ISE",
+                    "Fraunhofer Institute for Solar Energy Systems (ISE)",
+                    FraunhoferInstitutionLocator,
+                    null,
+                    InstitutionState.VERIFIED,
+                    InstitutionOperatingState.OPERATING
+                );
+                iseInstitution.RepresentativeEdges.Add(
+                    new InstitutionRepresentative
+                    {
+                        UserId = (await context.Users.Where(x => x.Email == AdministratorUser.EmailAddress).SingleAsync().ConfigureAwait(false)).Id,
+                        Role = InstitutionRepresentativeRole.OWNER,
+                        Pending = false
+                    }
+                );
+                context.Institutions.Add(iseInstitution);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+            }
+            if (!await context.Institutions.Where(x => x.WebsiteLocator == TestLabInstitutionLocator).AnyAsync().ConfigureAwait(false))
+            {
+                var institution = new Institution(
+                    "TestLab Solar Facades",
+                    "TLSF",
+                    "This institution represents the TestLab Solar Facades of Fraunhofer ISE",
+                    TestLabInstitutionLocator,
+                    null,
+                    InstitutionState.VERIFIED,
+                    InstitutionOperatingState.OPERATING
+                )
+                {
+                    ManagerId = iseInstitution.Id
+                };
+                context.Institutions.Add(institution);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+            }
+            if (!await context.Institutions.Where(x => x.WebsiteLocator == LbnlInstitutionLocator).AnyAsync().ConfigureAwait(false))
+            {
+                var institution = new Institution(
+                    "LBNL",
+                    "LBNL",
+                    "Lawrence Berkeley National Laboratory or Berkeley Lab",
+                    LbnlInstitutionLocator,
+                    null,
+                    InstitutionState.VERIFIED,
+                    InstitutionOperatingState.OPERATING
+                )
+                {
+                    ManagerId = iseInstitution.Id
+                };
+                context.Institutions.Add(institution);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+            }
+        }
+    }
+
+    private static async Task CreateDatabasesAsync(
+        IServiceProvider services,
+        ILogger<DbSeeder> logger,
+        IWebHostEnvironment environment
+    )
+    {
+        if (environment.IsDevelopment())
+        {
+            var context = services.GetRequiredService<ApplicationDbContext>();
+            if (!await context.Databases.Where(x => x.Locator == TestLabDatabaseLocator).AnyAsync().ConfigureAwait(false))
+            {
+                var database = new Database(
+                    "TestLab DB",
+                    "The database of the TestLab Solar Facades of Fraunhofer ISE",
+                    TestLabDatabaseLocator
+                )
+                {
+                    OperatorId = (await context.Institutions.SingleAsync(x => x.WebsiteLocator == TestLabInstitutionLocator).ConfigureAwait(false)).Id
+                };
+                database.Verify();
+                context.Databases.Add(database);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+            }
+            if (!await context.Databases.Where(x => x.Locator == IgsdbDatabaseLocator).AnyAsync().ConfigureAwait(false))
+            {
+                var database = new Database(
+                    "IGSDB",
+                    "The International Glazing and Shading Database (IGSDB)",
+                    IgsdbDatabaseLocator
+                )
+                {
+                    OperatorId = (await context.Institutions.SingleAsync(x => x.WebsiteLocator == LbnlInstitutionLocator).ConfigureAwait(false)).Id
+                };
+                database.Verify();
+                context.Databases.Add(database);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+            }
         }
     }
 }
