@@ -54,7 +54,7 @@ public sealed class Startup
         ConfigureDatabaseServices(services);
         ConfigureMessageSenderServices(services);
         ConfigureRequestResponseServices(services);
-        ConfigureSessionServices(services);
+        ConfigureSessionServices(services, _environment);
         services.AddAntiforgery(_ => { _.HeaderName = AntiforgeryHeaderName; });
         services
             .AddDataProtection()
@@ -132,14 +132,21 @@ public sealed class Startup
         );
     }
 
-    private static void ConfigureSessionServices(IServiceCollection services)
+    private static void ConfigureSessionServices(
+            IServiceCollection services,
+            IWebHostEnvironment environment
+            )
     {
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state
         services.AddDistributedMemoryCache();
         services.AddSession(options =>
         {
-            // Set a short timeout for easy testing.
-            options.IdleTimeout = TimeSpan.FromSeconds(10);
+            // Set a short timeout for easy testing in development and a long
+            // one otherwise.
+            options.IdleTimeout =
+                environment.IsDevelopment()
+                ? TimeSpan.FromSeconds(10)
+                : TimeSpan.FromMinutes(30);
             options.Cookie.HttpOnly = true;
             // Make the session cookie essential
             options.Cookie.IsEssential = true;
