@@ -110,7 +110,7 @@ public sealed class DatabaseResolvers
         "PhotovoltaicData.graphql"
     };
 
-        private static readonly string[] _geometricDataFileNames =
+    private static readonly string[] _geometricDataFileNames =
     {
         "DataFields.graphql",
         "GeometricDataFields.graphql",
@@ -166,7 +166,7 @@ public sealed class DatabaseResolvers
         "AllPhotovoltaicData.graphql"
     };
 
-        private static readonly string[] _allGeometricDataFileNames =
+    private static readonly string[] _allGeometricDataFileNames =
     {
         "DataFields.graphql",
         "GeometricDataFields.graphql",
@@ -1020,6 +1020,7 @@ public sealed class DatabaseResolvers
     private sealed record AllPhotovoltaicDataData(PhotovoltaicDataConnection AllPhotovoltaicData);
     private sealed record HasDataData(bool HasData);
     private sealed record HasOpticalDataData(bool HasOpticalData);
+    private sealed record HasCalorimetricDataData(bool HasCalorimetricData);
     private sealed record HasGeometricDataData(bool HasGeometricData);
     private sealed record HasHygrothermalDataData(bool HasHygrothermalData);
     private sealed record HasPhotovoltaicDataData(bool HasPhotovoltaicData);
