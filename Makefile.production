@@ -65,10 +65,29 @@ exec : up ## Execute the one-time command `${COMMAND}` against an existing `${CO
 
 execb : CONTAINER = backend
 execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
+.PHONY : execb
+
+execf : CONTAINER = frontend
+execf : exec ## Execute the one-time command `${COMMAND}` against an existing `frontend` container (after starting all containers if necessary)
+.PHONY : execf
 
 shellb : COMMAND = bash
 shellb : execb ## Enter shell in a running `backend` container (to test database access from within the shell run `apk add postgresql-client` and `psql "host=database port=5432 user=postgres passfile=/run/secrets/postgres_passwords"`)
 .PHONY : shellb
+
+shellf : COMMAND = bash
+shellf : execf ## Enter shell in a running `frontend` container (after starting all containers if necessary)
+.PHONY : shellf
+
+shelln : CONTAINER = nginx
+shelln : COMMAND = bash
+shelln : exec ## Enter shell in a running `nginx` container (after starting all containers if necessary)
+.PHONY : shelln
+
+shelld : CONTAINER = database
+shelld : COMMAND = bash
+shelld : exec ## Enter shell in a running `database` container (after starting all containers if necessary)
+.PHONY : shelld
 
 list : ## List all containers with health status
 	${docker_compose} ps \
