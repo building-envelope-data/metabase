@@ -145,10 +145,9 @@ traceb : ## Trace backend container with identifier `${CONTAINER_ID}`, for examp
 				"
 .PHONY : traceb
 
-shelln : up ## Enter shell in an existing `nginx` container (after starting all containers if necessary)
-	${docker_compose} exec \
-		nginx \
-		bash
+shelln : CONTAINER = nginx
+shelln : COMMAND = bash
+shelln : exec ## Enter shell in an existing `nginx` container (after starting all containers if necessary)
 .PHONY : shelln
 
 psql : ## Enter PostgreSQL interactive terminal in the running `database` container
@@ -159,10 +158,9 @@ psql : ## Enter PostgreSQL interactive terminal in the running `database` contai
 		--dbname xbase_development
 .PHONY : psql
 
-shelld : up ## Enter shell in an existing `database` container (after starting all containers if necessary)
-	${docker_compose} exec \
-		database \
-		bash
+shelld : CONTAINER = database
+shelld : COMMAND = bash
+shelld : exec ## Enter shell in an existing `database` container (after starting all containers if necessary)
 .PHONY : shelld
 
 list : ## List all containers with health status
