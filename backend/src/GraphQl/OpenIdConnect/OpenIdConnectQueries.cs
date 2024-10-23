@@ -23,7 +23,7 @@ public sealed class OpendIdConnectQueries
     public async Task<IList<OpenIddictEntityFrameworkCoreApplication>> GetOpenIdConnectApplications(
         [Service] OpenIddictApplicationManager<OpenIddictEntityFrameworkCoreApplication> manager,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         // Data.ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
         CancellationToken cancellationToken
     )
@@ -41,7 +41,7 @@ public sealed class OpendIdConnectQueries
     public async Task<IList<OpenIddictEntityFrameworkCoreScope>> GetOpenIdConnectScopes(
         [Service] OpenIddictScopeManager<OpenIddictEntityFrameworkCoreScope> manager,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         // Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
         CancellationToken cancellationToken
     )
@@ -58,7 +58,7 @@ public sealed class OpendIdConnectQueries
     public async Task<IList<OpenIddictEntityFrameworkCoreToken>> GetOpenIdConnectTokens(
         [Service] OpenIddictTokenManager<OpenIddictEntityFrameworkCoreToken> manager,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         // [TokendService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
         CancellationToken cancellationToken
     )
@@ -75,7 +75,7 @@ public sealed class OpendIdConnectQueries
     public async Task<IList<OpenIddictEntityFrameworkCoreAuthorization>> GetOpenIdConnectAuthorizations(
         [Service] OpenIddictAuthorizationManager<OpenIddictEntityFrameworkCoreAuthorization> manager,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         // [AuthorizationdService] Data.ApplicationDbContext context // TODO Make the application manager use the scoped database context.
         CancellationToken cancellationToken
     )

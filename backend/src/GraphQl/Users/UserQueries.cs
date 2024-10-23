@@ -17,7 +17,7 @@ public sealed class UserQueries
     [UseUserManager]
     public async Task<User?> GetCurrentUserAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager
+        [Service] UserManager<User> userManager
     )
     {
         return await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);

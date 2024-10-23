@@ -27,7 +27,7 @@ public sealed class InstitutionMutations
     public async Task<CreateInstitutionPayload> CreateInstitutionAsync(
         CreateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         [Service] IEmailSender emailSender,
         [Service] AppSettings appSettings,
@@ -172,7 +172,7 @@ public sealed class InstitutionMutations
     public async Task<VerifyInstitutionPayload> VerifyInstitutionAsync(
         VerifyInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -214,7 +214,7 @@ public sealed class InstitutionMutations
     public async Task<UpdateInstitutionPayload> UpdateInstitutionAsync(
         UpdateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -265,7 +265,7 @@ public sealed class InstitutionMutations
     public async Task<DeleteInstitutionPayload> DeleteInstitutionAsync(
         DeleteInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -354,7 +354,7 @@ public sealed class InstitutionMutations
     public async Task<SwitchInstitutionOperatingStatePayload> SwitchInstitutionOperatingStateAsync(
         SwitchInstitutionOperatingStateInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )

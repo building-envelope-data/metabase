@@ -27,7 +27,7 @@ public sealed class UserRepresentedInstitutionConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager
+        [Service] UserManager<User> userManager
     )
     {
         return InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(

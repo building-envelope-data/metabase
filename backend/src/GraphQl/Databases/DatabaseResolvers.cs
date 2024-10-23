@@ -208,7 +208,7 @@ public sealed class DatabaseResolvers
     public Task<bool> GetCanCurrentUserUpdateNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -220,7 +220,7 @@ public sealed class DatabaseResolvers
     public Task<bool> GetCanCurrentUserVerifyNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )

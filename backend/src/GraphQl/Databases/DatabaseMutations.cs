@@ -32,7 +32,7 @@ public sealed class DatabaseMutations
     public async Task<CreateDatabasePayload> CreateDatabaseAsync(
         CreateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -86,7 +86,7 @@ public sealed class DatabaseMutations
     public async Task<UpdateDatabasePayload> UpdateDatabaseAsync(
         UpdateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -135,7 +135,7 @@ public sealed class DatabaseMutations
     public async Task<VerifyDatabasePayload> VerifyDatabaseAsync(
         VerifyDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
-        [Service(ServiceKind.Resolver)] UserManager<User> userManager,
+        [Service] UserManager<User> userManager,
         ApplicationDbContext context,
         [Service] IHttpClientFactory httpClientFactory,
         [Service] IHttpContextAccessor httpContextAccessor,
