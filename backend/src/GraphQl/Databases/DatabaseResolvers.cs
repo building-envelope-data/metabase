@@ -686,6 +686,7 @@ public sealed class DatabaseResolvers
                 ).ConfigureAwait(false)
             )?.AllPhotovoltaicData;
     }
+
     public async Task<GeometricDataConnection?> GetAllGeometricDataAsync(
         [Parent] Database database,
         GeometricDataPropositionInput? where,
