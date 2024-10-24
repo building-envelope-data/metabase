@@ -29,7 +29,7 @@ public sealed class InstitutionManufacturedComponentConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service] UserManager<User> userManager,
+        UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -46,7 +46,7 @@ public sealed class InstitutionManufacturedComponentConnection
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service] UserManager<User> userManager,
+        UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )

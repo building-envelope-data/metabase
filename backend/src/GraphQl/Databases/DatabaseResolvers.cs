@@ -208,7 +208,7 @@ public sealed class DatabaseResolvers
     public Task<bool> GetCanCurrentUserUpdateNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
-        [Service] UserManager<User> userManager,
+        UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -220,7 +220,7 @@ public sealed class DatabaseResolvers
     public Task<bool> GetCanCurrentUserVerifyNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
-        [Service] UserManager<User> userManager,
+        UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -234,7 +234,7 @@ public sealed class DatabaseResolvers
         Guid id,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -265,7 +265,7 @@ public sealed class DatabaseResolvers
         Guid id,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -296,7 +296,7 @@ public sealed class DatabaseResolvers
         Guid id,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -327,7 +327,7 @@ public sealed class DatabaseResolvers
         Guid id,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -358,7 +358,7 @@ public sealed class DatabaseResolvers
         Guid id,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -393,7 +393,7 @@ public sealed class DatabaseResolvers
         string? after,
         uint? last,
         string? before,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -460,7 +460,7 @@ public sealed class DatabaseResolvers
         string? after,
         uint? last,
         string? before,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -529,7 +529,7 @@ public sealed class DatabaseResolvers
         string? after,
         uint? last,
         string? before,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -568,7 +568,7 @@ public sealed class DatabaseResolvers
         string? after,
         uint? last,
         string? before,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -607,7 +607,7 @@ public sealed class DatabaseResolvers
         string? after,
         uint? last,
         string? before,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -642,7 +642,7 @@ public sealed class DatabaseResolvers
         DataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -673,7 +673,7 @@ public sealed class DatabaseResolvers
         OpticalDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -704,7 +704,7 @@ public sealed class DatabaseResolvers
         CalorimetricDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -735,7 +735,7 @@ public sealed class DatabaseResolvers
         HygrothermalDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )
@@ -766,7 +766,7 @@ public sealed class DatabaseResolvers
         PhotovoltaicDataPropositionInput? where,
         DateTime? timestamp,
         string? locale,
-        [Service] IHttpContextAccessor httpContextAccessor,
+        IHttpContextAccessor httpContextAccessor,
         IResolverContext resolverContext,
         CancellationToken cancellationToken
     )

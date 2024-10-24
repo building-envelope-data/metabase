@@ -105,7 +105,7 @@ public sealed class ComponentType
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
             [Parent] Component component,
             ClaimsPrincipal claimsPrincipal,
-            [Service] UserManager<User> userManager,
+            UserManager<User> userManager,
             ApplicationDbContext context,
             CancellationToken cancellationToken
         )

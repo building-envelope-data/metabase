@@ -48,7 +48,7 @@ public sealed class DataFormatType
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
             [Parent] DataFormat dataFormat,
             ClaimsPrincipal claimsPrincipal,
-            [Service] UserManager<User> userManager,
+            UserManager<User> userManager,
             ApplicationDbContext context,
             CancellationToken cancellationToken
         )

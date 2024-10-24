@@ -30,7 +30,7 @@ public sealed class ComponentPartOfEdge
     [UseUserManager]
     public Task<bool> CanCurrentUserUpdateEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service] UserManager<User> userManager,
+        UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -48,7 +48,7 @@ public sealed class ComponentPartOfEdge
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        [Service] UserManager<User> userManager,
+        UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )

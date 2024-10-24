@@ -71,7 +71,7 @@ public sealed class MethodType
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
             [Parent] Method method,
             ClaimsPrincipal claimsPrincipal,
-            [Service] UserManager<User> userManager,
+            UserManager<User> userManager,
             ApplicationDbContext context,
             CancellationToken cancellationToken
         )
