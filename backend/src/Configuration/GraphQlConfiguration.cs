@@ -167,6 +167,7 @@ public static class GraphQlConfiguration
             .AddType<StakeholderType>()
             .AddType<StandardType>()
             .AddType<UserType>()
+            .AddType<GeometricData>()
             // Data Loaders
             .AddDataLoader<ComponentByIdDataLoader>()
             .AddDataLoader<DataFormatByIdDataLoader>()

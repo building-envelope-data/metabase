@@ -59,5 +59,6 @@ export default {
   hygrothermalData: "/data/hygrothermal",
   opticalData: "/data/optical",
   photovoltaicData: "/data/photovoltaic",
+  geometricData: "/data/geometric",
   openIdConnect: "/openIdConnect",
 };
