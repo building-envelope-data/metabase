@@ -166,6 +166,11 @@ public sealed class DatabaseResolvers
         "AllPhotovoltaicData.graphql"
     };
 
+    private static readonly string[] _igsdbAllGeometricDataFileNames =
+    {
+        "AllGeometricDataIgsdb.graphql"
+    };
+
     private static readonly string[] _allGeometricDataFileNames =
     {
         "DataFields.graphql",
@@ -220,7 +225,7 @@ public sealed class DatabaseResolvers
 
     private static bool IsIgsdbDatabase(Database database)
     {
-        return new[] {IgsdbUrl, IgsdbStagingUrl}
+        return new[] { IgsdbUrl, IgsdbStagingUrl }
             .Contains(database.Locator.AbsoluteUri);
     }
 
@@ -687,6 +692,16 @@ public sealed class DatabaseResolvers
             )?.AllPhotovoltaicData;
     }
 
+    private static GeometricDataPropositionInput? RewriteGeometricDataPropositionInput(
+        GeometricDataPropositionInput? where,
+        Database database
+    )
+    {
+        return IsIgsdbDatabase(database)
+            ? where ?? new GeometricDataPropositionInput(null, null, null, null, null, null)
+            : where;
+    }
+
     public async Task<GeometricDataConnection?> GetAllGeometricDataAsync(
         [Parent] Database database,
         GeometricDataPropositionInput? where,
@@ -701,12 +716,32 @@ public sealed class DatabaseResolvers
         CancellationToken cancellationToken
     )
     {
+        if (IsIgsdbDatabase(database))
+        {
+            return GeometricDataConnection.From(
+                (await QueryDatabase<AllGeometricDataDataIgsdb>(
+                        database,
+                        new GraphQLRequest(
+                            await QueryingDatabases.ConstructQuery(
+                                _igsdbAllGeometricDataFileNames).ConfigureAwait(false),
+                            new
+                            {
+                                where = RewriteGeometricDataPropositionInput(where, database)
+                            },
+                            "AllGeometricData"
+                        ),
+                        httpContextAccessor,
+                        resolverContext,
+                        cancellationToken
+                    ).ConfigureAwait(false)
+                )?.AllGeometricData
+            );
+        }
         return (await QueryDatabase<AllGeometricDataData>(
                     database,
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
-                            _allGeometricDataFileNames
-                        ).ConfigureAwait(false),
+                            _allGeometricDataFileNames).ConfigureAwait(false),
                         new
                         {
                             where,
@@ -725,6 +760,7 @@ public sealed class DatabaseResolvers
                 ).ConfigureAwait(false)
             )?.AllGeometricData;
     }
+
     public async Task<bool?> GetHasDataAsync(
         [Parent] Database database,
         DataPropositionInput? where,
@@ -1014,10 +1050,10 @@ public sealed class DatabaseResolvers
     private sealed record AllDataDataIgsdb(DataConnectionIgsdb AllData);
     private sealed record AllOpticalDataData(OpticalDataConnection AllOpticalData);
     private sealed record AllOpticalDataDataIgsdb(OpticalDataConnectionIgsdb AllOpticalData);
-    private sealed record AllOpticalDataIgsdbData(OpticalDataConnection AllOpticalData);
     private sealed record AllHygrothermalDataData(HygrothermalDataConnection AllHygrothermalData);
     private sealed record AllCalorimetricDataData(CalorimetricDataConnection AllCalorimetricData);
     private sealed record AllGeometricDataData(GeometricDataConnection AllGeometricData);
+    private sealed record AllGeometricDataDataIgsdb(GeometricDataConnectionIgsdb AllGeometricData);
     private sealed record AllPhotovoltaicDataData(PhotovoltaicDataConnection AllPhotovoltaicData);
     private sealed record HasDataData(bool HasData);
     private sealed record HasOpticalDataData(bool HasOpticalData);
