@@ -773,7 +773,7 @@ type GetHttpsResource {
   archivedFilesMetaInformation: [FileMetaInformation!]!
   dataFormat: DataFormat @cost(weight: "10")
   dataFormatId: Uuid!
-  description: String!
+  description: String
   hashValue: String!
   locator: Url!
 }
@@ -2045,12 +2045,6 @@ input CreateMethodInput {
   validity: OpenEndedDateTimeRangeInput
 }
 
-input NumerationInput {
-  mainNumber: String!
-  prefix: String
-  suffix: String
-}
-
 input DataFormatFilterInput {
   and: [DataFormatFilterInput!]
   or: [DataFormatFilterInput!]
@@ -2381,6 +2375,12 @@ input NullableOfPrimeSurfaceOperationFilterInput {
   notEqualTo: PrimeSurface @cost(weight: "10")
   in: [PrimeSurface] @cost(weight: "10")
   notIn: [PrimeSurface] @cost(weight: "10")
+}
+
+input NumerationInput {
+  mainNumber: String!
+  prefix: String
+  suffix: String
 }
 
 input OpenEndedDateTimeRangeInput {
