@@ -596,7 +596,7 @@ export function getAppliedMethodColumnProps<
 }
 
 export function getResourceTreeColumnProps<
-  RecordType extends { resourceTree: { root: { value: { description: string, hashValue: string, locator: Scalars["Url"], dataFormatId: Scalars["Uuid"] }}} }
+  RecordType extends { resourceTree: { root: { value: { description?: string | null | undefined, hashValue: string, locator: Scalars["Url"], dataFormatId: Scalars["Uuid"] }}} }
 >(
   onFilterTextChange: (
     key: keyof RecordType

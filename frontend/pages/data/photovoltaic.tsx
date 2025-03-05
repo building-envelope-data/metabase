@@ -88,7 +88,7 @@ type PartialPhotovoltaicData = {
       __typename?: "GetHttpsResourceTreeRoot";
       value: {
         __typename?: "GetHttpsResource";
-        description: string;
+        description?: string | null | undefined;
         hashValue: string;
         locator: Scalars["Url"];
         dataFormatId: Scalars["Uuid"];
