@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -35,9 +36,21 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        var httpContext = httpContextAccessor.HttpContext ?? throw new AntiforgeryValidationException(
-                "Cannot access the HTTP context to validate the antiforgery token.");
-        await antiforgeryService.ValidateRequestAsync(httpContext).ConfigureAwait(false);
+        try
+        {
+            var httpContext = httpContextAccessor.HttpContext ?? throw new AntiforgeryValidationException(
+                    "Cannot access the HTTP context to validate the antiforgery token.");
+            await antiforgeryService.ValidateRequestAsync(httpContext).ConfigureAwait(false);
+        }
+        catch (AntiforgeryValidationException exception)
+        {
+            throw new GraphQLException(
+                ErrorBuilder
+                .New()
+                .SetException(exception)
+                .Build()
+            );
+        }
     }
 
     /////////////////////
