@@ -62,9 +62,9 @@ public sealed class Program
             await application.RunAsync().ConfigureAwait(false);
             return 0;
         }
-        catch (Exception ex) when (ex is not HostAbortedException && ex.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
+        catch (Exception exception) when (exception is not HostAbortedException && exception.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
         {
-            Log.Fatal(ex, "Host terminated unexpectedly");
+            Log.Fatal(exception, "Host terminated unexpectedly");
             return 1;
         }
         finally
