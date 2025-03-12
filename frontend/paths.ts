@@ -64,7 +64,7 @@ export default {
     return `/application/${encodeURIComponent(uuid)}`;
   },
   applicationCreate: "/application/create",
-  openIdConnect: "/openIdConnect",
+  openIdConnect: "/open-id-connect",
   openIdConnectClientLogin: "/connect/client/login",
   openIdConnectClientLogout: "/connect/client/logout",
 };
