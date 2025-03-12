@@ -353,10 +353,11 @@ If the database container restarts indefinitely and its logs say
 PANIC:  could not locate a valid checkpoint record
 ```
 
-for example preceded by `LOG: invalid resource manager ID in primary checkpoint record` or `LOG: invalid primary checkpoint record`, then the
-database is corrupt. For example, the write-ahead log (WAL) may be corrupt
-because the database was not shut down cleanly. One solution is to restore the
-database from a backup by running
+for example preceded by `LOG: invalid resource manager ID in primary checkpoint
+record` or `LOG: invalid primary checkpoint record`, then the database is
+corrupt. For example, the write-ahead log (WAL) may be corrupt because the
+database was not shut down cleanly. One solution is to restore the database
+from a backup by running
 
 ```
 make --file=Makefile.production BACKUP_DIRECTORY=/app/data/backups/20XX-XX-XX_XX_XX_XX/ restore
