@@ -96,7 +96,7 @@ function Page() {
         );
         if (!errors && !data?.changeUserEmail?.errors) {
           message.success(
-            "Confirmation link to change email sent. Please check your email."
+            "Verification link to change email sent. Please check your email."
           );
         }
       } catch (error) {
@@ -127,11 +127,11 @@ function Page() {
         Your current email address is {currentUser.email}.
         {!currentUser.isEmailConfirmed && (
           <>
-            Please confirm it by following the confirmation link in the
-            confirmation email you received. If you didn&apos;t receive a
-            confirmation email, click the following button to resend it:{" "}
+            Please verify it by following the verification link in the
+            verification email you received. If you didn&apos;t receive a
+            verification email, click the following button to resend it:{" "}
             <Button onClick={resendUserEmailVerification} loading={resending}>
-              Resend confirmation email
+              Resend verification email
             </Button>
           </>
         )}
