@@ -59,7 +59,19 @@ In another shell
 1. Drop into `bash` with the working directory `/app`, which is mounted to the
    host's `./backend` directory, inside a fresh Docker container based on
    `./backend/Dockerfile` by running `make shellb`. If necessary, the Docker
-   image is (re)built automatically, which takes a while the first time.
+   image is (re)built automatically, which takes a while the first time. Note
+   that the Docker image and containers try to use the same user and group IDs
+   as the ones on the host machine. This has the upside that files created
+   within containers in mounted directories are owned by the host user. It has
+   the downside that the Docker image may fail to build because the IDs may
+   already be taken by other users and groups in the base image. This happens
+   for example if you are `root` on the host machine with the user and group
+   IDs 0. If there is an ID collision, then you can either change the user and
+   group ID on the host machine (for example by logging in as another user) or
+   you can replace all occurrences of `shell id --group` and `shell id --user`
+   in `Makefile` and `Makefile.production` by fixed non-colliding IDs like
+   1000. If you know a better way, please
+   [let use know on GitHub](https://github.com/building-envelope-data/metabase/issues/new).
 1. List all backend GNU Make targets by running `make help`.
 1. For example, update packages and tools by running `make update`.
 1. Drop out of the container by running `exit` or pressing `Ctrl-D`.
