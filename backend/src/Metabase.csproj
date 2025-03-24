@@ -24,13 +24,13 @@
     <!-- <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" /> -->
     <PackageReference Include="GraphQL.Client" Version="6.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
-    <PackageReference Include="HotChocolate" Version="15.0.3" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="15.0.3" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.0.3" />
-    <PackageReference Include="HotChocolate.Data" Version="15.0.3" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.0.3" />
-    <PackageReference Include="HotChocolate.PersistedOperations.InMemory" Version="15.0.3" />
-    <PackageReference Include="HotChocolate.Types.Scalars" Version="15.0.3" />
+    <PackageReference Include="HotChocolate" Version="15.1.1" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.1" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.1.1" />
+    <PackageReference Include="HotChocolate.Data" Version="15.1.1" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.1.1" />
+    <PackageReference Include="HotChocolate.PersistedOperations.InMemory" Version="15.1.1" />
+    <PackageReference Include="HotChocolate.Types.Scalars" Version="15.1.1" />
     <PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="MailKit" Version="4.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />

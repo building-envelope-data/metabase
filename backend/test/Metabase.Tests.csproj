@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="8.1.1" />
+    <PackageReference Include="FluentAssertions" Version="8.2.0" />
     <PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="JsonPath.Net" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.3" />
