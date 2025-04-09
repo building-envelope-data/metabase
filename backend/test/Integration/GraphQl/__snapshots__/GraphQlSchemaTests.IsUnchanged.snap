@@ -112,6 +112,18 @@ type AddInstitutionRepresentativePayload {
   representedInstitutionEdge: UserRepresentedInstitutionEdge
 }
 
+type AddKeyFingerprintError {
+  code: AddKeyFingerprintErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddKeyFingerprintPayload {
+  errors: [AddKeyFingerprintError!]
+  keyFingerprint: String
+  query: Query!
+}
+
 type AddUserMethodDeveloperError {
   code: AddUserMethodDeveloperErrorCode!
   message: String!
@@ -135,6 +147,18 @@ type AddUserRolePayload {
   errors: [AddUserRoleError!]
   query: Query!
   user: User
+}
+
+type AllowRepresentativeToSignDataError {
+  code: AllowRepresentativeToSignDataErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AllowRepresentativeToSignDataPayload {
+  errors: [AllowRepresentativeToSignDataError!]
+  institutionRepresentative: InstitutionRepresentative
+  query: Query!
 }
 
 type Application {
@@ -711,6 +735,18 @@ type FileMetaInformation {
   path: [String!]!
 }
 
+type ForbidRepresentativeToSignDataError {
+  code: ForbidRepresentativeToSignDataErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ForbidRepresentativeToSignDataPayload {
+  errors: [ForbidRepresentativeToSignDataError!]
+  institutionRepresentative: InstitutionRepresentative
+  query: Query!
+}
+
 type ForgetUserTwoFactorAuthenticationClientError {
   code: ForgetUserTwoFactorAuthenticationClientErrorCode!
   message: String!
@@ -938,6 +974,17 @@ type InstitutionOperatedDatabaseEdge {
   node: Database!
 }
 
+type InstitutionRepresentative {
+  dataSigningPermission: DataSigningPermission!
+  institution: Institution!
+  institutionId: Uuid!
+  keyFingerprints: [String!]!
+  pending: Boolean!
+  role: InstitutionRepresentativeRole!
+  user: User!
+  userId: Uuid!
+}
+
 type InstitutionRepresentativeConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionRepresentativeEdge!]! @cost(weight: "10")
@@ -1071,8 +1118,10 @@ type Mutation {
   addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload! @authorize(policy: "Write") @cost(weight: "10")
   addInstitutionMethodDeveloper(input: AddInstitutionMethodDeveloperInput!): AddInstitutionMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write") @cost(weight: "10")
+  addKeyFingerprint(input: KeyFingerprintInput!): AddKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload! @authorize(policy: "ManageUser") @cost(weight: "10")
+  allowRepresentativeToSignData(input: AllowRepresentativeToSignDataInput!): AllowRepresentativeToSignDataPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "Write") @cost(weight: "10")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -1095,6 +1144,7 @@ type Mutation {
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   enableUserTwoFactorAuthenticator(input: EnableUserTwoFactorAuthenticatorInput!): EnableUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
+  forbidRepresentativeToSignData(input: ForbidRepresentativeToSignDataInput!): ForbidRepresentativeToSignDataPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -1683,6 +1733,7 @@ type UpdateMethodPayload {
 
 type User implements Node & Stakeholder {
   canCurrentUserAddApplications: Boolean! @cost(weight: "10")
+  canCurrentUserAddApprovals: Boolean! @cost(weight: "10")
   canCurrentUserDeleteUser: Boolean! @cost(weight: "10")
   canCurrentUserViewApplications: Boolean! @cost(weight: "10")
   developedMethods(pending: Boolean! = false): UserDevelopedMethodConnection! @cost(weight: "10")
@@ -1725,6 +1776,7 @@ type UserRepresentedInstitutionConnection {
 }
 
 type UserRepresentedInstitutionEdge {
+  dataSigningPermission: DataSigningPermission!
   node: Institution! @cost(weight: "10")
   role: InstitutionRepresentativeRole!
 }
@@ -1811,6 +1863,11 @@ input AddUserMethodDeveloperInput {
 
 input AddUserRoleInput {
   role: UserRole!
+  userId: Uuid!
+}
+
+input AllowRepresentativeToSignDataInput {
+  institutionId: Uuid!
   userId: Uuid!
 }
 
@@ -2134,6 +2191,11 @@ input FloatsPropositionInput {
   some: FloatPropositionInput
 }
 
+input ForbidRepresentativeToSignDataInput {
+  institutionId: Uuid!
+  userId: Uuid!
+}
+
 input GeometricDataPropositionInput {
   and: [GeometricDataPropositionInput!]
   componentId: UuidPropositionInput
@@ -2223,6 +2285,12 @@ input InstitutionStateOperationFilterInput {
   neq: InstitutionState @cost(weight: "10")
   in: [InstitutionState!] @cost(weight: "10")
   nin: [InstitutionState!] @cost(weight: "10")
+}
+
+input KeyFingerprintInput {
+  institutionId: Uuid!
+  keyFingerprint: String!
+  userId: Uuid!
 }
 
 input ListComponentAssemblyFilterTypeFilterInput {
@@ -2718,6 +2786,15 @@ enum AddInstitutionRepresentativeErrorCode {
   UNAUTHORIZED
 }
 
+enum AddKeyFingerprintErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_INSTITUTION
+  UNKNOWN_USER
+  NOT_ALLOWED
+  UNKNOWN_REPRESENTATIVE
+}
+
 enum AddUserMethodDeveloperErrorCode {
   UNKNOWN
   UNKNOWN_METHOD
@@ -2729,6 +2806,13 @@ enum AddUserMethodDeveloperErrorCode {
 enum AddUserRoleErrorCode {
   UNKNOWN
   UNKNOWN_USER
+  UNAUTHORIZED
+}
+
+enum AllowRepresentativeToSignDataErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+  UNKNOWN_INSTITUTION
   UNAUTHORIZED
 }
 
@@ -2872,6 +2956,12 @@ enum DataKind {
   GEOMETRIC_DATA
 }
 
+enum DataSigningPermission {
+  NEVER
+  ALLOWED
+  FORBIDDEN
+}
+
 enum DatabaseVerificationState {
   PENDING
   VERIFIED
@@ -2919,6 +3009,13 @@ enum EnableUserTwoFactorAuthenticatorErrorCode {
   UNKNOWN_USER
   ENABLING_FAILED
   INVALID_VERIFICATION_CODE
+}
+
+enum ForbidRepresentativeToSignDataErrorCode {
+  UNKNOWN
+  UNKNOWN_USER
+  UNKNOWN_INSTITUTION
+  UNAUTHORIZED
 }
 
 enum ForgetUserTwoFactorAuthenticationClientErrorCode {

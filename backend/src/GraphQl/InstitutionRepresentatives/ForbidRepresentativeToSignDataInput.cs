@@ -2,7 +2,7 @@
 
 namespace Metabase.GraphQl.InstitutionRepresentatives;
 
-public sealed record ForbidPermissionToSignDataInput(
+public sealed record ForbidRepresentativeToSignDataInput(
     Guid UserId,
     Guid InstitutionId
 );

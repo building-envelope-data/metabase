@@ -98,11 +98,11 @@ public class KeyFingerprintMutations
                 ));
         }
 
-        if (institutionRepresentative.DataSigningPermission != Enumerations.DataSigningPermission.GRANTED)
+        if (institutionRepresentative.DataSigningPermission != Enumerations.DataSigningPermission.ALLOWED)
         {
             return new AddKeyFingerprintPayload(new AddKeyFingerprintError(
-                    AddKeyFingerprintErrorCode.USER_UNAUTHORIZED,
-                    "User is not authorized to sign data.",
+                    AddKeyFingerprintErrorCode.NOT_ALLOWED,
+                    "Representative is not allowed to sign data.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 ));
         }

@@ -19,7 +19,7 @@ public class ApprovalAuthorization
         return user is not null
                && (await context.InstitutionRepresentatives.AsQueryable()
                     .SingleOrDefaultAsync(
-                        x => x.UserId == user.Id && x.DataSigningPermission == Enumerations.DataSigningPermission.GRANTED,
+                        x => x.UserId == user.Id && x.DataSigningPermission == Enumerations.DataSigningPermission.ALLOWED,
                         cancellationToken
                     ).ConfigureAwait(false)) is not null;
     }

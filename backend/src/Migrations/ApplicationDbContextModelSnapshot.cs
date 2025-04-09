@@ -24,6 +24,7 @@ namespace Metabase.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "component_category", new[] { "layer", "material", "unit" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "data_signing_permission", new[] { "allowed", "forbidden", "never" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "database_verification_state", new[] { "pending", "verified" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "institution_operating_state", new[] { "not_operating", "operating" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "institution_representative_role", new[] { "assistant", "owner" });
@@ -309,8 +310,8 @@ namespace Metabase.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("DataSigningPermission")
-                        .HasColumnType("integer");
+                    b.Property<DataSigningPermission>("DataSigningPermission")
+                        .HasColumnType("metabase.data_signing_permission");
 
                     b.PrimitiveCollection<string[]>("KeyFingerprints")
                         .IsRequired()

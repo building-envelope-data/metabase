@@ -418,8 +418,8 @@ public sealed class InstitutionRepresentativeMutations
 
     [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
-    public async Task<GrantPermissionToSignDataPayload> GrantPermissionToSignData(
-        GrantPermissionToSignDataInput input,
+    public async Task<AllowRepresentativeToSignDataPayload> AllowRepresentativeToSignData(
+        AllowRepresentativeToSignDataInput input,
         ClaimsPrincipal claimsPrincipal,
         UserManager<User> userManager,
         IAntiforgery antiforgeryService,
@@ -430,16 +430,16 @@ public sealed class InstitutionRepresentativeMutations
         if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToManageSigningPermission(input.InstitutionId, claimsPrincipal, userManager, context, cancellationToken)
                 .ConfigureAwait(false))
         {
-            return new GrantPermissionToSignDataPayload(
-                new GrantPermissionToSignDataError(
-                   GrantPermissionToSignDataErrorCode.UNAUTHORIZED,
+            return new AllowRepresentativeToSignDataPayload(
+                new AllowRepresentativeToSignDataError(
+                   AllowRepresentativeToSignDataErrorCode.UNAUTHORIZED,
                     $"You are not authorized to grant signing permission.",
                     []
                 )
             );
         }
 
-        var errors = new List<GrantPermissionToSignDataError>();
+        var errors = new List<AllowRepresentativeToSignDataError>();
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
@@ -447,8 +447,8 @@ public sealed class InstitutionRepresentativeMutations
            )
         {
             errors.Add(
-                new GrantPermissionToSignDataError(
-                   GrantPermissionToSignDataErrorCode.UNKNOWN_INSTITUTION,
+                new AllowRepresentativeToSignDataError(
+                   AllowRepresentativeToSignDataErrorCode.UNKNOWN_INSTITUTION,
                     "Unknown institution.",
                     [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
                 )
@@ -462,8 +462,8 @@ public sealed class InstitutionRepresentativeMutations
            )
         {
             errors.Add(
-                new GrantPermissionToSignDataError(
-                   GrantPermissionToSignDataErrorCode.UNKNOWN_USER,
+                new AllowRepresentativeToSignDataError(
+                   AllowRepresentativeToSignDataErrorCode.UNKNOWN_USER,
                     "Unknown user.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 )
@@ -472,7 +472,7 @@ public sealed class InstitutionRepresentativeMutations
 
         if (errors.Count is not 0)
         {
-            return new GrantPermissionToSignDataPayload(errors.AsReadOnly());
+            return new AllowRepresentativeToSignDataPayload(errors.AsReadOnly());
         }
 
         var institutionRepresentative = await context.InstitutionRepresentatives.AsQueryable()
@@ -482,9 +482,9 @@ public sealed class InstitutionRepresentativeMutations
             ).ConfigureAwait(false);
         if (institutionRepresentative is null)
         {
-            return new GrantPermissionToSignDataPayload(
-                new GrantPermissionToSignDataError(
-                   GrantPermissionToSignDataErrorCode.UNKNOWN_USER,
+            return new AllowRepresentativeToSignDataPayload(
+                new AllowRepresentativeToSignDataError(
+                   AllowRepresentativeToSignDataErrorCode.UNKNOWN_USER,
                     "Unknown representative.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 )
@@ -492,24 +492,24 @@ public sealed class InstitutionRepresentativeMutations
         }
         if (institutionRepresentative.Role is not InstitutionRepresentativeRole.OWNER)
         {
-            return new GrantPermissionToSignDataPayload(
-                new GrantPermissionToSignDataError(
-                   GrantPermissionToSignDataErrorCode.UNAUTHORIZED,
+            return new AllowRepresentativeToSignDataPayload(
+                new AllowRepresentativeToSignDataError(
+                   AllowRepresentativeToSignDataErrorCode.UNAUTHORIZED,
                     $"Representative can not be granted signing permission.",
                     []
                 )
             );
         }
 
-        institutionRepresentative.DataSigningPermission = DataSigningPermission.GRANTED;
+        institutionRepresentative.DataSigningPermission = DataSigningPermission.ALLOWED;
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        return new GrantPermissionToSignDataPayload(institutionRepresentative);
+        return new AllowRepresentativeToSignDataPayload(institutionRepresentative);
     }
 
     [Authorize(Policy = AuthConfiguration.ManageUserPolicy)]
     [UseUserManager]
-    public async Task<ForbidPermissionToSignDataPayload> ForbidPermissionToSignData(
-        ForbidPermissionToSignDataInput input,
+    public async Task<ForbidRepresentativeToSignDataPayload> ForbidRepresentativeToSignData(
+        ForbidRepresentativeToSignDataInput input,
         ClaimsPrincipal claimsPrincipal,
         UserManager<User> userManager,
         IAntiforgery antiforgeryService,
@@ -520,16 +520,16 @@ public sealed class InstitutionRepresentativeMutations
         if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToManageSigningPermission(input.InstitutionId, claimsPrincipal, userManager, context, cancellationToken)
                 .ConfigureAwait(false))
         {
-            return new ForbidPermissionToSignDataPayload(
-                new ForbidPermissionToSignDataError(
-                    ForbidPermissionToSignDataErrorCode.UNAUTHORIZED,
+            return new ForbidRepresentativeToSignDataPayload(
+                new ForbidRepresentativeToSignDataError(
+                    ForbidRepresentativeToSignDataErrorCode.UNAUTHORIZED,
                     $"You are not authorized to forbid signing permission.",
                     []
                 )
             );
         }
 
-        var errors = new List<ForbidPermissionToSignDataError>();
+        var errors = new List<ForbidRepresentativeToSignDataError>();
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
@@ -537,8 +537,8 @@ public sealed class InstitutionRepresentativeMutations
            )
         {
             errors.Add(
-                new ForbidPermissionToSignDataError(
-                    ForbidPermissionToSignDataErrorCode.UNKNOWN_INSTITUTION,
+                new ForbidRepresentativeToSignDataError(
+                    ForbidRepresentativeToSignDataErrorCode.UNKNOWN_INSTITUTION,
                     "Unknown institution.",
                     [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
                 )
@@ -552,8 +552,8 @@ public sealed class InstitutionRepresentativeMutations
            )
         {
             errors.Add(
-                new ForbidPermissionToSignDataError(
-                    ForbidPermissionToSignDataErrorCode.UNKNOWN_USER,
+                new ForbidRepresentativeToSignDataError(
+                    ForbidRepresentativeToSignDataErrorCode.UNKNOWN_USER,
                     "Unknown user.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 )
@@ -562,7 +562,7 @@ public sealed class InstitutionRepresentativeMutations
 
         if (errors.Count is not 0)
         {
-            return new ForbidPermissionToSignDataPayload(errors.AsReadOnly());
+            return new ForbidRepresentativeToSignDataPayload(errors.AsReadOnly());
         }
 
         var institutionRepresentativep = await context.InstitutionRepresentatives.AsQueryable()
@@ -573,9 +573,9 @@ public sealed class InstitutionRepresentativeMutations
 
         if (institutionRepresentativep is null)
         {
-            return new ForbidPermissionToSignDataPayload(
-                new ForbidPermissionToSignDataError(
-                    ForbidPermissionToSignDataErrorCode.UNKNOWN_USER,
+            return new ForbidRepresentativeToSignDataPayload(
+                new ForbidRepresentativeToSignDataError(
+                    ForbidRepresentativeToSignDataErrorCode.UNKNOWN_USER,
                     "Unknown representative.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 )
@@ -584,9 +584,9 @@ public sealed class InstitutionRepresentativeMutations
 
         if (institutionRepresentativep.Role is not InstitutionRepresentativeRole.OWNER)
         {
-            return new ForbidPermissionToSignDataPayload(
-                new ForbidPermissionToSignDataError(
-                    ForbidPermissionToSignDataErrorCode.UNAUTHORIZED,
+            return new ForbidRepresentativeToSignDataPayload(
+                new ForbidRepresentativeToSignDataError(
+                    ForbidRepresentativeToSignDataErrorCode.UNAUTHORIZED,
                     $"Representative can not be forbid signing permission.",
                     []
                 )
@@ -595,7 +595,7 @@ public sealed class InstitutionRepresentativeMutations
 
         institutionRepresentativep.DataSigningPermission = DataSigningPermission.FORBIDDEN;
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        return new ForbidPermissionToSignDataPayload(institutionRepresentativep);
+        return new ForbidRepresentativeToSignDataPayload(institutionRepresentativep);
     }
 
     private static async Task<bool> ExistsOtherInstitutionOwner(

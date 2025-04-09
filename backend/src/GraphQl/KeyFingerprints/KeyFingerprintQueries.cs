@@ -83,7 +83,7 @@ public class KeyFingerprintQueries
                 ));
         }
 
-        return new VerifyKeyFingerprintPayload(institutionRepresentative.DataSigningPermission == DataSigningPermission.GRANTED
+        return new VerifyKeyFingerprintPayload(institutionRepresentative.DataSigningPermission == DataSigningPermission.ALLOWED
             || institutionRepresentative.DataSigningPermission == DataSigningPermission.FORBIDDEN);
     }
 }
