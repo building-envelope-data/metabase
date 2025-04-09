@@ -234,17 +234,16 @@ public static class CommonAuthorization
         return wrappedManagerRole?.Role;
     }
 
-    private static async Task<List<InstitutionRepresentativeRole>?> FetchRoles(
+    private static Task<List<InstitutionRepresentativeRole>> FetchRoles(
         User user,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        return await context.InstitutionRepresentatives.AsNoTracking()
+        return context.InstitutionRepresentatives.AsNoTracking()
                 .Where(x => x.UserId == user.Id && !x.Pending)
                 .Select(x => x.Role)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .ToListAsync(cancellationToken);
     }
 
     public static async Task<bool> IsVerifiedManufacturerOfComponents(

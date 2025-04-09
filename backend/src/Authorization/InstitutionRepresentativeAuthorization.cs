@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,5 +39,30 @@ public static class InstitutionRepresentativeAuthorization
                    loggedInUser,
                    userId
                );
+    }
+
+    public static async Task<bool> IsAuthorizedToManageSigningPermission(
+        Guid institutionId,
+        ClaimsPrincipal claimsPrincipal,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken)
+    {
+        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+
+        return user is not null
+               && (await CommonAuthorization.IsAdministrator(user, userManager)
+               || await CommonAuthorization.IsOwnerOfInstitution(user, institutionId, context, cancellationToken));
+    }
+
+    internal static async Task<bool> IsAuthorizedToAddKeyFingerprint(
+        ClaimsPrincipal claimsPrincipal,
+        ApplicationDbContext context,
+        UserManager<User> userManager,
+        CancellationToken cancellationToken)
+    {
+        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        return user is not null
+            && await CommonAuthorization.IsAtLeastAssistant(user, context, cancellationToken).ConfigureAwait(false);
     }
 }

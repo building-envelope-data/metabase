@@ -3,7 +3,7 @@
 namespace Metabase.GraphQl.InstitutionRepresentatives;
 
 [SuppressMessage("Naming", "CA1707")]
-public enum AllowRepresentativeToSignDataErrorCode
+public enum GrantPermissionToSignDataErrorCode
 {
     UNKNOWN,
     UNKNOWN_USER,

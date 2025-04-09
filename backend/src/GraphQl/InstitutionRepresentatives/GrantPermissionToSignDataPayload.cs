@@ -3,38 +3,38 @@ using Metabase.Data;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives;
 
-public class AllowRepresentativeToSignDataPayload
+public class GrantPermissionToSignDataPayload
 {
-    public AllowRepresentativeToSignDataPayload(
+    public GrantPermissionToSignDataPayload(
         InstitutionRepresentative institutionRepresentative
     )
     {
         InstitutionRepresentative = institutionRepresentative;
     }
 
-    public AllowRepresentativeToSignDataPayload(
-        IReadOnlyCollection<AllowRepresentativeToSignDataError> errors
+    public GrantPermissionToSignDataPayload(
+        IReadOnlyCollection<GrantPermissionToSignDataError> errors
     )
     {
         Errors = errors;
     }
 
-    public AllowRepresentativeToSignDataPayload(
+    public GrantPermissionToSignDataPayload(
         InstitutionRepresentative institutionRepresentative,
-        IReadOnlyCollection<AllowRepresentativeToSignDataError> errors
+        IReadOnlyCollection<GrantPermissionToSignDataError> errors
     )
     {
         InstitutionRepresentative = institutionRepresentative;
         Errors = errors;
     }
 
-    public AllowRepresentativeToSignDataPayload(
-        AllowRepresentativeToSignDataError error
+    public GrantPermissionToSignDataPayload(
+        GrantPermissionToSignDataError error
     )
         : this([error])
     {
     }
 
     public InstitutionRepresentative? InstitutionRepresentative { get; }
-    public IReadOnlyCollection<AllowRepresentativeToSignDataError>? Errors { get; }
+    public IReadOnlyCollection<GrantPermissionToSignDataError>? Errors { get; }
 }

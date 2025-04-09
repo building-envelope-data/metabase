@@ -134,7 +134,6 @@ public static class GraphQlConfiguration
             .AddType<TokenQueries>()
             .AddType<ScopeQueries>()
             .AddType<UserQueries>()
-            .AddType<KeyFingerprintQueries>()
             // Mutation Types
             .AddMutationType(d => d.Name(nameof(Mutation)))
             .AddType<ComponentAssemblyMutations>()
@@ -153,7 +152,7 @@ public static class GraphQlConfiguration
             .AddType<ApplicationMutations>()
             .AddType<AuthorizationMutations>()
             .AddType<TokenMutations>()
-            .AddType<KeyFingerprintMutation>()
+            .AddType<KeyFingerprintMutations>()
             /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
             /*     .AddType<ComponentSubscriptions>() */
             // Object Types

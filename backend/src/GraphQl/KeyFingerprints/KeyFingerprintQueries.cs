@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types;
 using Metabase.Data;
+using Metabase.Enumerations;
 using Metabase.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -82,7 +83,7 @@ public class KeyFingerprintQueries
                 ));
         }
 
-        return new VerifyKeyFingerprintPayload(institutionRepresentative.DataSigningPermission == Enumerations.DataSigningPermission.GRANTED
-            || institutionRepresentative.DataSigningPermission == Enumerations.DataSigningPermission.REMOVED);
+        return new VerifyKeyFingerprintPayload(institutionRepresentative.DataSigningPermission == DataSigningPermission.GRANTED
+            || institutionRepresentative.DataSigningPermission == DataSigningPermission.FORBIDDEN);
     }
 }

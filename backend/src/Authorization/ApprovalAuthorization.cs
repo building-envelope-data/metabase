@@ -21,6 +21,6 @@ public class ApprovalAuthorization
                     .SingleOrDefaultAsync(
                         x => x.UserId == user.Id && x.DataSigningPermission == Enumerations.DataSigningPermission.GRANTED,
                         cancellationToken
-                    ).ConfigureAwait(false)) != null;
+                    ).ConfigureAwait(false)) is not null;
     }
 }

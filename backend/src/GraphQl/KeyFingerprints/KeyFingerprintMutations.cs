@@ -9,7 +9,6 @@ using Metabase.Authorization;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
-using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -18,13 +17,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Metabase.GraphQl.KeyFingerprints;
 
 [ExtendObjectType(nameof(Mutation))]
-public class KeyFingerprintMutation
+public class KeyFingerprintMutations
 {
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<AddKeyFingerprintPayload> AddKeyFingerprintAsync(
         KeyFingerprintInput input,
-        InstitutionByIdDataLoader institutionById,
         ClaimsPrincipal claimsPrincipal,
         UserManager<User> userManager,
         ApplicationDbContext context,
@@ -32,11 +30,10 @@ public class KeyFingerprintMutation
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToManage(
+        if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToAddKeyFingerprint(
                 claimsPrincipal,
-                input.InstitutionId,
-                userManager,
                 context,
+                userManager,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -97,6 +94,15 @@ public class KeyFingerprintMutation
             return new AddKeyFingerprintPayload(new AddKeyFingerprintError(
                     AddKeyFingerprintErrorCode.UNKNOWN_REPRESENTATIVE,
                     "Unknown representative.",
+                    [nameof(input), nameof(input.UserId).FirstCharToLower()]
+                ));
+        }
+
+        if (institutionRepresentative.DataSigningPermission != Enumerations.DataSigningPermission.GRANTED)
+        {
+            return new AddKeyFingerprintPayload(new AddKeyFingerprintError(
+                    AddKeyFingerprintErrorCode.USER_UNAUTHORIZED,
+                    "User is not authorized to sign data.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 ));
         }

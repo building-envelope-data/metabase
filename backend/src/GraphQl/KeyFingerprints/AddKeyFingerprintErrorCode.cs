@@ -9,5 +9,6 @@ public enum AddKeyFingerprintErrorCode
     UNAUTHORIZED,
     UNKNOWN_INSTITUTION,
     UNKNOWN_USER,
+    USER_UNAUTHORIZED,
     UNKNOWN_REPRESENTATIVE,
 }
