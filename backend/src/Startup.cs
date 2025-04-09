@@ -164,6 +164,7 @@ public sealed class Startup(
                     .SetPostgresVersion(13, 13)
                     .MapEnum<ComponentCategory>(ApplicationDbContext.ComponentCategoryTypeName, appSettings.Database.SchemaName)
                     .MapEnum<DatabaseVerificationState>(ApplicationDbContext.DatabaseVerificationStateTypeName, appSettings.Database.SchemaName)
+                    .MapEnum<DataSigningPermission>(ApplicationDbContext.DataSigningPermissionTypeName, appSettings.Database.SchemaName)
                     .MapEnum<InstitutionRepresentativeRole>(ApplicationDbContext.InstitutionRepresentativeRoleTypeName, appSettings.Database.SchemaName)
                     .MapEnum<InstitutionState>(ApplicationDbContext.InstitutionStateTypeName, appSettings.Database.SchemaName)
                     .MapEnum<InstitutionOperatingState>(ApplicationDbContext.InstitutionOperatingStateTypeName, appSettings.Database.SchemaName)

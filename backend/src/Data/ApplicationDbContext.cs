@@ -21,6 +21,7 @@ public sealed class ApplicationDbContext
 
     internal const string ComponentCategoryTypeName = "component_category";
     internal const string DatabaseVerificationStateTypeName = "database_verification_state";
+    internal const string DataSigningPermissionTypeName = "data_signing_permission";
     internal const string InstitutionRepresentativeRoleTypeName = "institution_representative_role";
     internal const string InstitutionStateTypeName = "institution_state";
     internal const string InstitutionOperatingStateTypeName = "institution_operating_state";

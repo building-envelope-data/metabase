@@ -71,6 +71,22 @@ public static class CommonAuthorization
         return roles.Contains(InstitutionRepresentativeRole.OWNER);
     }
 
+    public static async Task<bool> IsAtLeastAssistant(
+        User user,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        var roles = await FetchRoles(
+                   user,
+                   context,
+                   cancellationToken
+               ).ConfigureAwait(false);
+
+        if (roles == null) return false;
+        return roles.Contains(InstitutionRepresentativeRole.OWNER) || roles.Contains(InstitutionRepresentativeRole.ASSISTANT);
+    }
+
     private static async Task<bool> IsInRole(
         User user,
         UserRole role,
@@ -218,17 +234,16 @@ public static class CommonAuthorization
         return wrappedManagerRole?.Role;
     }
 
-    private static async Task<List<InstitutionRepresentativeRole>?> FetchRoles(
+    private static Task<List<InstitutionRepresentativeRole>> FetchRoles(
         User user,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        return await context.InstitutionRepresentatives.AsNoTracking()
+        return context.InstitutionRepresentatives.AsNoTracking()
                 .Where(x => x.UserId == user.Id && !x.Pending)
                 .Select(x => x.Role)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .ToListAsync(cancellationToken);
     }
 
     public static async Task<bool> IsVerifiedManufacturerOfComponents(

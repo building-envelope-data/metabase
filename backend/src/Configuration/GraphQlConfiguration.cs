@@ -20,6 +20,7 @@ using Metabase.GraphQl.DescriptionOrReferences;
 using Metabase.GraphQl.InstitutionMethodDevelopers;
 using Metabase.GraphQl.InstitutionRepresentatives;
 using Metabase.GraphQl.Institutions;
+using Metabase.GraphQl.KeyFingerprints;
 using Metabase.GraphQl.Methods;
 using Metabase.GraphQl.Numerations;
 using Metabase.GraphQl.OpenIdConnect.Application;
@@ -151,6 +152,7 @@ public static class GraphQlConfiguration
             .AddType<ApplicationMutations>()
             .AddType<AuthorizationMutations>()
             .AddType<TokenMutations>()
+            .AddType<KeyFingerprintMutations>()
             /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
             /*     .AddType<ComponentSubscriptions>() */
             // Object Types
