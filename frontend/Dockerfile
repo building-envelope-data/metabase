@@ -8,8 +8,6 @@
 # https://hub.docker.com/_/node
 FROM node:22.14-bookworm-slim
 
-ARG GROUP_ID
-ARG USER_ID
 ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
 
 # TODO directory node_modules is created on host machine when container is run

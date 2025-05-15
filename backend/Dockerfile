@@ -16,6 +16,10 @@ ARG CERTIFICATE_AUTHORITY_PASSWORD
 
 # Create non-root user to run commands in (see https://medium.com/@mccode/processes-in-containers-should-not-run-as-root-2feae3f0df3b)
 RUN \
+  existing_user_name="$(getent passwd ${USER_ID} 2>/dev/null | cut --delimiter=: --fields=1)" && \
+  existing_group_name="$(getent group ${GROUP_ID} 2>/dev/null | cut --delimiter=: --fields=1)" && \
+  if test -n "${existing_user_name}"; then deluser --system "${existing_user_name}"; fi && \
+  if test -n "${existing_group_name}"; then delgroup --system "${existing_group_name}"; fi && \
   addgroup --system --gid ${GROUP_ID} us && \
   adduser --system --uid ${USER_ID} --ingroup us me
 
