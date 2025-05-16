@@ -8,5 +8,7 @@ public enum CoatedSide
     FRONT,
     BACK,
     BOTH,
-    NEITHER
+    NEITHER,
+    UNKNOWN,
+    NOT_APPLICABLE
 }
