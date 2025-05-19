@@ -1,3 +1,4 @@
+using System;
 using Metabase.Enumerations;
 using Microsoft.EntityFrameworkCore.Migrations;
 
