@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Metabase.Data;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives;

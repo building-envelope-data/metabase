@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +54,7 @@ public sealed class ApplicationMutations
             return new CreateApplicationPayload(
                 new CreateApplicationError(
                     CreateApplicationErrorCode.UNKNOWN_INSTITUTION,
-                    "No institution with this id found.",
+                    "Unknown institution.",
                     new[] { nameof(input), nameof(input.AssociatedInstitutionId).FirstCharToLower() }
                 )
             );
@@ -156,7 +156,7 @@ public sealed class ApplicationMutations
         {
             return new UpdateApplicationPayload(
                 new UpdateApplicationError(UpdateApplicationErrorCode.UNKNOWN,
-                "Empty Application Id",
+                "Empty application identifier.",
                 new[] { nameof(input), nameof(input.ApplicationId).FirstCharToLower() }));
         }
 

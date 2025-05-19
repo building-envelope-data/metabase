@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Metabase.GraphQl.KeyFingerprints;
 public sealed record KeyFingerprintInput(

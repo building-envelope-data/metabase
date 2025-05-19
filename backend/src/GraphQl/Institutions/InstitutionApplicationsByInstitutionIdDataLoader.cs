@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using GreenDonut;
 using Metabase.Data;
 using Metabase.GraphQl.Entities;

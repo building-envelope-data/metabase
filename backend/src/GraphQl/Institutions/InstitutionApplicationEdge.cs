@@ -1,4 +1,4 @@
-﻿using Metabase.Data;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Institutions
 {
