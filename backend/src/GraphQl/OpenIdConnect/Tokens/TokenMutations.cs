@@ -41,7 +41,7 @@ public sealed class TokenMutations
                 new RevokeTokenError(
                     RevokeTokenErrorCode.UNAUTHORIZED,
                     "You are not authorized to revoke the token.",
-                    new[] { nameof(input), nameof(input.TokenId).FirstCharToLower() }
+                    [nameof(input), nameof(input.TokenId).FirstCharToLower()]
                 )
             );
         }
@@ -50,7 +50,7 @@ public sealed class TokenMutations
             return new RevokeTokenPayload(
                 new RevokeTokenError(RevokeTokenErrorCode.UNKNOWN,
                     "Empty Token Id",
-                    new[] { nameof(input), nameof(input.TokenId).FirstCharToLower() }));
+                    [nameof(input), nameof(input.TokenId).FirstCharToLower()]));
         }
 
         var token = await tokenManager.FindByIdAsync(input.TokenId.ToString(), cancellationToken).ConfigureAwait(false);
@@ -61,7 +61,7 @@ public sealed class TokenMutations
                 new RevokeTokenError(
                     RevokeTokenErrorCode.UNKNOWN_TOKEN,
                     "Unknown Token.",
-                    new[] { nameof(input), nameof(input.TokenId).FirstCharToLower() }
+                    [nameof(input), nameof(input.TokenId).FirstCharToLower()]
                 )
             );
         }

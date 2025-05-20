@@ -13,7 +13,7 @@ public sealed class DeleteAuthorizationPayload
         DeleteAuthorizationError error
     )
     {
-        Errors = new[] { error };
+        Errors = [error];
     }
 
     public IReadOnlyCollection<DeleteAuthorizationError>? Errors { get; }

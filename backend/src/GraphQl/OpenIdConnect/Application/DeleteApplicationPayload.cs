@@ -12,7 +12,7 @@ public sealed class DeleteApplicationPayload
         DeleteApplicationError error
     )
     {
-        Errors = new[] { error };
+        Errors = [error];
     }
 
     public IReadOnlyCollection<DeleteApplicationError>? Errors { get; }

@@ -43,7 +43,7 @@ public sealed class ApplicationMutations
                 new CreateApplicationError(
                     CreateApplicationErrorCode.UNAUTHORIZED,
                     "You are not authorized to create applications.",
-                    new[] { nameof(input), nameof(input.ClientId).FirstCharToLower() }
+                    [nameof(input), nameof(input.ClientId).FirstCharToLower()]
                 )
             );
         }
@@ -55,7 +55,7 @@ public sealed class ApplicationMutations
                 new CreateApplicationError(
                     CreateApplicationErrorCode.UNKNOWN_INSTITUTION,
                     "Unknown institution.",
-                    new[] { nameof(input), nameof(input.AssociatedInstitutionId).FirstCharToLower() }
+                    [nameof(input), nameof(input.AssociatedInstitutionId).FirstCharToLower()]
                 )
             );
         }
@@ -148,7 +148,7 @@ public sealed class ApplicationMutations
                 new UpdateApplicationError(
                     UpdateApplicationErrorCode.UNAUTHORIZED,
                     "You are not authorized to update the application.",
-                    new[] { nameof(input), nameof(input.ApplicationId).FirstCharToLower() }
+                    [nameof(input), nameof(input.ApplicationId).FirstCharToLower()]
                 )
             );
         }
@@ -157,7 +157,7 @@ public sealed class ApplicationMutations
             return new UpdateApplicationPayload(
                 new UpdateApplicationError(UpdateApplicationErrorCode.UNKNOWN,
                 "Empty application identifier.",
-                new[] { nameof(input), nameof(input.ApplicationId).FirstCharToLower() }));
+                [nameof(input), nameof(input.ApplicationId).FirstCharToLower()]));
         }
 
         var application = await applicationManager.FindByIdAsync(input.ApplicationId.ToString(), cancellationToken).ConfigureAwait(false);
@@ -168,7 +168,7 @@ public sealed class ApplicationMutations
                 new UpdateApplicationError(
                     UpdateApplicationErrorCode.UNKNOWN_APPLICATION,
                     "Unknown application.",
-                    new[] { nameof(input), nameof(input.ApplicationId).FirstCharToLower() }
+                    [nameof(input), nameof(input.ApplicationId).FirstCharToLower()]
                 )
             );
         }
@@ -205,7 +205,7 @@ public sealed class ApplicationMutations
                 new DeleteApplicationError(
                     DeleteApplicationErrorCode.UNAUTHORIZED,
                     "You are not authorized to delete the application.",
-                    new[] { nameof(input), nameof(input.ApplicationId).FirstCharToLower() }
+                    [nameof(input), nameof(input.ApplicationId).FirstCharToLower()]
                 )
             );
         }
@@ -214,7 +214,7 @@ public sealed class ApplicationMutations
             return new DeleteApplicationPayload(
                 new DeleteApplicationError(DeleteApplicationErrorCode.UNKNOWN,
                     "Empty Application Id",
-                    new[] { nameof(input), nameof(input.ApplicationId).FirstCharToLower() }));
+                    [nameof(input), nameof(input.ApplicationId).FirstCharToLower()]));
         }
 
         var application = await applicationManager.FindByIdAsync(input.ApplicationId.ToString(), cancellationToken).ConfigureAwait(false);
@@ -225,7 +225,7 @@ public sealed class ApplicationMutations
                 new DeleteApplicationError(
                     DeleteApplicationErrorCode.UNKNOWN_APPLICATION,
                     "Unknown application.",
-                    new[] { nameof(input), nameof(input.ApplicationId).FirstCharToLower() }
+                    [nameof(input), nameof(input.ApplicationId).FirstCharToLower()]
                 )
             );
         }

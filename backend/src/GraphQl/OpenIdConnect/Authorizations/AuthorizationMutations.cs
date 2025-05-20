@@ -40,7 +40,7 @@ public class AuthorizationMutations
                 new DeleteAuthorizationError(
                     DeleteAuthorizationErrorCode.UNAUTHORIZED,
                     "You are not authorized to delete the authorization.",
-                    new[] { nameof(input), nameof(input.AuthorizationId).FirstCharToLower() }
+                    [nameof(input), nameof(input.AuthorizationId).FirstCharToLower()]
                 )
             );
         }
@@ -49,7 +49,7 @@ public class AuthorizationMutations
             return new DeleteAuthorizationPayload(
                 new DeleteAuthorizationError(DeleteAuthorizationErrorCode.UNKNOWN,
                     "Empty Authorization Id",
-                    new[] { nameof(input), nameof(input.AuthorizationId).FirstCharToLower() }));
+                    [nameof(input), nameof(input.AuthorizationId).FirstCharToLower()]));
         }
 
         var authorization = await authorizationManager.FindByIdAsync(input.AuthorizationId.ToString(), cancellationToken).ConfigureAwait(false);
@@ -60,7 +60,7 @@ public class AuthorizationMutations
                 new DeleteAuthorizationError(
                     DeleteAuthorizationErrorCode.UNKNOWN_AUTHORIZATION,
                     "Unknown authorization.",
-                    new[] { nameof(input), nameof(input.AuthorizationId).FirstCharToLower() }
+                    [nameof(input), nameof(input.AuthorizationId).FirstCharToLower()]
                 )
             );
         }

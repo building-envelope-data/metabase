@@ -12,7 +12,7 @@ public sealed class RevokeTokenPayload
         RevokeTokenError error
     )
     {
-        Errors = new[] { error };
+        Errors = [error];
     }
 
     public IReadOnlyCollection<RevokeTokenError>? Errors { get; }

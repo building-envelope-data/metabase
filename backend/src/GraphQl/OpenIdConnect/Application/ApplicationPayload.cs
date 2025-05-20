@@ -23,7 +23,7 @@ public class ApplicationPayload<TApplicationError> : Payload
     protected ApplicationPayload(
         TApplicationError error
     )
-        : this(new[] { error })
+        : this([error])
     {
     }
 
@@ -42,7 +42,7 @@ public class ApplicationPayload<TApplicationError> : Payload
     )
         : this(
             application,
-            new[] { error }
+            [error]
         )
     {
     }
