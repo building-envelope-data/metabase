@@ -51,7 +51,7 @@ public static class GraphQlConfiguration
         // Automatic-Persisted-Queries Services
         services
             .AddMemoryCache()
-            .AddSha256DocumentHashProvider(HashFormat.Hex);
+            .AddSha256DocumentHashProvider(HashFormat.Hex); // https://chillicream.com/docs/hotchocolate/v15/security/#fips-compliance
         // GraphQL Server
         services
             .AddGraphQLServer()
@@ -79,7 +79,7 @@ public static class GraphQlConfiguration
             .ModifyRequestOptions(options =>
                 {
                     // https://github.com/ChilliCream/hotchocolate/blob/main/src/HotChocolate/Core/src/Execution/Options/RequestExecutorOptions.cs
-                    /* options.ExecutionTimeout = ...; */
+                    options.ExecutionTimeout = TimeSpan.FromSeconds(120);
                     options.IncludeExceptionDetails = !environment.IsProduction(); // Default is `Debugger.IsAttached`.
                     /* options.QueryCacheSize = ...; */
                     /* options.UseComplexityMultipliers = ...; */
