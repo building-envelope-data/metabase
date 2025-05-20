@@ -322,7 +322,7 @@ and the pages following it.
    `update metabase.database set "Locator"='https://igsdb-v2-staging.herokuapp.com/graphql/' where "Id"='48994b60-670d-488d-aaf7-53333a64f1d6';`
 1. Change to the production environment by running `cd /app/production`.
 1. Adapt the environment file `./.env` if necessary by comparing it with the
-   `./.env.staging.sample` file of the release to be deployed.
+   `./.env.production.sample` file of the release to be deployed.
 1. Deploy the new release in the production environment by running
    `make --file=Makefile.production TARGET=${TAG} deploy`, where `${TAG}` is
    the release tag to be deployed, for example, `v1.0.0`.
