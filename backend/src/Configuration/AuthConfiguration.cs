@@ -276,7 +276,7 @@ public abstract class AuthConfiguration
                     options.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
                     options.SetAuthorizationEndpointUris("connect/authorize")
                         .SetPushedAuthorizationEndpointUris("connect/par")
-                        .SetDeviceAuthorizationEndpointUris("connect/device")
+                        // .SetDeviceAuthorizationEndpointUris("connect/device")
                         .SetEndSessionEndpointUris("connect/logout")
                         .SetIntrospectionEndpointUris("connect/introspect")
                         // .SetRevocationEndpointUris("")
@@ -296,7 +296,8 @@ public abstract class AuthConfiguration
                         ManageUserApiScope
                     );
                     options.AllowAuthorizationCodeFlow()
-                        .AllowDeviceAuthorizationFlow()
+                        // .AllowDeviceAuthorizationFlow()
+                        .AllowClientCredentialsFlow()
                         .AllowRefreshTokenFlow();
                     // .AllowHybridFlow()
                     if (environment.IsEnvironment(Program.TestEnvironment))
