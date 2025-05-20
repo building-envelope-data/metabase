@@ -1,4 +1,7 @@
-// Inspired by https://github.com/openiddict/openiddict-core/blob/rel/6.0.0/sandbox/OpenIddict.Sandbox.AspNetCore.Server/Controllers/AuthorizationController.cs
+// Inspired by
+// https://github.com/openiddict/openiddict-core/blob/dev/sandbox/OpenIddict.Sandbox.AspNetCore.Server/Controllers/AuthorizationController.cs
+// specifically by
+// https://github.com/openiddict/openiddict-core/blob/0048dc4b73ff2003f582e775a286db4c78985fae/sandbox/OpenIddict.Sandbox.AspNetCore.Server/Controllers/AuthorizationController.cs
 
 using System;
 using System.Collections.Generic;

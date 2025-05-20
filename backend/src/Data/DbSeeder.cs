@@ -213,7 +213,7 @@ public sealed class DbSeeder
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
-                        // OpenIddictConstants.Permissions.Endpoints.Device,
+                        OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
                         OpenIddictConstants.Permissions.Endpoints.Introspection,
                         OpenIddictConstants.Permissions.Endpoints.EndSession,
                         OpenIddictConstants.Permissions.Endpoints.Revocation,
@@ -221,7 +221,6 @@ public sealed class DbSeeder
                         environment.IsEnvironment(Program.TestEnvironment)
                             ? OpenIddictConstants.Permissions.GrantTypes.Password
                             : OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                        // OpenIddictConstants.Permissions.GrantTypes.ClientCredentials, OpenIddictConstants.Permissions.GrantTypes.DeviceCode,
                         OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
                         environment.IsEnvironment(Program.TestEnvironment)
                             ? OpenIddictConstants.Permissions.ResponseTypes.Token
@@ -240,7 +239,8 @@ public sealed class DbSeeder
                     },
                     Requirements =
                     {
-                        OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange
+                        OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
+                        OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
                     }
                 }
             ).ConfigureAwait(false);
@@ -274,13 +274,12 @@ public sealed class DbSeeder
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
-                        // OpenIddictConstants.Permissions.Endpoints.Device,
+                        OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
                         OpenIddictConstants.Permissions.Endpoints.Introspection,
                         OpenIddictConstants.Permissions.Endpoints.EndSession,
                         OpenIddictConstants.Permissions.Endpoints.Revocation,
                         OpenIddictConstants.Permissions.Endpoints.Token,
                         OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                        // OpenIddictConstants.Permissions.GrantTypes.ClientCredentials, OpenIddictConstants.Permissions.GrantTypes.DeviceCode,
                         OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
                         OpenIddictConstants.Permissions.ResponseTypes.Code,
                         OpenIddictConstants.Permissions.Scopes.Address,
@@ -295,7 +294,8 @@ public sealed class DbSeeder
                     },
                     Requirements =
                     {
-                        OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange
+                        OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
+                        OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
                     }
                 }
             ).ConfigureAwait(false);

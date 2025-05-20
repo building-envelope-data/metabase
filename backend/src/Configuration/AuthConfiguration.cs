@@ -275,6 +275,7 @@ public abstract class AuthConfiguration
                 {
                     options.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
                     options.SetAuthorizationEndpointUris("connect/authorize")
+                        .SetPushedAuthorizationEndpointUris("connect/par")
                         .SetDeviceAuthorizationEndpointUris("connect/device")
                         .SetEndSessionEndpointUris("connect/logout")
                         .SetIntrospectionEndpointUris("connect/introspect")
@@ -309,6 +310,10 @@ public abstract class AuthConfiguration
                         .AddSigningCertificate(signingCertificate);
                     // Force client applications to use Proof Key for Code Exchange (PKCE): https://documentation.openiddict.com/configuration/proof-key-for-code-exchange.html#enabling-pkce-enforcement-at-the-global-level
                     options.RequireProofKeyForCodeExchange();
+                    // Force client applications to use Pushed Authorization Requests (PAR): https://documentation.openiddict.com/configuration/pushed-authorization-requests
+                    options.RequirePushedAuthorizationRequests();
+                    // options.EnableAuthorizationRequestCaching();
+                    // options.EnableEndSessionRequestCaching();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                     var builder = options.UseAspNetCore()
                         .EnableStatusCodePagesIntegration()
