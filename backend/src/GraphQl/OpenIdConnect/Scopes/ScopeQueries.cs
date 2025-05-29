@@ -30,7 +30,9 @@ public sealed class ScopeQueries
     {
         if (!await OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
                 .ConfigureAwait(false))
+        {
             return Array.Empty<OpenIdScope>();
+        }
 
         return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -49,7 +51,9 @@ public sealed class ScopeQueries
     {
         if (!await OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
                 .ConfigureAwait(false))
+        {
             return null;
+        }
 
         return await manager.FindByIdAsync(scopeId.ToString(), cancellationToken: cancellationToken).ConfigureAwait(false);
     }
