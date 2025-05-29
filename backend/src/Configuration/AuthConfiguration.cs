@@ -313,20 +313,21 @@ public abstract class AuthConfiguration
                     options.RequireProofKeyForCodeExchange();
                     // Force client applications to use Pushed Authorization Requests (PAR): https://documentation.openiddict.com/configuration/pushed-authorization-requests
                     options.RequirePushedAuthorizationRequests();
-                    // options.EnableAuthorizationRequestCaching();
-                    // options.EnableEndSessionRequestCaching();
+                    // https://documentation.openiddict.com/integrations/aspnet-core#authorization-and-logout-request-caching
+                    options.EnableAuthorizationRequestCaching()
+                        .EnableEndSessionRequestCaching();
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                     var builder = options.UseAspNetCore()
-                        .EnableStatusCodePagesIntegration()
-                        .EnableAuthorizationEndpointPassthrough()
+                        .SuppressJsonResponseIndentation()
+                        .EnableStatusCodePagesIntegration() // https://documentation.openiddict.com/integrations/aspnet-core#status-code-pages-middleware-integration
+                        .EnableAuthorizationEndpointPassthrough() // https://documentation.openiddict.com/integrations/aspnet-core#pass-through-mode
                         .EnableEndSessionEndpointPassthrough()
+                        .EnableEndUserVerificationEndpointPassthrough()
                         .EnableTokenEndpointPassthrough()
-                        .EnableUserInfoEndpointPassthrough()
-                        .EnableEndUserVerificationEndpointPassthrough();
-                    // .EnableStatusCodePagesIntegration();
+                        .EnableUserInfoEndpointPassthrough();
                     if (environment.IsEnvironment(Program.TestEnvironment))
                     {
-                        builder.DisableTransportSecurityRequirement();
+                        builder.DisableTransportSecurityRequirement(); // https://documentation.openiddict.com/integrations/aspnet-core#transport-security-requirement
                     }
                     // _.UseDataProtection();
                     // Note: if you don't want to specify a client_id when sending a token or
@@ -401,10 +402,10 @@ public abstract class AuthConfiguration
 
                 // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                 options.UseAspNetCore()
-                    .EnableStatusCodePagesIntegration()
-                    .EnableRedirectionEndpointPassthrough()
+                    .EnableStatusCodePagesIntegration() // https://documentation.openiddict.com/integrations/aspnet-core#status-code-pages-middleware-integration
+                    .EnableRedirectionEndpointPassthrough() // https://documentation.openiddict.com/integrations/aspnet-core#pass-through-mode
                     .EnablePostLogoutRedirectionEndpointPassthrough();
-                // .DisableTransportSecurityRequirement();
+                // .DisableTransportSecurityRequirement(); // https://documentation.openiddict.com/integrations/aspnet-core#transport-security-requirement
 
                 // Register the System.Net.Http integration and use the identity of the current
                 // assembly as a more specific user agent, which can be useful when dealing with
