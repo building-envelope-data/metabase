@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -63,7 +64,7 @@ public sealed class ApplicationMutations
         var descriptor = new OpenIddictApplicationDescriptor
         {
             ClientId = input.ClientId,
-            ClientSecret = "application.ClientSecret",
+            ClientSecret = RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+", 128),
             DisplayName = input.DisplayName,
             ConsentType = environment.IsEnvironment(Program.TestEnvironment)
                         ? OpenIddictConstants.ConsentTypes.Systematic
@@ -86,6 +87,7 @@ public sealed class ApplicationMutations
             {
                 // Add default permissions
                 OpenIddictConstants.Permissions.Endpoints.Authorization,
+                OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
                 OpenIddictConstants.Permissions.Endpoints.Introspection,
                 OpenIddictConstants.Permissions.Endpoints.EndSession,
                 OpenIddictConstants.Permissions.Endpoints.Revocation,
@@ -105,7 +107,8 @@ public sealed class ApplicationMutations
             },
             Requirements =
             {
-                OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange
+                OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
+                OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests,
             }
         };
 
