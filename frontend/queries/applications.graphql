@@ -7,7 +7,7 @@ query Applications {
 }
 
 query Application($uuid: Uuid!) {
-  application(applicationId: $uuid) {    
+  application(applicationId: $uuid) {
     ...ApplicationPartial
   }
 }
@@ -30,9 +30,10 @@ mutation CreateApplication(
       postLogoutRedirectUri: $postLogoutRedirectUri
     }
   ) {
-    application{
+    application {
       ...ApplicationPartial
     }
+    clientSecret
     errors {
       code
       message

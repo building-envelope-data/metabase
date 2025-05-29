@@ -68,7 +68,7 @@ export default function CreateApplication() {
                     form
                 );
                 if (data) {
-                    message.success('Successfully created application ' + data.createApplication.application?.displayName);                    
+                    message.success('Successfully created application ' + data.createApplication.application?.displayName);
                     Modal.info({
                         title: "Application Client Secret",
                         centered: true,
@@ -78,7 +78,7 @@ export default function CreateApplication() {
                             <span><ExclamationCircleTwoTone twoToneColor="#f9b02e" /> </span>
                             Please copy an save the client secret now, you will not be able to access it later.
                             <p/>
-                          <Typography.Paragraph copyable>{data.createApplication.application?.clientSecret}</Typography.Paragraph>
+                          <Typography.Paragraph copyable>{data.createApplication.clientSecret}</Typography.Paragraph>
                           </Typography.Paragraph>
                         ),
                         onOk: () => {

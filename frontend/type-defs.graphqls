@@ -165,7 +165,6 @@ type AllowRepresentativeToSignDataPayload {
 type Application {
   canCurrentUserManageApplication: Boolean! @cost(weight: "10")
   clientId: String
-  clientSecret: String
   displayName: String
   id: Uuid!
   institutions: ApplicationInstitutionConnection! @cost(weight: "10")
@@ -220,7 +219,7 @@ type CalorimetricData implements Data {
 type CalorimetricDataConnection {
   edges: [CalorimetricDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type CalorimetricDataEdge {
@@ -459,6 +458,7 @@ type CreateApplicationError {
 
 type CreateApplicationPayload {
   application: Application
+  clientSecret: String
   errors: [CreateApplicationError!]
   query: Query!
 }
@@ -797,7 +797,7 @@ type GeometricData implements Data {
 type GeometricDataConnection {
   edges: [GeometricDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type GeometricDataEdge {
@@ -855,7 +855,7 @@ type HygrothermalData implements Data {
 type HygrothermalDataConnection {
   edges: [HygrothermalDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type HygrothermalDataEdge {
@@ -1222,7 +1222,7 @@ type OpticalData implements Data {
 type OpticalDataConnection {
   edges: [OpticalDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type OpticalDataEdge {
@@ -1302,7 +1302,7 @@ type PhotovoltaicData implements Data {
 type PhotovoltaicDataConnection {
   edges: [PhotovoltaicDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type PhotovoltaicDataEdge {
@@ -2896,6 +2896,8 @@ enum CoatedSide {
   BACK
   BOTH
   NEITHER
+  UNKNOWN
+  NOT_APPLICABLE
 }
 
 enum ComponentCategory {

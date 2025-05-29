@@ -61,10 +61,11 @@ public sealed class ApplicationMutations
             );
         }
 
+        var clientSecret = RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+", 128);
         var descriptor = new OpenIddictApplicationDescriptor
         {
             ClientId = input.ClientId,
-            ClientSecret = RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+", 128),
+            ClientSecret = clientSecret,
             DisplayName = input.DisplayName,
             ConsentType = environment.IsEnvironment(Program.TestEnvironment)
                         ? OpenIddictConstants.ConsentTypes.Systematic
@@ -124,7 +125,7 @@ public sealed class ApplicationMutations
         });
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        return new CreateApplicationPayload(application);
+        return new CreateApplicationPayload(application, clientSecret);
     }
 
     [UseUserManager]
