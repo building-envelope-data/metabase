@@ -50,7 +50,7 @@ public sealed class ApplicationMutations
         }
 
         var institution = await institutionById.LoadAsync(input.AssociatedInstitutionId, cancellationToken).ConfigureAwait(false);
-        if (institution == null)
+        if (institution is null)
         {
             return new CreateApplicationPayload(
                 new CreateApplicationError(
