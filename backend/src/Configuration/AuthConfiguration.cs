@@ -277,7 +277,7 @@ public abstract class AuthConfiguration
                     options.SetAuthorizationEndpointUris("connect/authorize")
                         .SetPushedAuthorizationEndpointUris("connect/par")
                         // .SetDeviceAuthorizationEndpointUris("connect/device")
-                        .SetEndSessionEndpointUris("connect/logout")
+                        .SetEndSessionEndpointUris("connect/endsession")
                         .SetIntrospectionEndpointUris("connect/introspect")
                         // .SetRevocationEndpointUris("")
                         // .SetJSONWebKeySetEndpointUris("")
