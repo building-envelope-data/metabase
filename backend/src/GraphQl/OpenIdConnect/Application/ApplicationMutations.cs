@@ -118,7 +118,7 @@ public sealed class ApplicationMutations
             descriptor.Permissions.Add(permission);
         }
         var application = await applicationManager.CreateAsync(descriptor, cancellationToken).ConfigureAwait(false);
-        context.ApplicationInstitutions.Add(new InstitutionApplication
+        context.InstitutionApplications.Add(new InstitutionApplication
         {
             ApplicationId = application.Id,
             InstitutionId = institution.Id

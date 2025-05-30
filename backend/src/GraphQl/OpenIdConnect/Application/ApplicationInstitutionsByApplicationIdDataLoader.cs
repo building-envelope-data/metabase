@@ -19,7 +19,7 @@ public sealed class ApplicationInstitutionsByApplicationIdDataLoader :
             options,
             dbContextFactory,
             (dbContext, ids) =>
-                dbContext.ApplicationInstitutions.AsNoTracking().Where(x =>
+                dbContext.InstitutionApplications.AsNoTracking().Where(x =>
                     ids.Contains(x.ApplicationId)
                 ),
             x => x.ApplicationId

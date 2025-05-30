@@ -111,9 +111,9 @@ public sealed class ComponentMutations
         );
 
         // Note that above we make sure that, for each reference, standard and publication are *not* both non-null.
-        component.PrimeSurface = input.PrimeSurface is null ? null : DescriptionOrReferenceType.FromInput(input.PrimeSurface);
-        component.PrimeDirection = input.PrimeDirection is null ? null : DescriptionOrReferenceType.FromInput(input.PrimeDirection);
-        component.SwitchableLayers = input.SwitchableLayers is null ? null : DescriptionOrReferenceType.FromInput(input.SwitchableLayers);
+        component.PrimeSurface = DescriptionOrReferenceType.FromInput(input.PrimeSurface);
+        component.PrimeDirection = DescriptionOrReferenceType.FromInput(input.PrimeDirection);
+        component.SwitchableLayers = DescriptionOrReferenceType.FromInput(input.SwitchableLayers);
 
         component.ManufacturerEdges.Add(
                         new ComponentManufacturer

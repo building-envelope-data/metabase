@@ -85,7 +85,7 @@ public static class OpenIdConnectAuthorization
 
     private static Institution? GetInstitutionByApplicationId(Guid applicationId, ApplicationDbContext context)
     {
-        var applicationInstitution = context.ApplicationInstitutions.Where(x => x.ApplicationId == applicationId).SingleOrDefault();
+        var applicationInstitution = context.InstitutionApplications.Where(x => x.ApplicationId == applicationId).SingleOrDefault();
         return applicationInstitution?.Institution;
     }
 }
