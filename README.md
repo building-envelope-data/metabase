@@ -174,8 +174,10 @@ executing it `make SQL=${SCRIPT_PATH} sql`.
 
 When your hard-disk starts to grow full, it may be the case that Docker does
 not clean-up anonymous volumes properly. You can do so manually by running
-`docker system prune` potentially with the argument `--all`. Note that this may
-result in loss of data.
+`docker system prune` potentially with the arguments `--volumes` and/or
+`--all`. Note that this may result in loss of data. It may also be the case
+that the log files grew huge. You can delete them by running
+`rm ./backend/src/logs/*`.
 
 When the `frontend` Docker image does not build in production because of an
 unused import in an automatically generated file, for example, one in the
@@ -191,9 +193,10 @@ typescript: {
 
 The same can happen in development when running `make build` (or `yarn run
 build`) in the shell entered by `make shellf`. In that case, remove the
-offending import manually in the file and try again. Do not disable build
-errors in development because when you do so, build errors in non-generated
-files may leak into the code base.
+offending import manually in the file and try again, for example using tail
+like so `tail -n +5 ./__generated__/queries/... > x.tmp && mv x.tmp ...` . Do
+not disable build errors in development because when you do so, build errors in
+non-generated files may leak into the code base.
 
 ## Deployment
 
