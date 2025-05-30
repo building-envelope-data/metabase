@@ -30,7 +30,9 @@ public sealed class TokenQueries
     {
         if (!await OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
                 .ConfigureAwait(false))
+        {
             return Array.Empty<OpenIdToken>();
+        }
 
         return await tokenManager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -49,7 +51,9 @@ public sealed class TokenQueries
     {
         if (!await OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
                 .ConfigureAwait(false))
+        {
             return null;
+        }
 
         return await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken: cancellationToken).ConfigureAwait(false);
     }
@@ -67,7 +71,9 @@ public sealed class TokenQueries
     {
         if (!await OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
                 .ConfigureAwait(false))
+        {
             return Array.Empty<OpenIdToken>();
+        }
 
         return await tokenManager.FindByApplicationIdAsync(applicationId.ToString(), cancellationToken: cancellationToken)
             .ToListAsync(cancellationToken)

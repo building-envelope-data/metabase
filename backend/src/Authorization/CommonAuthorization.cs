@@ -66,8 +66,6 @@ public static class CommonAuthorization
                    context,
                    cancellationToken
                ).ConfigureAwait(false);
-
-        if (roles == null) return false;
         return roles.Contains(InstitutionRepresentativeRole.OWNER);
     }
 
@@ -82,8 +80,6 @@ public static class CommonAuthorization
                    context,
                    cancellationToken
                ).ConfigureAwait(false);
-
-        if (roles == null) return false;
         return roles.Contains(InstitutionRepresentativeRole.OWNER) || roles.Contains(InstitutionRepresentativeRole.ASSISTANT);
     }
 
@@ -234,16 +230,18 @@ public static class CommonAuthorization
         return wrappedManagerRole?.Role;
     }
 
-    private static Task<List<InstitutionRepresentativeRole>> FetchRoles(
+    private static async Task<IReadOnlyList<InstitutionRepresentativeRole>> FetchRoles(
         User user,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        return context.InstitutionRepresentatives.AsNoTracking()
+        return (await context.InstitutionRepresentatives.AsNoTracking()
                 .Where(x => x.UserId == user.Id && !x.Pending)
                 .Select(x => x.Role)
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken)
+                )
+                .AsReadOnly();
     }
 
     public static async Task<bool> IsVerifiedManufacturerOfComponents(

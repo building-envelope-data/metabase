@@ -60,7 +60,7 @@ public sealed class ApplicationDbContext
     public DbSet<Method> Methods { get; private set; } = default!;
     public DbSet<UserMethodDeveloper> UserMethodDevelopers { get; private set; } = default!;
     public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
-    public DbSet<InstitutionApplication> ApplicationInstitutions { get; private set; } = default!;
+    public DbSet<InstitutionApplication> InstitutionApplications { get; private set; } = default!;
 
     // Inspired by https://github.com/openiddict/openiddict-core/issues/1376#issuecomment-1151275376
     // It is needed to fix the following error that occurred when trying to redeem OpenId Connect tokens in production:

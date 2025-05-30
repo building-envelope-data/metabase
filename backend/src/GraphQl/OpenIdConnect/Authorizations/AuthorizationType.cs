@@ -21,11 +21,11 @@ public sealed class AuthorizationType
         const string suffixedName = nameof(AuthorizationType);
         descriptor.Name(suffixedName.Remove(suffixedName.Length - "Type".Length));
 
-        descriptor.Field(authorization => authorization.Tokens).Ignore();
-        descriptor.Field(authorization => authorization.Properties).Ignore();
         descriptor.Field(authorization => authorization.Application).Ignore();
         descriptor.Field(authorization => authorization.ConcurrencyToken).Ignore();
+        descriptor.Field(authorization => authorization.Properties).Ignore();
         descriptor.Field(authorization => authorization.Scopes).Ignore();
+        descriptor.Field(authorization => authorization.Tokens).Ignore();
 
         descriptor
                 .Field("canCurrentUserDeleteAuthorization")

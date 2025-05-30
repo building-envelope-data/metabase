@@ -25,16 +25,6 @@ interface Node {
   id: ID!
 }
 
-interface Reference {
-  abstract: String
-  section: String
-  title: String
-}
-
-interface Stakeholder {
-  name: String!
-}
-
 type AddComponentAssemblyError {
   code: AddComponentAssemblyErrorCode!
   message: String!
@@ -165,7 +155,6 @@ type AllowRepresentativeToSignDataPayload {
 type Application {
   canCurrentUserManageApplication: Boolean! @cost(weight: "10")
   clientId: String
-  clientSecret: String
   displayName: String
   id: Uuid!
   institutions: ApplicationInstitutionConnection! @cost(weight: "10")
@@ -220,7 +209,7 @@ type CalorimetricData implements Data {
 type CalorimetricDataConnection {
   edges: [CalorimetricDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type CalorimetricDataEdge {
@@ -459,6 +448,7 @@ type CreateApplicationError {
 
 type CreateApplicationPayload {
   application: Application
+  clientSecret: String
   errors: [CreateApplicationError!]
   query: Query!
 }
@@ -797,7 +787,7 @@ type GeometricData implements Data {
 type GeometricDataConnection {
   edges: [GeometricDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type GeometricDataEdge {
@@ -855,7 +845,7 @@ type HygrothermalData implements Data {
 type HygrothermalDataConnection {
   edges: [HygrothermalDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type HygrothermalDataEdge {
@@ -863,7 +853,7 @@ type HygrothermalDataEdge {
   node: HygrothermalData!
 }
 
-type Institution implements Node & Stakeholder {
+type Institution implements Node {
   abbreviation: String
   applications: InstitutionApplicationConnection! @cost(weight: "10")
   canCurrentUserDeleteNode: Boolean! @cost(weight: "10")
@@ -1222,7 +1212,7 @@ type OpticalData implements Data {
 type OpticalDataConnection {
   edges: [OpticalDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type OpticalDataEdge {
@@ -1302,7 +1292,7 @@ type PhotovoltaicData implements Data {
 type PhotovoltaicDataConnection {
   edges: [PhotovoltaicDataEdge!]!
   pageInfo: PageInfo!
-  totalCount: NonNegativeInt
+  totalCount: NonNegativeInt!
 }
 
 type PhotovoltaicDataEdge {
@@ -1315,7 +1305,7 @@ type PrimeSurfaceOrDirection {
   surface: DescriptionOrReference
 }
 
-type Publication implements Reference {
+type Publication {
   abstract: String
   "The website arXiv.org is a free and open-access archive for publications. The arXiv identifier can be used to define a publication."
   arXiv: String
@@ -1586,7 +1576,7 @@ type SetUserPhoneNumberPayload {
 }
 
 "`ISO 52022` is an example of the abbreviation of a standardizer and the main number of the identifier."
-type Standard implements Reference {
+type Standard {
   abstract: String
   locator: Url
   numeration: Numeration!
@@ -1720,7 +1710,7 @@ type UpdateMethodPayload {
   query: Query!
 }
 
-type User implements Node & Stakeholder {
+type User implements Node {
   canCurrentUserAddApplications: Boolean! @cost(weight: "10")
   canCurrentUserAddApprovals: Boolean! @cost(weight: "10")
   canCurrentUserDeleteUser: Boolean! @cost(weight: "10")
@@ -1811,6 +1801,10 @@ type VerifyInstitutionPayload {
   institution: Institution
   query: Query!
 }
+
+union Reference = Publication | Standard
+
+union Stakeholder = Institution | User
 
 input AddComponentAssemblyInput {
   assembledComponentId: Uuid!
@@ -2896,6 +2890,8 @@ enum CoatedSide {
   BACK
   BOTH
   NEITHER
+  UNKNOWN
+  NOT_APPLICABLE
 }
 
 enum ComponentCategory {

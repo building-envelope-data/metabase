@@ -7,7 +7,7 @@ namespace Metabase.Data;
 [Owned]
 public sealed class Reference
 {
-    // Constructor for EF Core because navigation properties cannot be set using a constructor.
+    // Constructor for EF Core because navigation properties cannot be set using a constructor: https://learn.microsoft.com/en-us/ef/core/modeling/constructors#binding-to-mapped-properties
     private Reference()
     {
     }

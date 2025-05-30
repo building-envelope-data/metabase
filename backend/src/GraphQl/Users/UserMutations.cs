@@ -47,6 +47,7 @@ public sealed class UserMutations
             throw new GraphQLException(
                 ErrorBuilder
                 .New()
+                .SetMessage(exception.Message)
                 .SetException(exception)
                 .Build()
             );

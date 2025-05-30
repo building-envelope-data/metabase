@@ -20,20 +20,20 @@ public sealed class ScopeQueries
 {
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
-    public async Task<IList<OpenIdScope>> GetScopes(
+    public async Task<IAsyncEnumerable<OpenIdScope>> GetScopes(
         OpenIddictScopeManager<OpenIdScope> manager,
         ClaimsPrincipal claimsPrincipal,
         UserManager<User> userManager,
-        ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
+        ApplicationDbContext context, // TODO Make the scope manager use the scoped database context.
         CancellationToken cancellationToken
     )
     {
         if (!await OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
                 .ConfigureAwait(false))
-            return Array.Empty<OpenIdScope>();
-
-        return await manager.ListAsync(cancellationToken: cancellationToken).ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+        {
+            return AsyncEnumerable.Empty<OpenIdScope>();
+        }
+        return manager.ListAsync(cancellationToken: cancellationToken);
     }
 
     [UseUserManager]
@@ -43,13 +43,15 @@ public sealed class ScopeQueries
         OpenIddictScopeManager<OpenIdScope> manager,
         ClaimsPrincipal claimsPrincipal,
         UserManager<User> userManager,
-        ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
+        ApplicationDbContext context, // TODO Make the scope manager use the scoped database context.
         CancellationToken cancellationToken
     )
     {
         if (!await OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
                 .ConfigureAwait(false))
+        {
             return null;
+        }
 
         return await manager.FindByIdAsync(scopeId.ToString(), cancellationToken: cancellationToken).ConfigureAwait(false);
     }

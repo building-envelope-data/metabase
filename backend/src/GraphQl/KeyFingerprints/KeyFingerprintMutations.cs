@@ -10,7 +10,6 @@ using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +25,6 @@ public class KeyFingerprintMutations
         ClaimsPrincipal claimsPrincipal,
         UserManager<User> userManager,
         ApplicationDbContext context,
-        IWebHostEnvironment environment,
         CancellationToken cancellationToken
     )
     {
@@ -89,7 +87,7 @@ public class KeyFingerprintMutations
                     && r.UserId == input.UserId
                 , cancellationToken).ConfigureAwait(false);
 
-        if (institutionRepresentative == null)
+        if (institutionRepresentative is null)
         {
             return new AddKeyFingerprintPayload(new AddKeyFingerprintError(
                     AddKeyFingerprintErrorCode.UNKNOWN_REPRESENTATIVE,
@@ -98,7 +96,7 @@ public class KeyFingerprintMutations
                 ));
         }
 
-        if (institutionRepresentative.DataSigningPermission != Enumerations.DataSigningPermission.ALLOWED)
+        if (institutionRepresentative.DataSigningPermission is not Enumerations.DataSigningPermission.ALLOWED)
         {
             return new AddKeyFingerprintPayload(new AddKeyFingerprintError(
                     AddKeyFingerprintErrorCode.NOT_ALLOWED,

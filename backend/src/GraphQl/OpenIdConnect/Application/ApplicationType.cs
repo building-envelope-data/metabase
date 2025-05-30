@@ -25,6 +25,20 @@ public sealed class ApplicationType
         const string suffixedName = nameof(ApplicationType);
         descriptor.Name(suffixedName.Remove(suffixedName.Length - "Type".Length));
 
+        descriptor.Field(application => application.ApplicationType).Ignore();
+        descriptor.Field(application => application.Authorizations).Ignore();
+        descriptor.Field(application => application.ClientType).Ignore();
+        descriptor.Field(application => application.ClientSecret).Ignore();
+        descriptor.Field(application => application.ConcurrencyToken).Ignore();
+        descriptor.Field(application => application.ConsentType).Ignore();
+        descriptor.Field(application => application.DisplayNames).Ignore();
+        descriptor.Field(application => application.InstitutionEdges).Ignore();
+        descriptor.Field(application => application.JsonWebKeySet).Ignore();
+        descriptor.Field(application => application.Properties).Ignore();
+        descriptor.Field(application => application.Requirements).Ignore();
+        descriptor.Field(application => application.Settings).Ignore();
+        descriptor.Field(application => application.Tokens).Ignore();
+
         descriptor
             .Field(application => application.Permissions)
             .Type<NonNullType<ListType<StringType>>>()
@@ -76,19 +90,6 @@ public sealed class ApplicationType
                     context.Parent<OpenIdApplication>()
                 )
             );
-
-        descriptor.Field(application => application.InstitutionEdges).Ignore();
-        descriptor.Field(application => application.DisplayNames).Ignore();
-        descriptor.Field(application => application.JsonWebKeySet).Ignore();
-        descriptor.Field(application => application.Tokens).Ignore();
-        descriptor.Field(application => application.Requirements).Ignore();
-        descriptor.Field(application => application.Properties).Ignore();
-        descriptor.Field(application => application.ApplicationType).Ignore();
-        descriptor.Field(application => application.Authorizations).Ignore();
-        descriptor.Field(application => application.Settings).Ignore();
-        descriptor.Field(application => application.ClientType).Ignore();
-        descriptor.Field(application => application.ConsentType).Ignore();
-        descriptor.Field(application => application.ConcurrencyToken).Ignore();
 
         descriptor
             .Field("canCurrentUserManageApplication")

@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
@@ -49,7 +50,7 @@ public sealed class ApplicationMutations
         }
 
         var institution = await institutionById.LoadAsync(input.AssociatedInstitutionId, cancellationToken).ConfigureAwait(false);
-        if (institution == null)
+        if (institution is null)
         {
             return new CreateApplicationPayload(
                 new CreateApplicationError(
@@ -60,10 +61,11 @@ public sealed class ApplicationMutations
             );
         }
 
+        var clientSecret = RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+", 128);
         var descriptor = new OpenIddictApplicationDescriptor
         {
             ClientId = input.ClientId,
-            ClientSecret = "application.ClientSecret",
+            ClientSecret = clientSecret,
             DisplayName = input.DisplayName,
             ConsentType = environment.IsEnvironment(Program.TestEnvironment)
                         ? OpenIddictConstants.ConsentTypes.Systematic
@@ -86,6 +88,7 @@ public sealed class ApplicationMutations
             {
                 // Add default permissions
                 OpenIddictConstants.Permissions.Endpoints.Authorization,
+                OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
                 OpenIddictConstants.Permissions.Endpoints.Introspection,
                 OpenIddictConstants.Permissions.Endpoints.EndSession,
                 OpenIddictConstants.Permissions.Endpoints.Revocation,
@@ -105,7 +108,8 @@ public sealed class ApplicationMutations
             },
             Requirements =
             {
-                OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange
+                OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
+                OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests,
             }
         };
 
@@ -114,14 +118,14 @@ public sealed class ApplicationMutations
             descriptor.Permissions.Add(permission);
         }
         var application = await applicationManager.CreateAsync(descriptor, cancellationToken).ConfigureAwait(false);
-        context.ApplicationInstitutions.Add(new InstitutionApplication
+        context.InstitutionApplications.Add(new InstitutionApplication
         {
             ApplicationId = application.Id,
             InstitutionId = institution.Id
         });
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        return new CreateApplicationPayload(application);
+        return new CreateApplicationPayload(application, clientSecret);
     }
 
     [UseUserManager]

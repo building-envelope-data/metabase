@@ -1,6 +1,5 @@
 fragment ApplicationPartial on Application {
   clientId
-  clientSecret
   displayName
   id
   permissions

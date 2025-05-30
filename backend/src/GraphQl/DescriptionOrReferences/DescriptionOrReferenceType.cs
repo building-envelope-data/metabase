@@ -10,21 +10,37 @@ namespace Metabase.GraphQl.DescriptionOrReferences;
 public sealed class DescriptionOrReferenceType
     : ObjectType<DescriptionOrReference>
 {
-    internal static DescriptionOrReference FromInput(DescriptionOrReferenceInput input)
+    internal static DescriptionOrReference? FromInput(DescriptionOrReferenceInput? input)
     {
+        if (input?.Description is null && input?.Reference?.Standard is null && input?.Reference?.Publication is null)
+        {
+            return null;
+        }
         if (input.Reference?.Standard is not null && input.Reference?.Publication is not null)
+        {
             throw new ArgumentException("Both the reference's standard and publication are non-null.", nameof(input));
+        }
         Reference? reference = null;
         if (input.Reference?.Standard is not null)
+        {
             reference = new Reference(StandardType.FromInput(input.Reference.Standard));
+        }
         else if (input.Reference?.Publication is not null)
+        {
             reference = new Reference(PublicationType.FromInput(input.Reference.Publication));
+        }
         if (reference is null && input.Description is not null)
+        {
             return new DescriptionOrReference(input.Description);
+        }
         else if (reference is not null && input?.Description is null)
+        {
             return new DescriptionOrReference(reference);
+        }
         else if (reference is not null && input?.Description is not null)
+        {
             return new DescriptionOrReference(reference, input.Description);
+        }
         throw new ArgumentException("Impossible!", nameof(input));
     }
 

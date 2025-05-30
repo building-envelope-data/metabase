@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types;
 using Metabase.Data;
 using Metabase.Enumerations;
 using Metabase.Extensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.KeyFingerprints;
@@ -17,8 +15,6 @@ public class KeyFingerprintQueries
 {
     public async Task<VerifyKeyFingerprintPayload> VerifyKeyFingerprintAsync(
         KeyFingerprintInput input,
-        ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -65,7 +61,7 @@ public class KeyFingerprintQueries
                     && r.UserId == input.UserId
                 , cancellationToken).ConfigureAwait(false);
 
-        if (institutionRepresentative == null)
+        if (institutionRepresentative is null)
         {
             return new VerifyKeyFingerprintPayload(new VerifyKeyFingerprintError(
                     VerifyKeyFingerprintErrorCode.UNKNOWN_REPRESENTATIVE,
@@ -83,7 +79,7 @@ public class KeyFingerprintQueries
                 ));
         }
 
-        return new VerifyKeyFingerprintPayload(institutionRepresentative.DataSigningPermission == DataSigningPermission.ALLOWED
-            || institutionRepresentative.DataSigningPermission == DataSigningPermission.FORBIDDEN);
+        return new VerifyKeyFingerprintPayload(institutionRepresentative.DataSigningPermission is DataSigningPermission.ALLOWED
+            || institutionRepresentative.DataSigningPermission is DataSigningPermission.FORBIDDEN);
     }
 }

@@ -80,7 +80,7 @@ public sealed class QueryingDatabases
             Environment.NewLine,
             await Task.WhenAll(
                 fileNames.Select(fileName =>
-                    File.ReadAllTextAsync($"GraphQl/Databases/Queries/{fileName}")
+                    File.ReadAllTextAsync($"./GraphQl/Databases/Queries/{fileName}")
                 )
             ).ConfigureAwait(false)
         );

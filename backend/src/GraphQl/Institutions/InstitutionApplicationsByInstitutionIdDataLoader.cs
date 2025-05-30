@@ -19,7 +19,7 @@ namespace Metabase.GraphQl.Institutions
                 options,
                 dbContextFactory,
                 (dbContext, ids) =>
-                    dbContext.ApplicationInstitutions.AsNoTracking().Where(x =>
+                    dbContext.InstitutionApplications.AsNoTracking().Where(x =>
                         ids.Contains(x.InstitutionId)
                     ),
                 x => x.InstitutionId

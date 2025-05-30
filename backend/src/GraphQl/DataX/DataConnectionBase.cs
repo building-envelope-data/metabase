@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using HotChocolate;
-using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
@@ -14,7 +11,7 @@ public abstract class DataConnectionBase<TDataEdge>(
 {
     public IReadOnlyList<TDataEdge> Edges { get; } = edges;
 
-    [GraphQLType<NonNegativeIntType>] public uint TotalCount { get; } = totalCount;
+    public uint TotalCount { get; } = totalCount;
 
     public ConnectionPageInfo PageInfo { get; } = pageInfo;
 }

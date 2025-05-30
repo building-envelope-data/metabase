@@ -55,6 +55,7 @@ public static class GraphQlConfiguration
         // GraphQL Server
         services
             .AddGraphQLServer()
+            .BindRuntimeType<uint, NonNegativeIntType>()
             // Services https://chillicream.com/docs/hotchocolate/v13/integrations/entity-framework#registerdbcontext
             .RegisterDbContextFactory<ApplicationDbContext>()
             .AddMutationConventions(new MutationConventionOptions { ApplyToAllMutations = false })

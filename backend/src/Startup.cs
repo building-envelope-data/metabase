@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Net.Http;
 using HotChocolate.AspNetCore;
 using Metabase.Configuration;
@@ -20,13 +19,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using Serilog;
 
 namespace Metabase;
@@ -201,7 +198,7 @@ public sealed class Startup(
         // `OpenIddict`, see in particular `AuthConfiguration`,
         // `UseUserManagerAttribute` and `UseSignInManagerAttribute`.
         services.AddDbContext<ApplicationDbContext>(options =>
-            {},
+            { },
             contextLifetime: ServiceLifetime.Transient,
             optionsLifetime: ServiceLifetime.Singleton
         );
@@ -249,7 +246,7 @@ public sealed class Startup(
             // app.UseHsts(); // Done by NGINX, see https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
         }
 
-        // app.UseStatusCodePages();
+        app.UseStatusCodePages(); // [UseStatusCodePages](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling?view=aspnetcore-9.0#usestatuscodepages)
         // app.UseHttpsRedirection(); // Done by NGINX
         app.UseSerilogRequestLogging();
         app.UseStaticFiles();
