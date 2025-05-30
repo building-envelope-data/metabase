@@ -7,10 +7,10 @@ fragment DataFormatPartial on DataFormat {
   mediaType
   schemaLocator
   reference {
-    abstract
-    section
-    title
     ... on Standard {
+      abstract
+      section
+      title
       locator
       numeration {
         mainNumber
@@ -21,6 +21,9 @@ fragment DataFormatPartial on DataFormat {
       year
     }
     ... on Publication {
+      abstract
+      section
+      title
       arXiv
       authors
       doi

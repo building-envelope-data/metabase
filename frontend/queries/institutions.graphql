@@ -208,10 +208,10 @@ query Institution($uuid: Uuid!) {
           mediaType
           schemaLocator
           reference {
-            abstract
-            section
-            title
             ... on Standard {
+              abstract
+              section
+              title
               locator
               numeration {
                 mainNumber
@@ -222,6 +222,9 @@ query Institution($uuid: Uuid!) {
               year
             }
             ... on Publication {
+              abstract
+              section
+              title
               arXiv
               authors
               doi
@@ -256,10 +259,10 @@ query Institution($uuid: Uuid!) {
             to
           }
           reference {
-            abstract
-            section
-            title
             ... on Standard {
+              abstract
+              section
+              title
               locator
               numeration {
                 mainNumber
@@ -270,6 +273,9 @@ query Institution($uuid: Uuid!) {
               year
             }
             ... on Publication {
+              abstract
+              section
+              title
               arXiv
               authors
               doi

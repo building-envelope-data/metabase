@@ -12,10 +12,10 @@ fragment MethodPartial on Method {
     to
   }
   reference {
-    abstract
-    section
-    title
     ... on Standard {
+      abstract
+      section
+      title
       locator
       numeration {
         mainNumber
@@ -26,6 +26,9 @@ fragment MethodPartial on Method {
       year
     }
     ... on Publication {
+      abstract
+      section
+      title
       arXiv
       authors
       doi
@@ -38,15 +41,16 @@ fragment MethodPartial on Method {
   developers {
     edges {
       node {
-        name
         ... on Institution {
           id
           uuid
+          name
           description
         }
         ... on User {
           id
           uuid
+          name
         }
       }
       canCurrentUserConfirmEdge
@@ -58,15 +62,16 @@ fragment MethodPartial on Method {
   pendingDevelopers: developers(pending: true) {
     edges {
       node {
-        name
         ... on Institution {
           id
           uuid
+          name
           description
         }
         ... on User {
           id
           uuid
+          name
         }
       }
       canCurrentUserConfirmEdge

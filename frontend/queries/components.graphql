@@ -12,10 +12,10 @@ fragment ComponentPartial on Component {
 }
 
 fragment ReferencePartial on Reference {
-  abstract
-  section
-  title
   ... on Standard {
+    abstract
+    section
+    title
     locator
     numeration {
       mainNumber
@@ -26,6 +26,9 @@ fragment ReferencePartial on Reference {
     year
   }
   ... on Publication {
+    abstract
+    section
+    title
     arXiv
     authors
     doi
