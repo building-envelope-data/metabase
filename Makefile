@@ -90,6 +90,11 @@ restart : ## Restart all stopped and running containers
 	${docker_compose} restart
 .PHONY : restart
 
+prune : ## Remove all unused containers, unused networks, unused and dangling images, and unused anonymous volumes
+	docker system prune \
+		--volumes
+.PHONY : prune
+
 logs : ## Follow logs
 	${docker_compose} logs \
 		--since=24h \
