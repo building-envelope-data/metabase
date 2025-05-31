@@ -80,9 +80,10 @@ up : build ## (Re)create, and start containers (after building images if necessa
 		--detach
 .PHONY : up
 
-down : ## Stop containers and remove containers, networks, volumes, and images created by `up`
+down : ## Stop containers and remove containers and networks created by `up` and clear backend logs
 	${docker_compose} down \
 		--remove-orphans
+	rm ./backend/src/logs/*
 .PHONY : down
 
 restart : ## Restart all stopped and running containers
