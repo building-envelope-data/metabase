@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 
@@ -38,7 +39,6 @@ public static class OpenIdConnectAuthorization
 
     public static async Task<bool> IsAuthorizedToManageApplication(
         Guid applicationId,
-        OpenIddictApplicationManager<OpenIdApplication> applicationManager,
         ClaimsPrincipal claimsPrincipal,
         UserManager<User> userManager,
         ApplicationDbContext context,
@@ -53,7 +53,7 @@ public static class OpenIdConnectAuthorization
 
     public static async Task<bool> IsAuthorizedToDeleteAuthorization(
         Guid authorizationId,
-        OpenIddictAuthorizationManager<OpenIdAuthorization> authorizationManager,
+        OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
         ClaimsPrincipal claimsPrincipal,
         UserManager<User> userManager,
         ApplicationDbContext context,
@@ -69,7 +69,7 @@ public static class OpenIdConnectAuthorization
 
     public static async Task<bool> IsAuthorizedToRevokeToken(
         Guid tokenId,
-        OpenIddictTokenManager<OpenIdToken> tokenManager,
+        OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         ClaimsPrincipal claimsPrincipal,
         UserManager<User> userManager,
         ApplicationDbContext context,
@@ -85,7 +85,7 @@ public static class OpenIdConnectAuthorization
 
     private static Institution? GetInstitutionByApplicationId(Guid applicationId, ApplicationDbContext context)
     {
-        var applicationInstitution = context.InstitutionApplications.Where(x => x.ApplicationId == applicationId).SingleOrDefault();
+        var applicationInstitution = context.InstitutionOpenIdConnectApplications.Where(x => x.ApplicationId == applicationId).SingleOrDefault();
         return applicationInstitution?.Institution;
     }
 }

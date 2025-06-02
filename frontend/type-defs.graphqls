@@ -152,35 +152,11 @@ type AllowRepresentativeToSignDataPayload {
   query: Query!
 }
 
-type Application {
-  canCurrentUserManageApplication: Boolean! @cost(weight: "10")
-  clientId: String
-  displayName: String
-  id: Uuid!
-  institutions: ApplicationInstitutionConnection! @cost(weight: "10")
-  permissions: [String]! @cost(weight: "10")
-  postLogoutRedirectUri: String @cost(weight: "10")
-  redirectUri: String @cost(weight: "10")
-}
-
-type ApplicationInstitutionConnection {
-  edges: [InstitutionApplicationEdge!]! @cost(weight: "10")
-}
-
 type AppliedMethod {
   arguments: [NamedMethodArgument!]!
   method: Method @cost(weight: "10")
   methodId: Uuid!
   sources: [NamedMethodSource!]!
-}
-
-type Authorization {
-  canCurrentUserDeleteAuthorization: Boolean! @cost(weight: "10")
-  creationDate: DateTime
-  id: Uuid!
-  status: String
-  subject: String
-  type: String
 }
 
 type CalorimetricData implements Data {
@@ -440,19 +416,6 @@ type ConfirmUserMethodDeveloperPayload {
   query: Query!
 }
 
-type CreateApplicationError {
-  code: CreateApplicationErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type CreateApplicationPayload {
-  application: Application
-  clientSecret: String
-  errors: [CreateApplicationError!]
-  query: Query!
-}
-
 type CreateComponentError {
   code: CreateComponentErrorCode!
   message: String!
@@ -510,6 +473,19 @@ type CreateMethodError {
 type CreateMethodPayload {
   errors: [CreateMethodError!]
   method: Method
+  query: Query!
+}
+
+type CreateOpenIdConnectApplicationError {
+  code: CreateOpenIdConnectApplicationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type CreateOpenIdConnectApplicationPayload {
+  application: OpenIdConnectApplication
+  clientSecret: String
+  errors: [CreateOpenIdConnectApplicationError!]
   query: Query!
 }
 
@@ -616,28 +592,6 @@ type DatabasesEdge {
   node: Database!
 }
 
-type DeleteApplicationError {
-  code: DeleteApplicationErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type DeleteApplicationPayload {
-  errors: [DeleteApplicationError!]
-  query: Query!
-}
-
-type DeleteAuthorizationError {
-  code: DeleteAuthorizationErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type DeleteAuthorizationPayload {
-  errors: [DeleteAuthorizationError!]
-  query: Query!
-}
-
 type DeleteInstitutionError {
   code: DeleteInstitutionErrorCode!
   message: String!
@@ -646,6 +600,28 @@ type DeleteInstitutionError {
 
 type DeleteInstitutionPayload {
   errors: [DeleteInstitutionError!]
+  query: Query!
+}
+
+type DeleteOpenIdConnectApplicationError {
+  code: DeleteOpenIdConnectApplicationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type DeleteOpenIdConnectApplicationPayload {
+  errors: [DeleteOpenIdConnectApplicationError!]
+  query: Query!
+}
+
+type DeleteOpenIdConnectAuthorizationError {
+  code: DeleteOpenIdConnectAuthorizationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type DeleteOpenIdConnectAuthorizationPayload {
+  errors: [DeleteOpenIdConnectAuthorizationError!]
   query: Query!
 }
 
@@ -1107,15 +1083,15 @@ type Mutation {
   confirmUserEmail(input: ConfirmUserEmailInput!): ConfirmUserEmailPayload! @cost(weight: "10")
   confirmUserEmailChange(input: ConfirmUserEmailChangeInput!): ConfirmUserEmailChangePayload! @cost(weight: "10")
   confirmUserMethodDeveloper(input: ConfirmUserMethodDeveloperInput!): ConfirmUserMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
-  createApplication(input: CreateApplicationInput!): CreateApplicationPayload! @authorize(policy: "Write") @cost(weight: "10")
   createComponent(input: CreateComponentInput!): CreateComponentPayload! @authorize(policy: "Write") @cost(weight: "10")
   createDatabase(input: CreateDatabaseInput!): CreateDatabasePayload! @authorize(policy: "Write") @cost(weight: "10")
   createDataFormat(input: CreateDataFormatInput!): CreateDataFormatPayload! @authorize(policy: "Write") @cost(weight: "10")
   createInstitution(input: CreateInstitutionInput!): CreateInstitutionPayload! @authorize(policy: "Write") @cost(weight: "10")
   createMethod(input: CreateMethodInput!): CreateMethodPayload! @authorize(policy: "Write") @cost(weight: "10")
-  deleteApplication(input: DeleteApplicationInput!): DeleteApplicationPayload! @authorize(policy: "Write") @cost(weight: "10")
-  deleteAuthorization(input: DeleteAuthorizationInput!): DeleteAuthorizationPayload! @authorize(policy: "Write") @cost(weight: "10")
+  createOpenIdConnectApplication(input: CreateOpenIdConnectApplicationInput!): CreateOpenIdConnectApplicationPayload! @authorize(policy: "Write") @cost(weight: "10")
   deleteInstitution(input: DeleteInstitutionInput!): DeleteInstitutionPayload! @authorize(policy: "Write") @cost(weight: "10")
+  deleteOpenIdConnectApplication(input: DeleteOpenIdConnectApplicationInput!): DeleteOpenIdConnectApplicationPayload! @authorize(policy: "Write") @cost(weight: "10")
+  deleteOpenIdConnectAuthorization(input: DeleteOpenIdConnectAuthorizationInput!): DeleteOpenIdConnectAuthorizationPayload! @authorize(policy: "Write") @cost(weight: "10")
   deletePersonalUserData(input: DeletePersonalUserDataInput!): DeletePersonalUserDataPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -1142,17 +1118,17 @@ type Mutation {
   resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload! @cost(weight: "10")
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
-  revokeToken(input: RevokeTokenInput!): RevokeTokenPayload! @authorize(policy: "Write") @cost(weight: "10")
+  revokeOpenIdConnectToken(input: RevokeOpenIdConnectTokenInput!): RevokeOpenIdConnectTokenPayload! @authorize(policy: "Write") @cost(weight: "10")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload! @authorize(policy: "Write") @cost(weight: "10")
-  updateApplication(input: UpdateApplicationInput!): UpdateApplicationPayload! @authorize(policy: "Write") @cost(weight: "10")
   updateComponent(input: UpdateComponentInput!): UpdateComponentPayload! @authorize(policy: "Write") @cost(weight: "10")
   updateComponentAssembly(input: UpdateComponentAssemblyInput!): UpdateComponentAssemblyPayload! @authorize(policy: "Write") @cost(weight: "10")
   updateDatabase(input: UpdateDatabaseInput!): UpdateDatabasePayload! @authorize(policy: "Write") @cost(weight: "10")
   updateDataFormat(input: UpdateDataFormatInput!): UpdateDataFormatPayload! @authorize(policy: "Write") @cost(weight: "10")
   updateInstitution(input: UpdateInstitutionInput!): UpdateInstitutionPayload! @authorize(policy: "Write") @cost(weight: "10")
   updateMethod(input: UpdateMethodInput!): UpdateMethodPayload! @authorize(policy: "Write") @cost(weight: "10")
+  updateOpenIdConnectApplication(input: UpdateOpenIdConnectApplicationInput!): UpdateOpenIdConnectApplicationPayload! @authorize(policy: "Write") @cost(weight: "10")
   verifyDatabase(input: VerifyDatabaseInput!): VerifyDatabasePayload! @authorize(policy: "Write") @cost(weight: "10")
   verifyInstitution(input: VerifyInstitutionInput!): VerifyInstitutionPayload! @authorize(policy: "Write") @cost(weight: "10")
 }
@@ -1176,6 +1152,42 @@ type Numeration {
 type OpenEndedDateTimeRange {
   from: DateTime @cost(weight: "10")
   to: DateTime @cost(weight: "10")
+}
+
+type OpenIdConnectApplication {
+  canCurrentUserManageApplication: Boolean! @cost(weight: "10")
+  clientId: String
+  consentType: OpenIdConnectConsentType! @cost(weight: "10")
+  displayName: String
+  id: Uuid!
+  institutions: OpenIdConnectApplicationInstitutionConnection! @cost(weight: "10")
+  postLogoutRedirectUri: Url @cost(weight: "10")
+  redirectUri: Url @cost(weight: "10")
+  scopes: [OpenIdConnectScope]! @cost(weight: "10")
+}
+
+type OpenIdConnectApplicationInstitutionConnection {
+  edges: [InstitutionApplicationEdge!]! @cost(weight: "10")
+}
+
+type OpenIdConnectAuthorization {
+  canCurrentUserDeleteAuthorization: Boolean! @cost(weight: "10")
+  creationDate: DateTime
+  id: Uuid!
+  status: String
+  subject: String
+  type: String
+}
+
+type OpenIdConnectToken {
+  canCurrentUserRevokeToken: Boolean! @cost(weight: "10")
+  creationDate: DateTime
+  expirationDate: DateTime
+  id: Uuid!
+  redemptionDate: DateTime
+  status: String
+  subject: String
+  type: String
 }
 
 type OpticalData implements Data {
@@ -1322,11 +1334,6 @@ type Publication {
 }
 
 type Query {
-  application(applicationId: Uuid!): Application @authorize(policy: "Read") @cost(weight: "10")
-  applications: [Application!]! @authorize(policy: "Read") @cost(weight: "10")
-  authorization(authorizationId: Uuid!): Authorization @authorize(policy: "Read") @cost(weight: "10")
-  authorizations: [Authorization!]! @authorize(policy: "Read") @cost(weight: "10")
-  authorizationsByApplicationId(applicationId: Uuid!): [Authorization!]! @authorize(policy: "Read") @cost(weight: "10")
   component(uuid: Uuid!): Component @cost(weight: "10")
   components("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [ComponentSortInput!] @cost(weight: "10") where: ComponentFilterInput @cost(weight: "10")): ComponentsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   currentUser: User @cost(weight: "10")
@@ -1342,13 +1349,14 @@ type Query {
   node("ID of the object." id: ID!): Node @cost(weight: "10")
   "Lookup nodes by a list of IDs."
   nodes("The list of node IDs." ids: [ID!]!): [Node]! @cost(weight: "10")
+  openIdConnectApplication(applicationId: Uuid!): OpenIdConnectApplication @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectApplications: [OpenIdConnectApplication!]! @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectAuthorization(authorizationId: Uuid!): OpenIdConnectAuthorization @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectAuthorizations(applicationId: Uuid): [OpenIdConnectAuthorization!]! @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectToken(tokenId: Uuid!): OpenIdConnectToken @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectTokens(applicationId: Uuid): [OpenIdConnectToken!]! @authorize(policy: "Read") @cost(weight: "10")
   pendingDatabases("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DatabaseSortInput!] @cost(weight: "10") where: DatabaseFilterInput @cost(weight: "10")): PendingDatabasesConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   pendingInstitutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionSortInput!] @cost(weight: "10") where: InstitutionFilterInput @cost(weight: "10")): PendingInstitutionsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
-  scope(scopeId: Uuid!): Scope @authorize(policy: "Read") @cost(weight: "10")
-  scopes: [Scope!]! @authorize(policy: "Read") @cost(weight: "10")
-  token(tokenId: Uuid!): Token @authorize(policy: "Read") @cost(weight: "10")
-  tokens: [Token!]! @authorize(policy: "Read") @cost(weight: "10")
-  tokensByApplicationId(applicationId: Uuid!): [Token!]! @authorize(policy: "Read") @cost(weight: "10")
   user(uuid: Uuid!): User @cost(weight: "10")
   users("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [UserSortInput!] @cost(weight: "10") where: UserFilterInput @cost(weight: "10")): UsersConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
 }
@@ -1533,22 +1541,15 @@ type ResponseApproval {
   timestamp: DateTime!
 }
 
-type RevokeTokenError {
-  code: RevokeTokenErrorCode!
+type RevokeOpenIdConnectTokenError {
+  code: RevokeOpenIdConnectTokenErrorCode!
   message: String!
   path: [String!]!
 }
 
-type RevokeTokenPayload {
-  errors: [RevokeTokenError!]
+type RevokeOpenIdConnectTokenPayload {
+  errors: [RevokeOpenIdConnectTokenError!]
   query: Query!
-}
-
-type Scope {
-  description: String
-  displayName: String
-  id: Uuid!
-  name: String! @cost(weight: "10")
 }
 
 type SetUserPasswordError {
@@ -1607,34 +1608,11 @@ type ToTreeVertexAppliedConversionMethod {
   sourceName: String!
 }
 
-type Token {
-  canCurrentUserRevokeToken: Boolean! @cost(weight: "10")
-  creationDate: DateTime
-  expirationDate: DateTime
-  id: Uuid!
-  redemptionDate: DateTime
-  status: String
-  subject: String
-  type: String
-}
-
 type TwoFactorAuthentication {
   hasAuthenticator: Boolean!
   isEnabled: Boolean!
   isMachineRemembered: Boolean!
   recoveryCodesLeftCount: Int!
-}
-
-type UpdateApplicationError {
-  code: UpdateApplicationErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type UpdateApplicationPayload {
-  application: Application
-  errors: [UpdateApplicationError!]
-  query: Query!
 }
 
 type UpdateComponentAssemblyError {
@@ -1707,6 +1685,18 @@ type UpdateMethodError {
 type UpdateMethodPayload {
   errors: [UpdateMethodError!]
   method: Method
+  query: Query!
+}
+
+type UpdateOpenIdConnectApplicationError {
+  code: UpdateOpenIdConnectApplicationErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type UpdateOpenIdConnectApplicationPayload {
+  application: OpenIdConnectApplication
+  errors: [UpdateOpenIdConnectApplicationError!]
   query: Query!
 }
 
@@ -2035,15 +2025,6 @@ input ConfirmUserMethodDeveloperInput {
   userId: Uuid!
 }
 
-input CreateApplicationInput {
-  associatedInstitutionId: Uuid!
-  clientId: String!
-  displayName: String!
-  permissions: [String!]!
-  postLogoutRedirectUri: String!
-  redirectUri: String!
-}
-
 input CreateComponentInput {
   abbreviation: String
   availability: OpenEndedDateTimeRangeInput
@@ -2096,6 +2077,16 @@ input CreateMethodInput {
   validity: OpenEndedDateTimeRangeInput
 }
 
+input CreateOpenIdConnectApplicationInput {
+  associatedInstitutionId: Uuid!
+  clientId: String!
+  consentType: OpenIdConnectConsentType!
+  displayName: String!
+  postLogoutRedirectUri: Url
+  redirectUri: Url
+  scopes: [OpenIdConnectScope!]!
+}
+
 input DataFormatFilterInput {
   and: [DataFormatFilterInput!]
   or: [DataFormatFilterInput!]
@@ -2136,16 +2127,16 @@ input DatabaseSortInput {
   operator: InstitutionSortInput @cost(weight: "10")
 }
 
-input DeleteApplicationInput {
+input DeleteInstitutionInput {
+  institutionId: Uuid!
+}
+
+input DeleteOpenIdConnectApplicationInput {
   applicationId: Uuid!
 }
 
-input DeleteAuthorizationInput {
+input DeleteOpenIdConnectAuthorizationInput {
   authorizationId: Uuid!
-}
-
-input DeleteInstitutionInput {
-  institutionId: Uuid!
 }
 
 input DeletePersonalUserDataInput {
@@ -2570,7 +2561,7 @@ input ResetUserPasswordInput {
   resetCode: String!
 }
 
-input RevokeTokenInput {
+input RevokeOpenIdConnectTokenInput {
   tokenId: Uuid!
 }
 
@@ -2610,15 +2601,6 @@ input StringOperationFilterInput {
 
 input SwitchInstitutionOperatingStateInput {
   institutionId: Uuid!
-}
-
-input UpdateApplicationInput {
-  applicationId: Uuid!
-  clientId: String!
-  displayName: String!
-  permissions: [String!]!
-  postLogoutRedirectUri: String!
-  redirectUri: String!
 }
 
 input UpdateComponentAssemblyInput {
@@ -2675,6 +2657,16 @@ input UpdateMethodInput {
   name: String!
   reference: ReferenceInput
   validity: OpenEndedDateTimeRangeInput
+}
+
+input UpdateOpenIdConnectApplicationInput {
+  applicationId: Uuid!
+  clientId: String!
+  consentType: OpenIdConnectConsentType!
+  displayName: String!
+  postLogoutRedirectUri: Url
+  redirectUri: Url
+  scopes: [OpenIdConnectScope!]!
 }
 
 input UriFilterInput {
@@ -2945,12 +2937,6 @@ enum ConfirmUserMethodDeveloperErrorCode {
   UNKNOWN_DEVELOPER
 }
 
-enum CreateApplicationErrorCode {
-  UNKNOWN
-  UNAUTHORIZED
-  UNKNOWN_INSTITUTION
-}
-
 enum CreateComponentErrorCode {
   UNKNOWN
   UNKNOWN_MANUFACTURER
@@ -2988,6 +2974,12 @@ enum CreateMethodErrorCode {
   UNAUTHORIZED
 }
 
+enum CreateOpenIdConnectApplicationErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_INSTITUTION
+}
+
 enum DataKind {
   CALORIMETRIC_DATA
   HYGROTHERMAL_DATA
@@ -3007,23 +2999,23 @@ enum DatabaseVerificationState {
   VERIFIED
 }
 
-enum DeleteApplicationErrorCode {
-  UNKNOWN
-  UNAUTHORIZED
-  UNKNOWN_APPLICATION
-}
-
-enum DeleteAuthorizationErrorCode {
-  UNKNOWN
-  UNAUTHORIZED
-  UNKNOWN_AUTHORIZATION
-}
-
 enum DeleteInstitutionErrorCode {
   UNKNOWN
   UNKNOWN_INSTITUTION
   UNAUTHORIZED
   MANAGING
+}
+
+enum DeleteOpenIdConnectApplicationErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_APPLICATION
+}
+
+enum DeleteOpenIdConnectAuthorizationErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_AUTHORIZATION
 }
 
 enum DeletePersonalUserDataErrorCode {
@@ -3123,6 +3115,19 @@ enum LogoutUserErrorCode {
 enum MethodCategory {
   MEASUREMENT
   CALCULATION
+}
+
+enum OpenIdConnectConsentType {
+  EXPLICIT
+  EXTERNAL
+  IMPLICIT
+  SYSTEMATIC
+}
+
+enum OpenIdConnectScope {
+  READ_API
+  WRITE_API
+  MANAGE_USER_API
 }
 
 enum OpticalComponentSubtype {
@@ -3269,7 +3274,7 @@ enum ResetUserTwoFactorAuthenticatorErrorCode {
   RESETTING_FAILED
 }
 
-enum RevokeTokenErrorCode {
+enum RevokeOpenIdConnectTokenErrorCode {
   UNKNOWN
   UNAUTHORIZED
   UNKNOWN_TOKEN
@@ -3331,12 +3336,6 @@ enum SwitchInstitutionOperatingStateErrorCode {
   UNAUTHORIZED
 }
 
-enum UpdateApplicationErrorCode {
-  UNKNOWN
-  UNAUTHORIZED
-  UNKNOWN_APPLICATION
-}
-
 enum UpdateComponentAssemblyErrorCode {
   UNKNOWN
   UNKNOWN_ASSEMBLED_COMPONENT
@@ -3382,6 +3381,12 @@ enum UpdateMethodErrorCode {
   TWO_REFERENCES
   UNAUTHORIZED
   UNKNOWN_METHOD
+}
+
+enum UpdateOpenIdConnectApplicationErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_APPLICATION
 }
 
 enum UriHostNameType {

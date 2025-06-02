@@ -25,7 +25,6 @@ using Metabase.GraphQl.Methods;
 using Metabase.GraphQl.Numerations;
 using Metabase.GraphQl.OpenIdConnect.Application;
 using Metabase.GraphQl.OpenIdConnect.Authorizations;
-using Metabase.GraphQl.OpenIdConnect.Scopes;
 using Metabase.GraphQl.OpenIdConnect.Tokens;
 using Metabase.GraphQl.Publications;
 using Metabase.GraphQl.References;
@@ -130,10 +129,9 @@ public static class GraphQlConfiguration
             .AddType<DatabaseQueries>()
             .AddType<InstitutionQueries>()
             .AddType<MethodQueries>()
-            .AddType<ApplicationQueries>()
-            .AddType<AuthorizationQueries>()
-            .AddType<TokenQueries>()
-            .AddType<ScopeQueries>()
+            .AddType<OpenIdConnectApplicationQueries>()
+            .AddType<OpenIdConnectAuthorizationQueries>()
+            .AddType<OpenIdConnectTokenQueries>()
             .AddType<UserQueries>()
             // Mutation Types
             .AddMutationType(d => d.Name(nameof(Mutation)))
@@ -150,9 +148,9 @@ public static class GraphQlConfiguration
             .AddType<MethodMutations>()
             .AddType<UserMethodDeveloperMutations>()
             .AddType<UserMutations>()
-            .AddType<ApplicationMutations>()
-            .AddType<AuthorizationMutations>()
-            .AddType<TokenMutations>()
+            .AddType<OpenIdConnectApplicationMutations>()
+            .AddType<OpenIdConnectAuthorizationMutations>()
+            .AddType<OpenIdConnectTokenMutations>()
             .AddType<KeyFingerprintMutations>()
             /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
             /*     .AddType<ComponentSubscriptions>() */
@@ -175,10 +173,9 @@ public static class GraphQlConfiguration
             .AddType<InstitutionType>()
             .AddType<MethodType>()
             .AddType<NumerationType>()
-            .AddType<ApplicationType>()
-            .AddType<AuthorizationType>()
-            .AddType<ScopeType>()
-            .AddType<TokenType>()
+            .AddType<OpenIdConnectApplicationType>()
+            .AddType<OpenIdConnectAuthorizationType>()
+            .AddType<OpenIdConnectTokenType>()
             .AddType<PublicationType>()
             .AddType<ReferenceType>()
             .AddType<StakeholderType>()

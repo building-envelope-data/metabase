@@ -60,10 +60,10 @@ export default {
   opticalData: "/data/optical",
   photovoltaicData: "/data/photovoltaic",
   geometricData: "/data/geometric",
-  application(uuid: string) {
-    return `/application/${encodeURIComponent(uuid)}`;
+  openIdConnectApplication(uuid: string) {
+    return `/open-id-connect/application/${encodeURIComponent(uuid)}`;
   },
-  applicationCreate: "/application/create",
+  openIdConnectApplicationCreate: "/open-id-connect/application/create",
   openIdConnect: "/open-id-connect",
   openIdConnectClientLogin: "/connect/client/login",
   openIdConnectClientLogout: "/connect/client/logout",

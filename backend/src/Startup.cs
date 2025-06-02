@@ -25,6 +25,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase;
 
@@ -171,7 +172,7 @@ public sealed class Startup(
             // .UseNodaTime()
             )
             .UseSchemaName(appSettings.Database.SchemaName)
-            .UseOpenIddict<OpenIdApplication, OpenIdAuthorization, OpenIdScope, OpenIdToken, Guid>();
+            .UseOpenIddict<OpenIdConnectApplication, OpenIdConnectAuthorization, OpenIdConnectScope, OpenIdConnectToken, Guid>();
         if (!environment.IsProduction())
         {
             options

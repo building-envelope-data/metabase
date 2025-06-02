@@ -24,7 +24,7 @@ public sealed class OpenEndedDateTimeRangeType
         descriptor.BindFieldsExplicitly();
 
         const string SuffixedName = nameof(OpenEndedDateTimeRangeType);
-        descriptor.Name(SuffixedName.Remove(SuffixedName.Length - "Type".Length));
+        descriptor.Name(SuffixedName[..^"Type".Length]);
 
         descriptor
             .Field("from")

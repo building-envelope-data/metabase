@@ -3,15 +3,11 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.KeyFingerprints;
 
-public class AddKeyFingerprintError
-    : UserErrorBase<AddKeyFingerprintErrorCode>
-{
-    public AddKeyFingerprintError(
-        AddKeyFingerprintErrorCode code,
-        string message,
-        IReadOnlyList<string> path
+public class AddKeyFingerprintError(
+    AddKeyFingerprintErrorCode code,
+    string message,
+    IReadOnlyList<string> path
     )
-        : base(code, message, path)
-    {
-    }
+        : UserErrorBase<AddKeyFingerprintErrorCode>(code, message, path)
+{
 }

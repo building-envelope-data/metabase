@@ -1,14 +1,15 @@
-fragment ApplicationPartial on Application {
+fragment ApplicationPartial on OpenIdConnectApplication {
   clientId
   displayName
+  consentType
   id
-  permissions
+  scopes
   postLogoutRedirectUri
   redirectUri
   canCurrentUserManageApplication
 }
 
-fragment AuthorizationPartial on Authorization {
+fragment AuthorizationPartial on OpenIdConnectAuthorization {
   creationDate
   id
   status
@@ -17,7 +18,7 @@ fragment AuthorizationPartial on Authorization {
   canCurrentUserDeleteAuthorization
 }
 
-fragment TokenPartial on Token {
+fragment TokenPartial on OpenIdConnectToken {
   creationDate
   expirationDate
   id
@@ -26,10 +27,4 @@ fragment TokenPartial on Token {
   subject
   type
   canCurrentUserRevokeToken
-}
-
-fragment ScopePartial on Scope {
-  displayName
-  id
-  name
 }

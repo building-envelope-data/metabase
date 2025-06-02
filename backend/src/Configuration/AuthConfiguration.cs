@@ -15,6 +15,7 @@ using OpenIddict.Abstractions;
 using OpenIddict.Client;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Configuration;
 
@@ -29,10 +30,12 @@ public abstract class AuthConfiguration
     public const string ReadPolicy = "Read";
     public const string WritePolicy = "Write";
     public const string ManageUserPolicy = "ManageUser";
-    public const string ScopePrefixApi = "api";
-    public const string ReadApiScope = ScopePrefixApi + ":read";
-    public const string WriteApiScope = ScopePrefixApi + ":write";
-    public const string ManageUserApiScope = ScopePrefixApi + ":user:manage";
+    private const string ApiScopePrefix = "api";
+    private const string ScopeSeparator = ":";
+    public const string ReadApiScope = ApiScopePrefix + ScopeSeparator + "read";
+    public const string WriteApiScope = ApiScopePrefix + ScopeSeparator + "write";
+    public const string ManageUserApiScope = ApiScopePrefix + ScopeSeparator + "user" + ScopeSeparator + "manage";
+    public static IReadOnlyList<string> ApiScopes => [ReadApiScope, WriteApiScope, ManageUserApiScope];
 
     // Keep in sync with the scopes set in `OpenIddictClientRegistration`.
     private static readonly HashSet<string> s_clientScopes =
@@ -265,7 +268,7 @@ public abstract class AuthConfiguration
                     // Note: call ReplaceDefaultEntities() to replace the default OpenIddict entities.
                     options.UseEntityFrameworkCore()
                         .UseDbContext<ApplicationDbContext>()
-                        .ReplaceDefaultEntities<OpenIdApplication, OpenIdAuthorization, OpenIdScope, OpenIdToken, Guid>();
+                        .ReplaceDefaultEntities<OpenIdConnectApplication, OpenIdConnectAuthorization, OpenIdConnectScope, OpenIdConnectToken, Guid>();
                     // Enable Quartz.NET integration.
                     options.UseQuartz();
                 }

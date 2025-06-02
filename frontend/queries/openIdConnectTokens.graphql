@@ -1,0 +1,17 @@
+#import "./openIdConnect.graphql"
+
+query TokensByApplicationId($applicationId: Uuid!) {
+  openIdConnectTokens(applicationId: $applicationId) {    
+    ...TokenPartial
+  }
+}
+
+mutation RevokeToken($tokenId: Uuid!) {
+  revokeOpenIdConnectToken(input: { tokenId: $tokenId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

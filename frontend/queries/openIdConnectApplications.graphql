@@ -1,0 +1,86 @@
+#import "./openIdConnect.graphql"
+
+query Applications {
+  openIdConnectApplications {
+    ...ApplicationPartial
+  }
+}
+
+query Application($uuid: Uuid!) {
+  openIdConnectApplication(applicationId: $uuid) {
+    ...ApplicationPartial
+  }
+}
+
+mutation CreateApplication(
+  $associatedInstitutionId: Uuid!
+  $clientId: String!
+  $displayName: String!
+  $consentType: OpenIdConnectConsentType!
+  $scopes: [OpenIdConnectScope!]!
+  $redirectUri: Url
+  $postLogoutRedirectUri: Url
+) {
+  createOpenIdConnectApplication(
+    input: {
+      associatedInstitutionId: $associatedInstitutionId
+      clientId: $clientId
+      displayName: $displayName
+      consentType: $consentType
+      scopes: $scopes
+      redirectUri: $redirectUri
+      postLogoutRedirectUri: $postLogoutRedirectUri
+    }
+  ) {
+    application {
+      ...ApplicationPartial
+    }
+    clientSecret
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateApplication(
+  $applicationId: Uuid!
+  $clientId: String!
+  $displayName: String!
+  $consentType: OpenIdConnectConsentType!
+  $scopes: [OpenIdConnectScope!]!
+  $redirectUri: Url
+  $postLogoutRedirectUri: Url
+) {
+  updateOpenIdConnectApplication(
+    input: {
+      applicationId: $applicationId
+      clientId: $clientId
+      displayName: $displayName
+      consentType: $consentType
+      scopes: $scopes
+      redirectUri: $redirectUri
+      postLogoutRedirectUri: $postLogoutRedirectUri
+    }
+  ) {
+    application{
+      ...ApplicationPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteApplication($applicationId: Uuid!) {
+  deleteOpenIdConnectApplication(input: { applicationId: $applicationId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

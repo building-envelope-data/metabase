@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
 
 namespace Metabase.Data;
@@ -80,9 +81,9 @@ public sealed class Institution
 
     public ICollection<User> Representatives { get; } = [];
 
-    public ICollection<InstitutionApplication> ApplicationEdges { get; } = [];
+    public ICollection<InstitutionOpenIdConnectApplication> ApplicationEdges { get; } = [];
 
-    public ICollection<OpenIdApplication> Applications { get; } = [];
+    public ICollection<OpenIdConnectApplication> Applications { get; } = [];
 
     [Required][MinLength(1)] public string Name { get; private set; }
 

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Metabase.Configuration;
+using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
+using OpenIddict.Core;
 
 namespace Metabase.Data;
 
@@ -275,13 +277,16 @@ public sealed class DbSeeder
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
                         OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
+                        OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization,
                         OpenIddictConstants.Permissions.Endpoints.Introspection,
                         OpenIddictConstants.Permissions.Endpoints.EndSession,
                         OpenIddictConstants.Permissions.Endpoints.Revocation,
                         OpenIddictConstants.Permissions.Endpoints.Token,
                         OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                         OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                        OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
                         OpenIddictConstants.Permissions.ResponseTypes.Code,
+                        OpenIddictConstants.Permissions.ResponseTypes.Token,
                         OpenIddictConstants.Permissions.Scopes.Address,
                         OpenIddictConstants.Permissions.Scopes.Email,
                         OpenIddictConstants.Permissions.Scopes.Phone,
@@ -377,7 +382,7 @@ public sealed class DbSeeder
         IWebHostEnvironment environment
     )
     {
-        var manager = services.GetRequiredService<IOpenIddictApplicationManager>();
+        var manager = services.GetRequiredService<OpenIddictApplicationManager<OpenIdConnectApplication>>();
         var context = services.GetRequiredService<ApplicationDbContext>();
         if (environment.IsDevelopment())
         {
@@ -401,11 +406,11 @@ public sealed class DbSeeder
                         Pending = false
                     }
                 );
-                var application = await manager.FindByClientIdAsync(MetabaseClientId).AsTask().ConfigureAwait(false) as OpenIdApplication;
+                var application = await manager.FindByClientIdAsync(MetabaseClientId).AsTask().ConfigureAwait(false);
                 if (application != null)
                 {
                     iseInstitution.ApplicationEdges.Add(
-                        new InstitutionApplication
+                        new InstitutionOpenIdConnectApplication
                         {
                             ApplicationId = application.Id
                         });
@@ -428,11 +433,11 @@ public sealed class DbSeeder
                     ManagerId = iseInstitution.Id
                 };
 
-                var application = await manager.FindByClientIdAsync(TestlabSolarFacadesClientId).AsTask().ConfigureAwait(false) as OpenIdApplication;
+                var application = await manager.FindByClientIdAsync(TestlabSolarFacadesClientId).AsTask().ConfigureAwait(false);
                 if (application != null)
                 {
                     institution.ApplicationEdges.Add(
-                        new InstitutionApplication
+                        new InstitutionOpenIdConnectApplication
                         {
                             ApplicationId = application.Id
                         });

@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate.Authorization;
+using HotChocolate.Types;
+using Metabase.Configuration;
+using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
+using Metabase.GraphQl.Users;
+using Microsoft.AspNetCore.Identity;
+using OpenIddict.Core;
+
+namespace Metabase.GraphQl.OpenIdConnect.Tokens;
+
+[ExtendObjectType(nameof(Query))]
+public sealed class OpenIdConnectTokenQueries
+{
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.ReadPolicy)]
+    public async Task<IAsyncEnumerable<OpenIdConnectToken>> GetOpenIdConnectTokensAsync(
+        Guid? applicationId,
+        OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
+        ClaimsPrincipal claimsPrincipal,
+        UserManager<User> userManager,
+        ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
+        CancellationToken cancellationToken
+    )
+    {
+        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
+                .ConfigureAwait(false))
+        {
+            return AsyncEnumerable.Empty<OpenIdConnectToken>();
+        }
+        if (applicationId is not null)
+        {
+            return tokenManager.FindByApplicationIdAsync(applicationId.ToString() ?? "", cancellationToken: cancellationToken);
+        }
+        return tokenManager.ListAsync(cancellationToken: cancellationToken);
+    }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.ReadPolicy)]
+    public async Task<OpenIdConnectToken?> GetOpenIdConnectTokenAsync(
+        Guid tokenId,
+        OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
+        ClaimsPrincipal claimsPrincipal,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
+                .ConfigureAwait(false))
+        {
+            return null;
+        }
+
+        return await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken: cancellationToken).ConfigureAwait(false);
+    }
+}
