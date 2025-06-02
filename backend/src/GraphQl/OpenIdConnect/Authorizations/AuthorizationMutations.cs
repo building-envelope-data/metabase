@@ -44,13 +44,6 @@ public class AuthorizationMutations
                 )
             );
         }
-        if (input.AuthorizationId != Guid.Empty)
-        {
-            return new DeleteAuthorizationPayload(
-                new DeleteAuthorizationError(DeleteAuthorizationErrorCode.UNKNOWN,
-                    "Empty Authorization Id",
-                    [nameof(input), nameof(input.AuthorizationId).FirstCharToLower()]));
-        }
 
         var authorization = await authorizationManager.FindByIdAsync(input.AuthorizationId.ToString(), cancellationToken).ConfigureAwait(false);
 

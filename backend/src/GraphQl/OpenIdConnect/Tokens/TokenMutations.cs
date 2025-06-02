@@ -45,13 +45,6 @@ public sealed class TokenMutations
                 )
             );
         }
-        if (input.TokenId != Guid.Empty)
-        {
-            return new RevokeTokenPayload(
-                new RevokeTokenError(RevokeTokenErrorCode.UNKNOWN,
-                    "Empty Token Id",
-                    [nameof(input), nameof(input.TokenId).FirstCharToLower()]));
-        }
 
         var token = await tokenManager.FindByIdAsync(input.TokenId.ToString(), cancellationToken).ConfigureAwait(false);
 
