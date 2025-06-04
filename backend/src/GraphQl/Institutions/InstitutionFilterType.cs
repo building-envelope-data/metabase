@@ -17,6 +17,7 @@ public sealed class InstitutionFilterType
         descriptor.Field(x => x.Description);
         descriptor.Field(x => x.WebsiteLocator);
         descriptor.Field(x => x.State);
+        descriptor.Field(x => x.Extras);
         descriptor.Field(x => x.DevelopedMethods);
         descriptor.Field(x => x.DevelopedMethodEdges);
         descriptor.Field(x => x.ManagedMethods);

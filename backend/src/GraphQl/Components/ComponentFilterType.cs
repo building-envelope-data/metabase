@@ -16,6 +16,7 @@ public sealed class ComponentFilterType
         descriptor.Field(x => x.Abbreviation);
         descriptor.Field(x => x.Description);
         descriptor.Field(x => x.Categories);
+        descriptor.Field(x => x.Extras);
         descriptor.Field(x => x.PartOf);
         descriptor.Field(x => x.Parts);
         descriptor.Field(x => x.PartOfEdges);

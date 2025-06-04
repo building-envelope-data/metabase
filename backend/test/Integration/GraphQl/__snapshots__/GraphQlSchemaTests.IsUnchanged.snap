@@ -1970,6 +1970,7 @@ input ComponentFilterInput {
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
   categories: ListComponentCategoryOperationFilterInput
+  extras: JsonElementFilterInput
   partOf: ListComponentFilterTypeFilterInput
   parts: ListComponentFilterTypeFilterInput
   partOfEdges: ListComponentAssemblyFilterTypeFilterInput
@@ -2225,6 +2226,7 @@ input InstitutionFilterInput {
   description: StringOperationFilterInput
   websiteLocator: UriFilterInput
   state: InstitutionStateOperationFilterInput
+  extras: JsonElementFilterInput
   developedMethods: ListMethodFilterTypeFilterInput
   developedMethodEdges: ListInstitutionMethodDeveloperFilterTypeFilterInput
   managedMethods: ListMethodFilterTypeFilterInput
@@ -2277,6 +2279,19 @@ input InstitutionStateOperationFilterInput {
   notEqualTo: InstitutionState @cost(weight: "10")
   in: [InstitutionState!] @cost(weight: "10")
   notIn: [InstitutionState!] @cost(weight: "10")
+}
+
+input JsonElementFilterInput {
+  and: [JsonElementFilterInput!]
+  or: [JsonElementFilterInput!]
+  valueKind: JsonValueKindOperationFilterInput
+}
+
+input JsonValueKindOperationFilterInput {
+  equalTo: JsonValueKind @cost(weight: "10")
+  notEqualTo: JsonValueKind @cost(weight: "10")
+  in: [JsonValueKind!] @cost(weight: "10")
+  notIn: [JsonValueKind!] @cost(weight: "10")
 }
 
 input KeyFingerprintInput {
@@ -3089,6 +3104,17 @@ enum InstitutionRepresentativeRole {
 enum InstitutionState {
   PENDING
   VERIFIED
+}
+
+enum JsonValueKind {
+  UNDEFINED
+  OBJECT
+  ARRAY
+  STRING
+  NUMBER
+  TRUE
+  FALSE
+  NULL
 }
 
 enum LoginUserErrorCode {
