@@ -4,7 +4,7 @@ using OpenIddict.EntityFrameworkCore.Models;
 
 namespace Metabase.Data.OpenIdConnect;
 
-public class OpenIdConnectApplication : OpenIddictEntityFrameworkCoreApplication<Guid, OpenIdConnectAuthorization, OpenIdConnectToken>
+public sealed class OpenIdConnectApplication : OpenIddictEntityFrameworkCoreApplication<Guid, OpenIdConnectAuthorization, OpenIdConnectToken>
 {
     public ICollection<InstitutionOpenIdConnectApplication> InstitutionEdges { get; } = [];
 

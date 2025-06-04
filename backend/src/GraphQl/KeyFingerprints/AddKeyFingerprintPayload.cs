@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.KeyFingerprints;
 
-public class AddKeyFingerprintPayload
+public sealed class AddKeyFingerprintPayload
 {
     public AddKeyFingerprintPayload(
         string keyFingerprint

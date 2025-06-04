@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
-using Metabase.Authorization;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
@@ -14,7 +13,6 @@ using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 using OpenIddict.Core;
-using System.Linq;
 using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.GraphQl.OpenIdConnect.Application;

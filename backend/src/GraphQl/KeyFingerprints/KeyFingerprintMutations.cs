@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Metabase.GraphQl.KeyFingerprints;
 
 [ExtendObjectType(nameof(Mutation))]
-public class KeyFingerprintMutations
+public sealed class KeyFingerprintMutations
 {
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.WritePolicy)]

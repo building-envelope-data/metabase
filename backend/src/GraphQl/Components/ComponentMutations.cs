@@ -107,13 +107,15 @@ public sealed class ComponentMutations
             input.Availability is null
                 ? null
                 : OpenEndedDateTimeRangeType.FromInput(input.Availability),
-            input.Categories
-        );
-
-        // Note that above we make sure that, for each reference, standard and publication are *not* both non-null.
-        component.PrimeSurface = DescriptionOrReferenceType.FromInput(input.PrimeSurface);
-        component.PrimeDirection = DescriptionOrReferenceType.FromInput(input.PrimeDirection);
-        component.SwitchableLayers = DescriptionOrReferenceType.FromInput(input.SwitchableLayers);
+            input.Categories,
+            input.Extras
+        )
+        {
+            // Note that above we make sure that, for each reference, standard and publication are *not* both non-null.
+            PrimeSurface = DescriptionOrReferenceType.FromInput(input.PrimeSurface),
+            PrimeDirection = DescriptionOrReferenceType.FromInput(input.PrimeDirection),
+            SwitchableLayers = DescriptionOrReferenceType.FromInput(input.SwitchableLayers)
+        };
 
         component.ManufacturerEdges.Add(
                         new ComponentManufacturer
@@ -178,13 +180,14 @@ public sealed class ComponentMutations
             input.Availability is null
                 ? null
                 : OpenEndedDateTimeRangeType.FromInput(input.Availability),
-            input.Categories
+            input.Categories,
+            input.Extras
         );
 
         // Note that above we make sure that, for each reference, standard and publication are *not* both non-null.
-        component.PrimeSurface = input.PrimeSurface is null ? null : DescriptionOrReferenceType.FromInput(input.PrimeSurface);
-        component.PrimeDirection = input.PrimeDirection is null ? null : DescriptionOrReferenceType.FromInput(input.PrimeDirection);
-        component.SwitchableLayers = input.SwitchableLayers is null ? null : DescriptionOrReferenceType.FromInput(input.SwitchableLayers);
+        component.PrimeSurface = DescriptionOrReferenceType.FromInput(input.PrimeSurface);
+        component.PrimeDirection = DescriptionOrReferenceType.FromInput(input.PrimeDirection);
+        component.SwitchableLayers = DescriptionOrReferenceType.FromInput(input.SwitchableLayers);
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new UpdateComponentPayload(component);

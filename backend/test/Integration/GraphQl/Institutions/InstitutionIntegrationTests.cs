@@ -18,6 +18,7 @@ public abstract class InstitutionIntegrationTests
         "Best institution ever!",
         new Uri("https://institution-a.com", UriKind.Absolute),
         null,
+        null,
         [],
         null
     );

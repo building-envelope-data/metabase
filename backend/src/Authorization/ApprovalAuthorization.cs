@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Authorization;
 
-public class ApprovalAuthorization
+public sealed class ApprovalAuthorization
 {
     public static async Task<bool> IsAuthorizedToAddApprovals(
         ClaimsPrincipal claimsPrincipal,

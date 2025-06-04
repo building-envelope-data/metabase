@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.KeyFingerprints;
 
-public class AddKeyFingerprintError(
+public sealed class AddKeyFingerprintError(
     AddKeyFingerprintErrorCode code,
     string message,
     IReadOnlyList<string> path

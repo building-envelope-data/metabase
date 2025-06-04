@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Metabase.GraphQl.KeyFingerprints;
 
 [ExtendObjectType(nameof(Query))]
-public class KeyFingerprintQueries
+public sealed class KeyFingerprintQueries
 {
     public async Task<VerifyKeyFingerprintPayload> VerifyKeyFingerprintAsync(
         KeyFingerprintInput input,

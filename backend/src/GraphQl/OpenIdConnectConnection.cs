@@ -8,15 +8,14 @@ using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.GraphQl;
 
-public abstract class OpenIdConnectConnection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>(
-TSubject subject,
-Func<TAssociation, TEdge> createEdge)
-where TSubject : OpenIdConnectApplication
-where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
+public abstract class OpenIdConnectConnection<TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>(
+    OpenIdConnectApplication subject,
+    Func<TAssociation, TEdge> createEdge)
+    where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
     private readonly Func<TAssociation, TEdge> _createEdge = createEdge;
 
-    protected TSubject Subject { get; } = subject;
+    protected OpenIdConnectApplication Subject { get; } = subject;
 
     public async Task<IEnumerable<TEdge>> GetEdgesAsync(
         TAssociationsByAssociateIdDataLoader dataLoader,

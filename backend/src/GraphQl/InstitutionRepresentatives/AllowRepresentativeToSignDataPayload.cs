@@ -3,7 +3,7 @@ using Metabase.Data;
 
 namespace Metabase.GraphQl.InstitutionRepresentatives;
 
-public class AllowRepresentativeToSignDataPayload
+public sealed class AllowRepresentativeToSignDataPayload
 {
     public AllowRepresentativeToSignDataPayload(
         InstitutionRepresentative institutionRepresentative

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.KeyFingerprints;
 
-public class VerifyKeyFingerprintPayload
+public sealed class VerifyKeyFingerprintPayload
 {
     public VerifyKeyFingerprintPayload(
         bool valid

@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using NpgsqlTypes;
 using DateTime = System.DateTime;
 using Metabase.Enumerations;
+using System;
+using System.Text.Json;
 
 namespace Metabase.Data;
 
@@ -21,7 +23,8 @@ public sealed class Component
         string? abbreviation,
         string description,
         NpgsqlRange<DateTime>? availability,
-        ComponentCategory[] categories
+        ComponentCategory[] categories,
+        JsonElement? extras
     )
     {
         Name = name;
@@ -29,6 +32,7 @@ public sealed class Component
         Description = description;
         Availability = availability;
         Categories = categories;
+        Extras = extras;
     }
     // Entity Framework Core Read-Only Properties https://docs.microsoft.com/en-us/ef/core/modeling/constructors#read-only-properties
     // Data Annotations https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations
@@ -49,6 +53,8 @@ public sealed class Component
 
     // https://www.npgsql.org/efcore/mapping/array.html
     [Required] public ComponentCategory[] Categories { get; private set; }
+
+    public JsonElement? Extras { get; private set; }
 
     public DescriptionOrReference? PrimeSurface { get; set; }
     public DescriptionOrReference? PrimeDirection { get; set; }
@@ -84,7 +90,8 @@ public sealed class Component
         string? abbreviation,
         string description,
         NpgsqlRange<DateTime>? availability,
-        ComponentCategory[] categories
+        ComponentCategory[] categories,
+        JsonElement? extras
     )
     {
         Name = name;
@@ -92,5 +99,6 @@ public sealed class Component
         Description = description;
         Availability = availability;
         Categories = categories;
+        Extras = extras;
     }
 }

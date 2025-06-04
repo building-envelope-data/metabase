@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;

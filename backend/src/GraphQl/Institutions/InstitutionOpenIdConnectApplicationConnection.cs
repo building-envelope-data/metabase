@@ -2,13 +2,13 @@ using Metabase.Data;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionApplicationConnection(
+public sealed class InstitutionOpenIdConnectApplicationConnection(
     Institution institution
     )
         : Connection<Institution, InstitutionOpenIdConnectApplication,
-        InstitutionApplicationsByInstitutionIdDataLoader, InstitutionApplicationEdge>(
+        InstitutionOpenIdConnectApplicationsByInstitutionIdDataLoader, InstitutionOpenIdConnectApplicationEdge>(
         institution,
-        x => new InstitutionApplicationEdge(x)
+        x => new InstitutionOpenIdConnectApplicationEdge(x)
         )
 {
 }

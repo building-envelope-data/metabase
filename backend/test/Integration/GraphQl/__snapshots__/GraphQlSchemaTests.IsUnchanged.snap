@@ -244,6 +244,7 @@ type Component implements Node {
   categories: [ComponentCategory!]!
   concretizationOf: ComponentConcretizationOfConnection! @cost(weight: "10")
   description: String!
+  extras: Any
   generalizationOf: ComponentGeneralizationOfConnection! @cost(weight: "10")
   id: ID!
   manufacturers(pending: Boolean! = false): ComponentManufacturerConnection! @cost(weight: "10")
@@ -831,12 +832,12 @@ type HygrothermalDataEdge {
 
 type Institution implements Node {
   abbreviation: String
-  applications: InstitutionApplicationConnection! @cost(weight: "10")
   canCurrentUserDeleteNode: Boolean! @cost(weight: "10")
   canCurrentUserSwitchOperatingStateOfNode: Boolean! @cost(weight: "10")
   canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   description: String!
   developedMethods(pending: Boolean! = false): InstitutionDevelopedMethodConnection! @cost(weight: "10")
+  extras: Any
   id: ID!
   managedDataFormats: InstitutionManagedDataFormatConnection! @cost(weight: "10")
   managedInstitutions: InstitutionManagedInstitutionConnection! @cost(weight: "10")
@@ -844,6 +845,7 @@ type Institution implements Node {
   manager: InstitutionManagerEdge @cost(weight: "10")
   manufacturedComponents(pending: Boolean! = false): InstitutionManufacturedComponentConnection! @cost(weight: "10")
   name: String!
+  openIdConnectApplications: InstitutionOpenIdConnectApplicationConnection! @cost(weight: "10")
   operatedDatabases: InstitutionOperatedDatabaseConnection! @cost(weight: "10")
   operatingState: InstitutionOperatingState!
   publicKey: String
@@ -851,14 +853,6 @@ type Institution implements Node {
   state: InstitutionState!
   uuid: Uuid! @cost(weight: "10")
   websiteLocator: Url
-}
-
-type InstitutionApplicationConnection {
-  edges: [InstitutionApplicationEdge!]! @cost(weight: "10")
-}
-
-type InstitutionApplicationEdge {
-  node: Institution! @cost(weight: "10")
 }
 
 type InstitutionDevelopedMethodConnection {
@@ -914,6 +908,14 @@ type InstitutionManufacturedComponentEdge {
 type InstitutionMethodDeveloperEdge {
   canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  node: Institution! @cost(weight: "10")
+}
+
+type InstitutionOpenIdConnectApplicationConnection {
+  edges: [InstitutionOpenIdConnectApplicationEdge!]! @cost(weight: "10")
+}
+
+type InstitutionOpenIdConnectApplicationEdge {
   node: Institution! @cost(weight: "10")
 }
 
@@ -1167,7 +1169,7 @@ type OpenIdConnectApplication {
 }
 
 type OpenIdConnectApplicationInstitutionConnection {
-  edges: [InstitutionApplicationEdge!]! @cost(weight: "10")
+  edges: [InstitutionOpenIdConnectApplicationEdge!]! @cost(weight: "10")
 }
 
 type OpenIdConnectAuthorization {
@@ -1701,10 +1703,10 @@ type UpdateOpenIdConnectApplicationPayload {
 }
 
 type User implements Node {
-  canCurrentUserAddApplications: Boolean! @cost(weight: "10")
   canCurrentUserAddApprovals: Boolean! @cost(weight: "10")
+  canCurrentUserAddOpenIdConnectApplications: Boolean! @cost(weight: "10")
   canCurrentUserDeleteUser: Boolean! @cost(weight: "10")
-  canCurrentUserViewApplications: Boolean! @cost(weight: "10")
+  canCurrentUserViewOpenIdConnectApplications: Boolean! @cost(weight: "10")
   developedMethods(pending: Boolean! = false): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
@@ -2030,6 +2032,7 @@ input CreateComponentInput {
   availability: OpenEndedDateTimeRangeInput
   categories: [ComponentCategory!]!
   description: String!
+  extras: Any
   manufacturerId: Uuid!
   name: String!
   primeDirection: DescriptionOrReferenceInput
@@ -2057,6 +2060,7 @@ input CreateDatabaseInput {
 input CreateInstitutionInput {
   abbreviation: String
   description: String!
+  extras: Any
   managerId: Uuid
   name: String!
   ownerIds: [Uuid!]!
@@ -2616,6 +2620,7 @@ input UpdateComponentInput {
   categories: [ComponentCategory!]!
   componentId: Uuid!
   description: String!
+  extras: Any
   name: String!
   primeDirection: DescriptionOrReferenceInput
   primeSurface: DescriptionOrReferenceInput
@@ -2642,6 +2647,7 @@ input UpdateDatabaseInput {
 input UpdateInstitutionInput {
   abbreviation: String
   description: String!
+  extras: Any
   institutionId: Uuid!
   name: String!
   publicKey: String

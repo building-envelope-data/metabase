@@ -90,7 +90,7 @@ export default function ApplicationTable({ loading, applications }: Applications
 
     return <>
         <Typography.Title>Applications</Typography.Title>
-        {currentUser?.canCurrentUserAddApplications ? (
+        {currentUser?.canCurrentUserAddOpenIdConnectApplications ? (
             <>
                 <Flex justify="right" gap="small">
                     <Button type="primary" onClick={() => router.push(paths.openIdConnectApplicationCreate)} style={{ marginBottom: "5px" }}>Add Application</Button>

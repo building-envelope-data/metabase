@@ -396,7 +396,8 @@ public sealed class DbSeeder
                     new Uri("https://www.ise.fraunhofer.de", UriKind.Absolute),
                     null,
                     InstitutionState.VERIFIED,
-                    InstitutionOperatingState.OPERATING
+                    InstitutionOperatingState.OPERATING,
+                    null
                 );
                 iseInstitution.RepresentativeEdges.Add(
                     new InstitutionRepresentative
@@ -409,7 +410,7 @@ public sealed class DbSeeder
                 var application = await manager.FindByClientIdAsync(MetabaseClientId).AsTask().ConfigureAwait(false);
                 if (application != null)
                 {
-                    iseInstitution.ApplicationEdges.Add(
+                    iseInstitution.OpenIdConnectApplicationEdges.Add(
                         new InstitutionOpenIdConnectApplication
                         {
                             ApplicationId = application.Id
@@ -427,7 +428,8 @@ public sealed class DbSeeder
                     new Uri("https://www.ise.fraunhofer.de/en/rd-infrastructure/accredited-labs/testlab-solar-facades.html", UriKind.Absolute),
                     null,
                     InstitutionState.VERIFIED,
-                    InstitutionOperatingState.OPERATING
+                    InstitutionOperatingState.OPERATING,
+                    null
                 )
                 {
                     ManagerId = iseInstitution.Id
@@ -436,7 +438,7 @@ public sealed class DbSeeder
                 var application = await manager.FindByClientIdAsync(TestlabSolarFacadesClientId).AsTask().ConfigureAwait(false);
                 if (application != null)
                 {
-                    institution.ApplicationEdges.Add(
+                    institution.OpenIdConnectApplicationEdges.Add(
                         new InstitutionOpenIdConnectApplication
                         {
                             ApplicationId = application.Id
@@ -454,7 +456,8 @@ public sealed class DbSeeder
                     new Uri("https://www.lbl.gov", UriKind.Absolute),
                     null,
                     InstitutionState.VERIFIED,
-                    InstitutionOperatingState.OPERATING
+                    InstitutionOperatingState.OPERATING,
+                    null
                 )
                 {
                     ManagerId = iseInstitution.Id
@@ -476,8 +479,10 @@ public sealed class DbSeeder
             var context = services.GetRequiredService<ApplicationDbContext>();
             if (!await context.Databases.Where(x => x.Name == TestlabDatabaseName).AnyAsync().ConfigureAwait(false))
             {
-                var uriBuilder = new UriBuilder(new Uri(appSettings.TestlabSolarFacadesHost, UriKind.Absolute));
-                uriBuilder.Path = "/graphql/";
+                var uriBuilder = new UriBuilder(new Uri(appSettings.TestlabSolarFacadesHost, UriKind.Absolute))
+                {
+                    Path = "/graphql/"
+                };
                 var database = new Database(
                     TestlabDatabaseName,
                     "The database of the TestLab Solar Facades of Fraunhofer ISE",

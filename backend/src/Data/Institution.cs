@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
 
@@ -25,7 +26,8 @@ public sealed class Institution
         Uri? websiteLocator,
         string? publicKey,
         InstitutionState state,
-        InstitutionOperatingState operatingState
+        InstitutionOperatingState operatingState,
+        JsonElement? extras
     )
     {
         Name = name;
@@ -35,6 +37,7 @@ public sealed class Institution
         PublicKey = publicKey;
         State = state;
         OperatingState = operatingState;
+        Extras = extras;
     }
 
     [MinLength(1)] public string? Abbreviation { get; private set; }
@@ -48,6 +51,8 @@ public sealed class Institution
     [Required] public InstitutionState State { get; private set; }
 
     public InstitutionOperatingState OperatingState { get; private set; }
+
+    public JsonElement? Extras { get; private set; }
 
     public ICollection<InstitutionMethodDeveloper> DevelopedMethodEdges { get; } =
         [];
@@ -81,9 +86,9 @@ public sealed class Institution
 
     public ICollection<User> Representatives { get; } = [];
 
-    public ICollection<InstitutionOpenIdConnectApplication> ApplicationEdges { get; } = [];
+    public ICollection<InstitutionOpenIdConnectApplication> OpenIdConnectApplicationEdges { get; } = [];
 
-    public ICollection<OpenIdConnectApplication> Applications { get; } = [];
+    public ICollection<OpenIdConnectApplication> OpenIdConnectApplications { get; } = [];
 
     [Required][MinLength(1)] public string Name { get; private set; }
 
@@ -92,7 +97,8 @@ public sealed class Institution
         string? abbreviation,
         string description,
         Uri? websiteLocator,
-        string? publicKey
+        string? publicKey,
+        JsonElement? extras
     )
     {
         Name = name;
@@ -100,6 +106,7 @@ public sealed class Institution
         Description = description;
         WebsiteLocator = websiteLocator;
         PublicKey = publicKey;
+        Extras = extras;
     }
 
     public void Verify()

@@ -7,10 +7,9 @@ namespace Metabase.GraphQl.OpenIdConnect.Application;
 public sealed class OpenIdConnectApplicationInstitutionConnection(
     OpenIdConnectApplication application
     )
-: OpenIdConnectConnection<OpenIdConnectApplication, InstitutionOpenIdConnectApplication,
-    InstitutionApplicationsByInstitutionIdDataLoader, InstitutionApplicationEdge>(
+: OpenIdConnectConnection<InstitutionOpenIdConnectApplication, InstitutionOpenIdConnectApplicationsByInstitutionIdDataLoader, InstitutionOpenIdConnectApplicationEdge>(
         application,
-        x => new InstitutionApplicationEdge(x)
+        x => new InstitutionOpenIdConnectApplicationEdge(x)
         )
 {
 }

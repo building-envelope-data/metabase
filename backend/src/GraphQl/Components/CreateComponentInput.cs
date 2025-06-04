@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using Metabase.Enumerations;
 using Metabase.GraphQl.Common;
 using Metabase.GraphQl.DescriptionOrReferences;
@@ -14,5 +15,6 @@ public sealed record CreateComponentInput(
     DescriptionOrReferenceInput? PrimeSurface,
     DescriptionOrReferenceInput? PrimeDirection,
     DescriptionOrReferenceInput? SwitchableLayers,
+    JsonElement? Extras,
     Guid ManufacturerId
 );

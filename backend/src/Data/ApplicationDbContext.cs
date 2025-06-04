@@ -257,7 +257,7 @@ public sealed class ApplicationDbContext
     private static void ConfigureInstitutionOpenIdConnectApplication(ModelBuilder builder)
     {
         builder.Entity<Institution>()
-            .HasMany(i => i.Applications)
+            .HasMany(i => i.OpenIdConnectApplications)
             .WithMany(a => a.Institutions)
             .UsingEntity<InstitutionOpenIdConnectApplication>(
                 j => j
@@ -267,7 +267,7 @@ public sealed class ApplicationDbContext
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.Institution)
-                    .WithMany(i => i.ApplicationEdges)
+                    .WithMany(i => i.OpenIdConnectApplicationEdges)
                     .HasForeignKey(e => e.InstitutionId)
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j

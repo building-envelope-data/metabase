@@ -45,7 +45,7 @@ export default function NavBar({ items }: NavBarProps) {
       {currentUser ? (
         <>
           {/* TODO Put information whether person is allowed to access OpenIdConnect information in query result of current user (using OpenIdConnectAuthorization) */}
-          {currentUser?.canCurrentUserViewApplications && (
+          {currentUser?.canCurrentUserViewOpenIdConnectApplications && (
             <Menu.Item key={paths.openIdConnect}>
               <Link href={paths.openIdConnect}>OpenId Connect</Link>
             </Menu.Item>

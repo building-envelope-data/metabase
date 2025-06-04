@@ -22,6 +22,7 @@ public abstract class ComponentIntegrationTests
         null,
         null,
         null,
+        null,
         Guid.Empty
     );
 
@@ -37,6 +38,7 @@ public abstract class ComponentIntegrationTests
             ComponentCategory.MATERIAL,
             ComponentCategory.UNIT
         ],
+        null,
         null,
         null,
         null,
@@ -57,6 +59,7 @@ public abstract class ComponentIntegrationTests
         null,
         null,
         null,
+        null,
         Guid.Empty
     );
 
@@ -73,6 +76,7 @@ public abstract class ComponentIntegrationTests
             ComponentCategory.MATERIAL,
             ComponentCategory.UNIT
         ],
+        null,
         null,
         null,
         null,

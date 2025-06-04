@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Metabase.GraphQl.OpenIdConnect.Application;
 
-public class OpenIdConnectApplicationPayload<TApplicationError> : Payload
+public abstract class OpenIdConnectApplicationPayload<TApplicationError> : Payload
     where TApplicationError : IUserError
 {
     protected OpenIdConnectApplicationPayload(

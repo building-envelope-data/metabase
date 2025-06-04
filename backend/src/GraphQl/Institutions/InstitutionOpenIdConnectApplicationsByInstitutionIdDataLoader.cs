@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionApplicationsByInstitutionIdDataLoader(
+public sealed class InstitutionOpenIdConnectApplicationsByInstitutionIdDataLoader(
     IBatchScheduler batchScheduler,
     DataLoaderOptions options,
     IDbContextFactory<ApplicationDbContext> dbContextFactory

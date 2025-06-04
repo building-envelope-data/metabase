@@ -254,12 +254,12 @@ public sealed class UserType
             .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserDeleteUserAsync(default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserViewApplications")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserViewApplications(default!, default!, default!, default!))
+            .Field("canCurrentUserViewOpenIdConnectApplications")
+            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserViewOpenIdConnectApplications(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserAddApplications")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserAddApplications(default!, default!, default!, default!))
+            .Field("canCurrentUserAddOpenIdConnectApplications")
+            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserAddOpenIdConnectApplications(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserAddApprovals")
@@ -322,7 +322,7 @@ public sealed class UserType
             );
         }
 
-        public static Task<bool> GetCanCurrentUserViewApplications(
+        public static Task<bool> GetCanCurrentUserViewOpenIdConnectApplications(
             ClaimsPrincipal claimsPrincipal,
             UserManager<User> userManager,
             ApplicationDbContext context,
@@ -331,7 +331,7 @@ public sealed class UserType
             return OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken);
         }
 
-        public static Task<bool> GetCanCurrentUserAddApplications(
+        public static Task<bool> GetCanCurrentUserAddOpenIdConnectApplications(
             ClaimsPrincipal claimsPrincipal,
             UserManager<User> userManager,
             ApplicationDbContext context,

@@ -119,7 +119,8 @@ public sealed class InstitutionMutations
             input.WebsiteLocator,
             input.PublicKey,
             await GetInitialInstitutionState(input, user, userManager).ConfigureAwait(false),
-            InstitutionOperatingState.OPERATING
+            InstitutionOperatingState.OPERATING,
+            input.Extras
         )
         {
             ManagerId = input.ManagerId
@@ -275,7 +276,8 @@ public sealed class InstitutionMutations
             input.Abbreviation,
             input.Description,
             input.WebsiteLocator,
-            input.PublicKey
+            input.PublicKey,
+            input.Extras
         );
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new UpdateInstitutionPayload(institution);
