@@ -1,17 +1,17 @@
 using HotChocolate.Data.Sorting;
 using Metabase.Data;
+using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.Users;
 
 public sealed class UserSortType
-    : SortInputType<User>
+    : EntitySortType<User>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<User> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Id);
+        base.Configure(descriptor);
         // TODO The commented fiels below should be sortable by OpenId Connect Clients and application users with the proper scopes and rights. If they are filterable in general, it is a way to figure out that information even if it is not returned by GraphQL.
         // descriptor.Field(x => x.Name);
         // descriptor.Field(x => x.Email);

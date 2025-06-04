@@ -1965,7 +1965,7 @@ input ComponentCategoryOperationFilterInput {
 input ComponentFilterInput {
   and: [ComponentFilterInput!]
   or: [ComponentFilterInput!]
-  id: ComparableGuidOperationFilterInput
+  uuid: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -1991,7 +1991,7 @@ input ComponentManufacturerFilterInput {
 }
 
 input ComponentSortInput {
-  id: SortEnumType @cost(weight: "10")
+  uuid: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   abbreviation: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -2095,7 +2095,7 @@ input CreateOpenIdConnectApplicationInput {
 input DataFormatFilterInput {
   and: [DataFormatFilterInput!]
   or: [DataFormatFilterInput!]
-  id: ComparableGuidOperationFilterInput
+  uuid: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   extension: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2105,7 +2105,7 @@ input DataFormatFilterInput {
 }
 
 input DataFormatSortInput {
-  id: SortEnumType @cost(weight: "10")
+  uuid: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   extension: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -2117,7 +2117,7 @@ input DataFormatSortInput {
 input DatabaseFilterInput {
   and: [DatabaseFilterInput!]
   or: [DatabaseFilterInput!]
-  id: ComparableGuidOperationFilterInput
+  uuid: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   locator: UriFilterInput
@@ -2125,7 +2125,7 @@ input DatabaseFilterInput {
 }
 
 input DatabaseSortInput {
-  id: SortEnumType @cost(weight: "10")
+  uuid: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
   locator: UriSortInput @cost(weight: "10")
@@ -2220,7 +2220,7 @@ input HygrothermalDataPropositionInput {
 input InstitutionFilterInput {
   and: [InstitutionFilterInput!]
   or: [InstitutionFilterInput!]
-  id: ComparableGuidOperationFilterInput
+  uuid: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2265,7 +2265,7 @@ input InstitutionRepresentativeRoleOperationFilterInput {
 }
 
 input InstitutionSortInput {
-  id: SortEnumType @cost(weight: "10")
+  uuid: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   abbreviation: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -2422,7 +2422,7 @@ input MethodCategoryOperationFilterInput {
 input MethodFilterInput {
   and: [MethodFilterInput!]
   or: [MethodFilterInput!]
-  id: ComparableGuidOperationFilterInput
+  uuid: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   calculationLocator: UriFilterInput
@@ -2435,7 +2435,7 @@ input MethodFilterInput {
 }
 
 input MethodSortInput {
-  id: SortEnumType @cost(weight: "10")
+  uuid: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
   calculationLocator: UriSortInput @cost(weight: "10")
@@ -2751,7 +2751,7 @@ input UriSortInput {
 input UserFilterInput {
   and: [UserFilterInput!]
   or: [UserFilterInput!]
-  id: ComparableGuidOperationFilterInput
+  uuid: ComparableGuidOperationFilterInput
   developedMethods: ListMethodFilterTypeFilterInput
   developedMethodEdges: ListUserMethodDeveloperFilterTypeFilterInput
   representedInstitutions: ListInstitutionFilterTypeFilterInput
@@ -2767,7 +2767,7 @@ input UserMethodDeveloperFilterInput {
 }
 
 input UserSortInput {
-  id: SortEnumType @cost(weight: "10")
+  uuid: SortEnumType @cost(weight: "10")
 }
 
 input UuidPropositionInput {

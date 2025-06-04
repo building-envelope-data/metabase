@@ -1,17 +1,17 @@
 using HotChocolate.Data.Sorting;
 using Metabase.Data;
+using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.DataFormats;
 
 public sealed class DataFormatSortType
-    : SortInputType<DataFormat>
+    : EntitySortType<DataFormat>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<DataFormat> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Id);
+        base.Configure(descriptor);
         descriptor.Field(x => x.Name);
         descriptor.Field(x => x.Extension);
         descriptor.Field(x => x.Description);

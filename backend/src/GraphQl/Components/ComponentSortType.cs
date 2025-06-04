@@ -1,17 +1,17 @@
 using HotChocolate.Data.Sorting;
 using Metabase.Data;
+using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentSortType
-    : SortInputType<Component>
+    : EntitySortType<Component>
 {
     protected override void Configure(
         ISortInputTypeDescriptor<Component> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Id);
+        base.Configure(descriptor);
         descriptor.Field(x => x.Name);
         descriptor.Field(x => x.Abbreviation);
         descriptor.Field(x => x.Description);

@@ -1,17 +1,17 @@
 using HotChocolate.Data.Filters;
 using Metabase.Data;
+using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.DataFormats;
 
 public sealed class DataFormatFilterType
-    : FilterInputType<DataFormat>
+    : EntityFilterType<DataFormat>
 {
     protected override void Configure(
         IFilterInputTypeDescriptor<DataFormat> descriptor
     )
     {
-        descriptor.BindFieldsExplicitly();
-        descriptor.Field(x => x.Id);
+        base.Configure(descriptor);
         descriptor.Field(x => x.Name);
         descriptor.Field(x => x.Extension);
         descriptor.Field(x => x.Description);
