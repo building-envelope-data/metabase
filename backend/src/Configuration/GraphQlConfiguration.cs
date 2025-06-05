@@ -1,9 +1,12 @@
 using System;
+using System.Linq.Expressions;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
+using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Data.Sorting;
 using HotChocolate.Language;
 using HotChocolate.Types;
+using HotChocolate.Utilities;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl;
@@ -231,6 +234,104 @@ public static class GraphQlConfiguration
     }
 }
 
+// Inspired by https://chillicream.com/docs/hotchocolate/v15/api-reference/extending-filtering
+public static class CustomFilterOperations
+{
+    // public const int InClosedInterval = 1025;
+}
+
+// internal record ClosedIntervalInput<T>(
+//     T LowerBound,
+//     T UpperBound
+// );
+
+// internal sealed class ClosedIntervalInputType<TSchemaType, TRuntimeType>
+//     : InputObjectType<ClosedIntervalInput<TRuntimeType>>
+//     where TSchemaType : class, IInputType
+// {
+//     protected override void Configure(
+//         IInputObjectTypeDescriptor<ClosedIntervalInput<TRuntimeType>> descriptor
+//     )
+//     {
+//         descriptor.BindFieldsExplicitly();
+//         descriptor
+//             .Field(f => f.LowerBound)
+//             .Type<TSchemaType>();
+//         descriptor
+//             .Field(f => f.UpperBound)
+//             .Type<TSchemaType>();
+//     }
+// }
+
+// public sealed class QueryableComparableInClosedIntervalHandler : QueryableComparableOperationHandler
+// {
+//     public QueryableComparableInClosedIntervalHandler(
+//         ITypeConverter typeConverter,
+//         InputParser inputParser)
+//         : base(typeConverter, inputParser)
+//     {
+//         CanBeNull = false;
+//     }
+// 
+//     // This is used to match the handler to all `inClosedInterval` fields
+//     protected override int Operation => CustomFilterOperations.InClosedInterval;
+// 
+//     public override Expression HandleOperation(
+//         QueryableFilterContext context,
+//         IFilterOperationField field,
+//         IValueNode value,
+//         object? parsedValue
+//     )
+//     {
+//         // We get the instance of the context. This is the expression path to the property
+//         // e.g. ~> y.gValue
+//         var property = context.GetInstance();
+//         // the parsed value is what was specified in the query
+//         // e.g. ~> inClosedInterval: { lowerBound: 0.0, upperBound: 1.0 }
+//         parsedValue = ParseValue(value, parsedValue, field.Type, context);
+//         ArgumentNullException.ThrowIfNull(parsedValue);
+//         if (parsedValue is ClosedIntervalInput<double> closedIntervalInput)
+//         {
+//             // Creates and returns the LINQ operation
+//             // e.g. ~> 0.0 >= y.gValue && y.gValue <= 1.0
+//             return Expression.And(
+//                 FilterExpressionBuilder.GreaterThanOrEqual(property, closedIntervalInput.LowerBound),
+//                 FilterExpressionBuilder.LowerThanOrEqual(property, closedIntervalInput.UpperBound)
+//             );
+//         }
+//         // Something went wrong 😱
+//         throw new InvalidOperationException();
+//     }
+// 
+//     private new object? ParseValue(
+//         IValueNode node,
+//         object? parsedValue,
+//         IType type,
+//         QueryableFilterContext context
+//     )
+//     {
+//         if (parsedValue is null)
+//         {
+//             return parsedValue;
+//         }
+//         var returnType = context.RuntimeTypes.Peek().Source;
+//         return parsedValue;
+//     }
+// }
+
+// public sealed class ExtendedComparableOperationFilterInputType<T>
+//     : ComparableOperationFilterInputType<T>
+// {
+//     protected override void Configure(IFilterInputTypeDescriptor descriptor)
+//     {
+//         base.Configure(descriptor);
+//         descriptor
+//             .Operation(CustomFilterOperations.InClosedInterval)
+//             .Type(typeof(ClosedIntervalInput<T>))
+//             .MakeNullable();
+//     }
+// }
+
 // See https://chillicream.com/docs/hotchocolate/fetching-data/filtering/#filter-conventions
 public partial class CustomFilterConvention : FilterConvention
 {
@@ -255,6 +356,14 @@ public partial class CustomFilterConvention : FilterConvention
         descriptor.BindRuntimeType<Method, MethodFilterType>();
         descriptor.BindRuntimeType<User, UserFilterType>();
         descriptor.BindRuntimeType<UserMethodDeveloper, UserMethodDeveloperFilterType>();
+        // descriptor.BindRuntimeType<JsonElement, JsonElementFilterType>();
+        // descriptor.Operation(CustomFilterOperations.InClosedInterval).Name("inClosedInterval");
+        // descriptor.AddProviderExtension(
+        //     new QueryableFilterProviderExtension(filterProviderDescriptor =>
+        //         filterProviderDescriptor
+        //             .AddFieldHandler<QueryableComparableInClosedIntervalHandler>()
+        //     )
+        // );
     }
 }
 
@@ -265,7 +374,10 @@ public static class FilterConventionDescriptorExtensions
     public static IFilterConventionDescriptor AddDefaults(
         this IFilterConventionDescriptor descriptor)
     {
-        return descriptor.AddDefaultOperations().BindDefaultTypes().UseQueryableProvider();
+        return descriptor
+            .AddDefaultOperations()
+            .BindDefaultTypes()
+            .UseQueryableProvider();
     }
 
     // Inspired by FilterConventionDescriptorExtensions#AddDefaultOperations
@@ -275,14 +387,6 @@ public static class FilterConventionDescriptorExtensions
     {
         descriptor.Operation(DefaultFilterOperations.Equals).Name("equalTo");
         descriptor.Operation(DefaultFilterOperations.NotEquals).Name("notEqualTo");
-        descriptor.Operation(DefaultFilterOperations.GreaterThan).Name("greaterThan");
-        descriptor.Operation(DefaultFilterOperations.NotGreaterThan).Name("notGreaterThan");
-        descriptor.Operation(DefaultFilterOperations.GreaterThanOrEquals).Name("greaterThanOrEqualTo");
-        descriptor.Operation(DefaultFilterOperations.NotGreaterThanOrEquals).Name("notGreaterThanOrEqualTo");
-        descriptor.Operation(DefaultFilterOperations.LowerThan).Name("lessThan");
-        descriptor.Operation(DefaultFilterOperations.NotLowerThan).Name("notLessThan");
-        descriptor.Operation(DefaultFilterOperations.LowerThanOrEquals).Name("lessThanOrEqualTo");
-        descriptor.Operation(DefaultFilterOperations.NotLowerThanOrEquals).Name("notLessThanOrEqualTo");
         descriptor.Operation(DefaultFilterOperations.Contains).Name("contains");
         descriptor.Operation(DefaultFilterOperations.NotContains).Name("doesNotContain");
         descriptor.Operation(DefaultFilterOperations.In).Name("in");
@@ -291,15 +395,23 @@ public static class FilterConventionDescriptorExtensions
         descriptor.Operation(DefaultFilterOperations.NotStartsWith).Name("doesNotStartWith");
         descriptor.Operation(DefaultFilterOperations.EndsWith).Name("endsWith");
         descriptor.Operation(DefaultFilterOperations.NotEndsWith).Name("doesNotEndWith");
-        descriptor.Operation(DefaultFilterOperations.All).Name("all");
-        descriptor.Operation(DefaultFilterOperations.None).Name("none");
-        descriptor.Operation(DefaultFilterOperations.Some).Name("some");
-        descriptor.Operation(DefaultFilterOperations.Any).Name("any");
         descriptor.Operation(DefaultFilterOperations.And).Name("and");
         descriptor.Operation(DefaultFilterOperations.Or).Name("or");
+        descriptor.Operation(DefaultFilterOperations.GreaterThan).Name("greaterThan");
+        descriptor.Operation(DefaultFilterOperations.NotGreaterThan).Name("notGreaterThan");
+        descriptor.Operation(DefaultFilterOperations.GreaterThanOrEquals).Name("greaterThanOrEqualTo");
+        descriptor.Operation(DefaultFilterOperations.NotGreaterThanOrEquals).Name("notGreaterThanOrEqualTo");
+        descriptor.Operation(DefaultFilterOperations.LowerThan).Name("lessThan");
+        descriptor.Operation(DefaultFilterOperations.NotLowerThan).Name("notLessThan");
+        descriptor.Operation(DefaultFilterOperations.LowerThanOrEquals).Name("lessThanOrEqualTo");
+        descriptor.Operation(DefaultFilterOperations.NotLowerThanOrEquals).Name("notLessThanOrEqualTo");
+        descriptor.Operation(DefaultFilterOperations.Some).Name("some");
+        descriptor.Operation(DefaultFilterOperations.All).Name("all");
+        descriptor.Operation(DefaultFilterOperations.None).Name("none");
+        descriptor.Operation(DefaultFilterOperations.Any).Name("any");
+        descriptor.Operation(DefaultFilterOperations.Like).Name("like");
         descriptor.Operation(DefaultFilterOperations.Data).Name("data");
         // TODO `descriptor.Operation(AdditionalFilterOperations.Not).Name("not");` as in the project `database`
-        // TODO `inClosedInterval`
         return descriptor;
     }
 
@@ -344,6 +456,8 @@ public static class FilterConventionDescriptorExtensions
         descriptor
             .BindRuntimeType<T, ComparableOperationFilterInputType<T>>()
             .BindRuntimeType<T?, ComparableOperationFilterInputType<T?>>();
+        // .BindRuntimeType<T, ExtendedComparableOperationFilterInputType<T>>()
+        // .BindRuntimeType<T?, ExtendedComparableOperationFilterInputType<T?>>();
         // TODO Why does this not work?
         // if (name is not null)
         // {
