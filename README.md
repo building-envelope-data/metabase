@@ -25,6 +25,8 @@ If you have a question for which you don't find the answer in this repository, p
 - [Deploying a release](#deploying-a-release)
 - [Troubleshooting](#troubleshooting-1)
 
+[Access right management](#access-right-management)
+
 [Original Idea](#original-idea)
 
 [Useful Resources](#useful-resources)
@@ -435,6 +437,18 @@ under /app/staging before doing it in `production` under /app/production.
 1. Update a single field by running `update metabase.method set "Description" = 'Harmonized European Standard 410' where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
 1. Create a new method by running `insert into metabase.method("Id" ,"Name", "Description", "Categories","ManagerId") values ('f07499ab-f119-471f-8aad-d3c016676bce', 'EN 410','European Standard 410','{calculation}','5320d6fb-b96d-4aeb-a24c-eb7036d3437a');`
 1. Delete a faulty method by running `delete from metabase.method where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
+
+## Access right management
+
+The access right management can be used by product data servers to limit a part of their data to users, institutions or applications. This can be necessary for example when a license is needed to finance the maintenance of the product data.
+
+From the point of view of a software company, the access right management can enable users, institutions or applications to access product data which is not public. For example, an application may be allowed to use detailed data of an association, when the association is convinced by the validation of its calculations.
+
+The access right management of the product data network is based on the framework [OpenID Connect](https://openid.net/developers/how-connect-works/). The general idea is that users, institutions and applications can authenticate at the metabase and receive a token. When an application sends queries and mutations to product data servers, it can attach the token. The product data server receives the token and determines the access rights accordingly (authorization).
+
+A product data server can use the authentication at the metabase and the authorization for the access right management of the product data server.
+
+When you would like to use the access right management for a software application or a product data server, you should first [add an OpenID Connect Application to the product data network](https://www.buildingenvelopedata.org/open-id-connect). If you wonder which OpenID Connect flow you should use, [this website](https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use) could help you. For example, there is a [flow for web applications](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow/authorization-code-flow-with-par) and a [flow for data exchange from one machine to another](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow). The last four links refer to OpenID Connect in general. The OpenID Connect configuration of the metabase is presented by https://www.buildingenvelopedata.org/.well-known/openid-configuration .
 
 ## Original Idea
 
