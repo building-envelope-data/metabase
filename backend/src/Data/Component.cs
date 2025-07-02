@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using NpgsqlTypes;
 using DateTime = System.DateTime;
 using Metabase.Enumerations;
-using System;
 using System.Text.Json;
 
 namespace Metabase.Data;
@@ -99,6 +98,13 @@ public sealed class Component
         Description = description;
         Availability = availability;
         Categories = categories;
+        Extras = extras;
+    }
+
+    public void Update(
+        JsonElement? extras
+    )
+    {
         Extras = extras;
     }
 }

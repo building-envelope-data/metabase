@@ -192,4 +192,51 @@ public sealed class ComponentMutations
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new UpdateComponentPayload(component);
     }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    public async Task<SetComponentExtrasPayload> SetComponentExtrasAsync(
+        SetComponentExtrasInput input,
+        ClaimsPrincipal claimsPrincipal,
+        UserManager<User> userManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        if (!await ComponentAuthorization.IsAuthorizedToUpdate(
+                claimsPrincipal,
+                input.ComponentId,
+                userManager,
+                context,
+                cancellationToken
+            ).ConfigureAwait(false)
+           )
+        {
+            return new SetComponentExtrasPayload(
+                new SetComponentExtrasError(
+                    SetComponentExtrasErrorCode.UNAUTHORIZED,
+                    "You are not authorized to update the component.",
+                    []
+                )
+            );
+        }
+        var component =
+            await context.Components.AsQueryable()
+                .Where(i => i.Id == input.ComponentId)
+                .SingleOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+        if (component is null)
+        {
+            return new SetComponentExtrasPayload(
+                new SetComponentExtrasError(
+                    SetComponentExtrasErrorCode.UNKNOWN_COMPONENT,
+                    "Unknown component.",
+                    [nameof(input), nameof(input.ComponentId).FirstCharToLower()]
+                )
+            );
+        }
+        component.Update(input.Extras);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return new SetComponentExtrasPayload(component);
+    }
 }

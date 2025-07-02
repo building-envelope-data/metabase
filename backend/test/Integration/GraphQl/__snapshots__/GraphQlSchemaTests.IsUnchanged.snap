@@ -1121,6 +1121,7 @@ type Mutation {
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload! @cost(weight: "10")
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   revokeOpenIdConnectToken(input: RevokeOpenIdConnectTokenInput!): RevokeOpenIdConnectTokenPayload! @authorize(policy: "Write") @cost(weight: "10")
+  setComponentExtras(input: SetComponentExtrasInput!): SetComponentExtrasPayload! @authorize(policy: "Write") @cost(weight: "10")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload! @authorize(policy: "Write") @cost(weight: "10")
@@ -1551,6 +1552,18 @@ type RevokeOpenIdConnectTokenError {
 
 type RevokeOpenIdConnectTokenPayload {
   errors: [RevokeOpenIdConnectTokenError!]
+  query: Query!
+}
+
+type SetComponentExtrasError {
+  code: SetComponentExtrasErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type SetComponentExtrasPayload {
+  component: Component
+  errors: [SetComponentExtrasError!]
   query: Query!
 }
 
@@ -2584,6 +2597,11 @@ input RevokeOpenIdConnectTokenInput {
   tokenId: Uuid!
 }
 
+input SetComponentExtrasInput {
+  componentId: Uuid!
+  extras: Any
+}
+
 input SetUserPasswordInput {
   password: String!
   passwordConfirmation: String!
@@ -3310,6 +3328,12 @@ enum RevokeOpenIdConnectTokenErrorCode {
   UNKNOWN
   UNAUTHORIZED
   UNKNOWN_TOKEN
+}
+
+enum SetComponentExtrasErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_COMPONENT
 }
 
 enum SetUserPasswordErrorCode {
