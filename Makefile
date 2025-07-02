@@ -83,7 +83,7 @@ up : build ## (Re)create, and start containers (after building images if necessa
 down : ## Stop containers and remove containers and networks created by `up` and clear backend logs
 	${docker_compose} down \
 		--remove-orphans
-	rm ./backend/src/logs/*
+	-rm ./backend/src/logs/*
 .PHONY : down
 
 restart : ## Restart all stopped and running containers
@@ -97,7 +97,7 @@ prune : ## Remove all unused containers, unused networks, unused and dangling im
 
 logs : ## Follow logs
 	${docker_compose} logs \
-		--since=24h \
+		--since=1h \
 		--follow
 .PHONY : logs
 
