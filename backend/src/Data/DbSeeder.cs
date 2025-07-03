@@ -66,8 +66,9 @@ public static partial class Log
 
 public sealed class DbSeeder
 {
-    public const string MetabaseClientId = "metabase";
-    public const string TestlabSolarFacadesClientId = "testlab-solar-facades";
+    public const string MetabaseOpenIdConnectClientId = "metabase";
+    public const string TestlabSolarFacadesOpenIdConnectClientId = "testlab-solar-facades";
+    public const string IgsdbOpenIdConnectClientId = "igsdb";
 
     public static readonly ReadOnlyCollection<(string Name, string EmailAddress, Enumerations.UserRole Role)> Users =
         Role.AllEnum.Select(role => (
@@ -179,14 +180,14 @@ public sealed class DbSeeder
     )
     {
         var manager = services.GetRequiredService<IOpenIddictApplicationManager>();
-        if (await manager.FindByClientIdAsync(MetabaseClientId).ConfigureAwait(false) is null)
+        if (await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId).ConfigureAwait(false) is null)
         {
-            logger.CreatingApplicationClient(MetabaseClientId);
+            logger.CreatingApplicationClient(MetabaseOpenIdConnectClientId);
             var host = appSettings.Host;
             await manager.CreateAsync(
                 new OpenIddictApplicationDescriptor
                 {
-                    ClientId = MetabaseClientId,
+                    ClientId = MetabaseOpenIdConnectClientId,
                     // The secret is used in tests, see `IntegrationTests#RequestAuthToken` and in
                     // the metabase client, see `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
                     ClientSecret = appSettings.OpenIdConnectClientSecret,
@@ -248,14 +249,14 @@ public sealed class DbSeeder
             ).ConfigureAwait(false);
         }
 
-        if (await manager.FindByClientIdAsync(TestlabSolarFacadesClientId).ConfigureAwait(false) is null)
+        if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId).ConfigureAwait(false) is null)
         {
-            logger.CreatingApplicationClient(TestlabSolarFacadesClientId);
+            logger.CreatingApplicationClient(TestlabSolarFacadesOpenIdConnectClientId);
             var host = appSettings.TestlabSolarFacadesHost;
             await manager.CreateAsync(
                 new OpenIddictApplicationDescriptor
                 {
-                    ClientId = TestlabSolarFacadesClientId,
+                    ClientId = TestlabSolarFacadesOpenIdConnectClientId,
                     // The secret is used in the database client, see
                     // `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
                     ClientSecret = appSettings.TestlabSolarFacadesOpenIdConnectClientSecret,
@@ -286,6 +287,51 @@ public sealed class DbSeeder
                         OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
                         OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
                         OpenIddictConstants.Permissions.ResponseTypes.Code,
+                        OpenIddictConstants.Permissions.ResponseTypes.Token,
+                        OpenIddictConstants.Permissions.Scopes.Address,
+                        OpenIddictConstants.Permissions.Scopes.Email,
+                        OpenIddictConstants.Permissions.Scopes.Phone,
+                        OpenIddictConstants.Permissions.Scopes.Profile,
+                        OpenIddictConstants.Permissions.Scopes.Roles,
+                        OpenIddictConstants.Permissions.Prefixes.Scope +
+                        AuthConfiguration.ReadApiScope,
+                        OpenIddictConstants.Permissions.Prefixes.Scope +
+                        AuthConfiguration.WriteApiScope
+                    },
+                    Requirements =
+                    {
+                        OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
+                        OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
+                    }
+                }
+            ).ConfigureAwait(false);
+        }
+
+        if (await manager.FindByClientIdAsync(IgsdbOpenIdConnectClientId).ConfigureAwait(false) is null)
+        {
+            logger.CreatingApplicationClient(IgsdbOpenIdConnectClientId);
+            var host = appSettings.TestlabSolarFacadesHost;
+            await manager.CreateAsync(
+                new OpenIddictApplicationDescriptor
+                {
+                    ClientId = IgsdbOpenIdConnectClientId,
+                    // The secret is used in the database client, see
+                    // `OPEN_ID_CONNECT_CLIENT_SECRET` in `.env.*`.
+                    ClientSecret = appSettings.IgsdbOpenIdConnectClientSecret,
+                    ConsentType = OpenIddictConstants.ConsentTypes.Implicit,
+                    DisplayName = "IGSDB client application",
+                    DisplayNames = { },
+                    RedirectUris = { },
+                    PostLogoutRedirectUris = { },
+                    Permissions =
+                    {
+                        OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization,
+                        OpenIddictConstants.Permissions.Endpoints.Introspection,
+                        OpenIddictConstants.Permissions.Endpoints.EndSession,
+                        OpenIddictConstants.Permissions.Endpoints.Revocation,
+                        OpenIddictConstants.Permissions.Endpoints.Token,
+                        OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                        OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
                         OpenIddictConstants.Permissions.ResponseTypes.Token,
                         OpenIddictConstants.Permissions.Scopes.Address,
                         OpenIddictConstants.Permissions.Scopes.Email,
@@ -407,7 +453,7 @@ public sealed class DbSeeder
                         Pending = false
                     }
                 );
-                var application = await manager.FindByClientIdAsync(MetabaseClientId).AsTask().ConfigureAwait(false);
+                var application = await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId).AsTask().ConfigureAwait(false);
                 if (application != null)
                 {
                     iseInstitution.OpenIdConnectApplicationEdges.Add(
@@ -435,7 +481,7 @@ public sealed class DbSeeder
                     ManagerId = iseInstitution.Id
                 };
 
-                var application = await manager.FindByClientIdAsync(TestlabSolarFacadesClientId).AsTask().ConfigureAwait(false);
+                var application = await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId).AsTask().ConfigureAwait(false);
                 if (application != null)
                 {
                     institution.OpenIdConnectApplicationEdges.Add(

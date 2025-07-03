@@ -77,6 +77,7 @@ services:
       - XBASE_TestlabSolarFacadesHost=https://${TESTLAB_SOLAR_FACADES_HOST}
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
       - XBASE_IgsdbApiToken=${IGSDB_API_TOKEN}
+      - XBASE_IgsdbOpenIdConnectClientSecret=${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET}
     volumes:
       - backend_logs:/app/logs
       - ./secrets:/run/secrets:ro

@@ -433,7 +433,7 @@ public abstract class AuthConfiguration
 
                         // Note: these settings must match the application details inserted in the
                         // database at the server level.
-                        ClientId = DbSeeder.MetabaseClientId,
+                        ClientId = DbSeeder.MetabaseOpenIdConnectClientId,
                         ClientSecret = appSettings.OpenIdConnectClientSecret,
 
                         // https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims

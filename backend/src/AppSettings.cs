@@ -25,6 +25,9 @@ public sealed class AppSettings
     public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }
         = "";
 
+    public string IgsdbOpenIdConnectClientSecret { get; set; }
+        = "";
+
     public string IgsdbApiToken { get; set; }
         = "";
 
