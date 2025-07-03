@@ -49,7 +49,7 @@ public static class OpenIdConnectAuthorization
         var institutionId = await GetInstitutionIdByApplicationId(applicationId, context, cancellationToken).ConfigureAwait(false);
         return user is not null
                && (await CommonAuthorization.IsAdministrator(user, userManager).ConfigureAwait(false)
-               || await CommonAuthorization.IsOwnerOfInstitution(user, institutionId, context, cancellationToken).ConfigureAwait(false));
+               || institutionId is not null && await CommonAuthorization.IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, context, cancellationToken).ConfigureAwait(false));
     }
 
     public static async Task<bool> IsAuthorizedToDeleteAuthorization(
@@ -84,7 +84,7 @@ public static class OpenIdConnectAuthorization
                || institutionId is not null && await CommonAuthorization.IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, context, cancellationToken).ConfigureAwait(false));
     }
 
-    private static async Task<Guid> GetInstitutionIdByApplicationId(Guid applicationId, ApplicationDbContext context, CancellationToken cancellationToken)
+    private static async Task<Guid?> GetInstitutionIdByApplicationId(Guid applicationId, ApplicationDbContext context, CancellationToken cancellationToken)
     {
         return (
             await context.InstitutionOpenIdConnectApplications.Where(x =>
@@ -93,7 +93,7 @@ public static class OpenIdConnectAuthorization
             {
                 x.InstitutionId
             }
-            ).SingleAsync(cancellationToken).ConfigureAwait(false)
-        ).InstitutionId;
+            ).SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false)
+        )?.InstitutionId;
     }
 }
