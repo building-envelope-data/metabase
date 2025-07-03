@@ -36,11 +36,12 @@ public static class CommonAuthorization
 
     public static async Task<bool> IsAdministrator(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager)
+        UserManager<User> userManager
+    )
     {
         var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
         return user is not null
-               && await CommonAuthorization.IsAdministrator(user, userManager);
+               && await IsAdministrator(user, userManager).ConfigureAwait(false);
     }
 
     public static Task<bool> IsVerifier(
@@ -83,30 +84,30 @@ public static class CommonAuthorization
         return roles.Contains(InstitutionRepresentativeRole.OWNER) || roles.Contains(InstitutionRepresentativeRole.ASSISTANT);
     }
 
-    private static async Task<bool> IsInRole(
+    private static Task<bool> IsInRole(
         User user,
         UserRole role,
         UserManager<User> userManager
     )
     {
-        return await userManager.IsInRoleAsync(
+        return userManager.IsInRoleAsync(
             user,
             Role.EnumToName(role)
-        ).ConfigureAwait(false);
+        );
     }
 
-    public static async Task<bool> IsVerified(
+    public static Task<bool> IsVerified(
         Guid institutionId,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        return await context.Institutions.AsNoTracking()
+        return context.Institutions.AsNoTracking()
             .AnyAsync(x =>
                     x.Id == institutionId &&
                     x.State == InstitutionState.VERIFIED,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
     }
 
     public static async Task<bool> IsOwnerOfInstitution(
@@ -206,7 +207,7 @@ public static class CommonAuthorization
         {
             return wrappedRole.Role;
         }
-
+        // TODO Recursively fetch manager roles (currently we support only one level)
         var wrappedManagerRole =
             await context.InstitutionRepresentatives.AsNoTracking()
                 .Where(x => !x.Pending)
@@ -244,7 +245,7 @@ public static class CommonAuthorization
                 .AsReadOnly();
     }
 
-    public static async Task<bool> IsVerifiedManufacturerOfComponents(
+    public static Task<bool> IsVerifiedManufacturerOfComponents(
         Guid institutionId,
         Guid[] componentIds,
         ApplicationDbContext context,
@@ -253,33 +254,30 @@ public static class CommonAuthorization
     {
         if (componentIds.Length == 0)
         {
-            return true;
+            return Task.FromResult(true);
         }
-
-        return await context.ComponentManufacturers.AsNoTracking()
+        return context.ComponentManufacturers.AsNoTracking()
             .AnyAsync(x =>
                     x.InstitutionId == institutionId &&
                     componentIds.Contains(x.ComponentId) &&
                     !x.Pending,
                 cancellationToken
-            )
-            .ConfigureAwait(false);
+            );
     }
 
-    public static async Task<bool> IsVerifiedManufacturerOfComponent(
+    public static Task<bool> IsVerifiedManufacturerOfComponent(
         Guid institutionId,
         Guid componentId,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        return await context.ComponentManufacturers.AsNoTracking()
+        return context.ComponentManufacturers.AsNoTracking()
             .AnyAsync(x =>
                     x.InstitutionId == institutionId &&
                     x.ComponentId == componentId &&
                     !x.Pending,
                 cancellationToken
-            )
-            .ConfigureAwait(false);
+            );
     }
 }
