@@ -69,7 +69,11 @@ export default function CreateApplication() {
                     setGlobalErrorMessages,
                     form
                 );
-                if (data) {
+                if (
+                  !errors &&
+                  !data?.createOpenIdConnectApplication?.errors &&
+                  data?.createOpenIdConnectApplication?.application
+                ) {
                     message.success('Successfully created application ' + data.createOpenIdConnectApplication.application?.displayName);
                     Modal.info({
                         title: "Application Client Secret",

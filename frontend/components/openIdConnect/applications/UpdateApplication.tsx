@@ -69,7 +69,11 @@ export default function UpdateApplication({ applicationId }: ApplicationProps) {
           setGlobalErrorMessages,
           form
         );
-        if (data) {
+        if (
+          !errors &&
+          !data?.updateOpenIdConnectApplication?.errors &&
+          data?.updateOpenIdConnectApplication?.application
+        ) {
           message.success('Successfully updated application ' + data.updateOpenIdConnectApplication.application?.displayName)
           router.push(paths.openIdConnect)
         }
