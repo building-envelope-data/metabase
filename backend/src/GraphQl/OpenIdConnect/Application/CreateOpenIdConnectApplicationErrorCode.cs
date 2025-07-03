@@ -7,5 +7,6 @@ public enum CreateOpenIdConnectApplicationErrorCode
 {
     UNKNOWN,
     UNAUTHORIZED,
-    UNKNOWN_INSTITUTION
+    UNKNOWN_INSTITUTION,
+    DUPLICATE_CLIENT_ID,
 }

@@ -56,6 +56,16 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
+        if (await applicationManager.FindByClientIdAsync(input.ClientId, cancellationToken).ConfigureAwait(false) is not null)
+        {
+            return new CreateOpenIdConnectApplicationPayload(
+                new CreateOpenIdConnectApplicationError(
+                    CreateOpenIdConnectApplicationErrorCode.DUPLICATE_CLIENT_ID,
+                    "The client ID is already in use.",
+                    [nameof(input), nameof(input.ClientId).FirstCharToLower()]
+                )
+            );
+        }
         var clientSecret = RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+", 128);
         var descriptor = new OpenIddictApplicationDescriptor
         {
