@@ -109,12 +109,12 @@ public sealed class DatabaseType
         descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<DatabaseResolvers>(x =>
-                x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!, default!))
+                x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserVerifyNode")
             .ResolveWith<DatabaseResolvers>(x =>
-                x.GetCanCurrentUserVerifyNodeAsync(default!, default!, default!, default!, default!))
+                x.GetCanCurrentUserVerifyNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 

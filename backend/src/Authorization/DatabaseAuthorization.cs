@@ -3,77 +3,70 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Metabase.Data;
 
 namespace Metabase.Authorization;
 
-public static class DatabaseAuthorization
+public sealed class DatabaseAuthorization(
+    ApplicationDbContext context,
+    UserManager<User> userManager
+) : CommonAuthorization(context, userManager)
 {
-    public static async Task<bool> IsAuthorizedToCreateDatabaseForInstitution(
+    internal async Task<bool> IsAuthorizedToCreateDatabaseForInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-               && await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+               && await IsAtLeastAssistantOfVerifiedInstitution(
                    user,
                    institutionId,
-                   context,
                    cancellationToken
                );
     }
 
-    public static async Task<bool> IsAuthorizedToUpdate(
+    internal async Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid databaseId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null &&
                await IsAtLeastAssistantOfVerifiedDatabaseOperator(
                    user,
                    databaseId,
-                   context,
                    cancellationToken
                );
     }
 
-    public static async Task<bool> IsAuthorizedToVerify(
+    internal async Task<bool> IsAuthorizedToVerify(
         ClaimsPrincipal claimsPrincipal,
         Guid databaseId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null &&
                await IsAtLeastAssistantOfVerifiedDatabaseOperator(
                    user,
                    databaseId,
-                   context,
                    cancellationToken
                );
     }
 
-    private static async Task<bool> IsAtLeastAssistantOfVerifiedDatabaseOperator(
+    private async Task<bool> IsAtLeastAssistantOfVerifiedDatabaseOperator(
         User user,
         Guid databaseId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         var wrappedOperatorId =
-            await context.Databases.AsNoTracking()
+            await Context.Databases.AsNoTracking()
                 .Where(x => x.Id == databaseId)
                 .Select(x => new { x.OperatorId })
                 .SingleOrDefaultAsync(cancellationToken)
@@ -83,8 +76,6 @@ public static class DatabaseAuthorization
             return false;
         }
 
-        return await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-            user, wrappedOperatorId.OperatorId, context, cancellationToken
-        );
+        return await IsAtLeastAssistantOfVerifiedInstitution(user, wrappedOperatorId.OperatorId, cancellationToken);
     }
 }

@@ -18,17 +18,14 @@ public sealed class ComponentGeneralizationOfEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentGeneralizationAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentGeneralizationAuthorization.IsAuthorizedToManage(
+        return authorization.IsAuthorizedToManage(
             claimsPrincipal,
             _association.GeneralComponentId,
             _association.ConcreteComponentId,
-            userManager,
-            context,
             cancellationToken
         );
     }

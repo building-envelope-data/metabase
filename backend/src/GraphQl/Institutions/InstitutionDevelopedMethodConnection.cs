@@ -23,16 +23,13 @@ public sealed class InstitutionDevelopedMethodConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(
+        return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

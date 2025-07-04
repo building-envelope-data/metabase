@@ -22,14 +22,13 @@ public sealed class OpenIdConnectAuthorizationQueries
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<IAsyncEnumerable<OpenIdConnectAuthorization>> GetOpenIdConnectAuthorizationsAsync(
         Guid? applicationId,
-        OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        Authorization.OpenIdConnectAuthorization authorization, // TODO Make the authorization manager use the scoped database context.
+        OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
+        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken)
                 .ConfigureAwait(false))
         {
             return AsyncEnumerable.Empty<OpenIdConnectAuthorization>();
@@ -45,14 +44,13 @@ public sealed class OpenIdConnectAuthorizationQueries
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<OpenIdConnectAuthorization?> GetOpenIdConnectAuthorization(
         Guid authorizationId,
-        OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        Authorization.OpenIdConnectAuthorization authorization,
+        OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
+        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken)
                 .ConfigureAwait(false))
         {
             return null;

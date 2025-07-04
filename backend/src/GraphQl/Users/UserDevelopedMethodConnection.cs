@@ -20,13 +20,12 @@ public sealed class UserDevelopedMethodConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager
+        UserMethodDeveloperAuthorization authorization
     )
     {
-        return UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(
+        return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
-            Subject.Id,
-            userManager
+            Subject.Id
         );
     }
 }

@@ -27,16 +27,14 @@ public sealed class InstitutionRepresentativeMutations
     public async Task<AddInstitutionRepresentativePayload> AddInstitutionRepresentativeAsync(
         AddInstitutionRepresentativeInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionRepresentativeAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.InstitutionId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -109,8 +107,7 @@ public sealed class InstitutionRepresentativeMutations
             InstitutionId = input.InstitutionId,
             UserId = input.UserId,
             Role = input.Role,
-            Pending = !await InstitutionRepresentativeAuthorization
-                .IsAuthorizedToConfirm(claimsPrincipal, input.UserId, userManager).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId).ConfigureAwait(false)
         };
         context.InstitutionRepresentatives.Add(institutionRepresentative);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -122,16 +119,14 @@ public sealed class InstitutionRepresentativeMutations
     public async Task<RemoveInstitutionRepresentativePayload> RemoveInstitutionRepresentativeAsync(
         RemoveInstitutionRepresentativeInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionRepresentativeAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.InstitutionId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -228,16 +223,14 @@ public sealed class InstitutionRepresentativeMutations
     public async Task<ChangeInstitutionRepresentativeRolePayload> ChangeInstitutionRepresentativeRoleAsync(
         ChangeInstitutionRepresentativeRoleInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionRepresentativeAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.InstitutionId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -335,15 +328,14 @@ public sealed class InstitutionRepresentativeMutations
     public async Task<ConfirmInstitutionRepresentativePayload> ConfirmInstitutionRepresentativeAsync(
         ConfirmInstitutionRepresentativeInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionRepresentativeAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(
+        if (!await authorization.IsAuthorizedToConfirm(
                 claimsPrincipal,
-                input.UserId,
-                userManager
+                input.UserId
             ).ConfigureAwait(false)
            )
         {
@@ -421,14 +413,13 @@ public sealed class InstitutionRepresentativeMutations
     public async Task<AllowRepresentativeToSignDataPayload> AllowRepresentativeToSignData(
         AllowRepresentativeToSignDataInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionRepresentativeAuthorization authorization,
         IAntiforgery antiforgeryService,
         IHttpContextAccessor httpContextAccessor,
         ApplicationDbContext context,
         CancellationToken cancellationToken)
     {
-        if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToManageSigningPermission(input.InstitutionId, claimsPrincipal, userManager, context, cancellationToken)
-                .ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageSigningPermission(claimsPrincipal, input.InstitutionId, cancellationToken).ConfigureAwait(false))
         {
             return new AllowRepresentativeToSignDataPayload(
                 new AllowRepresentativeToSignDataError(
@@ -511,13 +502,13 @@ public sealed class InstitutionRepresentativeMutations
     public async Task<ForbidRepresentativeToSignDataPayload> ForbidRepresentativeToSignData(
         ForbidRepresentativeToSignDataInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionRepresentativeAuthorization authorization,
         IAntiforgery antiforgeryService,
         IHttpContextAccessor httpContextAccessor,
         ApplicationDbContext context,
         CancellationToken cancellationToken)
     {
-        if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToManageSigningPermission(input.InstitutionId, claimsPrincipal, userManager, context, cancellationToken)
+        if (!await authorization.IsAuthorizedToManageSigningPermission(claimsPrincipal, input.InstitutionId, cancellationToken)
                 .ConfigureAwait(false))
         {
             return new ForbidRepresentativeToSignDataPayload(

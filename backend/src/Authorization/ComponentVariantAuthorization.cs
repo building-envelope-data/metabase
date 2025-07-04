@@ -2,55 +2,51 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
+using Metabase.Data;
 
 namespace Metabase.Authorization;
 
-public static class ComponentVariantAuthorization
+public sealed class ComponentVariantAuthorization(
+    ApplicationDbContext context,
+    UserManager<User> userManager
+) : CommonComponentAuthorization(context, userManager)
 {
-    public static async Task<bool> IsAuthorizedToAdd(
+    internal async Task<bool> IsAuthorizedToAdd(
         ClaimsPrincipal claimsPrincipal,
         Guid componentId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
                &&
-               await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+               await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
                    user,
                    componentId,
-                   context,
                    cancellationToken
                );
     }
 
-    public static async Task<bool> IsAuthorizedToManage(
+    internal async Task<bool> IsAuthorizedToManage(
         ClaimsPrincipal claimsPrincipal,
         Guid ofComponentId,
         Guid toComponentId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
                &&
-               await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+               await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
                    user,
                    ofComponentId,
-                   context,
                    cancellationToken
                )
                &&
-               await CommonComponentAuthorization.IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+               await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
                    user,
                    toComponentId,
-                   context,
                    cancellationToken
                );
     }

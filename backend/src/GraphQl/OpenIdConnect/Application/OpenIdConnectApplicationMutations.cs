@@ -1,5 +1,4 @@
 using System;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
@@ -10,10 +9,10 @@ using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 using OpenIddict.Core;
 using Metabase.Data.OpenIdConnect;
+using System.Security.Claims;
 
 namespace Metabase.GraphQl.OpenIdConnect.Application;
 
@@ -24,18 +23,15 @@ public sealed class OpenIdConnectApplicationMutations
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<CreateOpenIdConnectApplicationPayload> CreateOpenIdConnectApplicationAsync(
         CreateOpenIdConnectApplicationInput input,
+        ClaimsPrincipal claimsPrincipal,
+        Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         InstitutionByIdDataLoader institutionById,
-        ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToManageApplications(
-                claimsPrincipal,
-                userManager,
-                context, cancellationToken).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageApplications(claimsPrincipal, cancellationToken).ConfigureAwait(false))
         {
             return new CreateOpenIdConnectApplicationPayload(
                 new CreateOpenIdConnectApplicationError(
@@ -124,18 +120,15 @@ public sealed class OpenIdConnectApplicationMutations
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<UpdateOpenIdConnectApplicationPayload> UpdateOpenIdConnectApplicationAsync(
         UpdateOpenIdConnectApplicationInput input,
-        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        Authorization.OpenIdConnectAuthorization authorization,
+        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToManageApplication(
-                input.ApplicationId,
+        if (!await authorization.IsAuthorizedToManageApplication(
                 claimsPrincipal,
-                userManager,
-                context,
+                input.ApplicationId,
                 cancellationToken
             ).ConfigureAwait(false))
         {
@@ -173,18 +166,15 @@ public sealed class OpenIdConnectApplicationMutations
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<DeleteOpenIdConnectApplicationPayload> DeleteOpenIdConnectApplicationAsync(
         DeleteOpenIdConnectApplicationInput input,
-        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        Authorization.OpenIdConnectAuthorization authorization,
+        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToManageApplication(
-                input.ApplicationId,
+        if (!await authorization.IsAuthorizedToManageApplication(
                 claimsPrincipal,
-                userManager,
-                context,
+                input.ApplicationId,
                 cancellationToken
             ).ConfigureAwait(false))
         {

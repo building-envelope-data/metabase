@@ -28,8 +28,7 @@ public sealed class OpenIdConnectTokenType
         descriptor
                 .Field("canCurrentUserRevokeToken")
                 .ResolveWith<TokenResolvers>(x =>
-                    TokenResolvers.GetCanCurrentUserRevokeTokenAsync(default!, default!, default!, default!, default!,
-                        default!))
+                    TokenResolvers.GetCanCurrentUserRevokeTokenAsync(default!, default!, default!, default!, default!))
                 .UseUserManager();
     }
 
@@ -37,14 +36,13 @@ public sealed class OpenIdConnectTokenType
     {
         public static Task<bool> GetCanCurrentUserRevokeTokenAsync(
             [Parent] OpenIdConnectToken token,
-            OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
+            Authorization.OpenIdConnectAuthorization authorization,
+            OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
             CancellationToken cancellationToken
         )
         {
-            return Authorization.OpenIdConnectAuthorization.IsAuthorizedToRevokeToken(token.Id, tokenManager, claimsPrincipal, userManager, context, cancellationToken);
+            return authorization.IsAuthorizedToRevokeToken(claimsPrincipal, token.Id, tokenManager, cancellationToken);
         }
     }
 }

@@ -18,17 +18,14 @@ public sealed class ComponentVariantOfEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentAssemblyAuthorization.IsAuthorizedToManage(
+        return authorization.IsAuthorizedToManage(
             claimsPrincipal,
             _association.OfComponentId,
             _association.ToComponentId,
-            userManager,
-            context,
             cancellationToken
         );
     }

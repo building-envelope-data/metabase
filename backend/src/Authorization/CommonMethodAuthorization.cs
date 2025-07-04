@@ -2,22 +2,26 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Data;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Metabase.Data;
 
 namespace Metabase.Authorization;
 
-public static class CommonMethodAuthorization
+public abstract class CommonMethodAuthorization(
+    ApplicationDbContext context,
+    UserManager<User> userManager
+) : CommonAuthorization(context, userManager)
 {
-    internal static async Task<bool> IsAtLeastAssistantOfVerifiedMethodManager(
+    protected async Task<bool> IsAtLeastAssistantOfVerifiedMethodManager(
         User user,
         Guid methodId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         var wrappedManagerId =
-            await context.Methods.AsNoTracking()
+            await Context.Methods.AsNoTracking()
                 .Where(x => x.Id == methodId)
                 .Select(x => new { x.ManagerId })
                 .SingleOrDefaultAsync(cancellationToken)
@@ -27,8 +31,8 @@ public static class CommonMethodAuthorization
             return false;
         }
 
-        return await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
-            user, wrappedManagerId.ManagerId, context, cancellationToken
+        return await IsAtLeastAssistantOfVerifiedInstitution(
+            user, wrappedManagerId.ManagerId, cancellationToken
         );
     }
 }

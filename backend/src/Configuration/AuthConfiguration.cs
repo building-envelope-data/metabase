@@ -16,10 +16,11 @@ using OpenIddict.Client;
 using OpenIddict.Validation.AspNetCore;
 using Quartz;
 using Metabase.Data.OpenIdConnect;
+using Metabase.Authorization;
 
 namespace Metabase.Configuration;
 
-public abstract class AuthConfiguration
+public static class AuthConfiguration
 {
     // `IdentityConstants.ApplicationScheme` is not a constant but only read-only. It can thus not
     // be used in the `Authorize` attribute. See the corresponding issue
@@ -64,6 +65,28 @@ public abstract class AuthConfiguration
         ConfigureAuthenticationAndAuthorizationServices(services);
         ConfigureTaskScheduling(services, environment);
         ConfigureOpenIddictServices(services, environment, appSettings, encryptionCertificate, signingCertificate);
+        AddAuthorizationServices(services);
+    }
+
+    private static void AddAuthorizationServices(
+        IServiceCollection services
+    )
+    {
+        services.AddScoped<ApprovalAuthorization>();
+        services.AddScoped<ComponentAssemblyAuthorization>();
+        services.AddScoped<ComponentAuthorization>();
+        services.AddScoped<ComponentGeneralizationAuthorization>();
+        services.AddScoped<ComponentManufacturerAuthorization>();
+        services.AddScoped<ComponentVariantAuthorization>();
+        services.AddScoped<DataFormatAuthorization>();
+        services.AddScoped<DatabaseAuthorization>();
+        services.AddScoped<InstitutionAuthorization>();
+        services.AddScoped<InstitutionMethodDeveloperAuthorization>();
+        services.AddScoped<InstitutionRepresentativeAuthorization>();
+        services.AddScoped<MethodAuthorization>();
+        services.AddScoped<Authorization.OpenIdConnectAuthorization>();
+        services.AddScoped<UserAuthorization>();
+        services.AddScoped<UserMethodDeveloperAuthorization>();
     }
 
     private static X509Certificate2 LoadCertificate(
@@ -268,7 +291,7 @@ public abstract class AuthConfiguration
                     // Note: call ReplaceDefaultEntities() to replace the default OpenIddict entities.
                     options.UseEntityFrameworkCore()
                         .UseDbContext<ApplicationDbContext>()
-                        .ReplaceDefaultEntities<OpenIdConnectApplication, OpenIdConnectAuthorization, OpenIdConnectScope, OpenIdConnectToken, Guid>();
+                        .ReplaceDefaultEntities<OpenIdConnectApplication, Data.OpenIdConnect.OpenIdConnectAuthorization, OpenIdConnectScope, OpenIdConnectToken, Guid>();
                     // Enable Quartz.NET integration.
                     options.UseQuartz();
                 }

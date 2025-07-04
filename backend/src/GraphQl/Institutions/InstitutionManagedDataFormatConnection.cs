@@ -20,16 +20,13 @@ public sealed class InstitutionManagedDataFormatConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        DataFormatAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return DataFormatAuthorization.IsAuthorizedToCreateDataFormatForInstitution(
+        return authorization.IsAuthorizedToCreateDataFormatForInstitution(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

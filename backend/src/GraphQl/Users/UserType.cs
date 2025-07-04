@@ -37,20 +37,14 @@ public sealed class UserType
         var claimsPrincipal =
             context.GetGlobalStateOrDefault<ClaimsPrincipal>(nameof(ClaimsPrincipal))
             ?? throw new ArgumentException("Claims principal must not be null.");
+        var authorization = context.Service<UserAuthorization>();
         if (scope is not null && !claimsPrincipal.HasScope(scope))
         {
             return null;
         }
 
         var user = context.Parent<User>();
-        var userManager =
-            context.GetLocalStateOrDefault<UserManager<User>>(GetServiceName<UserManager<User>>())
-            ?? throw new ArgumentException("User manager must not be null.");
-        if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-            ).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
         {
             return null;
         }
@@ -68,20 +62,14 @@ public sealed class UserType
         var claimsPrincipal =
             context.GetGlobalStateOrDefault<ClaimsPrincipal>(nameof(ClaimsPrincipal))
             ?? throw new ArgumentException("Claims principal must not be null.");
+        var authorization = context.Service<UserAuthorization>();
         if (scope is not null && !claimsPrincipal.HasScope(scope))
         {
             return null;
         }
 
         var user = context.Parent<User>();
-        var userManager =
-            context.GetLocalStateOrDefault<UserManager<User>>(GetServiceName<UserManager<User>>())
-            ?? throw new ArgumentException("User manager must not be null.");
-        if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-            ).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
         {
             return null;
         }
@@ -91,7 +79,7 @@ public sealed class UserType
 
     private static async Task<T?> AuthorizeAsync<T>(
         IResolverContext context,
-        Func<User, UserManager<User>, Task<T?>> getValue,
+        Func<User, UserAuthorization, Task<T?>> getValue,
         string? scope = null
     )
         where T : class
@@ -99,30 +87,24 @@ public sealed class UserType
         var claimsPrincipal =
             context.GetGlobalStateOrDefault<ClaimsPrincipal>(nameof(ClaimsPrincipal))
             ?? throw new ArgumentException("Claims principal must not be null.");
+        var authorization = context.Service<UserAuthorization>();
         if (scope is not null && !claimsPrincipal.HasScope(scope))
         {
             return null;
         }
 
         var user = context.Parent<User>();
-        var userManager =
-            context.GetLocalStateOrDefault<UserManager<User>>(GetServiceName<UserManager<User>>())
-            ?? throw new ArgumentException("User manager must not be null.");
-        if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-            ).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
         {
             return null;
         }
 
-        return await getValue(user, userManager).ConfigureAwait(false);
+        return await getValue(user, authorization).ConfigureAwait(false);
     }
 
     private static async Task<T?> AuthorizeAsync<T>(
         IResolverContext context,
-        Func<User, UserManager<User>, Task<T?>> getValue,
+        Func<User, UserAuthorization, Task<T?>> getValue,
         string? scope = null
     )
         where T : struct
@@ -130,25 +112,19 @@ public sealed class UserType
         var claimsPrincipal =
             context.GetGlobalStateOrDefault<ClaimsPrincipal>(nameof(ClaimsPrincipal))
             ?? throw new ArgumentException("Claims principal must not be null.");
+        var authorization = context.Service<UserAuthorization>();
         if (scope is not null && !claimsPrincipal.HasScope(scope))
         {
             return null;
         }
 
         var user = context.Parent<User>();
-        var userManager =
-            context.GetLocalStateOrDefault<UserManager<User>>(GetServiceName<UserManager<User>>())
-            ?? throw new ArgumentException("User manager must not be null.");
-        if (!await UserAuthorization.IsAuthorizedToManageUser(
-                claimsPrincipal,
-                user.Id,
-                userManager
-            ).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
         {
             return null;
         }
 
-        return await getValue(user, userManager).ConfigureAwait(false);
+        return await getValue(user, authorization).ConfigureAwait(false);
     }
 
     protected override void Configure(
@@ -212,7 +188,7 @@ public sealed class UserType
         descriptor
             .Field("twoFactorAuthentication")
             .ResolveWith<UserResolvers>(t =>
-                UserResolvers.GetTwoFactorAuthenticationAsync(default!, default!, default!, default!))
+                UserResolvers.GetTwoFactorAuthenticationAsync(default!, default!, default!, default!, default!))
             .UseUserManager()
             .UseSignInManager();
         descriptor
@@ -221,8 +197,7 @@ public sealed class UserType
             .Resolve(context =>
                 AuthorizeAsync<bool>(
                     context,
-                    async (user, userManager) =>
-                        await userManager.HasPasswordAsync(user).ConfigureAwait(false),
+                    async (user, authorization) => await authorization.HasPasswordAsync(user).ConfigureAwait(false),
                     AuthConfiguration.ManageUserApiScope
                 )
             )
@@ -232,9 +207,7 @@ public sealed class UserType
             .Resolve(context =>
                 AuthorizeAsync(
                     context,
-                    async (user, userManager) =>
-                        (await userManager.GetRolesAsync(user).ConfigureAwait(false))
-                        .Select(Role.EnumFromName),
+                    async (user, authorization) => await authorization.GetRolesAsync(user).ConfigureAwait(false),
                     Scopes.Roles
                 )
             )
@@ -255,15 +228,15 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field("canCurrentUserViewOpenIdConnectApplications")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserViewOpenIdConnectApplications(default!, default!, default!, default!))
+            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserViewOpenIdConnectApplications(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserAddOpenIdConnectApplications")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserAddOpenIdConnectApplications(default!, default!, default!, default!))
+            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserAddOpenIdConnectApplications(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserAddApprovals")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserAddApprovals(default!, default!, default!, default!))
+            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserAddApprovals(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field(t => t.DevelopedMethods)
@@ -294,9 +267,10 @@ public sealed class UserType
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
         public static async Task<TwoFactorAuthentication?> GetTwoFactorAuthenticationAsync(
             [Parent] User user,
-            ClaimsPrincipal claimsPrincipal,
             UserManager<User> userManager,
-            SignInManager<User> signInManager
+            SignInManager<User> signInManager,
+            ClaimsPrincipal claimsPrincipal,
+            UserAuthorization authorization
         )
         {
             if (!claimsPrincipal.HasScope(AuthConfiguration.ManageUserApiScope))
@@ -304,11 +278,7 @@ public sealed class UserType
                 return null;
             }
 
-            if (!await UserAuthorization.IsAuthorizedToManageUser(
-                    claimsPrincipal,
-                    user.Id,
-                    userManager
-                ).ConfigureAwait(false))
+            if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
             {
                 return null;
             }
@@ -324,73 +294,69 @@ public sealed class UserType
 
         public static Task<bool> GetCanCurrentUserViewOpenIdConnectApplications(
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
-            CancellationToken cancellationToken)
+            OpenIdConnectAuthorization authorization,
+            CancellationToken cancellationToken
+        )
         {
-            return OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken);
+            return authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken);
         }
 
         public static Task<bool> GetCanCurrentUserAddOpenIdConnectApplications(
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
-            CancellationToken cancellationToken)
+            OpenIdConnectAuthorization authorization,
+            CancellationToken cancellationToken
+        )
         {
-            return OpenIdConnectAuthorization.IsAuthorizedToManageApplications(claimsPrincipal, userManager, context, cancellationToken);
+            return authorization.IsAuthorizedToManageApplications(claimsPrincipal, cancellationToken);
         }
 
         public static Task<bool> GetCanCurrentUserAddApprovals(
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
-            CancellationToken cancellationToken)
+            ApprovalAuthorization authorization,
+            CancellationToken cancellationToken
+        )
         {
-            return ApprovalAuthorization.IsAuthorizedToAddApprovals(claimsPrincipal, userManager, context, cancellationToken);
+            return authorization.IsAuthorizedToAddApprovals(claimsPrincipal, cancellationToken);
         }
 
         public static Task<bool> GetCanCurrentUserDeleteUserAsync(
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager
+            UserAuthorization authorization
         )
         {
-            return UserAuthorization.IsAuthorizedToDeleteUsers(claimsPrincipal, userManager);
+            return authorization.IsAuthorizedToDeleteUsers(claimsPrincipal);
         }
 
         public static async Task<IList<UserRole>> GetRolesCurrentUserCanAddAsync(
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
+            UserAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, userManager)
+            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization)
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
         public static async Task<IList<UserRole>> GetRolesCurrentUserCanRemoveAsync(
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
+            UserAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, userManager)
+            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization)
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
         private static async IAsyncEnumerable<UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager
+            UserAuthorization authorization
         )
         {
             foreach (var role in Role.AllEnum)
             {
-                if (await UserAuthorization.IsAuthorizedToAddOrRemoveRole(
-                        claimsPrincipal,
-                        role,
-                        userManager
-                    ).ConfigureAwait(false))
+                if (await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, role).ConfigureAwait(false))
                 {
                     yield return role;
                 }

@@ -122,20 +122,17 @@ public sealed class InstitutionType
         descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!,
-                    default!))
+                InstitutionResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserDeleteNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!,
-                    default!))
+                InstitutionResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserSwitchOperatingStateOfNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetCanCurrentUserSwitchOperatingStateOfNodeAsync(default!, default!, default!, default!,
-                    default!))
+                InstitutionResolvers.GetCanCurrentUserSwitchOperatingStateOfNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
@@ -144,37 +141,31 @@ public sealed class InstitutionType
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
+            InstitutionAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return InstitutionAuthorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id,
-                userManager, context, cancellationToken);
+            return authorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, cancellationToken);
         }
 
         public static Task<bool> GetCanCurrentUserDeleteNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
+            InstitutionAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return InstitutionAuthorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id,
-                userManager, context, cancellationToken);
+            return authorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id, cancellationToken);
         }
 
         public static Task<bool> GetCanCurrentUserSwitchOperatingStateOfNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
+            InstitutionAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return InstitutionAuthorization.IsAuthorizedToSwitchInstitutionOperatingState(claimsPrincipal, institution.Id,
-                userManager, context, cancellationToken);
+            return authorization.IsAuthorizedToSwitchInstitutionOperatingState(claimsPrincipal, institution.Id, cancellationToken);
         }
     }
 }

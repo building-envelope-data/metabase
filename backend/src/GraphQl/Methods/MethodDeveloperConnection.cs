@@ -52,16 +52,13 @@ public sealed class MethodDeveloperConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserAddInstitutionEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return InstitutionMethodDeveloperAuthorization.IsAuthorizedToAdd(
+        return authorization.IsAuthorizedToAdd(
             claimsPrincipal,
             _subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }
@@ -69,16 +66,13 @@ public sealed class MethodDeveloperConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserAddUserEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return UserMethodDeveloperAuthorization.IsAuthorizedToAdd(
+        return authorization.IsAuthorizedToAdd(
             claimsPrincipal,
             _subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

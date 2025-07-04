@@ -23,14 +23,13 @@ public sealed class OpenIdConnectApplicationQueries
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<IAsyncEnumerable<OpenIdConnectApplication>> GetOpenIdConnectApplicationsAsync(
-        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
+        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager, // TODO Make the application manager use the scoped database context.
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        Authorization.OpenIdConnectAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
+        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken)
                 .ConfigureAwait(false))
         {
             return AsyncEnumerable.Empty<OpenIdConnectApplication>();
@@ -42,15 +41,13 @@ public sealed class OpenIdConnectApplicationQueries
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<OpenIdConnectApplication?> GetOpenIdConnectApplicationAsync(
         Guid applicationId,
-        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        Authorization.OpenIdConnectAuthorization authorization,
+        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
-                .ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken).ConfigureAwait(false))
         {
             return null;
         }

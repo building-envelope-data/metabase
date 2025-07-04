@@ -23,16 +23,13 @@ public sealed class InstitutionRepresentativeConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionRepresentativeAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return InstitutionRepresentativeAuthorization.IsAuthorizedToManage(
+        return authorization.IsAuthorizedToManage(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

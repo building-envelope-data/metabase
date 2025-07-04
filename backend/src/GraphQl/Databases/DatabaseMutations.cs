@@ -31,16 +31,14 @@ public sealed class DatabaseMutations
     public async Task<CreateDatabasePayload> CreateDatabaseAsync(
         CreateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        DatabaseAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await DatabaseAuthorization.IsAuthorizedToCreateDatabaseForInstitution(
+        if (!await authorization.IsAuthorizedToCreateDatabaseForInstitution(
                 claimsPrincipal,
                 input.OperatorId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -89,16 +87,14 @@ public sealed class DatabaseMutations
     public async Task<UpdateDatabasePayload> UpdateDatabaseAsync(
         UpdateDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        DatabaseAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await DatabaseAuthorization.IsAuthorizedToUpdate(
+        if (!await authorization.IsAuthorizedToUpdate(
                 claimsPrincipal,
                 input.DatabaseId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -142,18 +138,16 @@ public sealed class DatabaseMutations
     public async Task<VerifyDatabasePayload> VerifyDatabaseAsync(
         VerifyDatabaseInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        DatabaseAuthorization authorization,
         ApplicationDbContext context,
         IHttpClientFactory httpClientFactory,
         IHttpContextAccessor httpContextAccessor,
         CancellationToken cancellationToken
     )
     {
-        if (!await DatabaseAuthorization.IsAuthorizedToVerify(
+        if (!await authorization.IsAuthorizedToVerify(
                 claimsPrincipal,
                 input.DatabaseId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

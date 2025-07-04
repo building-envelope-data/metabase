@@ -2,45 +2,42 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
+using Metabase.Data;
 
 namespace Metabase.Authorization;
 
-public static class MethodAuthorization
+public sealed class MethodAuthorization(
+    ApplicationDbContext context,
+    UserManager<User> userManager
+) : CommonMethodAuthorization(context, userManager)
 {
-    public static async Task<bool> IsAuthorizedToCreateMethodManagedByInstitution(
+    internal async Task<bool> IsAuthorizedToCreateMethodManagedByInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-               && await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+               && await IsAtLeastAssistantOfVerifiedInstitution(
                    user,
                    institutionId,
-                   context,
                    cancellationToken
                );
     }
 
-    public static async Task<bool> IsAuthorizedToUpdate(
+    internal async Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid methodId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null &&
-               await CommonMethodAuthorization.IsAtLeastAssistantOfVerifiedMethodManager(
+               await IsAtLeastAssistantOfVerifiedMethodManager(
                    user,
                    methodId,
-                   context,
                    cancellationToken
                );
     }

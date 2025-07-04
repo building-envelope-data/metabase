@@ -20,16 +20,13 @@ public sealed class InstitutionManagedMethodConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        MethodAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return MethodAuthorization.IsAuthorizedToCreateMethodManagedByInstitution(
+        return authorization.IsAuthorizedToCreateMethodManagedByInstitution(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

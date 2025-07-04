@@ -39,8 +39,7 @@ public sealed class DataFormatType
         descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<DataFormatResolvers>(x =>
-                DataFormatResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!,
-                    default!))
+                DataFormatResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
@@ -49,13 +48,11 @@ public sealed class DataFormatType
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
             [Parent] DataFormat dataFormat,
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
+            DataFormatAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return DataFormatAuthorization.IsAuthorizedToUpdate(claimsPrincipal, dataFormat.Id, userManager,
-                context, cancellationToken);
+            return authorization.IsAuthorizedToUpdate(claimsPrincipal, dataFormat.Id, cancellationToken);
         }
     }
 }

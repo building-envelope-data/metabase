@@ -23,17 +23,15 @@ public sealed class ComponentGeneralizationMutations
     public async Task<AddComponentGeneralizationPayload> AddComponentGeneralizationAsync(
         AddComponentGeneralizationInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentGeneralizationAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentGeneralizationAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.ConcreteComponentId,
                 input.GeneralComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -116,17 +114,15 @@ public sealed class ComponentGeneralizationMutations
     public async Task<RemoveComponentGeneralizationPayload> RemoveComponentGeneralizationAsync(
         RemoveComponentGeneralizationInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentGeneralizationAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentGeneralizationAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.ConcreteComponentId,
                 input.GeneralComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

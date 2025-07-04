@@ -198,25 +198,21 @@ public sealed class DatabaseResolvers(
     public Task<bool> GetCanCurrentUserUpdateNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        DatabaseAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return DatabaseAuthorization.IsAuthorizedToUpdate(claimsPrincipal, database.Id, userManager, context,
-            cancellationToken);
+        return authorization.IsAuthorizedToUpdate(claimsPrincipal, database.Id, cancellationToken);
     }
 
     public Task<bool> GetCanCurrentUserVerifyNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        DatabaseAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return DatabaseAuthorization.IsAuthorizedToVerify(claimsPrincipal, database.Id, userManager, context,
-            cancellationToken);
+        return authorization.IsAuthorizedToVerify(claimsPrincipal, database.Id, cancellationToken);
     }
 
     public async Task<OpticalData?> GetOpticalDataAsync(

@@ -20,16 +20,13 @@ public sealed class ComponentConcretizationOfConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentGeneralizationAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentGeneralizationAuthorization.IsAuthorizedToAdd(
+        return authorization.IsAuthorizedToAdd(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

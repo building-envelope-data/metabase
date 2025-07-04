@@ -23,16 +23,13 @@ public sealed class InstitutionManufacturedComponentConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentAuthorization.IsAuthorizedToCreateComponentForInstitution(
+        return authorization.IsAuthorizedToCreateComponentForInstitution(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }
@@ -40,16 +37,13 @@ public sealed class InstitutionManufacturedComponentConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentManufacturerAuthorization.IsAuthorizedToConfirm(
+        return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

@@ -23,16 +23,14 @@ public sealed class UserMethodDeveloperMutations
     public async Task<AddUserMethodDeveloperPayload> AddUserMethodDeveloperAsync(
         AddUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        UserMethodDeveloperAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await UserMethodDeveloperAuthorization.IsAuthorizedToAdd(
+        if (!await authorization.IsAuthorizedToAdd(
                 claimsPrincipal,
                 input.MethodId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -104,8 +102,7 @@ public sealed class UserMethodDeveloperMutations
         {
             MethodId = input.MethodId,
             UserId = input.UserId,
-            Pending = !await UserMethodDeveloperAuthorization
-                .IsAuthorizedToConfirm(claimsPrincipal, input.UserId, userManager).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId).ConfigureAwait(false)
         };
         context.UserMethodDevelopers.Add(userMethodDeveloper);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -117,15 +114,14 @@ public sealed class UserMethodDeveloperMutations
     public async Task<ConfirmUserMethodDeveloperPayload> ConfirmUserMethodDeveloperAsync(
         ConfirmUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        UserMethodDeveloperAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(
+        if (!await authorization.IsAuthorizedToConfirm(
                 claimsPrincipal,
-                input.UserId,
-                userManager
+                input.UserId
             ).ConfigureAwait(false)
            )
         {
@@ -203,16 +199,14 @@ public sealed class UserMethodDeveloperMutations
     public async Task<RemoveUserMethodDeveloperPayload> RemoveUserMethodDeveloperAsync(
         RemoveUserMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        UserMethodDeveloperAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await UserMethodDeveloperAuthorization.IsAuthorizedToRemove(
+        if (!await authorization.IsAuthorizedToRemove(
                 claimsPrincipal,
                 input.MethodId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

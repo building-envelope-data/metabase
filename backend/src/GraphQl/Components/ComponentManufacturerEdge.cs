@@ -19,16 +19,13 @@ public sealed class ComponentManufacturerEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentManufacturerAuthorization.IsAuthorizedToConfirm(
+        return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
             _association.InstitutionId,
-            userManager,
-            context,
             cancellationToken
         );
     }
@@ -36,16 +33,13 @@ public sealed class ComponentManufacturerEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentManufacturerAuthorization.IsAuthorizedToRemove(
+        return authorization.IsAuthorizedToRemove(
             claimsPrincipal,
             _association.InstitutionId,
-            userManager,
-            context,
             cancellationToken
         );
     }

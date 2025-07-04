@@ -20,16 +20,13 @@ public sealed class InstitutionOperatedDatabaseConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        DatabaseAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return DatabaseAuthorization.IsAuthorizedToCreateDatabaseForInstitution(
+        return authorization.IsAuthorizedToCreateDatabaseForInstitution(
             claimsPrincipal,
             Subject.Id,
-            userManager,
-            context,
             cancellationToken
         );
     }

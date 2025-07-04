@@ -2,39 +2,41 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Data;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Metabase.Data;
 
 namespace Metabase.Authorization;
 
-public static class CommonComponentAuthorization
+public abstract class CommonComponentAuthorization(
+    ApplicationDbContext context,
+    UserManager<User> userManager
+) : CommonAuthorization(context, userManager)
 {
-    internal static async Task<bool> IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+    protected async Task<bool> IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
         User user,
         Guid componentId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         var manufacturerIds =
-            await context.Institutions.AsNoTracking()
+            await Context.Institutions.AsNoTracking()
                 .Where(i => i.ManufacturedComponents.Any(c => c.Id == componentId))
                 .Select(i => i.Id)
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
         foreach (var manufacturerId in manufacturerIds)
         {
-            if (await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+            if (await IsAtLeastAssistantOfVerifiedInstitution(
                     user,
                     manufacturerId,
-                    context,
                     cancellationToken
                 ).ConfigureAwait(false)
                 &&
-                await CommonAuthorization.IsVerifiedManufacturerOfComponent(
+                await IsVerifiedManufacturerOfComponent(
                     manufacturerId,
                     componentId,
-                    context,
                     cancellationToken
                 ).ConfigureAwait(false)
                )

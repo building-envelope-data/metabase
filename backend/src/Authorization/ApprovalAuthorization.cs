@@ -7,17 +7,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Authorization;
 
-public sealed class ApprovalAuthorization
+public sealed class ApprovalAuthorization(
+    ApplicationDbContext context,
+    UserManager<User> userManager
+) : CommonAuthorization(context, userManager)
 {
-    public static async Task<bool> IsAuthorizedToAddApprovals(
+    internal async Task<bool> IsAuthorizedToAddApprovals(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-               && (await context.InstitutionRepresentatives.AsQueryable()
+               && (await Context.InstitutionRepresentatives.AsQueryable()
                     .SingleOrDefaultAsync(
                         x => x.UserId == user.Id && x.DataSigningPermission == Enumerations.DataSigningPermission.ALLOWED,
                         cancellationToken

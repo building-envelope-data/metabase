@@ -21,13 +21,12 @@ public sealed class UserRepresentedInstitutionConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager
+        InstitutionRepresentativeAuthorization authorization
     )
     {
-        return InstitutionRepresentativeAuthorization.IsAuthorizedToConfirm(
+        return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
-            Subject.Id,
-            userManager
+            Subject.Id
         );
     }
 }

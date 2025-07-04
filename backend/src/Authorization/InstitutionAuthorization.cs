@@ -2,94 +2,81 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
+using Metabase.Data;
 
 namespace Metabase.Authorization;
 
-public static class InstitutionAuthorization
+public sealed class InstitutionAuthorization(
+    ApplicationDbContext context,
+    UserManager<User> userManager
+) : CommonAuthorization(context, userManager)
 {
-    internal static async Task<bool> IsAuthorizedToUpdateInstitution(
+    internal async Task<bool> IsAuthorizedToUpdateInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-               && await CommonAuthorization.IsAtLeastAssistant(
+               && await IsAtLeastAssistant(
                    user,
                    institutionId,
-                   context,
                    cancellationToken
                );
     }
 
-    internal static async Task<bool> IsAuthorizedToDeleteInstitution(
+    internal async Task<bool> IsAuthorizedToDeleteInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-               && await CommonAuthorization.IsOwnerOfInstitution(
+               && await IsOwnerOfInstitution(
                    user,
                    institutionId,
-                   context,
                    cancellationToken
                );
     }
 
-    internal static async Task<bool> IsAuthorizedToCreateInstitutionManagedByInstitution(
+    internal async Task<bool> IsAuthorizedToCreateInstitutionManagedByInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-               && await CommonAuthorization.IsAtLeastAssistantOfVerifiedInstitution(
+               && await IsAtLeastAssistantOfVerifiedInstitution(
                    user,
                    institutionId,
-                   context,
                    cancellationToken
                );
     }
 
-    internal static async Task<bool> IsAuthorizedToVerifyInstitution(
-        ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager
+    internal async Task<bool> IsAuthorizedToVerifyInstitution(
+        ClaimsPrincipal claimsPrincipal
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-               && await CommonAuthorization.IsVerifier(
-                   user,
-                   userManager
-               );
+               && await IsVerifier(user);
     }
 
-    internal static async Task<bool> IsAuthorizedToSwitchInstitutionOperatingState(
+    internal async Task<bool> IsAuthorizedToSwitchInstitutionOperatingState(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-               && await CommonAuthorization.IsOwnerOfInstitution(
+               && await IsOwnerOfInstitution(
                    user,
                    institutionId,
-                   context,
                    cancellationToken
                );
     }

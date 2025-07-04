@@ -23,17 +23,15 @@ public sealed class ComponentVariantMutations
     public async Task<AddComponentVariantPayload> AddComponentVariantAsync(
         AddComponentVariantInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentVariantAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentVariantAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.OtherComponentId,
                 input.OneComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -122,17 +120,15 @@ public sealed class ComponentVariantMutations
     public async Task<RemoveComponentVariantPayload> RemoveComponentVariantAsync(
         RemoveComponentVariantInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentVariantAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentVariantAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.OtherComponentId,
                 input.OneComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

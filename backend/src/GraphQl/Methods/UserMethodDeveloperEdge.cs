@@ -18,29 +18,25 @@ public sealed class UserMethodDeveloperEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager
+        UserMethodDeveloperAuthorization authorization
     )
     {
-        return UserMethodDeveloperAuthorization.IsAuthorizedToConfirm(
+        return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
-            _association.UserId,
-            userManager
+            _association.UserId
         );
     }
 
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        UserMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return UserMethodDeveloperAuthorization.IsAuthorizedToRemove(
+        return authorization.IsAuthorizedToRemove(
             claimsPrincipal,
             _association.MethodId,
-            userManager,
-            context,
             cancellationToken
         );
     }

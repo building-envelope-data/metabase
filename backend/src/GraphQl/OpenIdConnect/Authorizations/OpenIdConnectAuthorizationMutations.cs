@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Configuration;
-using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
@@ -21,18 +19,15 @@ public sealed class OpenIdConnectAuthorizationMutations
     public async Task<DeleteOpenIdConnectAuthorizationPayload> DeleteOpenIdConnectAuthorizationAsync(
         DeleteOpenIdConnectAuthorizationInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,
         OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToDeleteAuthorization(
+        if (!await openIdConnectAuthorization.IsAuthorizedToDeleteAuthorization(
+                claimsPrincipal,
                 input.AuthorizationId,
                 authorizationManager,
-                claimsPrincipal,
-                userManager,
-                context,
                 cancellationToken).ConfigureAwait(false))
         {
             return new DeleteOpenIdConnectAuthorizationPayload(

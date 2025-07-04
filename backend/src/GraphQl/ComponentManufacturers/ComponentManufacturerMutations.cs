@@ -23,16 +23,14 @@ public sealed class ComponentManufacturerMutations
     public async Task<AddComponentManufacturerPayload> AddComponentManufacturerAsync(
         AddComponentManufacturerInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentManufacturerAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentManufacturerAuthorization.IsAuthorizedToAdd(
+        if (!await authorization.IsAuthorizedToAdd(
                 claimsPrincipal,
                 input.ComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -104,9 +102,7 @@ public sealed class ComponentManufacturerMutations
         {
             ComponentId = input.ComponentId,
             InstitutionId = input.InstitutionId,
-            Pending = !await ComponentManufacturerAuthorization
-                .IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, userManager, context,
-                    cancellationToken).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, cancellationToken).ConfigureAwait(false)
         };
         context.ComponentManufacturers.Add(componentManufacturer);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -118,16 +114,14 @@ public sealed class ComponentManufacturerMutations
     public async Task<ConfirmComponentManufacturerPayload> ConfirmComponentManufacturerAsync(
         ConfirmComponentManufacturerInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentManufacturerAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentManufacturerAuthorization.IsAuthorizedToConfirm(
+        if (!await authorization.IsAuthorizedToConfirm(
                 claimsPrincipal,
                 input.InstitutionId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -206,16 +200,14 @@ public sealed class ComponentManufacturerMutations
     public async Task<RemoveComponentManufacturerPayload> RemoveComponentManufacturerAsync(
         RemoveComponentManufacturerInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentManufacturerAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentManufacturerAuthorization.IsAuthorizedToRemove(
+        if (!await authorization.IsAuthorizedToRemove(
                 claimsPrincipal,
                 input.InstitutionId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

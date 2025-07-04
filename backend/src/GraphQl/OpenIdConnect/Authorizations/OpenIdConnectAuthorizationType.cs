@@ -27,8 +27,7 @@ public sealed class OpenIdConnectAuthorizationType
         descriptor
                 .Field("canCurrentUserDeleteAuthorization")
                 .ResolveWith<AuthorizationResolvers>(x =>
-                    AuthorizationResolvers.GetCanCurrentUserDeleteAuthorizationAsync(default!, default!, default!, default!, default!,
-                        default!))
+                    AuthorizationResolvers.GetCanCurrentUserDeleteAuthorizationAsync(default!, default!, default!, default!, default!))
                 .UseUserManager();
     }
 
@@ -36,14 +35,13 @@ public sealed class OpenIdConnectAuthorizationType
     {
         public static Task<bool> GetCanCurrentUserDeleteAuthorizationAsync(
             [Parent] OpenIdConnectAuthorization authorization,
-            OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
+            Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,
+            OpenIddictAuthorizationManager<OpenIdConnectAuthorization> authorizationManager,
             CancellationToken cancellationToken
         )
         {
-            return Authorization.OpenIdConnectAuthorization.IsAuthorizedToDeleteAuthorization(authorization.Id, authorizationManager, claimsPrincipal, userManager, context, cancellationToken);
+            return openIdConnectAuthorization.IsAuthorizedToDeleteAuthorization(claimsPrincipal, authorization.Id, authorizationManager, cancellationToken);
         }
     }
 }

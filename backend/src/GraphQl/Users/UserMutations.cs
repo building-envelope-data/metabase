@@ -735,16 +735,14 @@ public sealed class UserMutations
     public async Task<DeleteUserPayload> DeleteUserAsync(
         DeleteUserInput input,
         ClaimsPrincipal claimsPrincipal,
+        UserAuthorization authorization,
         UserManager<User> userManager,
         IAntiforgery antiforgeryService,
         IHttpContextAccessor httpContextAccessor
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        if (!await UserAuthorization.IsAuthorizedToDeleteUsers(
-                claimsPrincipal,
-                userManager
-            ).ConfigureAwait(false)
+        if (!await authorization.IsAuthorizedToDeleteUsers(claimsPrincipal).ConfigureAwait(false)
            )
         {
             return new DeleteUserPayload(
@@ -1709,6 +1707,7 @@ public sealed class UserMutations
     public async Task<AddUserRolePayload> AddUserRoleAsync(
         AddUserRoleInput input,
         ClaimsPrincipal claimsPrincipal,
+        UserAuthorization authorization,
         UserManager<User> userManager,
         IAntiforgery antiforgeryService,
         IHttpContextAccessor httpContextAccessor,
@@ -1717,7 +1716,7 @@ public sealed class UserMutations
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager)
+        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role)
                 .ConfigureAwait(false))
         {
             return new AddUserRolePayload(
@@ -1777,6 +1776,7 @@ public sealed class UserMutations
     public async Task<RemoveUserRolePayload> RemoveUserRoleAsync(
         RemoveUserRoleInput input,
         ClaimsPrincipal claimsPrincipal,
+        UserAuthorization authorization,
         UserManager<User> userManager,
         IAntiforgery antiforgeryService,
         IHttpContextAccessor httpContextAccessor,
@@ -1785,7 +1785,7 @@ public sealed class UserMutations
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        if (!await UserAuthorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, userManager)
+        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role)
                 .ConfigureAwait(false))
         {
             return new RemoveUserRolePayload(

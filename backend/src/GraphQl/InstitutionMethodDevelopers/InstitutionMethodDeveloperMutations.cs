@@ -23,16 +23,14 @@ public sealed class InstitutionMethodDeveloperMutations
     public async Task<AddInstitutionMethodDeveloperPayload> AddInstitutionMethodDeveloperAsync(
         AddInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionMethodDeveloperAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionMethodDeveloperAuthorization.IsAuthorizedToAdd(
+        if (!await authorization.IsAuthorizedToAdd(
                 claimsPrincipal,
                 input.MethodId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -104,9 +102,7 @@ public sealed class InstitutionMethodDeveloperMutations
         {
             MethodId = input.MethodId,
             InstitutionId = input.InstitutionId,
-            Pending = !await InstitutionMethodDeveloperAuthorization
-                .IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, userManager, context,
-                    cancellationToken).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, cancellationToken).ConfigureAwait(false)
         };
         context.InstitutionMethodDevelopers.Add(institutionMethodDeveloper);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -118,16 +114,14 @@ public sealed class InstitutionMethodDeveloperMutations
     public async Task<ConfirmInstitutionMethodDeveloperPayload> ConfirmInstitutionMethodDeveloperAsync(
         ConfirmInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionMethodDeveloperAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(
+        if (!await authorization.IsAuthorizedToConfirm(
                 claimsPrincipal,
                 input.InstitutionId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -206,16 +200,14 @@ public sealed class InstitutionMethodDeveloperMutations
     public async Task<RemoveInstitutionMethodDeveloperPayload> RemoveInstitutionMethodDeveloperAsync(
         RemoveInstitutionMethodDeveloperInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionMethodDeveloperAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionMethodDeveloperAuthorization.IsAuthorizedToRemove(
+        if (!await authorization.IsAuthorizedToRemove(
                 claimsPrincipal,
                 input.MethodId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

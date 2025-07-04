@@ -91,8 +91,7 @@ public sealed class OpenIdConnectApplicationType
         descriptor
             .Field("canCurrentUserManageApplication")
             .ResolveWith<ApplicationResolvers>(_ =>
-                ApplicationResolvers.GetCanCurrentUserManageApplicationAsync(default!, default!, default!, default!, default!,
-                    default!))
+                ApplicationResolvers.GetCanCurrentUserManageApplicationAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
@@ -119,14 +118,12 @@ public sealed class OpenIdConnectApplicationType
     {
         public static Task<bool> GetCanCurrentUserManageApplicationAsync(
             [Parent] OpenIdConnectApplication application,
-            OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
+            Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,
             CancellationToken cancellationToken
         )
         {
-            return Authorization.OpenIdConnectAuthorization.IsAuthorizedToManageApplication(application.Id, claimsPrincipal, userManager, context, cancellationToken);
+            return openIdConnectAuthorization.IsAuthorizedToManageApplication(claimsPrincipal, application.Id, cancellationToken);
         }
     }
 }

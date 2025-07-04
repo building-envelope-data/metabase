@@ -19,20 +19,18 @@ public sealed class OpenIdConnectTokenMutations
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<RevokeOpenIdConnectTokenPayload> RevokeOpenIdConnectTokenAsync(
-    RevokeOpenIdConnectTokenInput input,
-    ClaimsPrincipal claimsPrincipal,
-    UserManager<User> userManager,
-    OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
-    ApplicationDbContext context,
-    CancellationToken cancellationToken
-)
+        RevokeOpenIdConnectTokenInput input,
+        ClaimsPrincipal claimsPrincipal,
+        Authorization.OpenIdConnectAuthorization authorization,
+        OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToRevokeToken(
+        if (!await authorization.IsAuthorizedToRevokeToken(
+                claimsPrincipal,
                 input.TokenId,
                 tokenManager,
-                claimsPrincipal,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false))
         {

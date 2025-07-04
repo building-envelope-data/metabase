@@ -24,16 +24,14 @@ public sealed class ComponentMutations
     public async Task<CreateComponentPayload> CreateComponentAsync(
         CreateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentAuthorization.IsAuthorizedToCreateComponentForInstitution(
+        if (!await authorization.IsAuthorizedToCreateComponentForInstitution(
                 claimsPrincipal,
                 input.ManufacturerId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -134,16 +132,14 @@ public sealed class ComponentMutations
     public async Task<UpdateComponentPayload> UpdateComponentAsync(
         UpdateComponentInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentAuthorization.IsAuthorizedToUpdate(
+        if (!await authorization.IsAuthorizedToUpdate(
                 claimsPrincipal,
                 input.ComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -198,16 +194,14 @@ public sealed class ComponentMutations
     public async Task<SetComponentExtrasPayload> SetComponentExtrasAsync(
         SetComponentExtrasInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentAuthorization.IsAuthorizedToUpdate(
+        if (!await authorization.IsAuthorizedToUpdate(
                 claimsPrincipal,
                 input.ComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

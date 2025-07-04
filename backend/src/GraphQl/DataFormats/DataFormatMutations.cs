@@ -24,16 +24,14 @@ public sealed class DataFormatMutations
     public async Task<CreateDataFormatPayload> CreateDataFormatAsync(
         CreateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        DataFormatAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await DataFormatAuthorization.IsAuthorizedToCreateDataFormatForInstitution(
+        if (!await authorization.IsAuthorizedToCreateDataFormatForInstitution(
                 claimsPrincipal,
                 input.ManagerId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -105,16 +103,14 @@ public sealed class DataFormatMutations
     public async Task<UpdateDataFormatPayload> UpdateDataFormatAsync(
         UpdateDataFormatInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        DataFormatAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await DataFormatAuthorization.IsAuthorizedToUpdate(
+        if (!await authorization.IsAuthorizedToUpdate(
                 claimsPrincipal,
                 input.DataFormatId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

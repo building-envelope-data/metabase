@@ -25,16 +25,16 @@ public sealed class MethodMutations
     public async Task<CreateMethodPayload> CreateMethodAsync(
         CreateMethodInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        MethodAuthorization authorization,
+        InstitutionMethodDeveloperAuthorization institutionMethodDeveloperAuthorization,
+        UserMethodDeveloperAuthorization userMethodDeveloperAuthorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await MethodAuthorization.IsAuthorizedToCreateMethodManagedByInstitution(
+        if (!await authorization.IsAuthorizedToCreateMethodManagedByInstitution(
                 claimsPrincipal,
                 input.ManagerId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -145,21 +145,18 @@ public sealed class MethodMutations
                 new InstitutionMethodDeveloper
                 {
                     InstitutionId = institutionDeveloperId,
-                    Pending = !await InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal,
-                        institutionDeveloperId, userManager, context, cancellationToken).ConfigureAwait(false)
+                    Pending = !await institutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, institutionDeveloperId, cancellationToken).ConfigureAwait(false)
                 }
             );
         }
 
-        var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
         foreach (var userDeveloperId in input.UserDeveloperIds.Distinct())
         {
             method.UserDeveloperEdges.Add(
                 new UserMethodDeveloper
                 {
                     UserId = userDeveloperId,
-                    Pending = !await UserMethodDeveloperAuthorization
-                        .IsAuthorizedToConfirm(claimsPrincipal, userDeveloperId, userManager).ConfigureAwait(false)
+                    Pending = !await userMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, userDeveloperId).ConfigureAwait(false)
                 }
             );
         }
@@ -174,16 +171,14 @@ public sealed class MethodMutations
     public async Task<UpdateMethodPayload> UpdateMethodAsync(
         UpdateMethodInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        MethodAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await MethodAuthorization.IsAuthorizedToUpdate(
+        if (!await authorization.IsAuthorizedToUpdate(
                 claimsPrincipal,
                 input.MethodId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

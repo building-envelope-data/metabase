@@ -26,19 +26,18 @@ public sealed class InstitutionMutations
     public async Task<CreateInstitutionPayload> CreateInstitutionAsync(
         CreateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionAuthorization authorization,
+        InstitutionRepresentativeAuthorization representativeAuthorization,
         ApplicationDbContext context,
         IEmailSender emailSender,
         AppSettings appSettings,
         CancellationToken cancellationToken
     )
     {
-        if (input.ManagerId is not null && !await InstitutionAuthorization
+        if (input.ManagerId is not null && !await authorization
                 .IsAuthorizedToCreateInstitutionManagedByInstitution(
                     claimsPrincipal,
                     input.ManagerId ?? Guid.Empty,
-                    userManager,
-                    context,
                     cancellationToken
                 ).ConfigureAwait(false)
            )
@@ -52,7 +51,7 @@ public sealed class InstitutionMutations
             );
         }
 
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await authorization.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
         if (user is null)
         {
             return new CreateInstitutionPayload(
@@ -118,7 +117,7 @@ public sealed class InstitutionMutations
             input.Description,
             input.WebsiteLocator,
             input.PublicKey,
-            await GetInitialInstitutionState(input, user, userManager).ConfigureAwait(false),
+            await GetInitialInstitutionState(input, user, authorization).ConfigureAwait(false),
             InstitutionOperatingState.OPERATING,
             input.Extras
         )
@@ -132,8 +131,7 @@ public sealed class InstitutionMutations
                 {
                     UserId = ownerId,
                     Role = InstitutionRepresentativeRole.OWNER,
-                    Pending = !await InstitutionRepresentativeAuthorization
-                        .IsAuthorizedToConfirm(claimsPrincipal, ownerId, userManager).ConfigureAwait(false)
+                    Pending = !await representativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId).ConfigureAwait(false)
                 }
             );
         }
@@ -143,9 +141,7 @@ public sealed class InstitutionMutations
         if (institution.State == InstitutionState.PENDING)
         {
             var verifiers =
-                await userManager.GetUsersInRoleAsync(
-                    Role.EnumToName(UserRole.VERIFIER)
-                ).ConfigureAwait(false);
+                await authorization.GetUsersInRoleAsync(UserRole.VERIFIER).ConfigureAwait(false);
             await Task.WhenAll(
                 verifiers.Select(verifier =>
                     verifier.Email is null
@@ -165,13 +161,13 @@ public sealed class InstitutionMutations
     private static async Task<InstitutionState> GetInitialInstitutionState(
         CreateInstitutionInput input,
         User user,
-        UserManager<User> userManager
+        CommonAuthorization authorization
     )
     {
         if (input.ManagerId is not null
-            || await userManager.IsInRoleAsync(user, Role.EnumToName(UserRole.ADMINISTRATOR))
+            || await authorization.IsInRole(user, UserRole.ADMINISTRATOR)
                 .ConfigureAwait(false)
-            || await userManager.IsInRoleAsync(user, Role.EnumToName(UserRole.VERIFIER))
+            || await authorization.IsInRole(user, UserRole.VERIFIER)
                 .ConfigureAwait(false)
            )
         {
@@ -186,15 +182,12 @@ public sealed class InstitutionMutations
     public async Task<VerifyInstitutionPayload> VerifyInstitutionAsync(
         VerifyInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionAuthorization.IsAuthorizedToVerifyInstitution(
-                claimsPrincipal,
-                userManager
-            ).ConfigureAwait(false)
+        if (!await authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal).ConfigureAwait(false)
            )
         {
             return new VerifyInstitutionPayload(
@@ -232,16 +225,14 @@ public sealed class InstitutionMutations
     public async Task<UpdateInstitutionPayload> UpdateInstitutionAsync(
         UpdateInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionAuthorization.IsAuthorizedToUpdateInstitution(
+        if (!await authorization.IsAuthorizedToUpdateInstitution(
                 claimsPrincipal,
                 input.InstitutionId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -288,16 +279,14 @@ public sealed class InstitutionMutations
     public async Task<DeleteInstitutionPayload> DeleteInstitutionAsync(
         DeleteInstitutionInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionAuthorization.IsAuthorizedToDeleteInstitution(
+        if (!await authorization.IsAuthorizedToDeleteInstitution(
                 claimsPrincipal,
                 input.InstitutionId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -383,16 +372,14 @@ public sealed class InstitutionMutations
     public async Task<SwitchInstitutionOperatingStatePayload> SwitchInstitutionOperatingStateAsync(
         SwitchInstitutionOperatingStateInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionAuthorization.IsAuthorizedToSwitchInstitutionOperatingState(
+        if (!await authorization.IsAuthorizedToSwitchInstitutionOperatingState(
                 claimsPrincipal,
                 input.InstitutionId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

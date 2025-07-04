@@ -2,67 +2,64 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
+using Metabase.Data;
 
 namespace Metabase.Authorization;
 
-public static class InstitutionRepresentativeAuthorization
+public sealed class InstitutionRepresentativeAuthorization(
+    ApplicationDbContext context,
+    UserManager<User> userManager
+) : CommonAuthorization(context, userManager)
 {
-    public static async Task<bool> IsAuthorizedToManage(
+    internal async Task<bool> IsAuthorizedToManage(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-               && await CommonAuthorization.IsOwnerOfVerifiedInstitution(
+               && await IsOwnerOfVerifiedInstitution(
                    user,
                    institutionId,
-                   context,
                    cancellationToken
                );
     }
 
-    public static async Task<bool> IsAuthorizedToConfirm(
+    internal async Task<bool> IsAuthorizedToConfirm(
         ClaimsPrincipal claimsPrincipal,
-        Guid userId,
-        UserManager<User> userManager
+        Guid userId
     )
     {
-        var loggedInUser = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var loggedInUser = await GetUserAsync(claimsPrincipal);
         return loggedInUser is not null
-               && CommonAuthorization.IsSame(
+               && IsSame(
                    loggedInUser,
                    userId
                );
     }
 
-    public static async Task<bool> IsAuthorizedToManageSigningPermission(
-        Guid institutionId,
+    internal async Task<bool> IsAuthorizedToManageSigningPermission(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
-        CancellationToken cancellationToken)
+        Guid institutionId,
+        CancellationToken cancellationToken
+    )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
 
         return user is not null
-               && (await CommonAuthorization.IsAdministrator(user, userManager)
-               || await CommonAuthorization.IsOwnerOfInstitution(user, institutionId, context, cancellationToken));
+               && (await IsAdministrator(user)
+               || await IsOwnerOfInstitution(user, institutionId, cancellationToken));
     }
 
-    internal static async Task<bool> IsAuthorizedToAddKeyFingerprint(
+    internal async Task<bool> IsAuthorizedToAddKeyFingerprint(
         ClaimsPrincipal claimsPrincipal,
-        ApplicationDbContext context,
-        UserManager<User> userManager,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-            && await CommonAuthorization.IsAtLeastAssistant(user, context, cancellationToken).ConfigureAwait(false);
+            && await IsAtLeastAssistant(user, cancellationToken).ConfigureAwait(false);
     }
 }

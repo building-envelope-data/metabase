@@ -115,8 +115,7 @@ public sealed class ComponentType
         descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<ComponentResolvers>(x =>
-                ComponentResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!,
-                    default!))
+                ComponentResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
@@ -125,13 +124,11 @@ public sealed class ComponentType
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
             [Parent] Component component,
             ClaimsPrincipal claimsPrincipal,
-            UserManager<User> userManager,
-            ApplicationDbContext context,
+            ComponentAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return ComponentAuthorization.IsAuthorizedToUpdate(claimsPrincipal, component.Id, userManager, context,
-                cancellationToken);
+            return authorization.IsAuthorizedToUpdate(claimsPrincipal, component.Id, cancellationToken);
         }
     }
 }

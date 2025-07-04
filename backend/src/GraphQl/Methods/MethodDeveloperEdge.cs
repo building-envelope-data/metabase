@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
@@ -51,22 +52,19 @@ public sealed class MethodDeveloperEdge
     [UseUserManager]
     public async Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization institutionMethodDeveloperAuthorization,
+        UserMethodDeveloperAuthorization userMethodDeveloperAuthorization,
         CancellationToken cancellationToken
     )
     {
         if (_institutionMethodDeveloperEdge is not null)
         {
-            return await _institutionMethodDeveloperEdge
-                .CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager, context, cancellationToken)
-                .ConfigureAwait(false);
+            return await _institutionMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken).ConfigureAwait(false);
         }
 
         if (_userMethodDeveloperEdge is not null)
         {
-            return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userManager)
-                .ConfigureAwait(false);
+            return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization).ConfigureAwait(false);
         }
 
         throw new ArgumentException("Impossible!");
@@ -75,22 +73,22 @@ public sealed class MethodDeveloperEdge
     [UseUserManager]
     public async Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization institutionMethodDeveloperAuthorization,
+        UserMethodDeveloperAuthorization userMethodDeveloperAuthorization,
         CancellationToken cancellationToken
     )
     {
         if (_institutionMethodDeveloperEdge is not null)
         {
             return await _institutionMethodDeveloperEdge
-                .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken)
+                .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken)
                 .ConfigureAwait(false);
         }
 
         if (_userMethodDeveloperEdge is not null)
         {
             return await _userMethodDeveloperEdge
-                .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userManager, context, cancellationToken)
+                .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization, cancellationToken)
                 .ConfigureAwait(false);
         }
 

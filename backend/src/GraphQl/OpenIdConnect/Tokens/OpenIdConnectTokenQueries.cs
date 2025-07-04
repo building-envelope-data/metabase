@@ -22,14 +22,13 @@ public sealed class OpenIdConnectTokenQueries
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<IAsyncEnumerable<OpenIdConnectToken>> GetOpenIdConnectTokensAsync(
         Guid? applicationId,
-        OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context, // TODO Make the application manager use the scoped database context.
+        Authorization.OpenIdConnectAuthorization authorization,
+        OpenIddictTokenManager<OpenIdConnectToken> tokenManager, // TODO Make the token manager use the scoped database context.
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
+        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken)
                 .ConfigureAwait(false))
         {
             return AsyncEnumerable.Empty<OpenIdConnectToken>();
@@ -45,14 +44,13 @@ public sealed class OpenIdConnectTokenQueries
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<OpenIdConnectToken?> GetOpenIdConnectTokenAsync(
         Guid tokenId,
-        OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        Authorization.OpenIdConnectAuthorization authorization,
+        OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         CancellationToken cancellationToken
     )
     {
-        if (!await Authorization.OpenIdConnectAuthorization.IsAuthorizedToViewApplications(claimsPrincipal, userManager, context, cancellationToken)
+        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken)
                 .ConfigureAwait(false))
         {
             return null;

@@ -23,17 +23,15 @@ public sealed class ComponentAssemblyMutations
     public async Task<AddComponentAssemblyPayload> AddComponentAssemblyAsync(
         AddComponentAssemblyInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentAssemblyAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentAssemblyAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.PartComponentId,
                 input.AssembledComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -118,17 +116,15 @@ public sealed class ComponentAssemblyMutations
     public async Task<UpdateComponentAssemblyPayload> UpdateComponentAssemblyAsync(
         UpdateComponentAssemblyInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentAssemblyAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentAssemblyAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.PartComponentId,
                 input.AssembledComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )
@@ -209,17 +205,15 @@ public sealed class ComponentAssemblyMutations
     public async Task<RemoveComponentAssemblyPayload> RemoveComponentAssemblyAsync(
         RemoveComponentAssemblyInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        ComponentAssemblyAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await ComponentAssemblyAuthorization.IsAuthorizedToManage(
+        if (!await authorization.IsAuthorizedToManage(
                 claimsPrincipal,
                 input.PartComponentId,
                 input.AssembledComponentId,
-                userManager,
-                context,
                 cancellationToken
             ).ConfigureAwait(false)
            )

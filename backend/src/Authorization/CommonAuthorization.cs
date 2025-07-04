@@ -12,9 +12,20 @@ using UserRole = Metabase.Enumerations.UserRole;
 
 namespace Metabase.Authorization;
 
-public static class CommonAuthorization
+public abstract class CommonAuthorization(
+    ApplicationDbContext context,
+    UserManager<User> userManager
+    )
 {
-    public static bool IsSame(
+    protected ApplicationDbContext Context { get; } = context;
+    protected UserManager<User> UserManager { get; } = userManager;
+
+    internal Task<User?> GetUserAsync(ClaimsPrincipal claimsPrincipal)
+    {
+        return UserManager.GetUserAsync(claimsPrincipal);
+    }
+
+    protected bool IsSame(
         User user,
         Guid userId
     )
@@ -22,87 +33,76 @@ public static class CommonAuthorization
         return user.Id == userId;
     }
 
-    public static Task<bool> IsAdministrator(
-        User user,
-        UserManager<User> userManager
+    protected Task<bool> IsAdministrator(
+        User user
     )
     {
         return IsInRole(
             user,
-            UserRole.ADMINISTRATOR,
-            userManager
+            UserRole.ADMINISTRATOR
         );
     }
 
-    public static async Task<bool> IsAdministrator(
-        ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager
-    )
-    {
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
-        return user is not null
-               && await IsAdministrator(user, userManager).ConfigureAwait(false);
-    }
-
-    public static Task<bool> IsVerifier(
-        User user,
-        UserManager<User> userManager
+    protected Task<bool> IsVerifier(
+        User user
     )
     {
         return IsInRole(
             user,
-            UserRole.VERIFIER,
-            userManager
+            UserRole.VERIFIER
         );
     }
 
-    public static async Task<bool> IsOwner(
+    protected async Task<bool> IsOwner(
         User user,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         var roles = await FetchRoles(
                    user,
-                   context,
                    cancellationToken
                ).ConfigureAwait(false);
         return roles.Contains(InstitutionRepresentativeRole.OWNER);
     }
 
-    public static async Task<bool> IsAtLeastAssistant(
+    protected async Task<bool> IsAtLeastAssistant(
         User user,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         var roles = await FetchRoles(
                    user,
-                   context,
                    cancellationToken
                ).ConfigureAwait(false);
         return roles.Contains(InstitutionRepresentativeRole.OWNER) || roles.Contains(InstitutionRepresentativeRole.ASSISTANT);
     }
 
-    private static Task<bool> IsInRole(
+    internal Task<bool> IsInRole(
         User user,
-        UserRole role,
-        UserManager<User> userManager
+        UserRole role
     )
     {
-        return userManager.IsInRoleAsync(
+        return UserManager.IsInRoleAsync(
             user,
             Role.EnumToName(role)
         );
     }
 
-    public static Task<bool> IsVerified(
+    internal Task<IList<User>> GetUsersInRoleAsync(
+        UserRole role
+    )
+    {
+        return UserManager.GetUsersInRoleAsync(
+            Role.EnumToName(role)
+        );
+    }
+
+    protected Task<bool> IsVerified(
         Guid institutionId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        return context.Institutions.AsNoTracking()
+        return Context.Institutions.AsNoTracking()
             .AnyAsync(x =>
                     x.Id == institutionId &&
                     x.State == InstitutionState.VERIFIED,
@@ -110,53 +110,46 @@ public static class CommonAuthorization
             );
     }
 
-    public static async Task<bool> IsOwnerOfInstitution(
+    protected async Task<bool> IsOwnerOfInstitution(
         User user,
         Guid institutionId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         return await FetchRole(
                    user,
                    institutionId,
-                   context,
                    cancellationToken
                ).ConfigureAwait(false)
                == InstitutionRepresentativeRole.OWNER;
     }
 
-    public static async Task<bool> IsOwnerOfVerifiedInstitution(
+    protected async Task<bool> IsOwnerOfVerifiedInstitution(
         User user,
         Guid institutionId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         return await IsVerified(
                 institutionId,
-                context,
                 cancellationToken
             ).ConfigureAwait(false) &&
             await IsOwnerOfInstitution(
                 user,
                 institutionId,
-                context,
                 cancellationToken
             ).ConfigureAwait(false);
     }
 
-    public static async Task<bool> IsAtLeastAssistant(
+    protected async Task<bool> IsAtLeastAssistant(
         User user,
         Guid institutionId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         var role = await FetchRole(
                 user,
                 institutionId,
-                context,
                 cancellationToken
             ).ConfigureAwait(false);
         return
@@ -164,34 +157,30 @@ public static class CommonAuthorization
             or InstitutionRepresentativeRole.ASSISTANT;
     }
 
-    public static async Task<bool> IsAtLeastAssistantOfVerifiedInstitution(
+    protected async Task<bool> IsAtLeastAssistantOfVerifiedInstitution(
         User user,
         Guid institutionId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
         return await IsVerified(
                 institutionId,
-                context,
                 cancellationToken
             ).ConfigureAwait(false) &&
             await IsAtLeastAssistant(
                 user,
                 institutionId,
-                context,
                 cancellationToken
             ).ConfigureAwait(false);
     }
 
-    private static async Task<InstitutionRepresentativeRole?> FetchRole(
+    private async Task<InstitutionRepresentativeRole?> FetchRole(
         User user,
         Guid institutionId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var wrappedRole = await context.InstitutionRepresentatives.AsNoTracking()
+        var wrappedRole = await Context.InstitutionRepresentatives.AsNoTracking()
                 .Where(x =>
                     x.InstitutionId == institutionId &&
                     x.UserId == user.Id &&
@@ -209,10 +198,10 @@ public static class CommonAuthorization
         }
         // TODO Recursively fetch manager roles (currently we support only one level)
         var wrappedManagerRole =
-            await context.InstitutionRepresentatives.AsNoTracking()
+            await Context.InstitutionRepresentatives.AsNoTracking()
                 .Where(x => !x.Pending)
                 .Join(
-                    context.Institutions,
+                    Context.Institutions,
                     representative => representative.InstitutionId,
                     institution => institution.ManagerId,
                     (representative, institution) => new
@@ -231,13 +220,12 @@ public static class CommonAuthorization
         return wrappedManagerRole?.Role;
     }
 
-    private static async Task<IReadOnlyList<InstitutionRepresentativeRole>> FetchRoles(
+    private async Task<IReadOnlyList<InstitutionRepresentativeRole>> FetchRoles(
         User user,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        return (await context.InstitutionRepresentatives.AsNoTracking()
+        return (await Context.InstitutionRepresentatives.AsNoTracking()
                 .Where(x => x.UserId == user.Id && !x.Pending)
                 .Select(x => x.Role)
                 .ToListAsync(cancellationToken)
@@ -245,10 +233,9 @@ public static class CommonAuthorization
                 .AsReadOnly();
     }
 
-    public static Task<bool> IsVerifiedManufacturerOfComponents(
+    protected Task<bool> IsVerifiedManufacturerOfComponents(
         Guid institutionId,
         Guid[] componentIds,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
@@ -256,7 +243,7 @@ public static class CommonAuthorization
         {
             return Task.FromResult(true);
         }
-        return context.ComponentManufacturers.AsNoTracking()
+        return Context.ComponentManufacturers.AsNoTracking()
             .AnyAsync(x =>
                     x.InstitutionId == institutionId &&
                     componentIds.Contains(x.ComponentId) &&
@@ -265,14 +252,13 @@ public static class CommonAuthorization
             );
     }
 
-    public static Task<bool> IsVerifiedManufacturerOfComponent(
+    protected Task<bool> IsVerifiedManufacturerOfComponent(
         Guid institutionId,
         Guid componentId,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        return context.ComponentManufacturers.AsNoTracking()
+        return Context.ComponentManufacturers.AsNoTracking()
             .AnyAsync(x =>
                     x.InstitutionId == institutionId &&
                     x.ComponentId == componentId &&

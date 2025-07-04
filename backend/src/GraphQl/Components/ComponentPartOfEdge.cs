@@ -23,17 +23,14 @@ public sealed class ComponentPartOfEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserUpdateEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentAssemblyAuthorization.IsAuthorizedToManage(
+        return authorization.IsAuthorizedToManage(
             claimsPrincipal,
             _association.AssembledComponentId,
             _association.PartComponentId,
-            userManager,
-            context,
             cancellationToken
         );
     }
@@ -41,17 +38,14 @@ public sealed class ComponentPartOfEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return ComponentAssemblyAuthorization.IsAuthorizedToManage(
+        return authorization.IsAuthorizedToManage(
             claimsPrincipal,
             _association.AssembledComponentId,
             _association.PartComponentId,
-            userManager,
-            context,
             cancellationToken
         );
     }

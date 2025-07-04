@@ -19,16 +19,13 @@ public sealed class InstitutionMethodDeveloperEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return InstitutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(
+        return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
             _association.InstitutionId,
-            userManager,
-            context,
             cancellationToken
         );
     }
@@ -36,16 +33,13 @@ public sealed class InstitutionMethodDeveloperEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
-        ApplicationDbContext context,
+        InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
-        return InstitutionMethodDeveloperAuthorization.IsAuthorizedToRemove(
+        return authorization.IsAuthorizedToRemove(
             claimsPrincipal,
             _association.MethodId,
-            userManager,
-            context,
             cancellationToken
         );
     }

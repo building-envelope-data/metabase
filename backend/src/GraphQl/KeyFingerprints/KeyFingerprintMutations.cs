@@ -23,15 +23,13 @@ public sealed class KeyFingerprintMutations
     public async Task<AddKeyFingerprintPayload> AddKeyFingerprintAsync(
         KeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager,
+        InstitutionRepresentativeAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await InstitutionRepresentativeAuthorization.IsAuthorizedToAddKeyFingerprint(
+        if (!await authorization.IsAuthorizedToAddKeyFingerprint(
                 claimsPrincipal,
-                context,
-                userManager,
                 cancellationToken
             ).ConfigureAwait(false)
            )
