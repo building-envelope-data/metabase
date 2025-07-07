@@ -131,7 +131,7 @@ public sealed class InstitutionMutations
                 {
                     UserId = ownerId,
                     Role = InstitutionRepresentativeRole.OWNER,
-                    Pending = !await representativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId).ConfigureAwait(false)
+                    Pending = !await representativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId, cancellationToken).ConfigureAwait(false)
                 }
             );
         }
@@ -187,7 +187,7 @@ public sealed class InstitutionMutations
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal).ConfigureAwait(false)
+        if (!await authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal, cancellationToken).ConfigureAwait(false)
            )
         {
             return new VerifyInstitutionPayload(

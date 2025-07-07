@@ -1,28 +1,34 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Core;
+using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Authorization;
 
 public sealed class ApprovalAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonAuthorization(context, userManager, applicationManager)
 {
-    internal async Task<bool> IsAuthorizedToAddApprovals(
+    internal Task<bool> IsAuthorizedToAddApprovals(
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && (await Context.InstitutionRepresentatives.AsQueryable()
+        return AuthorizeAsync(
+            claimsPrincipal,
+            async user => (await Context.InstitutionRepresentatives.AsQueryable()
                     .SingleOrDefaultAsync(
                         x => x.UserId == user.Id && x.DataSigningPermission == Enumerations.DataSigningPermission.ALLOWED,
                         cancellationToken
-                    ).ConfigureAwait(false)) is not null;
+                    ).ConfigureAwait(false)) is not null,
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 }

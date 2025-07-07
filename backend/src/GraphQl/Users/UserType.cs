@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ public sealed class UserType
         }
 
         var user = context.Parent<User>();
-        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted).ConfigureAwait(false))
         {
             return null;
         }
@@ -69,7 +70,7 @@ public sealed class UserType
         }
 
         var user = context.Parent<User>();
-        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted).ConfigureAwait(false))
         {
             return null;
         }
@@ -94,7 +95,7 @@ public sealed class UserType
         }
 
         var user = context.Parent<User>();
-        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted).ConfigureAwait(false))
         {
             return null;
         }
@@ -119,7 +120,7 @@ public sealed class UserType
         }
 
         var user = context.Parent<User>();
-        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted).ConfigureAwait(false))
         {
             return null;
         }
@@ -188,7 +189,7 @@ public sealed class UserType
         descriptor
             .Field("twoFactorAuthentication")
             .ResolveWith<UserResolvers>(t =>
-                UserResolvers.GetTwoFactorAuthenticationAsync(default!, default!, default!, default!, default!))
+                UserResolvers.GetTwoFactorAuthenticationAsync(default!, default!, default!, default!, default!, default!))
             .UseUserManager()
             .UseSignInManager();
         descriptor
@@ -224,7 +225,7 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field("canCurrentUserDeleteUser")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserDeleteUserAsync(default!, default!))
+            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserDeleteUserAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserViewOpenIdConnectApplications")
@@ -270,7 +271,8 @@ public sealed class UserType
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ClaimsPrincipal claimsPrincipal,
-            UserAuthorization authorization
+            UserAuthorization authorization,
+            CancellationToken cancellationToken
         )
         {
             if (!claimsPrincipal.HasScope(AuthConfiguration.ManageUserApiScope))
@@ -278,7 +280,7 @@ public sealed class UserType
                 return null;
             }
 
-            if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id).ConfigureAwait(false))
+            if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, cancellationToken).ConfigureAwait(false))
             {
                 return null;
             }
@@ -321,10 +323,11 @@ public sealed class UserType
 
         public static Task<bool> GetCanCurrentUserDeleteUserAsync(
             ClaimsPrincipal claimsPrincipal,
-            UserAuthorization authorization
+            UserAuthorization authorization,
+            CancellationToken cancellationToken
         )
         {
-            return authorization.IsAuthorizedToDeleteUsers(claimsPrincipal);
+            return authorization.IsAuthorizedToDeleteUsers(claimsPrincipal, cancellationToken);
         }
 
         public static async Task<IList<UserRole>> GetRolesCurrentUserCanAddAsync(
@@ -333,7 +336,7 @@ public sealed class UserType
             CancellationToken cancellationToken
         )
         {
-            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization)
+            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization, cancellationToken)
                 .ToListAsync(cancellationToken);
         }
 
@@ -343,18 +346,19 @@ public sealed class UserType
             CancellationToken cancellationToken
         )
         {
-            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization)
+            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization, cancellationToken)
                 .ToListAsync(cancellationToken);
         }
 
         private static async IAsyncEnumerable<UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
             ClaimsPrincipal claimsPrincipal,
-            UserAuthorization authorization
+            UserAuthorization authorization,
+            [EnumeratorCancellation] CancellationToken cancellationToken
         )
         {
             foreach (var role in Role.AllEnum)
             {
-                if (await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, role).ConfigureAwait(false))
+                if (await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, role, cancellationToken).ConfigureAwait(false))
                 {
                     yield return role;
                 }

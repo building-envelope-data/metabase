@@ -102,7 +102,7 @@ public sealed class UserMethodDeveloperMutations
         {
             MethodId = input.MethodId,
             UserId = input.UserId,
-            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId, cancellationToken).ConfigureAwait(false)
         };
         context.UserMethodDevelopers.Add(userMethodDeveloper);
         await context.SaveChangesAsync(cancellationToken);
@@ -121,7 +121,8 @@ public sealed class UserMethodDeveloperMutations
     {
         if (!await authorization.IsAuthorizedToConfirm(
                 claimsPrincipal,
-                input.UserId
+                input.UserId,
+                cancellationToken
             ).ConfigureAwait(false)
            )
         {

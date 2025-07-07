@@ -5,43 +5,52 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Core;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Authorization;
 
 public sealed class DataFormatAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonAuthorization(context, userManager, applicationManager)
 {
-    internal async Task<bool> IsAuthorizedToCreateDataFormatForInstitution(
+    internal Task<bool> IsAuthorizedToCreateDataFormatForInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsAtLeastAssistantOfVerifiedInstitution(
-                   user,
-                   institutionId,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
+                user,
+                institutionId,
+                cancellationToken
+            ),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToUpdate(
+    internal Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid dataFormatId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null &&
-               await IsAtLeastAssistantOfVerifiedDataFormatManager(
-                   user,
-                   dataFormatId,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedDataFormatManager(
+                user,
+                dataFormatId,
+                cancellationToken
+            ),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
     private async Task<bool> IsAtLeastAssistantOfVerifiedDataFormatManager(
@@ -50,16 +59,18 @@ public sealed class DataFormatAuthorization(
         CancellationToken cancellationToken
     )
     {
-        var wrappedManagerId =
+        var managerId = await QueryManagerId(dataFormatId, cancellationToken);
+        return managerId is not null
+            && await IsAtLeastAssistantOfVerifiedInstitution(user, managerId ?? Guid.Empty, cancellationToken);
+    }
+
+    private async Task<Guid?> QueryManagerId(Guid dataFormatId, CancellationToken cancellationToken)
+    {
+        return (
             await Context.DataFormats.AsNoTracking()
                 .Where(x => x.Id == dataFormatId)
                 .Select(x => new { x.ManagerId })
-                .SingleOrDefaultAsync(cancellationToken);
-        if (wrappedManagerId is null)
-        {
-            return false;
-        }
-
-        return await IsAtLeastAssistantOfVerifiedInstitution(user, wrappedManagerId.ManagerId, cancellationToken);
+                .SingleOrDefaultAsync(cancellationToken)
+        )?.ManagerId;
     }
 }

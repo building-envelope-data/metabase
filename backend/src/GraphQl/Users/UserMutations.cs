@@ -738,11 +738,12 @@ public sealed class UserMutations
         UserAuthorization authorization,
         UserManager<User> userManager,
         IAntiforgery antiforgeryService,
-        IHttpContextAccessor httpContextAccessor
+        IHttpContextAccessor httpContextAccessor,
+        CancellationToken cancellationToken
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
-        if (!await authorization.IsAuthorizedToDeleteUsers(claimsPrincipal).ConfigureAwait(false)
+        if (!await authorization.IsAuthorizedToDeleteUsers(claimsPrincipal, cancellationToken).ConfigureAwait(false)
            )
         {
             return new DeleteUserPayload(
@@ -756,7 +757,8 @@ public sealed class UserMutations
 
         var user =
             await userManager.Users.SingleOrDefaultAsync(_ =>
-                _.Id == input.UserId
+                _.Id == input.UserId,
+                cancellationToken
             );
         if (user is null)
         {
@@ -1714,7 +1716,7 @@ public sealed class UserMutations
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
-        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role)
+        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, cancellationToken)
                 .ConfigureAwait(false))
         {
             return new AddUserRolePayload(
@@ -1782,7 +1784,7 @@ public sealed class UserMutations
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
-        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role)
+        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, cancellationToken)
                 .ConfigureAwait(false))
         {
             return new RemoveUserRolePayload(

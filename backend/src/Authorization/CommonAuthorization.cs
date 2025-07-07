@@ -4,7 +4,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using OpenIddict.Abstractions;
+using OpenIddict.Core;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +18,30 @@ namespace Metabase.Authorization;
 
 public abstract class CommonAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
     )
 {
     protected ApplicationDbContext Context { get; } = context;
     protected UserManager<User> UserManager { get; } = userManager;
+    protected OpenIddictApplicationManager<OpenIdConnectApplication> ApplicationManager { get; } = applicationManager;
+
+    protected async Task<bool> AuthorizeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        Func<User, Task<bool>> authorizeUser,
+        Func<OpenIdConnectApplication, Task<bool>> authorizeApplication,
+        CancellationToken cancellationToken
+    )
+    {
+        var userOrApplicationId = claimsPrincipal.GetClaim(Claims.Subject);
+        var user = await GetUserAsync(claimsPrincipal);
+        // var application = await ApplicationManager.FindByApplicationIdAsync(userOrApplicationId, cancellationToken);
+        // application is not null && await authorizeApplication(application);
+        return user is not null && (
+            await IsAdministrator(user)
+            || await authorizeUser(user)
+        );
+    }
 
     internal Task<User?> GetUserAsync(ClaimsPrincipal claimsPrincipal)
     {

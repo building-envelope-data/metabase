@@ -156,7 +156,7 @@ public sealed class MethodMutations
                 new UserMethodDeveloper
                 {
                     UserId = userDeveloperId,
-                    Pending = !await userMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, userDeveloperId).ConfigureAwait(false)
+                    Pending = !await userMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, userDeveloperId, cancellationToken).ConfigureAwait(false)
                 }
             );
         }

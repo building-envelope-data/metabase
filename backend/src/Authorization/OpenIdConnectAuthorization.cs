@@ -13,68 +13,88 @@ namespace Metabase.Authorization;
 
 public sealed class OpenIdConnectAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonAuthorization(context, userManager, applicationManager)
 {
-    internal async Task<bool> IsAuthorizedToViewApplications(
+    internal Task<bool> IsAuthorizedToViewApplications(
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && (await IsAdministrator(user).ConfigureAwait(false)
-               || await IsOwner(user, cancellationToken).ConfigureAwait(false));
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsOwner(user, cancellationToken),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToManageApplications(
+    internal Task<bool> IsAuthorizedToManageApplications(
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken)
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && (await IsAdministrator(user).ConfigureAwait(false)
-               || await IsOwner(user, cancellationToken).ConfigureAwait(false));
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsOwner(user, cancellationToken),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToManageApplication(
+    internal Task<bool> IsAuthorizedToManageApplication(
         ClaimsPrincipal claimsPrincipal,
         Guid applicationId,
         CancellationToken cancellationToken)
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        var institutionId = await GetInstitutionIdByApplicationId(applicationId, cancellationToken);
-        return user is not null
-               && (await IsAdministrator(user).ConfigureAwait(false)
-               || institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false));
+        return AuthorizeAsync(
+            claimsPrincipal,
+            async user =>
+            {
+                var institutionId = await GetInstitutionIdByApplicationId(applicationId, cancellationToken);
+                return institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false);
+            },
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToDeleteAuthorization(
+    internal Task<bool> IsAuthorizedToDeleteAuthorization(
         ClaimsPrincipal claimsPrincipal,
         Guid authorizationId,
         OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
         CancellationToken cancellationToken)
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken);
-        Guid? institutionId = authorization is not null && authorization.Application is not null ? await GetInstitutionIdByApplicationId(authorization.Application.Id, cancellationToken).ConfigureAwait(false) : null;
-        return user is not null
-               && (await IsAdministrator(user).ConfigureAwait(false)
-               || institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false));
+        return AuthorizeAsync(
+            claimsPrincipal,
+            async user =>
+            {
+                var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken);
+                var institutionId = authorization is not null && authorization.Application is not null ? await GetInstitutionIdByApplicationId(authorization.Application.Id, cancellationToken).ConfigureAwait(false) : null;
+                return institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false);
+            },
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToRevokeToken(
+    internal Task<bool> IsAuthorizedToRevokeToken(
         ClaimsPrincipal claimsPrincipal,
         Guid tokenId,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         CancellationToken cancellationToken)
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken);
-        Guid? institutionId = token is not null && token.Application is not null ? await GetInstitutionIdByApplicationId(token.Application.Id, cancellationToken).ConfigureAwait(false) : null;
-        return user is not null
-               && (await IsAdministrator(user).ConfigureAwait(false)
-               || institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false));
+        return AuthorizeAsync(
+            claimsPrincipal,
+            async user =>
+            {
+                var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken);
+                var institutionId = token is not null && token.Application is not null ? await GetInstitutionIdByApplicationId(token.Application.Id, cancellationToken).ConfigureAwait(false) : null;
+                return institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false);
+            },
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
     private async Task<Guid?> GetInstitutionIdByApplicationId(Guid applicationId, CancellationToken cancellationToken)

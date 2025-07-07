@@ -3,60 +3,69 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using OpenIddict.Core;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Authorization;
 
 public sealed class ComponentManufacturerAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonComponentAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonComponentAuthorization(context, userManager, applicationManager)
 {
-    internal async Task<bool> IsAuthorizedToAdd(
+    internal Task<bool> IsAuthorizedToAdd(
         ClaimsPrincipal claimsPrincipal,
         Guid componentId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               &&
-               await IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-                   user,
-                   componentId,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
+                user,
+                componentId,
+                cancellationToken
+            ),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToConfirm(
+    internal Task<bool> IsAuthorizedToConfirm(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               &&
-               await IsAtLeastAssistantOfVerifiedInstitution(
-                   user,
-                   institutionId,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
+                user,
+                institutionId,
+                cancellationToken
+            ),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToRemove(
+    internal Task<bool> IsAuthorizedToRemove(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               &&
-               await IsAtLeastAssistantOfVerifiedInstitution(
-                   user,
-                   institutionId,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
+                user,
+                institutionId,
+                cancellationToken
+            ),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 }

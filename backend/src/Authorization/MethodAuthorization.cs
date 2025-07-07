@@ -3,42 +3,51 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using OpenIddict.Core;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Authorization;
 
 public sealed class MethodAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonMethodAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonMethodAuthorization(context, userManager, applicationManager)
 {
-    internal async Task<bool> IsAuthorizedToCreateMethodManagedByInstitution(
+    internal Task<bool> IsAuthorizedToCreateMethodManagedByInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsAtLeastAssistantOfVerifiedInstitution(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
                    user,
                    institutionId,
                    cancellationToken
-               );
+               ),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToUpdate(
+    internal Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid methodId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null &&
-               await IsAtLeastAssistantOfVerifiedMethodManager(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedMethodManager(
                    user,
                    methodId,
                    cancellationToken
-               );
+               ),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 }

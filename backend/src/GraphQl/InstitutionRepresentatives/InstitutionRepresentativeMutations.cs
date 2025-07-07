@@ -107,7 +107,7 @@ public sealed class InstitutionRepresentativeMutations
             InstitutionId = input.InstitutionId,
             UserId = input.UserId,
             Role = input.Role,
-            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId, cancellationToken).ConfigureAwait(false)
         };
         context.InstitutionRepresentatives.Add(institutionRepresentative);
         await context.SaveChangesAsync(cancellationToken);
@@ -333,7 +333,8 @@ public sealed class InstitutionRepresentativeMutations
     {
         if (!await authorization.IsAuthorizedToConfirm(
                 claimsPrincipal,
-                input.UserId
+                input.UserId,
+                cancellationToken
             ).ConfigureAwait(false)
            )
         {
