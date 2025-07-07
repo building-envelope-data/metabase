@@ -41,7 +41,7 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
-        var institution = await institutionById.LoadAsync(input.AssociatedInstitutionId, cancellationToken).ConfigureAwait(false);
+        var institution = await institutionById.LoadAsync(input.AssociatedInstitutionId, cancellationToken);
         if (institution is null)
         {
             return new CreateOpenIdConnectApplicationPayload(
@@ -106,13 +106,13 @@ public sealed class OpenIdConnectApplicationMutations
         {
             descriptor.Permissions.Add(scope.ToStringScope());
         }
-        var application = await applicationManager.CreateAsync(descriptor, cancellationToken).ConfigureAwait(false);
+        var application = await applicationManager.CreateAsync(descriptor, cancellationToken);
         context.InstitutionOpenIdConnectApplications.Add(new InstitutionOpenIdConnectApplication
         {
             ApplicationId = application.Id,
             InstitutionId = institution.Id
         });
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new CreateOpenIdConnectApplicationPayload(application, clientSecret);
     }
 
@@ -141,7 +141,7 @@ public sealed class OpenIdConnectApplicationMutations
             );
         }
 
-        var application = await applicationManager.FindByIdAsync(input.ApplicationId.ToString(), cancellationToken).ConfigureAwait(false);
+        var application = await applicationManager.FindByIdAsync(input.ApplicationId.ToString(), cancellationToken);
 
         if (application is null)
         {
@@ -155,9 +155,9 @@ public sealed class OpenIdConnectApplicationMutations
         }
 
         var descriptor = new OpenIddictApplicationDescriptor();
-        await applicationManager.PopulateAsync(descriptor, application, cancellationToken).ConfigureAwait(false);
+        await applicationManager.PopulateAsync(descriptor, application, cancellationToken);
         UpdateOpenIdConnectApplicationDescriptor(input, descriptor);
-        await applicationManager.UpdateAsync(application, descriptor, cancellationToken).ConfigureAwait(false);
+        await applicationManager.UpdateAsync(application, descriptor, cancellationToken);
 
         return new UpdateOpenIdConnectApplicationPayload(application);
     }
@@ -187,7 +187,7 @@ public sealed class OpenIdConnectApplicationMutations
             );
         }
 
-        var application = await applicationManager.FindByIdAsync(input.ApplicationId.ToString(), cancellationToken).ConfigureAwait(false);
+        var application = await applicationManager.FindByIdAsync(input.ApplicationId.ToString(), cancellationToken);
 
         if (application is null)
         {
@@ -200,7 +200,7 @@ public sealed class OpenIdConnectApplicationMutations
             );
         }
 
-        await applicationManager.DeleteAsync(application, cancellationToken).ConfigureAwait(false);
+        await applicationManager.DeleteAsync(application, cancellationToken);
 
         return new DeleteOpenIdConnectApplicationPayload();
     }

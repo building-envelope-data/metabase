@@ -24,7 +24,7 @@ public static class HttpContextAuthentication
         // `AuthorizationController#Authorize`,
         // `AuthorizationController#Accept` `AuthorizationController#Deny`.
         var identityAuthenticateResult = await httpContext
-            .AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme).ConfigureAwait(false);
+            .AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme);
         if (identityAuthenticateResult.Succeeded && identityAuthenticateResult.Principal is not null)
         {
             httpContext.User = identityAuthenticateResult.Principal;
@@ -39,7 +39,7 @@ public static class HttpContextAuthentication
         // `OpenIddictBuilder#AddClient` in
         // `AuthConfiguration#ConfigureOpenIddictServices`.
         var cookieAuthenticateResult = await httpContext
-            .AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
+            .AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         if (cookieAuthenticateResult.Succeeded && cookieAuthenticateResult.Principal is not null)
         {
             httpContext.User = cookieAuthenticateResult.Principal;
@@ -55,7 +55,7 @@ public static class HttpContextAuthentication
         // `AuthConfiguration#ConfigureOpenIddictServices` by
         // `OpenIddictBuilder#AddValidation`.
         var jwtAuthenticateResult = await httpContext
-            .AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme).ConfigureAwait(false);
+            .AuthenticateAsync(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
         if (jwtAuthenticateResult.Succeeded && jwtAuthenticateResult.Principal is not null)
         {
             httpContext.User = jwtAuthenticateResult.Principal;

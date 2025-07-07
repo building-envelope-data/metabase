@@ -22,7 +22,7 @@ public sealed class UserQueries
         UserManager<User> userManager
     )
     {
-        return await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        return await userManager.GetUserAsync(claimsPrincipal);
     }
 
     [UsePaging]

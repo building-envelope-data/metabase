@@ -94,7 +94,7 @@ public sealed class DataFormatMutations
                     : PublicationType.FromInput(input.Reference.Publication)
         };
         context.DataFormats.Add(dataFormat);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new CreateDataFormatPayload(dataFormat);
     }
 
@@ -140,8 +140,7 @@ public sealed class DataFormatMutations
         var dataFormat =
             await context.DataFormats.AsQueryable()
                 .Where(i => i.Id == input.DataFormatId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (dataFormat is null)
         {
             return new UpdateDataFormatPayload(
@@ -168,7 +167,7 @@ public sealed class DataFormatMutations
             input.Reference?.Publication is null
                 ? null
                 : PublicationType.FromInput(input.Reference.Publication);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new UpdateDataFormatPayload(dataFormat);
     }
 }

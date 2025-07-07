@@ -105,7 +105,7 @@ public sealed class UserMethodDeveloperMutations
             Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId).ConfigureAwait(false)
         };
         context.UserMethodDevelopers.Add(userMethodDeveloper);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new AddUserMethodDeveloperPayload(userMethodDeveloper);
     }
 
@@ -176,8 +176,7 @@ public sealed class UserMethodDeveloperMutations
                     r.MethodId == input.MethodId
                     && r.UserId == input.UserId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (userMethodDeveloper is null)
         {
             return new ConfirmUserMethodDeveloperPayload(
@@ -190,7 +189,7 @@ public sealed class UserMethodDeveloperMutations
         }
 
         userMethodDeveloper.Pending = false;
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new ConfirmUserMethodDeveloperPayload(userMethodDeveloper);
     }
 
@@ -262,8 +261,7 @@ public sealed class UserMethodDeveloperMutations
                     r.MethodId == input.MethodId
                     && r.UserId == input.UserId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (userMethodDeveloper is null)
         {
             return new RemoveUserMethodDeveloperPayload(
@@ -276,7 +274,7 @@ public sealed class UserMethodDeveloperMutations
         }
 
         context.UserMethodDevelopers.Remove(userMethodDeveloper);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new RemoveUserMethodDeveloperPayload(userMethodDeveloper);
     }
 }

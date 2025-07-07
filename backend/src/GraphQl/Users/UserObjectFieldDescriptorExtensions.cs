@@ -48,7 +48,7 @@ public static class UserObjectFieldDescriptorExtensions
             try
             {
                 context.SetLocalState(userManagerServiceName, userManager);
-                await next(context).ConfigureAwait(false);
+                await next(context);
             }
             finally
             {
@@ -81,7 +81,7 @@ public static class UserObjectFieldDescriptorExtensions
             try
             {
                 context.SetLocalState(signInManagerServiceName, signInManager);
-                await next(context).ConfigureAwait(false);
+                await next(context);
             }
             finally
             {

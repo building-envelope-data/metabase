@@ -99,7 +99,7 @@ public sealed class UserType
             return null;
         }
 
-        return await getValue(user, authorization).ConfigureAwait(false);
+        return await getValue(user, authorization);
     }
 
     private static async Task<T?> AuthorizeAsync<T>(
@@ -124,7 +124,7 @@ public sealed class UserType
             return null;
         }
 
-        return await getValue(user, authorization).ConfigureAwait(false);
+        return await getValue(user, authorization);
     }
 
     protected override void Configure(
@@ -334,8 +334,7 @@ public sealed class UserType
         )
         {
             return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .ToListAsync(cancellationToken);
         }
 
         public static async Task<IList<UserRole>> GetRolesCurrentUserCanRemoveAsync(
@@ -345,8 +344,7 @@ public sealed class UserType
         )
         {
             return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .ToListAsync(cancellationToken);
         }
 
         private static async IAsyncEnumerable<UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(

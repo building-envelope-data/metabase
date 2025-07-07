@@ -162,7 +162,7 @@ public sealed class MethodMutations
         }
 
         context.Methods.Add(method);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new CreateMethodPayload(method);
     }
 
@@ -208,8 +208,7 @@ public sealed class MethodMutations
         var method =
             await context.Methods.AsQueryable()
                 .Where(i => i.Id == input.MethodId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (method is null)
         {
             return new UpdateMethodPayload(
@@ -241,7 +240,7 @@ public sealed class MethodMutations
             input.Reference?.Publication is null
                 ? null
                 : PublicationType.FromInput(input.Reference.Publication);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new UpdateMethodPayload(method);
     }
 }

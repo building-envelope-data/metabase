@@ -51,6 +51,6 @@ public sealed class OpenIdConnectApplicationQueries
         {
             return null;
         }
-        return await applicationManager.FindByIdAsync(applicationId.ToString(), cancellationToken: cancellationToken).ConfigureAwait(false);
+        return await applicationManager.FindByIdAsync(applicationId.ToString(), cancellationToken: cancellationToken);
     }
 }

@@ -100,7 +100,7 @@ public sealed class QueryingDatabases
         var cookieBearerToken = await httpContextAccessor.HttpContext.GetTokenAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             OpenIddictClientAspNetCoreConstants.Tokens.BackchannelAccessToken
-        ).ConfigureAwait(false);
+        );
         if (cookieBearerToken is not null)
         {
             return cookieBearerToken;
@@ -159,7 +159,7 @@ public sealed class QueryingDatabases
             // add a named client to the factory and set the bearer token there as
             // detailed in
             // https://stackoverflow.com/questions/51358870/configure-httpclientfactory-to-use-data-from-the-current-request-context/51460160#51460160
-            var bearerToken = await ExtractBearerToken(httpContextAccessor).ConfigureAwait(false);
+            var bearerToken = await ExtractBearerToken(httpContextAccessor);
             if (bearerToken is not null)
             {
                 httpClient.SetBearerToken(bearerToken);
@@ -173,7 +173,7 @@ public sealed class QueryingDatabases
                 database.Locator,
                 jsonHttpContent,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
         if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
         {
             throw new HttpRequestException(
@@ -184,8 +184,7 @@ public sealed class QueryingDatabases
         // We could use `httpResponseMessage.Content.ReadFromJsonAsync<GraphQL.GraphQLResponse<TGraphQlResponse>>` which would make debugging more difficult though, https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-5.0#System_Net_Http_Json_HttpContentJsonExtensions_ReadFromJsonAsync__1_System_Net_Http_HttpContent_System_Text_Json_JsonSerializerOptions_System_Threading_CancellationToken_
         using var graphQlResponseStream =
             await httpResponseMessage.Content
-                .ReadAsStreamAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .ReadAsStreamAsync(cancellationToken);
         // For debugging, the following lines of code write the response to standard output.
         // Console.WriteLine(new StreamReader(graphQlResponseStream).ReadToEnd());
         var deserializedGraphQlResponse =

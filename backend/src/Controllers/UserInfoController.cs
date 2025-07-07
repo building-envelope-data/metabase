@@ -59,7 +59,7 @@ public sealed class UserInfoController(UserManager<User> userManager) : Controll
                 }));
         }
 
-        var user = await _userManager.FindByIdAsync(subject).ConfigureAwait(false);
+        var user = await _userManager.FindByIdAsync(subject);
         if (user is null)
         {
             return Challenge(
@@ -92,25 +92,25 @@ public sealed class UserInfoController(UserManager<User> userManager) : Controll
 
         if (User.HasScope(Scopes.Email))
         {
-            var email = await _userManager.GetEmailAsync(user).ConfigureAwait(false);
+            var email = await _userManager.GetEmailAsync(user);
             if (email is not null)
             {
                 claims[Claims.Email] = email;
             }
 
-            claims[Claims.EmailVerified] = await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false);
+            claims[Claims.EmailVerified] = await _userManager.IsEmailConfirmedAsync(user);
         }
 
         if (User.HasScope(Scopes.Phone))
         {
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user).ConfigureAwait(false);
+            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (phoneNumber is not null)
             {
                 claims[Claims.PhoneNumber] = phoneNumber;
             }
 
             claims[Claims.PhoneNumberVerified] =
-                await _userManager.IsPhoneNumberConfirmedAsync(user).ConfigureAwait(false);
+                await _userManager.IsPhoneNumberConfirmedAsync(user);
         }
 
         if (User.HasScope(Scopes.Profile))
@@ -126,7 +126,7 @@ public sealed class UserInfoController(UserManager<User> userManager) : Controll
 
         if (User.HasScope(Scopes.Roles))
         {
-            claims[Claims.Role] = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
+            claims[Claims.Role] = await _userManager.GetRolesAsync(user);
         }
 
         // Note: the complete list of standard claims supported by the OpenID Connect specification

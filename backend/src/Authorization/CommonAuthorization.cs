@@ -61,7 +61,7 @@ public abstract class CommonAuthorization(
         var roles = await FetchRoles(
                    user,
                    cancellationToken
-               ).ConfigureAwait(false);
+               );
         return roles.Contains(InstitutionRepresentativeRole.OWNER);
     }
 
@@ -73,7 +73,7 @@ public abstract class CommonAuthorization(
         var roles = await FetchRoles(
                    user,
                    cancellationToken
-               ).ConfigureAwait(false);
+               );
         return roles.Contains(InstitutionRepresentativeRole.OWNER) || roles.Contains(InstitutionRepresentativeRole.ASSISTANT);
     }
 
@@ -138,7 +138,7 @@ public abstract class CommonAuthorization(
                 user,
                 institutionId,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
     }
 
     protected async Task<bool> IsAtLeastAssistant(
@@ -151,7 +151,7 @@ public abstract class CommonAuthorization(
                 user,
                 institutionId,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
         return
             role is InstitutionRepresentativeRole.OWNER
             or InstitutionRepresentativeRole.ASSISTANT;
@@ -171,7 +171,7 @@ public abstract class CommonAuthorization(
                 user,
                 institutionId,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
     }
 
     private async Task<InstitutionRepresentativeRole?> FetchRole(
@@ -190,8 +190,7 @@ public abstract class CommonAuthorization(
                 {
                     x.Role
                 }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (wrappedRole is not null)
         {
             return wrappedRole.Role;
@@ -215,8 +214,7 @@ public abstract class CommonAuthorization(
                 {
                     x.Representative.Role
                 }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         return wrappedManagerRole?.Role;
     }
 

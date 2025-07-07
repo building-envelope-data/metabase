@@ -25,7 +25,7 @@ public sealed class AntiforgeryController(IAntiforgery antiforgeryService) : Con
     [HttpGet("~/antiforgery/token")]
     public async Task<IActionResult> Token()
     {
-        await HttpContextAuthentication.Authenticate(HttpContext).ConfigureAwait(false);
+        await HttpContextAuthentication.Authenticate(HttpContext);
         var tokens = _antiforgeryService.GetAndStoreTokens(HttpContext);
         HttpContext.Response.Cookies.Append(
             XsrfCookieKey,

@@ -56,6 +56,6 @@ public sealed class OpenIdConnectTokenQueries
             return null;
         }
 
-        return await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken: cancellationToken).ConfigureAwait(false);
+        return await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken: cancellationToken);
     }
 }

@@ -56,10 +56,10 @@ public sealed class Program
             using (var scope = application.Services.CreateScope())
             {
                 // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
-                await CreateAndSeedDb(scope.ServiceProvider).ConfigureAwait(false);
+                await CreateAndSeedDb(scope.ServiceProvider);
             }
 
-            await application.RunAsync().ConfigureAwait(false);
+            await application.RunAsync();
             return 0;
         }
         catch (Exception exception) when (exception is not HostAbortedException && exception.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
@@ -116,7 +116,7 @@ public sealed class Program
                 services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
                     .CreateDbContext();
             dbContext.Database.EnsureCreated();
-            await DbSeeder.DoAsync(services).ConfigureAwait(false);
+            await DbSeeder.DoAsync(services);
         }
         catch (Exception exception)
         {

@@ -105,7 +105,7 @@ public sealed class InstitutionMethodDeveloperMutations
             Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, cancellationToken).ConfigureAwait(false)
         };
         context.InstitutionMethodDevelopers.Add(institutionMethodDeveloper);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new AddInstitutionMethodDeveloperPayload(institutionMethodDeveloper);
     }
 
@@ -177,8 +177,7 @@ public sealed class InstitutionMethodDeveloperMutations
                     r.MethodId == input.MethodId
                     && r.InstitutionId == input.InstitutionId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (institutionMethodDeveloper is null)
         {
             return new ConfirmInstitutionMethodDeveloperPayload(
@@ -191,7 +190,7 @@ public sealed class InstitutionMethodDeveloperMutations
         }
 
         institutionMethodDeveloper.Pending = false;
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new ConfirmInstitutionMethodDeveloperPayload(institutionMethodDeveloper);
     }
 
@@ -263,8 +262,7 @@ public sealed class InstitutionMethodDeveloperMutations
                     r.MethodId == input.MethodId
                     && r.InstitutionId == input.InstitutionId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (institutionMethodDeveloper is null)
         {
             return new RemoveInstitutionMethodDeveloperPayload(
@@ -277,7 +275,7 @@ public sealed class InstitutionMethodDeveloperMutations
         }
 
         context.InstitutionMethodDevelopers.Remove(institutionMethodDeveloper);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new RemoveInstitutionMethodDeveloperPayload(institutionMethodDeveloper);
     }
 }

@@ -40,7 +40,7 @@ public sealed class UserMutations
         {
             var httpContext = httpContextAccessor.HttpContext ?? throw new AntiforgeryValidationException(
                     "Cannot access the HTTP context to validate the antiforgery token.");
-            await antiforgeryService.ValidateRequestAsync(httpContext).ConfigureAwait(false);
+            await antiforgeryService.ValidateRequestAsync(httpContext);
         }
         catch (AntiforgeryValidationException exception)
         {
@@ -69,8 +69,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.FindByEmailAsync(input.Email);
         if (user is null)
         {
             return new ConfirmUserEmailPayload(
@@ -97,7 +97,7 @@ public sealed class UserMutations
                 )
             );
         }
-        var identityResult = await userManager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
+        var identityResult = await userManager.ConfirmEmailAsync(user, confirmationToken);
         if (!identityResult.Succeeded)
         {
             var errors = new List<ConfirmUserEmailError>();
@@ -140,9 +140,9 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
         // TODO This public endpoint can be used to test whether there is a user for the given email address. Is this a problem? In other endpoints like `ResetUserPasswordAsync` do not do that on purpose. Why exactly?
-        var user = await userManager.FindByEmailAsync(input.CurrentEmail).ConfigureAwait(false);
+        var user = await userManager.FindByEmailAsync(input.CurrentEmail);
         if (user is null)
         {
             return new ConfirmUserEmailChangePayload(
@@ -174,11 +174,11 @@ public sealed class UserMutations
                 user,
                 input.NewEmail,
                 confirmationToken
-            ).ConfigureAwait(false);
+            );
         // For us email and user name are one and the same, so when we
         // update the email we need to update the user name.
         var setUserNameIdentityResult =
-            await userManager.SetUserNameAsync(user, input.NewEmail).ConfigureAwait(false);
+            await userManager.SetUserNameAsync(user, input.NewEmail);
         if (!(changeEmailIdentityResult.Succeeded && setUserNameIdentityResult.Succeeded))
         {
             var errors = new List<ConfirmUserEmailChangeError>();
@@ -233,7 +233,7 @@ public sealed class UserMutations
             return new ConfirmUserEmailChangePayload(errors);
         }
 
-        await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
+        await signInManager.RefreshSignInAsync(user);
         return new ConfirmUserEmailChangePayload(user);
     }
 
@@ -248,13 +248,13 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
         var signInResult = await signInManager.PasswordSignInAsync(
             input.Email,
             input.Password,
             false,
             true
-        ).ConfigureAwait(false);
+        );
         // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.signinresult?view=aspnetcore-5.0
         if (signInResult.IsLockedOut)
         {
@@ -290,7 +290,7 @@ public sealed class UserMutations
         }
 
         // TODO Only load the user if requested in the GraphQl query. Use resolver in payload and just pass email address.
-        var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+        var user = await userManager.FindByEmailAsync(input.Email);
         if (user is null)
         {
             return new LoginUserPayload(
@@ -327,8 +327,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await signInManager.GetTwoFactorAuthenticationUserAsync();
         if (user is null)
         {
             return new LoginUserWithTwoFactorCodePayload(
@@ -349,7 +349,7 @@ public sealed class UserMutations
                 authenticatorCode,
                 false,
                 input.RememberMachine
-            ).ConfigureAwait(false);
+            );
         if (signInResult.IsLockedOut)
         {
             return new LoginUserWithTwoFactorCodePayload(
@@ -396,8 +396,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await signInManager.GetTwoFactorAuthenticationUserAsync();
         if (user is null)
         {
             return new LoginUserWithRecoveryCodePayload(
@@ -415,7 +415,7 @@ public sealed class UserMutations
         var signInResult =
             await signInManager.TwoFactorRecoveryCodeSignInAsync(
                 recoveryCode
-            ).ConfigureAwait(false);
+            );
         if (signInResult.IsLockedOut)
         {
             return new LoginUserWithRecoveryCodePayload(
@@ -464,7 +464,7 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
         var user = new User(
             input.Name,
             input.Email,
@@ -486,7 +486,7 @@ public sealed class UserMutations
             await userManager.CreateAsync(
                 user,
                 input.Password
-            ).ConfigureAwait(false);
+            );
         if (!identityResult.Succeeded)
         {
             var errors = new List<RegisterUserError>();
@@ -570,7 +570,7 @@ public sealed class UserMutations
             appSettings.Host,
             input.ReturnTo,
             urlEncoder
-        ).ConfigureAwait(false);
+        );
         return new RegisterUserPayload(user);
     }
 
@@ -586,8 +586,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.FindByEmailAsync(input.Email);
         // Don't reveal that the user does not exist.
         if (user is not null)
         {
@@ -598,7 +598,7 @@ public sealed class UserMutations
                 appSettings.Host,
                 null,
                 urlEncoder
-            ).ConfigureAwait(false);
+            );
         }
 
         return new ResendUserEmailConfirmationPayload();
@@ -616,8 +616,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.FindByEmailAsync(input.Email);
         // Don't reveal that the user does not exist or is not confirmed
         if (user is not null && await userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
         {
@@ -631,7 +631,7 @@ public sealed class UserMutations
                 "Reset password",
                 $"Please reset your password by following the link {appSettings.Host}/users/reset-password?resetCode={resetCode}" +
                 (input.ReturnTo is null ? "" : $"&returnTo={urlEncoder.Encode(input.ReturnTo.OriginalString)}")
-            ).ConfigureAwait(false);
+            );
         }
 
         return new RequestUserPasswordResetPayload();
@@ -646,8 +646,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.FindByEmailAsync(input.Email).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.FindByEmailAsync(input.Email);
         if (input.Password != input.PasswordConfirmation)
         {
             return new ResetUserPasswordPayload(
@@ -667,7 +667,7 @@ public sealed class UserMutations
                 user,
                 DecodeCode(input.ResetCode),
                 input.Password
-            ).ConfigureAwait(false);
+            );
             if (!identityResult.Succeeded)
             {
                 var errors = new List<ResetUserPasswordError>();
@@ -741,7 +741,7 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
         if (!await authorization.IsAuthorizedToDeleteUsers(claimsPrincipal).ConfigureAwait(false)
            )
         {
@@ -757,7 +757,7 @@ public sealed class UserMutations
         var user =
             await userManager.Users.SingleOrDefaultAsync(_ =>
                 _.Id == input.UserId
-            ).ConfigureAwait(false);
+            );
         if (user is null)
         {
             return new DeleteUserPayload(
@@ -769,7 +769,7 @@ public sealed class UserMutations
             );
         }
 
-        var identityResult = await userManager.DeleteAsync(user).ConfigureAwait(false);
+        var identityResult = await userManager.DeleteAsync(user);
         if (!identityResult.Succeeded)
         {
             var errors = new List<DeleteUserError>();
@@ -809,8 +809,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        await signInManager.SignOutAsync().ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        await signInManager.SignOutAsync();
         return new LogoutUserPayload();
     }
 
@@ -827,8 +827,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new ChangeUserPasswordPayload(
@@ -864,8 +864,7 @@ public sealed class UserMutations
             );
         }
 
-        var identityResult = await userManager.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword)
-            .ConfigureAwait(false);
+        var identityResult = await userManager.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword);
         if (!identityResult.Succeeded)
         {
             var errors = new List<ChangeUserPasswordError>();
@@ -918,7 +917,7 @@ public sealed class UserMutations
             return new ChangeUserPasswordPayload(user, errors);
         }
 
-        await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
+        await signInManager.RefreshSignInAsync(user);
         return new ChangeUserPasswordPayload(user);
     }
 
@@ -935,8 +934,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new DeletePersonalUserDataPayload(
@@ -975,7 +974,7 @@ public sealed class UserMutations
             }
         }
 
-        var identityResult = await userManager.DeleteAsync(user).ConfigureAwait(false);
+        var identityResult = await userManager.DeleteAsync(user);
         if (!identityResult.Succeeded)
         {
             var errors = new List<DeletePersonalUserDataError>();
@@ -998,7 +997,7 @@ public sealed class UserMutations
             return new DeletePersonalUserDataPayload(user, errors);
         }
 
-        await signInManager.SignOutAsync().ConfigureAwait(false);
+        await signInManager.SignOutAsync();
         return new DeletePersonalUserDataPayload(user);
     }
 
@@ -1012,8 +1011,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new DisableUserTwoFactorAuthenticationPayload(
@@ -1025,7 +1024,7 @@ public sealed class UserMutations
             );
         }
 
-        var disableResult = await userManager.SetTwoFactorEnabledAsync(user, false).ConfigureAwait(false);
+        var disableResult = await userManager.SetTwoFactorEnabledAsync(user, false);
         if (!disableResult.Succeeded)
         {
             return new DisableUserTwoFactorAuthenticationPayload(
@@ -1052,8 +1051,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new ForgetUserTwoFactorAuthenticationClientPayload(
@@ -1065,7 +1064,7 @@ public sealed class UserMutations
             );
         }
 
-        await signInManager.ForgetTwoFactorClientAsync().ConfigureAwait(false);
+        await signInManager.ForgetTwoFactorClientAsync();
         return new ForgetUserTwoFactorAuthenticationClientPayload(user);
     }
 
@@ -1081,8 +1080,8 @@ public sealed class UserMutations
             IHttpContextAccessor httpContextAccessor
         )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
@@ -1151,8 +1150,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new EnableUserTwoFactorAuthenticatorPayload(
@@ -1173,8 +1172,7 @@ public sealed class UserMutations
                     user,
                     userManager.Options.Tokens.AuthenticatorTokenProvider,
                     verificationToken
-                )
-                .ConfigureAwait(false);
+                );
         if (!isTokenValid)
         {
             return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false) switch
@@ -1200,7 +1198,7 @@ public sealed class UserMutations
             };
         }
 
-        var enableResult = await userManager.SetTwoFactorEnabledAsync(user, true).ConfigureAwait(false);
+        var enableResult = await userManager.SetTwoFactorEnabledAsync(user, true);
         if (!enableResult.Succeeded)
         {
             return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false) switch
@@ -1229,7 +1227,7 @@ public sealed class UserMutations
         if (await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false) == 0)
         {
             var recoveryCodes =
-                await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
+                await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             if (recoveryCodes is null)
             {
                 return new EnableUserTwoFactorAuthenticatorPayload(user, []);
@@ -1252,16 +1250,16 @@ public sealed class UserMutations
         UserManager<User> userManager, UrlEncoder urlEncoder, User user)
     {
         // Load the authenticator key & QR code URI to display on the form
-        var unformattedKey = await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+        var unformattedKey = await userManager.GetAuthenticatorKeyAsync(user);
         if (string.IsNullOrEmpty(unformattedKey))
         {
-            var identityResult = await userManager.ResetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+            var identityResult = await userManager.ResetAuthenticatorKeyAsync(user);
             if (!identityResult.Succeeded)
             {
                 return new LoadSharedKeyAndQrCodeUriPayload.ResettingAuthenticatorKeyFailure();
             }
 
-            unformattedKey = await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+            unformattedKey = await userManager.GetAuthenticatorKeyAsync(user);
             if (string.IsNullOrEmpty(unformattedKey))
             {
                 return new LoadSharedKeyAndQrCodeUriPayload.GettingAuthenticatorKeyFailure();
@@ -1269,7 +1267,7 @@ public sealed class UserMutations
         }
 
         var sharedKey = FormatKey(unformattedKey);
-        var email = await userManager.GetEmailAsync(user).ConfigureAwait(false);
+        var email = await userManager.GetEmailAsync(user);
         if (email is null)
         {
             return new LoadSharedKeyAndQrCodeUriPayload.GettingEmailFailure();
@@ -1320,8 +1318,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new ResetUserTwoFactorAuthenticatorPayload(
@@ -1333,7 +1331,7 @@ public sealed class UserMutations
             );
         }
 
-        var disableResult = await userManager.SetTwoFactorEnabledAsync(user, false).ConfigureAwait(false);
+        var disableResult = await userManager.SetTwoFactorEnabledAsync(user, false);
         if (!disableResult.Succeeded)
         {
             return new ResetUserTwoFactorAuthenticatorPayload(
@@ -1345,7 +1343,7 @@ public sealed class UserMutations
             );
         }
 
-        var resetResult = await userManager.ResetAuthenticatorKeyAsync(user).ConfigureAwait(false);
+        var resetResult = await userManager.ResetAuthenticatorKeyAsync(user);
         if (!resetResult.Succeeded)
         {
             return new ResetUserTwoFactorAuthenticatorPayload(
@@ -1357,7 +1355,7 @@ public sealed class UserMutations
             );
         }
 
-        await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
+        await signInManager.RefreshSignInAsync(user);
         return new ResetUserTwoFactorAuthenticatorPayload(user);
     }
 
@@ -1375,8 +1373,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new ChangeUserEmailPayload(
@@ -1388,7 +1386,7 @@ public sealed class UserMutations
             );
         }
 
-        var currentEmail = await userManager.GetEmailAsync(user).ConfigureAwait(false);
+        var currentEmail = await userManager.GetEmailAsync(user);
         if (currentEmail is null)
         {
             return new ChangeUserEmailPayload(
@@ -1421,7 +1419,7 @@ public sealed class UserMutations
             emailSender,
             appSettings.Host,
             urlEncoder
-        ).ConfigureAwait(false);
+        );
         return new ChangeUserEmailPayload(user);
     }
 
@@ -1438,8 +1436,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new ResendUserEmailVerificationPayload(
@@ -1451,7 +1449,7 @@ public sealed class UserMutations
             );
         }
 
-        var email = await userManager.GetEmailAsync(user).ConfigureAwait(false);
+        var email = await userManager.GetEmailAsync(user);
         if (email is null)
         {
             return new ResendUserEmailVerificationPayload(
@@ -1470,7 +1468,7 @@ public sealed class UserMutations
             appSettings.Host,
             null,
             urlEncoder
-        ).ConfigureAwait(false);
+        );
         return new ResendUserEmailVerificationPayload(user);
     }
 
@@ -1484,8 +1482,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new GenerateUserTwoFactorRecoveryCodesPayload(
@@ -1510,7 +1508,7 @@ public sealed class UserMutations
         }
 
         var recoveryCodes =
-            await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
+            await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
         if (recoveryCodes is null)
         {
             return new GenerateUserTwoFactorRecoveryCodesPayload(
@@ -1542,8 +1540,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new SetUserPhoneNumberPayload(
@@ -1555,7 +1553,7 @@ public sealed class UserMutations
             );
         }
 
-        var currentPhoneNumber = await userManager.GetPhoneNumberAsync(user).ConfigureAwait(false);
+        var currentPhoneNumber = await userManager.GetPhoneNumberAsync(user);
         if (currentPhoneNumber == input.PhoneNumber)
         {
             return new SetUserPhoneNumberPayload(
@@ -1568,7 +1566,7 @@ public sealed class UserMutations
             );
         }
 
-        var identityResult = await userManager.SetPhoneNumberAsync(user, input.PhoneNumber).ConfigureAwait(false);
+        var identityResult = await userManager.SetPhoneNumberAsync(user, input.PhoneNumber);
         if (!identityResult.Succeeded)
         {
             var errors = new List<SetUserPhoneNumberError>();
@@ -1591,7 +1589,7 @@ public sealed class UserMutations
             return new SetUserPhoneNumberPayload(user, errors);
         }
 
-        await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
+        await signInManager.RefreshSignInAsync(user);
         return new SetUserPhoneNumberPayload(user);
     }
 
@@ -1608,8 +1606,8 @@ public sealed class UserMutations
         IHttpContextAccessor httpContextAccessor
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
-        var user = await userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
+        var user = await userManager.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new SetUserPasswordPayload(
@@ -1645,7 +1643,7 @@ public sealed class UserMutations
             );
         }
 
-        var identityResult = await userManager.AddPasswordAsync(user, input.Password).ConfigureAwait(false);
+        var identityResult = await userManager.AddPasswordAsync(user, input.Password);
         if (!identityResult.Succeeded)
         {
             var errors = new List<SetUserPasswordError>();
@@ -1698,7 +1696,7 @@ public sealed class UserMutations
             return new SetUserPasswordPayload(user, errors);
         }
 
-        await signInManager.RefreshSignInAsync(user).ConfigureAwait(false);
+        await signInManager.RefreshSignInAsync(user);
         return new SetUserPasswordPayload(user);
     }
 
@@ -1715,7 +1713,7 @@ public sealed class UserMutations
         CancellationToken cancellationToken
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
         if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role)
                 .ConfigureAwait(false))
         {
@@ -1732,7 +1730,7 @@ public sealed class UserMutations
             .SingleOrDefaultAsync(
                 x => x.Id == input.UserId,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
         if (user is null)
         {
             return new AddUserRolePayload(
@@ -1744,8 +1742,7 @@ public sealed class UserMutations
             );
         }
 
-        var identityResult = await userManager.AddToRoleAsync(user, Role.EnumToName(input.Role))
-            .ConfigureAwait(false);
+        var identityResult = await userManager.AddToRoleAsync(user, Role.EnumToName(input.Role));
         if (!identityResult.Succeeded)
         {
             var errors = new List<AddUserRoleError>();
@@ -1784,7 +1781,7 @@ public sealed class UserMutations
         CancellationToken cancellationToken
     )
     {
-        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor).ConfigureAwait(false);
+        await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
         if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role)
                 .ConfigureAwait(false))
         {
@@ -1801,7 +1798,7 @@ public sealed class UserMutations
             .SingleOrDefaultAsync(
                 x => x.Id == input.UserId,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
         if (user is null)
         {
             return new RemoveUserRolePayload(
@@ -1813,8 +1810,7 @@ public sealed class UserMutations
             );
         }
 
-        var identityResult = await userManager.RemoveFromRoleAsync(user, Role.EnumToName(input.Role))
-            .ConfigureAwait(false);
+        var identityResult = await userManager.RemoveFromRoleAsync(user, Role.EnumToName(input.Role));
         if (!identityResult.Succeeded)
         {
             var errors = new List<RemoveUserRoleError>();
@@ -1854,8 +1850,7 @@ public sealed class UserMutations
                 recipient,
                 "Confirm your email",
                 $"Please confirm your email address by following the link {host}/users/confirm-email?email={urlEncoder.Encode(recipient.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}" +
-                (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}"))
-            .ConfigureAwait(false);
+                (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}"));
     }
 
     private static async Task SendChangeUserEmailConfirmation(
@@ -1872,8 +1867,7 @@ public sealed class UserMutations
         await emailSender.SendAsync(
                 (name, newEmail),
                 "Confirm your email change",
-                $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={urlEncoder.Encode(currentEmail)}&newEmail={urlEncoder.Encode(newEmail)}&confirmationCode={confirmationCode}")
-            .ConfigureAwait(false);
+                $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={urlEncoder.Encode(currentEmail)}&newEmail={urlEncoder.Encode(newEmail)}&confirmationCode={confirmationCode}");
     }
 
     private static string EncodeToken(string token)

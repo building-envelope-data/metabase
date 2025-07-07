@@ -24,8 +24,7 @@ public abstract class CommonComponentAuthorization(
             await Context.Institutions.AsNoTracking()
                 .Where(i => i.ManufacturedComponents.Any(c => c.Id == componentId))
                 .Select(i => i.Id)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .ToListAsync(cancellationToken);
         foreach (var manufacturerId in manufacturerIds)
         {
             if (await IsAtLeastAssistantOfVerifiedInstitution(

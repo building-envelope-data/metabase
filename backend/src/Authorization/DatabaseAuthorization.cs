@@ -69,8 +69,7 @@ public sealed class DatabaseAuthorization(
             await Context.Databases.AsNoTracking()
                 .Where(x => x.Id == databaseId)
                 .Select(x => new { x.OperatorId })
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (wrappedOperatorId is null)
         {
             return false;

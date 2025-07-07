@@ -55,6 +55,6 @@ public sealed class OpenIdConnectAuthorizationQueries
         {
             return null;
         }
-        return await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken: cancellationToken).ConfigureAwait(false);
+        return await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken: cancellationToken);
     }
 }

@@ -38,7 +38,7 @@ public sealed class OpenIdConnectAuthorizationMutations
                 )
             );
         }
-        var authorization = await authorizationManager.FindByIdAsync(input.AuthorizationId.ToString(), cancellationToken).ConfigureAwait(false);
+        var authorization = await authorizationManager.FindByIdAsync(input.AuthorizationId.ToString(), cancellationToken);
         if (authorization is null)
         {
             return new DeleteOpenIdConnectAuthorizationPayload(
@@ -49,7 +49,7 @@ public sealed class OpenIdConnectAuthorizationMutations
                 )
             );
         }
-        await authorizationManager.DeleteAsync(authorization, cancellationToken).ConfigureAwait(false);
+        await authorizationManager.DeleteAsync(authorization, cancellationToken);
         return new DeleteOpenIdConnectAuthorizationPayload();
     }
 }

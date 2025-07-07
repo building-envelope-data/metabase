@@ -59,7 +59,7 @@ public sealed class KeyFingerprintQueries
                 .FirstOrDefaultAsync(r =>
                     r.InstitutionId == input.InstitutionId
                     && r.UserId == input.UserId
-                , cancellationToken).ConfigureAwait(false);
+                , cancellationToken);
 
         if (institutionRepresentative is null)
         {

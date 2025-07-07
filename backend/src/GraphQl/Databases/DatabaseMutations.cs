@@ -78,7 +78,7 @@ public sealed class DatabaseMutations
             OperatorId = input.OperatorId
         };
         context.Databases.Add(database);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new CreateDatabasePayload(database);
     }
 
@@ -111,8 +111,7 @@ public sealed class DatabaseMutations
         var database =
             await context.Databases.AsQueryable()
                 .Where(i => i.Id == input.DatabaseId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (database is null)
         {
             return new UpdateDatabasePayload(
@@ -129,7 +128,7 @@ public sealed class DatabaseMutations
             input.Description,
             input.Locator
         );
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new UpdateDatabasePayload(database);
     }
 
@@ -164,8 +163,7 @@ public sealed class DatabaseMutations
         var database =
             await context.Databases.AsQueryable()
                 .Where(i => i.Id == input.DatabaseId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (database is null)
         {
             return new VerifyDatabasePayload(
@@ -220,7 +218,7 @@ public sealed class DatabaseMutations
         }
 
         database.Verify();
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new VerifyDatabasePayload(database);
     }
 

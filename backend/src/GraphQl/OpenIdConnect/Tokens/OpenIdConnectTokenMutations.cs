@@ -42,7 +42,7 @@ public sealed class OpenIdConnectTokenMutations
                 )
             );
         }
-        var token = await tokenManager.FindByIdAsync(input.TokenId.ToString(), cancellationToken).ConfigureAwait(false);
+        var token = await tokenManager.FindByIdAsync(input.TokenId.ToString(), cancellationToken);
         if (token is null)
         {
             return new RevokeOpenIdConnectTokenPayload(
@@ -53,7 +53,7 @@ public sealed class OpenIdConnectTokenMutations
                 )
             );
         }
-        await tokenManager.TryRevokeAsync(token, cancellationToken).ConfigureAwait(false);
+        await tokenManager.TryRevokeAsync(token, cancellationToken);
         return new RevokeOpenIdConnectTokenPayload();
     }
 }

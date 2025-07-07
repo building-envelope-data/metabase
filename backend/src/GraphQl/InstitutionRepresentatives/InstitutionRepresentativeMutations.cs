@@ -110,7 +110,7 @@ public sealed class InstitutionRepresentativeMutations
             Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId).ConfigureAwait(false)
         };
         context.InstitutionRepresentatives.Add(institutionRepresentative);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new AddInstitutionRepresentativePayload(institutionRepresentative);
     }
 
@@ -182,8 +182,7 @@ public sealed class InstitutionRepresentativeMutations
                     r.InstitutionId == input.InstitutionId
                     && r.UserId == input.UserId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (institutionRepresentative is null)
         {
             return new RemoveInstitutionRepresentativePayload(
@@ -214,7 +213,7 @@ public sealed class InstitutionRepresentativeMutations
         }
 
         context.InstitutionRepresentatives.Remove(institutionRepresentative);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new RemoveInstitutionRepresentativePayload(institutionRepresentative);
     }
 
@@ -286,8 +285,7 @@ public sealed class InstitutionRepresentativeMutations
                     r.InstitutionId == input.InstitutionId
                     && r.UserId == input.UserId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (institutionRepresentative is null)
         {
             return new ChangeInstitutionRepresentativeRolePayload(
@@ -319,7 +317,7 @@ public sealed class InstitutionRepresentativeMutations
         }
 
         institutionRepresentative.Role = input.Role;
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new ChangeInstitutionRepresentativeRolePayload(institutionRepresentative);
     }
 
@@ -390,8 +388,7 @@ public sealed class InstitutionRepresentativeMutations
                     r.InstitutionId == input.InstitutionId
                     && r.UserId == input.UserId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (institutionRepresentative is null)
         {
             return new ConfirmInstitutionRepresentativePayload(
@@ -404,7 +401,7 @@ public sealed class InstitutionRepresentativeMutations
         }
 
         institutionRepresentative.Pending = false;
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new ConfirmInstitutionRepresentativePayload(institutionRepresentative);
     }
 
@@ -470,7 +467,7 @@ public sealed class InstitutionRepresentativeMutations
             .SingleOrDefaultAsync(
                 x => x.UserId == input.UserId && x.InstitutionId == input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
         if (institutionRepresentative is null)
         {
             return new AllowRepresentativeToSignDataPayload(
@@ -493,7 +490,7 @@ public sealed class InstitutionRepresentativeMutations
         }
 
         institutionRepresentative.DataSigningPermission = DataSigningPermission.ALLOWED;
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new AllowRepresentativeToSignDataPayload(institutionRepresentative);
     }
 
@@ -560,7 +557,7 @@ public sealed class InstitutionRepresentativeMutations
             .SingleOrDefaultAsync(
                 x => x.UserId == input.UserId && x.InstitutionId == input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
 
         if (institutionRepresentativep is null)
         {
@@ -585,7 +582,7 @@ public sealed class InstitutionRepresentativeMutations
         }
 
         institutionRepresentativep.DataSigningPermission = DataSigningPermission.FORBIDDEN;
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new ForbidRepresentativeToSignDataPayload(institutionRepresentativep);
     }
 
@@ -602,7 +599,6 @@ public sealed class InstitutionRepresentativeMutations
                 && r.UserId != userId
                 && r.Role == InstitutionRepresentativeRole.OWNER
             )
-            .AnyAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .AnyAsync(cancellationToken);
     }
 }

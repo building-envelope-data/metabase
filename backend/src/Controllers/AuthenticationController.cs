@@ -64,7 +64,7 @@ public sealed class AuthenticationController(
         }
 
         // Remove the local authentication cookie before triggering a redirection to the remote server.
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         // Ask the OpenIddict client middleware to redirect the user agent to the identity provider.
         return SignOut(
             new AuthenticationProperties(

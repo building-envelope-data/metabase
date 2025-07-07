@@ -60,6 +60,6 @@ public sealed class InstitutionRepresentativeAuthorization(
     {
         var user = await GetUserAsync(claimsPrincipal);
         return user is not null
-            && await IsAtLeastAssistant(user, cancellationToken).ConfigureAwait(false);
+            && await IsAtLeastAssistant(user, cancellationToken);
     }
 }

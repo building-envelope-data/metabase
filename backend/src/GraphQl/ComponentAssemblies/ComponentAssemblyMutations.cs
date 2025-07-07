@@ -107,7 +107,7 @@ public sealed class ComponentAssemblyMutations
             PrimeSurface = input.PrimeSurface
         };
         context.ComponentAssemblies.Add(componentAssembly);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new AddComponentAssemblyPayload(componentAssembly);
     }
 
@@ -180,8 +180,7 @@ public sealed class ComponentAssemblyMutations
                     a.AssembledComponentId == input.AssembledComponentId
                     && a.PartComponentId == input.PartComponentId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (componentAssembly is null)
         {
             return new UpdateComponentAssemblyPayload(
@@ -196,7 +195,7 @@ public sealed class ComponentAssemblyMutations
         componentAssembly.Index = input.Index;
         componentAssembly.PrimeSurface = input.PrimeSurface;
         context.ComponentAssemblies.Update(componentAssembly);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new UpdateComponentAssemblyPayload(componentAssembly);
     }
 
@@ -269,8 +268,7 @@ public sealed class ComponentAssemblyMutations
                     a.AssembledComponentId == input.AssembledComponentId
                     && a.PartComponentId == input.PartComponentId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (componentAssembly is null)
         {
             return new RemoveComponentAssemblyPayload(
@@ -283,7 +281,7 @@ public sealed class ComponentAssemblyMutations
         }
 
         context.ComponentAssemblies.Remove(componentAssembly);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new RemoveComponentAssemblyPayload(componentAssembly);
     }
 }

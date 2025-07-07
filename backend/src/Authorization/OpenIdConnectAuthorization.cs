@@ -43,7 +43,7 @@ public sealed class OpenIdConnectAuthorization(
         CancellationToken cancellationToken)
     {
         var user = await GetUserAsync(claimsPrincipal);
-        var institutionId = await GetInstitutionIdByApplicationId(applicationId, cancellationToken).ConfigureAwait(false);
+        var institutionId = await GetInstitutionIdByApplicationId(applicationId, cancellationToken);
         return user is not null
                && (await IsAdministrator(user).ConfigureAwait(false)
                || institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false));
@@ -56,7 +56,7 @@ public sealed class OpenIdConnectAuthorization(
         CancellationToken cancellationToken)
     {
         var user = await GetUserAsync(claimsPrincipal);
-        var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken).ConfigureAwait(false);
+        var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken);
         Guid? institutionId = authorization is not null && authorization.Application is not null ? await GetInstitutionIdByApplicationId(authorization.Application.Id, cancellationToken).ConfigureAwait(false) : null;
         return user is not null
                && (await IsAdministrator(user).ConfigureAwait(false)
@@ -70,7 +70,7 @@ public sealed class OpenIdConnectAuthorization(
         CancellationToken cancellationToken)
     {
         var user = await GetUserAsync(claimsPrincipal);
-        var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken).ConfigureAwait(false);
+        var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken);
         Guid? institutionId = token is not null && token.Application is not null ? await GetInstitutionIdByApplicationId(token.Application.Id, cancellationToken).ConfigureAwait(false) : null;
         return user is not null
                && (await IsAdministrator(user).ConfigureAwait(false)

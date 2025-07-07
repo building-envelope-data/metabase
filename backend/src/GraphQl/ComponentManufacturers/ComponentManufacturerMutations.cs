@@ -105,7 +105,7 @@ public sealed class ComponentManufacturerMutations
             Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, cancellationToken).ConfigureAwait(false)
         };
         context.ComponentManufacturers.Add(componentManufacturer);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new AddComponentManufacturerPayload(componentManufacturer);
     }
 
@@ -177,8 +177,7 @@ public sealed class ComponentManufacturerMutations
                     r.ComponentId == input.ComponentId
                     && r.InstitutionId == input.InstitutionId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (componentManufacturer is null)
         {
             return new ConfirmComponentManufacturerPayload(
@@ -191,7 +190,7 @@ public sealed class ComponentManufacturerMutations
         }
 
         componentManufacturer.Pending = false;
-        var x = await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        var x = await context.SaveChangesAsync(cancellationToken);
         return new ConfirmComponentManufacturerPayload(componentManufacturer);
     }
 
@@ -263,8 +262,7 @@ public sealed class ComponentManufacturerMutations
                     a.ComponentId == input.ComponentId
                     && a.InstitutionId == input.InstitutionId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (componentManufacturer is null)
         {
             return new RemoveComponentManufacturerPayload(
@@ -295,7 +293,7 @@ public sealed class ComponentManufacturerMutations
         }
 
         context.ComponentManufacturers.Remove(componentManufacturer);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new RemoveComponentManufacturerPayload(componentManufacturer);
     }
 }

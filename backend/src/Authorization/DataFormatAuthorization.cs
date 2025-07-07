@@ -54,8 +54,7 @@ public sealed class DataFormatAuthorization(
             await Context.DataFormats.AsNoTracking()
                 .Where(x => x.Id == dataFormatId)
                 .Select(x => new { x.ManagerId })
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (wrappedManagerId is null)
         {
             return false;

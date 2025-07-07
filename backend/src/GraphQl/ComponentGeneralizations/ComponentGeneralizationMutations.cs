@@ -105,7 +105,7 @@ public sealed class ComponentGeneralizationMutations
             ConcreteComponentId = input.ConcreteComponentId
         };
         context.ComponentConcretizationAndGeneralizations.Add(componentGeneralization);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new AddComponentGeneralizationPayload(componentGeneralization);
     }
 
@@ -178,8 +178,7 @@ public sealed class ComponentGeneralizationMutations
                     a.GeneralComponentId == input.GeneralComponentId
                     && a.ConcreteComponentId == input.ConcreteComponentId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (componentGeneralization is null)
         {
             return new RemoveComponentGeneralizationPayload(
@@ -192,7 +191,7 @@ public sealed class ComponentGeneralizationMutations
         }
 
         context.ComponentConcretizationAndGeneralizations.Remove(componentGeneralization);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new RemoveComponentGeneralizationPayload(componentGeneralization);
     }
 }

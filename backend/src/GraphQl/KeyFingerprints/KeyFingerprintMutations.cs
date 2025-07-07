@@ -83,7 +83,7 @@ public sealed class KeyFingerprintMutations
                 .FirstOrDefaultAsync(r =>
                     r.InstitutionId == input.InstitutionId
                     && r.UserId == input.UserId
-                , cancellationToken).ConfigureAwait(false);
+                , cancellationToken);
 
         if (institutionRepresentative is null)
         {
@@ -104,7 +104,7 @@ public sealed class KeyFingerprintMutations
         }
 
         institutionRepresentative.KeyFingerprints.Add(input.KeyFingerprint);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new AddKeyFingerprintPayload(input.KeyFingerprint);
     }
 }

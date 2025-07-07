@@ -34,7 +34,6 @@ public abstract class EntityByIdDataLoader<TEntity>(
                 entity => entity.Id,
                 entity => (TEntity?)entity,
                 cancellationToken
-            )
-            .ConfigureAwait(false);
+            );
     }
 }

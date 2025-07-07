@@ -40,7 +40,7 @@ public sealed class PersonalUserDataController(
     [HttpGet("~/personal-user-data")]
     public async Task<IActionResult> GetAsync()
     {
-        var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
+        var user = await _userManager.GetUserAsync(User);
         if (user is null)
         {
             return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -57,26 +57,26 @@ public sealed class PersonalUserDataController(
 
         if (User.HasScope(Scopes.Email))
         {
-            var email = await _userManager.GetEmailAsync(user).ConfigureAwait(false);
+            var email = await _userManager.GetEmailAsync(user);
             if (email is not null)
             {
                 personalData[Claims.Email] = email;
             }
 
             personalData[Claims.EmailVerified] =
-                await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false);
+                await _userManager.IsEmailConfirmedAsync(user);
         }
 
         if (User.HasScope(Scopes.Phone))
         {
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user).ConfigureAwait(false);
+            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (phoneNumber is not null)
             {
                 personalData[Claims.PhoneNumber] = phoneNumber;
             }
 
             personalData[Claims.PhoneNumberVerified] =
-                await _userManager.IsPhoneNumberConfirmedAsync(user).ConfigureAwait(false);
+                await _userManager.IsPhoneNumberConfirmedAsync(user);
         }
 
         if (User.HasScope(Scopes.Profile))
@@ -89,7 +89,7 @@ public sealed class PersonalUserDataController(
                 personalData[Claims.Website] = user.WebsiteLocator;
             }
 
-            var logins = await _userManager.GetLoginsAsync(user).ConfigureAwait(false);
+            var logins = await _userManager.GetLoginsAsync(user);
             foreach (var login in logins)
             {
                 personalData.Add($"{login.LoginProvider} external login provider key", login.ProviderKey);
@@ -98,7 +98,7 @@ public sealed class PersonalUserDataController(
 
         if (User.HasScope(Scopes.Roles))
         {
-            personalData[Claims.Role] = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
+            personalData[Claims.Role] = await _userManager.GetRolesAsync(user);
         }
 
         Response.Headers.Append("Content-Disposition", "attachment; filename=PersonalUserData.json");

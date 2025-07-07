@@ -123,7 +123,7 @@ public sealed class ComponentMutations
                         }
                     );
         context.Components.Add(component);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new CreateComponentPayload(component);
     }
 
@@ -156,8 +156,7 @@ public sealed class ComponentMutations
         var component =
             await context.Components.AsQueryable()
                 .Where(i => i.Id == input.ComponentId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (component is null)
         {
             return new UpdateComponentPayload(
@@ -185,7 +184,7 @@ public sealed class ComponentMutations
         component.PrimeDirection = DescriptionOrReferenceType.FromInput(input.PrimeDirection);
         component.SwitchableLayers = DescriptionOrReferenceType.FromInput(input.SwitchableLayers);
 
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new UpdateComponentPayload(component);
     }
 
@@ -217,8 +216,7 @@ public sealed class ComponentMutations
         var component =
             await context.Components.AsQueryable()
                 .Where(i => i.Id == input.ComponentId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (component is null)
         {
             return new SetComponentExtrasPayload(
@@ -230,7 +228,7 @@ public sealed class ComponentMutations
             );
         }
         component.Update(input.Extras);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new SetComponentExtrasPayload(component);
     }
 }

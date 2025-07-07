@@ -51,7 +51,7 @@ public sealed class InstitutionMutations
             );
         }
 
-        var user = await authorization.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
+        var user = await authorization.GetUserAsync(claimsPrincipal);
         if (user is null)
         {
             return new CreateInstitutionPayload(
@@ -137,11 +137,11 @@ public sealed class InstitutionMutations
         }
 
         context.Institutions.Add(institution);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         if (institution.State == InstitutionState.PENDING)
         {
             var verifiers =
-                await authorization.GetUsersInRoleAsync(UserRole.VERIFIER).ConfigureAwait(false);
+                await authorization.GetUsersInRoleAsync(UserRole.VERIFIER);
             await Task.WhenAll(
                 verifiers.Select(verifier =>
                     verifier.Email is null
@@ -152,7 +152,7 @@ public sealed class InstitutionMutations
                             $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID {institution.Id:D} on {appSettings.Host}/institutions Have a nice day! :-)"
                         )
                 )
-            ).ConfigureAwait(false);
+            );
         }
 
         return new CreateInstitutionPayload(institution);
@@ -202,8 +202,7 @@ public sealed class InstitutionMutations
         var institution =
             await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (institution is null)
         {
             return new VerifyInstitutionPayload(
@@ -216,7 +215,7 @@ public sealed class InstitutionMutations
         }
 
         institution.Verify();
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new VerifyInstitutionPayload(institution);
     }
 
@@ -249,8 +248,7 @@ public sealed class InstitutionMutations
         var institution =
             await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (institution is null)
         {
             return new UpdateInstitutionPayload(
@@ -270,7 +268,7 @@ public sealed class InstitutionMutations
             input.PublicKey,
             input.Extras
         );
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new UpdateInstitutionPayload(institution);
     }
 
@@ -303,8 +301,7 @@ public sealed class InstitutionMutations
         var institution =
             await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (institution is null)
         {
             return new DeleteInstitutionPayload(
@@ -363,7 +360,7 @@ public sealed class InstitutionMutations
         }
 
         context.Institutions.Remove(institution);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new DeleteInstitutionPayload();
     }
 
@@ -396,8 +393,7 @@ public sealed class InstitutionMutations
         var institution =
             await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         if (institution is null)
         {
             return new SwitchInstitutionOperatingStatePayload(
@@ -420,7 +416,7 @@ public sealed class InstitutionMutations
             default:
                 throw new ArgumentException($"The operating state {institution.OperatingState} is not supported.");
         }
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new SwitchInstitutionOperatingStatePayload(institution);
     }
 }

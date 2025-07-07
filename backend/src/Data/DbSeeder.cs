@@ -100,12 +100,12 @@ public sealed class DbSeeder
         logger.SeedingDatabase();
         var environment = services.GetRequiredService<IWebHostEnvironment>();
         var appSettings = services.GetRequiredService<AppSettings>();
-        await CreateRolesAsync(services, logger).ConfigureAwait(false);
-        await CreateUsersAsync(services, environment, appSettings, logger).ConfigureAwait(false);
-        await RegisterApplicationsAsync(services, logger, environment, appSettings).ConfigureAwait(false);
-        await RegisterScopesAsync(services, logger).ConfigureAwait(false);
-        await CreateInstitutionsAsync(services, environment).ConfigureAwait(false);
-        await CreateDatabasesAsync(services, environment, appSettings).ConfigureAwait(false);
+        await CreateRolesAsync(services, logger);
+        await CreateUsersAsync(services, environment, appSettings, logger);
+        await RegisterApplicationsAsync(services, logger, environment, appSettings);
+        await RegisterScopesAsync(services, logger);
+        await CreateInstitutionsAsync(services, environment);
+        await CreateDatabasesAsync(services, environment, appSettings);
     }
 
     private static async Task CreateRolesAsync(
@@ -121,7 +121,7 @@ public sealed class DbSeeder
                 logger.CreatingRole(role);
                 await manager.CreateAsync(
                     new Role(role)
-                ).ConfigureAwait(false);
+                );
             }
         }
     }
@@ -138,7 +138,7 @@ public sealed class DbSeeder
         {
             if ((await manager.GetUsersInRoleAsync(Role.Administrator).ConfigureAwait(false)).Count == 0)
             {
-                await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger).ConfigureAwait(false);
+                await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger);
             }
         }
         else
@@ -147,7 +147,7 @@ public sealed class DbSeeder
             {
                 if (await manager.FindByEmailAsync(userInfo.EmailAddress).ConfigureAwait(false) is null)
                 {
-                    await CreateUserAsync(manager, userInfo, appSettings.BootstrapUserPassword, logger).ConfigureAwait(false);
+                    await CreateUserAsync(manager, userInfo, appSettings.BootstrapUserPassword, logger);
                 }
             }
         }
@@ -165,11 +165,11 @@ public sealed class DbSeeder
         await manager.CreateAsync(
             user,
             password
-        ).ConfigureAwait(false);
+        );
         var confirmationToken =
-            await manager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
-        await manager.ConfirmEmailAsync(user, confirmationToken).ConfigureAwait(false);
-        await manager.AddToRoleAsync(user, Role.EnumToName(userInfo.Role)).ConfigureAwait(false);
+            await manager.GenerateEmailConfirmationTokenAsync(user);
+        await manager.ConfirmEmailAsync(user, confirmationToken);
+        await manager.AddToRoleAsync(user, Role.EnumToName(userInfo.Role));
     }
 
     private static async Task RegisterApplicationsAsync(
@@ -246,7 +246,7 @@ public sealed class DbSeeder
                         OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
                     }
                 }
-            ).ConfigureAwait(false);
+            );
         }
 
         if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId).ConfigureAwait(false) is null)
@@ -304,7 +304,7 @@ public sealed class DbSeeder
                         OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
                     }
                 }
-            ).ConfigureAwait(false);
+            );
         }
 
         if (await manager.FindByClientIdAsync(IgsdbOpenIdConnectClientId).ConfigureAwait(false) is null)
@@ -349,7 +349,7 @@ public sealed class DbSeeder
                         OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
                     }
                 }
-            ).ConfigureAwait(false);
+            );
         }
     }
 
@@ -377,7 +377,7 @@ public sealed class DbSeeder
                         AuthConfiguration.Audience
                     }
                 }
-            ).ConfigureAwait(false);
+            );
         }
 
         if (await manager.FindByNameAsync(AuthConfiguration.WriteApiScope)
@@ -398,7 +398,7 @@ public sealed class DbSeeder
                         AuthConfiguration.Audience
                     }
                 }
-            ).ConfigureAwait(false);
+            );
         }
 
         if (await manager.FindByNameAsync(AuthConfiguration.ManageUserApiScope)
@@ -419,7 +419,7 @@ public sealed class DbSeeder
                         AuthConfiguration.Audience
                     }
                 }
-            ).ConfigureAwait(false);
+            );
         }
     }
 
@@ -432,7 +432,7 @@ public sealed class DbSeeder
         var context = services.GetRequiredService<ApplicationDbContext>();
         if (environment.IsDevelopment())
         {
-            var iseInstitution = await context.Institutions.Where(x => x.Name == IseInstitutionName).SingleOrDefaultAsync().ConfigureAwait(false);
+            var iseInstitution = await context.Institutions.Where(x => x.Name == IseInstitutionName).SingleOrDefaultAsync();
             if (iseInstitution is null)
             {
                 iseInstitution = new Institution(
@@ -453,7 +453,7 @@ public sealed class DbSeeder
                         Pending = false
                     }
                 );
-                var application = await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId).AsTask().ConfigureAwait(false);
+                var application = await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId).AsTask();
                 if (application != null)
                 {
                     iseInstitution.OpenIdConnectApplicationEdges.Add(
@@ -463,7 +463,7 @@ public sealed class DbSeeder
                         });
                 }
                 context.Institutions.Add(iseInstitution);
-                await context.SaveChangesAsync().ConfigureAwait(false);
+                await context.SaveChangesAsync();
             }
             if (!await context.Institutions.Where(x => x.Name == TestlabInstitutionName).AnyAsync().ConfigureAwait(false))
             {
@@ -481,7 +481,7 @@ public sealed class DbSeeder
                     ManagerId = iseInstitution.Id
                 };
 
-                var application = await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId).AsTask().ConfigureAwait(false);
+                var application = await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId).AsTask();
                 if (application != null)
                 {
                     institution.OpenIdConnectApplicationEdges.Add(
@@ -491,7 +491,7 @@ public sealed class DbSeeder
                         });
                 }
                 context.Institutions.Add(institution);
-                await context.SaveChangesAsync().ConfigureAwait(false);
+                await context.SaveChangesAsync();
             }
             if (!await context.Institutions.Where(x => x.Name == LbnlInstitutionName).AnyAsync().ConfigureAwait(false))
             {
@@ -509,7 +509,7 @@ public sealed class DbSeeder
                     ManagerId = iseInstitution.Id
                 };
                 context.Institutions.Add(institution);
-                await context.SaveChangesAsync().ConfigureAwait(false);
+                await context.SaveChangesAsync();
             }
         }
     }
@@ -539,7 +539,7 @@ public sealed class DbSeeder
                 };
                 database.Verify();
                 context.Databases.Add(database);
-                await context.SaveChangesAsync().ConfigureAwait(false);
+                await context.SaveChangesAsync();
             }
             if (!await context.Databases.Where(x => x.Name == IgsdbDatabaseName).AnyAsync().ConfigureAwait(false))
             {
@@ -553,7 +553,7 @@ public sealed class DbSeeder
                 };
                 database.Verify();
                 context.Databases.Add(database);
-                await context.SaveChangesAsync().ConfigureAwait(false);
+                await context.SaveChangesAsync();
             }
         }
     }

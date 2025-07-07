@@ -111,7 +111,7 @@ public sealed class ComponentVariantMutations
         };
         context.ComponentVariants.Add(componentVariant);
         context.ComponentVariants.Add(reverseComponentVariant);
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new AddComponentVariantPayload(componentVariant, reverseComponentVariant);
     }
 
@@ -184,16 +184,14 @@ public sealed class ComponentVariantMutations
                     a.OfComponentId == input.OneComponentId
                     && a.ToComponentId == input.OtherComponentId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         var reverseComponentVariant =
             await context.ComponentVariants.AsQueryable()
                 .Where(a =>
                     a.OfComponentId == input.OtherComponentId
                     && a.ToComponentId == input.OneComponentId
                 )
-                .SingleOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
+                .SingleOrDefaultAsync(cancellationToken);
         // Note that if the database is consistent, due to the reflivity of
         // the variant association, either both variants exist or none.
         if (componentVariant is null && reverseComponentVariant is null)
@@ -217,7 +215,7 @@ public sealed class ComponentVariantMutations
             context.ComponentVariants.Remove(reverseComponentVariant);
         }
 
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken);
         return new RemoveComponentVariantPayload(input.OneComponentId, input.OtherComponentId);
     }
 }
