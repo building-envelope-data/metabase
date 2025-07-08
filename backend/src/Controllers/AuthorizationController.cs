@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Metabase.Authorization;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.ViewModels.Authorization;
@@ -651,7 +652,7 @@ public sealed class AuthorizationController(
             // Add the claims that will be persisted in the tokens (use the client_id as the subject identifier).
             var clientId = await _applicationManager.GetClientIdAsync(application);
             var displayName = await _applicationManager.GetDisplayNameAsync(application);
-            identity.SetClaim(Claims.Subject, clientId);
+            identity.SetClaim(Claims.Subject, $"{CommonAuthorization.ClientSubjectPrefix}{clientId}");
             identity.SetClaim(Claims.Name, displayName);
             identity.SetClaim(Claims.PreferredUsername, displayName);
 

@@ -24,11 +24,15 @@ public sealed class ComponentAssemblyAuthorization(
         return AuthorizeAsync(
             claimsPrincipal,
             user => IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
-               user,
-               componentId,
-               cancellationToken
+                user,
+                componentId,
+                cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedManufacturerOfComponent(
+                application,
+                componentId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -52,7 +56,16 @@ public sealed class ComponentAssemblyAuthorization(
                 partComponentId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            async application => await BelongsToVerifiedManufacturerOfComponent(
+                application,
+                assembledComponentId,
+                cancellationToken
+            )
+            && await BelongsToVerifiedManufacturerOfComponent(
+                application,
+                partComponentId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }

@@ -28,7 +28,11 @@ public sealed class ComponentVariantAuthorization(
                 componentId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedManufacturerOfComponent(
+                application,
+                componentId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -52,7 +56,16 @@ public sealed class ComponentVariantAuthorization(
                 toComponentId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            async application => await BelongsToVerifiedManufacturerOfComponent(
+                application,
+                ofComponentId,
+                cancellationToken
+            )
+            && await BelongsToVerifiedManufacturerOfComponent(
+                application,
+                toComponentId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }

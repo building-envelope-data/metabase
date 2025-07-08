@@ -28,7 +28,11 @@ public sealed class InstitutionRepresentativeAuthorization(
                    institutionId,
                    cancellationToken
                ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -61,7 +65,11 @@ public sealed class InstitutionRepresentativeAuthorization(
         return AuthorizeAsync(
             claimsPrincipal,
             user => IsOwnerOfInstitution(user, institutionId, cancellationToken),
-            application => Task.FromResult(false),
+            application => BelongsToInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }

@@ -28,7 +28,11 @@ public sealed class UserMethodDeveloperAuthorization(
                    methodId,
                    cancellationToken
                ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedMethodManager(
+                   application,
+                   methodId,
+                   cancellationToken
+               ),
             cancellationToken
         );
     }
@@ -65,7 +69,11 @@ public sealed class UserMethodDeveloperAuthorization(
                    methodId,
                    cancellationToken
                ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedMethodManager(
+                   application,
+                   methodId,
+                   cancellationToken
+               ),
             cancellationToken
         );
     }

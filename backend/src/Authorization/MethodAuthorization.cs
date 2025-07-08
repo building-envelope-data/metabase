@@ -28,7 +28,11 @@ public sealed class MethodAuthorization(
                    institutionId,
                    cancellationToken
                ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -46,7 +50,11 @@ public sealed class MethodAuthorization(
                    methodId,
                    cancellationToken
                ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedMethodManager(
+                application,
+                methodId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }

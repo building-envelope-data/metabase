@@ -13,6 +13,7 @@ using Metabase.Enumerations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserRole = Metabase.Enumerations.UserRole;
+using System.Globalization;
 
 namespace Metabase.Authorization;
 
@@ -26,6 +27,8 @@ public abstract class CommonAuthorization(
     protected UserManager<User> UserManager { get; } = userManager;
     protected OpenIddictApplicationManager<OpenIdConnectApplication> ApplicationManager { get; } = applicationManager;
 
+    internal const string ClientSubjectPrefix = "client:";
+
     protected async Task<bool> AuthorizeAsync(
         ClaimsPrincipal claimsPrincipal,
         Func<User, Task<bool>> authorizeUser,
@@ -33,14 +36,24 @@ public abstract class CommonAuthorization(
         CancellationToken cancellationToken
     )
     {
-        var userOrApplicationId = claimsPrincipal.GetClaim(Claims.Subject);
-        var user = await GetUserAsync(claimsPrincipal);
-        // var application = await ApplicationManager.FindByApplicationIdAsync(userOrApplicationId, cancellationToken);
-        // application is not null && await authorizeApplication(application);
-        return user is not null && (
-            await IsAdministrator(user)
-            || await authorizeUser(user)
-        );
+        var userOrPrefixedClientId = claimsPrincipal.GetClaim(Claims.Subject);
+        // Note that a user ID is a UUID and thus cannot start with the client-subject prefix.
+        if (userOrPrefixedClientId is not null
+            && userOrPrefixedClientId.StartsWith(ClientSubjectPrefix, ignoreCase: false, culture: CultureInfo.InvariantCulture)
+        )
+        {
+            var clientId = userOrPrefixedClientId[ClientSubjectPrefix.Length..];
+            var application = await ApplicationManager.FindByClientIdAsync(clientId, cancellationToken);
+            return application is not null && await authorizeApplication(application);
+        }
+        else
+        {
+            var user = await GetUserAsync(claimsPrincipal);
+            return user is not null && (
+                await IsAdministrator(user)
+                || await authorizeUser(user)
+            );
+        }
     }
 
     internal Task<User?> GetUserAsync(ClaimsPrincipal claimsPrincipal)
@@ -195,6 +208,31 @@ public abstract class CommonAuthorization(
                 institutionId,
                 cancellationToken
             );
+    }
+
+    protected Task<bool> BelongsToInstitution(
+        OpenIdConnectApplication application,
+        Guid institutionId,
+        CancellationToken cancellationToken
+    )
+    {
+        return Context.Institutions.AsNoTracking()
+            .Where(i => i.Id == institutionId)
+            .Where(i => i.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
+            .AnyAsync(cancellationToken);
+    }
+
+    protected Task<bool> BelongsToVerifiedInstitution(
+        OpenIdConnectApplication application,
+        Guid institutionId,
+        CancellationToken cancellationToken
+    )
+    {
+        return Context.Institutions.AsNoTracking()
+            .Where(i => i.Id == institutionId)
+            .Where(i => i.State == InstitutionState.VERIFIED)
+            .Where(i => i.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
+            .AnyAsync(cancellationToken);
     }
 
     private async Task<InstitutionRepresentativeRole?> FetchRole(

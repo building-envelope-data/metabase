@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Core;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Metabase.Enumerations;
 
 namespace Metabase.Authorization;
 
@@ -23,30 +23,37 @@ public abstract class CommonComponentAuthorization(
         CancellationToken cancellationToken
     )
     {
-        var manufacturerIds =
+        var verifiedManufacturerIds =
             await Context.Institutions.AsNoTracking()
-                .Where(i => i.ManufacturedComponents.Any(c => c.Id == componentId))
+                .Where(i => i.State == InstitutionState.VERIFIED)
+                .Where(i => i.ManufacturedComponentEdges.Any(c => c.ComponentId == componentId && !c.Pending))
                 .Select(i => i.Id)
                 .ToListAsync(cancellationToken);
-        foreach (var manufacturerId in manufacturerIds)
+        foreach (var verifiedManufacturerId in verifiedManufacturerIds)
         {
-            if (await IsAtLeastAssistantOfVerifiedInstitution(
+            if (await IsAtLeastAssistant(
                     user,
-                    manufacturerId,
+                    verifiedManufacturerId,
                     cancellationToken
                 ).ConfigureAwait(false)
-                &&
-                await IsVerifiedManufacturerOfComponent(
-                    manufacturerId,
-                    componentId,
-                    cancellationToken
-                ).ConfigureAwait(false)
-               )
+            )
             {
                 return true;
             }
         }
-
         return false;
+    }
+
+    protected Task<bool> BelongsToVerifiedManufacturerOfComponent(
+        OpenIdConnectApplication application,
+        Guid componentId,
+        CancellationToken cancellationToken
+    )
+    {
+        return Context.Institutions.AsNoTracking()
+            .Where(i => i.State == InstitutionState.VERIFIED)
+            .Where(i => i.ManufacturedComponentEdges.Any(e => e.ComponentId == componentId && !e.Pending))
+            .Where(i => i.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
+            .AnyAsync(cancellationToken);
     }
 }

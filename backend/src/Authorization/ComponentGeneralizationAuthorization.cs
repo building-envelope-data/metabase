@@ -28,7 +28,11 @@ public sealed class ComponentGeneralizationAuthorization(
                 componentId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedManufacturerOfComponent(
+                application,
+                componentId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -52,7 +56,16 @@ public sealed class ComponentGeneralizationAuthorization(
                 partComponentId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            async application => await BelongsToVerifiedManufacturerOfComponent(
+                application,
+                assembledComponentId,
+                cancellationToken
+            )
+            && await BelongsToVerifiedManufacturerOfComponent(
+                application,
+                partComponentId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }

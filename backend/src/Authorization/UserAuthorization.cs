@@ -50,21 +50,7 @@ public sealed class UserAuthorization(
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            async loggedInUser =>
-            {
-                if (loggedInUser.Id == userId)
-                {
-                    return true;
-                }
-                if (await IsInRole(
-                        loggedInUser,
-                        UserRole.ADMINISTRATOR
-                    ).ConfigureAwait(false))
-                {
-                    return true;
-                }
-                return false;
-            },
+            loggedInUser => Task.FromResult(loggedInUser.Id == userId),
             application => Task.FromResult(false),
             cancellationToken
         );

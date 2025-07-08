@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using OpenIddict.Core;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Metabase.Enumerations;
 
 namespace Metabase.Authorization;
 
@@ -30,7 +31,11 @@ public sealed class DatabaseAuthorization(
                 institutionId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -48,7 +53,11 @@ public sealed class DatabaseAuthorization(
                 databaseId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedDatabaseOperator(
+                application,
+                databaseId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -66,7 +75,11 @@ public sealed class DatabaseAuthorization(
                 databaseId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedDatabaseOperator(
+                application,
+                databaseId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -86,9 +99,22 @@ public sealed class DatabaseAuthorization(
     {
         return (
             await Context.Databases.AsNoTracking()
-                .Where(x => x.Id == databaseId)
-                .Select(x => new { x.OperatorId })
+                .Where(d => d.Id == databaseId)
+                .Select(d => new { d.OperatorId })
                 .SingleOrDefaultAsync(cancellationToken)
         )?.OperatorId;
+    }
+
+    private Task<bool> BelongsToVerifiedDatabaseOperator(
+        OpenIdConnectApplication application,
+        Guid databaseId,
+        CancellationToken cancellationToken
+    )
+    {
+        return Context.Databases.AsNoTracking()
+            .Where(d => d.Id == databaseId)
+            .Where(d => d.Operator != null && d.Operator.State == InstitutionState.VERIFIED)
+            .Where(d => d.Operator != null && d.Operator.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
+            .AnyAsync(cancellationToken);
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using OpenIddict.Core;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Metabase.Enumerations;
 
 namespace Metabase.Authorization;
 
@@ -30,7 +31,11 @@ public sealed class DataFormatAuthorization(
                 institutionId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -48,7 +53,11 @@ public sealed class DataFormatAuthorization(
                 dataFormatId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedDataFormatManager(
+                application,
+                dataFormatId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -72,5 +81,18 @@ public sealed class DataFormatAuthorization(
                 .Select(x => new { x.ManagerId })
                 .SingleOrDefaultAsync(cancellationToken)
         )?.ManagerId;
+    }
+
+    private Task<bool> BelongsToVerifiedDataFormatManager(
+        OpenIdConnectApplication application,
+        Guid dataFormatId,
+        CancellationToken cancellationToken
+    )
+    {
+        return Context.DataFormats.AsNoTracking()
+            .Where(f => f.Id == dataFormatId)
+            .Where(f => f.Manager != null && f.Manager.State == InstitutionState.VERIFIED)
+            .Where(f => f.Manager != null && f.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
+            .AnyAsync(cancellationToken);
     }
 }

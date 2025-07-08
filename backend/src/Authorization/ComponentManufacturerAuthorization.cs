@@ -28,7 +28,11 @@ public sealed class ComponentManufacturerAuthorization(
                 componentId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedManufacturerOfComponent(
+                application,
+                componentId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -46,7 +50,11 @@ public sealed class ComponentManufacturerAuthorization(
                 institutionId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -64,7 +72,11 @@ public sealed class ComponentManufacturerAuthorization(
                 institutionId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }

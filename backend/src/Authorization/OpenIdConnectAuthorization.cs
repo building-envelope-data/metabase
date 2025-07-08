@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using OpenIddict.Core;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using System.Collections.Generic;
 
 namespace Metabase.Authorization;
 
@@ -51,10 +52,10 @@ public sealed class OpenIdConnectAuthorization(
             claimsPrincipal,
             async user =>
             {
-                var institutionId = await GetInstitutionIdByApplicationId(applicationId, cancellationToken);
-                return institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false);
+                var institutionIds = await GetInstitutionIdsByApplicationId(applicationId, cancellationToken);
+                return institutionIds is not null && await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken).ConfigureAwait(false);
             },
-            application => Task.FromResult(false),
+            application => BelongsToAtLeastOneInstitutionOfApplication(application, applicationId, cancellationToken),
             cancellationToken
         );
     }
@@ -70,10 +71,19 @@ public sealed class OpenIdConnectAuthorization(
             async user =>
             {
                 var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken);
-                var institutionId = authorization is not null && authorization.Application is not null ? await GetInstitutionIdByApplicationId(authorization.Application.Id, cancellationToken).ConfigureAwait(false) : null;
-                return institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false);
+                var institutionIds = authorization is not null && authorization.Application is not null
+                    ? await GetInstitutionIdsByApplicationId(authorization.Application.Id, cancellationToken).ConfigureAwait(false)
+                    : null;
+                return institutionIds is not null
+                    && await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken);
             },
-            application => Task.FromResult(false),
+            async application =>
+            {
+                var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken);
+                return authorization is not null
+                    && authorization.Application is not null
+                    && await BelongsToAtLeastOneInstitutionOfApplication(application, authorization.Application.Id, cancellationToken);
+            },
             cancellationToken
         );
     }
@@ -89,24 +99,57 @@ public sealed class OpenIdConnectAuthorization(
             async user =>
             {
                 var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken);
-                var institutionId = token is not null && token.Application is not null ? await GetInstitutionIdByApplicationId(token.Application.Id, cancellationToken).ConfigureAwait(false) : null;
-                return institutionId is not null && await IsOwnerOfInstitution(user, institutionId ?? Guid.Empty, cancellationToken).ConfigureAwait(false);
+                var institutionIds = token is not null && token.Application is not null
+                    ? await GetInstitutionIdsByApplicationId(token.Application.Id, cancellationToken).ConfigureAwait(false)
+                    : null;
+                return institutionIds is not null && await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken);
             },
-            application => Task.FromResult(false),
+            async application =>
+            {
+                var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken);
+                return token is not null
+                    && token.Application is not null
+                    && await BelongsToAtLeastOneInstitutionOfApplication(application, token.Application.Id, cancellationToken);
+            },
             cancellationToken
         );
     }
 
-    private async Task<Guid?> GetInstitutionIdByApplicationId(Guid applicationId, CancellationToken cancellationToken)
+    private async Task<IEnumerable<Guid>> GetInstitutionIdsByApplicationId(Guid applicationId, CancellationToken cancellationToken)
     {
         return (
-            await Context.InstitutionOpenIdConnectApplications.Where(x =>
-                x.ApplicationId == applicationId
-            ).Select(x => new
+            await Context.InstitutionOpenIdConnectApplications.AsNoTracking()
+                .Where(x => x.ApplicationId == applicationId)
+                .Select(x => new { x.InstitutionId })
+                .ToListAsync(cancellationToken).ConfigureAwait(false)
+        ).Select(x => x.InstitutionId);
+    }
+
+    private async Task<bool> IsOwnerOfAtLeastOneInstitution(
+        User user,
+        IEnumerable<Guid> institutionIds,
+        CancellationToken cancellationToken
+    )
+    {
+        foreach (var institutionId in institutionIds)
+        {
+            if (await IsOwnerOfInstitution(user, institutionId, cancellationToken).ConfigureAwait(false))
             {
-                x.InstitutionId
+                return true;
             }
-            ).SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false)
-        )?.InstitutionId;
+        }
+        return false;
+    }
+
+    private Task<bool> BelongsToAtLeastOneInstitutionOfApplication(
+        OpenIdConnectApplication application,
+        Guid applicationId,
+        CancellationToken cancellationToken
+    )
+    {
+        return Context.InstitutionOpenIdConnectApplications.AsNoTracking()
+            .Where(a => a.ApplicationId == application.Id)
+            .Where(a => a.Institution.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == applicationId))
+            .AnyAsync(cancellationToken);
     }
 }

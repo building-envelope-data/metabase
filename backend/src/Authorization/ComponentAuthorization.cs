@@ -28,7 +28,11 @@ public sealed class ComponentAuthorization(
                 institutionId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -46,7 +50,11 @@ public sealed class ComponentAuthorization(
                 componentId,
                 cancellationToken
             ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedManufacturerOfComponent(
+                application,
+                componentId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }

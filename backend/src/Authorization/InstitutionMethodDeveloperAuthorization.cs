@@ -28,7 +28,11 @@ public sealed class InstitutionMethodDeveloperAuthorization(
                    methodId,
                    cancellationToken
                ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedMethodManager(
+                application,
+                methodId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -46,7 +50,11 @@ public sealed class InstitutionMethodDeveloperAuthorization(
                    institutionId,
                    cancellationToken
                ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
@@ -64,7 +72,11 @@ public sealed class InstitutionMethodDeveloperAuthorization(
                    methodId,
                    cancellationToken
                ),
-            application => Task.FromResult(false),
+            application => BelongsToVerifiedMethodManager(
+                application,
+                methodId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
