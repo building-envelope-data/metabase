@@ -53,7 +53,7 @@ public sealed class OpenIdConnectAuthorization(
             async user =>
             {
                 var institutionIds = await GetInstitutionIdsByApplicationId(applicationId, cancellationToken);
-                return institutionIds is not null && await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken).ConfigureAwait(false);
+                return institutionIds is not null && await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken);
             },
             application => BelongsToAtLeastOneInstitutionOfApplication(application, applicationId, cancellationToken),
             cancellationToken
@@ -72,7 +72,7 @@ public sealed class OpenIdConnectAuthorization(
             {
                 var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken);
                 var institutionIds = authorization is not null && authorization.Application is not null
-                    ? await GetInstitutionIdsByApplicationId(authorization.Application.Id, cancellationToken).ConfigureAwait(false)
+                    ? await GetInstitutionIdsByApplicationId(authorization.Application.Id, cancellationToken)
                     : null;
                 return institutionIds is not null
                     && await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken);
@@ -100,7 +100,7 @@ public sealed class OpenIdConnectAuthorization(
             {
                 var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken);
                 var institutionIds = token is not null && token.Application is not null
-                    ? await GetInstitutionIdsByApplicationId(token.Application.Id, cancellationToken).ConfigureAwait(false)
+                    ? await GetInstitutionIdsByApplicationId(token.Application.Id, cancellationToken)
                     : null;
                 return institutionIds is not null && await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken);
             },
@@ -121,7 +121,7 @@ public sealed class OpenIdConnectAuthorization(
             await Context.InstitutionOpenIdConnectApplications.AsNoTracking()
                 .Where(x => x.ApplicationId == applicationId)
                 .Select(x => new { x.InstitutionId })
-                .ToListAsync(cancellationToken).ConfigureAwait(false)
+                .ToListAsync(cancellationToken)
         ).Select(x => x.InstitutionId);
     }
 
@@ -133,7 +133,7 @@ public sealed class OpenIdConnectAuthorization(
     {
         foreach (var institutionId in institutionIds)
         {
-            if (await IsOwnerOfInstitution(user, institutionId, cancellationToken).ConfigureAwait(false))
+            if (await IsOwnerOfInstitution(user, institutionId, cancellationToken))
             {
                 return true;
             }

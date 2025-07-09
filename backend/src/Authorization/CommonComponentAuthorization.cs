@@ -35,7 +35,7 @@ public abstract class CommonComponentAuthorization(
                     user,
                     verifiedManufacturerId,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )
             {
                 return true;

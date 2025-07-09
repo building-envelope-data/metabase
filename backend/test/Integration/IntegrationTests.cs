@@ -110,7 +110,7 @@ public abstract partial class IntegrationTests
         // Get the antiforgery token in the cookie "XSRF-TOKEN" and set it
         // permanently on the HTTP client by requesting /antiforgery/token
         // synchronously.
-        var response = await httpClient.GetAsync("/antiforgery/token").ConfigureAwait(false);
+        var response = await httpClient.GetAsync("/antiforgery/token");
         // Add the antiforgery token as the default request header "X-XSRF-TOKEN".
         var xsrfToken =
             ExtractCookies(response)
@@ -166,8 +166,7 @@ public abstract partial class IntegrationTests
                         UserName = emailAddress,
                         Password = password
                     }
-                )
-                .ConfigureAwait(false);
+                );
         if (response.IsError)
         {
             throw new HttpRequestException($"Error {response.Error} of type {response.ErrorType} with description {response.ErrorDescription}");
@@ -199,12 +198,11 @@ public abstract partial class IntegrationTests
                     httpClient,
                     email,
                     password
-                )
-                .ConfigureAwait(false);
+                );
         httpClient.SetBearerToken(tokenResponse.AccessToken ??
                                   throw new InvalidOperationException(
                                       $"The auth-token request to {httpClient.BaseAddress} with email address {email} and password {password} returned `null` as access token."));
-        await UpdateAntiforgeryCookieAndToken(httpClient).ConfigureAwait(false);
+        await UpdateAntiforgeryCookieAndToken(httpClient);
     }
 
     protected Task LoginUser(
@@ -224,7 +222,7 @@ public abstract partial class IntegrationTests
     )
     {
         httpClient.SetBearerToken("");
-        await UpdateAntiforgeryCookieAndToken(httpClient).ConfigureAwait(false);
+        await UpdateAntiforgeryCookieAndToken(httpClient);
     }
 
     protected Task LogoutUser()
@@ -252,9 +250,9 @@ public abstract partial class IntegrationTests
                 httpClient,
                 email,
                 password
-            ).ConfigureAwait(false);
-            var result = await task(httpClient).ConfigureAwait(false);
-            await LogoutUser(httpClient).ConfigureAwait(false);
+            );
+            var result = await task(httpClient);
+            await LogoutUser(httpClient);
             return result;
         }
         finally
@@ -279,7 +277,7 @@ public abstract partial class IntegrationTests
                 ["password"] = password,
                 ["passwordConfirmation"] = passwordConfirmation ?? password
             }
-        ).ConfigureAwait(false);
+        );
     }
 
     protected async Task<Guid> RegisterUserReturningUuid(
@@ -298,7 +296,7 @@ public abstract partial class IntegrationTests
                 ["password"] = password,
                 ["passwordConfirmation"] = passwordConfirmation ?? password
             }
-        ).ConfigureAwait(false);
+        );
         return new Guid(
             ExtractString(
                 "$.data.registerUser.user.uuid",
@@ -339,7 +337,7 @@ public abstract partial class IntegrationTests
                 ["email"] = email,
                 ["confirmationCode"] = confirmationCode
             }
-        ).ConfigureAwait(false);
+        );
     }
 
     protected async Task<Guid> RegisterAndConfirmUser(
@@ -353,12 +351,12 @@ public abstract partial class IntegrationTests
                 name,
                 email,
                 password
-            ).ConfigureAwait(false);
+            );
         var confirmationCode = ExtractConfirmationCodeFromEmail();
         await ConfirmUserEmail(
             confirmationCode,
             email
-        ).ConfigureAwait(false);
+        );
         return uuid;
     }
 
@@ -373,11 +371,11 @@ public abstract partial class IntegrationTests
                 name,
                 email,
                 password
-            ).ConfigureAwait(false);
+            );
         await LoginUser(
             email,
             password
-        ).ConfigureAwait(false);
+        );
         return uuid;
     }
 
@@ -440,14 +438,14 @@ public abstract partial class IntegrationTests
             query,
             operationName,
             variables
-        ).ConfigureAwait(false);
+        );
         if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
         {
             // We wrap this check in an if-condition such that the message
             // content is only read when the status code is not 200.
             httpResponseMessage.StatusCode.Should().Be(
                 HttpStatusCode.OK,
-                await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false)
+                await httpResponseMessage.Content.ReadAsStringAsync()
             );
         }
 
@@ -480,14 +478,14 @@ public abstract partial class IntegrationTests
             query,
             operationName,
             variables
-        ).ConfigureAwait(false);
+        );
         if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
         {
             // We wrap this check in an if-condition such that the message
             // content is only read when the status code is not 200.
             httpResponseMessage.StatusCode.Should().NotBe(
                 HttpStatusCode.OK,
-                await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false)
+                await httpResponseMessage.Content.ReadAsStringAsync()
             );
         }
 
@@ -522,10 +520,8 @@ public abstract partial class IntegrationTests
                         operationName,
                         variables
                     )
-                    .ConfigureAwait(false)
             )
-            .ReadAsStringAsync()
-            .ConfigureAwait(false);
+            .ReadAsStringAsync();
     }
 
     protected Task<JsonElement> SuccessfullyQueryGraphQlContentAsJson(
@@ -558,12 +554,9 @@ public abstract partial class IntegrationTests
                                         operationName,
                                         variables
                                     )
-                                    .ConfigureAwait(false)
                             )
                             .ReadAsStreamAsync()
-                            .ConfigureAwait(false)
                     )
-                    .ConfigureAwait(false)
             )
             .RootElement;
     }
@@ -596,10 +589,8 @@ public abstract partial class IntegrationTests
                         operationName,
                         variables
                     )
-                    .ConfigureAwait(false)
             )
-            .ReadAsStringAsync()
-            .ConfigureAwait(false);
+            .ReadAsStringAsync();
     }
 
     protected static string ExtractString(

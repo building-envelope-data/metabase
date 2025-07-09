@@ -19,7 +19,7 @@ public sealed class GetComponentsTests
     public async Task NoComponent_ReturnsEmptyList()
     {
         // Act
-        var response = await GetComponents().ConfigureAwait(false);
+        var response = await GetComponents();
         // Assert
         Snapshot.Match(response);
     }
@@ -29,7 +29,7 @@ public sealed class GetComponentsTests
     public async Task SingleComponent_IsReturned()
     {
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        var userId = await RegisterAndConfirmAndLoginUser();
         var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
             HttpClient,
             AppSettings.BootstrapUserPassword,
@@ -37,16 +37,16 @@ public sealed class GetComponentsTests
             {
                 OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
+        );
         var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(
             MinimalComponentInput with
             {
                 ManufacturerId = institutionId
             }
-        ).ConfigureAwait(false);
-        await LogoutUser().ConfigureAwait(false);
+        );
+        await LogoutUser();
         // Act
-        var response = await GetComponents().ConfigureAwait(false);
+        var response = await GetComponents();
         // Assert
         Snapshot.Match(
             response,
@@ -65,7 +65,7 @@ public sealed class GetComponentsTests
     public async Task MultipleComponents_AreReturned()
     {
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        var userId = await RegisterAndConfirmAndLoginUser();
         var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
             HttpClient,
             AppSettings.BootstrapUserPassword,
@@ -73,7 +73,7 @@ public sealed class GetComponentsTests
             {
                 OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
+        );
         var componentIdsAndUuids = new List<(string, string)>();
         foreach (var input in ComponentInputs)
         {
@@ -83,13 +83,13 @@ public sealed class GetComponentsTests
                     {
                         ManufacturerId = institutionId
                     }
-                ).ConfigureAwait(false)
+                )
             );
         }
 
-        await LogoutUser().ConfigureAwait(false);
+        await LogoutUser();
         // Act
-        var response = await GetComponents().ConfigureAwait(false);
+        var response = await GetComponents();
         // Assert
         Snapshot.Match(
             response,

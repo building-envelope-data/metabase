@@ -45,7 +45,7 @@ public sealed class UserType
         }
 
         var user = context.Parent<User>();
-        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted))
         {
             return null;
         }
@@ -70,7 +70,7 @@ public sealed class UserType
         }
 
         var user = context.Parent<User>();
-        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted))
         {
             return null;
         }
@@ -95,7 +95,7 @@ public sealed class UserType
         }
 
         var user = context.Parent<User>();
-        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted))
         {
             return null;
         }
@@ -120,7 +120,7 @@ public sealed class UserType
         }
 
         var user = context.Parent<User>();
-        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, context.RequestAborted))
         {
             return null;
         }
@@ -198,7 +198,7 @@ public sealed class UserType
             .Resolve(context =>
                 AuthorizeAsync<bool>(
                     context,
-                    async (user, authorization) => await authorization.HasPasswordAsync(user).ConfigureAwait(false),
+                    async (user, authorization) => await authorization.HasPasswordAsync(user),
                     AuthConfiguration.ManageUserApiScope
                 )
             )
@@ -208,7 +208,7 @@ public sealed class UserType
             .Resolve(context =>
                 AuthorizeAsync(
                     context,
-                    async (user, authorization) => await authorization.GetRolesAsync(user).ConfigureAwait(false),
+                    async (user, authorization) => await authorization.GetRolesAsync(user),
                     Scopes.Roles
                 )
             )
@@ -280,17 +280,16 @@ public sealed class UserType
                 return null;
             }
 
-            if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, cancellationToken).ConfigureAwait(false))
+            if (!await authorization.IsAuthorizedToManageUser(claimsPrincipal, user.Id, cancellationToken))
             {
                 return null;
             }
 
             return new TwoFactorAuthentication(
-                await userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false) != null,
-                await userManager.GetTwoFactorEnabledAsync(user).ConfigureAwait(false),
-                await signInManager.IsTwoFactorClientRememberedAsync(user)
-                    .ConfigureAwait(false),
-                await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false)
+                await userManager.GetAuthenticatorKeyAsync(user) != null,
+                await userManager.GetTwoFactorEnabledAsync(user),
+                await signInManager.IsTwoFactorClientRememberedAsync(user),
+                await userManager.CountRecoveryCodesAsync(user)
             );
         }
 
@@ -358,7 +357,7 @@ public sealed class UserType
         {
             foreach (var role in Role.AllEnum)
             {
-                if (await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, role, cancellationToken).ConfigureAwait(false))
+                if (await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, role, cancellationToken))
                 {
                     yield return role;
                 }

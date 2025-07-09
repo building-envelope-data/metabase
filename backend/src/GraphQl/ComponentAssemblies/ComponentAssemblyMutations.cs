@@ -33,7 +33,7 @@ public sealed class ComponentAssemblyMutations
                 input.PartComponentId,
                 input.AssembledComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new AddComponentAssemblyPayload(
@@ -49,7 +49,6 @@ public sealed class ComponentAssemblyMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.AssembledComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -64,7 +63,6 @@ public sealed class ComponentAssemblyMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.PartComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -87,7 +85,6 @@ public sealed class ComponentAssemblyMutations
                     && a.PartComponentId == input.PartComponentId
                 )
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             return new AddComponentAssemblyPayload(
@@ -126,7 +123,7 @@ public sealed class ComponentAssemblyMutations
                 input.PartComponentId,
                 input.AssembledComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new UpdateComponentAssemblyPayload(
@@ -142,7 +139,6 @@ public sealed class ComponentAssemblyMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.AssembledComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -157,7 +153,6 @@ public sealed class ComponentAssemblyMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.PartComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -214,7 +209,7 @@ public sealed class ComponentAssemblyMutations
                 input.PartComponentId,
                 input.AssembledComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new RemoveComponentAssemblyPayload(
@@ -230,7 +225,6 @@ public sealed class ComponentAssemblyMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.AssembledComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -245,7 +239,6 @@ public sealed class ComponentAssemblyMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.PartComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(

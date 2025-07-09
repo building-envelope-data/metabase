@@ -21,7 +21,7 @@ public sealed class OpenIdConnectApplicationByIdDataLoader(
         var ret = new Dictionary<Guid, OpenIdConnectApplication?>();
         foreach (var key in keys)
         {
-            ret.Add(key, await _applicationManager.FindByIdAsync(key.ToString(), cancellationToken: cancellationToken).ConfigureAwait(false));
+            ret.Add(key, await _applicationManager.FindByIdAsync(key.ToString(), cancellationToken: cancellationToken));
         }
         return ret;
     }

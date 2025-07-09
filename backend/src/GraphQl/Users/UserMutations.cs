@@ -565,7 +565,7 @@ public sealed class UserMutations
         // TODO The confirmation also confirms the registration/account. Should we use another email text then?
         await SendUserEmailConfirmation(
             (user.Name, input.Email),
-            await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
+            await userManager.GenerateEmailConfirmationTokenAsync(user),
             emailSender,
             appSettings.Host,
             input.ReturnTo,
@@ -593,7 +593,7 @@ public sealed class UserMutations
         {
             await SendUserEmailConfirmation(
                 (user.Name, input.Email),
-                await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
+                await userManager.GenerateEmailConfirmationTokenAsync(user),
                 emailSender,
                 appSettings.Host,
                 null,
@@ -619,12 +619,12 @@ public sealed class UserMutations
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
         var user = await userManager.FindByEmailAsync(input.Email);
         // Don't reveal that the user does not exist or is not confirmed
-        if (user is not null && await userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
+        if (user is not null && await userManager.IsEmailConfirmedAsync(user))
         {
             // For more information on how to enable account confirmation and password reset please
             // visit https://docs.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-5.0
             var resetCode = EncodeToken(
-                await userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false)
+                await userManager.GeneratePasswordResetTokenAsync(user)
             );
             await emailSender.SendAsync(
                 (user.Name, input.Email),
@@ -743,7 +743,7 @@ public sealed class UserMutations
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
-        if (!await authorization.IsAuthorizedToDeleteUsers(claimsPrincipal, cancellationToken).ConfigureAwait(false)
+        if (!await authorization.IsAuthorizedToDeleteUsers(claimsPrincipal, cancellationToken)
            )
         {
             return new DeleteUserPayload(
@@ -842,7 +842,7 @@ public sealed class UserMutations
             );
         }
 
-        if (!await userManager.HasPasswordAsync(user).ConfigureAwait(false))
+        if (!await userManager.HasPasswordAsync(user))
         {
             return new ChangeUserPasswordPayload(
                 user,
@@ -949,7 +949,7 @@ public sealed class UserMutations
             );
         }
 
-        if (await userManager.HasPasswordAsync(user).ConfigureAwait(false))
+        if (await userManager.HasPasswordAsync(user))
         {
             if (input.Password is null)
             {
@@ -963,7 +963,7 @@ public sealed class UserMutations
                 );
             }
 
-            if (!await userManager.CheckPasswordAsync(user, input.Password).ConfigureAwait(false))
+            if (!await userManager.CheckPasswordAsync(user, input.Password))
             {
                 return new DeletePersonalUserDataPayload(
                     user,
@@ -1095,7 +1095,7 @@ public sealed class UserMutations
             );
         }
 
-        return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false) switch
+        return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user) switch
         {
             LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
                 new GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload(
@@ -1177,7 +1177,7 @@ public sealed class UserMutations
                 );
         if (!isTokenValid)
         {
-            return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false) switch
+            return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user) switch
             {
                 LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
                     new EnableUserTwoFactorAuthenticatorPayload(
@@ -1203,7 +1203,7 @@ public sealed class UserMutations
         var enableResult = await userManager.SetTwoFactorEnabledAsync(user, true);
         if (!enableResult.Succeeded)
         {
-            return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user).ConfigureAwait(false) switch
+            return await LoadSharedKeyAndQrCodeUriAsync(userManager, urlEncoder, user) switch
             {
                 LoadSharedKeyAndQrCodeUriPayload.Success(var sharedKey, var authenticatorUri) =>
                     new EnableUserTwoFactorAuthenticatorPayload(
@@ -1226,7 +1226,7 @@ public sealed class UserMutations
             };
         }
 
-        if (await userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false) == 0)
+        if (await userManager.CountRecoveryCodesAsync(user) == 0)
         {
             var recoveryCodes =
                 await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
@@ -1417,7 +1417,7 @@ public sealed class UserMutations
             user.Name,
             currentEmail,
             input.NewEmail,
-            await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail).ConfigureAwait(false),
+            await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail),
             emailSender,
             appSettings.Host,
             urlEncoder
@@ -1465,7 +1465,7 @@ public sealed class UserMutations
 
         await SendUserEmailConfirmation(
             (user.Name, email),
-            await userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false),
+            await userManager.GenerateEmailConfirmationTokenAsync(user),
             emailSender,
             appSettings.Host,
             null,
@@ -1497,7 +1497,7 @@ public sealed class UserMutations
             );
         }
 
-        if (!await userManager.GetTwoFactorEnabledAsync(user).ConfigureAwait(false))
+        if (!await userManager.GetTwoFactorEnabledAsync(user))
         {
             return new GenerateUserTwoFactorRecoveryCodesPayload(
                 user,
@@ -1621,7 +1621,7 @@ public sealed class UserMutations
             );
         }
 
-        if (await userManager.HasPasswordAsync(user).ConfigureAwait(false))
+        if (await userManager.HasPasswordAsync(user))
         {
             return new SetUserPasswordPayload(
                 user,
@@ -1716,8 +1716,7 @@ public sealed class UserMutations
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
-        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, cancellationToken)
-                .ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, cancellationToken))
         {
             return new AddUserRolePayload(
                 new AddUserRoleError(
@@ -1784,8 +1783,7 @@ public sealed class UserMutations
     )
     {
         await ValidateAntiforgeryTokenAsync(antiforgeryService, httpContextAccessor);
-        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, cancellationToken)
-                .ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToAddOrRemoveRole(claimsPrincipal, input.Role, cancellationToken))
         {
             return new RemoveUserRolePayload(
                 new RemoveUserRoleError(

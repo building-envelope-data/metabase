@@ -23,7 +23,6 @@ public sealed class KeyFingerprintQueries
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -38,7 +37,6 @@ public sealed class KeyFingerprintQueries
         if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(

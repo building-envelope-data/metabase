@@ -32,7 +32,7 @@ public sealed class UserMethodDeveloperMutations
                 claimsPrincipal,
                 input.MethodId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new AddUserMethodDeveloperPayload(
@@ -48,7 +48,6 @@ public sealed class UserMethodDeveloperMutations
         if (!await context.Methods.AsQueryable()
                 .Where(u => u.Id == input.MethodId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -63,7 +62,6 @@ public sealed class UserMethodDeveloperMutations
         if (!await context.Users.AsQueryable()
                 .Where(i => i.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -86,7 +84,6 @@ public sealed class UserMethodDeveloperMutations
                     && m.UserId == input.UserId
                 )
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             return new AddUserMethodDeveloperPayload(
@@ -102,7 +99,7 @@ public sealed class UserMethodDeveloperMutations
         {
             MethodId = input.MethodId,
             UserId = input.UserId,
-            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId, cancellationToken).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId, cancellationToken)
         };
         context.UserMethodDevelopers.Add(userMethodDeveloper);
         await context.SaveChangesAsync(cancellationToken);
@@ -123,7 +120,7 @@ public sealed class UserMethodDeveloperMutations
                 claimsPrincipal,
                 input.UserId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new ConfirmUserMethodDeveloperPayload(
@@ -139,7 +136,6 @@ public sealed class UserMethodDeveloperMutations
         if (!await context.Methods.AsQueryable()
                 .Where(u => u.Id == input.MethodId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -154,7 +150,6 @@ public sealed class UserMethodDeveloperMutations
         if (!await context.Users.AsQueryable()
                 .Where(i => i.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -208,7 +203,7 @@ public sealed class UserMethodDeveloperMutations
                 claimsPrincipal,
                 input.MethodId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new RemoveUserMethodDeveloperPayload(
@@ -224,7 +219,6 @@ public sealed class UserMethodDeveloperMutations
         if (!await context.Methods.AsQueryable()
                 .Where(u => u.Id == input.MethodId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -239,7 +233,6 @@ public sealed class UserMethodDeveloperMutations
         if (!await context.Users.AsQueryable()
                 .Where(i => i.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(

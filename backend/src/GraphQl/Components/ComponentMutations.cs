@@ -33,7 +33,7 @@ public sealed class ComponentMutations
                 claimsPrincipal,
                 input.ManufacturerId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new CreateComponentPayload(
@@ -50,7 +50,6 @@ public sealed class ComponentMutations
                     x => x.Id == input.ManufacturerId,
                     cancellationToken
                 )
-                .ConfigureAwait(false)
            )
         {
             return new CreateComponentPayload(
@@ -141,7 +140,7 @@ public sealed class ComponentMutations
                 claimsPrincipal,
                 input.ComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new UpdateComponentPayload(
@@ -202,7 +201,7 @@ public sealed class ComponentMutations
                 claimsPrincipal,
                 input.ComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new SetComponentExtrasPayload(

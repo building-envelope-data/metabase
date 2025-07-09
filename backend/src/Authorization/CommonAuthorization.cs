@@ -156,7 +156,7 @@ public abstract class CommonAuthorization(
                    user,
                    institutionId,
                    cancellationToken
-               ).ConfigureAwait(false)
+               )
                == InstitutionRepresentativeRole.OWNER;
     }
 
@@ -169,7 +169,7 @@ public abstract class CommonAuthorization(
         return await IsVerified(
                 institutionId,
                 cancellationToken
-            ).ConfigureAwait(false) &&
+            ) &&
             await IsOwnerOfInstitution(
                 user,
                 institutionId,
@@ -202,7 +202,7 @@ public abstract class CommonAuthorization(
         return await IsVerified(
                 institutionId,
                 cancellationToken
-            ).ConfigureAwait(false) &&
+            ) &&
             await IsAtLeastAssistant(
                 user,
                 institutionId,

@@ -17,12 +17,12 @@ public sealed class ResendUserEmailConfirmationTests
         // Arrange
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser().ConfigureAwait(false);
+        await RegisterUser();
         EmailSender.Clear();
         // Act
         var response = await ResendUserEmailConfirmation(
             email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailsShouldContainSingle(
@@ -38,12 +38,12 @@ public sealed class ResendUserEmailConfirmationTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email).ConfigureAwait(false);
+        await RegisterUser(email: email);
         EmailSender.Clear();
         // Act
         var response = await ResendUserEmailConfirmation(
             "unknown." + email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();

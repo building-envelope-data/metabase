@@ -36,7 +36,7 @@ public sealed class MethodMutations
                 claimsPrincipal,
                 input.ManagerId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new CreateMethodPayload(
@@ -53,7 +53,6 @@ public sealed class MethodMutations
                     x => x.Id == input.ManagerId,
                     cancellationToken
                 )
-                .ConfigureAwait(false)
            )
         {
             return new CreateMethodPayload(
@@ -71,7 +70,6 @@ public sealed class MethodMutations
                     .Where(x => input.InstitutionDeveloperIds.Contains(x.Id))
                     .Select(x => x.Id)
                     .ToListAsync(cancellationToken)
-                    .ConfigureAwait(false)
             );
         if (unknownInstitutionDeveloperIds.Any())
         {
@@ -90,7 +88,6 @@ public sealed class MethodMutations
                     .Where(u => input.UserDeveloperIds.Contains(u.Id))
                     .Select(u => u.Id)
                     .ToListAsync(cancellationToken)
-                    .ConfigureAwait(false)
             );
         if (unknownUserDeveloperIds.Any())
         {
@@ -145,7 +142,7 @@ public sealed class MethodMutations
                 new InstitutionMethodDeveloper
                 {
                     InstitutionId = institutionDeveloperId,
-                    Pending = !await institutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, institutionDeveloperId, cancellationToken).ConfigureAwait(false)
+                    Pending = !await institutionMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, institutionDeveloperId, cancellationToken)
                 }
             );
         }
@@ -156,7 +153,7 @@ public sealed class MethodMutations
                 new UserMethodDeveloper
                 {
                     UserId = userDeveloperId,
-                    Pending = !await userMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, userDeveloperId, cancellationToken).ConfigureAwait(false)
+                    Pending = !await userMethodDeveloperAuthorization.IsAuthorizedToConfirm(claimsPrincipal, userDeveloperId, cancellationToken)
                 }
             );
         }
@@ -180,7 +177,7 @@ public sealed class MethodMutations
                 claimsPrincipal,
                 input.MethodId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new UpdateMethodPayload(

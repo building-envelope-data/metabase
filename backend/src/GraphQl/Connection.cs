@@ -25,7 +25,7 @@ public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociat
     )
     {
         return (
-                await dataLoader.LoadAsync(Subject.Id, cancellationToken).ConfigureAwait(false) ?? []
+                await dataLoader.LoadAsync(Subject.Id, cancellationToken) ?? []
             )
             .Select(_createEdge);
     }

@@ -229,7 +229,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_opticalDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             id,
@@ -240,7 +240,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.OpticalData;
     }
 
@@ -258,7 +258,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_hygrothermalDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             id,
@@ -269,7 +269,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.HygrothermalData;
     }
 
@@ -287,7 +287,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_calorimetricDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             id,
@@ -298,7 +298,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.CalorimetricData;
     }
 
@@ -316,7 +316,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_photovoltaicDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             id,
@@ -327,7 +327,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.PhotovoltaicData;
     }
 
@@ -345,7 +345,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_geometricDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             id,
@@ -356,7 +356,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.GeometricData;
     }
 
@@ -377,7 +377,7 @@ public sealed class DatabaseResolvers(
                     database,
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
-                            s_allOpticalDataFileNames).ConfigureAwait(false),
+                            s_allOpticalDataFileNames),
                         new
                         {
                             where,
@@ -392,7 +392,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.AllOpticalData;
     }
 
@@ -414,7 +414,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_allHygrothermalDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             where,
@@ -429,7 +429,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.AllHygrothermalData;
     }
 
@@ -451,7 +451,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_allCalorimetricDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             where,
@@ -466,7 +466,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.AllCalorimetricData;
     }
 
@@ -488,7 +488,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_allPhotovoltaicDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             where,
@@ -503,7 +503,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.AllPhotovoltaicData;
     }
 
@@ -524,7 +524,7 @@ public sealed class DatabaseResolvers(
                     database,
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
-                            s_allGeometricDataFileNames).ConfigureAwait(false),
+                            s_allGeometricDataFileNames),
                         new
                         {
                             where,
@@ -539,7 +539,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.AllGeometricData;
     }
 
@@ -557,7 +557,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_hasOpticalDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             where,
@@ -568,7 +568,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.HasOpticalData;
     }
 
@@ -586,7 +586,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_hasCalorimetricDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             where,
@@ -597,7 +597,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.HasCalorimetricData;
     }
 
@@ -615,7 +615,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_hasHygrothermalDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             where,
@@ -626,7 +626,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.HasHygrothermalData;
     }
 
@@ -644,7 +644,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_hasPhotovoltaicDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             where,
@@ -655,7 +655,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.HasPhotovoltaicData;
     }
 
@@ -673,7 +673,7 @@ public sealed class DatabaseResolvers(
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_hasGeometricDataFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         new
                         {
                             where,
@@ -684,7 +684,7 @@ public sealed class DatabaseResolvers(
                     httpContextAccessor,
                     resolverContext,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             )?.HasGeometricData;
     }
 

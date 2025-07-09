@@ -39,7 +39,7 @@ public sealed class InstitutionMutations
                     claimsPrincipal,
                     input.ManagerId ?? Guid.Empty,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
            )
         {
             return new CreateInstitutionPayload(
@@ -80,7 +80,6 @@ public sealed class InstitutionMutations
                     .Where(u => input.OwnerIds.Contains(u.Id))
                     .Select(u => u.Id)
                     .ToListAsync(cancellationToken)
-                    .ConfigureAwait(false)
             );
         if (unknownOwnerIds.Any())
         {
@@ -99,7 +98,6 @@ public sealed class InstitutionMutations
                     x => x.Id == input.ManagerId,
                     cancellationToken
                 )
-                .ConfigureAwait(false)
            )
         {
             return new CreateInstitutionPayload(
@@ -117,7 +115,7 @@ public sealed class InstitutionMutations
             input.Description,
             input.WebsiteLocator,
             input.PublicKey,
-            await GetInitialInstitutionState(input, user, authorization).ConfigureAwait(false),
+            await GetInitialInstitutionState(input, user, authorization),
             InstitutionOperatingState.OPERATING,
             input.Extras
         )
@@ -131,7 +129,7 @@ public sealed class InstitutionMutations
                 {
                     UserId = ownerId,
                     Role = InstitutionRepresentativeRole.OWNER,
-                    Pending = !await representativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId, cancellationToken).ConfigureAwait(false)
+                    Pending = !await representativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId, cancellationToken)
                 }
             );
         }
@@ -166,9 +164,7 @@ public sealed class InstitutionMutations
     {
         if (input.ManagerId is not null
             || await authorization.IsInRole(user, UserRole.ADMINISTRATOR)
-                .ConfigureAwait(false)
             || await authorization.IsInRole(user, UserRole.VERIFIER)
-                .ConfigureAwait(false)
            )
         {
             return InstitutionState.VERIFIED;
@@ -187,7 +183,7 @@ public sealed class InstitutionMutations
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal, cancellationToken).ConfigureAwait(false)
+        if (!await authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal, cancellationToken)
            )
         {
             return new VerifyInstitutionPayload(
@@ -233,7 +229,7 @@ public sealed class InstitutionMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new UpdateInstitutionPayload(
@@ -286,7 +282,7 @@ public sealed class InstitutionMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new DeleteInstitutionPayload(
@@ -319,35 +315,30 @@ public sealed class InstitutionMutations
                 .Collection(i => i.ManagedDataFormats)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
             ||
             await context
                 .Entry(institution)
                 .Collection(i => i.ManagedInstitutions)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
             ||
             await context
                 .Entry(institution)
                 .Collection(i => i.ManagedMethods)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
             ||
             await context
                 .Entry(institution)
                 .Collection(i => i.OperatedDatabases)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
             ||
             await context
                 .Entry(institution)
                 .Collection(i => i.ManufacturedComponents)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
         )
         {
             return new DeleteInstitutionPayload(
@@ -378,7 +369,7 @@ public sealed class InstitutionMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new SwitchInstitutionOperatingStatePayload(

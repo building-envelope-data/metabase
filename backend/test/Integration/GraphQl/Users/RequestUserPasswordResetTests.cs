@@ -17,12 +17,12 @@ public sealed class RequestUserPasswordResetTests
         // Arrange
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterAndConfirmUser().ConfigureAwait(false);
+        await RegisterAndConfirmUser();
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
             email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailsShouldContainSingle(
@@ -38,12 +38,12 @@ public sealed class RequestUserPasswordResetTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterAndConfirmUser(email: email).ConfigureAwait(false);
+        await RegisterAndConfirmUser(email: email);
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
             "unknown." + email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();
@@ -55,12 +55,12 @@ public sealed class RequestUserPasswordResetTests
     {
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterUser(email: email).ConfigureAwait(false);
+        await RegisterUser(email: email);
         EmailSender.Clear();
         // Act
         var response = await RequestUserPasswordReset(
             email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
         EmailSender.Emails.Should().BeEmpty();

@@ -67,9 +67,9 @@ public sealed class UserAuthorization(
             async user => role switch
             {
                 UserRole.ADMINISTRATOR =>
-                    await IsAdministrator(user).ConfigureAwait(false),
+                    await IsAdministrator(user),
                 UserRole.VERIFIER =>
-                    await IsVerifier(user).ConfigureAwait(false),
+                    await IsVerifier(user),
                 _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown role `{role}.`")
             },
             application => Task.FromResult(false),

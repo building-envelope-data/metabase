@@ -31,7 +31,7 @@ public sealed class OpenIdConnectApplicationMutations
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManageApplications(claimsPrincipal, cancellationToken).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageApplications(claimsPrincipal, cancellationToken))
         {
             return new CreateOpenIdConnectApplicationPayload(
                 new CreateOpenIdConnectApplicationError(
@@ -52,7 +52,7 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
-        if (await applicationManager.FindByClientIdAsync(input.ClientId, cancellationToken).ConfigureAwait(false) is not null)
+        if (await applicationManager.FindByClientIdAsync(input.ClientId, cancellationToken) is not null)
         {
             return new CreateOpenIdConnectApplicationPayload(
                 new CreateOpenIdConnectApplicationError(
@@ -130,7 +130,7 @@ public sealed class OpenIdConnectApplicationMutations
                 claimsPrincipal,
                 input.ApplicationId,
                 cancellationToken
-            ).ConfigureAwait(false))
+            ))
         {
             return new UpdateOpenIdConnectApplicationPayload(
                 new UpdateOpenIdConnectApplicationError(
@@ -176,7 +176,7 @@ public sealed class OpenIdConnectApplicationMutations
                 claimsPrincipal,
                 input.ApplicationId,
                 cancellationToken
-            ).ConfigureAwait(false))
+            ))
         {
             return new DeleteOpenIdConnectApplicationPayload(
                 new DeleteOpenIdConnectApplicationError(

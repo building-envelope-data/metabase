@@ -47,7 +47,7 @@ public sealed class CustomWebApplicationFactory
     private async Task DoAsync(Func<IServiceProvider, Task> what)
     {
         using var scope = Services.CreateScope();
-        await what(scope.ServiceProvider).ConfigureAwait(false);
+        await what(scope.ServiceProvider);
     }
 
     // private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
@@ -115,7 +115,7 @@ public sealed class CustomWebApplicationFactory
     {
         await DoAsync(
             DbSeeder.DoAsync
-        ).ConfigureAwait(false);
+        );
     }
 
     // https://docs.microsoft.com/en-us/dotnet/standard/managed-code

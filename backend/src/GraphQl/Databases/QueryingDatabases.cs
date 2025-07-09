@@ -82,7 +82,7 @@ public sealed class QueryingDatabases
                 fileNames.Select(fileName =>
                     File.ReadAllTextAsync($"./GraphQl/Databases/Queries/{fileName}")
                 )
-            ).ConfigureAwait(false)
+            )
         );
     }
 
@@ -137,7 +137,7 @@ public sealed class QueryingDatabases
         //      request,
         //      cancellationToken
         //      )
-        //    .ConfigureAwait(false)
+        //
         //    )
         //   .AsGraphQLHttpResponse();
         using var httpClient = httpClientFactory.CreateClient(DatabaseHttpClient);
@@ -192,7 +192,7 @@ public sealed class QueryingDatabases
                 graphQlResponseStream,
                 SerializerOptions,
                 cancellationToken
-            ).ConfigureAwait(false) ?? throw new JsonException("Failed to deserialize the GraphQL response.");
+            ) ?? throw new JsonException("Failed to deserialize the GraphQL response.");
         return deserializedGraphQlResponse;
     }
 

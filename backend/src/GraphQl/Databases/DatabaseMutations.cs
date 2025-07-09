@@ -40,7 +40,7 @@ public sealed class DatabaseMutations
                 claimsPrincipal,
                 input.OperatorId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new CreateDatabasePayload(
@@ -57,7 +57,6 @@ public sealed class DatabaseMutations
                     x => x.Id == input.OperatorId,
                     cancellationToken
                 )
-                .ConfigureAwait(false)
            )
         {
             return new CreateDatabasePayload(
@@ -96,7 +95,7 @@ public sealed class DatabaseMutations
                 claimsPrincipal,
                 input.DatabaseId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new UpdateDatabasePayload(
@@ -148,7 +147,7 @@ public sealed class DatabaseMutations
                 claimsPrincipal,
                 input.DatabaseId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new VerifyDatabasePayload(
@@ -234,13 +233,13 @@ public sealed class DatabaseMutations
                     new GraphQLRequest(
                         await QueryingDatabases.ConstructQuery(
                             s_verificationCodeFileNames
-                        ).ConfigureAwait(false),
+                        ),
                         operationName: "VerificationCode"
                     ),
                     httpClientFactory,
                     httpContextAccessor,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
             ).Data.VerificationCode;
     }
 

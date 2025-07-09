@@ -31,7 +31,7 @@ public sealed class KeyFingerprintMutations
         if (!await authorization.IsAuthorizedToAddKeyFingerprint(
                 claimsPrincipal,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new AddKeyFingerprintPayload(
@@ -47,7 +47,6 @@ public sealed class KeyFingerprintMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -62,7 +61,6 @@ public sealed class KeyFingerprintMutations
         if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(

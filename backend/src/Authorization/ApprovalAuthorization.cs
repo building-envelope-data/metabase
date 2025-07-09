@@ -26,7 +26,7 @@ public sealed class ApprovalAuthorization(
                     .SingleOrDefaultAsync(
                         x => x.UserId == user.Id && x.DataSigningPermission == Enumerations.DataSigningPermission.ALLOWED,
                         cancellationToken
-                    ).ConfigureAwait(false)) is not null,
+                    )) is not null,
             application => Task.FromResult(false),
             cancellationToken
         );

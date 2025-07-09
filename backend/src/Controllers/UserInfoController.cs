@@ -75,7 +75,7 @@ public sealed class UserInfoController(UserManager<User> userManager) : Controll
         var claims = new Dictionary<string, object>(StringComparer.Ordinal)
         {
             // Note: the "sub" claim is a mandatory claim and must be included in the JSON response.
-            [Claims.Subject] = await _userManager.GetUserIdAsync(user).ConfigureAwait(false)
+            [Claims.Subject] = await _userManager.GetUserIdAsync(user)
         };
         if (User.HasScope(Scopes.Address))
         {

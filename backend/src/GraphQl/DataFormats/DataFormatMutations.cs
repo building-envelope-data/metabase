@@ -33,7 +33,7 @@ public sealed class DataFormatMutations
                 claimsPrincipal,
                 input.ManagerId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new CreateDataFormatPayload(
@@ -50,7 +50,6 @@ public sealed class DataFormatMutations
                     x => x.Id == input.ManagerId,
                     cancellationToken
                 )
-                .ConfigureAwait(false)
            )
         {
             return new CreateDataFormatPayload(
@@ -112,7 +111,7 @@ public sealed class DataFormatMutations
                 claimsPrincipal,
                 input.DataFormatId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new UpdateDataFormatPayload(

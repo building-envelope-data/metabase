@@ -36,7 +36,7 @@ public sealed class InstitutionRepresentativeMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new AddInstitutionRepresentativePayload(
@@ -52,7 +52,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -67,7 +66,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -90,7 +88,6 @@ public sealed class InstitutionRepresentativeMutations
                     && r.UserId == input.UserId
                 )
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             return new AddInstitutionRepresentativePayload(
@@ -107,7 +104,7 @@ public sealed class InstitutionRepresentativeMutations
             InstitutionId = input.InstitutionId,
             UserId = input.UserId,
             Role = input.Role,
-            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId, cancellationToken).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.UserId, cancellationToken)
         };
         context.InstitutionRepresentatives.Add(institutionRepresentative);
         await context.SaveChangesAsync(cancellationToken);
@@ -128,7 +125,7 @@ public sealed class InstitutionRepresentativeMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new RemoveInstitutionRepresentativePayload(
@@ -144,7 +141,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -159,7 +155,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -200,7 +195,7 @@ public sealed class InstitutionRepresentativeMutations
                 institutionRepresentative.UserId,
                 context,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new RemoveInstitutionRepresentativePayload(
@@ -231,7 +226,7 @@ public sealed class InstitutionRepresentativeMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new ChangeInstitutionRepresentativeRolePayload(
@@ -247,7 +242,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -262,7 +256,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -304,7 +297,7 @@ public sealed class InstitutionRepresentativeMutations
                 institutionRepresentative.UserId,
                 context,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new ChangeInstitutionRepresentativeRolePayload(
@@ -335,7 +328,7 @@ public sealed class InstitutionRepresentativeMutations
                 claimsPrincipal,
                 input.UserId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new ConfirmInstitutionRepresentativePayload(
@@ -351,7 +344,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -366,7 +358,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -417,7 +408,7 @@ public sealed class InstitutionRepresentativeMutations
         ApplicationDbContext context,
         CancellationToken cancellationToken)
     {
-        if (!await authorization.IsAuthorizedToManageSigningPermission(claimsPrincipal, input.InstitutionId, cancellationToken).ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageSigningPermission(claimsPrincipal, input.InstitutionId, cancellationToken))
         {
             return new AllowRepresentativeToSignDataPayload(
                 new AllowRepresentativeToSignDataError(
@@ -432,7 +423,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -447,7 +437,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -506,8 +495,7 @@ public sealed class InstitutionRepresentativeMutations
         ApplicationDbContext context,
         CancellationToken cancellationToken)
     {
-        if (!await authorization.IsAuthorizedToManageSigningPermission(claimsPrincipal, input.InstitutionId, cancellationToken)
-                .ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToManageSigningPermission(claimsPrincipal, input.InstitutionId, cancellationToken))
         {
             return new ForbidRepresentativeToSignDataPayload(
                 new ForbidRepresentativeToSignDataError(
@@ -522,7 +510,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -537,7 +524,6 @@ public sealed class InstitutionRepresentativeMutations
         if (!await context.Users.AsQueryable()
                 .Where(u => u.Id == input.UserId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(

@@ -19,7 +19,7 @@ public sealed class LoginUserTests
         // Arrange
         const string email = "john.doe@ise.fraunhofer.de";
         const string password = "aaaAAA123$!@";
-        await RegisterAndConfirmUser(email: email, password: password).ConfigureAwait(false);
+        await RegisterAndConfirmUser(email: email, password: password);
         // Act
         var response = await SuccessfullyQueryGraphQlContentAsString(
             File.ReadAllText("Integration/GraphQl/Users/LoginUser.graphql"),
@@ -28,7 +28,7 @@ public sealed class LoginUserTests
                 ["email"] = email,
                 ["password"] = password,
             }
-        ).ConfigureAwait(false);
+        );
         // Assert
         // TODO assert that cookie was set!
         Snapshot.Match(

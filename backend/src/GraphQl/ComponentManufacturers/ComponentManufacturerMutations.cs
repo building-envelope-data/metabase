@@ -32,7 +32,7 @@ public sealed class ComponentManufacturerMutations
                 claimsPrincipal,
                 input.ComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new AddComponentManufacturerPayload(
@@ -48,7 +48,6 @@ public sealed class ComponentManufacturerMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.ComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -63,7 +62,6 @@ public sealed class ComponentManufacturerMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(c => c.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -86,7 +84,6 @@ public sealed class ComponentManufacturerMutations
                     && m.InstitutionId == input.InstitutionId
                 )
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             return new AddComponentManufacturerPayload(
@@ -102,7 +99,7 @@ public sealed class ComponentManufacturerMutations
         {
             ComponentId = input.ComponentId,
             InstitutionId = input.InstitutionId,
-            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, cancellationToken).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, cancellationToken)
         };
         context.ComponentManufacturers.Add(componentManufacturer);
         await context.SaveChangesAsync(cancellationToken);
@@ -123,7 +120,7 @@ public sealed class ComponentManufacturerMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new ConfirmComponentManufacturerPayload(
@@ -139,7 +136,6 @@ public sealed class ComponentManufacturerMutations
         if (!await context.Components.AsQueryable()
                 .Where(u => u.Id == input.ComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -154,7 +150,6 @@ public sealed class ComponentManufacturerMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -208,7 +203,7 @@ public sealed class ComponentManufacturerMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new RemoveComponentManufacturerPayload(
@@ -224,7 +219,6 @@ public sealed class ComponentManufacturerMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.ComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -239,7 +233,6 @@ public sealed class ComponentManufacturerMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(c => c.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -280,8 +273,7 @@ public sealed class ComponentManufacturerMutations
                     && a.InstitutionId != input.InstitutionId
                     && !a.Pending
                 )
-                .AnyAsync(cancellationToken)
-                .ConfigureAwait(false))
+                .AnyAsync(cancellationToken))
         {
             return new RemoveComponentManufacturerPayload(
                 new RemoveComponentManufacturerError(

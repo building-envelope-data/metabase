@@ -17,6 +17,6 @@ public abstract class Edge<TNode, TNodeByIdDataLoader>(
         CancellationToken cancellationToken
     )
     {
-        return (await byId.LoadAsync(_nodeId, cancellationToken).ConfigureAwait(false))!;
+        return (await byId.LoadAsync(_nodeId, cancellationToken))!;
     }
 }

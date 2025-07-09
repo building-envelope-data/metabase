@@ -22,11 +22,11 @@ public sealed class DeletePersonalUserDataTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await DeletePersonalUserData(
             password
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -47,12 +47,12 @@ public sealed class DeletePersonalUserDataTests
             await RegisterAndConfirmAndLoginUser(
                 email: email,
                 password: password
-            ).ConfigureAwait(false);
+            );
         // Act
         await DeletePersonalUserData(
             password
-        ).ConfigureAwait(false);
-        var response = await GetUser(userId).ConfigureAwait(false);
+        );
+        var response = await GetUser(userId);
         // Assert
         Snapshot.Match(response);
     }
@@ -67,7 +67,7 @@ public sealed class DeletePersonalUserDataTests
         await RegisterAndConfirmUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await SuccessfullyQueryGraphQlContentAsString(
             File.ReadAllText("Integration/GraphQl/Users/DeletePersonalUserData.graphql"),
@@ -75,7 +75,7 @@ public sealed class DeletePersonalUserDataTests
             {
                 ["password"] = password
             }
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
     }
@@ -91,7 +91,7 @@ public sealed class DeletePersonalUserDataTests
             await RegisterAndConfirmUser(
                 email: email,
                 password: password
-            ).ConfigureAwait(false);
+            );
         // Act
         await SuccessfullyQueryGraphQlContentAsString(
             File.ReadAllText("Integration/GraphQl/Users/DeletePersonalUserData.graphql"),
@@ -99,9 +99,9 @@ public sealed class DeletePersonalUserDataTests
             {
                 ["password"] = password
             }
-        ).ConfigureAwait(false);
-        await LoginUser().ConfigureAwait(false);
-        var response = await GetUser(userId).ConfigureAwait(false);
+        );
+        await LoginUser();
+        var response = await GetUser(userId);
         // Assert
         Snapshot.Match(
             response,
@@ -121,11 +121,11 @@ public sealed class DeletePersonalUserDataTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await DeletePersonalUserData(
             null
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -146,12 +146,12 @@ public sealed class DeletePersonalUserDataTests
             await RegisterAndConfirmAndLoginUser(
                 email: email,
                 password: password
-            ).ConfigureAwait(false);
+            );
         // Act
         await DeletePersonalUserData(
             null
-        ).ConfigureAwait(false);
-        var response = await GetUser(userId).ConfigureAwait(false);
+        );
+        var response = await GetUser(userId);
         // Assert
         Snapshot.Match(
             response,
@@ -171,11 +171,11 @@ public sealed class DeletePersonalUserDataTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await DeletePersonalUserData(
             "incorrect" + password
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -196,12 +196,12 @@ public sealed class DeletePersonalUserDataTests
             await RegisterAndConfirmAndLoginUser(
                 email: email,
                 password: password
-            ).ConfigureAwait(false);
+            );
         // Act
         await DeletePersonalUserData(
             "incorrect" + password
-        ).ConfigureAwait(false);
-        var response = await GetUser(userId).ConfigureAwait(false);
+        );
+        var response = await GetUser(userId);
         // Assert
         Snapshot.Match(
             response,

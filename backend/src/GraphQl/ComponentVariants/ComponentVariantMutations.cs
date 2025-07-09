@@ -33,7 +33,7 @@ public sealed class ComponentVariantMutations
                 input.OtherComponentId,
                 input.OneComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new AddComponentVariantPayload(
@@ -49,7 +49,6 @@ public sealed class ComponentVariantMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.OneComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -64,7 +63,6 @@ public sealed class ComponentVariantMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.OtherComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -87,7 +85,6 @@ public sealed class ComponentVariantMutations
                     && a.ToComponentId == input.OtherComponentId
                 )
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             return new AddComponentVariantPayload(
@@ -130,7 +127,7 @@ public sealed class ComponentVariantMutations
                 input.OtherComponentId,
                 input.OneComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new RemoveComponentVariantPayload(
@@ -146,7 +143,6 @@ public sealed class ComponentVariantMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.OneComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -161,7 +157,6 @@ public sealed class ComponentVariantMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.OtherComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(

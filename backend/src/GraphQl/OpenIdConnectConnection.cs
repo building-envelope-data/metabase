@@ -23,7 +23,7 @@ public abstract class OpenIdConnectConnection<TAssociation, TAssociationsByAssoc
     )
     {
         return (
-                await dataLoader.LoadAsync(Subject.Id, cancellationToken).ConfigureAwait(false) ?? []
+                await dataLoader.LoadAsync(Subject.Id, cancellationToken) ?? []
             )
             .Select(_createEdge);
     }
