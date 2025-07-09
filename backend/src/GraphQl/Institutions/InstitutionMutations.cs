@@ -410,4 +410,48 @@ public sealed class InstitutionMutations
         await context.SaveChangesAsync(cancellationToken);
         return new SwitchInstitutionOperatingStatePayload(institution);
     }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    public async Task<SetInstitutionExtrasPayload> SetInstitutionExtrasAsync(
+        SetInstitutionExtrasInput input,
+        ClaimsPrincipal claimsPrincipal,
+        InstitutionAuthorization authorization,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        if (!await authorization.IsAuthorizedToUpdateInstitution(
+                claimsPrincipal,
+                input.InstitutionId,
+                cancellationToken
+            )
+           )
+        {
+            return new SetInstitutionExtrasPayload(
+                new SetInstitutionExtrasError(
+                    SetInstitutionExtrasErrorCode.UNAUTHORIZED,
+                    "You are not authorized to update the institution.",
+                    []
+                )
+            );
+        }
+        var institution =
+            await context.Institutions.AsQueryable()
+                .Where(i => i.Id == input.InstitutionId)
+                .SingleOrDefaultAsync(cancellationToken);
+        if (institution is null)
+        {
+            return new SetInstitutionExtrasPayload(
+                new SetInstitutionExtrasError(
+                    SetInstitutionExtrasErrorCode.UNKNOWN_INSTITUTION,
+                    "Unknown institution.",
+                    [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
+                )
+            );
+        }
+        institution.Update(input.Extras);
+        await context.SaveChangesAsync(cancellationToken);
+        return new SetInstitutionExtrasPayload(institution);
+    }
 }

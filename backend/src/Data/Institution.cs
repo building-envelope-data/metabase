@@ -109,6 +109,13 @@ public sealed class Institution
         Extras = extras;
     }
 
+    public void Update(
+        JsonElement? extras
+    )
+    {
+        Extras = extras;
+    }
+
     public void Verify()
     {
         State = InstitutionState.VERIFIED;

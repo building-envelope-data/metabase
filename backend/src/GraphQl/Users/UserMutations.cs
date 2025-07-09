@@ -658,14 +658,29 @@ public sealed class UserMutations
                 )
             );
         }
+        string? resetToken;
+        try
+        {
+            resetToken = DecodeCode(input.ResetCode);
+        }
+        catch (FormatException exception)
+        {
+            return new ResetUserPasswordPayload(
+                new ResetUserPasswordError(
+                    ResetUserPasswordErrorCode.INVALID_RESET_CODE,
+                    exception.Message,
+                    [nameof(input), nameof(input.ResetCode).FirstCharToLower()]
+                )
+            );
+        }
 
         // Don't reveal that the user does not exist
-        // TODO As said above, do not reveal that the user does or does not exist. However, right now we reveal whether the user exists or not because errors with the password are only reported when the user exists and not otherwise.
+        // TODO As said above, we should not reveal that the user does or does not exist. However, right now we reveal whether the user exists or not because errors with the password are only reported when the user exists and not otherwise.
         if (user is not null)
         {
             var identityResult = await userManager.ResetPasswordAsync(
                 user,
-                DecodeCode(input.ResetCode),
+                resetToken,
                 input.Password
             );
             if (!identityResult.Succeeded)
