@@ -53,6 +53,28 @@ public sealed class ResetUserPasswordTests
 
     [Test]
     [SuppressMessage("Naming", "CA1707")]
+    public async Task NonBase64ResetCode_IsUserError()
+    {
+        // Arrange
+        const string Email = "john.doe@ise.fraunhofer.de";
+        const string Password = "aaaAAA123$!@";
+        var resetCode = await RegisterAndConfirmUserAndRequestPasswordReset(
+            Email,
+            Password
+        );
+        // Act
+        var response = await ResetUserPassword(
+            Email,
+            "new" + Password,
+            "nonBase64" + resetCode
+        );
+        // Assert
+        Snapshot.Match(response);
+        await LoginUser();
+    }
+
+    [Test]
+    [SuppressMessage("Naming", "CA1707")]
     public async Task InvalidResetCode_IsUserError()
     {
         // Arrange
@@ -66,7 +88,7 @@ public sealed class ResetUserPasswordTests
         var response = await ResetUserPassword(
             Email,
             "new" + Password,
-            "invalid" + resetCode
+            "SSBhbSBhIGZha2UgYmFzZTY0IGVuY29kZWQgdG9rZW4="
         );
         // Assert
         Snapshot.Match(response);
