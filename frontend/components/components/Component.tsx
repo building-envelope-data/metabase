@@ -301,18 +301,29 @@ export default function Component({ componentId }: ComponentProps) {
         <Descriptions.Item label="Available">
           <OpenEndedDateTimeRangeX range={component.availability} />
         </Descriptions.Item>
-        <Descriptions.Item label="Prime Surface">
-          {component.prime?.surface?.description}{" "}
-          {component.prime?.surface?.reference?.title}
-        </Descriptions.Item>
-        <Descriptions.Item label="Prime Direction">
-          {component.prime?.direction?.description}{" "}
-          {component.prime?.direction?.reference?.title}
-        </Descriptions.Item>
-        <Descriptions.Item label="Switchable Layers">
-          {component.switchableLayers?.description}{" "}
-          {component.switchableLayers?.reference?.title}
-        </Descriptions.Item>
+        {component.prime?.surface && (
+          <Descriptions.Item label="Prime Surface">
+            {component.prime?.surface?.description}{" "}
+            {component.prime?.surface?.reference?.title}
+          </Descriptions.Item>
+        )}
+        {component.prime?.direction && (
+          <Descriptions.Item label="Prime Direction">
+            {component.prime?.direction?.description}{" "}
+            {component.prime?.direction?.reference?.title}
+          </Descriptions.Item>
+        )}
+        {component.switchableLayers && (
+          <Descriptions.Item label="Switchable Layers">
+            {component.switchableLayers?.description}{" "}
+            {component.switchableLayers?.reference?.title}
+          </Descriptions.Item>
+        )}
+        {component.extras != undefined && (
+          <Descriptions.Item label="Extras">
+            {JSON.stringify(component.extras, null, "\t")}
+          </Descriptions.Item>
+        )}
       </Descriptions>
     </PageHeader>
     <Space direction="vertical" style={{ display: "flex" }}>

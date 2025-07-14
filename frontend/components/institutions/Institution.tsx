@@ -224,6 +224,11 @@ export default function Institution({ institutionId }: InstitutionProps) {
             </Typography.Link>
           </Descriptions.Item>
         )}
+        {institution.extras != undefined && (
+          <Descriptions.Item label="Extras">
+            {JSON.stringify(institution.extras, null, "\t")}
+          </Descriptions.Item>
+        )}
       </Descriptions>
     </PageHeader>
     <Divider />
