@@ -271,7 +271,7 @@ public sealed class ApplicationDbContext
                     .HasForeignKey(e => e.InstitutionId)
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
-                    .ToTable("institution_application")
+                    .ToTable("institution_open_id_connect_application")
                     .HasKey(a => new { a.InstitutionId, a.ApplicationId })
             );
     }
