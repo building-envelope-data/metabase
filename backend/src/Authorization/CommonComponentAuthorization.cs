@@ -53,7 +53,11 @@ public abstract class CommonComponentAuthorization(
         return Context.Institutions.AsNoTracking()
             .Where(i => i.State == InstitutionState.VERIFIED)
             .Where(i => i.ManufacturedComponentEdges.Any(e => e.ComponentId == componentId && !e.Pending))
-            .Where(i => i.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
+            .Where(manufacturer =>
+                manufacturer.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || manufacturer.Manager != null && manufacturer.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || manufacturer.Manager != null && manufacturer.Manager.Manager != null && manufacturer.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+            )
             .AnyAsync(cancellationToken);
     }
 }

@@ -92,7 +92,11 @@ public sealed class DataFormatAuthorization(
         return Context.DataFormats.AsNoTracking()
             .Where(f => f.Id == dataFormatId)
             .Where(f => f.Manager != null && f.Manager.State == InstitutionState.VERIFIED)
-            .Where(f => f.Manager != null && f.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
+            .Where(d => d.Manager != null && (
+                d.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || d.Manager.Manager != null && d.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || d.Manager.Manager != null && d.Manager.Manager.Manager != null && d.Manager.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+            ))
             .AnyAsync(cancellationToken);
     }
 }

@@ -210,15 +210,27 @@ public abstract class CommonAuthorization(
             );
     }
 
+    private IQueryable<Institution> BelongsToInstitutionQuery(
+        OpenIdConnectApplication application,
+        Guid institutionId
+    )
+    {
+        return Context.Institutions.AsNoTracking()
+            .Where(i => i.Id == institutionId)
+            .Where(i =>
+                i.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || i.Manager != null && i.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || i.Manager != null && i.Manager.Manager != null && i.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+            );
+    }
+
     protected Task<bool> BelongsToInstitution(
         OpenIdConnectApplication application,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        return Context.Institutions.AsNoTracking()
-            .Where(i => i.Id == institutionId)
-            .Where(i => i.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
+        return BelongsToInstitutionQuery(application, institutionId)
             .AnyAsync(cancellationToken);
     }
 
@@ -228,10 +240,8 @@ public abstract class CommonAuthorization(
         CancellationToken cancellationToken
     )
     {
-        return Context.Institutions.AsNoTracking()
-            .Where(i => i.Id == institutionId)
+        return BelongsToInstitutionQuery(application, institutionId)
             .Where(i => i.State == InstitutionState.VERIFIED)
-            .Where(i => i.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
             .AnyAsync(cancellationToken);
     }
 

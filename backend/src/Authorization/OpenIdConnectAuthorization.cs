@@ -148,8 +148,12 @@ public sealed class OpenIdConnectAuthorization(
     )
     {
         return Context.InstitutionOpenIdConnectApplications.AsNoTracking()
-            .Where(a => a.ApplicationId == application.Id)
-            .Where(a => a.Institution.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == applicationId))
+            .Where(a => a.ApplicationId == applicationId)
+            .Where(a =>
+                a.Institution.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || a.Institution.Manager != null && a.Institution.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || a.Institution.Manager != null && a.Institution.Manager.Manager != null && a.Institution.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+            )
             .AnyAsync(cancellationToken);
     }
 }

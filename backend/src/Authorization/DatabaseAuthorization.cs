@@ -114,7 +114,11 @@ public sealed class DatabaseAuthorization(
         return Context.Databases.AsNoTracking()
             .Where(d => d.Id == databaseId)
             .Where(d => d.Operator != null && d.Operator.State == InstitutionState.VERIFIED)
-            .Where(d => d.Operator != null && d.Operator.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id))
+            .Where(d => d.Operator != null && (
+                d.Operator.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || d.Operator.Manager != null && d.Operator.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || d.Operator.Manager != null && d.Operator.Manager.Manager != null && d.Operator.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+            ))
             .AnyAsync(cancellationToken);
     }
 }
