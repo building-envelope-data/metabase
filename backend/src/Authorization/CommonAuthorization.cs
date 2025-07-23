@@ -29,10 +29,10 @@ public abstract class CommonAuthorization(
 
     internal const string ClientSubjectPrefix = "client:";
 
-    protected async Task<bool> AuthorizeAsync(
+    public async Task<T> UserOrApplicationAsync<T>(
         ClaimsPrincipal claimsPrincipal,
-        Func<User, Task<bool>> authorizeUser,
-        Func<OpenIdConnectApplication, Task<bool>> authorizeApplication,
+        Func<User?, Task<T>> authorizeUser,
+        Func<OpenIdConnectApplication?, Task<T>> authorizeApplication,
         CancellationToken cancellationToken
     )
     {
@@ -43,17 +43,35 @@ public abstract class CommonAuthorization(
         )
         {
             var clientId = userOrPrefixedClientId[ClientSubjectPrefix.Length..];
-            var application = await ApplicationManager.FindByClientIdAsync(clientId, cancellationToken);
-            return application is not null && await authorizeApplication(application);
+            return await authorizeApplication(
+                await ApplicationManager.FindByClientIdAsync(clientId, cancellationToken)
+            );
         }
         else
         {
-            var user = await GetUserAsync(claimsPrincipal);
-            return user is not null && (
-                await IsAdministrator(user)
-                || await authorizeUser(user)
+            return await authorizeUser(
+                await GetUserAsync(claimsPrincipal)
             );
         }
+    }
+
+    protected Task<bool> AuthorizeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        Func<User, Task<bool>> authorizeUser,
+        Func<OpenIdConnectApplication, Task<bool>> authorizeApplication,
+        CancellationToken cancellationToken
+    )
+    {
+        return UserOrApplicationAsync(
+            claimsPrincipal,
+            async user => user is not null && (
+                await IsAdministrator(user)
+                || await authorizeUser(user)
+            ),
+            async application => application is not null &&
+                await authorizeApplication(application),
+            cancellationToken
+        );
     }
 
     internal Task<User?> GetUserAsync(ClaimsPrincipal claimsPrincipal)
