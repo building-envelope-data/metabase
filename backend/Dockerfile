@@ -52,14 +52,14 @@ RUN \
     --assume-yes \
     --no-install-recommends \
     curl \
-    dumb-init \
     editorconfig \
     gawk \
     lldb \
     make \
     # npm \
     openssl \
-    procps && \
+    procps \
+    tini && \
   rm \
     --recursive \
     --force \
@@ -320,4 +320,4 @@ RUN \
 
 ENV SHELL=/bin/bash
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--"]

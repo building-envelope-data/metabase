@@ -28,9 +28,9 @@ RUN \
     --assume-yes \
     --no-install-recommends \
     ca-certificates \
-    dumb-init \
     make \
     openssl \
+    tini \
     wget && \
   rm \
     --recursive \
@@ -68,4 +68,4 @@ RUN \
   yarn install \
     --pure-lockfile
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
