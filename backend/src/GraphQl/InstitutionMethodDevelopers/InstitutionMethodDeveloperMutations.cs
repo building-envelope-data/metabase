@@ -32,7 +32,7 @@ public sealed class InstitutionMethodDeveloperMutations
                 claimsPrincipal,
                 input.MethodId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new AddInstitutionMethodDeveloperPayload(
@@ -48,7 +48,6 @@ public sealed class InstitutionMethodDeveloperMutations
         if (!await context.Methods.AsQueryable()
                 .Where(u => u.Id == input.MethodId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -63,7 +62,6 @@ public sealed class InstitutionMethodDeveloperMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -86,7 +84,6 @@ public sealed class InstitutionMethodDeveloperMutations
                     && m.InstitutionId == input.InstitutionId
                 )
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             return new AddInstitutionMethodDeveloperPayload(
@@ -102,7 +99,7 @@ public sealed class InstitutionMethodDeveloperMutations
         {
             MethodId = input.MethodId,
             InstitutionId = input.InstitutionId,
-            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, cancellationToken).ConfigureAwait(false)
+            Pending = !await authorization.IsAuthorizedToConfirm(claimsPrincipal, input.InstitutionId, cancellationToken)
         };
         context.InstitutionMethodDevelopers.Add(institutionMethodDeveloper);
         await context.SaveChangesAsync(cancellationToken);
@@ -123,7 +120,7 @@ public sealed class InstitutionMethodDeveloperMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new ConfirmInstitutionMethodDeveloperPayload(
@@ -139,7 +136,6 @@ public sealed class InstitutionMethodDeveloperMutations
         if (!await context.Methods.AsQueryable()
                 .Where(u => u.Id == input.MethodId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -154,7 +150,6 @@ public sealed class InstitutionMethodDeveloperMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -208,7 +203,7 @@ public sealed class InstitutionMethodDeveloperMutations
                 claimsPrincipal,
                 input.MethodId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new RemoveInstitutionMethodDeveloperPayload(
@@ -224,7 +219,6 @@ public sealed class InstitutionMethodDeveloperMutations
         if (!await context.Methods.AsQueryable()
                 .Where(u => u.Id == input.MethodId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -239,7 +233,6 @@ public sealed class InstitutionMethodDeveloperMutations
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(

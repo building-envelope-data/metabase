@@ -12,5 +12,6 @@ public abstract class Entity
     // [NotMapped]
     // public Guid Uuid { get => Id; }
 
+    // Configured via `IsRowVersion` in `ApplicationDbContext`
     public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
 }

@@ -18,10 +18,10 @@ public sealed class ResendUserEmailVerificationTests
         // Arrange
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        await RegisterAndConfirmAndLoginUser();
         EmailSender.Clear();
         // Act
-        var response = await ResendUserEmailVerification().ConfigureAwait(false);
+        var response = await ResendUserEmailVerification();
         // Assert
         Snapshot.Match(
             response,
@@ -47,11 +47,11 @@ public sealed class ResendUserEmailVerificationTests
         await RegisterAndConfirmUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await SuccessfullyQueryGraphQlContentAsString(
             File.ReadAllText("Integration/GraphQl/Users/ResendUserEmailVerification.graphql")
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
     }

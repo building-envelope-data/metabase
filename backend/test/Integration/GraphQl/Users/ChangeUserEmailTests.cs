@@ -19,13 +19,13 @@ public sealed class ChangeUserEmailTests
         // Arrange
         const string name = "John Doe";
         const string email = "john.doe@ise.fraunhofer.de";
-        await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        await RegisterAndConfirmAndLoginUser();
         EmailSender.Clear();
         const string newEmail = "new." + email;
         // Act
         var response = await ChangeUserEmail(
             newEmail
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -33,7 +33,7 @@ public sealed class ChangeUserEmailTests
                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
         EmailsShouldContainSingle(
             (name, newEmail),
             "Confirm your email change",
@@ -51,7 +51,7 @@ public sealed class ChangeUserEmailTests
         await RegisterAndConfirmUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         const string newEmail = "new." + email;
         // Act
         var response = await SuccessfullyQueryGraphQlContentAsString(
@@ -60,10 +60,10 @@ public sealed class ChangeUserEmailTests
             {
                 ["newEmail"] = newEmail
             }
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -76,11 +76,11 @@ public sealed class ChangeUserEmailTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ChangeUserEmail(
             email
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -88,7 +88,7 @@ public sealed class ChangeUserEmailTests
                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -101,12 +101,12 @@ public sealed class ChangeUserEmailTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         const string newEmail = "@invalid@" + email;
         // Act
         var response = await ChangeUserEmail(
             newEmail
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -114,6 +114,6 @@ public sealed class ChangeUserEmailTests
                 fieldOptions.Field<string>("data.changeUserEmail.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 }

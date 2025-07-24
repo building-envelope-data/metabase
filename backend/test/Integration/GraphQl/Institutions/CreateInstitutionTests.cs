@@ -22,7 +22,7 @@ public sealed class CreateInstitutionTests
             await SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
                 variables: PendingInstitutionInput
-            ).ConfigureAwait(false);
+            );
         // Assert
         Snapshot.Match(response);
     }
@@ -35,8 +35,8 @@ public sealed class CreateInstitutionTests
         await SuccessfullyQueryGraphQlContentAsString(
             File.ReadAllText("Integration/GraphQl/Institutions/CreateInstitution.graphql"),
             variables: PendingInstitutionInput
-        ).ConfigureAwait(false);
-        var response = await GetInstitutions().ConfigureAwait(false);
+        );
+        var response = await GetInstitutions();
         // Assert
         Snapshot.Match(response);
     }
@@ -52,14 +52,14 @@ public sealed class CreateInstitutionTests
         var testName = SnapshotFullNameHelper(typeof(CreateInstitutionTests), key);
 
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        var userId = await RegisterAndConfirmAndLoginUser();
         // Act
         var response = await CreateInstitution(
             input with
             {
                 OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -86,15 +86,15 @@ public sealed class CreateInstitutionTests
         var testName = SnapshotFullNameHelper(typeof(CreateInstitutionTests), key);
 
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        var userId = await RegisterAndConfirmAndLoginUser();
         // Act
         var (institutionId, institutionUuid) = await CreateInstitutionReturningIdAndUuid(
             input with
             {
                 OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
-        var response = await GetPendingInstitutions().ConfigureAwait(false);
+        );
+        var response = await GetPendingInstitutions();
         // Assert
         Snapshot.Match(
             response,

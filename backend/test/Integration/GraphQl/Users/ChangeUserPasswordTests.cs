@@ -22,13 +22,13 @@ public sealed class ChangeUserPasswordTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         const string newPassword = "new" + password;
         // Act
         var response = await ChangeUserPassword(
             password,
             newPassword
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -39,7 +39,7 @@ public sealed class ChangeUserPasswordTests
         await LoginUser(
             email,
             newPassword
-        ).ConfigureAwait(false);
+        );
     }
 
     [Test]
@@ -52,7 +52,7 @@ public sealed class ChangeUserPasswordTests
         await RegisterAndConfirmUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         const string newPassword = "new" + password;
         // Act
         var response = await SuccessfullyQueryGraphQlContentAsString(
@@ -63,10 +63,10 @@ public sealed class ChangeUserPasswordTests
                 ["newPassword"] = newPassword,
                 ["newPasswordConfirmation"] = newPassword
             }
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(response);
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -79,12 +79,12 @@ public sealed class ChangeUserPasswordTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ChangeUserPassword(
             password,
             "new" + password
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -105,13 +105,13 @@ public sealed class ChangeUserPasswordTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ChangeUserPassword(
             password,
             "new" + password,
             "other" + password
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -119,7 +119,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -132,12 +132,12 @@ public sealed class ChangeUserPasswordTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ChangeUserPassword(
             password,
             "aabb@$CCDD"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -145,7 +145,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -158,12 +158,12 @@ public sealed class ChangeUserPasswordTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ChangeUserPassword(
             password,
             "AABB@$567"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -171,7 +171,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -184,12 +184,12 @@ public sealed class ChangeUserPasswordTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ChangeUserPassword(
             password,
             "aaBBccDDeeFF123"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -197,7 +197,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -210,12 +210,12 @@ public sealed class ChangeUserPasswordTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ChangeUserPassword(
             password,
             "aabb@$567"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -223,7 +223,7 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 
     [Test]
@@ -236,12 +236,12 @@ public sealed class ChangeUserPasswordTests
         await RegisterAndConfirmAndLoginUser(
             email: email,
             password: password
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await ChangeUserPassword(
             password,
             "aA@$567"
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -249,6 +249,6 @@ public sealed class ChangeUserPasswordTests
                 fieldOptions.Field<string>("data.changeUserPassword.user.id").Should().NotBeNullOrWhiteSpace()
             )
         );
-        await LoginUser().ConfigureAwait(false);
+        await LoginUser();
     }
 }

@@ -4,21 +4,75 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using OpenIddict.Abstractions;
+using OpenIddict.Core;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Metabase.Enumerations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserRole = Metabase.Enumerations.UserRole;
+using System.Globalization;
 
 namespace Metabase.Authorization;
 
 public abstract class CommonAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
     )
 {
     protected ApplicationDbContext Context { get; } = context;
     protected UserManager<User> UserManager { get; } = userManager;
+    protected OpenIddictApplicationManager<OpenIdConnectApplication> ApplicationManager { get; } = applicationManager;
+
+    internal const string ClientSubjectPrefix = "client:";
+
+    public async Task<T> UserOrApplicationAsync<T>(
+        ClaimsPrincipal claimsPrincipal,
+        Func<User?, Task<T>> authorizeUser,
+        Func<OpenIdConnectApplication?, Task<T>> authorizeApplication,
+        CancellationToken cancellationToken
+    )
+    {
+        var userOrPrefixedClientId = claimsPrincipal.GetClaim(Claims.Subject);
+        // Note that a user ID is a UUID and thus cannot start with the client-subject prefix.
+        if (userOrPrefixedClientId is not null
+            && userOrPrefixedClientId.StartsWith(ClientSubjectPrefix, ignoreCase: false, culture: CultureInfo.InvariantCulture)
+        )
+        {
+            var clientId = userOrPrefixedClientId[ClientSubjectPrefix.Length..];
+            return await authorizeApplication(
+                await ApplicationManager.FindByClientIdAsync(clientId, cancellationToken)
+            );
+        }
+        else
+        {
+            return await authorizeUser(
+                await GetUserAsync(claimsPrincipal)
+            );
+        }
+    }
+
+    protected Task<bool> AuthorizeAsync(
+        ClaimsPrincipal claimsPrincipal,
+        Func<User, Task<bool>> authorizeUser,
+        Func<OpenIdConnectApplication, Task<bool>> authorizeApplication,
+        CancellationToken cancellationToken
+    )
+    {
+        return UserOrApplicationAsync(
+            claimsPrincipal,
+            async user => user is not null && (
+                await IsAdministrator(user)
+                || await authorizeUser(user)
+            ),
+            async application => application is not null &&
+                await authorizeApplication(application),
+            cancellationToken
+        );
+    }
 
     internal Task<User?> GetUserAsync(ClaimsPrincipal claimsPrincipal)
     {
@@ -120,7 +174,7 @@ public abstract class CommonAuthorization(
                    user,
                    institutionId,
                    cancellationToken
-               ).ConfigureAwait(false)
+               )
                == InstitutionRepresentativeRole.OWNER;
     }
 
@@ -133,7 +187,7 @@ public abstract class CommonAuthorization(
         return await IsVerified(
                 institutionId,
                 cancellationToken
-            ).ConfigureAwait(false) &&
+            ) &&
             await IsOwnerOfInstitution(
                 user,
                 institutionId,
@@ -166,12 +220,47 @@ public abstract class CommonAuthorization(
         return await IsVerified(
                 institutionId,
                 cancellationToken
-            ).ConfigureAwait(false) &&
+            ) &&
             await IsAtLeastAssistant(
                 user,
                 institutionId,
                 cancellationToken
             );
+    }
+
+    private IQueryable<Institution> BelongsToInstitutionQuery(
+        OpenIdConnectApplication application,
+        Guid institutionId
+    )
+    {
+        return Context.Institutions.AsNoTracking()
+            .Where(i => i.Id == institutionId)
+            .Where(i =>
+                i.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || i.Manager != null && i.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || i.Manager != null && i.Manager.Manager != null && i.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+            );
+    }
+
+    protected Task<bool> BelongsToInstitution(
+        OpenIdConnectApplication application,
+        Guid institutionId,
+        CancellationToken cancellationToken
+    )
+    {
+        return BelongsToInstitutionQuery(application, institutionId)
+            .AnyAsync(cancellationToken);
+    }
+
+    protected Task<bool> BelongsToVerifiedInstitution(
+        OpenIdConnectApplication application,
+        Guid institutionId,
+        CancellationToken cancellationToken
+    )
+    {
+        return BelongsToInstitutionQuery(application, institutionId)
+            .Where(i => i.State == InstitutionState.VERIFIED)
+            .AnyAsync(cancellationToken);
     }
 
     private async Task<InstitutionRepresentativeRole?> FetchRole(

@@ -8,7 +8,9 @@ docker_compose = \
 		--file docker-compose.yml \
 		--project-name ${NAME}
 
-database_name = xbase_development
+database_name = xbase
+
+dump_archive_name = postgresql_dumpall.gz
 
 # Taken from https://www.client9.com/self-documenting-makefiles/
 help : ## Print this help
@@ -180,7 +182,7 @@ list : ## List all containers with health status
 .PHONY : list
 
 createdb : DBNAME = ${database_name}
-createdb : ## Create database with name `${DBNAME}` defaulting to `xbase_development`
+createdb : ## Create database with name `${DBNAME}` defaulting to `xbase`
 	${docker_compose} exec \
 		database \
 		bash -c " \
@@ -189,7 +191,7 @@ createdb : ## Create database with name `${DBNAME}` defaulting to `xbase_develop
 .PHONY : createdb
 
 dropdb : DBNAME = ${database_name}
-dropdb : ## Drop database with name `${DBNAME}` defaulting to `xbase_development`
+dropdb : ## Drop database with name `${DBNAME}` defaulting to `xbase`
 	${docker_compose} exec \
 		database \
 		bash -c " \
@@ -208,6 +210,67 @@ sql : ## Run the SQL script in the file `${SQL}` in the running `database` servi
 			--username=postgres \
 			--dbname=${database_name}
 .PHONY : sql
+
+# Backup with `pg_dumpall`: https://www.postgresql.org/docs/13/backup-dump.html#BACKUP-DUMP-ALL
+# Command `pg_dumpall`: https://www.postgresql.org/docs/13/app-pg-dumpall.html
+backup : CONTAINER_NAME = backup_${NAME}_database
+backup : ## Backup database and related data to directory with absolute path `${BACKUP_DIRECTORY}` (down-ing and up-ing the database service before and after to prevent race conditions), for example, `make BACKUP_DIRECTORY=./backups/$(date +"%Y-%m-%d_%H_%M_%S") backup`
+	mkdir --parents ${BACKUP_DIRECTORY}
+	${docker_compose} down \
+		--remove-orphans \
+		database
+	-docker container stop ${CONTAINER_NAME}
+	-docker container rm --volumes ${CONTAINER_NAME}
+	${docker_compose} run \
+		--name ${CONTAINER_NAME} \
+		--detach \
+		database
+	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
+	docker exec \
+		${CONTAINER_NAME} \
+		pg_dumpall \
+			--clean \
+			--username=postgres \
+	| gzip \
+	> ${BACKUP_DIRECTORY}/${dump_archive_name}
+	docker container stop ${CONTAINER_NAME}
+	docker container rm --volumes ${CONTAINER_NAME}
+	${docker_compose} up \
+		--remove-orphans \
+		--detach \
+		database
+.PHONY : backup
+
+restore : CONTAINER_NAME = restore_${NAME}_database
+restore : ## Restore database and related data from directory with absolute path `${BACKUP_DIRECTORY}` (down-ing and up-ing the database service before and after to prevent race conditions and removing and recreating the data volume before to start cleanly), for example, `make BACKUP_DIRECTORY=./backups/2021-04-22_15_43_35/ restore (note that after restoring a database it is usually necessary to restart the backend service for the object-relational mapper Npgsql to work seamlessly, for example, by restarting all services with `make restart`)`
+	${docker_compose} down \
+		--remove-orphans \
+		database
+	docker volume rm \
+		${NAME}_data
+	-docker container stop ${CONTAINER_NAME}
+	-docker container rm --volumes ${CONTAINER_NAME}
+	${docker_compose} run \
+		--name ${CONTAINER_NAME} \
+		--detach \
+		database
+	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
+	gunzip --stdout ${BACKUP_DIRECTORY}/${dump_archive_name} \
+	| docker exec \
+		--interactive \
+		${CONTAINER_NAME} \
+		psql \
+			--echo-all \
+			--file=- \
+			--username=postgres \
+			--dbname=postgres
+	docker container stop ${CONTAINER_NAME}
+	docker container rm --volumes ${CONTAINER_NAME}
+	${docker_compose} up \
+		--remove-orphans \
+		--detach \
+		database
+.PHONY : restore
 
 begin-maintenance : ## Begin maintenance
 	cp \

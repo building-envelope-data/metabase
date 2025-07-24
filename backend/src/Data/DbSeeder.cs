@@ -116,7 +116,7 @@ public sealed class DbSeeder
         var manager = services.GetRequiredService<RoleManager<Role>>();
         foreach (var role in Role.AllEnum)
         {
-            if (await manager.FindByNameAsync(Role.EnumToName(role)).ConfigureAwait(false) is null)
+            if (await manager.FindByNameAsync(Role.EnumToName(role)) is null)
             {
                 logger.CreatingRole(role);
                 await manager.CreateAsync(
@@ -136,7 +136,7 @@ public sealed class DbSeeder
         var manager = services.GetRequiredService<UserManager<User>>();
         if (environment.IsProduction())
         {
-            if ((await manager.GetUsersInRoleAsync(Role.Administrator).ConfigureAwait(false)).Count == 0)
+            if ((await manager.GetUsersInRoleAsync(Role.Administrator)).Count == 0)
             {
                 await CreateUserAsync(manager, AdministratorUser, appSettings.BootstrapUserPassword, logger);
             }
@@ -145,7 +145,7 @@ public sealed class DbSeeder
         {
             foreach (var userInfo in Users)
             {
-                if (await manager.FindByEmailAsync(userInfo.EmailAddress).ConfigureAwait(false) is null)
+                if (await manager.FindByEmailAsync(userInfo.EmailAddress) is null)
                 {
                     await CreateUserAsync(manager, userInfo, appSettings.BootstrapUserPassword, logger);
                 }
@@ -180,7 +180,7 @@ public sealed class DbSeeder
     )
     {
         var manager = services.GetRequiredService<IOpenIddictApplicationManager>();
-        if (await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId).ConfigureAwait(false) is null)
+        if (await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId) is null)
         {
             logger.CreatingApplicationClient(MetabaseOpenIdConnectClientId);
             var host = appSettings.Host;
@@ -249,7 +249,7 @@ public sealed class DbSeeder
             );
         }
 
-        if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId).ConfigureAwait(false) is null)
+        if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId) is null)
         {
             logger.CreatingApplicationClient(TestlabSolarFacadesOpenIdConnectClientId);
             var host = appSettings.TestlabSolarFacadesHost;
@@ -307,7 +307,7 @@ public sealed class DbSeeder
             );
         }
 
-        if (await manager.FindByClientIdAsync(IgsdbOpenIdConnectClientId).ConfigureAwait(false) is null)
+        if (await manager.FindByClientIdAsync(IgsdbOpenIdConnectClientId) is null)
         {
             logger.CreatingApplicationClient(IgsdbOpenIdConnectClientId);
             var host = appSettings.TestlabSolarFacadesHost;
@@ -359,8 +359,7 @@ public sealed class DbSeeder
     )
     {
         var manager = services.GetRequiredService<IOpenIddictScopeManager>();
-        if (await manager.FindByNameAsync(AuthConfiguration.ReadApiScope)
-                .ConfigureAwait(false) is null)
+        if (await manager.FindByNameAsync(AuthConfiguration.ReadApiScope) is null)
         {
             logger.CreatingScope(AuthConfiguration.ReadApiScope);
             await manager.CreateAsync(
@@ -380,8 +379,7 @@ public sealed class DbSeeder
             );
         }
 
-        if (await manager.FindByNameAsync(AuthConfiguration.WriteApiScope)
-                .ConfigureAwait(false) is null)
+        if (await manager.FindByNameAsync(AuthConfiguration.WriteApiScope) is null)
         {
             logger.CreatingScope(AuthConfiguration.WriteApiScope);
             await manager.CreateAsync(
@@ -401,8 +399,7 @@ public sealed class DbSeeder
             );
         }
 
-        if (await manager.FindByNameAsync(AuthConfiguration.ManageUserApiScope)
-                .ConfigureAwait(false) is null)
+        if (await manager.FindByNameAsync(AuthConfiguration.ManageUserApiScope) is null)
         {
             logger.CreatingScope(AuthConfiguration.ManageUserApiScope);
             await manager.CreateAsync(
@@ -448,7 +445,7 @@ public sealed class DbSeeder
                 iseInstitution.RepresentativeEdges.Add(
                     new InstitutionRepresentative
                     {
-                        UserId = (await context.Users.Where(x => x.Email == AdministratorUser.EmailAddress).SingleAsync().ConfigureAwait(false)).Id,
+                        UserId = (await context.Users.Where(x => x.Email == AdministratorUser.EmailAddress).SingleAsync()).Id,
                         Role = InstitutionRepresentativeRole.OWNER,
                         Pending = false
                     }
@@ -465,7 +462,7 @@ public sealed class DbSeeder
                 context.Institutions.Add(iseInstitution);
                 await context.SaveChangesAsync();
             }
-            if (!await context.Institutions.Where(x => x.Name == TestlabInstitutionName).AnyAsync().ConfigureAwait(false))
+            if (!await context.Institutions.Where(x => x.Name == TestlabInstitutionName).AnyAsync())
             {
                 var institution = new Institution(
                     TestlabInstitutionName,
@@ -493,7 +490,7 @@ public sealed class DbSeeder
                 context.Institutions.Add(institution);
                 await context.SaveChangesAsync();
             }
-            if (!await context.Institutions.Where(x => x.Name == LbnlInstitutionName).AnyAsync().ConfigureAwait(false))
+            if (!await context.Institutions.Where(x => x.Name == LbnlInstitutionName).AnyAsync())
             {
                 var institution = new Institution(
                     LbnlInstitutionName,
@@ -523,7 +520,7 @@ public sealed class DbSeeder
         if (environment.IsDevelopment())
         {
             var context = services.GetRequiredService<ApplicationDbContext>();
-            if (!await context.Databases.Where(x => x.Name == TestlabDatabaseName).AnyAsync().ConfigureAwait(false))
+            if (!await context.Databases.Where(x => x.Name == TestlabDatabaseName).AnyAsync())
             {
                 var uriBuilder = new UriBuilder(new Uri(appSettings.TestlabSolarFacadesHost, UriKind.Absolute))
                 {
@@ -535,13 +532,13 @@ public sealed class DbSeeder
                     uriBuilder.Uri
                 )
                 {
-                    OperatorId = (await context.Institutions.SingleAsync(x => x.Name == TestlabInstitutionName).ConfigureAwait(false)).Id
+                    OperatorId = (await context.Institutions.SingleAsync(x => x.Name == TestlabInstitutionName)).Id
                 };
                 database.Verify();
                 context.Databases.Add(database);
                 await context.SaveChangesAsync();
             }
-            if (!await context.Databases.Where(x => x.Name == IgsdbDatabaseName).AnyAsync().ConfigureAwait(false))
+            if (!await context.Databases.Where(x => x.Name == IgsdbDatabaseName).AnyAsync())
             {
                 var database = new Database(
                     IgsdbDatabaseName,
@@ -549,7 +546,7 @@ public sealed class DbSeeder
                     new Uri(environment.IsProduction() ? "https://igsdb-v2.herokuapp.com/graphql/" : "https://igsdb-v2-staging.herokuapp.com/graphql/", UriKind.Absolute)
                 )
                 {
-                    OperatorId = (await context.Institutions.SingleAsync(x => x.Name == LbnlInstitutionName).ConfigureAwait(false)).Id
+                    OperatorId = (await context.Institutions.SingleAsync(x => x.Name == LbnlInstitutionName)).Id
                 };
                 database.Verify();
                 context.Databases.Add(database);

@@ -6,7 +6,6 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Methods;
 
@@ -39,12 +38,10 @@ public sealed class MethodDeveloperEdge
         {
             return await _institutionMethodDeveloperEdge.GetNodeAsync(institutionById, cancellationToken);
         }
-
         if (_userMethodDeveloperEdge is not null)
         {
             return await _userMethodDeveloperEdge.GetNodeAsync(userById, cancellationToken);
         }
-
         throw new ArgumentException("Impossible!");
     }
 
@@ -60,12 +57,10 @@ public sealed class MethodDeveloperEdge
         {
             return await _institutionMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken);
         }
-
         if (_userMethodDeveloperEdge is not null)
         {
-            return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization);
+            return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization, cancellationToken);
         }
-
         throw new ArgumentException("Impossible!");
     }
 
@@ -82,13 +77,11 @@ public sealed class MethodDeveloperEdge
             return await _institutionMethodDeveloperEdge
                 .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken);
         }
-
         if (_userMethodDeveloperEdge is not null)
         {
             return await _userMethodDeveloperEdge
                 .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization, cancellationToken);
         }
-
         throw new ArgumentException("Impossible!");
     }
 }

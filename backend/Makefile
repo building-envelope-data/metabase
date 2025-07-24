@@ -17,18 +17,23 @@ help : ## Print this help
 # https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet
 
 # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
+# Sadly, `--list-tests` ignores the option `--filter` in the test adapter
+# `NUnit`: https://github.com/dotnet/sdk/issues/8643#issuecomment-1497765835
 # dotnet test --filter "FullyQualifiedName~${x}" --verbosity minimal
-test : ## Run tests
+test : ARGS =
+test : ## Run tests, possibly with custom arguments `${ARGS}` from `dotnet test --help`, for example, `make test` or `make ARGS='--filter "FullyQualifiedName~InvalidResetCode_IsUserError"' test`
 	@echo "--------------------------------------------------"
 	@echo "Complete test list"
 	@echo "--------------------------------------------------"
 	dotnet test \
-		--list-tests
+		--list-tests \
+		${ARGS}
 	@echo "--------------------------------------------------"
 	@echo "All test runs"
 	@echo "--------------------------------------------------"
 	dotnet test \
-		--collect:"XPlat Code Coverage"
+		--collect:"XPlat Code Coverage" \
+		${ARGS}
 .PHONY : test
 
 assets : ## Build assets

@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Metabase.Authorization;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.ViewModels.Authorization;
@@ -97,7 +98,6 @@ public sealed class AuthorizationController(
                     principal.GetScopes()
                 )
                 .ToListAsync()
-                .ConfigureAwait(false)
         );
         if (extend is not null)
         {
@@ -129,13 +129,13 @@ public sealed class AuthorizationController(
         var authorization = authorizations.LastOrDefault();
         authorization ??= await _authorizationManager.CreateAsync(
                 principal,
-                await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
+                await _userManager.GetUserIdAsync(user),
                 applicationId,
                 AuthorizationTypes.Permanent,
                 principal.GetScopes()
             );
         principal.SetAuthorizationId(
-            await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false)
+            await _authorizationManager.GetIdAsync(authorization)
         );
     }
 
@@ -223,7 +223,7 @@ public sealed class AuthorizationController(
         var user = (
                        result.Principal is null
                            ? null
-                           : await _userManager.GetUserAsync(result.Principal).ConfigureAwait(false)
+                           : await _userManager.GetUserAsync(result.Principal)
                    )
                    ?? throw new InvalidOperationException("The user details cannot be retrieved.");
 
@@ -232,18 +232,17 @@ public sealed class AuthorizationController(
                               request.ClientId is null
                                   ? null
                                   : await _applicationManager.FindByClientIdAsync(request.ClientId)
-                                      .ConfigureAwait(false)
                           )
                           ?? throw new InvalidOperationException(
                               "Details concerning the calling client application cannot be found.");
         // Can't we not just use `request.ClientId`?
         var applicationId =
-            await _applicationManager.GetIdAsync(application).ConfigureAwait(false)
+            await _applicationManager.GetIdAsync(application)
             ?? throw new InvalidOperationException(
                 "Details concerning the calling client application cannot be found.");
         // Retrieve the permanent authorizations associated with the user and the calling client application.
         var authorizations = await _authorizationManager.FindAsync(
-                await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
+                await _userManager.GetUserIdAsync(user),
                 applicationId,
                 Statuses.Valid,
                 AuthorizationTypes.Permanent,
@@ -251,7 +250,7 @@ public sealed class AuthorizationController(
             )
             .ToListAsync();
 
-        switch (await _applicationManager.GetConsentTypeAsync(application).ConfigureAwait(false))
+        switch (await _applicationManager.GetConsentTypeAsync(application))
         {
             // If the consent is external (e.g when authorizations are granted by a sysadmin),
             // immediately return an error if no authorization can be found in the database.
@@ -283,7 +282,6 @@ public sealed class AuthorizationController(
                                     authorizations,
                                     applicationId
                                 )
-                                .ConfigureAwait(false)
                     );
                 // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
                 return await DoSignIn(principal);
@@ -305,8 +303,7 @@ public sealed class AuthorizationController(
             default:
                 return View(new AuthorizeViewModel
                 {
-                    ApplicationName = await _applicationManager.GetLocalizedDisplayNameAsync(application)
-                        .ConfigureAwait(false),
+                    ApplicationName = await _applicationManager.GetLocalizedDisplayNameAsync(application),
                     Scope = request.Scope
                 });
         }
@@ -322,7 +319,7 @@ public sealed class AuthorizationController(
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
         // Retrieve the profile of the logged in user.
-        var user = await _userManager.GetUserAsync(User).ConfigureAwait(false) ??
+        var user = await _userManager.GetUserAsync(User) ??
             throw new InvalidOperationException("The user details cannot be retrieved.");
 
         // Retrieve the application details from the database.
@@ -330,19 +327,18 @@ public sealed class AuthorizationController(
                               request.ClientId is null
                                   ? null
                                   : await _applicationManager.FindByClientIdAsync(request.ClientId)
-                                      .ConfigureAwait(false)
                           )
                           ?? throw new InvalidOperationException(
                               "Details concerning the calling client application cannot be found.");
         // Can't we just use `request.ClientId`?
         var applicationId =
-            await _applicationManager.GetIdAsync(application).ConfigureAwait(false)
+            await _applicationManager.GetIdAsync(application)
             ?? throw new InvalidOperationException(
                 "Details concerning the calling client application cannot be found.");
 
         // Retrieve the permanent authorizations associated with the user and the calling client application.
         var authorizations = await _authorizationManager.FindAsync(
-                await _userManager.GetUserIdAsync(user).ConfigureAwait(false),
+                await _userManager.GetUserIdAsync(user),
                 applicationId,
                 Statuses.Valid,
                 AuthorizationTypes.Permanent,
@@ -354,7 +350,7 @@ public sealed class AuthorizationController(
         // here to ensure a malicious user can't abuse this POST-only endpoint and
         // force it to return a valid response without the external authorization.
         if (authorizations.Count is 0 && await _applicationManager
-                .HasConsentTypeAsync(application, ConsentTypes.External).ConfigureAwait(false))
+                .HasConsentTypeAsync(application, ConsentTypes.External))
         {
             return Forbid(
                 new AuthenticationProperties(new Dictionary<string, string?>
@@ -378,7 +374,6 @@ public sealed class AuthorizationController(
                             authorizations,
                             applicationId
                         )
-                        .ConfigureAwait(false)
             );
         return await DoSignIn(principal);
     }
@@ -411,15 +406,14 @@ public sealed class AuthorizationController(
         {
             var scopes = result.Principal.GetScopes();
             // Retrieve the application details from the database using the client_id stored in the principal.
-            var application = await _applicationManager.FindByClientIdAsync(clientId).ConfigureAwait(false) ??
+            var application = await _applicationManager.FindByClientIdAsync(clientId) ??
                               throw new InvalidOperationException(
                                   "Details concerning the calling client application cannot be found.");
 
             // Render a form asking the user to confirm the authorization demand.
             return View(new VerifyViewModel
             {
-                ApplicationName = await _applicationManager.GetLocalizedDisplayNameAsync(application)
-                    .ConfigureAwait(false),
+                ApplicationName = await _applicationManager.GetLocalizedDisplayNameAsync(application),
                 Scope = string.Join(" ", scopes),
                 UserCode = result.Properties.GetTokenValue(OpenIddictServerAspNetCoreConstants.Tokens.UserCode)
             });
@@ -445,7 +439,7 @@ public sealed class AuthorizationController(
     public async Task<IActionResult> VerifyAccept()
     {
         // Retrieve the profile of the logged in user.
-        var user = await _userManager.GetUserAsync(User).ConfigureAwait(false) ??
+        var user = await _userManager.GetUserAsync(User) ??
             throw new InvalidOperationException("The user details cannot be retrieved.");
 
         // Retrieve the claims principal associated with the user code.
@@ -584,8 +578,7 @@ public sealed class AuthorizationController(
         if (request.IsAuthorizationCodeGrantType() || request.IsDeviceCodeGrantType() || request.IsRefreshTokenGrantType())
         {
             // Retrieve the claims principal stored in the authorization code/device code/refresh token.
-            var principal = (await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)
-                .ConfigureAwait(false)).Principal;
+            var principal = (await AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
             if (principal is null)
             {
                 return Forbid(
@@ -614,7 +607,7 @@ public sealed class AuthorizationController(
                     OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
             // Ensure the user is still allowed to sign in.
-            if (!await _signInManager.CanSignInAsync(user).ConfigureAwait(false))
+            if (!await _signInManager.CanSignInAsync(user))
             {
                 return Forbid(
                     new AuthenticationProperties(new Dictionary<string, string?>
@@ -651,7 +644,7 @@ public sealed class AuthorizationController(
             // Add the claims that will be persisted in the tokens (use the client_id as the subject identifier).
             var clientId = await _applicationManager.GetClientIdAsync(application);
             var displayName = await _applicationManager.GetDisplayNameAsync(application);
-            identity.SetClaim(Claims.Subject, clientId);
+            identity.SetClaim(Claims.Subject, $"{CommonAuthorization.ClientSubjectPrefix}{clientId}");
             identity.SetClaim(Claims.Name, displayName);
             identity.SetClaim(Claims.PreferredUsername, displayName);
 
@@ -665,7 +658,7 @@ public sealed class AuthorizationController(
 
             // Set the list of scopes granted to the client application in access_token.
             identity.SetScopes(request.GetScopes());
-            identity.SetResources(await _scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync().ConfigureAwait(false));
+            identity.SetResources(await _scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
             var principal = new ClaimsPrincipal(identity);
             identity.SetDestinations(claim => GetDestinations(claim, principal));
 

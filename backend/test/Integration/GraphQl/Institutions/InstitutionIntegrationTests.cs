@@ -135,7 +135,7 @@ public abstract class InstitutionIntegrationTests
         CreateInstitutionInput input
     )
     {
-        var response = await CreateInstitutionAsJson(httpClient, input).ConfigureAwait(false);
+        var response = await CreateInstitutionAsJson(httpClient, input);
         return new Guid(
             ExtractString(
                 "$.data.createInstitution.institution.uuid",
@@ -150,8 +150,8 @@ public abstract class InstitutionIntegrationTests
         CreateInstitutionInput input
     )
     {
-        var uuid = await CreateInstitutionReturningUuid(httpClient, input).ConfigureAwait(false);
-        await VerifyInstitutionByVerifierUser(httpClient, verifierPassword, uuid).ConfigureAwait(false);
+        var uuid = await CreateInstitutionReturningUuid(httpClient, input);
+        await VerifyInstitutionByVerifierUser(httpClient, verifierPassword, uuid);
         return uuid;
     }
 
@@ -159,7 +159,7 @@ public abstract class InstitutionIntegrationTests
         CreateInstitutionInput input
     )
     {
-        var response = await CreateInstitutionAsJson(input).ConfigureAwait(false);
+        var response = await CreateInstitutionAsJson(input);
         return (
             ExtractString(
                 "$.data.createInstitution.institution.id",

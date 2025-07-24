@@ -33,7 +33,7 @@ public sealed class ComponentGeneralizationMutations
                 input.ConcreteComponentId,
                 input.GeneralComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new AddComponentGeneralizationPayload(
@@ -49,7 +49,6 @@ public sealed class ComponentGeneralizationMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.GeneralComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -64,7 +63,6 @@ public sealed class ComponentGeneralizationMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.ConcreteComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -87,7 +85,6 @@ public sealed class ComponentGeneralizationMutations
                     && a.ConcreteComponentId == input.ConcreteComponentId
                 )
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             return new AddComponentGeneralizationPayload(
@@ -124,7 +121,7 @@ public sealed class ComponentGeneralizationMutations
                 input.ConcreteComponentId,
                 input.GeneralComponentId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new RemoveComponentGeneralizationPayload(
@@ -140,7 +137,6 @@ public sealed class ComponentGeneralizationMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.GeneralComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(
@@ -155,7 +151,6 @@ public sealed class ComponentGeneralizationMutations
         if (!await context.Components.AsQueryable()
                 .Where(c => c.Id == input.ConcreteComponentId)
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
            )
         {
             errors.Add(

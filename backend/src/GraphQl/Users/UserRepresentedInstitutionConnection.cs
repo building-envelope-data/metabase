@@ -1,8 +1,8 @@
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Authorization;
 using Metabase.Data;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Users;
 
@@ -21,12 +21,14 @@ public sealed class UserRepresentedInstitutionConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        InstitutionRepresentativeAuthorization authorization
+        InstitutionRepresentativeAuthorization authorization,
+        CancellationToken cancellationToken
     )
     {
         return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
-            Subject.Id
+            Subject.Id,
+            cancellationToken
         );
     }
 }

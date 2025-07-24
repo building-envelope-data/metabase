@@ -3,63 +3,87 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using OpenIddict.Core;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Authorization;
 
 public sealed class InstitutionRepresentativeAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonAuthorization(context, userManager, applicationManager)
 {
-    internal async Task<bool> IsAuthorizedToManage(
+    internal Task<bool> IsAuthorizedToManage(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsOwnerOfVerifiedInstitution(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsOwnerOfVerifiedInstitution(
                    user,
                    institutionId,
                    cancellationToken
-               );
+               ),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToConfirm(
+    internal Task<bool> IsAuthorizedToConfirm(
         ClaimsPrincipal claimsPrincipal,
-        Guid userId
+        Guid userId,
+        CancellationToken cancellationToken
     )
     {
-        var loggedInUser = await GetUserAsync(claimsPrincipal);
-        return loggedInUser is not null
-               && IsSame(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            loggedInUser => Task.FromResult(
+                IsSame(
                    loggedInUser,
                    userId
-               );
+               )
+            ),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToManageSigningPermission(
+    internal Task<bool> IsAuthorizedToManageSigningPermission(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-
-        return user is not null
-               && (await IsAdministrator(user)
-               || await IsOwnerOfInstitution(user, institutionId, cancellationToken));
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsOwnerOfInstitution(user, institutionId, cancellationToken),
+            application => BelongsToInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToAddKeyFingerprint(
+    internal Task<bool> IsAuthorizedToAddKeyFingerprint(
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-            && await IsAtLeastAssistant(user, cancellationToken);
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistant(user, cancellationToken),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 }

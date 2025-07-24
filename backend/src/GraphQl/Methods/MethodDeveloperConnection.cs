@@ -33,7 +33,6 @@ public sealed class MethodDeveloperConnection(
                     institutionMethodDevelopersDataLoader,
                     cancellationToken
                 )
-                .ConfigureAwait(false)
             )
             .Select(e => new MethodDeveloperEdge(e))
             .Concat(
@@ -43,7 +42,6 @@ public sealed class MethodDeveloperConnection(
                         userMethodDevelopersDataLoader,
                         cancellationToken
                     )
-                    .ConfigureAwait(false)
                 )
                 .Select(e => new MethodDeveloperEdge(e))
             );

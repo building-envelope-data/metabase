@@ -18,12 +18,14 @@ public sealed class UserMethodDeveloperEdge(
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserMethodDeveloperAuthorization authorization
+        UserMethodDeveloperAuthorization authorization,
+        CancellationToken cancellationToken
     )
     {
         return authorization.IsAuthorizedToConfirm(
             claimsPrincipal,
-            _association.UserId
+            _association.UserId,
+            cancellationToken
         );
     }
 

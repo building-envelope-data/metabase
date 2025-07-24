@@ -5,15 +5,19 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
+using OpenIddict.Core;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using UserRole = Metabase.Enumerations.UserRole;
+using System.Threading;
 
 namespace Metabase.Authorization;
 
 public sealed class UserAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonAuthorization(context, userManager, applicationManager)
 {
     internal Task<bool> HasPasswordAsync(User user)
     {
@@ -25,65 +29,51 @@ public sealed class UserAuthorization(
         return (await UserManager.GetRolesAsync(user)).Select(Role.EnumFromName);
     }
 
-    internal async Task<bool> IsAuthorizedToDeleteUsers(
-        ClaimsPrincipal claimsPrincipal
+    internal Task<bool> IsAuthorizedToDeleteUsers(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsAdministrator(user);
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => Task.FromResult(false),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToManageUser(
+    internal Task<bool> IsAuthorizedToManageUser(
         ClaimsPrincipal claimsPrincipal,
-        Guid userId
+        Guid userId,
+        CancellationToken cancellationToken
     )
     {
-        var loggedInUser = await GetUserAsync(claimsPrincipal);
-        if (loggedInUser is null)
-        {
-            return false;
-        }
-
-        if (loggedInUser.Id == userId)
-        {
-            return true;
-        }
-
-        if (await IsInRole(
-                loggedInUser,
-                UserRole.ADMINISTRATOR
-            ).ConfigureAwait(false))
-        {
-            return true;
-        }
-
-        return false;
+        return AuthorizeAsync(
+            claimsPrincipal,
+            loggedInUser => Task.FromResult(loggedInUser.Id == userId),
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToAddOrRemoveRole(
+    internal Task<bool> IsAuthorizedToAddOrRemoveRole(
         ClaimsPrincipal claimsPrincipal,
-        UserRole role
+        UserRole role,
+        CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        if (user is null)
-        {
-            return false;
-        }
-
-        if (await IsAdministrator(user).ConfigureAwait(false))
-        {
-            return true;
-        }
-
-        return role switch
-        {
-            UserRole.ADMINISTRATOR =>
-                await IsAdministrator(user).ConfigureAwait(false),
-            UserRole.VERIFIER =>
-                await IsVerifier(user).ConfigureAwait(false),
-            _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown role `{role}.`")
-        };
+        return AuthorizeAsync(
+            claimsPrincipal,
+            async user => role switch
+            {
+                UserRole.ADMINISTRATOR =>
+                    await IsAdministrator(user),
+                UserRole.VERIFIER =>
+                    await IsVerifier(user),
+                _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown role `{role}.`")
+            },
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 }

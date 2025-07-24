@@ -32,7 +32,7 @@ public sealed class OpenIdConnectTokenMutations
                 input.TokenId,
                 tokenManager,
                 cancellationToken
-            ).ConfigureAwait(false))
+            ))
         {
             return new RevokeOpenIdConnectTokenPayload(
                 new RevokeOpenIdConnectTokenError(

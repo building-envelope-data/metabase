@@ -1122,6 +1122,7 @@ type Mutation {
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   revokeOpenIdConnectToken(input: RevokeOpenIdConnectTokenInput!): RevokeOpenIdConnectTokenPayload! @authorize(policy: "Write") @cost(weight: "10")
   setComponentExtras(input: SetComponentExtrasInput!): SetComponentExtrasPayload! @authorize(policy: "Write") @cost(weight: "10")
+  setInstitutionExtras(input: SetInstitutionExtrasInput!): SetInstitutionExtrasPayload! @authorize(policy: "Write") @cost(weight: "10")
   setUserPassword(input: SetUserPasswordInput!): SetUserPasswordPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   setUserPhoneNumber(input: SetUserPhoneNumberInput!): SetUserPhoneNumberPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   switchInstitutionOperatingState(input: SwitchInstitutionOperatingStateInput!): SwitchInstitutionOperatingStatePayload! @authorize(policy: "Write") @cost(weight: "10")
@@ -1564,6 +1565,18 @@ type SetComponentExtrasError {
 type SetComponentExtrasPayload {
   component: Component
   errors: [SetComponentExtrasError!]
+  query: Query!
+}
+
+type SetInstitutionExtrasError {
+  code: SetInstitutionExtrasErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type SetInstitutionExtrasPayload {
+  errors: [SetInstitutionExtrasError!]
+  institution: Institution
   query: Query!
 }
 
@@ -2602,6 +2615,11 @@ input SetComponentExtrasInput {
   extras: Any
 }
 
+input SetInstitutionExtrasInput {
+  extras: Any
+  institutionId: Uuid!
+}
+
 input SetUserPasswordInput {
   password: String!
   passwordConfirmation: String!
@@ -3335,6 +3353,12 @@ enum SetComponentExtrasErrorCode {
   UNKNOWN
   UNAUTHORIZED
   UNKNOWN_COMPONENT
+}
+
+enum SetInstitutionExtrasErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_INSTITUTION
 }
 
 enum SetUserPasswordErrorCode {

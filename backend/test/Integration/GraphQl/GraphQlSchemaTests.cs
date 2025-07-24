@@ -16,10 +16,10 @@ public sealed class GraphQlSchemaTests
     public async Task IsUnchanged()
     {
         // Act
-        var response = await HttpClient.GetAsync("/graphql?sdl").ConfigureAwait(false);
+        var response = await HttpClient.GetAsync("/graphql?sdl");
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var schema = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var schema = await response.Content.ReadAsStringAsync();
         Snapshot.Match(schema);
     }
 }

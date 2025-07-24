@@ -35,7 +35,6 @@ public abstract class AssociationsByAssociateIdDataLoader<TAssociation>(
         return (
                 await _getAssociations(dbContext, keys)
                     .ToListAsync(cancellationToken)
-                    .ConfigureAwait(false)
             )
             .ToLookup(_getAssociateId);
     }

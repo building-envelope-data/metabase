@@ -3,57 +3,81 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using OpenIddict.Core;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Authorization;
 
 public sealed class InstitutionMethodDeveloperAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonMethodAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonMethodAuthorization(context, userManager, applicationManager)
 {
-    internal async Task<bool> IsAuthorizedToAdd(
+    internal Task<bool> IsAuthorizedToAdd(
         ClaimsPrincipal claimsPrincipal,
         Guid methodId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsAtLeastAssistantOfVerifiedMethodManager(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedMethodManager(
                    user,
                    methodId,
                    cancellationToken
-               );
+               ),
+            application => BelongsToVerifiedMethodManager(
+                application,
+                methodId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToConfirm(
+    internal Task<bool> IsAuthorizedToConfirm(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsAtLeastAssistantOfVerifiedInstitution(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
                    user,
                    institutionId,
                    cancellationToken
-               );
+               ),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToRemove(
+    internal Task<bool> IsAuthorizedToRemove(
         ClaimsPrincipal claimsPrincipal,
         Guid methodId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsAtLeastAssistantOfVerifiedMethodManager(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedMethodManager(
                    user,
                    methodId,
                    cancellationToken
-               );
+               ),
+            application => BelongsToVerifiedMethodManager(
+                application,
+                methodId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 }

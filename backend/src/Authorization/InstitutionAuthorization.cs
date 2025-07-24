@@ -3,81 +3,116 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using OpenIddict.Core;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Authorization;
 
 public sealed class InstitutionAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonAuthorization(context, userManager, applicationManager)
 {
-    internal async Task<bool> IsAuthorizedToUpdateInstitution(
+    internal Task<bool> IsAuthorizedToUpdateInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsAtLeastAssistant(
-                   user,
-                   institutionId,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistant(
+                user,
+                institutionId,
+                cancellationToken
+            ),
+            application => BelongsToInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToDeleteInstitution(
+    internal Task<bool> IsAuthorizedToDeleteInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsOwnerOfInstitution(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsOwnerOfInstitution(
                    user,
                    institutionId,
                    cancellationToken
-               );
+               ),
+            application => BelongsToInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToCreateInstitutionManagedByInstitution(
+    internal Task<bool> IsAuthorizedToCreateInstitutionManagedByInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsAtLeastAssistantOfVerifiedInstitution(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
                    user,
                    institutionId,
                    cancellationToken
-               );
+               ),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToVerifyInstitution(
-        ClaimsPrincipal claimsPrincipal
+    internal Task<bool> IsAuthorizedToVerifyInstitution(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsVerifier(user);
+        return AuthorizeAsync(
+            claimsPrincipal,
+            IsVerifier,
+            application => Task.FromResult(false),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToSwitchInstitutionOperatingState(
+    internal Task<bool> IsAuthorizedToSwitchInstitutionOperatingState(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsOwnerOfInstitution(
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsOwnerOfInstitution(
                    user,
                    institutionId,
                    cancellationToken
-               );
+               ),
+            application => BelongsToInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 }

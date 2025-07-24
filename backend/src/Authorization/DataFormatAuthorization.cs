@@ -5,43 +5,61 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Core;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
+using Metabase.Enumerations;
 
 namespace Metabase.Authorization;
 
 public sealed class DataFormatAuthorization(
     ApplicationDbContext context,
-    UserManager<User> userManager
-) : CommonAuthorization(context, userManager)
+    UserManager<User> userManager,
+    OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
+) : CommonAuthorization(context, userManager, applicationManager)
 {
-    internal async Task<bool> IsAuthorizedToCreateDataFormatForInstitution(
+    internal Task<bool> IsAuthorizedToCreateDataFormatForInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null
-               && await IsAtLeastAssistantOfVerifiedInstitution(
-                   user,
-                   institutionId,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedInstitution(
+                user,
+                institutionId,
+                cancellationToken
+            ),
+            application => BelongsToVerifiedInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
-    internal async Task<bool> IsAuthorizedToUpdate(
+    internal Task<bool> IsAuthorizedToUpdate(
         ClaimsPrincipal claimsPrincipal,
         Guid dataFormatId,
         CancellationToken cancellationToken
     )
     {
-        var user = await GetUserAsync(claimsPrincipal);
-        return user is not null &&
-               await IsAtLeastAssistantOfVerifiedDataFormatManager(
-                   user,
-                   dataFormatId,
-                   cancellationToken
-               );
+        return AuthorizeAsync(
+            claimsPrincipal,
+            user => IsAtLeastAssistantOfVerifiedDataFormatManager(
+                user,
+                dataFormatId,
+                cancellationToken
+            ),
+            application => BelongsToVerifiedDataFormatManager(
+                application,
+                dataFormatId,
+                cancellationToken
+            ),
+            cancellationToken
+        );
     }
 
     private async Task<bool> IsAtLeastAssistantOfVerifiedDataFormatManager(
@@ -50,16 +68,35 @@ public sealed class DataFormatAuthorization(
         CancellationToken cancellationToken
     )
     {
-        var wrappedManagerId =
+        var managerId = await QueryManagerId(dataFormatId, cancellationToken);
+        return managerId is not null
+            && await IsAtLeastAssistantOfVerifiedInstitution(user, managerId ?? Guid.Empty, cancellationToken);
+    }
+
+    private async Task<Guid?> QueryManagerId(Guid dataFormatId, CancellationToken cancellationToken)
+    {
+        return (
             await Context.DataFormats.AsNoTracking()
                 .Where(x => x.Id == dataFormatId)
                 .Select(x => new { x.ManagerId })
-                .SingleOrDefaultAsync(cancellationToken);
-        if (wrappedManagerId is null)
-        {
-            return false;
-        }
+                .SingleOrDefaultAsync(cancellationToken)
+        )?.ManagerId;
+    }
 
-        return await IsAtLeastAssistantOfVerifiedInstitution(user, wrappedManagerId.ManagerId, cancellationToken);
+    private Task<bool> BelongsToVerifiedDataFormatManager(
+        OpenIdConnectApplication application,
+        Guid dataFormatId,
+        CancellationToken cancellationToken
+    )
+    {
+        return Context.DataFormats.AsNoTracking()
+            .Where(f => f.Id == dataFormatId)
+            .Where(f => f.Manager != null && f.Manager.State == InstitutionState.VERIFIED)
+            .Where(d => d.Manager != null && (
+                d.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || d.Manager.Manager != null && d.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                || d.Manager.Manager != null && d.Manager.Manager.Manager != null && d.Manager.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+            ))
+            .AnyAsync(cancellationToken);
     }
 }

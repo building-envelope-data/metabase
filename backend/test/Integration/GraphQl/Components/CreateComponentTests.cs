@@ -23,7 +23,7 @@ public sealed class CreateComponentTests
             await SuccessfullyQueryGraphQlContentAsString(
                 File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
                 variables: MinimalComponentInput
-            ).ConfigureAwait(false);
+            );
         // Assert
         Snapshot.Match(response);
     }
@@ -36,8 +36,8 @@ public sealed class CreateComponentTests
         await SuccessfullyQueryGraphQlContentAsString(
             File.ReadAllText("Integration/GraphQl/Components/CreateComponent.graphql"),
             variables: MinimalComponentInput
-        ).ConfigureAwait(false);
-        var response = await GetComponents().ConfigureAwait(false);
+        );
+        var response = await GetComponents();
         // Assert
         Snapshot.Match(response);
     }
@@ -53,7 +53,7 @@ public sealed class CreateComponentTests
         var testName = SnapshotFullNameHelper(typeof(CreateComponentTests), key);
 
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        var userId = await RegisterAndConfirmAndLoginUser();
         var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
             HttpClient,
             AppSettings.BootstrapUserPassword,
@@ -61,14 +61,14 @@ public sealed class CreateComponentTests
             {
                 OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
+        );
         // Act
         var response = await CreateComponent(
             input with
             {
                 ManufacturerId = institutionId
             }
-        ).ConfigureAwait(false);
+        );
         // Assert
         Snapshot.Match(
             response,
@@ -94,7 +94,7 @@ public sealed class CreateComponentTests
         var testName = SnapshotFullNameHelper(typeof(CreateComponentTests), key);
 
         // Arrange
-        var userId = await RegisterAndConfirmAndLoginUser().ConfigureAwait(false);
+        var userId = await RegisterAndConfirmAndLoginUser();
         var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
             HttpClient,
             AppSettings.BootstrapUserPassword,
@@ -102,15 +102,15 @@ public sealed class CreateComponentTests
             {
                 OwnerIds = [userId]
             }
-        ).ConfigureAwait(false);
+        );
         // Act
         var (componentId, componentUuid) = await CreateComponentReturningIdAndUuid(
             input with
             {
                 ManufacturerId = institutionId
             }
-        ).ConfigureAwait(false);
-        var response = await GetComponents().ConfigureAwait(false);
+        );
+        var response = await GetComponents();
         // Assert
         Snapshot.Match(
             response,

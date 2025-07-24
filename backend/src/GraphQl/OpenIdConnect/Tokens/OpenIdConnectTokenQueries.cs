@@ -28,8 +28,7 @@ public sealed class OpenIdConnectTokenQueries
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken)
-                .ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken))
         {
             return AsyncEnumerable.Empty<OpenIdConnectToken>();
         }
@@ -50,8 +49,7 @@ public sealed class OpenIdConnectTokenQueries
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken)
-                .ConfigureAwait(false))
+        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken))
         {
             return null;
         }

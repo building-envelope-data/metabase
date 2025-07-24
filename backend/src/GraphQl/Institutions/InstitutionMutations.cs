@@ -12,7 +12,6 @@ using Metabase.Enumerations;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
 using Metabase.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserRole = Metabase.Enumerations.UserRole;
 
@@ -39,7 +38,7 @@ public sealed class InstitutionMutations
                     claimsPrincipal,
                     input.ManagerId ?? Guid.Empty,
                     cancellationToken
-                ).ConfigureAwait(false)
+                )
            )
         {
             return new CreateInstitutionPayload(
@@ -47,18 +46,6 @@ public sealed class InstitutionMutations
                     CreateInstitutionErrorCode.UNAUTHORIZED,
                     "You are not authorized to create institutions.",
                     [nameof(input), nameof(input.ManagerId).FirstCharToLower()]
-                )
-            );
-        }
-
-        var user = await authorization.GetUserAsync(claimsPrincipal);
-        if (user is null)
-        {
-            return new CreateInstitutionPayload(
-                new CreateInstitutionError(
-                    CreateInstitutionErrorCode.UNKNOWN,
-                    "Unknown user.",
-                    []
                 )
             );
         }
@@ -80,7 +67,6 @@ public sealed class InstitutionMutations
                     .Where(u => input.OwnerIds.Contains(u.Id))
                     .Select(u => u.Id)
                     .ToListAsync(cancellationToken)
-                    .ConfigureAwait(false)
             );
         if (unknownOwnerIds.Any())
         {
@@ -99,7 +85,6 @@ public sealed class InstitutionMutations
                     x => x.Id == input.ManagerId,
                     cancellationToken
                 )
-                .ConfigureAwait(false)
            )
         {
             return new CreateInstitutionPayload(
@@ -117,7 +102,7 @@ public sealed class InstitutionMutations
             input.Description,
             input.WebsiteLocator,
             input.PublicKey,
-            await GetInitialInstitutionState(input, user, authorization).ConfigureAwait(false),
+            await GetInitialInstitutionState(input, claimsPrincipal, authorization, cancellationToken),
             InstitutionOperatingState.OPERATING,
             input.Extras
         )
@@ -131,7 +116,7 @@ public sealed class InstitutionMutations
                 {
                     UserId = ownerId,
                     Role = InstitutionRepresentativeRole.OWNER,
-                    Pending = !await representativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId).ConfigureAwait(false)
+                    Pending = !await representativeAuthorization.IsAuthorizedToConfirm(claimsPrincipal, ownerId, cancellationToken)
                 }
             );
         }
@@ -158,23 +143,31 @@ public sealed class InstitutionMutations
         return new CreateInstitutionPayload(institution);
     }
 
-    private static async Task<InstitutionState> GetInitialInstitutionState(
+    private static Task<InstitutionState> GetInitialInstitutionState(
         CreateInstitutionInput input,
-        User user,
-        CommonAuthorization authorization
+        ClaimsPrincipal claimsPrincipal,
+        CommonAuthorization authorization,
+        CancellationToken cancellationToken
     )
     {
-        if (input.ManagerId is not null
-            || await authorization.IsInRole(user, UserRole.ADMINISTRATOR)
-                .ConfigureAwait(false)
-            || await authorization.IsInRole(user, UserRole.VERIFIER)
-                .ConfigureAwait(false)
-           )
-        {
-            return InstitutionState.VERIFIED;
-        }
-
-        return InstitutionState.PENDING;
+        return authorization.UserOrApplicationAsync(
+            claimsPrincipal,
+            async user =>
+            {
+                if (input.ManagerId is not null
+                    || user is not null && (
+                        await authorization.IsInRole(user, UserRole.ADMINISTRATOR)
+                        || await authorization.IsInRole(user, UserRole.VERIFIER)
+                    )
+                )
+                {
+                    return InstitutionState.VERIFIED;
+                }
+                return InstitutionState.PENDING;
+            },
+            application => Task.FromResult(InstitutionState.VERIFIED),
+            cancellationToken
+        );
     }
 
     [UseUserManager]
@@ -187,7 +180,7 @@ public sealed class InstitutionMutations
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal).ConfigureAwait(false)
+        if (!await authorization.IsAuthorizedToVerifyInstitution(claimsPrincipal, cancellationToken)
            )
         {
             return new VerifyInstitutionPayload(
@@ -233,7 +226,7 @@ public sealed class InstitutionMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new UpdateInstitutionPayload(
@@ -286,7 +279,7 @@ public sealed class InstitutionMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new DeleteInstitutionPayload(
@@ -319,35 +312,30 @@ public sealed class InstitutionMutations
                 .Collection(i => i.ManagedDataFormats)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
             ||
             await context
                 .Entry(institution)
                 .Collection(i => i.ManagedInstitutions)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
             ||
             await context
                 .Entry(institution)
                 .Collection(i => i.ManagedMethods)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
             ||
             await context
                 .Entry(institution)
                 .Collection(i => i.OperatedDatabases)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
             ||
             await context
                 .Entry(institution)
                 .Collection(i => i.ManufacturedComponents)
                 .Query()
                 .AnyAsync(cancellationToken)
-                .ConfigureAwait(false)
         )
         {
             return new DeleteInstitutionPayload(
@@ -378,7 +366,7 @@ public sealed class InstitutionMutations
                 claimsPrincipal,
                 input.InstitutionId,
                 cancellationToken
-            ).ConfigureAwait(false)
+            )
            )
         {
             return new SwitchInstitutionOperatingStatePayload(
@@ -418,5 +406,49 @@ public sealed class InstitutionMutations
         }
         await context.SaveChangesAsync(cancellationToken);
         return new SwitchInstitutionOperatingStatePayload(institution);
+    }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    public async Task<SetInstitutionExtrasPayload> SetInstitutionExtrasAsync(
+        SetInstitutionExtrasInput input,
+        ClaimsPrincipal claimsPrincipal,
+        InstitutionAuthorization authorization,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        if (!await authorization.IsAuthorizedToUpdateInstitution(
+                claimsPrincipal,
+                input.InstitutionId,
+                cancellationToken
+            )
+           )
+        {
+            return new SetInstitutionExtrasPayload(
+                new SetInstitutionExtrasError(
+                    SetInstitutionExtrasErrorCode.UNAUTHORIZED,
+                    "You are not authorized to update the institution.",
+                    []
+                )
+            );
+        }
+        var institution =
+            await context.Institutions.AsQueryable()
+                .Where(i => i.Id == input.InstitutionId)
+                .SingleOrDefaultAsync(cancellationToken);
+        if (institution is null)
+        {
+            return new SetInstitutionExtrasPayload(
+                new SetInstitutionExtrasError(
+                    SetInstitutionExtrasErrorCode.UNKNOWN_INSTITUTION,
+                    "Unknown institution.",
+                    [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
+                )
+            );
+        }
+        institution.Update(input.Extras);
+        await context.SaveChangesAsync(cancellationToken);
+        return new SetInstitutionExtrasPayload(institution);
     }
 }

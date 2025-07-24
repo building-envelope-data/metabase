@@ -178,7 +178,7 @@ public abstract class ComponentIntegrationTests
         CreateComponentInput input
     )
     {
-        var response = await CreateComponentAsJson(input).ConfigureAwait(false);
+        var response = await CreateComponentAsJson(input);
         return (
             ExtractString(
                 "$.data.createComponent.component.id",

@@ -28,7 +28,7 @@ public sealed class OpenIdConnectAuthorizationMutations
                 claimsPrincipal,
                 input.AuthorizationId,
                 authorizationManager,
-                cancellationToken).ConfigureAwait(false))
+                cancellationToken))
         {
             return new DeleteOpenIdConnectAuthorizationPayload(
                 new DeleteOpenIdConnectAuthorizationError(
