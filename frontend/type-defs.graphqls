@@ -913,6 +913,7 @@ type InstitutionMethodDeveloperEdge {
 
 type InstitutionOpenIdConnectApplicationConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
+  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionOpenIdConnectApplicationEdge!]! @cost(weight: "10")
 }
 
