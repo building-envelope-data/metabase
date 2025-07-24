@@ -1,8 +1,14 @@
 #import "./openIdConnect.graphql"
 
-query AuthorizationsByApplicationId($applicationId: Uuid!) {
-  openIdConnectAuthorizations(applicationId: $applicationId) {    
-    ...AuthorizationPartial
+query Authorizations($applicationId: Uuid!) {
+  openIdConnectApplication(uuid: $applicationId) {
+    authorizations {
+      edges {
+        node {
+          ...AuthorizationPartial
+        }
+      }
+    }
   }
 }
 

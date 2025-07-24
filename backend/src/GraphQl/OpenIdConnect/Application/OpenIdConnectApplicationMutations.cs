@@ -7,12 +7,12 @@ using HotChocolate.Types;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
-using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
 using OpenIddict.Abstractions;
 using OpenIddict.Core;
 using Metabase.Data.OpenIdConnect;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.OpenIdConnect.Application;
 
@@ -26,29 +26,32 @@ public sealed class OpenIdConnectApplicationMutations
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
-        InstitutionByIdDataLoader institutionById,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManageApplications(claimsPrincipal, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageApplication(claimsPrincipal, input.InstitutionId, cancellationToken))
         {
             return new CreateOpenIdConnectApplicationPayload(
                 new CreateOpenIdConnectApplicationError(
                     CreateOpenIdConnectApplicationErrorCode.UNAUTHORIZED,
-                    "You are not authorized to create applications.",
-                    [nameof(input), nameof(input.ClientId).FirstCharToLower()]
+                    "You are not authorized to create applications for the institution.",
+                    [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
                 )
             );
         }
-        var institution = await institutionById.LoadAsync(input.AssociatedInstitutionId, cancellationToken);
-        if (institution is null)
+        if (!await context.Institutions.AsQueryable()
+                .AnyAsync(
+                    x => x.Id == input.InstitutionId,
+                    cancellationToken
+                )
+           )
         {
             return new CreateOpenIdConnectApplicationPayload(
                 new CreateOpenIdConnectApplicationError(
                     CreateOpenIdConnectApplicationErrorCode.UNKNOWN_INSTITUTION,
                     "Unknown institution.",
-                    [nameof(input), nameof(input.AssociatedInstitutionId).FirstCharToLower()]
+                    [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
                 )
             );
         }
@@ -107,11 +110,13 @@ public sealed class OpenIdConnectApplicationMutations
             descriptor.Permissions.Add(scope.ToStringScope());
         }
         var application = await applicationManager.CreateAsync(descriptor, cancellationToken);
-        context.InstitutionOpenIdConnectApplications.Add(new InstitutionOpenIdConnectApplication
-        {
-            ApplicationId = application.Id,
-            InstitutionId = institution.Id
-        });
+        context.InstitutionOpenIdConnectApplications.Add(
+            new InstitutionOpenIdConnectApplication
+            {
+                ApplicationId = application.Id,
+                InstitutionId = input.InstitutionId,
+            }
+        );
         await context.SaveChangesAsync(cancellationToken);
         return new CreateOpenIdConnectApplicationPayload(application, clientSecret);
     }

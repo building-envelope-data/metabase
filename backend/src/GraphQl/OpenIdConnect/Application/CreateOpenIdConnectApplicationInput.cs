@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Metabase.GraphQl.OpenIdConnect.Application;
 
 public sealed record CreateOpenIdConnectApplicationInput(
-    Guid AssociatedInstitutionId,
+    Guid InstitutionId,
     string ClientId,
     string DisplayName,
     OpenIdConnectConsentType ConsentType,

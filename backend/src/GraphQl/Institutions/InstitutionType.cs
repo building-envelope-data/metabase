@@ -8,7 +8,6 @@ using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Entities;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Institutions;
 

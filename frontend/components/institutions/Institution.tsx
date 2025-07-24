@@ -11,6 +11,7 @@ import {
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import {
+  ApplicationPartialFragment,
   InstitutionDocument,
   useInstitutionQuery,
 } from "../../queries/institutions.graphql";
@@ -36,6 +37,8 @@ import { messageApolloError } from "../../lib/apollo";
 import UpdateInstitution from "./UpdateInstitution";
 import DeleteInstitution from "./DeleteInstitution";
 import SwitchInstitutionOperatingState from "./SwitchInstitutionOperatingState";
+import ApplicationTable from "../openIdConnect/applications/ApplicationTable";
+import CreateApplication from "../openIdConnect/applications/CreateApplication";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -322,6 +325,25 @@ export default function Institution({ institutionId }: InstitutionProps) {
           )}
         />
       )}
+    {institution.openIdConnectApplications.canCurrentUserAddEdge && (
+      <>
+        <Divider />
+        <Typography.Title level={2}>OpenId Connect Applications</Typography.Title>
+        <ApplicationTable
+          loading={false}
+          applications={institution.openIdConnectApplications.edges.map(e => e.node) as ApplicationPartialFragment[]}
+          refetchQueries={[{
+            query: InstitutionDocument, 
+            variables: {
+              uuid: institutionId,
+            },
+          }]}
+        />
+      </>
+    )}
+    {institution.openIdConnectApplications.canCurrentUserAddEdge && (
+      <CreateApplication institutionId={institution.uuid} />
+    )}
     <Divider />
     <Typography.Title level={2}>Managed Institutions</Typography.Title>
     <List

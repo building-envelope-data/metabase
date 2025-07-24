@@ -1,27 +1,30 @@
 fragment ApplicationPartial on OpenIdConnectApplication {
+  id
+  uuid
   clientId
   displayName
   consentType
-  id
   scopes
   postLogoutRedirectUri
   redirectUri
-  canCurrentUserManageApplication
+  canCurrentUserManageNode
 }
 
 fragment AuthorizationPartial on OpenIdConnectAuthorization {
-  creationDate
   id
+  uuid
+  creationDate
   status
   subject
   type
-  canCurrentUserDeleteAuthorization
+  canCurrentUserDeleteNode
 }
 
 fragment TokenPartial on OpenIdConnectToken {
+  id
+  uuid
   creationDate
   expirationDate
-  id
   redemptionDate
   status
   subject

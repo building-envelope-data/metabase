@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Configuration;
-using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Tokens;
@@ -21,20 +19,15 @@ public sealed class OpenIdConnectTokenQueries
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<IAsyncEnumerable<OpenIdConnectToken>> GetOpenIdConnectTokensAsync(
-        Guid? applicationId,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager, // TODO Make the token manager use the scoped database context.
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageApplications(claimsPrincipal, cancellationToken))
         {
             return AsyncEnumerable.Empty<OpenIdConnectToken>();
-        }
-        if (applicationId is not null)
-        {
-            return tokenManager.FindByApplicationIdAsync(applicationId.ToString() ?? "", cancellationToken: cancellationToken);
         }
         return tokenManager.ListAsync(cancellationToken: cancellationToken);
     }
@@ -42,18 +35,18 @@ public sealed class OpenIdConnectTokenQueries
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<OpenIdConnectToken?> GetOpenIdConnectTokenAsync(
-        Guid tokenId,
+        Guid uuid,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageToken(claimsPrincipal, uuid, tokenManager, cancellationToken))
         {
             return null;
         }
 
-        return await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken: cancellationToken);
+        return await tokenManager.FindByIdAsync(uuid.ToString(), cancellationToken: cancellationToken);
     }
 }

@@ -41,7 +41,7 @@ namespace Metabase.Migrations
                 name: "PK_institution_open_id_connect_application",
                 schema: "metabase",
                 table: "institution_open_id_connect_application",
-                columns: new[] { "InstitutionId", "ApplicationId" });
+                columns: ["InstitutionId", "ApplicationId"]);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_institution_open_id_connect_application_OpenIddictApplicati~",
@@ -98,7 +98,7 @@ namespace Metabase.Migrations
                 name: "PK_institution_application",
                 schema: "metabase",
                 table: "institution_application",
-                columns: new[] { "InstitutionId", "ApplicationId" });
+                columns: ["InstitutionId", "ApplicationId"]);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_institution_application_OpenIddictApplications_ApplicationId",

@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Configuration;
-using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Tokens;
@@ -23,11 +21,10 @@ public sealed class OpenIdConnectTokenMutations
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
-        ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToRevokeToken(
+        if (!await authorization.IsAuthorizedToManageToken(
                 claimsPrincipal,
                 input.TokenId,
                 tokenManager,
@@ -48,12 +45,21 @@ public sealed class OpenIdConnectTokenMutations
             return new RevokeOpenIdConnectTokenPayload(
                 new RevokeOpenIdConnectTokenError(
                     RevokeOpenIdConnectTokenErrorCode.UNKNOWN_TOKEN,
-                    "Unknown Token.",
+                    "Unknown token.",
                     [nameof(input), nameof(input.TokenId).FirstCharToLower()]
                 )
             );
         }
-        await tokenManager.TryRevokeAsync(token, cancellationToken);
+        if (!await tokenManager.TryRevokeAsync(token, cancellationToken))
+        {
+            return new RevokeOpenIdConnectTokenPayload(
+                new RevokeOpenIdConnectTokenError(
+                    RevokeOpenIdConnectTokenErrorCode.FAILED,
+                    "Failed to revoke the token.",
+                    [nameof(input), nameof(input.TokenId).FirstCharToLower()]
+                )
+            );
+        }
         return new RevokeOpenIdConnectTokenPayload();
     }
 }

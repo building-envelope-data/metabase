@@ -1,44 +1,41 @@
-import { OpenIdConnectApplication } from "../../../__generated__/__types__";
-import { Button, Flex, message, Popconfirm, Skeleton, Space, Table, TableProps, Typography } from "antd";
-import { useCurrentUserQuery } from "../../../queries/currentUser.graphql";
-import Link from "next/link";
+import { Skeleton, Table, TableProps } from "antd";
 import paths from "../../../paths";
-import { useRouter } from "next/router";
-import { ApplicationsDocument, useDeleteApplicationMutation } from "../../../queries/openIdConnectApplications.graphql";
+import { ApplicationPartialFragment } from "../../../queries/openIdConnectApplications.graphql";
+import { getUuidColumnProps } from "../../../lib/table";
+import { useState } from "react";
+import { setMapValue } from "../../../lib/freeTextFilter";
+import { DocumentNode } from "graphql";
+import DeleteApplication from "./DeleteApplication";
 
 export type ApplicationsProps = {
-    editable: boolean | undefined;
     loading: boolean;
-    applications: Array<OpenIdConnectApplication>;
+    applications: ApplicationPartialFragment[];
+    refetchQueries: {query: DocumentNode, variables?: {[key: string]: any}}[];
 };
 
-export default function ApplicationTable({ loading, applications }: ApplicationsProps) {
-    const router = useRouter();
-    const currentUser = useCurrentUserQuery()?.data?.currentUser;
-    const [deleteApplicationMutation] = useDeleteApplicationMutation({
-        // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-        // See https://www.apollographql.com/docs/react/data/mutations/#options
-        refetchQueries: [
-            {
-                query: ApplicationsDocument,
-            },
-        ],
-    });
+export default function ApplicationTable({ loading, applications, refetchQueries }: ApplicationsProps) {
+    const [filterText, setFilterText] = useState(() => new Map<string, string>());
+    const onFilterTextChange = setMapValue(filterText, setFilterText);
 
     if (loading) {
         return <Skeleton active avatar title />;
     }
 
-    const applicationColumns: TableProps<OpenIdConnectApplication>['columns'] = [
-        {
-            title: "Name",
-            dataIndex: "displayName",
-            key: "displayName",
-        },
+    const applicationColumns: TableProps<ApplicationPartialFragment>['columns'] = [
+        getUuidColumnProps<(typeof applications)[0]>(
+          onFilterTextChange,
+          (x) => filterText.get(x),
+          paths.openIdConnectApplication
+        ),
         {
             title: "Client ID",
             dataIndex: "clientId",
             key: "clientId",
+        },
+        {
+            title: "Name",
+            dataIndex: "displayName",
+            key: "displayName",
         },
         {
             title: "Redirect URL",
@@ -53,55 +50,18 @@ export default function ApplicationTable({ loading, applications }: Applications
         {
             title: 'Action',
             key: 'action',
-            render: (_, application) => (
-                <Space key={`space_${application.id}`} size="middle">
-                    {application.canCurrentUserManageApplication ? (
+            render: (_, application) => application.canCurrentUserManageNode ? (
                         <>
-                            <Link key={`edit_${application.id}`} href={paths.openIdConnectApplication(application.id!)}>Edit</Link>
-                            <Popconfirm key={`popcon_${application.id}`}
-                                title="Are you sure to delete this application?"
-                                onConfirm={async () => {
-                                    const { data } = await deleteApplicationMutation({
-                                        variables: {
-                                            applicationId: application.id
-                                        },
-                                    });
-                                    if (data?.deleteOpenIdConnectApplication.errors) {
-                                        message.error(data?.deleteOpenIdConnectApplication.errors.toString())
-                                    }
-                                    else {
-                                        message.success('Successfully deleted application ' + application.displayName)
-                                    }
-                                }}
-                                okText="Yes"
-                                cancelText="No"
-                            >
-                                <Link key={`delete_${application.id}`} href="#">Delete</Link>
-                            </Popconfirm>
+                            <DeleteApplication applicationId={application.uuid} refetchQueries={refetchQueries} />
                         </>
                     )
-                        : <></>}
-
-                </Space>
-            ),
+                        : <></>
         },
     ];
 
-
-    return <>
-        <Typography.Title>Applications</Typography.Title>
-        {currentUser?.canCurrentUserAddOpenIdConnectApplications ? (
-            <>
-                <Flex justify="right" gap="small">
-                    <Button type="primary" onClick={() => router.push(paths.openIdConnectApplicationCreate)} style={{ marginBottom: "5px" }}>Add Application</Button>
-                </Flex>
-            </>
-        )
-            : <></>}
-        <Table<OpenIdConnectApplication>
-            loading={loading}
-            columns={applicationColumns}
-            dataSource={applications}
-        />
-    </>;
+    return <Table<ApplicationPartialFragment>
+        loading={loading}
+        columns={applicationColumns}
+        dataSource={applications}
+    />;
 }

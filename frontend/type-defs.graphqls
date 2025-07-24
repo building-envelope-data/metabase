@@ -912,11 +912,13 @@ type InstitutionMethodDeveloperEdge {
 }
 
 type InstitutionOpenIdConnectApplicationConnection {
+  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionOpenIdConnectApplicationEdge!]! @cost(weight: "10")
 }
 
 type InstitutionOpenIdConnectApplicationEdge {
-  node: Institution! @cost(weight: "10")
+  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  node: OpenIdConnectApplication! @cost(weight: "10")
 }
 
 type InstitutionOperatedDatabaseConnection {
@@ -1158,40 +1160,67 @@ type OpenEndedDateTimeRange {
   to: DateTime @cost(weight: "10")
 }
 
-type OpenIdConnectApplication {
-  canCurrentUserManageApplication: Boolean! @cost(weight: "10")
+type OpenIdConnectApplication implements Node {
+  applicationType: String
+  authorizations: OpenIdConnectApplicationAuthorizationConnection! @cost(weight: "10")
+  canCurrentUserManageNode: Boolean! @cost(weight: "10")
   clientId: String
+  clientType: String
   consentType: OpenIdConnectConsentType! @cost(weight: "10")
   displayName: String
-  id: Uuid!
+  id: ID!
   institutions: OpenIdConnectApplicationInstitutionConnection! @cost(weight: "10")
   postLogoutRedirectUri: Url @cost(weight: "10")
   redirectUri: Url @cost(weight: "10")
   scopes: [OpenIdConnectScope]! @cost(weight: "10")
+  tokens: OpenIdConnectApplicationTokenConnection! @cost(weight: "10")
+  uuid: Uuid! @cost(weight: "10")
+}
+
+type OpenIdConnectApplicationAuthorizationConnection {
+  edges: [OpenIdConnectApplicationAuthorizationEdge!]! @cost(weight: "10")
+}
+
+type OpenIdConnectApplicationAuthorizationEdge {
+  node: OpenIdConnectAuthorization!
 }
 
 type OpenIdConnectApplicationInstitutionConnection {
-  edges: [InstitutionOpenIdConnectApplicationEdge!]! @cost(weight: "10")
+  edges: [OpenIdConnectApplicationInstitutionEdge!]! @cost(weight: "10")
 }
 
-type OpenIdConnectAuthorization {
-  canCurrentUserDeleteAuthorization: Boolean! @cost(weight: "10")
+type OpenIdConnectApplicationInstitutionEdge {
+  node: Institution! @cost(weight: "10")
+}
+
+type OpenIdConnectApplicationTokenConnection {
+  edges: [OpenIdConnectApplicationTokenEdge!]! @cost(weight: "10")
+}
+
+type OpenIdConnectApplicationTokenEdge {
+  node: OpenIdConnectToken!
+}
+
+type OpenIdConnectAuthorization implements Node {
+  canCurrentUserDeleteNode: Boolean! @cost(weight: "10")
   creationDate: DateTime
-  id: Uuid!
+  id: ID!
   status: String
   subject: String
   type: String
+  uuid: Uuid! @cost(weight: "10")
 }
 
-type OpenIdConnectToken {
+type OpenIdConnectToken implements Node {
   canCurrentUserRevokeToken: Boolean! @cost(weight: "10")
   creationDate: DateTime
   expirationDate: DateTime
-  id: Uuid!
+  id: ID!
   redemptionDate: DateTime
   status: String
   subject: String
   type: String
+  uuid: Uuid! @cost(weight: "10")
 }
 
 type OpticalData implements Data {
@@ -1353,12 +1382,12 @@ type Query {
   node("ID of the object." id: ID!): Node @cost(weight: "10")
   "Lookup nodes by a list of IDs."
   nodes("The list of node IDs." ids: [ID!]!): [Node]! @cost(weight: "10")
-  openIdConnectApplication(applicationId: Uuid!): OpenIdConnectApplication @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectApplication(uuid: Uuid!): OpenIdConnectApplication @authorize(policy: "Read") @cost(weight: "10")
   openIdConnectApplications: [OpenIdConnectApplication!]! @authorize(policy: "Read") @cost(weight: "10")
-  openIdConnectAuthorization(authorizationId: Uuid!): OpenIdConnectAuthorization @authorize(policy: "Read") @cost(weight: "10")
-  openIdConnectAuthorizations(applicationId: Uuid): [OpenIdConnectAuthorization!]! @authorize(policy: "Read") @cost(weight: "10")
-  openIdConnectToken(tokenId: Uuid!): OpenIdConnectToken @authorize(policy: "Read") @cost(weight: "10")
-  openIdConnectTokens(applicationId: Uuid): [OpenIdConnectToken!]! @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectAuthorization(uuid: Uuid!): OpenIdConnectAuthorization @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectAuthorizations: [OpenIdConnectAuthorization!]! @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectToken(uuid: Uuid!): OpenIdConnectToken @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectTokens: [OpenIdConnectToken!]! @authorize(policy: "Read") @cost(weight: "10")
   pendingDatabases("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DatabaseSortInput!] @cost(weight: "10") where: DatabaseFilterInput @cost(weight: "10")): PendingDatabasesConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   pendingInstitutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionSortInput!] @cost(weight: "10") where: InstitutionFilterInput @cost(weight: "10")): PendingInstitutionsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   user(uuid: Uuid!): User @cost(weight: "10")
@@ -1730,9 +1759,8 @@ type UpdateOpenIdConnectApplicationPayload {
 
 type User implements Node {
   canCurrentUserAddApprovals: Boolean! @cost(weight: "10")
-  canCurrentUserAddOpenIdConnectApplications: Boolean! @cost(weight: "10")
   canCurrentUserDeleteUser: Boolean! @cost(weight: "10")
-  canCurrentUserViewOpenIdConnectApplications: Boolean! @cost(weight: "10")
+  canCurrentUserManageOpenIdConnectApplications: Boolean! @cost(weight: "10")
   developedMethods(pending: Boolean! = false): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
@@ -2109,10 +2137,10 @@ input CreateMethodInput {
 }
 
 input CreateOpenIdConnectApplicationInput {
-  associatedInstitutionId: Uuid!
   clientId: String!
   consentType: OpenIdConnectConsentType!
   displayName: String!
+  institutionId: Uuid!
   postLogoutRedirectUri: Url
   redirectUri: Url
   scopes: [OpenIdConnectScope!]!
@@ -3347,6 +3375,7 @@ enum RevokeOpenIdConnectTokenErrorCode {
   UNKNOWN
   UNAUTHORIZED
   UNKNOWN_TOKEN
+  FAILED
 }
 
 enum SetComponentExtrasErrorCode {

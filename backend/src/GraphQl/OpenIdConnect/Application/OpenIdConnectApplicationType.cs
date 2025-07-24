@@ -7,10 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Application;
@@ -22,18 +20,30 @@ public sealed class OpenIdConnectApplicationType
         IObjectTypeDescriptor<OpenIdConnectApplication> descriptor
     )
     {
-        descriptor.Field(application => application.ApplicationType).Ignore();
-        descriptor.Field(application => application.Authorizations).Ignore();
-        descriptor.Field(application => application.ClientType).Ignore();
+        descriptor.Field(application => application.InstitutionEdges).Ignore();
         descriptor.Field(application => application.ClientSecret).Ignore();
         descriptor.Field(application => application.ConcurrencyToken).Ignore();
         descriptor.Field(application => application.DisplayNames).Ignore();
-        descriptor.Field(application => application.InstitutionEdges).Ignore();
         descriptor.Field(application => application.JsonWebKeySet).Ignore();
         descriptor.Field(application => application.Properties).Ignore();
         descriptor.Field(application => application.Requirements).Ignore();
         descriptor.Field(application => application.Settings).Ignore();
-        descriptor.Field(application => application.Tokens).Ignore();
+
+        descriptor
+            .ImplementsNode()
+            .IdField(t => t.Id)
+            .ResolveNode((context, id) =>
+                context
+                    .Service<OpenIddictApplicationManager<OpenIdConnectApplication>>()
+                    .FindByIdAsync(id.ToString(), context.RequestAborted)
+                    .AsTask()
+            );
+        descriptor
+            .Field("uuid")
+            .Type<NonNullType<UuidType>>()
+            .Resolve(context =>
+                context.Parent<OpenIdConnectApplication>().Id
+            );
 
         descriptor
             .Field(application => application.ConsentType)
@@ -87,11 +97,27 @@ public sealed class OpenIdConnectApplicationType
                     context.Parent<OpenIdConnectApplication>()
                 )
             );
+        descriptor
+            .Field(application => application.Authorizations)
+            .Type<NonNullType<ObjectType<OpenIdConnectApplicationAuthorizationConnection>>>()
+            .Resolve(context =>
+                new OpenIdConnectApplicationAuthorizationConnection(
+                    context.Parent<OpenIdConnectApplication>()
+                )
+            );
+        descriptor
+            .Field(application => application.Tokens)
+            .Type<NonNullType<ObjectType<OpenIdConnectApplicationTokenConnection>>>()
+            .Resolve(context =>
+                new OpenIdConnectApplicationTokenConnection(
+                    context.Parent<OpenIdConnectApplication>()
+                )
+            );
 
         descriptor
-            .Field("canCurrentUserManageApplication")
+            .Field("canCurrentUserManageNode")
             .ResolveWith<ApplicationResolvers>(_ =>
-                ApplicationResolvers.GetCanCurrentUserManageApplicationAsync(default!, default!, default!, default!))
+                ApplicationResolvers.GetCanCurrentUserManageNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
@@ -116,7 +142,7 @@ public sealed class OpenIdConnectApplicationType
 
     private sealed class ApplicationResolvers
     {
-        public static Task<bool> GetCanCurrentUserManageApplicationAsync(
+        public static Task<bool> GetCanCurrentUserManageNodeAsync(
             [Parent] OpenIdConnectApplication application,
             ClaimsPrincipal claimsPrincipal,
             Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,

@@ -107,30 +107,6 @@ public abstract class CommonAuthorization(
         );
     }
 
-    protected async Task<bool> IsOwner(
-        User user,
-        CancellationToken cancellationToken
-    )
-    {
-        var roles = await FetchRoles(
-                   user,
-                   cancellationToken
-               );
-        return roles.Contains(InstitutionRepresentativeRole.OWNER);
-    }
-
-    protected async Task<bool> IsAtLeastAssistant(
-        User user,
-        CancellationToken cancellationToken
-    )
-    {
-        var roles = await FetchRoles(
-                   user,
-                   cancellationToken
-               );
-        return roles.Contains(InstitutionRepresentativeRole.OWNER) || roles.Contains(InstitutionRepresentativeRole.ASSISTANT);
-    }
-
     internal Task<bool> IsInRole(
         User user,
         UserRole role
@@ -195,7 +171,7 @@ public abstract class CommonAuthorization(
             );
     }
 
-    protected async Task<bool> IsAtLeastAssistant(
+    protected async Task<bool> IsAtLeastAssistantOfInstitution(
         User user,
         Guid institutionId,
         CancellationToken cancellationToken
@@ -221,7 +197,7 @@ public abstract class CommonAuthorization(
                 institutionId,
                 cancellationToken
             ) &&
-            await IsAtLeastAssistant(
+            await IsAtLeastAssistantOfInstitution(
                 user,
                 institutionId,
                 cancellationToken
@@ -305,52 +281,5 @@ public abstract class CommonAuthorization(
                 }) // We wrap the role in an object whose default value is `null`. Note that enumerations have the first value as default value.
                 .SingleOrDefaultAsync(cancellationToken);
         return wrappedManagerRole?.Role;
-    }
-
-    private async Task<IReadOnlyList<InstitutionRepresentativeRole>> FetchRoles(
-        User user,
-        CancellationToken cancellationToken
-    )
-    {
-        return (await Context.InstitutionRepresentatives.AsNoTracking()
-                .Where(x => x.UserId == user.Id && !x.Pending)
-                .Select(x => x.Role)
-                .ToListAsync(cancellationToken)
-                )
-                .AsReadOnly();
-    }
-
-    protected Task<bool> IsVerifiedManufacturerOfComponents(
-        Guid institutionId,
-        Guid[] componentIds,
-        CancellationToken cancellationToken
-    )
-    {
-        if (componentIds.Length == 0)
-        {
-            return Task.FromResult(true);
-        }
-        return Context.ComponentManufacturers.AsNoTracking()
-            .AnyAsync(x =>
-                    x.InstitutionId == institutionId &&
-                    componentIds.Contains(x.ComponentId) &&
-                    !x.Pending,
-                cancellationToken
-            );
-    }
-
-    protected Task<bool> IsVerifiedManufacturerOfComponent(
-        Guid institutionId,
-        Guid componentId,
-        CancellationToken cancellationToken
-    )
-    {
-        return Context.ComponentManufacturers.AsNoTracking()
-            .AnyAsync(x =>
-                    x.InstitutionId == institutionId &&
-                    x.ComponentId == componentId &&
-                    !x.Pending,
-                cancellationToken
-            );
     }
 }

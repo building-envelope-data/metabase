@@ -6,7 +6,7 @@ import paths, { redirectToLoginPage } from "../../../paths";
 import { Col, Row, Skeleton, Tabs, TabsProps, Typography } from "antd";
 import { messageApolloError } from "../../../lib/apollo";
 import UpdateApplication from "./UpdateApplication";
-import AutorizationsTable from "../authorizations/AuthorizationsTable";
+import AutorizationTable from "../authorizations/AuthorizationTable";
 import TokenTable from "../tokens/TokenTable";
 
 export type ApplicationProps = {
@@ -60,12 +60,12 @@ export default function Application({ applicationId }: ApplicationProps) {
         {
             key: 'authorization',
             label: 'Authorizations',
-            children: <AutorizationsTable applicationId={applicationId}/>,
+            children: <AutorizationTable applicationId={applicationId} />,
         },
         {
             key: 'token',
             label: 'Tokens',
-            children: <TokenTable applicationId={applicationId}/>,
+            children: <TokenTable applicationId={applicationId} />,
         },
     ];
 

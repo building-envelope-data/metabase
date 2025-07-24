@@ -18,14 +18,14 @@ public sealed class OpenIdConnectAuthorization(
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
 ) : CommonAuthorization(context, userManager, applicationManager)
 {
-    internal Task<bool> IsAuthorizedToViewApplications(
+    internal Task<bool> IsAuthorizedToManageApplications(
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken
     )
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            user => IsOwner(user, cancellationToken),
+            IsAdministrator,
             application => Task.FromResult(false),
             cancellationToken
         );
@@ -33,12 +33,14 @@ public sealed class OpenIdConnectAuthorization(
 
     internal Task<bool> IsAuthorizedToManageApplications(
         ClaimsPrincipal claimsPrincipal,
-        CancellationToken cancellationToken)
+        Guid institutionId,
+        CancellationToken cancellationToken
+    )
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            user => IsOwner(user, cancellationToken),
-            application => Task.FromResult(false),
+            user => IsAtLeastAssistantOfVerifiedInstitution(user, institutionId, cancellationToken),
+            application => BelongsToVerifiedInstitution(application, institutionId, cancellationToken),
             cancellationToken
         );
     }
@@ -46,7 +48,8 @@ public sealed class OpenIdConnectAuthorization(
     internal Task<bool> IsAuthorizedToManageApplication(
         ClaimsPrincipal claimsPrincipal,
         Guid applicationId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return AuthorizeAsync(
             claimsPrincipal,
@@ -60,11 +63,12 @@ public sealed class OpenIdConnectAuthorization(
         );
     }
 
-    internal Task<bool> IsAuthorizedToDeleteAuthorization(
+    internal Task<bool> IsAuthorizedToManageAuthorization(
         ClaimsPrincipal claimsPrincipal,
         Guid authorizationId,
         OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return AuthorizeAsync(
             claimsPrincipal,
@@ -88,11 +92,12 @@ public sealed class OpenIdConnectAuthorization(
         );
     }
 
-    internal Task<bool> IsAuthorizedToRevokeToken(
+    internal Task<bool> IsAuthorizedToManageToken(
         ClaimsPrincipal claimsPrincipal,
         Guid tokenId,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return AuthorizeAsync(
             claimsPrincipal,
@@ -115,7 +120,9 @@ public sealed class OpenIdConnectAuthorization(
         );
     }
 
-    private async Task<IEnumerable<Guid>> GetInstitutionIdsByApplicationId(Guid applicationId, CancellationToken cancellationToken)
+    private async Task<IEnumerable<Guid>> GetInstitutionIdsByApplicationId(
+        Guid applicationId, CancellationToken cancellationToken
+    )
     {
         return (
             await Context.InstitutionOpenIdConnectApplications.AsNoTracking()

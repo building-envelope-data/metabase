@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
-import { useUpdateApplicationMutation, ApplicationsDocument, useApplicationQuery, ApplicationPartialFragment } from "../../../queries/openIdConnectApplications.graphql";
-import { Alert, Button, Flex, Form, Input, message, Select, Skeleton } from "antd";
+import { useUpdateApplicationMutation, useApplicationQuery, ApplicationPartialFragment, ApplicationDocument } from "../../../queries/openIdConnectApplications.graphql";
+import { Alert, Button, Form, Input, message, Result, Select, Skeleton } from "antd";
 import { messageApolloError } from "../../../lib/apollo";
-import { useRouter } from "next/router";
 import { handleFormErrors } from "../../../lib/form";
-import paths from "../../../paths";
-import { ApplicationProps } from "./Application";
-import { OpenIdConnectConsentType, OpenIdConnectScope } from "../../../__generated__/__types__";
+import { OpenIdConnectConsentType, OpenIdConnectScope, Scalars } from "../../../__generated__/__types__";
+
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
+
+export type UpdateApplicationProps = {
+    applicationId: Scalars["Uuid"];
+};
 
 type FormValues = {
   newClientId: string;
@@ -17,14 +26,13 @@ type FormValues = {
   newScopes: OpenIdConnectScope[];
 };
 
-export default function UpdateApplication({ applicationId }: ApplicationProps) {
+export default function UpdateApplication({ applicationId }: UpdateApplicationProps) {
   const { loading, error, data } = useApplicationQuery({
     variables: {
       uuid: applicationId,
     },
   });
   const application = data?.openIdConnectApplication as ApplicationPartialFragment;
-  const router = useRouter();
   const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(new Array<string>());
@@ -34,7 +42,10 @@ export default function UpdateApplication({ applicationId }: ApplicationProps) {
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
       {
-        query: ApplicationsDocument,
+        query: ApplicationDocument,
+        variables: {
+          uuid: applicationId,
+        },
       },
     ],
   });
@@ -74,8 +85,7 @@ export default function UpdateApplication({ applicationId }: ApplicationProps) {
           !data?.updateOpenIdConnectApplication?.errors &&
           data?.updateOpenIdConnectApplication?.application
         ) {
-          message.success('Successfully updated application ' + data.updateOpenIdConnectApplication.application?.displayName)
-          router.push(paths.openIdConnect)
+          message.success('Successfully updated application ' + data.updateOpenIdConnectApplication.application?.clientId)
         }
       } catch (error) {
         // TODO Handle properly.
@@ -101,21 +111,29 @@ export default function UpdateApplication({ applicationId }: ApplicationProps) {
     return <Skeleton active avatar title />;
   }
 
+  if (!application) {
+    return (
+      <Result
+        status="500"
+        title="500"
+        subTitle="Sorry, something went wrong."
+      />
+    );
+  }
+
   return (
     <>
       {globalErrorMessages.length > 0 ? (
-        <Alert className="error-message" type="error" message={globalErrorMessages.join(" ")} />
+        <Alert type="error" message={globalErrorMessages.join(" ")} />
       ) : (
         <></>
       )}
       <Form
-        labelAlign="left"
-        labelCol={{ flex: "150px" }}
-        wrapperCol={{ flex: "auto" }}
-        form={form}
-        name="basic"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+          {...layout}
+          form={form}
+          name="updateApplication"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
       >
         <Form.Item
           label="ClientId"
@@ -177,21 +195,10 @@ export default function UpdateApplication({ applicationId }: ApplicationProps) {
               )}
           />
         </Form.Item>
-        <Form.Item>
-          <Flex gap="small" justify="right">
-              <Button type="primary"
-                htmlType="button"
-                loading={updating}
-                href={paths.openIdConnect}>
-                Cancel
-              </Button>
-              <Button type="primary"
-                htmlType="submit"
-                loading={updating}
-                style={{ marginLeft: "5px" }}>
-                Update
-              </Button>
-            </Flex>          
+        <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={updating}>
+              Update
+            </Button>
         </Form.Item>
       </Form>
     </>

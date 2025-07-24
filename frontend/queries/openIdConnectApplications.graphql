@@ -7,13 +7,13 @@ query Applications {
 }
 
 query Application($uuid: Uuid!) {
-  openIdConnectApplication(applicationId: $uuid) {
+  openIdConnectApplication(uuid: $uuid) {
     ...ApplicationPartial
   }
 }
 
 mutation CreateApplication(
-  $associatedInstitutionId: Uuid!
+  $institutionId: Uuid!
   $clientId: String!
   $displayName: String!
   $consentType: OpenIdConnectConsentType!
@@ -23,7 +23,7 @@ mutation CreateApplication(
 ) {
   createOpenIdConnectApplication(
     input: {
-      associatedInstitutionId: $associatedInstitutionId
+      institutionId: $institutionId
       clientId: $clientId
       displayName: $displayName
       consentType: $consentType

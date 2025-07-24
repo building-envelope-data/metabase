@@ -23,7 +23,7 @@ public sealed class InstitutionAuthorization(
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            user => IsAtLeastAssistant(
+            user => IsAtLeastAssistantOfInstitution(
                 user,
                 institutionId,
                 cancellationToken

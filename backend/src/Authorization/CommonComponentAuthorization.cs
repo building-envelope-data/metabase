@@ -31,7 +31,7 @@ public abstract class CommonComponentAuthorization(
                 .ToListAsync(cancellationToken);
         foreach (var verifiedManufacturerId in verifiedManufacturerIds)
         {
-            if (await IsAtLeastAssistant(
+            if (await IsAtLeastAssistantOfInstitution(
                     user,
                     verifiedManufacturerId,
                     cancellationToken

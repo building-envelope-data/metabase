@@ -228,12 +228,8 @@ public sealed class UserType
             .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserDeleteUserAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserViewOpenIdConnectApplications")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserViewOpenIdConnectApplications(default!, default!, default!))
-            .UseUserManager();
-        descriptor
-            .Field("canCurrentUserAddOpenIdConnectApplications")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserAddOpenIdConnectApplications(default!, default!, default!))
+            .Field("canCurrentUserManageOpenIdConnectApplications")
+            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserManageOpenIdConnectApplications(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserAddApprovals")
@@ -293,16 +289,7 @@ public sealed class UserType
             );
         }
 
-        public static Task<bool> GetCanCurrentUserViewOpenIdConnectApplications(
-            ClaimsPrincipal claimsPrincipal,
-            OpenIdConnectAuthorization authorization,
-            CancellationToken cancellationToken
-        )
-        {
-            return authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken);
-        }
-
-        public static Task<bool> GetCanCurrentUserAddOpenIdConnectApplications(
+        public static Task<bool> GetCanCurrentUserManageOpenIdConnectApplications(
             ClaimsPrincipal claimsPrincipal,
             OpenIdConnectAuthorization authorization,
             CancellationToken cancellationToken

@@ -7,5 +7,6 @@ public enum RevokeOpenIdConnectTokenErrorCode
 {
     UNKNOWN,
     UNAUTHORIZED,
-    UNKNOWN_TOKEN
+    UNKNOWN_TOKEN,
+    FAILED
 }

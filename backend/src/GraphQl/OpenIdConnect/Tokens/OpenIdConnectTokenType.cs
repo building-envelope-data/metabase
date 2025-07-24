@@ -3,10 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Tokens;
@@ -26,6 +24,22 @@ public sealed class OpenIdConnectTokenType
         descriptor.Field(token => token.ConcurrencyToken).Ignore();
 
         descriptor
+            .ImplementsNode()
+            .IdField(t => t.Id)
+            .ResolveNode((context, id) =>
+                context
+                    .Service<OpenIddictTokenManager<OpenIdConnectToken>>()
+                    .FindByIdAsync(id.ToString(), context.RequestAborted)
+                    .AsTask()
+            );
+        descriptor
+            .Field("uuid")
+            .Type<NonNullType<UuidType>>()
+            .Resolve(context =>
+                context.Parent<OpenIdConnectToken>().Id
+            );
+
+        descriptor
                 .Field("canCurrentUserRevokeToken")
                 .ResolveWith<TokenResolvers>(x =>
                     TokenResolvers.GetCanCurrentUserRevokeTokenAsync(default!, default!, default!, default!, default!))
@@ -42,7 +56,7 @@ public sealed class OpenIdConnectTokenType
             CancellationToken cancellationToken
         )
         {
-            return authorization.IsAuthorizedToRevokeToken(claimsPrincipal, token.Id, tokenManager, cancellationToken);
+            return authorization.IsAuthorizedToManageToken(claimsPrincipal, token.Id, tokenManager, cancellationToken);
         }
     }
 }

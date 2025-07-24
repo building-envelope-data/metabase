@@ -1,10 +1,13 @@
 using Metabase.Data;
-using Metabase.Data.OpenIdConnect;
+using Metabase.GraphQl.Institutions;
 
 namespace Metabase.GraphQl.OpenIdConnect.Application;
 
 public sealed class OpenIdConnectApplicationInstitutionEdge(
     InstitutionOpenIdConnectApplication association
-    ) : Edge<OpenIdConnectApplication, OpenIdConnectApplicationByIdDataLoader>(association.InstitutionId)
+) : Edge<Institution, InstitutionByIdDataLoader>
+(
+    association.InstitutionId
+)
 {
 }

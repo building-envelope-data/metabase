@@ -76,12 +76,14 @@ public sealed class InstitutionRepresentativeAuthorization(
 
     internal Task<bool> IsAuthorizedToAddKeyFingerprint(
         ClaimsPrincipal claimsPrincipal,
+        Guid institutionId,
+        Guid userId,
         CancellationToken cancellationToken
     )
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            user => IsAtLeastAssistant(user, cancellationToken),
+            async user => IsSame(user, userId) && await IsAtLeastAssistantOfVerifiedInstitution(user, institutionId, cancellationToken),
             application => Task.FromResult(false),
             cancellationToken
         );

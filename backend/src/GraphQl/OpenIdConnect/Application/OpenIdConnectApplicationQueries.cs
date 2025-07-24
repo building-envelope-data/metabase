@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Configuration;
-using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Application;
@@ -29,7 +27,7 @@ public sealed class OpenIdConnectApplicationQueries
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageApplications(claimsPrincipal, cancellationToken))
         {
             return AsyncEnumerable.Empty<OpenIdConnectApplication>();
         }
@@ -39,17 +37,17 @@ public sealed class OpenIdConnectApplicationQueries
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<OpenIdConnectApplication?> GetOpenIdConnectApplicationAsync(
-        Guid applicationId,
+        Guid uuid,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToViewApplications(claimsPrincipal, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageApplication(claimsPrincipal, uuid, cancellationToken))
         {
             return null;
         }
-        return await applicationManager.FindByIdAsync(applicationId.ToString(), cancellationToken: cancellationToken);
+        return await applicationManager.FindByIdAsync(uuid.ToString(), cancellationToken: cancellationToken);
     }
 }

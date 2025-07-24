@@ -3,10 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 
 namespace Metabase.GraphQl.OpenIdConnect.Authorizations;
@@ -25,15 +23,31 @@ public sealed class OpenIdConnectAuthorizationType
         descriptor.Field(authorization => authorization.Tokens).Ignore();
 
         descriptor
-                .Field("canCurrentUserDeleteAuthorization")
+            .ImplementsNode()
+            .IdField(t => t.Id)
+            .ResolveNode((context, id) =>
+                context
+                    .Service<OpenIddictAuthorizationManager<OpenIdConnectAuthorization>>()
+                    .FindByIdAsync(id.ToString(), context.RequestAborted)
+                    .AsTask()
+            );
+        descriptor
+            .Field("uuid")
+            .Type<NonNullType<UuidType>>()
+            .Resolve(context =>
+                context.Parent<OpenIdConnectAuthorization>().Id
+            );
+
+        descriptor
+                .Field("canCurrentUserDeleteNode")
                 .ResolveWith<AuthorizationResolvers>(x =>
-                    AuthorizationResolvers.GetCanCurrentUserDeleteAuthorizationAsync(default!, default!, default!, default!, default!))
+                    AuthorizationResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!, default!))
                 .UseUserManager();
     }
 
     private sealed class AuthorizationResolvers
     {
-        public static Task<bool> GetCanCurrentUserDeleteAuthorizationAsync(
+        public static Task<bool> GetCanCurrentUserDeleteNodeAsync(
             [Parent] OpenIdConnectAuthorization authorization,
             ClaimsPrincipal claimsPrincipal,
             Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,
@@ -41,7 +55,7 @@ public sealed class OpenIdConnectAuthorizationType
             CancellationToken cancellationToken
         )
         {
-            return openIdConnectAuthorization.IsAuthorizedToDeleteAuthorization(claimsPrincipal, authorization.Id, authorizationManager, cancellationToken);
+            return openIdConnectAuthorization.IsAuthorizedToManageAuthorization(claimsPrincipal, authorization.Id, authorizationManager, cancellationToken);
         }
     }
 }

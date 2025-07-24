@@ -125,8 +125,7 @@ public sealed class InstitutionMutations
         await context.SaveChangesAsync(cancellationToken);
         if (institution.State == InstitutionState.PENDING)
         {
-            var verifiers =
-                await authorization.GetUsersInRoleAsync(UserRole.VERIFIER);
+            var verifiers = await authorization.GetUsersInRoleAsync(UserRole.VERIFIER);
             await Task.WhenAll(
                 verifiers.Select(verifier =>
                     verifier.Email is null

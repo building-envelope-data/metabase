@@ -27,8 +27,7 @@ query User($uuid: Uuid!) {
     rolesCurrentUserCanAdd
     rolesCurrentUserCanRemove
     canCurrentUserDeleteUser
-    canCurrentUserAddOpenIdConnectApplications
-    canCurrentUserViewOpenIdConnectApplications
+    canCurrentUserManageOpenIdConnectApplications
     developedMethods {
       edges {
         node {

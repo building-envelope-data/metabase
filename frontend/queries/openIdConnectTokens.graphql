@@ -1,8 +1,14 @@
 #import "./openIdConnect.graphql"
 
-query TokensByApplicationId($applicationId: Uuid!) {
-  openIdConnectTokens(applicationId: $applicationId) {    
-    ...TokenPartial
+query Tokens($applicationId: Uuid!) {
+  openIdConnectApplication(uuid: $applicationId) {
+    tokens {
+      edges {
+        node {
+          ...TokenPartial
+        }
+      }
+    }
   }
 }
 

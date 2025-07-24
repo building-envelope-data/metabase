@@ -24,11 +24,13 @@ public sealed class OpenIdConnectAuthorizationMutations
         CancellationToken cancellationToken
     )
     {
-        if (!await openIdConnectAuthorization.IsAuthorizedToDeleteAuthorization(
+        if (!await openIdConnectAuthorization.IsAuthorizedToManageAuthorization(
                 claimsPrincipal,
                 input.AuthorizationId,
                 authorizationManager,
-                cancellationToken))
+                cancellationToken
+            )
+        )
         {
             return new DeleteOpenIdConnectAuthorizationPayload(
                 new DeleteOpenIdConnectAuthorizationError(

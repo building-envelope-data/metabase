@@ -30,6 +30,8 @@ public sealed class KeyFingerprintMutations
     {
         if (!await authorization.IsAuthorizedToAddKeyFingerprint(
                 claimsPrincipal,
+                input.InstitutionId,
+                input.UserId,
                 cancellationToken
             )
            )
@@ -37,7 +39,7 @@ public sealed class KeyFingerprintMutations
             return new AddKeyFingerprintPayload(
                 new AddKeyFingerprintError(
                     AddKeyFingerprintErrorCode.UNAUTHORIZED,
-                    "You are not authorized to add keyfingerprints.",
+                    "You are not authorized to add key fingerprints.",
                     []
                 )
             );

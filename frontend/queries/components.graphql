@@ -55,6 +55,7 @@ query Component($uuid: Uuid!) {
     abbreviation
     description
     categories
+    extras
     availability {
       from
       to

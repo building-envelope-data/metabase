@@ -171,7 +171,7 @@ export default function UpdateComponent({
         <Form
           {...layout}
           form={form}
-          name="basic"
+          name="updateComponent"
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
         >

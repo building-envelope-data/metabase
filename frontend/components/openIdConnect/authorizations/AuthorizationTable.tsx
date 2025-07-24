@@ -1,21 +1,21 @@
 import { Result, Skeleton, Space, Table, TableProps } from "antd";
 import { useEffect } from "react";
 import { messageApolloError } from "../../../lib/apollo";
-import { TokenPartialFragment, TokensDocument, useTokensQuery } from "../../../queries/openIdConnectTokens.graphql";
+import { AuthorizationPartialFragment, AuthorizationsDocument, useAuthorizationsQuery } from "../../../queries/openIdConnectAuthorizations.graphql";
 import { Scalars } from "../../../__generated__/__types__";
-import RevokeToken from "./RevokeToken";
+import DeleteAuthorization from "./DeleteAuthorization";
 
-export type TokenTableProps = {
+export type AuthorizationTableProps = {
     applicationId: Scalars["Uuid"];
 };
 
-export default function TokenTable({ applicationId }: TokenTableProps) {
-    const { loading, error, data } = useTokensQuery({
+export default function AutorizationTable({ applicationId }: AuthorizationTableProps) {
+    const { loading, error, data } = useAuthorizationsQuery({
       variables: {
         applicationId: applicationId,
       },
     });
-    const tokens = data?.openIdConnectApplication?.tokens.edges.map(edge => edge.node) as TokenPartialFragment[];
+    const authorizations = data?.openIdConnectApplication?.authorizations.edges.map(edge => edge.node) as AuthorizationPartialFragment[];
 
     useEffect(() => {
       if (error) {
@@ -27,7 +27,7 @@ export default function TokenTable({ applicationId }: TokenTableProps) {
         return <Skeleton active avatar title />;
     }
 
-    if (!tokens) {
+    if (!authorizations) {
       return (
         <Result
           status="500"
@@ -37,7 +37,7 @@ export default function TokenTable({ applicationId }: TokenTableProps) {
       );
     }
 
-    const tokenColumns: TableProps<TokenPartialFragment>['columns'] = [
+    const authorizationColumns: TableProps<AuthorizationPartialFragment>['columns'] = [
         {
             title: "Satus",
             dataIndex: "status",
@@ -54,21 +54,16 @@ export default function TokenTable({ applicationId }: TokenTableProps) {
             key: "subject",
         },
         {
-            title: "Expiration Date",
-            dataIndex: "expirationDate",
-            key: "expirationDate",
-        },
-        {
             title: 'Action',
             key: 'action',
-            render: (_, token) => (
+            render: (_, authorization) => (
                 <Space size="middle">
-                    {token.canCurrentUserRevokeToken ? (
+                    {authorization.canCurrentUserDeleteNode ? (
                         <>
-                            <RevokeToken
-                                tokenId={token.uuid}
+                            <DeleteAuthorization
+                                authorizationId={authorization.uuid}
                                 refetchQueries={[{
-                                    query: TokensDocument,
+                                    query: AuthorizationsDocument,
                                     variables: {
                                         applicationId: applicationId,
                                     }
@@ -83,9 +78,12 @@ export default function TokenTable({ applicationId }: TokenTableProps) {
         },
     ];
 
-    return <Table<TokenPartialFragment>
-        loading={loading}
-        columns={tokenColumns}
-        dataSource={tokens}
-    />;
+
+    return <>
+        <Table<AuthorizationPartialFragment>
+            loading={loading}
+            columns={authorizationColumns}
+            dataSource={authorizations}
+        />
+    </>;
 }
