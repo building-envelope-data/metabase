@@ -1,5 +1,6 @@
-# syntax=docker/dockerfile:1.6
-# The above line fixes the Dockerfile frontend used by BuildKit. For details
+# syntax=docker/dockerfile:1.17
+# check=error=true;skip=SecretsUsedInArgOrEnv
+# The first line fixes the Dockerfile frontend used by BuildKit. For details
 # see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 # Available versions are listed on https://hub.docker.com/r/docker/dockerfile
 

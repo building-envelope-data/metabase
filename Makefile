@@ -29,20 +29,23 @@ name : ## Print value of variable `NAME`
 # ----------------------------- #
 
 pull : ## Pull images
-	COMPOSE_DOCKER_CLI_BUILD=1 \
-		DOCKER_BUILDKIT=1 \
-			${docker_compose} pull
+	COMPOSE_BAKE=true \
+		COMPOSE_DOCKER_CLI_BUILD=1 \
+			DOCKER_BUILDKIT=1 \
+				${docker_compose} pull
 .PHONY : pull
 
 # To debug errors during build add `--progress plain \` to get additional
 # output.
 build : pull ## Build images
-	COMPOSE_DOCKER_CLI_BUILD=1 \
-		DOCKER_BUILDKIT=1 \
-			${docker_compose} build \
-				--pull \
-				--build-arg GROUP_ID=$(shell id --group) \
-				--build-arg USER_ID=$(shell id --user)
+	COMPOSE_BAKE=true \
+		COMPOSE_DOCKER_CLI_BUILD=1 \
+			DOCKER_BUILDKIT=1 \
+				${docker_compose} build \
+					--check	\
+					--pull \
+					--build-arg GROUP_ID=$(shell id --group) \
+					--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
 backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
