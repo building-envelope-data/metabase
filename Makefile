@@ -28,6 +28,13 @@ name : ## Print value of variable `NAME`
 # Interface with Docker Compose #
 # ----------------------------- #
 
+config : ## Parse, resolve and render compose file in canonical format
+	COMPOSE_BAKE=true \
+		COMPOSE_DOCKER_CLI_BUILD=1 \
+			DOCKER_BUILDKIT=1 \
+				${docker_compose} config
+.PHONY : config
+
 check : ## Check build configuration
 	COMPOSE_BAKE=true \
 		COMPOSE_DOCKER_CLI_BUILD=1 \
