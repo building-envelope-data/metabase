@@ -56,6 +56,16 @@ build : check pull ## Build images
 					# --no-cache
 .PHONY : build
 
+bake : ## Print docker-compose file equivalent bake file
+	COMPOSE_BAKE=true \
+		COMPOSE_DOCKER_CLI_BUILD=1 \
+			DOCKER_BUILDKIT=1 \
+				${docker_compose} build \
+					--print \
+					--pull
+					# --no-cache
+.PHONY : bake
+
 up : ## (Re)create and start containers
 	${docker_compose} up \
 		--remove-orphans \

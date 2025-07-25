@@ -57,6 +57,16 @@ build : check pull ## Build images
 					--build-arg USER_ID=$(shell id --user)
 .PHONY : build
 
+bake : ## Print docker-compose file equivalent bake file
+	COMPOSE_BAKE=true \
+		COMPOSE_DOCKER_CLI_BUILD=1 \
+			DOCKER_BUILDKIT=1 \
+				${docker_compose} build \
+					--print \
+					--pull
+					# --no-cache
+.PHONY : bake
+
 backend-build-context : ## Show the build context configured by `./backend/.dockerignore`
 	DOCKER_BUILDKIT=1 \
 		docker build \
