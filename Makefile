@@ -33,7 +33,9 @@ check : ## Check build configuration
 		COMPOSE_DOCKER_CLI_BUILD=1 \
 			DOCKER_BUILDKIT=1 \
 				${docker_compose} build \
-					--check
+					--check \
+					--build-arg GROUP_ID=$(shell id --group) \
+					--build-arg USER_ID=$(shell id --user)
 .PHONY : check
 
 pull : ## Pull images
