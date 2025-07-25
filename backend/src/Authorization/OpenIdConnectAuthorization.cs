@@ -63,6 +63,15 @@ public sealed class OpenIdConnectAuthorization(
         );
     }
 
+    internal Task<bool> IsAuthorizedToManageAuthorizations(
+        ClaimsPrincipal claimsPrincipal,
+        Guid applicationId,
+        CancellationToken cancellationToken
+    )
+    {
+        return IsAuthorizedToManageApplication(claimsPrincipal, applicationId, cancellationToken);
+    }
+
     internal Task<bool> IsAuthorizedToManageAuthorization(
         ClaimsPrincipal claimsPrincipal,
         Guid authorizationId,
@@ -90,6 +99,15 @@ public sealed class OpenIdConnectAuthorization(
             },
             cancellationToken
         );
+    }
+
+    internal Task<bool> IsAuthorizedToManageTokens(
+        ClaimsPrincipal claimsPrincipal,
+        Guid applicationId,
+        CancellationToken cancellationToken
+    )
+    {
+        return IsAuthorizedToManageApplication(claimsPrincipal, applicationId, cancellationToken);
     }
 
     internal Task<bool> IsAuthorizedToManageToken(

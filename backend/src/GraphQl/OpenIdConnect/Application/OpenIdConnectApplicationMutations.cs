@@ -30,7 +30,7 @@ public sealed class OpenIdConnectApplicationMutations
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManageApplication(claimsPrincipal, input.InstitutionId, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageApplications(claimsPrincipal, input.InstitutionId, cancellationToken))
         {
             return new CreateOpenIdConnectApplicationPayload(
                 new CreateOpenIdConnectApplicationError(

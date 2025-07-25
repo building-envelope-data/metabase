@@ -18,7 +18,7 @@ public sealed class OpenIdConnectApplicationTokenConnection(
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManage(claimsPrincipal, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageTokens(claimsPrincipal, application.Id, cancellationToken))
         {
             yield break;
         }

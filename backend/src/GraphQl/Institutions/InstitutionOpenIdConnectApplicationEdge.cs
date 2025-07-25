@@ -24,9 +24,9 @@ public sealed class InstitutionOpenIdConnectApplicationEdge(
         CancellationToken cancellationToken
     )
     {
-        return authorization.IsAuthorizedToManageApplication(
+        return authorization.IsAuthorizedToManageApplications(
             claimsPrincipal,
-            _association.ApplicationId,
+            _association.InstitutionId,
             cancellationToken
         );
     }
