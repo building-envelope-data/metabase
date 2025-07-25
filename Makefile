@@ -28,6 +28,14 @@ name : ## Print value of variable `NAME`
 # Interface with Docker Compose #
 # ----------------------------- #
 
+check : ## Check build configuration
+	COMPOSE_BAKE=true \
+		COMPOSE_DOCKER_CLI_BUILD=1 \
+			DOCKER_BUILDKIT=1 \
+				${docker_compose} build \
+					--check
+.PHONY : check
+
 pull : ## Pull images
 	COMPOSE_BAKE=true \
 		COMPOSE_DOCKER_CLI_BUILD=1 \
@@ -37,12 +45,11 @@ pull : ## Pull images
 
 # To debug errors during build add `--progress plain \` to get additional
 # output.
-build : pull ## Build images
+build : check pull ## Build images
 	COMPOSE_BAKE=true \
 		COMPOSE_DOCKER_CLI_BUILD=1 \
 			DOCKER_BUILDKIT=1 \
 				${docker_compose} build \
-					--check	\
 					--pull \
 					--build-arg GROUP_ID=$(shell id --group) \
 					--build-arg USER_ID=$(shell id --user)

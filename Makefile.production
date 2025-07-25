@@ -32,6 +32,14 @@ name : ## Print value of variable `NAME`
 	@echo ${NAME}
 .PHONY : name
 
+check : ## Check build configuration
+	COMPOSE_BAKE=true \
+		COMPOSE_DOCKER_CLI_BUILD=1 \
+			DOCKER_BUILDKIT=1 \
+				${docker_compose} build \
+					--check
+.PHONY : check
+
 pull : ## Pull images
 	COMPOSE_BAKE=true \
 		COMPOSE_DOCKER_CLI_BUILD=1 \
@@ -39,14 +47,13 @@ pull : ## Pull images
 				${docker_compose} pull
 .PHONY : pull
 
-build : pull ## Build images
+build : check pull ## Build images
 	COMPOSE_BAKE=true \
 		COMPOSE_DOCKER_CLI_BUILD=1 \
 			DOCKER_BUILDKIT=1 \
 				${docker_compose} build \
-					--check \
-					--pull \
-					--no-cache
+					--pull
+					# --no-cache
 .PHONY : build
 
 up : ## (Re)create and start containers
@@ -313,17 +320,7 @@ migrate : ## Migrate database (down-ing and up-ing the database service before a
 
 # Note that NGINX is because of its dependencies taken down and up last and in
 # one go so the maintenance page is only down very shortly.
-deploy-services : ## Deploy services
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} pull
-	COMPOSE_BAKE=true \
-		COMPOSE_DOCKER_CLI_BUILD=1 \
-			DOCKER_BUILDKIT=1 \
-				${docker_compose} build \
-					--check \
-					--pull
+deploy-services : build ## Deploy services
 	${docker_compose} up \
 		--force-recreate \
 		--renew-anon-volumes \
