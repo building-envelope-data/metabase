@@ -18,7 +18,7 @@ public sealed class OpenIdConnectAuthorization(
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
 ) : CommonAuthorization(context, userManager, applicationManager)
 {
-    internal Task<bool> IsAuthorizedToManageApplications(
+    internal Task<bool> IsAuthorizedToManage(
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken
     )

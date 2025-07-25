@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,18 +18,21 @@ public sealed class OpenIdConnectTokenQueries
 {
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
-    public async Task<IAsyncEnumerable<OpenIdConnectToken>> GetOpenIdConnectTokensAsync(
+    public async IAsyncEnumerable<OpenIdConnectToken> GetOpenIdConnectTokensAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager, // TODO Make the token manager use the scoped database context.
-        CancellationToken cancellationToken
+        [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManageApplications(claimsPrincipal, cancellationToken))
+        if (!await authorization.IsAuthorizedToManage(claimsPrincipal, cancellationToken))
         {
-            return AsyncEnumerable.Empty<OpenIdConnectToken>();
+            yield break;
         }
-        return tokenManager.ListAsync(cancellationToken: cancellationToken);
+        await foreach (var token in tokenManager.ListAsync(cancellationToken: cancellationToken))
+        {
+            yield return token;
+        }
     }
 
     [UseUserManager]

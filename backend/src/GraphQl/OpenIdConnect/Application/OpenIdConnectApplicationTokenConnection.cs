@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using System.Threading;
 using Metabase.Data.OpenIdConnect;
 using OpenIddict.Core;
@@ -10,12 +11,20 @@ public sealed class OpenIdConnectApplicationTokenConnection(
     OpenIdConnectApplication application
 )
 {
-    public IAsyncEnumerable<OpenIdConnectApplicationTokenEdge> GetEdgesAsync(
+    public async IAsyncEnumerable<OpenIdConnectApplicationTokenEdge> GetEdgesAsync(
+        ClaimsPrincipal claimsPrincipal,
+        Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
-        CancellationToken cancellationToken
+        [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        return tokenManager.FindByApplicationIdAsync(application.Id.ToString(), cancellationToken)
-            .Select(token => new OpenIdConnectApplicationTokenEdge(token));
+        if (!await authorization.IsAuthorizedToManage(claimsPrincipal, cancellationToken))
+        {
+            yield break;
+        }
+        await foreach (var token in tokenManager.FindByApplicationIdAsync(application.Id.ToString(), cancellationToken))
+        {
+            yield return new OpenIdConnectApplicationTokenEdge(token);
+        }
     }
 }

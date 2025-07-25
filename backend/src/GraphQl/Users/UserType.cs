@@ -23,11 +23,6 @@ namespace Metabase.GraphQl.Users;
 public sealed class UserType
     : EntityType<User, UserByIdDataLoader>
 {
-    private static string GetServiceName<TService>()
-    {
-        return typeof(TService).FullName ?? typeof(TService).Name;
-    }
-
     private static async Task<T?> Authorize<T>(
         IResolverContext context,
         Func<User, T?> getValue,
@@ -228,8 +223,8 @@ public sealed class UserType
             .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserDeleteUserAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserManageOpenIdConnectApplications")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserManageOpenIdConnectApplications(default!, default!, default!))
+            .Field("canCurrentUserManageOpenIdConnect")
+            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserManageOpenIdConnect(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserAddApprovals")
@@ -289,13 +284,13 @@ public sealed class UserType
             );
         }
 
-        public static Task<bool> GetCanCurrentUserManageOpenIdConnectApplications(
+        public static Task<bool> GetCanCurrentUserManageOpenIdConnect(
             ClaimsPrincipal claimsPrincipal,
             OpenIdConnectAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return authorization.IsAuthorizedToManageApplications(claimsPrincipal, cancellationToken);
+            return authorization.IsAuthorizedToManage(claimsPrincipal, cancellationToken);
         }
 
         public static Task<bool> GetCanCurrentUserAddApprovals(

@@ -9,15 +9,18 @@ namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionOpenIdConnectApplicationConnection(
     Institution institution
-) : Connection<
+) : AuthorizedConnection<
         Institution,
         InstitutionOpenIdConnectApplication,
         InstitutionOpenIdConnectApplicationsByInstitutionIdDataLoader,
-        InstitutionOpenIdConnectApplicationEdge
+        InstitutionOpenIdConnectApplicationEdge,
+        OpenIdConnectAuthorization
     >
 (
     institution,
-    x => new InstitutionOpenIdConnectApplicationEdge(x)
+    x => new InstitutionOpenIdConnectApplicationEdge(x),
+    (claimsPrincipal, institution, authorization, cancellationToken) =>
+        authorization.IsAuthorizedToManageApplications(claimsPrincipal, institution.Id, cancellationToken)
 )
 {
     [UseUserManager]
