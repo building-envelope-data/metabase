@@ -163,7 +163,7 @@ services:
       - backend
 
   nginx: # https://hub.docker.com/_/nginx
-    image: nginx:1.25-bookworm
+    image: nginx:1.27-bookworm
     command: [
       "nginx-debug",
       "-g", "daemon off;"
