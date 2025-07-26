@@ -1,9 +1,11 @@
 using System;
 using System.Linq.Expressions;
+using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
 using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Data.Sorting;
+using HotChocolate.Execution;
 using HotChocolate.Language;
 using HotChocolate.Types;
 using HotChocolate.Utilities;
@@ -75,8 +77,23 @@ public static class GraphQlConfiguration
                     options.UseXmlDocumentation = false;
                     options.SortFieldsByName = true;
                     options.RemoveUnreachableTypes = false;
+                    options.RemoveUnusedTypeSystemDirectives = true;
                     options.DefaultBindingBehavior = BindingBehavior.Implicit;
-                    /* options.FieldMiddleware = ... */
+                    // options.DefaultFieldBindingFlags = FieldBindingFlags.InstanceAndStatic;
+                    options.EnableDirectiveIntrospection = true;
+                    options.DefaultDirectiveVisibility = DirectiveVisibility.Public;
+                    options.DefaultResolverStrategy = ExecutionStrategy.Parallel;
+                    options.ValidatePipelineOrder = true;
+                    options.StrictRuntimeTypeValidation = true;
+                    options.EnableOneOf = true;
+                    options.EnsureAllNodesCanBeResolved = true;
+                    options.EnableFlagEnums = false;
+                    options.EnableDefer = false;
+                    options.EnableStream = false;
+                    options.EnableSemanticNonNull = false;
+                    options.StripLeadingIFromInterface = false;
+                    options.EnableTag = true;
+                    options.PublishRootFieldPagesToPromiseCache = true;
                 }
             )
             .ModifyRequestOptions(options =>
