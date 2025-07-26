@@ -211,12 +211,12 @@ public sealed class UserType
         descriptor
             .Field("rolesCurrentUserCanAdd")
             .ResolveWith<UserResolvers>(x =>
-                UserResolvers.GetRolesCurrentUserCanAddAsync(default!, default!, default!))
+                UserResolvers.GetRolesCurrentUserCanAddOrRemoveAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("rolesCurrentUserCanRemove")
             .ResolveWith<UserResolvers>(x =>
-                UserResolvers.GetRolesCurrentUserCanRemoveAsync(default!, default!, default!))
+                UserResolvers.GetRolesCurrentUserCanAddOrRemoveAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserDeleteUser")
@@ -311,27 +311,7 @@ public sealed class UserType
             return authorization.IsAuthorizedToDeleteUsers(claimsPrincipal, cancellationToken);
         }
 
-        public static async Task<IList<UserRole>> GetRolesCurrentUserCanAddAsync(
-            ClaimsPrincipal claimsPrincipal,
-            UserAuthorization authorization,
-            CancellationToken cancellationToken
-        )
-        {
-            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization, cancellationToken)
-                .ToListAsync(cancellationToken);
-        }
-
-        public static async Task<IList<UserRole>> GetRolesCurrentUserCanRemoveAsync(
-            ClaimsPrincipal claimsPrincipal,
-            UserAuthorization authorization,
-            CancellationToken cancellationToken
-        )
-        {
-            return await GetRolesCurrentUserCanAddOrRemoveAsync(claimsPrincipal, authorization, cancellationToken)
-                .ToListAsync(cancellationToken);
-        }
-
-        private static async IAsyncEnumerable<UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
+        public static async IAsyncEnumerable<UserRole> GetRolesCurrentUserCanAddOrRemoveAsync(
             ClaimsPrincipal claimsPrincipal,
             UserAuthorization authorization,
             [EnumeratorCancellation] CancellationToken cancellationToken

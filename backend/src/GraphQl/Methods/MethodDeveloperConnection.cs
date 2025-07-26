@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Methods;
 
@@ -18,33 +17,34 @@ public sealed class MethodDeveloperConnection(
     private readonly bool _pending = pending;
     private readonly Method _subject = subject;
 
-    public async Task<IEnumerable<MethodDeveloperEdge>> GetEdgesAsync(
+    public async IAsyncEnumerable<MethodDeveloperEdge> GetEdgesAsync(
         InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
         UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
         PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
         PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
-        CancellationToken cancellationToken
+        [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        return
-            (await new InstitutionMethodDeveloperConnection(_subject, _pending)
-                .GetEdgesAsync(
-                    pendingInstitutionMethodDevelopersDataLoader,
-                    institutionMethodDevelopersDataLoader,
-                    cancellationToken
-                )
+        await foreach (var edge in new InstitutionMethodDeveloperConnection(_subject, _pending)
+            .GetEdgesAsync(
+                pendingInstitutionMethodDevelopersDataLoader,
+                institutionMethodDevelopersDataLoader,
+                cancellationToken
             )
-            .Select(e => new MethodDeveloperEdge(e))
-            .Concat(
-                (await new UserMethodDeveloperConnection(_subject, _pending)
-                    .GetEdgesAsync(
-                        pendingUserMethodDevelopersDataLoader,
-                        userMethodDevelopersDataLoader,
-                        cancellationToken
-                    )
-                )
-                .Select(e => new MethodDeveloperEdge(e))
-            );
+        )
+        {
+            yield return new MethodDeveloperEdge(edge);
+        }
+        await foreach (var edge in new UserMethodDeveloperConnection(_subject, _pending)
+            .GetEdgesAsync(
+                pendingUserMethodDevelopersDataLoader,
+                userMethodDevelopersDataLoader,
+                cancellationToken
+            )
+        )
+        {
+            yield return new MethodDeveloperEdge(edge);
+        }
     }
 
     [UseUserManager]

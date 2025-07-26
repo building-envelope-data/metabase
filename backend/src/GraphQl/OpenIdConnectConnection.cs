@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using GreenDonut;
 using Metabase.Data.OpenIdConnect;
 
@@ -17,14 +16,14 @@ public abstract class OpenIdConnectConnection<TAssociation, TAssociationsByAssoc
 
     protected OpenIdConnectApplication Subject { get; } = subject;
 
-    public async Task<IEnumerable<TEdge>> GetEdgesAsync(
+    public async IAsyncEnumerable<TEdge> GetEdgesAsync(
         TAssociationsByAssociateIdDataLoader dataLoader,
-        CancellationToken cancellationToken
+        [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        return (
-                await dataLoader.LoadAsync(Subject.Id, cancellationToken) ?? []
-            )
-            .Select(_createEdge);
+        foreach (var association in await dataLoader.LoadAsync(Subject.Id, cancellationToken) ?? [])
+        {
+            yield return _createEdge(association);
+        }
     }
 }

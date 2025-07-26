@@ -118,13 +118,13 @@ public abstract class CommonAuthorization(
         );
     }
 
-    internal Task<IList<User>> GetUsersInRoleAsync(
+    internal async Task<IReadOnlyList<User>> GetUsersInRoleAsync(
         UserRole role
     )
     {
-        return UserManager.GetUsersInRoleAsync(
+        return (await UserManager.GetUsersInRoleAsync(
             Role.EnumToName(role)
-        );
+        )).AsReadOnly();
     }
 
     protected Task<bool> IsVerified(

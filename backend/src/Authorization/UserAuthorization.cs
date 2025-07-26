@@ -24,9 +24,9 @@ public sealed class UserAuthorization(
         return UserManager.HasPasswordAsync(user);
     }
 
-    internal async Task<IEnumerable<UserRole>> GetRolesAsync(User user)
+    internal async Task<IReadOnlyList<UserRole>> GetRolesAsync(User user)
     {
-        return (await UserManager.GetRolesAsync(user)).Select(Role.EnumFromName);
+        return (await UserManager.GetRolesAsync(user)).Select(Role.EnumFromName).ToList().AsReadOnly();
     }
 
     internal Task<bool> IsAuthorizedToDeleteUsers(

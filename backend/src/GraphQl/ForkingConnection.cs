@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using GreenDonut;
 using Metabase.Data;
 
@@ -23,7 +22,7 @@ public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociation
 
     protected TSubject Subject { get; } = subject;
 
-    public Task<IEnumerable<TEdge>> GetEdgesAsync(
+    public IAsyncEnumerable<TEdge> GetEdgesAsync(
         TSomeAssociationsByAssociateIdDataLoader someDataLoader,
         TOtherAssociationsByAssociateIdDataLoader otherDataLoader,
         CancellationToken cancellationToken
@@ -34,15 +33,15 @@ public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociation
             : GetEdgesAsync(otherDataLoader, cancellationToken);
     }
 
-    private async Task<IEnumerable<TEdge>> GetEdgesAsync<TDataLoader>(
+    private async IAsyncEnumerable<TEdge> GetEdgesAsync<TDataLoader>(
         TDataLoader dataLoader,
-        CancellationToken cancellationToken
+        [EnumeratorCancellation] CancellationToken cancellationToken
     )
         where TDataLoader : IDataLoader<Guid, TAssociation[]>
     {
-        return (
-                await dataLoader.LoadAsync(Subject.Id, cancellationToken) ?? []
-            )
-            .Select(_createEdge);
+        foreach (var association in await dataLoader.LoadAsync(Subject.Id, cancellationToken) ?? [])
+        {
+            yield return _createEdge(association);
+        }
     }
 }

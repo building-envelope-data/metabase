@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,17 +19,20 @@ public abstract class AuthorizedConnection<TSubject, TAssociation, TAssociations
 {
     private readonly Func<ClaimsPrincipal, TSubject, TAuthorization, CancellationToken, Task<bool>> _isAuthorized = isAuthorized;
 
-    public async Task<IEnumerable<TEdge>> GetEdgesAsync(
+    public async IAsyncEnumerable<TEdge> GetEdgesAsync(
         ClaimsPrincipal claimsPrincipal,
         TAuthorization authorization,
         TAssociationsByAssociateIdDataLoader dataLoader,
-        CancellationToken cancellationToken
+        [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
         if (!await _isAuthorized(claimsPrincipal, Subject, authorization, cancellationToken))
         {
-            return [];
+            yield break;
         }
-        return await GetEdgesAsync(dataLoader, cancellationToken);
+        await foreach (var edge in GetEdgesAsync(dataLoader, cancellationToken))
+        {
+            yield return edge;
+        }
     }
 }
