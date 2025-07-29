@@ -6,14 +6,15 @@ using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Authorization;
 
 public sealed class UserMethodDeveloperAuthorization(
-    ApplicationDbContext context,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
-) : CommonMethodAuthorization(context, userManager, applicationManager)
+) : CommonMethodAuthorization(dbContextFactory, userManager, applicationManager)
 {
     internal Task<bool> IsAuthorizedToAdd(
         ClaimsPrincipal claimsPrincipal,

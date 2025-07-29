@@ -72,21 +72,21 @@ public static class AuthConfiguration
         IServiceCollection services
     )
     {
-        services.AddScoped<ApprovalAuthorization>();
-        services.AddScoped<ComponentAssemblyAuthorization>();
-        services.AddScoped<ComponentAuthorization>();
-        services.AddScoped<ComponentGeneralizationAuthorization>();
-        services.AddScoped<ComponentManufacturerAuthorization>();
-        services.AddScoped<ComponentVariantAuthorization>();
-        services.AddScoped<DataFormatAuthorization>();
-        services.AddScoped<DatabaseAuthorization>();
-        services.AddScoped<InstitutionAuthorization>();
-        services.AddScoped<InstitutionMethodDeveloperAuthorization>();
-        services.AddScoped<InstitutionRepresentativeAuthorization>();
-        services.AddScoped<MethodAuthorization>();
-        services.AddScoped<Authorization.OpenIdConnectAuthorization>();
-        services.AddScoped<UserAuthorization>();
-        services.AddScoped<UserMethodDeveloperAuthorization>();
+        services.AddTransient<ApprovalAuthorization>();
+        services.AddTransient<ComponentAssemblyAuthorization>();
+        services.AddTransient<ComponentAuthorization>();
+        services.AddTransient<ComponentGeneralizationAuthorization>();
+        services.AddTransient<ComponentManufacturerAuthorization>();
+        services.AddTransient<ComponentVariantAuthorization>();
+        services.AddTransient<DataFormatAuthorization>();
+        services.AddTransient<DatabaseAuthorization>();
+        services.AddTransient<InstitutionAuthorization>();
+        services.AddTransient<InstitutionMethodDeveloperAuthorization>();
+        services.AddTransient<InstitutionRepresentativeAuthorization>();
+        services.AddTransient<MethodAuthorization>();
+        services.AddTransient<Authorization.OpenIdConnectAuthorization>();
+        services.AddTransient<UserAuthorization>();
+        services.AddTransient<UserMethodDeveloperAuthorization>();
     }
 
     private static X509Certificate2 LoadCertificate(

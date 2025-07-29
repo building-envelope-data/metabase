@@ -6,14 +6,15 @@ using Microsoft.AspNetCore.Identity;
 using OpenIddict.Core;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Authorization;
 
 public sealed class InstitutionAuthorization(
-    ApplicationDbContext context,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
-) : CommonAuthorization(context, userManager, applicationManager)
+) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
     internal Task<bool> IsAuthorizedToUpdateInstitution(
         ClaimsPrincipal claimsPrincipal,

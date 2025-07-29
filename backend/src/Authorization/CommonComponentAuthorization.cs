@@ -12,10 +12,10 @@ using Metabase.Enumerations;
 namespace Metabase.Authorization;
 
 public abstract class CommonComponentAuthorization(
-    ApplicationDbContext context,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
-) : CommonAuthorization(context, userManager, applicationManager)
+) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
     protected async Task<bool> IsAtLeastAssistantOfOneVerifiedManufacturerOfComponent(
         User user,

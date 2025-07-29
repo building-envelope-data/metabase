@@ -13,10 +13,10 @@ using Metabase.Enumerations;
 namespace Metabase.Authorization;
 
 public sealed class DataFormatAuthorization(
-    ApplicationDbContext context,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
-) : CommonAuthorization(context, userManager, applicationManager)
+) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
     internal Task<bool> IsAuthorizedToCreateDataFormatForInstitution(
         ClaimsPrincipal claimsPrincipal,

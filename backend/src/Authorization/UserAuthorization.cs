@@ -8,16 +8,17 @@ using OpenIddict.Abstractions;
 using OpenIddict.Core;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Microsoft.EntityFrameworkCore;
 using UserRole = Metabase.Enumerations.UserRole;
 using System.Threading;
 
 namespace Metabase.Authorization;
 
 public sealed class UserAuthorization(
-    ApplicationDbContext context,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
-) : CommonAuthorization(context, userManager, applicationManager)
+) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
     internal Task<bool> HasPasswordAsync(User user)
     {

@@ -10,10 +10,10 @@ using Metabase.Data.OpenIdConnect;
 namespace Metabase.Authorization;
 
 public sealed class ApprovalAuthorization(
-    ApplicationDbContext context,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
-) : CommonAuthorization(context, userManager, applicationManager)
+) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
     internal Task<bool> IsAuthorizedToAddApprovals(
         ClaimsPrincipal claimsPrincipal,

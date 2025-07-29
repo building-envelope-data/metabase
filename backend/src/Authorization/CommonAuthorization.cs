@@ -9,21 +9,22 @@ using OpenIddict.Core;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Microsoft.EntityFrameworkCore;
 using Metabase.Enumerations;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using UserRole = Metabase.Enumerations.UserRole;
 using System.Globalization;
 
 namespace Metabase.Authorization;
 
 public abstract class CommonAuthorization(
-    ApplicationDbContext context,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
     )
 {
-    protected ApplicationDbContext Context { get; } = context;
+    protected IDbContextFactory<ApplicationDbContext> IDbContextFactory { get; } = dbContextFactory;
+    protected ApplicationDbContext Context { get => IDbContextFactory.CreateDbContext(); }
     protected UserManager<User> UserManager { get; } = userManager;
     protected OpenIddictApplicationManager<OpenIdConnectApplication> ApplicationManager { get; } = applicationManager;
 
