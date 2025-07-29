@@ -5,6 +5,7 @@ using System.Text.Json;
 namespace Metabase.GraphQl.Institutions;
 
 public sealed record CreateInstitutionInput(
+    Guid? InstitutionId,
     string Name,
     string? Abbreviation,
     string Description,

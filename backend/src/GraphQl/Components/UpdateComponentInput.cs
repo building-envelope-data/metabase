@@ -16,5 +16,6 @@ public sealed record UpdateComponentInput(
     JsonElement? Extras,
     DescriptionOrReferenceInput? PrimeSurface,
     DescriptionOrReferenceInput? PrimeDirection,
-    DescriptionOrReferenceInput? SwitchableLayers
+    DescriptionOrReferenceInput? SwitchableLayers,
+    Guid? ManufacturerId
 );

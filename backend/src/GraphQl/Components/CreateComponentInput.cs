@@ -7,6 +7,7 @@ using Metabase.GraphQl.DescriptionOrReferences;
 namespace Metabase.GraphQl.Components;
 
 public sealed record CreateComponentInput(
+    Guid? ComponentId,
     string Name,
     string? Abbreviation,
     string Description,

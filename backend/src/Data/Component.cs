@@ -4,6 +4,7 @@ using NpgsqlTypes;
 using DateTime = System.DateTime;
 using Metabase.Enumerations;
 using System.Text.Json;
+using System;
 
 namespace Metabase.Data;
 
@@ -33,6 +34,25 @@ public sealed class Component
         Categories = categories;
         Extras = extras;
     }
+
+    public Component(
+        Guid componentId,
+        string name,
+        string? abbreviation,
+        string description,
+        NpgsqlRange<DateTime>? availability,
+        ComponentCategory[] categories,
+        JsonElement? extras
+    ) : base(componentId)
+    {
+        Name = name;
+        Abbreviation = abbreviation;
+        Description = description;
+        Availability = availability;
+        Categories = categories;
+        Extras = extras;
+    }
+
     // Entity Framework Core Read-Only Properties https://docs.microsoft.com/en-us/ef/core/modeling/constructors#read-only-properties
     // Data Annotations https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations
     // Built-In Validation Attributes https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation#built-in-attributes

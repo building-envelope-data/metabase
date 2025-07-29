@@ -75,6 +75,35 @@ public sealed class CreateInstitutionTests
         );
     }
 
+    [Test]
+    [SuppressMessage("Naming", "CA1707")]
+    public async Task LoggedInUser_IsSuccessWithCustomId()
+    {
+        var input = CustomIdInstitutionInput;
+
+        // Arrange
+        var userId = await RegisterAndConfirmAndLoginUser();
+        // Act
+        var response = await CreateInstitution(
+            input with
+            {
+                OwnerIds = [userId]
+            }
+        );
+        // Assert
+        Snapshot.Match(
+            response,
+            matchOptions => matchOptions
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<string>("data.createInstitution.institution.id").Should()
+                        .NotBeNullOrWhiteSpace()
+                )
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<Guid>("data.createInstitution.institution.uuid").Should().Be(input.InstitutionId ?? Guid.Empty)
+                )
+        );
+    }
+
     [TestCaseSource(nameof(EnumerateInstitutionInputs))]
     [Theory]
     [SuppressMessage("Naming", "CA1707")]

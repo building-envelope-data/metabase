@@ -1,4 +1,5 @@
 mutation createComponent(
+  $componentId: Uuid
   $name: String!
   $abbreviation: String
   $description: String!
@@ -8,6 +9,7 @@ mutation createComponent(
 ) {
   createComponent(
     input: {
+      componentId: $componentId
       name: $name
       abbreviation: $abbreviation
       description: $description

@@ -83,6 +83,42 @@ public sealed class CreateComponentTests
         );
     }
 
+    [Test]
+    [SuppressMessage("Naming", "CA1707")]
+    public async Task LoggedInUser_IsSuccessWithCustomId()
+    {
+        var input = CustomIdComponentInput;
+
+        // Arrange
+        var userId = await RegisterAndConfirmAndLoginUser();
+        var institutionId = await InstitutionIntegrationTests.CreateAndVerifyInstitutionReturningUuid(
+            HttpClient,
+            AppSettings.BootstrapUserPassword,
+            InstitutionIntegrationTests.PendingInstitutionInput with
+            {
+                OwnerIds = [userId]
+            }
+        );
+        // Act
+        var response = await CreateComponent(
+            input with
+            {
+                ManufacturerId = institutionId
+            }
+        );
+        // Assert
+        Snapshot.Match(
+            response,
+            matchOptions => matchOptions
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<string>("data.createComponent.component.id").Should().NotBeNullOrWhiteSpace()
+                )
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<Guid>("data.createComponent.component.uuid").Should().Be(input.ComponentId ?? Guid.Empty)
+                )
+        );
+    }
+
     [TestCaseSource(nameof(EnumerateComponentInputs))]
     [Theory]
     [SuppressMessage("Naming", "CA1707")]

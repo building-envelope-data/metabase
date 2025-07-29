@@ -13,6 +13,7 @@ public abstract class InstitutionIntegrationTests
     : IntegrationTests
 {
     internal static CreateInstitutionInput PendingInstitutionInput { get; } = new(
+        null,
         "Institution A",
         "I!A",
         "Best institution ever!",
@@ -23,14 +24,30 @@ public abstract class InstitutionIntegrationTests
         null
     );
 
+    internal static CreateInstitutionInput CustomIdInstitutionInput { get; } = new(
+        Guid.NewGuid(),
+        "Institution B",
+        "I!B",
+        "Custom ID institution.",
+        new Uri("https://institution-b.com", UriKind.Absolute),
+        null,
+        null,
+        [],
+        null
+    );
+
     internal static IEnumerable<CreateInstitutionInput> InstitutionInputs
     {
-        get { yield return PendingInstitutionInput; }
+        get {
+            yield return PendingInstitutionInput;
+            yield return CustomIdInstitutionInput;
+        }
     }
 
     internal static IEnumerable<object[]> EnumerateInstitutionInputs()
     {
         yield return new object[] { nameof(PendingInstitutionInput), PendingInstitutionInput };
+        yield return new object[] { nameof(CustomIdInstitutionInput), CustomIdInstitutionInput };
     }
 
     protected Task<string> GetInstitutions()

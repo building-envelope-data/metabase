@@ -50,6 +50,23 @@ public sealed class InstitutionMutations
             );
         }
 
+        if (input.InstitutionId is not null
+            && await context.Institutions.AsQueryable()
+                .AnyAsync(
+                    x => x.Id == input.InstitutionId,
+                    cancellationToken
+                )
+           )
+        {
+            return new CreateInstitutionPayload(
+                new CreateInstitutionError(
+                    CreateInstitutionErrorCode.DUPLICATE_INSTITUTION_ID,
+                    "The institution ID is already in use.",
+                    [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
+                )
+            );
+        }
+
         if (input.OwnerIds.Count is 0 && input.ManagerId is null)
         {
             return new CreateInstitutionPayload(
@@ -96,19 +113,33 @@ public sealed class InstitutionMutations
             );
         }
 
-        var institution = new Institution(
-            input.Name,
-            input.Abbreviation,
-            input.Description,
-            input.WebsiteLocator,
-            input.PublicKey,
-            await GetInitialInstitutionState(input, claimsPrincipal, authorization, cancellationToken),
-            InstitutionOperatingState.OPERATING,
-            input.Extras
-        )
-        {
-            ManagerId = input.ManagerId
-        };
+        var institutionState = await GetInitialInstitutionState(input, claimsPrincipal, authorization, cancellationToken);
+        var institution =
+            input.InstitutionId is null
+            ? new Institution(
+                input.Name,
+                input.Abbreviation,
+                input.Description,
+                input.WebsiteLocator,
+                input.PublicKey,
+                institutionState,
+                InstitutionOperatingState.OPERATING,
+                input.Extras
+            )
+            : new Institution(
+                input.InstitutionId ?? Guid.Empty,
+                input.Name,
+                input.Abbreviation,
+                input.Description,
+                input.WebsiteLocator,
+                input.PublicKey,
+                institutionState,
+                InstitutionOperatingState.OPERATING,
+                input.Extras
+            )
+            {
+                ManagerId = input.ManagerId
+            };
         foreach (var ownerId in input.OwnerIds)
         {
             institution.RepresentativeEdges.Add(

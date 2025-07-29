@@ -40,6 +40,28 @@ public sealed class Institution
         Extras = extras;
     }
 
+    public Institution(
+        Guid institutionId,
+        string name,
+        string? abbreviation,
+        string description,
+        Uri? websiteLocator,
+        string? publicKey,
+        InstitutionState state,
+        InstitutionOperatingState operatingState,
+        JsonElement? extras
+    ) : base(institutionId)
+    {
+        Name = name;
+        Abbreviation = abbreviation;
+        Description = description;
+        WebsiteLocator = websiteLocator;
+        PublicKey = publicKey;
+        State = state;
+        OperatingState = operatingState;
+        Extras = extras;
+    }
+
     [MinLength(1)] public string? Abbreviation { get; private set; }
 
     [Required][MinLength(1)] public string Description { get; private set; }

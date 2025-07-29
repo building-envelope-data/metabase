@@ -14,6 +14,7 @@ public abstract class ComponentIntegrationTests
     : IntegrationTests
 {
     internal static CreateComponentInput MinimalComponentInput { get; } = new(
+        null,
         "Component A",
         "C!A",
         "Best component ever!",
@@ -27,6 +28,7 @@ public abstract class ComponentIntegrationTests
     );
 
     internal static CreateComponentInput FromAndToRestrictedAvailabilityComponentInput { get; } = new(
+        null,
         "Component B",
         "C!B",
         "Another component!",
@@ -46,6 +48,7 @@ public abstract class ComponentIntegrationTests
     );
 
     internal static CreateComponentInput ToRestrictedAvailabilityComponentInput { get; } = new(
+        null,
         "Component C",
         "C!C",
         "Yet another component!",
@@ -64,6 +67,7 @@ public abstract class ComponentIntegrationTests
     );
 
     internal static CreateComponentInput FromRestrictedAvailabilityComponentInput { get; } = new(
+        null,
         "Component D",
         "C!D",
         "Whatever component!",
@@ -83,6 +87,20 @@ public abstract class ComponentIntegrationTests
         Guid.Empty
     );
 
+    internal static CreateComponentInput CustomIdComponentInput { get; } = new(
+        Guid.NewGuid(),
+        "Component E",
+        "C!E",
+        "Custom ID component.",
+        null,
+        [],
+        null,
+        null,
+        null,
+        null,
+        Guid.Empty
+    );
+
     internal static IEnumerable<CreateComponentInput> ComponentInputs
     {
         get
@@ -91,6 +109,7 @@ public abstract class ComponentIntegrationTests
             yield return FromAndToRestrictedAvailabilityComponentInput;
             yield return ToRestrictedAvailabilityComponentInput;
             yield return FromRestrictedAvailabilityComponentInput;
+            yield return CustomIdComponentInput;
         }
     }
 
@@ -105,6 +124,8 @@ public abstract class ComponentIntegrationTests
             { nameof(ToRestrictedAvailabilityComponentInput), ToRestrictedAvailabilityComponentInput };
         yield return new object[]
             { nameof(FromRestrictedAvailabilityComponentInput), FromRestrictedAvailabilityComponentInput };
+        yield return new object[]
+            { nameof(CustomIdComponentInput), CustomIdComponentInput };
     }
 
     protected Task<string> GetComponents()
