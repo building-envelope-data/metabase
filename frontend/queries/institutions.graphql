@@ -12,7 +12,7 @@ fragment InstitutionPartial on Institution {
 }
 
 query Institutions {
-  institutions {
+  institutions(first: 2147483646) {
     edges {
       node {
         ...InstitutionPartial

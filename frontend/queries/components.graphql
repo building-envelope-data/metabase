@@ -38,7 +38,7 @@ fragment ReferencePartial on Reference {
 }
 
 query Components {
-  components {
+  components(first: 2147483646) {
     edges {
       node {
         ...ComponentPartial
