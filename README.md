@@ -1,14 +1,58 @@
 # Metabase
 
-The network of databases [buildingenvelopedata.org](https://www.buildingenvelopedata.org/) is based on [databases](https://github.com/building-envelope-data/database) and one metabase. This repository presents the source code of the metabase. Before deploying this repository, [machine](https://github.com/building-envelope-data/machine) can be used to set up the machine.
+The network of databases
+[buildingenvelopedata.org](https://www.buildingenvelopedata.org/) is based on
+[databases](https://github.com/building-envelope-data/database) and one
+metabase. This repository presents the source code of the metabase. Before
+deploying this repository,
+[machine](https://github.com/building-envelope-data/machine) can be used to set
+up the machine.
 
-The [API specification of the metabase](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql) is available in the repository [api](https://github.com/building-envelope-data/api). There is also a [visualization of the API of the metabase](https://graphql-kit.com/graphql-voyager/?url=https://www.buildingenvelopedata.org/graphql/). The current [development version of the API of the metabase](https://github.com/building-envelope-data/metabase/blob/develop/frontend/type-defs.graphqls) may not be deployed yet.
+The [API specification of the
+metabase](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql)
+is available in the repository
+[api](https://github.com/building-envelope-data/api). There is also
+a [visualization of the API of the
+metabase](https://graphql-kit.com/graphql-voyager/?url=https://www.buildingenvelopedata.org/graphql/).
+The current [development version of the API of the
+metabase](https://github.com/building-envelope-data/metabase/blob/develop/frontend/type-defs.graphqls)
+may not be deployed yet.
 
-You can try the queries of the [tutorial](https://github.com/building-envelope-data/api/blob/develop/queries/metabase/tutorial.graphql) at the [GraphQL endpoint of the metabase](https://www.buildingenvelopedata.org/graphql/).
+You can try the queries of the
+[tutorial](https://github.com/building-envelope-data/api/blob/develop/queries/metabase/tutorial.graphql)
+at the [GraphQL endpoint of the
+metabase](https://www.buildingenvelopedata.org/graphql/).
 
-If you have a question for which you don't find the answer in this repository, please raise a [new issue](https://github.com/building-envelope-data/metabase/issues/new) and add the tag `question`! All ways to contribute are presented by [CONTRIBUTING.md](https://github.com/building-envelope-data/metabase/blob/develop/CONTRIBUTING.md). The basis for our collaboration is decribed by our [Code of Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF_CONDUCT.md).
+If you have a question for which you don't find the answer in this repository,
+please raise a [new
+issue](https://github.com/building-envelope-data/metabase/issues/new) and add
+the tag `question`! All ways to contribute are presented by
+[CONTRIBUTING.md](https://github.com/building-envelope-data/metabase/blob/develop/CONTRIBUTING.md).
+The basis for our collaboration is decribed by our [Code of
+Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF_CONDUCT.md).
 
 [![Watch the video introduction](https://img.youtube.com/vi/QsulJnpvuh0/maxresdefault.jpg)](https://www.youtube.com/watch?v=QsulJnpvuh0)
+
+## Contents
+
+[Getting started](#getting-started)
+
+- [On your Linux machine](#on-your-linux-machine)
+- [Developing with Visual Studio Code](#developing-with-visual-studio-code)
+- [Troubleshooting](#troubleshooting)
+
+[Deployment](#deployment)
+
+- [Setting up a Debian production machine](#setting-up-a-debian-production-machine)
+- [Creating a release](#creating-a-release)
+- [Deploying a release](#deploying-a-release)
+- [Troubleshooting](#troubleshooting-1)
+
+[Access Right Management (Single Sign-On)](#access-right-management-single-sign-on)
+
+[Original Idea](#original-idea)
+
+[Useful Resources](#useful-resources)
 
 ## Getting started
 
@@ -69,8 +113,7 @@ In another shell
    IDs 0. If there is an ID collision, then you can either change the user and
    group ID on the host machine (for example by logging in as another user) or
    you can replace all occurrences of `shell id --group` and `shell id --user`
-   in `Makefile` and `Makefile.production` by fixed non-colliding IDs like
-   1000. If you know a better way, please
+   in `Makefile` and `Makefile.production` by fixed non-colliding IDs like 1000. If you know a better way, please
    [let use know on GitHub](https://github.com/building-envelope-data/metabase/issues/new).
 1. List all backend GNU Make targets by running `make help`.
 1. For example, update packages and tools by running `make update`.
@@ -167,9 +210,7 @@ data from PostgreSQL, recreate the database and its schema, and seed it
 freshly.
 
 After changing the domain model in `./backend/src/data`, you probably need to
-migrate the database by dropping into `make shellb`, adding a migration `make
-NAME=${MIGRATION_NAME} add-migration`, generating a migration script `make
-FROM=${PREVIOUS_MIGRATION} TO=${NEW_MIGRATION} generate-migration-script`, and
+migrate the database by dropping into `make shellb`, adding a migration `make NAME=${MIGRATION_NAME} add-migration`, generating a migration script `make FROM=${PREVIOUS_MIGRATION} TO=${NEW_MIGRATION} generate-migration-script`, and
 executing it `make SQL=${SCRIPT_PATH} sql`.
 
 When your hard-disk starts to grow full, it may be the case that Docker does
@@ -191,8 +232,7 @@ typescript: {
 },
 ```
 
-The same can happen in development when running `make build` (or `yarn run
-build`) in the shell entered by `make shellf`. In that case, remove the
+The same can happen in development when running `make build` (or `yarn run build`) in the shell entered by `make shellf`. In that case, remove the
 offending import manually in the file and try again, for example using tail
 like so `tail -n +5 ./__generated__/queries/... > x.tmp && mv x.tmp ...` . Do
 not disable build errors in development because when you do so, build errors in
@@ -226,32 +266,32 @@ and the pages following it.
       generated by running `openssl rand -base64 32`. Here is some information
       on what the variables mean
       - `NAME` is the name Docker project name, in particular, it is the prefix
-          of the Docker container names listed by `docker ps --all`;
+        of the Docker container names listed by `docker ps --all`;
       - `HOST` is the domain name with sub-domain of the deployment, in
-          particular, it is used by the OpenId Connect provider and to make
-          URLs absolute in emails sent for example when a user registers;
+        particular, it is used by the OpenId Connect provider and to make
+        URLs absolute in emails sent for example when a user registers;
       - `HTTP_PORT` is the HTTP port on which the reverse proxy NGINX listens
-          for requests;
+        for requests;
       - `BOOTSTRAP_USER_PASSWORD` is the password used by the database seeder
-          for the administrator account if there is none yet;
+        for the administrator account if there is none yet;
       - `OPEN_ID_CONNECT_CLIENT_SECRET` is the OpenId Connect client secret of
-          the metabase as a client of itself as identity provider;
+        the metabase as a client of itself as identity provider;
       - `TESTLAB_SOLAR_FACADES_HOST` is the host with sub-domain of the TestLab
-          Solar Facades used by the database seeder to add it as an OpenId
-          Connect client;
+        Solar Facades used by the database seeder to add it as an OpenId
+        Connect client;
       - `TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET` is the
-          corresponding client secret;
+        corresponding client secret;
       - `IGSDB_API_TOKEN` is the API token of the metabase user registered at
-          the IGSDB and is sent when requests to the IGSDB are performed;
+        the IGSDB and is sent when requests to the IGSDB are performed;
       - `JSON_WEB_TOKEN_ENCRYPTION_CERTIFICATE_PASSWORD` and
-          `JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD` are passwords used to
-          encrypt and sign JSON web tokens (JWT) used by OpenId Connect;
+        `JSON_WEB_TOKEN_SIGNING_CERTIFICATE_PASSWORD` are passwords used to
+        encrypt and sign JSON web tokens (JWT) used by OpenId Connect;
       - `SMTP_HOST` and `SMTP_PORT` are host and port of the message transfer
-          agent to be used to send emails through the Simple Mail Transfer
-          Protocol (SMTP);
+        agent to be used to send emails through the Simple Mail Transfer
+        Protocol (SMTP);
       - `RELAY_SMTP_HOST`, `RELAY_SMTP_PORT`, and `RELAY_ALLOWED_EMAILS` are
-          host and port of the message transfer agent and a list of allowed
-          email addresses to send emails to even in the staging environment.
+        host and port of the message transfer agent and a list of allowed
+        email addresses to send emails to even in the staging environment.
    1. Prepare PostgreSQL by generating new password files by running
       `make --file=Makefile.production postgres_passwords`
       and creating the database by running
@@ -368,8 +408,7 @@ If the database container restarts indefinitely and its logs say
 PANIC:  could not locate a valid checkpoint record
 ```
 
-for example preceded by `LOG: invalid resource manager ID in primary checkpoint
-record` or `LOG: invalid primary checkpoint record`, then the database is
+for example preceded by `LOG: invalid resource manager ID in primary checkpoint record` or `LOG: invalid primary checkpoint record`, then the database is
 corrupt. For example, the write-ahead log (WAL) may be corrupt because the
 database was not shut down cleanly. One solution is to restore the database
 from a backup by running
@@ -421,6 +460,50 @@ under /app/staging before doing it in `production` under /app/production.
 1. Update a single field by running `update metabase.method set "Description" = 'Harmonized European Standard 410' where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
 1. Create a new method by running `insert into metabase.method("Id" ,"Name", "Description", "Categories","ManagerId") values ('f07499ab-f119-471f-8aad-d3c016676bce', 'EN 410','European Standard 410','{calculation}','5320d6fb-b96d-4aeb-a24c-eb7036d3437a');`
 1. Delete a faulty method by running `delete from metabase.method where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
+
+## Access Right Management (Single Sign-On)
+
+The access right management can be used by product data servers to limit a part
+of their data to users, institutions or applications. This can be necessary for
+example when a license is needed to finance the maintenance of the product
+data.
+
+From the point of view of a software company, the access right management can
+enable users, institutions or applications to access product data which is not
+public. For example, an application may be allowed to use detailed data of an
+association, when the association is convinced by the validation of its
+calculations.
+
+The access right management of the product data network is based on the
+framework [OpenID Connect](https://openid.net/developers/how-connect-works/).
+The general idea is that users and applications can authenticate at the
+metabase (OpenId Connect Provider) and receive an access token (security
+credentials). When an application sends queries and mutations to product data
+servers, it can attach the token. The product data server receives the token
+and determines the access rights accordingly (authorization) using information
+stored in the token, the product data server and/or the metabase.
+
+To use the access right management for your software application or product
+data server, you can first
+[register](https://www.buildingenvelopedata.org/users/register), then
+[login](https://www.buildingenvelopedata.org/connect/client/login), then
+[create an
+institution](https://www.buildingenvelopedata.org/institutions/create), then
+wait for the institution to be verified, then, still being logged-in, add an
+OpenID Connect Application on the institution page, for example, [Fraunhofer
+ISE](https://www.buildingenvelopedata.org/institutions/5320d6fb-b96d-4aeb-a24c-eb7036d3437a)
+remembering the given secret, and finally you can equip your product data
+server with an OpenId Connect Client partly configuring it via OpenID Connect
+Discovery using the [Well-Known Configuration
+Endpoint](https://www.buildingenvelopedata.org/.well-known/openid-configuration).
+When adding an OpenId Connect Application, you need to make various decisions:
+[Which OAuth 2.0 Flow Should
+I Use?](https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use)
+We support the [Authorization Code Flow with Pushed Authorization Requests
+(PAR)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow/authorization-code-flow-with-par)
+for web applications and the [Client Credentials
+Flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow)
+for Machine-to-Machine interaction.
 
 ## Original Idea
 
