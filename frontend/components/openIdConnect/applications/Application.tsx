@@ -73,7 +73,11 @@ export default function Application({ applicationId }: ApplicationProps) {
                 <Descriptions.Item label="UUID">{application.uuid}</Descriptions.Item>
                 <Descriptions.Item label="Client ID">{application.clientId}</Descriptions.Item>
                 <Descriptions.Item label="Consent Type">{application.consentType}</Descriptions.Item>
+                <Descriptions.Item label="Endpoints">{application.endpoints.join(", ")}</Descriptions.Item>
+                <Descriptions.Item label="Grant Types">{application.grantTypes.join(", ")}</Descriptions.Item>
+                <Descriptions.Item label="Response Types">{application.responseTypes.join(", ")}</Descriptions.Item>
                 <Descriptions.Item label="Scopes">{application.scopes.join(", ")}</Descriptions.Item>
+                <Descriptions.Item label="Requirements">{application.requirements.join(", ")}</Descriptions.Item>
                 {application.postLogoutRedirectUri && (
                     <Descriptions.Item label="Post Logout Redirect URI">
                         <Typography.Link href={application.postLogoutRedirectUri}>

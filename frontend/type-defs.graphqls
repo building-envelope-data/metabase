@@ -1165,15 +1165,19 @@ type OpenIdConnectApplication implements Node {
   applicationType: String
   authorizations: OpenIdConnectApplicationAuthorizationConnection! @cost(weight: "10")
   canCurrentUserManageNode: Boolean! @cost(weight: "10")
-  clientId: String
+  clientId: String! @cost(weight: "10")
   clientType: String
   consentType: OpenIdConnectConsentType! @cost(weight: "10")
   displayName: String
+  endpoints: [OpenIdConnectEndpoint!]! @cost(weight: "10")
+  grantTypes: [OpenIdConnectGrantType!]! @cost(weight: "10")
   id: ID!
   institutions: OpenIdConnectApplicationInstitutionConnection! @cost(weight: "10")
   postLogoutRedirectUri: Url @cost(weight: "10")
   redirectUri: Url @cost(weight: "10")
-  scopes: [OpenIdConnectScope]! @cost(weight: "10")
+  requirements: [OpenIdConnectRequirement!]! @cost(weight: "10")
+  responseTypes: [OpenIdConnectResponseType!]! @cost(weight: "10")
+  scopes: [OpenIdConnectScope!]! @cost(weight: "10")
   tokens: OpenIdConnectApplicationTokenConnection! @cost(weight: "10")
   uuid: Uuid! @cost(weight: "10")
 }
@@ -2167,9 +2171,12 @@ input CreateOpenIdConnectApplicationInput {
   clientId: String!
   consentType: OpenIdConnectConsentType!
   displayName: String!
+  endpoints: [OpenIdConnectEndpoint!]!
+  grantTypes: [OpenIdConnectGrantType!]!
   institutionId: Uuid!
   postLogoutRedirectUri: Url
   redirectUri: Url
+  responseTypes: [OpenIdConnectResponseType!]!
   scopes: [OpenIdConnectScope!]!
 }
 
@@ -2777,8 +2784,11 @@ input UpdateOpenIdConnectApplicationInput {
   clientId: String!
   consentType: OpenIdConnectConsentType!
   displayName: String!
+  endpoints: [OpenIdConnectEndpoint!]!
+  grantTypes: [OpenIdConnectGrantType!]!
   postLogoutRedirectUri: Url
   redirectUri: Url
+  responseTypes: [OpenIdConnectResponseType!]!
   scopes: [OpenIdConnectScope!]!
 }
 
@@ -3251,10 +3261,41 @@ enum OpenIdConnectConsentType {
   SYSTEMATIC
 }
 
+enum OpenIdConnectEndpoint {
+  AUTHORIZATION
+  PUSHED_AUTHORIZATION
+  DEVICE_AUTHORIZATION
+  INTROSPECTION
+  END_SESSION
+  REVOCATION
+  TOKEN
+}
+
+enum OpenIdConnectGrantType {
+  AUTHORIZATION_CODE
+  CLIENT_CREDENTIALS
+  REFRESH_TOKEN
+}
+
+enum OpenIdConnectRequirement {
+  PROOF_KEY_FOR_CODE_EXCHANGE
+  PUSHED_AUTHORIZATION_REQUESTS
+}
+
+enum OpenIdConnectResponseType {
+  CODE
+  TOKEN
+}
+
 enum OpenIdConnectScope {
   READ_API
   WRITE_API
   MANAGE_USER_API
+  ADDRESS
+  EMAIL
+  PHONE
+  PROFILE
+  ROLES
 }
 
 enum OpticalComponentSubtype {

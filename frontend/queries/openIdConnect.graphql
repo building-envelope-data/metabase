@@ -4,7 +4,11 @@ fragment ApplicationPartial on OpenIdConnectApplication {
   clientId
   displayName
   consentType
+  endpoints
+  grantTypes
+  responseTypes
   scopes
+  requirements
   postLogoutRedirectUri
   redirectUri
   canCurrentUserManageNode
@@ -63,6 +67,9 @@ mutation CreateApplication(
   $clientId: String!
   $displayName: String!
   $consentType: OpenIdConnectConsentType!
+  $endpoints: [OpenIdConnectEndpoint!]!
+  $grantTypes: [OpenIdConnectGrantType!]!
+  $responseTypes: [OpenIdConnectResponseType!]!
   $scopes: [OpenIdConnectScope!]!
   $redirectUri: Url
   $postLogoutRedirectUri: Url
@@ -73,6 +80,9 @@ mutation CreateApplication(
       clientId: $clientId
       displayName: $displayName
       consentType: $consentType
+      endpoints: $endpoints
+      grantTypes: $grantTypes
+      responseTypes: $responseTypes
       scopes: $scopes
       redirectUri: $redirectUri
       postLogoutRedirectUri: $postLogoutRedirectUri
@@ -95,6 +105,9 @@ mutation UpdateApplication(
   $clientId: String!
   $displayName: String!
   $consentType: OpenIdConnectConsentType!
+  $endpoints: [OpenIdConnectEndpoint!]!
+  $grantTypes: [OpenIdConnectGrantType!]!
+  $responseTypes: [OpenIdConnectResponseType!]!
   $scopes: [OpenIdConnectScope!]!
   $redirectUri: Url
   $postLogoutRedirectUri: Url
@@ -105,6 +118,9 @@ mutation UpdateApplication(
       clientId: $clientId
       displayName: $displayName
       consentType: $consentType
+      endpoints: $endpoints
+      grantTypes: $grantTypes
+      responseTypes: $responseTypes
       scopes: $scopes
       redirectUri: $redirectUri
       postLogoutRedirectUri: $postLogoutRedirectUri

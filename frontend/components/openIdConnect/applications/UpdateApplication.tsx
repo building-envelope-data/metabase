@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useUpdateApplicationMutation, ApplicationPartialFragment, ApplicationDocument } from "../../../queries/openIdConnect.graphql";
+import { useUpdateApplicationMutation, ApplicationPartialFragment, ApplicationDocument, ApplicationsDocument } from "../../../queries/openIdConnect.graphql";
 import { Alert, Button, Form, Input, message, Modal, Select } from "antd";
 import { handleFormErrors } from "../../../lib/form";
-import { OpenIdConnectConsentType, OpenIdConnectScope } from "../../../__generated__/__types__";
-import { ApplicationsDocument } from "../../../__generated__/queries/openIdConnectApplications.graphql";
+import { OpenIdConnectConsentType, OpenIdConnectEndpoint, OpenIdConnectGrantType, OpenIdConnectResponseType, OpenIdConnectScope, OpenIdConnectRequirement } from "../../../__generated__/__types__";
 
 const layout = {
   labelCol: { span: 8 },
@@ -23,6 +22,9 @@ type FormValues = {
   newConsentType: OpenIdConnectConsentType
   newRedirectUri: string | null | undefined;
   newPostLogoutRedirectUri: string | null | undefined;
+  newEndpoints: OpenIdConnectEndpoint[];
+  newGrantTypes: OpenIdConnectGrantType[];
+  newResponseTypes: OpenIdConnectResponseType[];
   newScopes: OpenIdConnectScope[];
 };
 
@@ -54,6 +56,9 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
     newConsentType,
     newRedirectUri,
     newPostLogoutRedirectUri,
+    newEndpoints,
+    newGrantTypes,
+    newResponseTypes,
     newScopes,
   }: FormValues) => {
     const update = async () => {
@@ -67,6 +72,9 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
             consentType: newConsentType,
             redirectUri: newRedirectUri,
             postLogoutRedirectUri: newPostLogoutRedirectUri,
+            endpoints: newEndpoints || [],
+            grantTypes: newGrantTypes || [],
+            responseTypes: newResponseTypes || [],
             scopes: newScopes || [],
           },
         });
@@ -167,6 +175,51 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
             <Input />
           </Form.Item>
           <Form.Item
+            label="Endpoints"
+            name="newEndpoints"
+            rules={[{ required: true }]}
+            initialValue={application.endpoints}
+          >
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Please select"
+              options={Object.entries(OpenIdConnectEndpoint).map(
+                ([_key, value]) => ({ label: value, value: value })
+              )}
+            />
+          </Form.Item>
+          <Form.Item
+            label="GrantTypes"
+            name="newGrantTypes"
+            rules={[{ required: true }]}
+            initialValue={application.grantTypes}
+          >
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Please select"
+              options={Object.entries(OpenIdConnectGrantType).map(
+                ([_key, value]) => ({ label: value, value: value })
+              )}
+            />
+          </Form.Item>
+          <Form.Item
+            label="ResponseTypes"
+            name="newResponseTypes"
+            rules={[{ required: true }]}
+            initialValue={application.responseTypes}
+          >
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Please select"
+              options={Object.entries(OpenIdConnectResponseType).map(
+                ([_key, value]) => ({ label: value, value: value })
+              )}
+            />
+          </Form.Item>
+          <Form.Item
             label="Scopes"
             name="newScopes"
             rules={[{ required: true }]}
@@ -177,6 +230,22 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
               allowClear
               placeholder="Please select"
               options={Object.entries(OpenIdConnectScope).map(
+                ([_key, value]) => ({ label: value, value: value })
+              )}
+            />
+          </Form.Item>
+          <Form.Item
+            label="Requirements"
+            name="newRequirements"
+            rules={[{ required: true }]}
+            initialValue={Object.entries(OpenIdConnectRequirement).map(([_key, value]) => ({ label: value, value: value }))}
+          >
+            <Select
+              disabled
+              mode="multiple"
+              allowClear
+              placeholder="Please select"
+              options={Object.entries(OpenIdConnectRequirement).map(
                 ([_key, value]) => ({ label: value, value: value })
               )}
             />

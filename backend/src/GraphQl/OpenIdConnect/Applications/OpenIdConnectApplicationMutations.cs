@@ -13,6 +13,7 @@ using OpenIddict.Core;
 using Metabase.Data.OpenIdConnect;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
@@ -72,31 +73,18 @@ public sealed class OpenIdConnectApplicationMutations
             ClientSecret = clientSecret,
             DisplayName = input.DisplayName,
             ConsentType = input.ConsentType.ToStringConsentType(),
-            Permissions = {
-                // Add default permissions
-                OpenIddictConstants.Permissions.Endpoints.Authorization,
-                OpenIddictConstants.Permissions.Endpoints.PushedAuthorization,
-                OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization,
-                OpenIddictConstants.Permissions.Endpoints.Introspection,
-                OpenIddictConstants.Permissions.Endpoints.EndSession,
-                OpenIddictConstants.Permissions.Endpoints.Revocation,
-                OpenIddictConstants.Permissions.Endpoints.Token,
-                OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
-                OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                OpenIddictConstants.Permissions.ResponseTypes.Code,
-                OpenIddictConstants.Permissions.ResponseTypes.Token,
-                OpenIddictConstants.Permissions.Scopes.Address,
-                OpenIddictConstants.Permissions.Scopes.Email,
-                OpenIddictConstants.Permissions.Scopes.Phone,
-                OpenIddictConstants.Permissions.Scopes.Profile,
-                OpenIddictConstants.Permissions.Scopes.Roles,
-            },
+            Permissions = { },
             Requirements = {
                 OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
                 OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests,
             }
         };
+        descriptor.Permissions.UnionWith(
+            input.Endpoints.Select(x => x.ToStringEndpoint())
+            .Concat(input.GrantTypes.Select(x => x.ToStringGrantType()))
+            .Concat(input.ResponseTypes.Select(x => x.ToStringResponseType()))
+            .Concat(input.Scopes.Select(x => x.ToStringScope()))
+        );
         if (input.RedirectUri is not null)
         {
             descriptor.RedirectUris.Add(input.RedirectUri);
@@ -104,10 +92,6 @@ public sealed class OpenIdConnectApplicationMutations
         if (input.PostLogoutRedirectUri is not null)
         {
             descriptor.PostLogoutRedirectUris.Add(input.PostLogoutRedirectUri);
-        }
-        foreach (var scope in input.Scopes)
-        {
-            descriptor.Permissions.Add(scope.ToStringScope());
         }
         var application = await applicationManager.CreateAsync(descriptor, cancellationToken);
         context.InstitutionOpenIdConnectApplications.Add(
@@ -227,8 +211,40 @@ public sealed class OpenIdConnectApplicationMutations
         }
         descriptor.Permissions.RemoveWhere(permission =>
         {
-            try
+            try {
+                permission.ToOpenIdConnectEndpoint();
+                return true;
+            }
+            catch (ArgumentOutOfRangeException)
             {
+                return false;
+            }
+        });
+        descriptor.Permissions.RemoveWhere(permission =>
+        {
+            try {
+                permission.ToOpenIdConnectGrantType();
+                return true;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+        });
+        descriptor.Permissions.RemoveWhere(permission =>
+        {
+            try {
+                permission.ToOpenIdConnectResponseType();
+                return true;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+        });
+        descriptor.Permissions.RemoveWhere(permission =>
+        {
+            try {
                 permission.ToOpenIdConnectScope();
                 return true;
             }
@@ -237,9 +253,11 @@ public sealed class OpenIdConnectApplicationMutations
                 return false;
             }
         });
-        foreach (var scope in input.Scopes)
-        {
-            descriptor.Permissions.Add(scope.ToStringScope());
-        }
+        descriptor.Permissions.UnionWith(
+            input.Endpoints.Select(x => x.ToStringEndpoint())
+            .Concat(input.GrantTypes.Select(x => x.ToStringGrantType()))
+            .Concat(input.ResponseTypes.Select(x => x.ToStringResponseType()))
+            .Concat(input.Scopes.Select(x => x.ToStringScope()))
+        );
     }
 }

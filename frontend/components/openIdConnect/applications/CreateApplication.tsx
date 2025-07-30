@@ -3,7 +3,7 @@ import { ApplicationsDocument, useCreateApplicationMutation } from "../../../que
 import { Alert, Button, Form, Input, message, Modal, Select, Typography } from "antd";
 import { handleFormErrors } from "../../../lib/form";
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
-import { OpenIdConnectConsentType, OpenIdConnectScope, Scalars } from "../../../__generated__/__types__";
+import { OpenIdConnectConsentType, OpenIdConnectEndpoint, OpenIdConnectGrantType, OpenIdConnectResponseType, OpenIdConnectScope, OpenIdConnectRequirement, Scalars } from "../../../__generated__/__types__";
 import { InstitutionDocument } from "../../../queries/institutions.graphql";
 
 const layout = {
@@ -20,6 +20,9 @@ type FormValues = {
     consentType: OpenIdConnectConsentType;
     redirectUri: Scalars["Url"] | null | undefined;
     postLogoutRedirectUri: Scalars["Url"] | null | undefined;
+    endpoints: OpenIdConnectEndpoint[];
+    grantTypes: OpenIdConnectGrantType[];
+    responseTypes: OpenIdConnectResponseType[];
     scopes: OpenIdConnectScope[];
 };
 
@@ -55,6 +58,9 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
         consentType,
         redirectUri,
         postLogoutRedirectUri,
+        endpoints,
+        grantTypes,
+        responseTypes,
         scopes,
     }: FormValues) => {
         const update = async () => {
@@ -70,6 +76,9 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
                         consentType: consentType,
                         redirectUri: redirectUri,
                         postLogoutRedirectUri: postLogoutRedirectUri,
+                        endpoints: endpoints || [],
+                        grantTypes: grantTypes || [],
+                        responseTypes: responseTypes || [],
                         scopes: scopes || [],
                     },
                 });
@@ -169,6 +178,48 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
                     <Input />
                 </Form.Item>
                 <Form.Item
+                    label="Endpoints"
+                    name="endpoints"
+                    rules={[{ required: true }]}
+                >
+                    <Select
+                        mode="multiple"
+                        allowClear
+                        placeholder="Please select"
+                        options={Object.entries(OpenIdConnectEndpoint).map(
+                            ([_key, value]) => ({ label: value, value: value })
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item
+                    label="GrantTypes"
+                    name="grantTypes"
+                    rules={[{ required: true }]}
+                >
+                    <Select
+                        mode="multiple"
+                        allowClear
+                        placeholder="Please select"
+                        options={Object.entries(OpenIdConnectGrantType).map(
+                            ([_key, value]) => ({ label: value, value: value })
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item
+                    label="ResponseTypes"
+                    name="responseTypes"
+                    rules={[{ required: true }]}
+                >
+                    <Select
+                        mode="multiple"
+                        allowClear
+                        placeholder="Please select"
+                        options={Object.entries(OpenIdConnectResponseType).map(
+                            ([_key, value]) => ({ label: value, value: value })
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item
                     label="Scopes"
                     name="scopes"
                     rules={[{ required: true }]}
@@ -178,6 +229,22 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
                         allowClear
                         placeholder="Please select"
                         options={Object.entries(OpenIdConnectScope).map(
+                            ([_key, value]) => ({ label: value, value: value })
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item
+                    label="Requirements"
+                    name="requirements"
+                    rules={[{ required: true }]}
+                    initialValue={Object.entries(OpenIdConnectRequirement).map(([_key, value]) => ({ label: value, value: value }))}
+                >
+                    <Select
+                        disabled
+                        mode="multiple"
+                        allowClear
+                        placeholder="Please select"
+                        options={Object.entries(OpenIdConnectRequirement).map(
                             ([_key, value]) => ({ label: value, value: value })
                         )}
                     />

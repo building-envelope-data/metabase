@@ -20,13 +20,11 @@ public sealed class OpenIdConnectApplicationType
         IObjectTypeDescriptor<OpenIdConnectApplication> descriptor
     )
     {
-        descriptor.Field(application => application.InstitutionEdges).Ignore();
         descriptor.Field(application => application.ClientSecret).Ignore();
         descriptor.Field(application => application.ConcurrencyToken).Ignore();
         descriptor.Field(application => application.DisplayNames).Ignore();
         descriptor.Field(application => application.JsonWebKeySet).Ignore();
         descriptor.Field(application => application.Properties).Ignore();
-        descriptor.Field(application => application.Requirements).Ignore();
         descriptor.Field(application => application.Settings).Ignore();
 
         descriptor
@@ -46,6 +44,13 @@ public sealed class OpenIdConnectApplicationType
             );
 
         descriptor
+            .Field(application => application.ClientId)
+            .Type<NonNullType<StringType>>()
+            .Resolve(context =>
+                context.Parent<OpenIdConnectApplication>().ClientId
+                ?? throw new GraphQLException("Client ID is missing.")
+            );
+        descriptor
             .Field(application => application.ConsentType)
             .Type<NonNullType<EnumType<OpenIdConnectConsentType>>>()
             .Resolve(context =>
@@ -54,8 +59,88 @@ public sealed class OpenIdConnectApplicationType
             );
         descriptor
             .Field(application => application.Permissions)
-            .Name("scopes")
-            .Type<NonNullType<ListType<EnumType<OpenIdConnectScope>>>>()
+            .Ignore();
+        descriptor
+            .Field("endpoints")
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectEndpoint>>>>>()
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            if (application.Permissions is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
+                ?.FindAll(permission =>
+                {
+                    try
+                    {
+                        permission.ToOpenIdConnectEndpoint();
+                        return true;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        return false;
+                    }
+                })
+                ?.Select(endpoint => endpoint.ToOpenIdConnectEndpoint())
+                .ToList() ?? [];
+        });
+        descriptor
+            .Field("grantTypes")
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectGrantType>>>>>()
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            if (application.Permissions is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
+                ?.FindAll(permission =>
+                {
+                    try
+                    {
+                        permission.ToOpenIdConnectGrantType();
+                        return true;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        return false;
+                    }
+                })
+                ?.Select(grantType => grantType.ToOpenIdConnectGrantType())
+                .ToList() ?? [];
+        });
+        descriptor
+            .Field("responseTypes")
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectResponseType>>>>>()
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            if (application.Permissions is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(application.Permissions)
+                ?.FindAll(permission =>
+                {
+                    try
+                    {
+                        permission.ToOpenIdConnectResponseType();
+                        return true;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        return false;
+                    }
+                })
+                ?.Select(responseType => responseType.ToOpenIdConnectResponseType())
+                .ToList() ?? [];
+        });
+        descriptor
+            .Field("scopes")
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectScope>>>>>()
             .Resolve(context =>
         {
             var application = context.Parent<OpenIdConnectApplication>();
@@ -77,7 +162,21 @@ public sealed class OpenIdConnectApplicationType
                     }
                 })
                 ?.Select(scope => scope.ToOpenIdConnectScope())
-                .ToList();
+                .ToList() ?? [];
+        });
+        descriptor
+            .Field(application => application.Requirements)
+            .Type<NonNullType<ListType<NonNullType<EnumType<OpenIdConnectRequirement>>>>>()
+            .Resolve(context =>
+        {
+            var application = context.Parent<OpenIdConnectApplication>();
+            if (application.Requirements is null)
+            {
+                return [];
+            }
+            return JsonSerializer.Deserialize<List<string>>(application.Requirements)
+                ?.Select(requirement => requirement.ToOpenIdConnectRequirement())
+                .ToList() ?? [];
         });
         descriptor
             .Field(application => application.RedirectUris)
@@ -89,6 +188,7 @@ public sealed class OpenIdConnectApplicationType
             .Name("postLogoutRedirectUri")
             .Type<UrlType>()
             .Resolve(context => ExtractUri(context.Parent<OpenIdConnectApplication>().PostLogoutRedirectUris));
+        descriptor.Field(application => application.InstitutionEdges).Ignore();
         descriptor
             .Field(application => application.Institutions)
             .Type<NonNullType<ObjectType<OpenIdConnectApplicationInstitutionConnection>>>()

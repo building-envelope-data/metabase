@@ -3,9 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 [SuppressMessage("Naming", "CA1707")]
-public enum OpenIdConnectScope
+public enum OpenIdConnectGrantType
 {
-    READ_API,
-    WRITE_API,
-    MANAGE_USER_API,
+    AUTHORIZATION_CODE,
+    CLIENT_CREDENTIALS,
+    REFRESH_TOKEN,
 }
