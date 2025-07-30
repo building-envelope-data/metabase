@@ -25,7 +25,7 @@ If you have a question for which you don't find the answer in this repository, p
 - [Deploying a release](#deploying-a-release)
 - [Troubleshooting](#troubleshooting-1)
 
-[Access right management](#access-right-management)
+[Access Right Management (Single Sign-On)](#access-right-management-single-sign-on)
 
 [Original Idea](#original-idea)
 
@@ -438,17 +438,15 @@ under /app/staging before doing it in `production` under /app/production.
 1. Create a new method by running `insert into metabase.method("Id" ,"Name", "Description", "Categories","ManagerId") values ('f07499ab-f119-471f-8aad-d3c016676bce', 'EN 410','European Standard 410','{calculation}','5320d6fb-b96d-4aeb-a24c-eb7036d3437a');`
 1. Delete a faulty method by running `delete from metabase.method where "Id" = 'f07499ab-f119-471f-8aad-d3c016676bce';`.
 
-## Access right management
+## Access Right Management (Single Sign-On)
 
 The access right management can be used by product data servers to limit a part of their data to users, institutions or applications. This can be necessary for example when a license is needed to finance the maintenance of the product data.
 
 From the point of view of a software company, the access right management can enable users, institutions or applications to access product data which is not public. For example, an application may be allowed to use detailed data of an association, when the association is convinced by the validation of its calculations.
 
-The access right management of the product data network is based on the framework [OpenID Connect](https://openid.net/developers/how-connect-works/). The general idea is that users, institutions and applications can authenticate at the metabase and receive a token. When an application sends queries and mutations to product data servers, it can attach the token. The product data server receives the token and determines the access rights accordingly (authorization).
+The access right management of the product data network is based on the framework [OpenID Connect](https://openid.net/developers/how-connect-works/). The general idea is that users and applications can authenticate at the metabase (OpenId Connect Provider) and receive an access token (security credentials). When an application sends queries and mutations to product data servers, it can attach the token. The product data server receives the token and determines the access rights accordingly (authorization) using information stored in the token, the product data server and/or the metabase.
 
-A product data server can use the authentication at the metabase and the authorization for the access right management of the product data server.
-
-When you would like to use the access right management for a software application or a product data server, you should first [add an OpenID Connect Application to the product data network](https://www.buildingenvelopedata.org/open-id-connect). If you wonder which OpenID Connect flow you should use, [this website](https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use) could help you. For example, there is a [flow for web applications](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow/authorization-code-flow-with-par) and a [flow for data exchange from one machine to another](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow). The last four links refer to OpenID Connect in general. The OpenID Connect configuration of the metabase is presented by https://www.buildingenvelopedata.org/.well-known/openid-configuration .
+To use the access right management for your software application or product data server, you can first [register](https://www.buildingenvelopedata.org/users/register), then [login](https://www.buildingenvelopedata.org/connect/client/login), then [create an institution](https://www.buildingenvelopedata.org/institutions/create), then wait for the institution to be verified, then, still being logged-in, add an OpenID Connect Application on the institution page, for example, [Fraunhofer ISE](https://www.buildingenvelopedata.org/institutions/5320d6fb-b96d-4aeb-a24c-eb7036d3437a) remembering the given secret, and finally you can equip your product data server with an OpenId Connect Client partly configuring it via OpenID Connect Discovery using the [Well-Known Configuration Endpoint](https://www.buildingenvelopedata.org/.well-known/openid-configuration). When adding an OpenId Connect Application, you need to make various decisions: [Which OAuth 2.0 Flow Should I Use?](https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use) We support the [Authorization Code Flow with Pushed Authorization Requests (PAR)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow/authorization-code-flow-with-par) for web applications and the [Client Credentials Flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow) for Machine-to-Machine interaction.
 
 ## Original Idea
 
