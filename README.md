@@ -1,12 +1,35 @@
 # Metabase
 
-The network of databases [buildingenvelopedata.org](https://www.buildingenvelopedata.org/) is based on [databases](https://github.com/building-envelope-data/database) and one metabase. This repository presents the source code of the metabase. Before deploying this repository, [machine](https://github.com/building-envelope-data/machine) can be used to set up the machine.
+The network of databases
+[buildingenvelopedata.org](https://www.buildingenvelopedata.org/) is based on
+[databases](https://github.com/building-envelope-data/database) and one
+metabase. This repository presents the source code of the metabase. Before
+deploying this repository,
+[machine](https://github.com/building-envelope-data/machine) can be used to set
+up the machine.
 
-The [API specification of the metabase](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql) is available in the repository [api](https://github.com/building-envelope-data/api). There is also a [visualization of the API of the metabase](https://graphql-kit.com/graphql-voyager/?url=https://www.buildingenvelopedata.org/graphql/). The current [development version of the API of the metabase](https://github.com/building-envelope-data/metabase/blob/develop/frontend/type-defs.graphqls) may not be deployed yet.
+The [API specification of the
+metabase](https://github.com/building-envelope-data/api/blob/develop/apis/metabase.graphql)
+is available in the repository
+[api](https://github.com/building-envelope-data/api). There is also
+a [visualization of the API of the
+metabase](https://graphql-kit.com/graphql-voyager/?url=https://www.buildingenvelopedata.org/graphql/).
+The current [development version of the API of the
+metabase](https://github.com/building-envelope-data/metabase/blob/develop/frontend/type-defs.graphqls)
+may not be deployed yet.
 
-You can try the queries of the [tutorial](https://github.com/building-envelope-data/api/blob/develop/queries/metabase/tutorial.graphql) at the [GraphQL endpoint of the metabase](https://www.buildingenvelopedata.org/graphql/).
+You can try the queries of the
+[tutorial](https://github.com/building-envelope-data/api/blob/develop/queries/metabase/tutorial.graphql)
+at the [GraphQL endpoint of the
+metabase](https://www.buildingenvelopedata.org/graphql/).
 
-If you have a question for which you don't find the answer in this repository, please raise a [new issue](https://github.com/building-envelope-data/metabase/issues/new) and add the tag `question`! All ways to contribute are presented by [CONTRIBUTING.md](https://github.com/building-envelope-data/metabase/blob/develop/CONTRIBUTING.md). The basis for our collaboration is decribed by our [Code of Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF_CONDUCT.md).
+If you have a question for which you don't find the answer in this repository,
+please raise a [new
+issue](https://github.com/building-envelope-data/metabase/issues/new) and add
+the tag `question`! All ways to contribute are presented by
+[CONTRIBUTING.md](https://github.com/building-envelope-data/metabase/blob/develop/CONTRIBUTING.md).
+The basis for our collaboration is decribed by our [Code of
+Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF_CONDUCT.md).
 
 [![Watch the video introduction](https://img.youtube.com/vi/QsulJnpvuh0/maxresdefault.jpg)](https://www.youtube.com/watch?v=QsulJnpvuh0)
 
@@ -440,13 +463,47 @@ under /app/staging before doing it in `production` under /app/production.
 
 ## Access Right Management (Single Sign-On)
 
-The access right management can be used by product data servers to limit a part of their data to users, institutions or applications. This can be necessary for example when a license is needed to finance the maintenance of the product data.
+The access right management can be used by product data servers to limit a part
+of their data to users, institutions or applications. This can be necessary for
+example when a license is needed to finance the maintenance of the product
+data.
 
-From the point of view of a software company, the access right management can enable users, institutions or applications to access product data which is not public. For example, an application may be allowed to use detailed data of an association, when the association is convinced by the validation of its calculations.
+From the point of view of a software company, the access right management can
+enable users, institutions or applications to access product data which is not
+public. For example, an application may be allowed to use detailed data of an
+association, when the association is convinced by the validation of its
+calculations.
 
-The access right management of the product data network is based on the framework [OpenID Connect](https://openid.net/developers/how-connect-works/). The general idea is that users and applications can authenticate at the metabase (OpenId Connect Provider) and receive an access token (security credentials). When an application sends queries and mutations to product data servers, it can attach the token. The product data server receives the token and determines the access rights accordingly (authorization) using information stored in the token, the product data server and/or the metabase.
+The access right management of the product data network is based on the
+framework [OpenID Connect](https://openid.net/developers/how-connect-works/).
+The general idea is that users and applications can authenticate at the
+metabase (OpenId Connect Provider) and receive an access token (security
+credentials). When an application sends queries and mutations to product data
+servers, it can attach the token. The product data server receives the token
+and determines the access rights accordingly (authorization) using information
+stored in the token, the product data server and/or the metabase.
 
-To use the access right management for your software application or product data server, you can first [register](https://www.buildingenvelopedata.org/users/register), then [login](https://www.buildingenvelopedata.org/connect/client/login), then [create an institution](https://www.buildingenvelopedata.org/institutions/create), then wait for the institution to be verified, then, still being logged-in, add an OpenID Connect Application on the institution page, for example, [Fraunhofer ISE](https://www.buildingenvelopedata.org/institutions/5320d6fb-b96d-4aeb-a24c-eb7036d3437a) remembering the given secret, and finally you can equip your product data server with an OpenId Connect Client partly configuring it via OpenID Connect Discovery using the [Well-Known Configuration Endpoint](https://www.buildingenvelopedata.org/.well-known/openid-configuration). When adding an OpenId Connect Application, you need to make various decisions: [Which OAuth 2.0 Flow Should I Use?](https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use) We support the [Authorization Code Flow with Pushed Authorization Requests (PAR)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow/authorization-code-flow-with-par) for web applications and the [Client Credentials Flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow) for Machine-to-Machine interaction.
+To use the access right management for your software application or product
+data server, you can first
+[register](https://www.buildingenvelopedata.org/users/register), then
+[login](https://www.buildingenvelopedata.org/connect/client/login), then
+[create an
+institution](https://www.buildingenvelopedata.org/institutions/create), then
+wait for the institution to be verified, then, still being logged-in, add an
+OpenID Connect Application on the institution page, for example, [Fraunhofer
+ISE](https://www.buildingenvelopedata.org/institutions/5320d6fb-b96d-4aeb-a24c-eb7036d3437a)
+remembering the given secret, and finally you can equip your product data
+server with an OpenId Connect Client partly configuring it via OpenID Connect
+Discovery using the [Well-Known Configuration
+Endpoint](https://www.buildingenvelopedata.org/.well-known/openid-configuration).
+When adding an OpenId Connect Application, you need to make various decisions:
+[Which OAuth 2.0 Flow Should
+I Use?](https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use)
+We support the [Authorization Code Flow with Pushed Authorization Requests
+(PAR)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow/authorization-code-flow-with-par)
+for web applications and the [Client Credentials
+Flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow)
+for Machine-to-Machine interaction.
 
 ## Original Idea
 
