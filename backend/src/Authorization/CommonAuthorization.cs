@@ -246,7 +246,8 @@ public abstract class CommonAuthorization(
         CancellationToken cancellationToken
     )
     {
-        var wrappedRole = await Context.InstitutionRepresentatives.AsNoTracking()
+        var context = Context;
+        var wrappedRole = await context.InstitutionRepresentatives.AsNoTracking()
                 .Where(x =>
                     x.InstitutionId == institutionId &&
                     x.UserId == user.Id &&
@@ -263,10 +264,10 @@ public abstract class CommonAuthorization(
         }
         // TODO Recursively fetch manager roles (currently we support only one level)
         var wrappedManagerRole =
-            await Context.InstitutionRepresentatives.AsNoTracking()
+            await context.InstitutionRepresentatives.AsNoTracking()
                 .Where(x => !x.Pending)
                 .Join(
-                    Context.Institutions,
+                    context.Institutions,
                     representative => representative.InstitutionId,
                     institution => institution.ManagerId,
                     (representative, institution) => new
