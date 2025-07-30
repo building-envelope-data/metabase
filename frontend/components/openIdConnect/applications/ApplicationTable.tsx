@@ -1,19 +1,16 @@
 import { Skeleton, Table, TableProps } from "antd";
 import paths from "../../../paths";
-import { ApplicationPartialFragment } from "../../../queries/openIdConnectApplications.graphql";
+import { ApplicationPartialFragment } from "../../../queries/openIdConnect.graphql";
 import { getUuidColumnProps } from "../../../lib/table";
 import { useState } from "react";
 import { setMapValue } from "../../../lib/freeTextFilter";
-import { DocumentNode } from "graphql";
-import DeleteApplication from "./DeleteApplication";
 
 export type ApplicationsProps = {
     loading: boolean;
     applications: ApplicationPartialFragment[];
-    refetchQueries: {query: DocumentNode, variables?: {[key: string]: any}}[];
 };
 
-export default function ApplicationTable({ loading, applications, refetchQueries }: ApplicationsProps) {
+export default function ApplicationTable({ loading, applications }: ApplicationsProps) {
     const [filterText, setFilterText] = useState(() => new Map<string, string>());
     const onFilterTextChange = setMapValue(filterText, setFilterText);
 
@@ -23,9 +20,9 @@ export default function ApplicationTable({ loading, applications, refetchQueries
 
     const applicationColumns: TableProps<ApplicationPartialFragment>['columns'] = [
         getUuidColumnProps<(typeof applications)[0]>(
-          onFilterTextChange,
-          (x) => filterText.get(x),
-          paths.openIdConnectApplication
+            onFilterTextChange,
+            (x) => filterText.get(x),
+            paths.openIdConnectApplication
         ),
         {
             title: "Client ID",
@@ -46,16 +43,6 @@ export default function ApplicationTable({ loading, applications, refetchQueries
             title: "Logout Redirect",
             dataIndex: "postLogoutRedirectUri",
             key: "postLogoutRedirectUri",
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, application) => application.canCurrentUserManageNode ? (
-                        <>
-                            <DeleteApplication applicationId={application.uuid} refetchQueries={refetchQueries} />
-                        </>
-                    )
-                        : <></>
         },
     ];
 

@@ -28,7 +28,7 @@ using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.KeyFingerprints;
 using Metabase.GraphQl.Methods;
 using Metabase.GraphQl.Numerations;
-using Metabase.GraphQl.OpenIdConnect.Application;
+using Metabase.GraphQl.OpenIdConnect.Applications;
 using Metabase.GraphQl.OpenIdConnect.Authorizations;
 using Metabase.GraphQl.OpenIdConnect.Tokens;
 using Metabase.GraphQl.Publications;

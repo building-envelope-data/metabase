@@ -1,20 +1,18 @@
 import { Button, message } from "antd";
 import { useState } from "react";
 import {
+  ApplicationDocument,
   ApplicationsDocument,
   useDeleteApplicationMutation,
-} from "../../../queries/openIdConnectApplications.graphql";
+} from "../../../queries/openIdConnect.graphql";
 import { Scalars } from "../../../__generated__/__types__";
-import { DocumentNode } from "graphql";
 
 export type DeleteApplicationProps = {
   applicationId: Scalars["Uuid"];
-  refetchQueries: {query: DocumentNode, variables?: {[key: string]: any}}[];
 };
 
 export default function DeleteApplication({
-  applicationId,
-  refetchQueries,
+  applicationId
 }: DeleteApplicationProps) {
   const [deleting, setDeleting] = useState(false);
 
@@ -25,7 +23,13 @@ export default function DeleteApplication({
       {
         query: ApplicationsDocument,
       },
-    ].concat(refetchQueries),
+      {
+        query: ApplicationDocument,
+        variables: {
+          uuid: applicationId,
+        }
+      },
+    ]
   });
 
   const deleteApplication = async () => {

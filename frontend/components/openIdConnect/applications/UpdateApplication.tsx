@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { useUpdateApplicationMutation, useApplicationQuery, ApplicationPartialFragment, ApplicationDocument } from "../../../queries/openIdConnectApplications.graphql";
-import { Alert, Button, Form, Input, message, Result, Select, Skeleton } from "antd";
-import { messageApolloError } from "../../../lib/apollo";
+import { useState } from "react";
+import { useUpdateApplicationMutation, ApplicationPartialFragment, ApplicationDocument } from "../../../queries/openIdConnect.graphql";
+import { Alert, Button, Form, Input, message, Modal, Select } from "antd";
 import { handleFormErrors } from "../../../lib/form";
-import { OpenIdConnectConsentType, OpenIdConnectScope, Scalars } from "../../../__generated__/__types__";
+import { OpenIdConnectConsentType, OpenIdConnectScope } from "../../../__generated__/__types__";
+import { ApplicationsDocument } from "../../../__generated__/queries/openIdConnectApplications.graphql";
 
 const layout = {
   labelCol: { span: 8 },
@@ -14,7 +14,7 @@ const tailLayout = {
 };
 
 export type UpdateApplicationProps = {
-    applicationId: Scalars["Uuid"];
+  application: ApplicationPartialFragment;
 };
 
 type FormValues = {
@@ -26,13 +26,8 @@ type FormValues = {
   newScopes: OpenIdConnectScope[];
 };
 
-export default function UpdateApplication({ applicationId }: UpdateApplicationProps) {
-  const { loading, error, data } = useApplicationQuery({
-    variables: {
-      uuid: applicationId,
-    },
-  });
-  const application = data?.openIdConnectApplication as ApplicationPartialFragment;
+export default function UpdateApplication({ application }: UpdateApplicationProps) {
+  const [open, setOpen] = useState(false);
   const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(new Array<string>());
@@ -42,9 +37,12 @@ export default function UpdateApplication({ applicationId }: UpdateApplicationPr
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
       {
+        query: ApplicationsDocument,
+      },
+      {
         query: ApplicationDocument,
         variables: {
-          uuid: applicationId,
+          uuid: application.uuid,
         },
       },
     ],
@@ -63,7 +61,7 @@ export default function UpdateApplication({ applicationId }: UpdateApplicationPr
         setUpdating(true);
         const { errors, data } = await updateApplicationMutation({
           variables: {
-            applicationId: applicationId,
+            applicationId: application.uuid,
             clientId: newClientId,
             displayName: newDisplayName,
             consentType: newConsentType,
@@ -85,7 +83,7 @@ export default function UpdateApplication({ applicationId }: UpdateApplicationPr
           !data?.updateOpenIdConnectApplication?.errors &&
           data?.updateOpenIdConnectApplication?.application
         ) {
-          message.success('Successfully updated application ' + data.updateOpenIdConnectApplication.application?.clientId)
+          setOpen(false);
         }
       } catch (error) {
         // TODO Handle properly.
@@ -101,106 +99,95 @@ export default function UpdateApplication({ applicationId }: UpdateApplicationPr
     setGlobalErrorMessages(["Fix the errors below."]);
   };
 
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
-
-  if (loading) {
-    return <Skeleton active avatar title />;
-  }
-
-  if (!application) {
-    return (
-      <Result
-        status="500"
-        title="500"
-        subTitle="Sorry, something went wrong."
-      />
-    );
-  }
-
   return (
     <>
-      {globalErrorMessages.length > 0 ? (
-        <Alert type="error" message={globalErrorMessages.join(" ")} />
-      ) : (
-        <></>
-      )}
-      <Form
+      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <Modal
+        open={open}
+        title="Edit Application"
+        // onOk={handleOk}
+        onCancel={() => setOpen(false)}
+        footer={false}
+      >
+        {globalErrorMessages.length > 0 ? (
+          <Alert type="error" message={globalErrorMessages.join(" ")} />
+        ) : (
+          <></>
+        )}
+        <Form
           {...layout}
           form={form}
           name="updateApplication"
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
-      >
-        <Form.Item
-          label="ClientId"
-          name="newClientId"
-          rules={[{ required: true }]}
-          initialValue={application.clientId}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Display Name"
-          name="newDisplayName"
-          rules={[{ required: true }]}
-          initialValue={application.displayName}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
+          <Form.Item
+            label="ClientId"
+            name="newClientId"
+            rules={[{ required: true }]}
+            initialValue={application.clientId}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Display Name"
+            name="newDisplayName"
+            rules={[{ required: true }]}
+            initialValue={application.displayName}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
             label="Consent Type"
             name="newConsentType"
             rules={[{ required: true }]}
             initialValue={application.consentType}
-        >
+          >
             <Select
-                placeholder="Please select"
-                options={Object.entries(OpenIdConnectConsentType).map(
-                    ([_key, value]) => ({ label: value, value: value })
-                )}
+              placeholder="Please select"
+              options={Object.entries(OpenIdConnectConsentType).map(
+                ([_key, value]) => ({ label: value, value: value })
+              )}
             />
-        </Form.Item>
-        <Form.Item
-          label="Login Redirect URL"
-          name="newRedirectUri"
-          rules={[{ type: 'url' }]}
-          initialValue={application.redirectUri}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Logout Redirect URL"
-          name="newPostLogoutRedirectUri"
-          rules={[{ type: 'url' }]}
-          initialValue={application.postLogoutRedirectUri}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Scopes"
-          name="newScopes"
-          rules={[{ required: true }]}
-          initialValue={application.scopes}
-        >
-          <Select
+          </Form.Item>
+          <Form.Item
+            label="Login Redirect URL"
+            name="newRedirectUri"
+            rules={[{ type: 'url' }]}
+            initialValue={application.redirectUri}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Logout Redirect URL"
+            name="newPostLogoutRedirectUri"
+            rules={[{ type: 'url' }]}
+            initialValue={application.postLogoutRedirectUri}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Scopes"
+            name="newScopes"
+            rules={[{ required: true }]}
+            initialValue={application.scopes}
+          >
+            <Select
               mode="multiple"
               allowClear
               placeholder="Please select"
               options={Object.entries(OpenIdConnectScope).map(
-                  ([_key, value]) => ({ label: value, value: value })
+                ([_key, value]) => ({ label: value, value: value })
               )}
-          />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
+            />
+          </Form.Item>
+          <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={updating}>
               Update
             </Button>
-        </Form.Item>
-      </Form>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

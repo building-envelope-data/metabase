@@ -1,42 +1,15 @@
-import { Result, Skeleton, Space, Table, TableProps } from "antd";
-import { useEffect } from "react";
-import { messageApolloError } from "../../../lib/apollo";
-import { AuthorizationPartialFragment, AuthorizationsDocument, useAuthorizationsQuery } from "../../../queries/openIdConnectAuthorizations.graphql";
-import { Scalars } from "../../../__generated__/__types__";
+import { Space, Table, TableProps } from "antd";
+import { AuthorizationPartialFragment } from "../../../queries/openIdConnect.graphql";
 import DeleteAuthorization from "./DeleteAuthorization";
+import { ApplicationDocument } from "../../../queries/openIdConnect.graphql";
+import { Scalars } from "../../../__generated__/__types__";
 
 export type AuthorizationTableProps = {
     applicationId: Scalars["Uuid"];
+    authorizations: AuthorizationPartialFragment[];
 };
 
-export default function AutorizationTable({ applicationId }: AuthorizationTableProps) {
-    const { loading, error, data } = useAuthorizationsQuery({
-      variables: {
-        applicationId: applicationId,
-      },
-    });
-    const authorizations = data?.openIdConnectApplication?.authorizations.edges.map(edge => edge.node) as AuthorizationPartialFragment[];
-
-    useEffect(() => {
-      if (error) {
-        messageApolloError(error);
-      }
-    }, [error]);
-
-    if (loading) {
-        return <Skeleton active avatar title />;
-    }
-
-    if (!authorizations) {
-      return (
-        <Result
-          status="500"
-          title="500"
-          subTitle="Sorry, something went wrong."
-        />
-      );
-    }
-
+export default function AutorizationTable({ applicationId, authorizations }: AuthorizationTableProps) {
     const authorizationColumns: TableProps<AuthorizationPartialFragment>['columns'] = [
         {
             title: "Satus",
@@ -63,9 +36,9 @@ export default function AutorizationTable({ applicationId }: AuthorizationTableP
                             <DeleteAuthorization
                                 authorizationId={authorization.uuid}
                                 refetchQueries={[{
-                                    query: AuthorizationsDocument,
+                                    query: ApplicationDocument,
                                     variables: {
-                                        applicationId: applicationId,
+                                        uuid: applicationId,
                                     }
                                 }]}
                             />
@@ -78,10 +51,8 @@ export default function AutorizationTable({ applicationId }: AuthorizationTableP
         },
     ];
 
-
     return <>
         <Table<AuthorizationPartialFragment>
-            loading={loading}
             columns={authorizationColumns}
             dataSource={authorizations}
         />

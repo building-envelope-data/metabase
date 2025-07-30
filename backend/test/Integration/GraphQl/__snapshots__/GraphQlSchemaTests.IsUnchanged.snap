@@ -1203,16 +1203,32 @@ type OpenIdConnectApplicationTokenEdge {
 }
 
 type OpenIdConnectAuthorization implements Node {
+  application: OpenIdConnectAuthorizationApplicationEdge! @cost(weight: "10")
   canCurrentUserDeleteNode: Boolean! @cost(weight: "10")
   creationDate: DateTime
   id: ID!
   status: String
   subject: String
+  tokens: OpenIdConnectAuthorizationTokenConnection! @cost(weight: "10")
   type: String
   uuid: Uuid! @cost(weight: "10")
 }
 
+type OpenIdConnectAuthorizationApplicationEdge {
+  node: OpenIdConnectApplication!
+}
+
+type OpenIdConnectAuthorizationTokenConnection {
+  edges: [OpenIdConnectAuthorizationTokenEdge!]! @cost(weight: "10")
+}
+
+type OpenIdConnectAuthorizationTokenEdge {
+  node: OpenIdConnectToken!
+}
+
 type OpenIdConnectToken implements Node {
+  application: OpenIdConnectTokenApplicationEdge! @cost(weight: "10")
+  authorization: OpenIdConnectTokenAuthorizationEdge! @cost(weight: "10")
   canCurrentUserRevokeToken: Boolean! @cost(weight: "10")
   creationDate: DateTime
   expirationDate: DateTime
@@ -1222,6 +1238,14 @@ type OpenIdConnectToken implements Node {
   subject: String
   type: String
   uuid: Uuid! @cost(weight: "10")
+}
+
+type OpenIdConnectTokenApplicationEdge {
+  node: OpenIdConnectApplication!
+}
+
+type OpenIdConnectTokenAuthorizationEdge {
+  node: OpenIdConnectAuthorization!
 }
 
 type OpticalData implements Data {

@@ -185,35 +185,35 @@ export default function Institution({ institutionId }: InstitutionProps) {
         .concat(
           institution.canCurrentUserUpdateNode
             ? [
-                <UpdateInstitution
-                  key="updateInstitution"
-                  institutionId={institution.uuid}
-                  name={institution.name}
-                  abbreviation={institution.abbreviation}
-                  description={institution.description}
-                  websiteLocator={institution.websiteLocator}
-                />,
-              ]
+              <UpdateInstitution
+                key="updateInstitution"
+                institutionId={institution.uuid}
+                name={institution.name}
+                abbreviation={institution.abbreviation}
+                description={institution.description}
+                websiteLocator={institution.websiteLocator}
+              />,
+            ]
             : []
         )
         .concat(
           institution.canCurrentUserDeleteNode
             ? [
-                <DeleteInstitution
-                  key="deleteInstitution"
-                  institutionId={institution.uuid}
-                />,
-              ]
+              <DeleteInstitution
+                key="deleteInstitution"
+                institutionId={institution.uuid}
+              />,
+            ]
             : []
         )
         .concat(
           institution.canCurrentUserSwitchOperatingStateOfNode
             ? [
-                <SwitchInstitutionOperatingState
-                  key="switchInstitutionOperatingState"
-                  institutionId={institution.uuid}
-                />,
-              ]
+              <SwitchInstitutionOperatingState
+                key="switchInstitutionOperatingState"
+                institutionId={institution.uuid}
+              />,
+            ]
             : []
         )}
       backIcon={false}
@@ -332,12 +332,6 @@ export default function Institution({ institutionId }: InstitutionProps) {
         <ApplicationTable
           loading={false}
           applications={institution.openIdConnectApplications.edges.map(e => e.node) as ApplicationPartialFragment[]}
-          refetchQueries={[{
-            query: InstitutionDocument, 
-            variables: {
-              uuid: institutionId,
-            },
-          }]}
         />
       </>
     )}

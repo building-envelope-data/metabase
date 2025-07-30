@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ApplicationsDocument, useCreateApplicationMutation } from "../../../queries/openIdConnectApplications.graphql";
+import { ApplicationsDocument, useCreateApplicationMutation } from "../../../queries/openIdConnect.graphql";
 import { Alert, Button, Form, Input, message, Modal, Select, Typography } from "antd";
 import { handleFormErrors } from "../../../lib/form";
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
@@ -7,11 +7,11 @@ import { OpenIdConnectConsentType, OpenIdConnectScope, Scalars } from "../../../
 import { InstitutionDocument } from "../../../queries/institutions.graphql";
 
 const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
 };
 const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
+    wrapperCol: { offset: 8, span: 16 },
 };
 
 type FormValues = {
@@ -24,27 +24,27 @@ type FormValues = {
 };
 
 export type CreateApplicationProps = {
-  institutionId: Scalars["Uuid"];
+    institutionId: Scalars["Uuid"];
 };
 
 export default function CreateApplication({ institutionId }: CreateApplicationProps) {
     const [createApplicationMutation] = useCreateApplicationMutation({
-      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-      // See https://www.apollographql.com/docs/react/data/mutations/#options
-      refetchQueries: [
-        {
-          query: InstitutionDocument,
-          variables: {
-            uuid: institutionId,
-          },
-        },
-        {
-          query: ApplicationsDocument,
-        },
-      ],
+        // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+        // See https://www.apollographql.com/docs/react/data/mutations/#options
+        refetchQueries: [
+            {
+                query: InstitutionDocument,
+                variables: {
+                    uuid: institutionId,
+                },
+            },
+            {
+                query: ApplicationsDocument,
+            },
+        ],
     });
     const [globalErrorMessages, setGlobalErrorMessages] = useState(
-      new Array<string>()
+        new Array<string>()
     );
     const [form] = Form.useForm<FormValues>();
     const [creating, setCreating] = useState(false);
@@ -82,23 +82,23 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
                     form
                 );
                 if (
-                  !errors &&
-                  !data?.createOpenIdConnectApplication?.errors &&
-                  data?.createOpenIdConnectApplication?.application
+                    !errors &&
+                    !data?.createOpenIdConnectApplication?.errors &&
+                    data?.createOpenIdConnectApplication?.application
                 ) {
                     Modal.info({
                         title: "Application Client Secret",
                         centered: true,
                         width: 500,
                         content: (
-                          <Typography.Paragraph>
-                            <span><ExclamationCircleTwoTone twoToneColor="#f9b02e" /> </span>
-                            Please copy an save the client secret now, you will not be able to access it later.
-                            <p/>
-                          <Typography.Paragraph copyable>{data.createOpenIdConnectApplication.clientSecret}</Typography.Paragraph>
-                          </Typography.Paragraph>
+                            <Typography.Paragraph>
+                                <span><ExclamationCircleTwoTone twoToneColor="#f9b02e" /> </span>
+                                Please copy an save the client secret now, you will not be able to access it later.
+                                <p />
+                                <Typography.Paragraph copyable>{data.createOpenIdConnectApplication.clientSecret}</Typography.Paragraph>
+                            </Typography.Paragraph>
                         ),
-                      });
+                    });
                 }
             } catch (error) {
                 // TODO Handle properly.
@@ -117,7 +117,7 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
     return (
         <>
             {globalErrorMessages.length > 0 ? (
-              <Alert type="error" message={globalErrorMessages.join(" ")} />
+                <Alert type="error" message={globalErrorMessages.join(" ")} />
             ) : (
                 <></>
             )}

@@ -72,36 +72,21 @@ public sealed class OpenIdConnectAuthorization(
         return IsAuthorizedToManageApplication(claimsPrincipal, applicationId, cancellationToken);
     }
 
-    internal Task<bool> IsAuthorizedToManageAuthorization(
+    internal async Task<bool> IsAuthorizedToManageAuthorization(
         ClaimsPrincipal claimsPrincipal,
         Guid authorizationId,
         OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
         CancellationToken cancellationToken
     )
     {
-        return AuthorizeAsync(
-            claimsPrincipal,
-            async user =>
-            {
-                var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken);
-                var institutionIds = authorization is not null && authorization.Application is not null
-                    ? GetInstitutionIdsByApplicationId(authorization.Application.Id)
-                    : null;
-                return institutionIds is not null
-                    && await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken);
-            },
-            async application =>
-            {
-                var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken);
-                return authorization is not null
-                    && authorization.Application is not null
-                    && await BelongsToAtLeastOneInstitutionOfApplication(application, authorization.Application.Id, cancellationToken);
-            },
-            cancellationToken
-        );
+        var authorization = await authorizationManager.FindByIdAsync(authorizationId.ToString(), cancellationToken);
+        return
+            authorization is not null
+            && authorization.Application is not null
+            && await IsAuthorizedToManageApplication(claimsPrincipal, authorization.Application.Id, cancellationToken);
     }
 
-    internal Task<bool> IsAuthorizedToManageTokens(
+    internal Task<bool> IsAuthorizedToManageTokensOfApplication(
         ClaimsPrincipal claimsPrincipal,
         Guid applicationId,
         CancellationToken cancellationToken
@@ -110,32 +95,28 @@ public sealed class OpenIdConnectAuthorization(
         return IsAuthorizedToManageApplication(claimsPrincipal, applicationId, cancellationToken);
     }
 
-    internal Task<bool> IsAuthorizedToManageToken(
+    internal Task<bool> IsAuthorizedToManageTokensOfAuthorization(
+        ClaimsPrincipal claimsPrincipal,
+        Guid authorizationId,
+        OpenIddictAuthorizationManager<Data.OpenIdConnect.OpenIdConnectAuthorization> authorizationManager,
+        CancellationToken cancellationToken
+    )
+    {
+        return IsAuthorizedToManageAuthorization(claimsPrincipal, authorizationId, authorizationManager, cancellationToken);
+    }
+
+    internal async Task<bool> IsAuthorizedToManageToken(
         ClaimsPrincipal claimsPrincipal,
         Guid tokenId,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         CancellationToken cancellationToken
     )
     {
-        return AuthorizeAsync(
-            claimsPrincipal,
-            async user =>
-            {
-                var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken);
-                var institutionIds = token is not null && token.Application is not null
-                    ? GetInstitutionIdsByApplicationId(token.Application.Id)
-                    : null;
-                return institutionIds is not null && await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken);
-            },
-            async application =>
-            {
-                var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken);
-                return token is not null
-                    && token.Application is not null
-                    && await BelongsToAtLeastOneInstitutionOfApplication(application, token.Application.Id, cancellationToken);
-            },
-            cancellationToken
-        );
+        var token = await tokenManager.FindByIdAsync(tokenId.ToString(), cancellationToken);
+        return
+            token is not null
+            && token.Application is not null
+            && await IsAuthorizedToManageApplication(claimsPrincipal, token.Application.Id, cancellationToken);
     }
 
     private async IAsyncEnumerable<Guid> GetInstitutionIdsByApplicationId(

@@ -16,8 +16,6 @@ public sealed class OpenIdConnectTokenType
         IObjectTypeDescriptor<OpenIdConnectToken> descriptor
     )
     {
-        descriptor.Field(token => token.Application).Ignore();
-        descriptor.Field(token => token.Authorization).Ignore();
         descriptor.Field(token => token.Properties).Ignore();
         descriptor.Field(token => token.ReferenceId).Ignore();
         descriptor.Field(token => token.Payload).Ignore();
@@ -39,6 +37,22 @@ public sealed class OpenIdConnectTokenType
                 context.Parent<OpenIdConnectToken>().Id
             );
 
+        descriptor
+            .Field(t => t.Application)
+            .Type<NonNullType<ObjectType<OpenIdConnectTokenApplicationEdge>>>()
+            .Resolve(context =>
+                new OpenIdConnectTokenApplicationEdge(
+                    context.Parent<OpenIdConnectToken>().Application!
+                )
+            );
+        descriptor
+            .Field(t => t.Authorization)
+            .Type<NonNullType<ObjectType<OpenIdConnectTokenAuthorizationEdge>>>()
+            .Resolve(context =>
+                new OpenIdConnectTokenAuthorizationEdge(
+                    context.Parent<OpenIdConnectToken>().Authorization!
+                )
+            );
         descriptor
                 .Field("canCurrentUserRevokeToken")
                 .ResolveWith<TokenResolvers>(x =>

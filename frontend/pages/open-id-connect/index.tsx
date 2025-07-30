@@ -5,7 +5,7 @@ import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
 import ApplicationTable from "../../components/openIdConnect/applications/ApplicationTable";
 import { useRouter } from "next/router";
 import paths, { redirectToLoginPage } from "../../paths";
-import { ApplicationPartialFragment, ApplicationsDocument, useApplicationsQuery } from "../../queries/openIdConnectApplications.graphql";
+import { ApplicationPartialFragment, useApplicationsQuery } from "../../queries/openIdConnect.graphql";
 
 function Page() {
   const { loading, error, data } = useApplicationsQuery();
@@ -21,16 +21,15 @@ function Page() {
 
   useEffect(() => {
     if (router.isReady && shouldRedirect) {
-        redirectToLoginPage(router, paths.openIdConnect);
+      redirectToLoginPage(router, paths.openIdConnect);
     }
-}, [shouldRedirect, router]);
+  }, [shouldRedirect, router]);
 
   return (
     <Layout>
       <ApplicationTable
         loading={loading}
         applications={data?.openIdConnectApplications as ApplicationPartialFragment[] || []}
-        refetchQueries={[{query: ApplicationsDocument}]}
       />
     </Layout>
   );

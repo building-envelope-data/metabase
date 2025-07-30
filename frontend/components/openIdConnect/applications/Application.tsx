@@ -1,45 +1,25 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { Scalars } from "../../../__generated__/__types__";
-import { useCurrentUserQuery } from "../../../queries/currentUser.graphql";
-import { useRouter } from "next/router";
-import paths, { redirectToLoginPage } from "../../../paths";
-import { Col, Row, Skeleton, Tabs, TabsProps, Typography } from "antd";
+import { Descriptions, Divider, Result, Skeleton, Typography } from "antd";
 import { messageApolloError } from "../../../lib/apollo";
 import UpdateApplication from "./UpdateApplication";
 import AutorizationTable from "../authorizations/AuthorizationTable";
 import TokenTable from "../tokens/TokenTable";
+import { PageHeader } from "@ant-design/pro-layout";
+import DeleteApplication from "./DeleteApplication";
+import { useApplicationQuery } from "../../../queries/openIdConnect.graphql";
 
 export type ApplicationProps = {
     applicationId: Scalars["Uuid"];
 };
 
 export default function Application({ applicationId }: ApplicationProps) {
-    const { loading, error, data } = useCurrentUserQuery();
-    const currentUser = data?.currentUser;
-    const router = useRouter();
-    const shouldRedirect = !(loading || error || currentUser);
-    const [tab, setTab] = useState("application")
-
-    useEffect(() => {
-      window.addEventListener("hashchange", () => {
-        const hash = window.location.hash.slice(1);
-        setTab(hash);
-      });
-    }, []);
-  
-    const onChange = (key: string) => {
-      setTab(key);
-    };
-  
-    useEffect(() => {
-      window.location.hash = tab;
-    }, [tab]);
-
-    useEffect(() => {
-        if (router.isReady && shouldRedirect) {
-            redirectToLoginPage(router, paths.openIdConnectApplication(applicationId));
-        }
-    }, [shouldRedirect, router]);
+    const { loading, error, data } = useApplicationQuery({
+        variables: {
+            uuid: applicationId,
+        },
+    });
+    const application = data?.openIdConnectApplication;
 
     useEffect(() => {
         if (error) {
@@ -51,36 +31,76 @@ export default function Application({ applicationId }: ApplicationProps) {
         return <Skeleton active avatar title />;
     }
 
-    const items: TabsProps['items'] = [
-        {
-            key: 'application',
-            label: 'Application',
-            children: <UpdateApplication applicationId={applicationId} />,
-        },
-        {
-            key: 'authorization',
-            label: 'Authorizations',
-            children: <AutorizationTable applicationId={applicationId} />,
-        },
-        {
-            key: 'token',
-            label: 'Tokens',
-            children: <TokenTable applicationId={applicationId} />,
-        },
-    ];
+    if (!application) {
+        return (
+            <Result
+                status="500"
+                title="500"
+                subTitle="Sorry, something went wrong."
+            />
+        );
+    }
 
-    return (
-        <>
-        <Typography.Title>
-          Edit Application
-        </Typography.Title>
-            <Row>
-                <Col flex={1}></Col>
-                <Col flex={3}>
-                    <Tabs activeKey={tab} defaultActiveKey="application" items={items} onChange={onChange} />
-                </Col>
-                <Col flex={1}></Col>
-            </Row>
-        </>
-    );
+    return <>
+        <PageHeader
+            title={application.displayName}
+            tags={[]}
+            extra={([] as ReactNode[])
+                .concat(
+                    application.canCurrentUserManageNode
+                        ? [
+                            <UpdateApplication
+                                key="updateApplication"
+                                application={application}
+                            />,
+                        ]
+                        : []
+                )
+                .concat(
+                    application.canCurrentUserManageNode
+                        ? [
+                            <DeleteApplication
+                                key="deleteApplication"
+                                applicationId={application.uuid}
+                            />,
+                        ]
+                        : []
+                )
+            }
+            backIcon={false}
+        >
+            <Descriptions size="small" column={1}>
+                <Descriptions.Item label="UUID">{application.uuid}</Descriptions.Item>
+                <Descriptions.Item label="Client ID">{application.clientId}</Descriptions.Item>
+                <Descriptions.Item label="Consent Type">{application.consentType}</Descriptions.Item>
+                <Descriptions.Item label="Scopes">{application.scopes.join(", ")}</Descriptions.Item>
+                {application.postLogoutRedirectUri && (
+                    <Descriptions.Item label="Post Logout Redirect URI">
+                        <Typography.Link href={application.postLogoutRedirectUri}>
+                            {application.postLogoutRedirectUri}
+                        </Typography.Link>
+                    </Descriptions.Item>
+                )}
+                {application.redirectUri && (
+                    <Descriptions.Item label="Redirect URI">
+                        <Typography.Link href={application.redirectUri}>
+                            {application.redirectUri}
+                        </Typography.Link>
+                    </Descriptions.Item>
+                )}
+            </Descriptions>
+        </PageHeader>
+        <Divider />
+        <Typography.Title level={2}>Authorizations</Typography.Title>
+        <AutorizationTable
+            applicationId={application.uuid}
+            authorizations={application.authorizations.edges.map((x) => x.node)}
+        />
+        <Divider />
+        <Typography.Title level={2}>Tokens</Typography.Title>
+        <TokenTable
+            applicationId={application.uuid}
+            tokens={application.tokens.edges.map((x) => x.node)}
+        />
+    </>;
 }

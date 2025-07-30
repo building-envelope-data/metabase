@@ -16,11 +16,9 @@ public sealed class OpenIdConnectAuthorizationType
         IObjectTypeDescriptor<OpenIdConnectAuthorization> descriptor
     )
     {
-        descriptor.Field(authorization => authorization.Application).Ignore();
         descriptor.Field(authorization => authorization.ConcurrencyToken).Ignore();
         descriptor.Field(authorization => authorization.Properties).Ignore();
         descriptor.Field(authorization => authorization.Scopes).Ignore();
-        descriptor.Field(authorization => authorization.Tokens).Ignore();
 
         descriptor
             .ImplementsNode()
@@ -38,6 +36,22 @@ public sealed class OpenIdConnectAuthorizationType
                 context.Parent<OpenIdConnectAuthorization>().Id
             );
 
+        descriptor
+            .Field(t => t.Application)
+            .Type<NonNullType<ObjectType<OpenIdConnectAuthorizationApplicationEdge>>>()
+            .Resolve(context =>
+                new OpenIdConnectAuthorizationApplicationEdge(
+                    context.Parent<OpenIdConnectAuthorization>().Application!
+                )
+            );
+        descriptor
+            .Field(authorization => authorization.Tokens)
+            .Type<NonNullType<ObjectType<OpenIdConnectAuthorizationTokenConnection>>>()
+            .Resolve(context =>
+                new OpenIdConnectAuthorizationTokenConnection(
+                    context.Parent<OpenIdConnectAuthorization>()
+                )
+            );
         descriptor
                 .Field("canCurrentUserDeleteNode")
                 .ResolveWith<AuthorizationResolvers>(x =>

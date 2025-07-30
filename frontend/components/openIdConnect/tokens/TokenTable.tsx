@@ -1,42 +1,14 @@
-import { Result, Skeleton, Space, Table, TableProps } from "antd";
-import { useEffect } from "react";
-import { messageApolloError } from "../../../lib/apollo";
-import { TokenPartialFragment, TokensDocument, useTokensQuery } from "../../../queries/openIdConnectTokens.graphql";
+import { Space, Table, TableProps } from "antd";
+import { ApplicationDocument, TokenPartialFragment } from "../../../queries/openIdConnect.graphql";
 import { Scalars } from "../../../__generated__/__types__";
 import RevokeToken from "./RevokeToken";
 
 export type TokenTableProps = {
     applicationId: Scalars["Uuid"];
+    tokens: TokenPartialFragment[];
 };
 
-export default function TokenTable({ applicationId }: TokenTableProps) {
-    const { loading, error, data } = useTokensQuery({
-      variables: {
-        applicationId: applicationId,
-      },
-    });
-    const tokens = data?.openIdConnectApplication?.tokens.edges.map(edge => edge.node) as TokenPartialFragment[];
-
-    useEffect(() => {
-      if (error) {
-        messageApolloError(error);
-      }
-    }, [error]);
-
-    if (loading) {
-        return <Skeleton active avatar title />;
-    }
-
-    if (!tokens) {
-      return (
-        <Result
-          status="500"
-          title="500"
-          subTitle="Sorry, something went wrong."
-        />
-      );
-    }
-
+export default function TokenTable({ applicationId, tokens }: TokenTableProps) {
     const tokenColumns: TableProps<TokenPartialFragment>['columns'] = [
         {
             title: "Satus",
@@ -68,9 +40,9 @@ export default function TokenTable({ applicationId }: TokenTableProps) {
                             <RevokeToken
                                 tokenId={token.uuid}
                                 refetchQueries={[{
-                                    query: TokensDocument,
+                                    query: ApplicationDocument,
                                     variables: {
-                                        applicationId: applicationId,
+                                        uuid: applicationId,
                                     }
                                 }]}
                             />
@@ -84,7 +56,6 @@ export default function TokenTable({ applicationId }: TokenTableProps) {
     ];
 
     return <Table<TokenPartialFragment>
-        loading={loading}
         columns={tokenColumns}
         dataSource={tokens}
     />;

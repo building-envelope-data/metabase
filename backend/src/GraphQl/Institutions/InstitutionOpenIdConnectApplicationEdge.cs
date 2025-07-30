@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
-using Metabase.GraphQl.OpenIdConnect.Application;
+using Metabase.GraphQl.OpenIdConnect.Applications;
 using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Institutions;

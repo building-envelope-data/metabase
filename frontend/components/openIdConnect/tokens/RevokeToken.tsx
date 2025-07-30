@@ -2,13 +2,13 @@ import { Button, message } from "antd";
 import { useState } from "react";
 import {
   useRevokeTokenMutation,
-} from "../../../queries/openIdConnectTokens.graphql";
+} from "../../../queries/openIdConnect.graphql";
 import { Scalars } from "../../../__generated__/__types__";
 import { DocumentNode } from "graphql";
 
 export type RevokeTokenProps = {
   tokenId: Scalars["Uuid"];
-  refetchQueries: {query: DocumentNode, variables: {[key: string]: any}}[];
+  refetchQueries: { query: DocumentNode, variables: { [key: string]: any } }[];
 };
 
 export default function RevokeToken({

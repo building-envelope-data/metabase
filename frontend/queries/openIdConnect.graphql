@@ -31,3 +31,122 @@ fragment TokenPartial on OpenIdConnectToken {
   type
   canCurrentUserRevokeToken
 }
+
+query Applications {
+  openIdConnectApplications {
+    ...ApplicationPartial
+  }
+}
+
+query Application($uuid: Uuid!) {
+  openIdConnectApplication(uuid: $uuid) {
+    ...ApplicationPartial
+    authorizations {
+      edges {
+        node {
+          ...AuthorizationPartial
+        }
+      }
+    }
+    tokens {
+      edges {
+        node {
+          ...TokenPartial
+        }
+      }
+    }
+  }
+}
+
+mutation CreateApplication(
+  $institutionId: Uuid!
+  $clientId: String!
+  $displayName: String!
+  $consentType: OpenIdConnectConsentType!
+  $scopes: [OpenIdConnectScope!]!
+  $redirectUri: Url
+  $postLogoutRedirectUri: Url
+) {
+  createOpenIdConnectApplication(
+    input: {
+      institutionId: $institutionId
+      clientId: $clientId
+      displayName: $displayName
+      consentType: $consentType
+      scopes: $scopes
+      redirectUri: $redirectUri
+      postLogoutRedirectUri: $postLogoutRedirectUri
+    }
+  ) {
+    application {
+      ...ApplicationPartial
+    }
+    clientSecret
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation UpdateApplication(
+  $applicationId: Uuid!
+  $clientId: String!
+  $displayName: String!
+  $consentType: OpenIdConnectConsentType!
+  $scopes: [OpenIdConnectScope!]!
+  $redirectUri: Url
+  $postLogoutRedirectUri: Url
+) {
+  updateOpenIdConnectApplication(
+    input: {
+      applicationId: $applicationId
+      clientId: $clientId
+      displayName: $displayName
+      consentType: $consentType
+      scopes: $scopes
+      redirectUri: $redirectUri
+      postLogoutRedirectUri: $postLogoutRedirectUri
+    }
+  ) {
+    application{
+      ...ApplicationPartial
+    }
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteApplication($applicationId: Uuid!) {
+  deleteOpenIdConnectApplication(input: { applicationId: $applicationId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteAuthorization($authorizationId: Uuid!) {
+  deleteOpenIdConnectAuthorization(input: { authorizationId: $authorizationId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
+mutation RevokeToken($tokenId: Uuid!) {
+  revokeOpenIdConnectToken(input: { tokenId: $tokenId }) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}

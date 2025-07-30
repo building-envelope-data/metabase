@@ -2,13 +2,13 @@ import { Button, message } from "antd";
 import { useState } from "react";
 import {
   useDeleteAuthorizationMutation,
-} from "../../../queries/openIdConnectAuthorizations.graphql";
+} from "../../../queries/openIdConnect.graphql";
 import { Scalars } from "../../../__generated__/__types__";
 import { DocumentNode } from "graphql";
 
 export type DeleteAuthorizationProps = {
   authorizationId: Scalars["Uuid"];
-  refetchQueries: {query: DocumentNode, variables: {[key: string]: any}}[];
+  refetchQueries: { query: DocumentNode, variables: { [key: string]: any } }[];
 };
 
 export default function DeleteAuthorization({
