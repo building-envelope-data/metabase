@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Metabase.GraphQl.KeyFingerprints;
+namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 
 [SuppressMessage("Naming", "CA1707")]
-public enum AddKeyFingerprintErrorCode
+public enum AddGnuPgKeyFingerprintErrorCode
 {
     UNKNOWN,
     UNAUTHORIZED,

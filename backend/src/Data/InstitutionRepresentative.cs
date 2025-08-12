@@ -17,7 +17,7 @@ public sealed class InstitutionRepresentative
 
     public DataSigningPermission DataSigningPermission { get; set; } = DataSigningPermission.NEVER;
 
-    public ICollection<string> KeyFingerprints { get; set; } = [];
+    public ICollection<string> GnuPgKeyFingerprints { get; set; } = [];
 
     public bool Pending { get; set; } = true;
 }

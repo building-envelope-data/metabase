@@ -77,6 +77,18 @@ type AddComponentVariantPayload {
   variantOfEdge: ComponentVariantOfEdge
 }
 
+type AddGnuPgKeyFingerprintError {
+  code: AddGnuPgKeyFingerprintErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AddGnuPgKeyFingerprintPayload {
+  errors: [AddGnuPgKeyFingerprintError!]
+  gnuPgKeyFingerprint: String
+  query: Query!
+}
+
 type AddInstitutionMethodDeveloperError {
   code: AddInstitutionMethodDeveloperErrorCode!
   message: String!
@@ -101,18 +113,6 @@ type AddInstitutionRepresentativePayload {
   institutionRepresentativeEdge: InstitutionRepresentativeEdge
   query: Query!
   representedInstitutionEdge: UserRepresentedInstitutionEdge
-}
-
-type AddKeyFingerprintError {
-  code: AddKeyFingerprintErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type AddKeyFingerprintPayload {
-  errors: [AddKeyFingerprintError!]
-  keyFingerprint: String
-  query: Query!
 }
 
 type AddUserMethodDeveloperError {
@@ -933,9 +933,9 @@ type InstitutionOperatedDatabaseEdge {
 
 type InstitutionRepresentative {
   dataSigningPermission: DataSigningPermission!
+  gnuPgKeyFingerprints: [String!]!
   institution: Institution!
   institutionId: Uuid!
-  keyFingerprints: [String!]!
   pending: Boolean!
   role: InstitutionRepresentativeRole!
   user: User!
@@ -1073,9 +1073,9 @@ type Mutation {
   addComponentGeneralization(input: AddComponentGeneralizationInput!): AddComponentGeneralizationPayload! @authorize(policy: "Write") @cost(weight: "10")
   addComponentManufacturer(input: AddComponentManufacturerInput!): AddComponentManufacturerPayload! @authorize(policy: "Write") @cost(weight: "10")
   addComponentVariant(input: AddComponentVariantInput!): AddComponentVariantPayload! @authorize(policy: "Write") @cost(weight: "10")
+  addGnuPgKeyFingerprint(input: GnuPgKeyFingerprintInput!): AddGnuPgKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   addInstitutionMethodDeveloper(input: AddInstitutionMethodDeveloperInput!): AddInstitutionMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write") @cost(weight: "10")
-  addKeyFingerprint(input: KeyFingerprintInput!): AddKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   allowRepresentativeToSignData(input: AllowRepresentativeToSignDataInput!): AllowRepresentativeToSignDataPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -2297,6 +2297,12 @@ input GetHttpsResourcesPropositionInput {
   some: GetHttpsResourcePropositionInput
 }
 
+input GnuPgKeyFingerprintInput {
+  fingerprint: String!
+  institutionId: Uuid!
+  userId: Uuid!
+}
+
 input HygrothermalDataPropositionInput {
   and: [HygrothermalDataPropositionInput!]
   componentId: UuidPropositionInput
@@ -2380,12 +2386,6 @@ input JsonValueKindOperationFilterInput {
   notEqualTo: JsonValueKind @cost(weight: "10")
   in: [JsonValueKind!] @cost(weight: "10")
   notIn: [JsonValueKind!] @cost(weight: "10")
-}
-
-input KeyFingerprintInput {
-  institutionId: Uuid!
-  keyFingerprint: String!
-  userId: Uuid!
 }
 
 input ListComponentAssemblyFilterTypeFilterInput {
@@ -2916,6 +2916,15 @@ enum AddComponentVariantErrorCode {
   UNAUTHORIZED
 }
 
+enum AddGnuPgKeyFingerprintErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_INSTITUTION
+  UNKNOWN_USER
+  NOT_ALLOWED
+  UNKNOWN_REPRESENTATIVE
+}
+
 enum AddInstitutionMethodDeveloperErrorCode {
   UNKNOWN
   UNKNOWN_METHOD
@@ -2930,15 +2939,6 @@ enum AddInstitutionRepresentativeErrorCode {
   UNKNOWN_USER
   DUPLICATE
   UNAUTHORIZED
-}
-
-enum AddKeyFingerprintErrorCode {
-  UNKNOWN
-  UNAUTHORIZED
-  UNKNOWN_INSTITUTION
-  UNKNOWN_USER
-  NOT_ALLOWED
-  UNKNOWN_REPRESENTATIVE
 }
 
 enum AddUserMethodDeveloperErrorCode {

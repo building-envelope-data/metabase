@@ -8,26 +8,26 @@ using Metabase.Enumerations;
 using Metabase.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Metabase.GraphQl.KeyFingerprints;
+namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 
 [ExtendObjectType(nameof(Query))]
-public sealed class KeyFingerprintQueries
+public sealed class GnuPgKeyFingerprintQueries
 {
-    public async Task<VerifyKeyFingerprintPayload> VerifyKeyFingerprintAsync(
-        KeyFingerprintInput input,
+    public async Task<VerifyGnuPgKeyFingerprintPayload> VerifyGnuPgKeyFingerprintAsync(
+        GnuPgKeyFingerprintInput input,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        var errors = new List<VerifyKeyFingerprintError>();
+        var errors = new List<VerifyGnuPgKeyFingerprintError>();
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
            )
         {
             errors.Add(
-                new VerifyKeyFingerprintError(
-                    VerifyKeyFingerprintErrorCode.UNKNOWN_INSTITUTION,
+                new VerifyGnuPgKeyFingerprintError(
+                    VerifyGnuPgKeyFingerprintErrorCode.UNKNOWN_INSTITUTION,
                     "Unknown institution.",
                     [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
                 )
@@ -40,8 +40,8 @@ public sealed class KeyFingerprintQueries
            )
         {
             errors.Add(
-                new VerifyKeyFingerprintError(
-                    VerifyKeyFingerprintErrorCode.UNKNOWN_USER,
+                new VerifyGnuPgKeyFingerprintError(
+                    VerifyGnuPgKeyFingerprintErrorCode.UNKNOWN_USER,
                     "Unknown user.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 )
@@ -50,7 +50,7 @@ public sealed class KeyFingerprintQueries
 
         if (errors.Count is not 0)
         {
-            return new VerifyKeyFingerprintPayload(errors.AsReadOnly());
+            return new VerifyGnuPgKeyFingerprintPayload(errors.AsReadOnly());
         }
 
         var institutionRepresentative = await context.InstitutionRepresentatives
@@ -61,23 +61,23 @@ public sealed class KeyFingerprintQueries
 
         if (institutionRepresentative is null)
         {
-            return new VerifyKeyFingerprintPayload(new VerifyKeyFingerprintError(
-                    VerifyKeyFingerprintErrorCode.UNKNOWN_REPRESENTATIVE,
+            return new VerifyGnuPgKeyFingerprintPayload(new VerifyGnuPgKeyFingerprintError(
+                    VerifyGnuPgKeyFingerprintErrorCode.UNKNOWN_REPRESENTATIVE,
                     "Unknown representative.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 ));
         }
 
-        if (!institutionRepresentative.KeyFingerprints.Contains(input.KeyFingerprint))
+        if (!institutionRepresentative.GnuPgKeyFingerprints.Contains(input.Fingerprint))
         {
-            return new VerifyKeyFingerprintPayload(new VerifyKeyFingerprintError(
-                    VerifyKeyFingerprintErrorCode.UNKNOWN_FINGERPRINT,
+            return new VerifyGnuPgKeyFingerprintPayload(new VerifyGnuPgKeyFingerprintError(
+                    VerifyGnuPgKeyFingerprintErrorCode.UNKNOWN_FINGERPRINT,
                     "Unknown keyfingerprint.",
-                    [nameof(input), nameof(input.KeyFingerprint).FirstCharToLower()]
+                    [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
                 ));
         }
 
-        return new VerifyKeyFingerprintPayload(institutionRepresentative.DataSigningPermission is DataSigningPermission.ALLOWED
+        return new VerifyGnuPgKeyFingerprintPayload(institutionRepresentative.DataSigningPermission is DataSigningPermission.ALLOWED
             || institutionRepresentative.DataSigningPermission is DataSigningPermission.FORBIDDEN);
     }
 }

@@ -10,25 +10,24 @@ using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Metabase.GraphQl.KeyFingerprints;
+namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 
 [ExtendObjectType(nameof(Mutation))]
-public sealed class KeyFingerprintMutations
+public sealed class GnuPgKeyFingerprintMutations
 {
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
-    public async Task<AddKeyFingerprintPayload> AddKeyFingerprintAsync(
-        KeyFingerprintInput input,
+    public async Task<AddGnuPgKeyFingerprintPayload> AddGnuPgKeyFingerprintAsync(
+        GnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
         InstitutionRepresentativeAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToAddKeyFingerprint(
+        if (!await authorization.IsAuthorizedToAddGnuPgKeyFingerprint(
                 claimsPrincipal,
                 input.InstitutionId,
                 input.UserId,
@@ -36,24 +35,24 @@ public sealed class KeyFingerprintMutations
             )
            )
         {
-            return new AddKeyFingerprintPayload(
-                new AddKeyFingerprintError(
-                    AddKeyFingerprintErrorCode.UNAUTHORIZED,
+            return new AddGnuPgKeyFingerprintPayload(
+                new AddGnuPgKeyFingerprintError(
+                    AddGnuPgKeyFingerprintErrorCode.UNAUTHORIZED,
                     "You are not authorized to add key fingerprints.",
                     []
                 )
             );
         }
 
-        var errors = new List<AddKeyFingerprintError>();
+        var errors = new List<AddGnuPgKeyFingerprintError>();
         if (!await context.Institutions.AsQueryable()
                 .Where(i => i.Id == input.InstitutionId)
                 .AnyAsync(cancellationToken)
            )
         {
             errors.Add(
-                new AddKeyFingerprintError(
-                    AddKeyFingerprintErrorCode.UNKNOWN_INSTITUTION,
+                new AddGnuPgKeyFingerprintError(
+                    AddGnuPgKeyFingerprintErrorCode.UNKNOWN_INSTITUTION,
                     "Unknown institution.",
                     [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
                 )
@@ -66,8 +65,8 @@ public sealed class KeyFingerprintMutations
            )
         {
             errors.Add(
-                new AddKeyFingerprintError(
-                    AddKeyFingerprintErrorCode.UNKNOWN_USER,
+                new AddGnuPgKeyFingerprintError(
+                    AddGnuPgKeyFingerprintErrorCode.UNKNOWN_USER,
                     "Unknown user.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 )
@@ -76,7 +75,7 @@ public sealed class KeyFingerprintMutations
 
         if (errors.Count is not 0)
         {
-            return new AddKeyFingerprintPayload(errors.AsReadOnly());
+            return new AddGnuPgKeyFingerprintPayload(errors.AsReadOnly());
         }
 
         var institutionRepresentative = await context.InstitutionRepresentatives
@@ -87,8 +86,8 @@ public sealed class KeyFingerprintMutations
 
         if (institutionRepresentative is null)
         {
-            return new AddKeyFingerprintPayload(new AddKeyFingerprintError(
-                    AddKeyFingerprintErrorCode.UNKNOWN_REPRESENTATIVE,
+            return new AddGnuPgKeyFingerprintPayload(new AddGnuPgKeyFingerprintError(
+                    AddGnuPgKeyFingerprintErrorCode.UNKNOWN_REPRESENTATIVE,
                     "Unknown representative.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 ));
@@ -96,15 +95,15 @@ public sealed class KeyFingerprintMutations
 
         if (institutionRepresentative.DataSigningPermission is not Enumerations.DataSigningPermission.ALLOWED)
         {
-            return new AddKeyFingerprintPayload(new AddKeyFingerprintError(
-                    AddKeyFingerprintErrorCode.NOT_ALLOWED,
+            return new AddGnuPgKeyFingerprintPayload(new AddGnuPgKeyFingerprintError(
+                    AddGnuPgKeyFingerprintErrorCode.NOT_ALLOWED,
                     "Representative is not allowed to sign data.",
                     [nameof(input), nameof(input.UserId).FirstCharToLower()]
                 ));
         }
 
-        institutionRepresentative.KeyFingerprints.Add(input.KeyFingerprint);
+        institutionRepresentative.GnuPgKeyFingerprints.Add(input.Fingerprint);
         await context.SaveChangesAsync(cancellationToken);
-        return new AddKeyFingerprintPayload(input.KeyFingerprint);
+        return new AddGnuPgKeyFingerprintPayload(input.Fingerprint);
     }
 }

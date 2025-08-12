@@ -75,7 +75,7 @@ public sealed class InstitutionRepresentativeAuthorization(
         );
     }
 
-    internal Task<bool> IsAuthorizedToAddKeyFingerprint(
+    internal Task<bool> IsAuthorizedToAddGnuPgKeyFingerprint(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
         Guid userId,
