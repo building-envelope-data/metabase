@@ -320,7 +320,7 @@ namespace Metabase.Migrations
                     b.Property<DataSigningPermission>("DataSigningPermission")
                         .HasColumnType("metabase.data_signing_permission");
 
-                    b.PrimitiveCollection<string[]>("KeyFingerprints")
+                    b.PrimitiveCollection<string[]>("GnuPgKeyFingerprints")
                         .IsRequired()
                         .HasColumnType("text[]");
 
