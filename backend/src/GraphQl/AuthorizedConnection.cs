@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut;
+using GreenDonut.Data;
 using Metabase.Data;
 
 namespace Metabase.GraphQl;
@@ -12,8 +13,9 @@ namespace Metabase.GraphQl;
 public abstract class AuthorizedConnection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge, TAuthorization>(
     TSubject subject,
     Func<TAssociation, TEdge> createEdge,
-    Func<ClaimsPrincipal, TSubject, TAuthorization, CancellationToken, Task<bool>> isAuthorized
-) : Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>(subject, createEdge)
+    Func<ClaimsPrincipal, TSubject, TAuthorization, CancellationToken, Task<bool>> isAuthorized,
+    QueryContext<TAssociation> queryContext
+) : Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>(subject, createEdge, queryContext)
     where TSubject : IEntity
     where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {

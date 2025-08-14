@@ -7,7 +7,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
+using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
+using Metabase.GraphQl.Extensions;
+using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
 using OpenIddict.Core;
 
@@ -192,9 +195,11 @@ public sealed class OpenIdConnectApplicationType
         descriptor
             .Field(application => application.Institutions)
             .Type<NonNullType<ObjectType<OpenIdConnectApplicationInstitutionConnection>>>()
+            .UseFiltering<InstitutionOpenIdConnectApplicationFilterType>()
             .Resolve(context =>
                 new OpenIdConnectApplicationInstitutionConnection(
-                    context.Parent<OpenIdConnectApplication>()
+                    context.Parent<OpenIdConnectApplication>(),
+                    context.GetQueryContext<InstitutionOpenIdConnectApplication>()
                 )
             );
         descriptor

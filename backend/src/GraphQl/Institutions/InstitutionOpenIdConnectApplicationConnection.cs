@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -8,7 +9,8 @@ using Metabase.GraphQl.Users;
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionOpenIdConnectApplicationConnection(
-    Institution institution
+    Institution institution,
+    QueryContext<InstitutionOpenIdConnectApplication> queryContext
 ) : AuthorizedConnection<
         Institution,
         InstitutionOpenIdConnectApplication,
@@ -20,7 +22,8 @@ public sealed class InstitutionOpenIdConnectApplicationConnection(
     institution,
     x => new InstitutionOpenIdConnectApplicationEdge(x),
     (claimsPrincipal, institution, authorization, cancellationToken) =>
-        authorization.IsAuthorizedToManageApplications(claimsPrincipal, institution.Id, cancellationToken)
+        authorization.IsAuthorizedToManageApplications(claimsPrincipal, institution.Id, cancellationToken),
+    queryContext
 )
 {
     [UseUserManager]

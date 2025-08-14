@@ -4,7 +4,7 @@ using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.Databases;
 
-public sealed class DatabaseFilterType
+public class DatabaseFilterType
     : EntityFilterType<Database>
 {
     protected override void Configure(

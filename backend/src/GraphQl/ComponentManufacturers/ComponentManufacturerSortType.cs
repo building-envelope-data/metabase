@@ -13,6 +13,5 @@ public sealed class ComponentManufacturerSortType
         descriptor.BindFieldsExplicitly();
         descriptor.Field(x => x.Component);
         descriptor.Field(x => x.Institution);
-        descriptor.Field(x => x.Pending);
     }
 }

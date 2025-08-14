@@ -15,10 +15,10 @@ public sealed class UserMethodDevelopersByMethodIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.UserMethodDevelopers.AsNoTracking().Where(x =>
                     !x.Pending && ids.Contains(x.MethodId)
-                ),
+                ).With(queryContext),
         x => x.MethodId
         )
 {

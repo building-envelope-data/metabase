@@ -1,10 +1,12 @@
+using GreenDonut.Data;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
 public sealed class OpenIdConnectApplicationInstitutionConnection(
-    OpenIdConnectApplication application
+    OpenIdConnectApplication application,
+    QueryContext<InstitutionOpenIdConnectApplication> queryContext
 ) : OpenIdConnectConnection<
     InstitutionOpenIdConnectApplication,
     OpenIdConnectApplicationInstitutionsByApplicationIdDataLoader,
@@ -12,7 +14,8 @@ public sealed class OpenIdConnectApplicationInstitutionConnection(
 >
 (
     application,
-    x => new OpenIdConnectApplicationInstitutionEdge(x)
+    x => new OpenIdConnectApplicationInstitutionEdge(x),
+    queryContext
 )
 {
 }

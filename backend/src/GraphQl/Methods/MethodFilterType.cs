@@ -4,7 +4,7 @@ using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.Methods;
 
-public sealed class MethodFilterType
+public class MethodFilterType
     : EntityFilterType<Method>
 {
     protected override void Configure(

@@ -238,22 +238,22 @@ type CielabColor {
 
 type Component implements Node {
   abbreviation: String
-  assembledOf: ComponentAssembledOfConnection! @cost(weight: "10")
+  assembledOf(where: ComponentAssembledOfFilterInput @cost(weight: "10")): ComponentAssembledOfConnection! @cost(weight: "10")
   availability: OpenEndedDateTimeRange
   canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   categories: [ComponentCategory!]!
-  concretizationOf: ComponentConcretizationOfConnection! @cost(weight: "10")
+  concretizationOf(where: ComponentConcretizationOfFilterInput @cost(weight: "10")): ComponentConcretizationOfConnection! @cost(weight: "10")
   description: String!
   extras: Any
-  generalizationOf: ComponentGeneralizationOfConnection! @cost(weight: "10")
+  generalizationOf(where: ComponentGeneralizationOfFilterInput @cost(weight: "10")): ComponentGeneralizationOfConnection! @cost(weight: "10")
   id: ID!
-  manufacturers(pending: Boolean! = false): ComponentManufacturerConnection! @cost(weight: "10")
+  manufacturers(pending: Boolean! = false where: ComponentManufacturerFilterInput @cost(weight: "10")): ComponentManufacturerConnection! @cost(weight: "10")
   name: String!
-  partOf: ComponentPartOfConnection! @cost(weight: "10")
+  partOf(where: ComponentPartOfFilterInput @cost(weight: "10")): ComponentPartOfConnection! @cost(weight: "10")
   prime: PrimeSurfaceOrDirection @cost(weight: "10")
   switchableLayers: DescriptionOrReference
   uuid: Uuid! @cost(weight: "10")
-  variantOf: ComponentVariantOfConnection! @cost(weight: "10")
+  variantOf(where: ComponentVariantOfFilterInput @cost(weight: "10")): ComponentVariantOfConnection! @cost(weight: "10")
 }
 
 type ComponentAssembledOfConnection {
@@ -836,20 +836,20 @@ type Institution implements Node {
   canCurrentUserSwitchOperatingStateOfNode: Boolean! @cost(weight: "10")
   canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   description: String!
-  developedMethods(pending: Boolean! = false): InstitutionDevelopedMethodConnection! @cost(weight: "10")
+  developedMethods(pending: Boolean! = false where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
   id: ID!
-  managedDataFormats: InstitutionManagedDataFormatConnection! @cost(weight: "10")
-  managedInstitutions: InstitutionManagedInstitutionConnection! @cost(weight: "10")
-  managedMethods: InstitutionManagedMethodConnection! @cost(weight: "10")
+  managedDataFormats(where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")): InstitutionManagedDataFormatConnection! @cost(weight: "10")
+  managedInstitutions(where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")): InstitutionManagedInstitutionConnection! @cost(weight: "10")
+  managedMethods(where: InstitutionManagedMethodFilterInput @cost(weight: "10")): InstitutionManagedMethodConnection! @cost(weight: "10")
   manager: InstitutionManagerEdge @cost(weight: "10")
-  manufacturedComponents(pending: Boolean! = false): InstitutionManufacturedComponentConnection! @cost(weight: "10")
+  manufacturedComponents(pending: Boolean! = false where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")): InstitutionManufacturedComponentConnection! @cost(weight: "10")
   name: String!
-  openIdConnectApplications: InstitutionOpenIdConnectApplicationConnection! @cost(weight: "10")
-  operatedDatabases: InstitutionOperatedDatabaseConnection! @cost(weight: "10")
+  openIdConnectApplications(where: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")): InstitutionOpenIdConnectApplicationConnection! @cost(weight: "10")
+  operatedDatabases(where: InstitutionOperatedDatabaseFilterInput @cost(weight: "10")): InstitutionOperatedDatabaseConnection! @cost(weight: "10")
   operatingState: InstitutionOperatingState!
   publicKey: String
-  representatives(pending: Boolean! = false): InstitutionRepresentativeConnection! @cost(weight: "10")
+  representatives(pending: Boolean! = false where: InstitutionRepresentativeFilterInput @cost(weight: "10")): InstitutionRepresentativeConnection! @cost(weight: "10")
   state: InstitutionState!
   uuid: Uuid! @cost(weight: "10")
   websiteLocator: Url
@@ -1025,7 +1025,7 @@ type Method implements Node {
   canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   categories: [MethodCategory!]!
   description: String!
-  developers(pending: Boolean! = false): MethodDeveloperConnection! @cost(weight: "10")
+  developers(pending: Boolean! = false where: IMethodDeveloperFilterInput @cost(weight: "10")): MethodDeveloperConnection! @cost(weight: "10")
   id: ID!
   manager: MethodManagerEdge! @cost(weight: "10")
   name: String!
@@ -1172,7 +1172,7 @@ type OpenIdConnectApplication implements Node {
   endpoints: [OpenIdConnectEndpoint!]! @cost(weight: "10")
   grantTypes: [OpenIdConnectGrantType!]! @cost(weight: "10")
   id: ID!
-  institutions: OpenIdConnectApplicationInstitutionConnection! @cost(weight: "10")
+  institutions(where: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")): OpenIdConnectApplicationInstitutionConnection! @cost(weight: "10")
   postLogoutRedirectUri: Url @cost(weight: "10")
   redirectUri: Url @cost(weight: "10")
   requirements: [OpenIdConnectRequirement!]! @cost(weight: "10")
@@ -1790,7 +1790,7 @@ type User implements Node {
   canCurrentUserAddApprovals: Boolean! @cost(weight: "10")
   canCurrentUserDeleteUser: Boolean! @cost(weight: "10")
   canCurrentUserManageOpenIdConnect: Boolean! @cost(weight: "10")
-  developedMethods(pending: Boolean! = false): UserDevelopedMethodConnection! @cost(weight: "10")
+  developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
   id: ID!
@@ -1800,7 +1800,7 @@ type User implements Node {
   name: String! @cost(weight: "10")
   phoneNumber: String @cost(weight: "10")
   postalAddress: String @cost(weight: "10")
-  representedInstitutions(pending: Boolean! = false): UserRepresentedInstitutionConnection! @cost(weight: "10")
+  representedInstitutions(pending: Boolean! = false where: UserRepresentedInstitutionFilterInput @cost(weight: "10")): UserRepresentedInstitutionConnection! @cost(weight: "10")
   roles: [UserRole!] @cost(weight: "10")
   rolesCurrentUserCanAdd: [UserRole!]! @cost(weight: "10")
   rolesCurrentUserCanRemove: [UserRole!]! @cost(weight: "10")
@@ -2029,10 +2029,24 @@ input ComparableNullableOfByteOperationFilterInput {
   notLessThanOrEqualTo: Byte @cost(weight: "10")
 }
 
-input ComponentAssemblyFilterInput {
-  and: [ComponentAssemblyFilterInput!]
-  or: [ComponentAssemblyFilterInput!]
-  assembledComponent: ComponentFilterInput
+input ComparableNullableOfDateTimeOperationFilterInput {
+  equalTo: DateTime @cost(weight: "10")
+  notEqualTo: DateTime @cost(weight: "10")
+  in: [DateTime] @cost(weight: "10")
+  notIn: [DateTime] @cost(weight: "10")
+  greaterThan: DateTime @cost(weight: "10")
+  notGreaterThan: DateTime @cost(weight: "10")
+  greaterThanOrEqualTo: DateTime @cost(weight: "10")
+  notGreaterThanOrEqualTo: DateTime @cost(weight: "10")
+  lessThan: DateTime @cost(weight: "10")
+  notLessThan: DateTime @cost(weight: "10")
+  lessThanOrEqualTo: DateTime @cost(weight: "10")
+  notLessThanOrEqualTo: DateTime @cost(weight: "10")
+}
+
+input ComponentAssembledOfFilterInput {
+  and: [ComponentAssembledOfFilterInput!]
+  or: [ComponentAssembledOfFilterInput!]
   partComponent: ComponentFilterInput
   index: ComparableNullableOfByteOperationFilterInput
   primeSurface: NullableOfPrimeSurfaceOperationFilterInput
@@ -2043,6 +2057,12 @@ input ComponentCategoryOperationFilterInput {
   notEqualTo: ComponentCategory @cost(weight: "10")
   in: [ComponentCategory!] @cost(weight: "10")
   notIn: [ComponentCategory!] @cost(weight: "10")
+}
+
+input ComponentConcretizationOfFilterInput {
+  and: [ComponentConcretizationOfFilterInput!]
+  or: [ComponentConcretizationOfFilterInput!]
+  generalComponent: ComponentFilterInput
 }
 
 input ComponentFilterInput {
@@ -2056,21 +2076,33 @@ input ComponentFilterInput {
   extras: JsonElementFilterInput
   partOf: ListComponentFilterTypeFilterInput
   parts: ListComponentFilterTypeFilterInput
-  partOfEdges: ListComponentAssemblyFilterTypeFilterInput
-  partEdges: ListComponentAssemblyFilterTypeFilterInput
+  partOfEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
+  partEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
   concretizations: ListComponentFilterTypeFilterInput
   generalizations: ListComponentFilterTypeFilterInput
   variants: ListComponentFilterTypeFilterInput
   manufacturers: ListInstitutionFilterTypeFilterInput
-  manufacturerEdges: ListComponentManufacturerFilterTypeFilterInput
+  manufacturerEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
+}
+
+input ComponentGeneralizationOfFilterInput {
+  and: [ComponentGeneralizationOfFilterInput!]
+  or: [ComponentGeneralizationOfFilterInput!]
+  concreteComponent: ComponentFilterInput
 }
 
 input ComponentManufacturerFilterInput {
   and: [ComponentManufacturerFilterInput!]
   or: [ComponentManufacturerFilterInput!]
-  component: ComponentFilterInput
   institution: InstitutionFilterInput
-  pending: BooleanOperationFilterInput
+}
+
+input ComponentPartOfFilterInput {
+  and: [ComponentPartOfFilterInput!]
+  or: [ComponentPartOfFilterInput!]
+  assembledComponent: ComponentFilterInput
+  index: ComparableNullableOfByteOperationFilterInput
+  primeSurface: NullableOfPrimeSurfaceOperationFilterInput
 }
 
 input ComponentSortInput {
@@ -2078,6 +2110,12 @@ input ComponentSortInput {
   name: SortEnumType @cost(weight: "10")
   abbreviation: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
+}
+
+input ComponentVariantOfFilterInput {
+  and: [ComponentVariantOfFilterInput!]
+  or: [ComponentVariantOfFilterInput!]
+  ofComponent: ComponentFilterInput
 }
 
 input ConfirmComponentManufacturerInput {
@@ -2311,6 +2349,11 @@ input HygrothermalDataPropositionInput {
   resources: GetHttpsResourcesPropositionInput
 }
 
+input IMethodDeveloperFilterInput {
+  and: [IMethodDeveloperFilterInput!]
+  or: [IMethodDeveloperFilterInput!]
+}
+
 input InstitutionFilterInput {
   and: [InstitutionFilterInput!]
   or: [InstitutionFilterInput!]
@@ -2322,33 +2365,99 @@ input InstitutionFilterInput {
   state: InstitutionStateOperationFilterInput
   extras: JsonElementFilterInput
   developedMethods: ListMethodFilterTypeFilterInput
-  developedMethodEdges: ListInstitutionMethodDeveloperFilterTypeFilterInput
+  developedMethodEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
   managedMethods: ListMethodFilterTypeFilterInput
   managedDataFormats: ListDataFormatFilterTypeFilterInput
   manufacturedComponents: ListComponentFilterTypeFilterInput
-  manufacturedComponentEdges: ListComponentManufacturerFilterTypeFilterInput
+  manufacturedComponentEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
   operatedDatabases: ListDatabaseFilterTypeFilterInput
   manager: InstitutionFilterInput
   managedInstitutions: ListInstitutionFilterTypeFilterInput
   representatives: ListUserFilterTypeFilterInput
-  representativeEdges: ListInstitutionRepresentativeFilterTypeFilterInput
+  representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
+}
+
+input InstitutionManagedDataFormatFilterInput {
+  and: [InstitutionManagedDataFormatFilterInput!]
+  or: [InstitutionManagedDataFormatFilterInput!]
+  uuid: ComparableGuidOperationFilterInput
+  name: StringOperationFilterInput
+  extension: StringOperationFilterInput
+  description: StringOperationFilterInput
+  mediaType: StringOperationFilterInput
+  schemaLocator: UriFilterInput
+}
+
+input InstitutionManagedInstitutionFilterInput {
+  and: [InstitutionManagedInstitutionFilterInput!]
+  or: [InstitutionManagedInstitutionFilterInput!]
+  uuid: ComparableGuidOperationFilterInput
+  name: StringOperationFilterInput
+  abbreviation: StringOperationFilterInput
+  description: StringOperationFilterInput
+  websiteLocator: UriFilterInput
+  state: InstitutionStateOperationFilterInput
+  extras: JsonElementFilterInput
+  developedMethods: ListMethodFilterTypeFilterInput
+  developedMethodEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
+  managedMethods: ListMethodFilterTypeFilterInput
+  managedDataFormats: ListDataFormatFilterTypeFilterInput
+  manufacturedComponents: ListComponentFilterTypeFilterInput
+  manufacturedComponentEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
+  operatedDatabases: ListDatabaseFilterTypeFilterInput
+  managedInstitutions: ListInstitutionFilterTypeFilterInput
+  representatives: ListUserFilterTypeFilterInput
+  representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
+}
+
+input InstitutionManagedMethodFilterInput {
+  and: [InstitutionManagedMethodFilterInput!]
+  or: [InstitutionManagedMethodFilterInput!]
+  uuid: ComparableGuidOperationFilterInput
+  name: StringOperationFilterInput
+  description: StringOperationFilterInput
+  calculationLocator: UriFilterInput
+  categories: ListMethodCategoryOperationFilterInput
+  institutionDevelopers: ListInstitutionFilterTypeFilterInput
+  institutionDeveloperEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
+  userDevelopers: ListUserFilterTypeFilterInput
+  userDeveloperEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
+}
+
+input InstitutionManufacturedComponentFilterInput {
+  and: [InstitutionManufacturedComponentFilterInput!]
+  or: [InstitutionManufacturedComponentFilterInput!]
+  component: ComponentFilterInput
 }
 
 input InstitutionMethodDeveloperFilterInput {
   and: [InstitutionMethodDeveloperFilterInput!]
   or: [InstitutionMethodDeveloperFilterInput!]
-  method: MethodFilterInput
+}
+
+input InstitutionOpenIdConnectApplicationFilterInput {
+  and: [InstitutionOpenIdConnectApplicationFilterInput!]
+  or: [InstitutionOpenIdConnectApplicationFilterInput!]
+  application: OpenIdConnectApplicationFilterInput
+  institutionId: ComparableGuidOperationFilterInput
   institution: InstitutionFilterInput
-  pending: BooleanOperationFilterInput
+  applicationId: ComparableGuidOperationFilterInput
+}
+
+input InstitutionOperatedDatabaseFilterInput {
+  and: [InstitutionOperatedDatabaseFilterInput!]
+  or: [InstitutionOperatedDatabaseFilterInput!]
+  uuid: ComparableGuidOperationFilterInput
+  name: StringOperationFilterInput
+  description: StringOperationFilterInput
+  locator: UriFilterInput
 }
 
 input InstitutionRepresentativeFilterInput {
   and: [InstitutionRepresentativeFilterInput!]
   or: [InstitutionRepresentativeFilterInput!]
-  institution: InstitutionFilterInput
   user: UserFilterInput
   role: InstitutionRepresentativeRoleOperationFilterInput
-  pending: BooleanOperationFilterInput
 }
 
 input InstitutionRepresentativeRoleOperationFilterInput {
@@ -2388,13 +2497,6 @@ input JsonValueKindOperationFilterInput {
   notIn: [JsonValueKind!] @cost(weight: "10")
 }
 
-input ListComponentAssemblyFilterTypeFilterInput {
-  all: ComponentAssemblyFilterInput @cost(weight: "10")
-  none: ComponentAssemblyFilterInput @cost(weight: "10")
-  some: ComponentAssemblyFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
 input ListComponentCategoryOperationFilterInput {
   all: ComponentCategoryOperationFilterInput @cost(weight: "10")
   none: ComponentCategoryOperationFilterInput @cost(weight: "10")
@@ -2406,13 +2508,6 @@ input ListComponentFilterTypeFilterInput {
   all: ComponentFilterInput @cost(weight: "10")
   none: ComponentFilterInput @cost(weight: "10")
   some: ComponentFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListComponentManufacturerFilterTypeFilterInput {
-  all: ComponentManufacturerFilterInput @cost(weight: "10")
-  none: ComponentManufacturerFilterInput @cost(weight: "10")
-  some: ComponentManufacturerFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
@@ -2430,24 +2525,52 @@ input ListDatabaseFilterTypeFilterInput {
   any: Boolean @cost(weight: "10")
 }
 
-input ListInstitutionFilterTypeFilterInput {
-  all: InstitutionFilterInput @cost(weight: "10")
-  none: InstitutionFilterInput @cost(weight: "10")
-  some: InstitutionFilterInput @cost(weight: "10")
+input ListFilterInputTypeOfComponentAssemblyFilterInput {
+  all: ComponentAssembledOfFilterInput @cost(weight: "10")
+  none: ComponentAssembledOfFilterInput @cost(weight: "10")
+  some: ComponentAssembledOfFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
-input ListInstitutionMethodDeveloperFilterTypeFilterInput {
+input ListFilterInputTypeOfComponentManufacturerFilterInput {
+  all: ComponentManufacturerFilterInput @cost(weight: "10")
+  none: ComponentManufacturerFilterInput @cost(weight: "10")
+  some: ComponentManufacturerFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput {
   all: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
   none: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
   some: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
-input ListInstitutionRepresentativeFilterTypeFilterInput {
+input ListFilterInputTypeOfInstitutionOpenIdConnectApplicationFilterInput {
+  all: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")
+  none: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")
+  some: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfInstitutionRepresentativeFilterInput {
   all: InstitutionRepresentativeFilterInput @cost(weight: "10")
   none: InstitutionRepresentativeFilterInput @cost(weight: "10")
   some: InstitutionRepresentativeFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfUserMethodDeveloperFilterInput {
+  all: UserDevelopedMethodFilterInput @cost(weight: "10")
+  none: UserDevelopedMethodFilterInput @cost(weight: "10")
+  some: UserDevelopedMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListInstitutionFilterTypeFilterInput {
+  all: InstitutionFilterInput @cost(weight: "10")
+  none: InstitutionFilterInput @cost(weight: "10")
+  some: InstitutionFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
@@ -2465,6 +2588,20 @@ input ListMethodFilterTypeFilterInput {
   any: Boolean @cost(weight: "10")
 }
 
+input ListOpenIdConnectAuthorizationFilterTypeFilterInput {
+  all: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
+  none: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
+  some: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListOpenIdConnectTokenFilterTypeFilterInput {
+  all: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  none: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  some: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
 input ListStringOperationFilterInput {
   all: StringOperationFilterInput @cost(weight: "10")
   none: StringOperationFilterInput @cost(weight: "10")
@@ -2476,13 +2613,6 @@ input ListUserFilterTypeFilterInput {
   all: UserFilterInput @cost(weight: "10")
   none: UserFilterInput @cost(weight: "10")
   some: UserFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListUserMethodDeveloperFilterTypeFilterInput {
-  all: UserMethodDeveloperFilterInput @cost(weight: "10")
-  none: UserMethodDeveloperFilterInput @cost(weight: "10")
-  some: UserMethodDeveloperFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
@@ -2516,9 +2646,9 @@ input MethodFilterInput {
   calculationLocator: UriFilterInput
   categories: ListMethodCategoryOperationFilterInput
   institutionDevelopers: ListInstitutionFilterTypeFilterInput
-  institutionDeveloperEdges: ListInstitutionMethodDeveloperFilterTypeFilterInput
+  institutionDeveloperEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
   userDevelopers: ListUserFilterTypeFilterInput
-  userDeveloperEdges: ListUserMethodDeveloperFilterTypeFilterInput
+  userDeveloperEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
   manager: InstitutionFilterInput
 }
 
@@ -2546,6 +2676,64 @@ input NumerationInput {
 input OpenEndedDateTimeRangeInput {
   from: DateTime
   to: DateTime
+}
+
+input OpenIdConnectApplicationFilterInput {
+  and: [OpenIdConnectApplicationFilterInput!]
+  or: [OpenIdConnectApplicationFilterInput!]
+  uuid: ComparableGuidOperationFilterInput
+  applicationType: StringOperationFilterInput
+  clientId: StringOperationFilterInput
+  consentType: StringOperationFilterInput
+  displayName: StringOperationFilterInput
+  institutionEdges: ListFilterInputTypeOfInstitutionOpenIdConnectApplicationFilterInput
+  institutions: ListInstitutionFilterTypeFilterInput
+  authorizations: ListOpenIdConnectAuthorizationFilterTypeFilterInput
+  clientSecret: StringOperationFilterInput
+  clientType: StringOperationFilterInput
+  concurrencyToken: StringOperationFilterInput
+  displayNames: StringOperationFilterInput
+  jsonWebKeySet: StringOperationFilterInput
+  permissions: StringOperationFilterInput
+  postLogoutRedirectUris: StringOperationFilterInput
+  properties: StringOperationFilterInput
+  redirectUris: StringOperationFilterInput
+  requirements: StringOperationFilterInput
+  settings: StringOperationFilterInput
+  tokens: ListOpenIdConnectTokenFilterTypeFilterInput
+}
+
+input OpenIdConnectAuthorizationFilterInput {
+  and: [OpenIdConnectAuthorizationFilterInput!]
+  or: [OpenIdConnectAuthorizationFilterInput!]
+  uuid: ComparableGuidOperationFilterInput
+  creationDate: ComparableNullableOfDateTimeOperationFilterInput
+  status: StringOperationFilterInput
+  subject: StringOperationFilterInput
+  tokens: ListOpenIdConnectTokenFilterTypeFilterInput
+  type: StringOperationFilterInput
+  application: OpenIdConnectApplicationFilterInput
+  concurrencyToken: StringOperationFilterInput
+  properties: StringOperationFilterInput
+  scopes: StringOperationFilterInput
+}
+
+input OpenIdConnectTokenFilterInput {
+  and: [OpenIdConnectTokenFilterInput!]
+  or: [OpenIdConnectTokenFilterInput!]
+  uuid: ComparableGuidOperationFilterInput
+  creationDate: ComparableNullableOfDateTimeOperationFilterInput
+  expirationDate: ComparableNullableOfDateTimeOperationFilterInput
+  redemptionDate: ComparableNullableOfDateTimeOperationFilterInput
+  status: StringOperationFilterInput
+  subject: StringOperationFilterInput
+  type: StringOperationFilterInput
+  application: OpenIdConnectApplicationFilterInput
+  authorization: OpenIdConnectAuthorizationFilterInput
+  concurrencyToken: StringOperationFilterInput
+  payload: StringOperationFilterInput
+  properties: StringOperationFilterInput
+  referenceId: StringOperationFilterInput
 }
 
 input OpticalComponentSubtypePropositionInput {
@@ -2850,22 +3038,27 @@ input UriSortInput {
   userInfo: SortEnumType @cost(weight: "10")
 }
 
+input UserDevelopedMethodFilterInput {
+  and: [UserDevelopedMethodFilterInput!]
+  or: [UserDevelopedMethodFilterInput!]
+  method: MethodFilterInput
+}
+
 input UserFilterInput {
   and: [UserFilterInput!]
   or: [UserFilterInput!]
   uuid: ComparableGuidOperationFilterInput
   developedMethods: ListMethodFilterTypeFilterInput
-  developedMethodEdges: ListUserMethodDeveloperFilterTypeFilterInput
+  developedMethodEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
   representedInstitutions: ListInstitutionFilterTypeFilterInput
-  representedInstitutionEdges: ListInstitutionRepresentativeFilterTypeFilterInput
+  representedInstitutionEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
 }
 
-input UserMethodDeveloperFilterInput {
-  and: [UserMethodDeveloperFilterInput!]
-  or: [UserMethodDeveloperFilterInput!]
-  method: MethodFilterInput
-  user: UserFilterInput
-  pending: BooleanOperationFilterInput
+input UserRepresentedInstitutionFilterInput {
+  and: [UserRepresentedInstitutionFilterInput!]
+  or: [UserRepresentedInstitutionFilterInput!]
+  institution: InstitutionFilterInput
+  role: InstitutionRepresentativeRoleOperationFilterInput
 }
 
 input UserSortInput {

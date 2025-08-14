@@ -13,6 +13,5 @@ public sealed class UserMethodDeveloperSortType
         descriptor.BindFieldsExplicitly();
         descriptor.Field(x => x.Method);
         descriptor.Field(x => x.User);
-        descriptor.Field(x => x.Pending);
     }
 }

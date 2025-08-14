@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using GreenDonut;
+using GreenDonut.Data;
 using Metabase.Data;
 
 namespace Metabase.GraphQl;
 
 public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociateIdDataLoader, TEdge>(
     TSubject subject,
-    Func<TAssociation, TEdge> createEdge
+    Func<TAssociation, TEdge> createEdge,
+    QueryContext<TAssociation> queryContext
     )
     where TSubject : IEntity
     where TAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
     private readonly Func<TAssociation, TEdge> _createEdge = createEdge;
+    private readonly QueryContext<TAssociation> _queryContext = queryContext;
 
     protected TSubject Subject { get; } = subject;
 
@@ -23,7 +26,7 @@ public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociat
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        foreach (var association in await dataLoader.LoadAsync(Subject.Id, cancellationToken) ?? [])
+        foreach (var association in await dataLoader.With(_queryContext).LoadAsync(Subject.Id, cancellationToken) ?? [])
         {
             yield return _createEdge(association);
         }

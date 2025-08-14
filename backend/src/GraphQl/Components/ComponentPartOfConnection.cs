@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -9,12 +10,14 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentPartOfConnection(
-    Component subject
+    Component subject,
+    QueryContext<ComponentAssembly> queryContext
     )
         : Connection<Component, ComponentAssembly, ComponentPartOfByComponentIdDataLoader,
         ComponentPartOfEdge>(
         subject,
-        x => new ComponentPartOfEdge(x)
+        x => new ComponentPartOfEdge(x),
+        queryContext
         )
 {
     [UseUserManager]

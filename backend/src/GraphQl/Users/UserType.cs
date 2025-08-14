@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
@@ -13,10 +13,13 @@ using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Entities;
+using Metabase.GraphQl.InstitutionRepresentatives;
+using Metabase.GraphQl.Extensions;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using UserRole = Metabase.Enumerations.UserRole;
+using Metabase.GraphQl.UserMethodDevelopers;
 
 namespace Metabase.GraphQl.Users;
 
@@ -235,10 +238,12 @@ public sealed class UserType
             .Argument(nameof(UserMethodDeveloper.Pending).FirstCharToLower(),
                 _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<UserDevelopedMethodConnection>>>()
+            .UseFiltering<UserDevelopedMethodFilterType>()
             .Resolve(context =>
                 new UserDevelopedMethodConnection(
                     context.Parent<User>(),
-                    context.ArgumentValue<bool>(nameof(UserMethodDeveloper.Pending).FirstCharToLower())
+                    context.ArgumentValue<bool>(nameof(UserMethodDeveloper.Pending).FirstCharToLower()),
+                    context.GetQueryContext<UserMethodDeveloper>()
                 )
             );
         descriptor
@@ -246,10 +251,12 @@ public sealed class UserType
             .Argument(nameof(InstitutionRepresentative.Pending).FirstCharToLower(),
                 _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<UserRepresentedInstitutionConnection>>>()
+            .UseFiltering<UserRepresentedInstitutionFilterType>()
             .Resolve(context =>
                 new UserRepresentedInstitutionConnection(
                     context.Parent<User>(),
-                    context.ArgumentValue<bool>(nameof(InstitutionRepresentative.Pending).FirstCharToLower())
+                    context.ArgumentValue<bool>(nameof(InstitutionRepresentative.Pending).FirstCharToLower()),
+                    context.GetQueryContext<InstitutionRepresentative>()
                 )
             );
     }

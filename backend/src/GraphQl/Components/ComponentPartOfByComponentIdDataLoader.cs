@@ -15,10 +15,10 @@ public sealed class ComponentPartOfByComponentIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.ComponentAssemblies.AsNoTracking().Where(x =>
                     ids.Contains(x.PartComponentId)
-                ),
+                ).With(queryContext),
         x => x.PartComponentId
         )
 {

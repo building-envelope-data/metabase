@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using GreenDonut;
+using GreenDonut.Data;
 using Metabase.Data;
 
 namespace Metabase.GraphQl;
@@ -11,13 +12,15 @@ public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociation
     TOtherAssociationsByAssociateIdDataLoader, TEdge>(
     TSubject subject,
     bool useFirstDataLoader,
-    Func<TAssociation, TEdge> createEdge
+    Func<TAssociation, TEdge> createEdge,
+    QueryContext<TAssociation>? queryContext
     )
     where TSubject : IEntity
     where TSomeAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
     where TOtherAssociationsByAssociateIdDataLoader : IDataLoader<Guid, TAssociation[]>
 {
     private readonly Func<TAssociation, TEdge> _createEdge = createEdge;
+    private readonly QueryContext<TAssociation>? _queryContext = queryContext;
     private readonly bool _useFirstDataLoader = useFirstDataLoader;
 
     protected TSubject Subject { get; } = subject;
@@ -39,7 +42,7 @@ public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociation
     )
         where TDataLoader : IDataLoader<Guid, TAssociation[]>
     {
-        foreach (var association in await dataLoader.LoadAsync(Subject.Id, cancellationToken) ?? [])
+        foreach (var association in await dataLoader.With(_queryContext).LoadAsync(Subject.Id, cancellationToken) ?? [])
         {
             yield return _createEdge(association);
         }

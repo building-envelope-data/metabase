@@ -13,6 +13,5 @@ public sealed class InstitutionMethodDeveloperSortType
         descriptor.BindFieldsExplicitly();
         descriptor.Field(x => x.Method);
         descriptor.Field(x => x.Institution);
-        descriptor.Field(x => x.Pending);
     }
 }

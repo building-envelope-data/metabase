@@ -15,10 +15,10 @@ public sealed class PendingUserRepresentedInstitutionsByUserIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.InstitutionRepresentatives.AsNoTracking().Where(x =>
                     x.Pending && ids.Contains(x.UserId)
-                ),
+                ).With(queryContext),
         x => x.UserId
         )
 {

@@ -7,8 +7,8 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Entities;
+using Metabase.GraphQl.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
@@ -44,10 +44,12 @@ public sealed class ComponentType
             .Argument(nameof(ComponentManufacturer.Pending).FirstCharToLower(),
                 _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<ComponentManufacturerConnection>>>()
+            .UseFiltering<ComponentManufacturerFilterType>()
             .Resolve(context =>
                 new ComponentManufacturerConnection(
                     context.Parent<Component>(),
-                    context.ArgumentValue<bool>(nameof(ComponentManufacturer.Pending).FirstCharToLower())
+                    context.ArgumentValue<bool>(nameof(ComponentManufacturer.Pending).FirstCharToLower()),
+                    context.GetQueryContext<ComponentManufacturer>()
                 )
             );
         descriptor
@@ -56,9 +58,11 @@ public sealed class ComponentType
             .Field(t => t.Parts)
             .Name("assembledOf")
             .Type<NonNullType<ObjectType<ComponentAssembledOfConnection>>>()
+            .UseFiltering<ComponentAssembledOfFilterType>()
             .Resolve(context =>
                 new ComponentAssembledOfConnection(
-                    context.Parent<Component>()
+                    context.Parent<Component>(),
+                    context.GetQueryContext<ComponentAssembly>()
                 )
             );
         descriptor
@@ -66,9 +70,11 @@ public sealed class ComponentType
         descriptor
             .Field(t => t.PartOf)
             .Type<NonNullType<ObjectType<ComponentPartOfConnection>>>()
+            .UseFiltering<ComponentPartOfFilterType>()
             .Resolve(context =>
                 new ComponentPartOfConnection(
-                    context.Parent<Component>()
+                    context.Parent<Component>(),
+                    context.GetQueryContext<ComponentAssembly>()
                 )
             );
         descriptor
@@ -77,9 +83,11 @@ public sealed class ComponentType
             .Field(t => t.Generalizations)
             .Name("concretizationOf")
             .Type<NonNullType<ObjectType<ComponentConcretizationOfConnection>>>()
+            .UseFiltering<ComponentConcretizationOfFilterType>()
             .Resolve(context =>
                 new ComponentConcretizationOfConnection(
-                    context.Parent<Component>()
+                    context.Parent<Component>(),
+                    context.GetQueryContext<ComponentConcretizationAndGeneralization>()
                 )
             );
         descriptor
@@ -89,9 +97,11 @@ public sealed class ComponentType
             .Field(t => t.Concretizations)
             .Name("generalizationOf")
             .Type<NonNullType<ObjectType<ComponentGeneralizationOfConnection>>>()
+            .UseFiltering<ComponentGeneralizationOfFilterType>()
             .Resolve(context =>
                 new ComponentGeneralizationOfConnection(
-                    context.Parent<Component>()
+                    context.Parent<Component>(),
+                    context.GetQueryContext<ComponentConcretizationAndGeneralization>()
                 )
             );
         descriptor
@@ -105,9 +115,11 @@ public sealed class ComponentType
         descriptor
             .Field(t => t.VariantOf)
             .Type<NonNullType<ObjectType<ComponentVariantOfConnection>>>()
+            .UseFiltering<ComponentVariantOfFilterType>()
             .Resolve(context =>
                 new ComponentVariantOfConnection(
-                    context.Parent<Component>()
+                    context.Parent<Component>(),
+                    context.GetQueryContext<ComponentVariant>()
                 )
             );
         descriptor

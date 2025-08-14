@@ -1,5 +1,6 @@
 using System.Linq;
 using GreenDonut;
+using GreenDonut.Data;
 using Metabase.Data;
 using Metabase.GraphQl.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +16,10 @@ public sealed class UserRepresentedInstitutionsByUserIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.InstitutionRepresentatives.AsNoTracking().Where(x =>
                     !x.Pending && ids.Contains(x.UserId)
-                ),
+                ).With(queryContext),
         x => x.UserId
         )
 {

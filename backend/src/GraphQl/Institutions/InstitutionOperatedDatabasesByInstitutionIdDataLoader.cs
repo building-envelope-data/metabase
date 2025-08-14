@@ -15,10 +15,10 @@ public sealed class InstitutionOperatedDatabasesByInstitutionIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.Databases.AsNoTracking().Where(x =>
                     ids.Contains(x.OperatorId)
-                ),
+                ).With(queryContext),
         x => x.OperatorId
         )
 {

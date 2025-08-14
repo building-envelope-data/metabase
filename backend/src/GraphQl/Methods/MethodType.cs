@@ -7,8 +7,8 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Entities;
+using Metabase.GraphQl.Extensions;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Methods;
 
@@ -42,10 +42,12 @@ public sealed class MethodType
             .Argument(nameof(IMethodDeveloper.Pending).FirstCharToLower(),
                 _ => _.Type<NonNullType<BooleanType>>().DefaultValue(false))
             .Type<NonNullType<ObjectType<MethodDeveloperConnection>>>()
+            .UseFiltering<MethodDeveloperFilterType>()
             .Resolve(context =>
                 new MethodDeveloperConnection(
                     context.Parent<Method>(),
-                    context.ArgumentValue<bool?>(nameof(IMethodDeveloper.Pending).FirstCharToLower()) ?? false
+                    context.ArgumentValue<bool?>(nameof(IMethodDeveloper.Pending).FirstCharToLower()) ?? false,
+                    context.GetQueryContext<IMethodDeveloper>()
                 )
             );
         descriptor

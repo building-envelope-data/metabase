@@ -15,10 +15,10 @@ public sealed class InstitutionManagedMethodsByInstitutionIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.Methods.AsNoTracking().Where(x =>
                     ids.Contains(x.ManagerId)
-                ),
+                ).With(queryContext),
         x => x.ManagerId
         )
 {

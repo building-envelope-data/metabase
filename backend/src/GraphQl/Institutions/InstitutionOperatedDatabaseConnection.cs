@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -9,12 +10,14 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Institutions;
 
 public sealed class InstitutionOperatedDatabaseConnection(
-    Institution institution
+    Institution institution,
+    QueryContext<Database> queryContext
     )
         : Connection<Institution, Database, InstitutionOperatedDatabasesByInstitutionIdDataLoader,
         InstitutionOperatedDatabaseEdge>(
         institution,
-        x => new InstitutionOperatedDatabaseEdge(x)
+        x => new InstitutionOperatedDatabaseEdge(x),
+        queryContext
         )
 {
     [UseUserManager]

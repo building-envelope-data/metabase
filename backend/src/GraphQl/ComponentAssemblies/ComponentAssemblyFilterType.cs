@@ -3,7 +3,7 @@ using Metabase.Data;
 
 namespace Metabase.GraphQl.ComponentAssemblies;
 
-public sealed class ComponentAssemblyFilterType
+public abstract class ComponentAssemblyFilterType
     : FilterInputType<ComponentAssembly>
 {
     protected override void Configure(

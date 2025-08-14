@@ -15,10 +15,10 @@ public sealed class PendingComponentManufacturersByComponentIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.ComponentManufacturers.AsNoTracking().Where(x =>
                     x.Pending && ids.Contains(x.ComponentId)
-                ),
+                ).With(queryContext),
         x => x.ComponentId
         )
 {

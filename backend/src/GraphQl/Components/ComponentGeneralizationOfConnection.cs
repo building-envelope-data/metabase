@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -9,12 +10,14 @@ using Microsoft.AspNetCore.Identity;
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentGeneralizationOfConnection(
-    Component subject
+    Component subject,
+    QueryContext<ComponentConcretizationAndGeneralization> queryContext
     )
         : Connection<Component, ComponentConcretizationAndGeneralization,
         ComponentConcretizationsByComponentIdDataLoader, ComponentGeneralizationOfEdge>(
         subject,
-        x => new ComponentGeneralizationOfEdge(x)
+        x => new ComponentGeneralizationOfEdge(x),
+        queryContext
         )
 {
     [UseUserManager]

@@ -14,6 +14,5 @@ public sealed class InstitutionRepresentativeSortType
         descriptor.Field(x => x.Institution);
         descriptor.Field(x => x.User);
         descriptor.Field(x => x.Role);
-        descriptor.Field(x => x.Pending);
     }
 }

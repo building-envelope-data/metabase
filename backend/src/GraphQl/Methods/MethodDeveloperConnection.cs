@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
@@ -11,11 +12,13 @@ namespace Metabase.GraphQl.Methods;
 
 public sealed class MethodDeveloperConnection(
     Method subject,
-    bool pending
+    bool pending,
+    QueryContext<IMethodDeveloper> queryContext
     )
 {
     private readonly bool _pending = pending;
     private readonly Method _subject = subject;
+    private readonly QueryContext<IMethodDeveloper> _queryContext = queryContext;
 
     public async IAsyncEnumerable<MethodDeveloperEdge> GetEdgesAsync(
         InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
@@ -25,7 +28,7 @@ public sealed class MethodDeveloperConnection(
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        await foreach (var edge in new InstitutionMethodDeveloperConnection(_subject, _pending)
+        await foreach (var edge in new InstitutionMethodDeveloperConnection(_subject, _pending, _queryContext)
             .GetEdgesAsync(
                 pendingInstitutionMethodDevelopersDataLoader,
                 institutionMethodDevelopersDataLoader,
@@ -35,7 +38,7 @@ public sealed class MethodDeveloperConnection(
         {
             yield return new MethodDeveloperEdge(edge);
         }
-        await foreach (var edge in new UserMethodDeveloperConnection(_subject, _pending)
+        await foreach (var edge in new UserMethodDeveloperConnection(_subject, _pending, _queryContext)
             .GetEdgesAsync(
                 pendingUserMethodDevelopersDataLoader,
                 userMethodDevelopersDataLoader,
@@ -78,27 +81,31 @@ public sealed class MethodDeveloperConnection(
 
 internal sealed class InstitutionMethodDeveloperConnection(
     Method subject,
-    bool pending
+    bool pending,
+    QueryContext<IMethodDeveloper> queryContext
     )
         : ForkingConnection<Method, InstitutionMethodDeveloper,
         PendingInstitutionMethodDevelopersByMethodIdDataLoader, InstitutionMethodDevelopersByMethodIdDataLoader,
         InstitutionMethodDeveloperEdge>(
         subject,
         pending,
-        x => new InstitutionMethodDeveloperEdge(x)
+        x => new InstitutionMethodDeveloperEdge(x),
+        null // TODO pass query context
         )
 {
 }
 
 internal sealed class UserMethodDeveloperConnection(
     Method subject,
-    bool pending
+    bool pending,
+    QueryContext<IMethodDeveloper> queryContext
     )
         : ForkingConnection<Method, UserMethodDeveloper, PendingUserMethodDevelopersByMethodIdDataLoader,
         UserMethodDevelopersByMethodIdDataLoader, UserMethodDeveloperEdge>(
         subject,
         pending,
-        x => new UserMethodDeveloperEdge(x)
+        x => new UserMethodDeveloperEdge(x),
+        null // TODO pass query context
         )
 {
 }

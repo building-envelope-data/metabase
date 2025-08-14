@@ -15,10 +15,10 @@ public sealed class InstitutionDevelopedMethodsByInstitutionIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.InstitutionMethodDevelopers.AsNoTracking().Where(x =>
                     !x.Pending && ids.Contains(x.InstitutionId)
-                ),
+                ).With(queryContext),
         x => x.InstitutionId
         )
 {

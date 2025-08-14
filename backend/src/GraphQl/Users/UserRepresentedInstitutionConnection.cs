@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 
@@ -8,15 +9,21 @@ namespace Metabase.GraphQl.Users;
 
 public sealed class UserRepresentedInstitutionConnection(
     User subject,
-    bool pending
+    bool pending,
+    QueryContext<InstitutionRepresentative> queryContext
+)
+: ForkingConnection<
+    User,
+    InstitutionRepresentative,
+    PendingUserRepresentedInstitutionsByUserIdDataLoader,
+    UserRepresentedInstitutionsByUserIdDataLoader,
+    UserRepresentedInstitutionEdge
+>(
+    subject,
+    pending,
+    x => new UserRepresentedInstitutionEdge(x),
+    queryContext
     )
-        : ForkingConnection<User, InstitutionRepresentative,
-        PendingUserRepresentedInstitutionsByUserIdDataLoader, UserRepresentedInstitutionsByUserIdDataLoader,
-        UserRepresentedInstitutionEdge>(
-        subject,
-        pending,
-        x => new UserRepresentedInstitutionEdge(x)
-        )
 {
     [UseUserManager]
     public Task<bool> CanCurrentUserConfirmEdgeAsync(

@@ -4,7 +4,7 @@ using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.DataFormats;
 
-public sealed class DataFormatFilterType
+public class DataFormatFilterType
     : EntityFilterType<DataFormat>
 {
     protected override void Configure(

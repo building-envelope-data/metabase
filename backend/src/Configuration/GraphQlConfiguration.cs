@@ -1,14 +1,11 @@
 using System;
-using System.Linq.Expressions;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
-using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Data.Sorting;
 using HotChocolate.Execution;
 using HotChocolate.Language;
 using HotChocolate.Types;
-using HotChocolate.Utilities;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl;
@@ -42,11 +39,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Configuration;
 
 public static class GraphQlConfiguration
 {
+    public const string FilterInputSuffix = "FilterInput";
+
     public static void ConfigureServices(
         IServiceCollection services,
         IWebHostEnvironment environment
@@ -67,6 +67,7 @@ public static class GraphQlConfiguration
             .AddProjections()
             .AddFiltering<CustomFilterConvention>()
             .AddSorting<CustomSortConvention>()
+            .AddQueryContext()
             .AddAuthorization()
             .AddGlobalObjectIdentification()
             .AddQueryFieldToMutationPayloads()
@@ -362,17 +363,15 @@ public partial class CustomFilterConvention : FilterConvention
         descriptor.AllowOr();
         // Bind custom types
         descriptor.BindRuntimeType<Component, ComponentFilterType>();
-        descriptor.BindRuntimeType<ComponentAssembly, ComponentAssemblyFilterType>();
-        descriptor.BindRuntimeType<ComponentManufacturer, ComponentManufacturerFilterType>();
+        descriptor.BindRuntimeType<Data.OpenIdConnect.OpenIdConnectAuthorization, OpenIdConnectAuthorizationFilterType>();
         descriptor.BindRuntimeType<DataFormat, DataFormatFilterType>();
         descriptor.BindRuntimeType<Database, DatabaseFilterType>();
         descriptor.BindRuntimeType<DescriptionOrReference, DescriptionOrReferenceFilterType>();
         descriptor.BindRuntimeType<Institution, InstitutionFilterType>();
-        descriptor.BindRuntimeType<InstitutionMethodDeveloper, InstitutionMethodDeveloperFilterType>();
-        descriptor.BindRuntimeType<InstitutionRepresentative, InstitutionRepresentativeFilterType>();
         descriptor.BindRuntimeType<Method, MethodFilterType>();
+        descriptor.BindRuntimeType<OpenIdConnectApplication, OpenIdConnectApplicationFilterType>();
+        descriptor.BindRuntimeType<OpenIdConnectToken, OpenIdConnectTokenFilterType>();
         descriptor.BindRuntimeType<User, UserFilterType>();
-        descriptor.BindRuntimeType<UserMethodDeveloper, UserMethodDeveloperFilterType>();
         // descriptor.BindRuntimeType<JsonElement, JsonElementFilterType>();
         // descriptor.Operation(CustomFilterOperations.InClosedInterval).Name("inClosedInterval");
         // descriptor.AddProviderExtension(

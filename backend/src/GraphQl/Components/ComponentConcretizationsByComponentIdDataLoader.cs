@@ -15,10 +15,10 @@ public sealed class ComponentConcretizationsByComponentIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.ComponentConcretizationAndGeneralizations.AsNoTracking().Where(x =>
                     ids.Contains(x.GeneralComponentId)
-                ),
+                ).With(queryContext),
         x => x.GeneralComponentId
         )
 {

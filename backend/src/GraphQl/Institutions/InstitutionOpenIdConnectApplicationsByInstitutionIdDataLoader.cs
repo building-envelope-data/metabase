@@ -15,10 +15,10 @@ public sealed class InstitutionOpenIdConnectApplicationsByInstitutionIdDataLoade
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.InstitutionOpenIdConnectApplications.AsNoTracking().Where(x =>
                     ids.Contains(x.InstitutionId)
-                ),
+                ).With(queryContext),
         x => x.InstitutionId
         )
 {

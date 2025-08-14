@@ -15,10 +15,10 @@ public sealed class ComponentVariantOfByComponentIdDataLoader(
         batchScheduler,
         options,
         dbContextFactory,
-        (dbContext, ids) =>
+        (dbContext, ids, queryContext) =>
                 dbContext.ComponentVariants.AsNoTracking().Where(x =>
                     ids.Contains(x.ToComponentId)
-                ),
+                ).With(queryContext),
         x => x.ToComponentId
         )
 {

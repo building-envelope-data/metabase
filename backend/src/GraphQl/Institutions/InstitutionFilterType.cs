@@ -4,7 +4,7 @@ using Metabase.GraphQl.Entities;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionFilterType
+public class InstitutionFilterType
     : EntityFilterType<Institution>
 {
     protected override void Configure(

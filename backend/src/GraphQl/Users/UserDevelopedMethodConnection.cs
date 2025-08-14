@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 
@@ -8,13 +9,15 @@ namespace Metabase.GraphQl.Users;
 
 public sealed class UserDevelopedMethodConnection(
     User subject,
-    bool pending
+    bool pending,
+    QueryContext<UserMethodDeveloper> queryContext
     )
         : ForkingConnection<User, UserMethodDeveloper, PendingUserDevelopedMethodsByUserIdDataLoader,
         UserDevelopedMethodsByUserIdDataLoader, UserDevelopedMethodEdge>(
         subject,
         pending,
-        x => new UserDevelopedMethodEdge(x)
+        x => new UserDevelopedMethodEdge(x),
+        queryContext
         )
 {
     [UseUserManager]

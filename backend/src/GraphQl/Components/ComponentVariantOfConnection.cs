@@ -1,20 +1,22 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut.Data;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace Metabase.GraphQl.Components;
 
 public sealed class ComponentVariantOfConnection(
-    Component subject
+    Component subject,
+    QueryContext<ComponentVariant> queryContext
     )
         : Connection<Component, ComponentVariant, ComponentVariantOfByComponentIdDataLoader,
         ComponentVariantOfEdge>(
         subject,
-        x => new ComponentVariantOfEdge(x)
+        x => new ComponentVariantOfEdge(x),
+        queryContext
         )
 {
     [UseUserManager]
