@@ -192,7 +192,7 @@ public sealed class LoggingDiagnosticEventListener(
                 StringBuilder stringBuilder = new(_context.Document.ToString(true));
                 stringBuilder.AppendLine();
 
-                if (_context.Variables != null)
+                if (_context.Variables is not null)
                 {
                     var variablesConcrete = _context.Variables!.ToList();
                     if (variablesConcrete.Count > 0)

@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using OpenIddict.Core;
 using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
-using System.Collections.Generic;
 
 namespace Metabase.Authorization;
 
@@ -55,10 +54,10 @@ public sealed class OpenIdConnectAuthorization(
             claimsPrincipal,
             async user =>
             {
-                var institutionIds = GetInstitutionIdsByApplicationId(applicationId);
-                return await IsOwnerOfAtLeastOneInstitution(user, institutionIds, cancellationToken);
+                var application = await ApplicationManager.FindByIdAsync(applicationId.ToString());
+                return application is not null && await IsOwnerOfInstitution(user, application.OwnerId, cancellationToken);
             },
-            application => BelongsToAtLeastOneInstitutionOfApplication(application, applicationId, cancellationToken),
+            application => BelongsToApplicationOwner(application, applicationId, cancellationToken),
             cancellationToken
         );
     }
@@ -119,49 +118,18 @@ public sealed class OpenIdConnectAuthorization(
             && await IsAuthorizedToManageApplication(claimsPrincipal, token.Application.Id, cancellationToken);
     }
 
-    private async IAsyncEnumerable<Guid> GetInstitutionIdsByApplicationId(
-        Guid applicationId
-    )
-    {
-        await foreach (
-            var x in Context.InstitutionOpenIdConnectApplications.AsNoTracking()
-                .Where(x => x.ApplicationId == applicationId)
-                .Select(x => new { x.InstitutionId })
-                .ToAsyncEnumerable()
-        )
-        {
-            yield return x.InstitutionId;
-        }
-    }
-
-    private async Task<bool> IsOwnerOfAtLeastOneInstitution(
-        User user,
-        IAsyncEnumerable<Guid> institutionIds,
-        CancellationToken cancellationToken
-    )
-    {
-        await foreach (var institutionId in institutionIds)
-        {
-            if (await IsOwnerOfInstitution(user, institutionId, cancellationToken))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Task<bool> BelongsToAtLeastOneInstitutionOfApplication(
+    private Task<bool> BelongsToApplicationOwner(
         OpenIdConnectApplication application,
         Guid applicationId,
         CancellationToken cancellationToken
     )
     {
-        return Context.InstitutionOpenIdConnectApplications.AsNoTracking()
-            .Where(a => a.ApplicationId == applicationId)
+        return Context.OpenIdConnectApplications.AsNoTracking()
+            .Where(a => a.Id == applicationId)
             .Where(a =>
-                a.Institution.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
-                || a.Institution.Manager != null && a.Institution.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
-                || a.Institution.Manager != null && a.Institution.Manager.Manager != null && a.Institution.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                a.Owner.OpenIdConnectApplications.Any(e => e.Id == application.Id)
+                || a.Owner.Manager != null && a.Owner.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
+                || a.Owner.Manager != null && a.Owner.Manager.Manager != null && a.Owner.Manager.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
             )
             .AnyAsync(cancellationToken);
     }

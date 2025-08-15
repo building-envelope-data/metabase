@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using OpenIddict.EntityFrameworkCore.Models;
 
 namespace Metabase.Data.OpenIdConnect;
@@ -9,9 +9,10 @@ public sealed class OpenIdConnectApplication
     : OpenIddictEntityFrameworkCoreApplication<Guid, OpenIdConnectAuthorization, OpenIdConnectToken>,
       IEntity
 {
-    public ICollection<InstitutionOpenIdConnectApplication> InstitutionEdges { get; } = [];
+    public Guid OwnerId { get; set; }
 
-    public ICollection<Institution> Institutions { get; } = [];
+    [InverseProperty(nameof(Institution.OpenIdConnectApplications))]
+    public Institution Owner { get; set; } = null!;
 
     [Timestamp]
     public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html

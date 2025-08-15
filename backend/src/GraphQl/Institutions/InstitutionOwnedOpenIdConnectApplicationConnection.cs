@@ -2,25 +2,25 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GreenDonut.Data;
-using Metabase.Authorization;
 using Metabase.Data;
+using Metabase.Data.OpenIdConnect;
 using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionOpenIdConnectApplicationConnection(
+public sealed class InstitutionOwnedOpenIdConnectApplicationConnection(
     Institution institution,
-    QueryContext<InstitutionOpenIdConnectApplication> queryContext
+    QueryContext<OpenIdConnectApplication> queryContext
 ) : AuthorizedConnection<
         Institution,
-        InstitutionOpenIdConnectApplication,
-        InstitutionOpenIdConnectApplicationsByInstitutionIdDataLoader,
-        InstitutionOpenIdConnectApplicationEdge,
-        OpenIdConnectAuthorization
+        OpenIdConnectApplication,
+        InstitutionOwnedOpenIdConnectApplicationsByInstitutionIdDataLoader,
+        InstitutionOwnedOpenIdConnectApplicationEdge,
+        Authorization.OpenIdConnectAuthorization
     >
 (
     institution,
-    x => new InstitutionOpenIdConnectApplicationEdge(x),
+    x => new InstitutionOwnedOpenIdConnectApplicationEdge(x),
     (claimsPrincipal, institution, authorization, cancellationToken) =>
         authorization.IsAuthorizedToManageApplications(claimsPrincipal, institution.Id, cancellationToken),
     queryContext
@@ -29,7 +29,7 @@ public sealed class InstitutionOpenIdConnectApplicationConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        OpenIdConnectAuthorization authorization,
+        Authorization.OpenIdConnectAuthorization authorization,
         CancellationToken cancellationToken
     )
     {
@@ -43,7 +43,7 @@ public sealed class InstitutionOpenIdConnectApplicationConnection(
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
-        OpenIdConnectAuthorization authorization,
+        Authorization.OpenIdConnectAuthorization authorization,
         CancellationToken cancellationToken
     )
     {

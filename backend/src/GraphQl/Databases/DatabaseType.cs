@@ -25,7 +25,8 @@ public sealed class DatabaseType
                 )
             );
         descriptor
-            .Field(t => t.OperatorId).Ignore();
+            .Field(t => t.OperatorId)
+            .Ignore();
         ConfigureDataField(
             descriptor,
             "opticalData",

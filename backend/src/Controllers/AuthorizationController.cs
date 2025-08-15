@@ -167,8 +167,8 @@ public sealed class AuthorizationController(
         //  - If a max_age parameter was provided and the authentication cookie is not considered "fresh" enough.
         var result = await AuthenticateAsync(AuthConfiguration.IdentityConstantsApplicationScheme);
         if (result?.Succeeded != true || (
-                request.MaxAge != null
-                && result.Properties?.IssuedUtc != null
+                request.MaxAge is not null
+                && result.Properties?.IssuedUtc is not null
                 && DateTimeOffset.UtcNow - result.Properties.IssuedUtc > TimeSpan.FromSeconds(request.MaxAge.Value)
             )
            )

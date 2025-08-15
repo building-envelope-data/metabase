@@ -3,7 +3,7 @@ using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.GraphQl.OpenIdConnect.Applications;
 
-public sealed class OpenIdConnectApplicationFilterType
+public class OpenIdConnectApplicationFilterType
     : FilterInputType<OpenIdConnectApplication>
 {
     protected override void Configure(

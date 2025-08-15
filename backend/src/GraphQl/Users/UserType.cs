@@ -284,7 +284,7 @@ public sealed class UserType
             }
 
             return new TwoFactorAuthentication(
-                await userManager.GetAuthenticatorKeyAsync(user) != null,
+                await userManager.GetAuthenticatorKeyAsync(user) is not null,
                 await userManager.GetTwoFactorEnabledAsync(user),
                 await signInManager.IsTwoFactorClientRememberedAsync(user),
                 await userManager.CountRecoveryCodesAsync(user)

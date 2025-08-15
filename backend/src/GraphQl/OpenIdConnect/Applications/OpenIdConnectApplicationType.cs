@@ -191,17 +191,17 @@ public sealed class OpenIdConnectApplicationType
             .Name("postLogoutRedirectUri")
             .Type<UrlType>()
             .Resolve(context => ExtractUri(context.Parent<OpenIdConnectApplication>().PostLogoutRedirectUris));
-        descriptor.Field(application => application.InstitutionEdges).Ignore();
         descriptor
-            .Field(application => application.Institutions)
-            .Type<NonNullType<ObjectType<OpenIdConnectApplicationInstitutionConnection>>>()
-            .UseFiltering<InstitutionOpenIdConnectApplicationFilterType>()
+            .Field(application => application.Owner)
+            .Type<NonNullType<ObjectType<OpenIdConnectApplicationOwnerEdge>>>()
             .Resolve(context =>
-                new OpenIdConnectApplicationInstitutionConnection(
-                    context.Parent<OpenIdConnectApplication>(),
-                    context.GetQueryContext<InstitutionOpenIdConnectApplication>()
+                new OpenIdConnectApplicationOwnerEdge(
+                    context.Parent<OpenIdConnectApplication>()
                 )
             );
+        descriptor
+            .Field(application => application.OwnerId)
+            .Ignore();
         descriptor
             .Field(application => application.Authorizations)
             .Type<NonNullType<ObjectType<OpenIdConnectApplicationAuthorizationConnection>>>()

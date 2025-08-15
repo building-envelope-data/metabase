@@ -451,13 +451,9 @@ public sealed class DbSeeder
                     }
                 );
                 var application = await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId).AsTask();
-                if (application != null)
+                if (application is not null)
                 {
-                    iseInstitution.OpenIdConnectApplicationEdges.Add(
-                        new InstitutionOpenIdConnectApplication
-                        {
-                            ApplicationId = application.Id
-                        });
+                    iseInstitution.OpenIdConnectApplications.Add(application);
                 }
                 context.Institutions.Add(iseInstitution);
                 await context.SaveChangesAsync();
@@ -479,13 +475,9 @@ public sealed class DbSeeder
                 };
 
                 var application = await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId).AsTask();
-                if (application != null)
+                if (application is not null)
                 {
-                    institution.OpenIdConnectApplicationEdges.Add(
-                        new InstitutionOpenIdConnectApplication
-                        {
-                            ApplicationId = application.Id
-                        });
+                    institution.OpenIdConnectApplications.Add(application);
                 }
                 context.Institutions.Add(institution);
                 await context.SaveChangesAsync();

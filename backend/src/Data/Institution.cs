@@ -108,8 +108,7 @@ public sealed class Institution
 
     public ICollection<User> Representatives { get; } = [];
 
-    public ICollection<InstitutionOpenIdConnectApplication> OpenIdConnectApplicationEdges { get; } = [];
-
+    [InverseProperty(nameof(OpenIdConnectApplication.Owner))]
     public ICollection<OpenIdConnectApplication> OpenIdConnectApplications { get; } = [];
 
     [Required][MinLength(1)] public string Name { get; private set; }

@@ -1,21 +1,16 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Metabase.Data.OpenIdConnect;
-using Metabase.GraphQl.OpenIdConnect.Applications;
 using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Institutions;
 
-public sealed class InstitutionOpenIdConnectApplicationEdge(
-    InstitutionOpenIdConnectApplication association
-) : Edge<OpenIdConnectApplication, OpenIdConnectApplicationByIdDataLoader>
-(
-    association.ApplicationId
-)
+public sealed class InstitutionOwnedOpenIdConnectApplicationEdge(
+    OpenIdConnectApplication node
+    )
 {
-    private readonly InstitutionOpenIdConnectApplication _association = association;
+    public OpenIdConnectApplication Node { get; } = node;
 
     [UseUserManager]
     public Task<bool> CanCurrentUserRemoveEdgeAsync(
@@ -26,7 +21,7 @@ public sealed class InstitutionOpenIdConnectApplicationEdge(
     {
         return authorization.IsAuthorizedToManageApplications(
             claimsPrincipal,
-            _association.InstitutionId,
+            Node.OwnerId,
             cancellationToken
         );
     }

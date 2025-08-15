@@ -14,6 +14,7 @@ using Metabase.GraphQl.Extensions;
 using Metabase.GraphQl.DataFormats;
 using Metabase.GraphQl.InstitutionMethodDevelopers;
 using Metabase.GraphQl.OpenIdConnect.Applications;
+using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.GraphQl.Institutions;
 
@@ -131,17 +132,14 @@ public sealed class InstitutionType
             .Ignore();
         descriptor
             .Field(t => t.OpenIdConnectApplications)
-            .Type<NonNullType<ObjectType<InstitutionOpenIdConnectApplicationConnection>>>()
-            .UseFiltering<InstitutionOpenIdConnectApplicationFilterType>()
+            .Type<NonNullType<ObjectType<InstitutionOwnedOpenIdConnectApplicationConnection>>>()
+            .UseFiltering<InstitutionOwnedOpenIdConnectApplicationFilterType>()
             .Resolve(context =>
-                new InstitutionOpenIdConnectApplicationConnection(
+                new InstitutionOwnedOpenIdConnectApplicationConnection(
                     context.Parent<Institution>(),
-                    context.GetQueryContext<InstitutionOpenIdConnectApplication>()
+                    context.GetQueryContext<OpenIdConnectApplication>()
                 )
             );
-        descriptor
-            .Field(t => t.OpenIdConnectApplicationEdges)
-            .Ignore();
         descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<InstitutionResolvers>(x =>

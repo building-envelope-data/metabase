@@ -70,7 +70,7 @@ public sealed class OpenIdConnectApplicationMutations
         var descriptor = new OpenIddictApplicationDescriptor
         {
             ClientId = input.ClientId,
-            ClientSecret = clientSecret,
+            ClientSecret = null,
             DisplayName = input.DisplayName,
             ConsentType = input.ConsentType.ToStringConsentType(),
             Permissions = { },
@@ -93,15 +93,12 @@ public sealed class OpenIdConnectApplicationMutations
         {
             descriptor.PostLogoutRedirectUris.Add(input.PostLogoutRedirectUri);
         }
-        var application = await applicationManager.CreateAsync(descriptor, cancellationToken);
-        context.InstitutionOpenIdConnectApplications.Add(
-            new InstitutionOpenIdConnectApplication
-            {
-                ApplicationId = application.Id,
-                InstitutionId = input.InstitutionId,
-            }
-        );
-        await context.SaveChangesAsync(cancellationToken);
+        var application = new OpenIdConnectApplication
+        {
+            OwnerId = input.InstitutionId
+        };
+        await applicationManager.PopulateAsync(application, descriptor, cancellationToken);
+        await applicationManager.CreateAsync(application, clientSecret, cancellationToken);
         return new CreateOpenIdConnectApplicationPayload(application, clientSecret);
     }
 
@@ -129,9 +126,7 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
-
         var application = await applicationManager.FindByIdAsync(input.ApplicationId.ToString(), cancellationToken);
-
         if (application is null)
         {
             return new UpdateOpenIdConnectApplicationPayload(
@@ -142,12 +137,10 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
-
         var descriptor = new OpenIddictApplicationDescriptor();
         await applicationManager.PopulateAsync(descriptor, application, cancellationToken);
         UpdateOpenIdConnectApplicationDescriptor(input, descriptor);
         await applicationManager.UpdateAsync(application, descriptor, cancellationToken);
-
         return new UpdateOpenIdConnectApplicationPayload(application);
     }
 
@@ -175,9 +168,7 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
-
         var application = await applicationManager.FindByIdAsync(input.ApplicationId.ToString(), cancellationToken);
-
         if (application is null)
         {
             return new DeleteOpenIdConnectApplicationPayload(
@@ -188,9 +179,7 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
-
         await applicationManager.DeleteAsync(application, cancellationToken);
-
         return new DeleteOpenIdConnectApplicationPayload();
     }
 
@@ -211,7 +200,8 @@ public sealed class OpenIdConnectApplicationMutations
         }
         descriptor.Permissions.RemoveWhere(permission =>
         {
-            try {
+            try
+            {
                 permission.ToOpenIdConnectEndpoint();
                 return true;
             }
@@ -222,7 +212,8 @@ public sealed class OpenIdConnectApplicationMutations
         });
         descriptor.Permissions.RemoveWhere(permission =>
         {
-            try {
+            try
+            {
                 permission.ToOpenIdConnectGrantType();
                 return true;
             }
@@ -233,7 +224,8 @@ public sealed class OpenIdConnectApplicationMutations
         });
         descriptor.Permissions.RemoveWhere(permission =>
         {
-            try {
+            try
+            {
                 permission.ToOpenIdConnectResponseType();
                 return true;
             }
@@ -244,7 +236,8 @@ public sealed class OpenIdConnectApplicationMutations
         });
         descriptor.Permissions.RemoveWhere(permission =>
         {
-            try {
+            try
+            {
                 permission.ToOpenIdConnectScope();
                 return true;
             }

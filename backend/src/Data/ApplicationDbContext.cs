@@ -1,4 +1,5 @@
 using System;
+using Metabase.Data.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -52,14 +53,17 @@ public sealed class ApplicationDbContext
     public DbSet<ComponentManufacturer> ComponentManufacturers { get; private set; } = default!;
     public DbSet<ComponentVariant> ComponentVariants { get; private set; } = default!;
     public DbSet<DataFormat> DataFormats { get; private set; } = default!;
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
     public DbSet<Database> Databases { get; private set; } = default!;
     public DbSet<Institution> Institutions { get; private set; } = default!;
     public DbSet<InstitutionMethodDeveloper> InstitutionMethodDevelopers { get; private set; } = default!;
     public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
     public DbSet<Method> Methods { get; private set; } = default!;
+    public DbSet<OpenIdConnectApplication> OpenIdConnectApplications { get; private set; } = default!;
+    public DbSet<OpenIdConnectAuthorization> OpenIdConnectAuthorizations { get; private set; } = default!;
+    public DbSet<OpenIdConnectToken> OpenIdConnectTokens { get; private set; } = default!;
+    public DbSet<OpenIdConnectScope> OpenIdConnectScopes { get; private set; } = default!;
     public DbSet<UserMethodDeveloper> UserMethodDevelopers { get; private set; } = default!;
-    public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
-    public DbSet<InstitutionOpenIdConnectApplication> InstitutionOpenIdConnectApplications { get; private set; } = default!;
 
     // Inspired by https://github.com/openiddict/openiddict-core/issues/1376#issuecomment-1151275376
     // It is needed to fix the following error that occurred when trying to redeem OpenId Connect tokens in production:
@@ -129,11 +133,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.PartComponent)
                     .WithMany(c => c.PartOfEdges)
                     .HasForeignKey(e => e.PartComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.AssembledComponent)
                     .WithMany(c => c.PartEdges)
                     .HasForeignKey(e => e.AssembledComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("component_assembly")
@@ -152,11 +158,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.ConcreteComponent)
                     .WithMany(c => c.GeneralizationEdges)
                     .HasForeignKey(e => e.ConcreteComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.GeneralComponent)
                     .WithMany(c => c.ConcretizationEdges)
                     .HasForeignKey(e => e.GeneralComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("component_concretization_and_generalization")
@@ -175,11 +183,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.ToComponent)
                     .WithMany(c => c.VariantOfEdges)
                     .HasForeignKey(e => e.ToComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.OfComponent)
                     .WithMany(c => c.VariantEdges)
                     .HasForeignKey(e => e.OfComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("component_variant")
@@ -198,11 +208,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.Institution)
                     .WithMany(i => i.ManufacturedComponentEdges)
                     .HasForeignKey(e => e.InstitutionId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.Component)
                     .WithMany(c => c.ManufacturerEdges)
                     .HasForeignKey(e => e.ComponentId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("component_manufacturer")
@@ -220,11 +232,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.Institution)
                     .WithMany(i => i.DevelopedMethodEdges)
                     .HasForeignKey(e => e.InstitutionId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.Method)
                     .WithMany(m => m.InstitutionDeveloperEdges)
                     .HasForeignKey(e => e.MethodId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("institution_method_developer")
@@ -242,11 +256,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.User)
                     .WithMany(u => u.RepresentedInstitutionEdges)
                     .HasForeignKey(e => e.UserId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.Institution)
                     .WithMany(i => i.RepresentativeEdges)
                     .HasForeignKey(e => e.InstitutionId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("institution_representative")
@@ -254,26 +270,14 @@ public sealed class ApplicationDbContext
             );
     }
 
-    private static void ConfigureInstitutionOpenIdConnectApplication(ModelBuilder builder)
+    private static void ConfigureOpenIdConnectApplicationOwner(ModelBuilder builder)
     {
         builder.Entity<Institution>()
             .HasMany(i => i.OpenIdConnectApplications)
-            .WithMany(a => a.Institutions)
-            .UsingEntity<InstitutionOpenIdConnectApplication>(
-                j => j
-                    .HasOne(e => e.Application)
-                    .WithMany(u => u.InstitutionEdges)
-                    .HasForeignKey(e => e.ApplicationId)
-                    .OnDelete(DeleteBehavior.Cascade),
-                j => j
-                    .HasOne(e => e.Institution)
-                    .WithMany(i => i.OpenIdConnectApplicationEdges)
-                    .HasForeignKey(e => e.InstitutionId)
-                    .OnDelete(DeleteBehavior.Cascade),
-                j => j
-                    .ToTable("institution_open_id_connect_application")
-                    .HasKey(a => new { a.InstitutionId, a.ApplicationId })
-            );
+            .WithOne(a => a.Owner)
+            .HasForeignKey(i => i.OwnerId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private static void ConfigureDatabaseOperator(ModelBuilder builder)
@@ -282,6 +286,7 @@ public sealed class ApplicationDbContext
             .HasMany(i => i.OperatedDatabases)
             .WithOne(i => i.Operator)
             .HasForeignKey(i => i.OperatorId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
 
@@ -295,11 +300,13 @@ public sealed class ApplicationDbContext
                     .HasOne(e => e.User)
                     .WithMany(i => i.DevelopedMethodEdges)
                     .HasForeignKey(e => e.UserId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne(e => e.Method)
                     .WithMany(m => m.UserDeveloperEdges)
                     .HasForeignKey(e => e.MethodId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .ToTable("user_method_developer")
@@ -313,6 +320,7 @@ public sealed class ApplicationDbContext
             .HasMany(i => i.ManagedInstitutions)
             .WithOne(i => i.Manager)
             .HasForeignKey(i => i.ManagerId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
     }
 
@@ -322,6 +330,7 @@ public sealed class ApplicationDbContext
             .HasMany(i => i.ManagedDataFormats)
             .WithOne(i => i.Manager)
             .HasForeignKey(i => i.ManagerId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
 
@@ -331,6 +340,7 @@ public sealed class ApplicationDbContext
             .HasMany(i => i.ManagedMethods)
             .WithOne(i => i.Manager)
             .HasForeignKey(i => i.ManagerId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
 
@@ -338,8 +348,7 @@ public sealed class ApplicationDbContext
     {
         base.OnModelCreating(builder);
         builder.HasDefaultSchema(_schemaName);
-        builder.HasPostgresExtension(
-            "pgcrypto"); // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
+        builder.HasPostgresExtension("pgcrypto"); // https://www.npgsql.org/efcore/modeling/generated-properties.html#guiduuid-generation
         ConfigureIdentityEntities(builder);
         ConfigureEntity(
                 builder.Entity<Component>()
@@ -363,7 +372,7 @@ public sealed class ApplicationDbContext
             .ToTable("institution");
         ConfigureInstitutionMethodDeveloper(builder);
         ConfigureInstitutionRepresentative(builder);
-        ConfigureInstitutionOpenIdConnectApplication(builder);
+        ConfigureOpenIdConnectApplicationOwner(builder);
         ConfigureDatabaseOperator(builder);
         ConfigureEntity(
                 builder.Entity<Method>()

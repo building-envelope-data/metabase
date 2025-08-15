@@ -47,9 +47,9 @@ public abstract class CommonMethodAuthorization(
             .Where(method => method.Id == methodId)
             .Where(method => method.Manager != null && method.Manager.State == InstitutionState.VERIFIED)
             .Where(method => method.Manager != null && (
-                method.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
-                || method.Manager.Manager != null && method.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
-                || method.Manager.Manager != null && method.Manager.Manager.Manager != null && method.Manager.Manager.Manager.OpenIdConnectApplicationEdges.Any(e => e.ApplicationId == application.Id)
+                method.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
+                || method.Manager.Manager != null && method.Manager.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
+                || method.Manager.Manager != null && method.Manager.Manager.Manager != null && method.Manager.Manager.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
             ))
             .AnyAsync(cancellationToken);
     }
