@@ -11,7 +11,7 @@ interface Data {
   creatorId: Uuid!
   databaseId: Uuid!
   description: String
-  locale: String!
+  locale: Locale!
   name: String
   resources: [GetHttpsResource!]!
   resourceTree: GetHttpsResourceTree!
@@ -171,8 +171,8 @@ type CalorimetricData implements Data {
   databaseId: Uuid!
   description: String
   gValues: [Float!]!
-  id: String!
-  locale: String!
+  id: ID!
+  locale: Locale!
   name: String
   resources: [GetHttpsResource!]!
   resourceTree: GetHttpsResourceTree!
@@ -550,28 +550,28 @@ type DataFormatsEdge {
 }
 
 type Database implements Node {
-  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: CalorimetricDataPropositionInput): CalorimetricDataConnection @cost(weight: "10")
-  allGeometricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: GeometricDataPropositionInput): GeometricDataConnection @cost(weight: "10")
-  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: HygrothermalDataPropositionInput): HygrothermalDataConnection @cost(weight: "10")
-  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: OpticalDataPropositionInput): OpticalDataConnection @cost(weight: "10")
-  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: String where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection @cost(weight: "10")
-  calorimetricData(id: Uuid! locale: String): CalorimetricData @cost(weight: "10")
+  allCalorimetricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: CalorimetricDataPropositionInput): CalorimetricDataConnection @cost(weight: "10")
+  allGeometricData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: GeometricDataPropositionInput): GeometricDataConnection @cost(weight: "10")
+  allHygrothermalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: HygrothermalDataPropositionInput): HygrothermalDataConnection @cost(weight: "10")
+  allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: OpticalDataPropositionInput): OpticalDataConnection @cost(weight: "10")
+  allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection @cost(weight: "10")
+  calorimetricData(id: Uuid! locale: Locale): CalorimetricData @cost(weight: "10")
   canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   canCurrentUserVerifyNode: Boolean! @cost(weight: "10")
   description: String!
-  geometricData(id: Uuid! locale: String): GeometricData @cost(weight: "10")
-  hasCalorimetricData(locale: String where: CalorimetricDataPropositionInput): Boolean @cost(weight: "10")
-  hasGeometricData(locale: String where: GeometricDataPropositionInput): Boolean @cost(weight: "10")
-  hasHygrothermalData(locale: String where: HygrothermalDataPropositionInput): Boolean @cost(weight: "10")
-  hasOpticalData(locale: String where: OpticalDataPropositionInput): Boolean @cost(weight: "10")
-  hasPhotovoltaicData(locale: String where: PhotovoltaicDataPropositionInput): Boolean @cost(weight: "10")
-  hygrothermalData(id: Uuid! locale: String): HygrothermalData @cost(weight: "10")
+  geometricData(id: Uuid! locale: Locale): GeometricData @cost(weight: "10")
+  hasCalorimetricData(locale: Locale where: CalorimetricDataPropositionInput): Boolean @cost(weight: "10")
+  hasGeometricData(locale: Locale where: GeometricDataPropositionInput): Boolean @cost(weight: "10")
+  hasHygrothermalData(locale: Locale where: HygrothermalDataPropositionInput): Boolean @cost(weight: "10")
+  hasOpticalData(locale: Locale where: OpticalDataPropositionInput): Boolean @cost(weight: "10")
+  hasPhotovoltaicData(locale: Locale where: PhotovoltaicDataPropositionInput): Boolean @cost(weight: "10")
+  hygrothermalData(id: Uuid! locale: Locale): HygrothermalData @cost(weight: "10")
   id: ID!
   locator: Url!
   name: String!
   operator: DatabaseOperatorEdge! @cost(weight: "10")
-  opticalData(id: Uuid! locale: String): OpticalData @cost(weight: "10")
-  photovoltaicData(id: Uuid! locale: String): PhotovoltaicData @cost(weight: "10")
+  opticalData(id: Uuid! locale: Locale): OpticalData @cost(weight: "10")
+  photovoltaicData(id: Uuid! locale: Locale): PhotovoltaicData @cost(weight: "10")
   uuid: Uuid! @cost(weight: "10")
   verificationCode: String!
   verificationState: DatabaseVerificationState!
@@ -756,8 +756,8 @@ type GeometricData implements Data {
   database: Database @cost(weight: "10")
   databaseId: Uuid!
   description: String
-  id: String!
-  locale: String!
+  id: ID!
+  locale: Locale!
   name: String
   resources: [GetHttpsResource!]!
   resourceTree: GetHttpsResourceTree!
@@ -815,8 +815,8 @@ type HygrothermalData implements Data {
   database: Database @cost(weight: "10")
   databaseId: Uuid!
   description: String
-  id: String!
-  locale: String!
+  id: ID!
+  locale: Locale!
   name: String
   resources: [GetHttpsResource!]!
   resourceTree: GetHttpsResourceTree!
@@ -851,7 +851,7 @@ type Institution implements Node {
   manager: InstitutionManagerEdge @cost(weight: "10")
   manufacturedComponents(pending: Boolean! = false where: InstitutionManufacturedComponentFilterInput @cost(weight: "10")): InstitutionManufacturedComponentConnection! @cost(weight: "10")
   name: String!
-  openIdConnectApplications(where: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")): InstitutionOpenIdConnectApplicationConnection! @cost(weight: "10")
+  openIdConnectApplications(where: InstitutionOwnedOpenIdConnectApplicationFilterInput @cost(weight: "10")): InstitutionOwnedOpenIdConnectApplicationConnection! @cost(weight: "10")
   operatedDatabases(where: InstitutionOperatedDatabaseFilterInput @cost(weight: "10")): InstitutionOperatedDatabaseConnection! @cost(weight: "10")
   operatingState: InstitutionOperatingState!
   publicKey: String
@@ -922,18 +922,6 @@ type InstitutionMethodDeveloperEdge {
   node: Institution! @cost(weight: "10")
 }
 
-type InstitutionOpenIdConnectApplicationConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
-  edges: [InstitutionOpenIdConnectApplicationEdge!]! @cost(weight: "10")
-  totalCount: NonNegativeInt! @cost(weight: "10")
-}
-
-type InstitutionOpenIdConnectApplicationEdge {
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
-  node: OpenIdConnectApplication! @cost(weight: "10")
-}
-
 type InstitutionOperatedDatabaseConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionOperatedDatabaseEdge!]! @cost(weight: "10")
@@ -942,6 +930,18 @@ type InstitutionOperatedDatabaseConnection {
 
 type InstitutionOperatedDatabaseEdge {
   node: Database!
+}
+
+type InstitutionOwnedOpenIdConnectApplicationConnection {
+  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
+  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  edges: [InstitutionOwnedOpenIdConnectApplicationEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type InstitutionOwnedOpenIdConnectApplicationEdge {
+  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  node: OpenIdConnectApplication!
 }
 
 type InstitutionRepresentative {
@@ -1187,7 +1187,7 @@ type OpenIdConnectApplication implements Node {
   endpoints: [OpenIdConnectEndpoint!]! @cost(weight: "10")
   grantTypes: [OpenIdConnectGrantType!]! @cost(weight: "10")
   id: ID!
-  institutions(where: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")): OpenIdConnectApplicationInstitutionConnection! @cost(weight: "10")
+  owner: OpenIdConnectApplicationOwnerEdge! @cost(weight: "10")
   postLogoutRedirectUri: Url @cost(weight: "10")
   redirectUri: Url @cost(weight: "10")
   requirements: [OpenIdConnectRequirement!]! @cost(weight: "10")
@@ -1207,12 +1207,7 @@ type OpenIdConnectApplicationAuthorizationEdge {
   node: OpenIdConnectAuthorization!
 }
 
-type OpenIdConnectApplicationInstitutionConnection {
-  edges: [OpenIdConnectApplicationInstitutionEdge!]! @cost(weight: "10")
-  totalCount: NonNegativeInt! @cost(weight: "10")
-}
-
-type OpenIdConnectApplicationInstitutionEdge {
+type OpenIdConnectApplicationOwnerEdge {
   node: Institution! @cost(weight: "10")
 }
 
@@ -1288,9 +1283,9 @@ type OpticalData implements Data {
   database: Database @cost(weight: "10")
   databaseId: Uuid!
   description: String
-  id: String!
+  id: ID!
   infraredEmittances: [Float!]!
-  locale: String!
+  locale: Locale!
   name: String
   nearnormalHemisphericalSolarReflectances: [Float!]!
   nearnormalHemisphericalSolarTransmittances: [Float!]!
@@ -1375,8 +1370,8 @@ type PhotovoltaicData implements Data {
   database: Database @cost(weight: "10")
   databaseId: Uuid!
   description: String
-  id: String!
-  locale: String!
+  id: ID!
+  locale: Locale!
   name: String
   resources: [GetHttpsResource!]!
   resourceTree: GetHttpsResourceTree!
@@ -2474,15 +2469,6 @@ input InstitutionMethodDeveloperFilterInput {
   or: [InstitutionMethodDeveloperFilterInput!]
 }
 
-input InstitutionOpenIdConnectApplicationFilterInput {
-  and: [InstitutionOpenIdConnectApplicationFilterInput!]
-  or: [InstitutionOpenIdConnectApplicationFilterInput!]
-  application: OpenIdConnectApplicationFilterInput
-  institutionId: ComparableGuidOperationFilterInput
-  institution: InstitutionFilterInput
-  applicationId: ComparableGuidOperationFilterInput
-}
-
 input InstitutionOperatedDatabaseFilterInput {
   and: [InstitutionOperatedDatabaseFilterInput!]
   or: [InstitutionOperatedDatabaseFilterInput!]
@@ -2490,6 +2476,31 @@ input InstitutionOperatedDatabaseFilterInput {
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   locator: UriFilterInput
+}
+
+input InstitutionOwnedOpenIdConnectApplicationFilterInput {
+  and: [InstitutionOwnedOpenIdConnectApplicationFilterInput!]
+  or: [InstitutionOwnedOpenIdConnectApplicationFilterInput!]
+  uuid: ComparableGuidOperationFilterInput
+  applicationType: StringOperationFilterInput
+  clientId: StringOperationFilterInput
+  consentType: StringOperationFilterInput
+  displayName: StringOperationFilterInput
+  ownerId: ComparableGuidOperationFilterInput
+  version: ComparableUInt32OperationFilterInput
+  authorizations: ListOpenIdConnectAuthorizationFilterTypeFilterInput
+  clientSecret: StringOperationFilterInput
+  clientType: StringOperationFilterInput
+  concurrencyToken: StringOperationFilterInput
+  displayNames: StringOperationFilterInput
+  jsonWebKeySet: StringOperationFilterInput
+  permissions: StringOperationFilterInput
+  postLogoutRedirectUris: StringOperationFilterInput
+  properties: StringOperationFilterInput
+  redirectUris: StringOperationFilterInput
+  requirements: StringOperationFilterInput
+  settings: StringOperationFilterInput
+  tokens: ListOpenIdConnectTokenFilterTypeFilterInput
 }
 
 input InstitutionRepresentativeFilterInput {
@@ -2582,13 +2593,6 @@ input ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput {
   all: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
   none: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
   some: InstitutionMethodDeveloperFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListFilterInputTypeOfInstitutionOpenIdConnectApplicationFilterInput {
-  all: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")
-  none: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")
-  some: InstitutionOpenIdConnectApplicationFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
@@ -2725,8 +2729,8 @@ input OpenIdConnectApplicationFilterInput {
   clientId: StringOperationFilterInput
   consentType: StringOperationFilterInput
   displayName: StringOperationFilterInput
-  institutionEdges: ListFilterInputTypeOfInstitutionOpenIdConnectApplicationFilterInput
-  institutions: ListInstitutionFilterTypeFilterInput
+  ownerId: ComparableGuidOperationFilterInput
+  owner: InstitutionFilterInput
   version: ComparableUInt32OperationFilterInput
   authorizations: ListOpenIdConnectAuthorizationFilterTypeFilterInput
   clientSecret: StringOperationFilterInput
@@ -3847,6 +3851,9 @@ scalar Byte
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"BCP 47 compliant Language Tag string"
+scalar Locale
 
 "The NonNegativeInt scalar type represents a unsigned 32-bit numeric non-fractional value equal to or greater than 0."
 scalar NonNegativeInt

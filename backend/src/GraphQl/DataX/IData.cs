@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HotChocolate;
 using HotChocolate.Types;
 
 namespace Metabase.GraphQl.DataX;
@@ -21,5 +22,7 @@ public interface IData
     IReadOnlyList<GetHttpsResource> Resources { get; }
     GetHttpsResourceTree ResourceTree { get; }
     // ResponseApproval Approval { get; }
+
+    [GraphQLType<NonNullType<LocaleType>>]
     string Locale { get; }
 }

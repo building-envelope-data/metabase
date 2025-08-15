@@ -128,7 +128,7 @@ public sealed class DatabaseType
         descriptor
             .Field(fieldName)
             .Argument("id", _ => _.Type<NonNullType<UuidType>>())
-            .Argument("locale", _ => _.Type<StringType>())
+            .Argument("locale", _ => _.Type<LocaleType>())
             .ResolveWith(resolverMethod);
     }
 
@@ -141,7 +141,7 @@ public sealed class DatabaseType
         descriptor
             .Field(fieldName)
             .Argument("where", _ => _.Type<InputObjectType<TDataPropositionInput>>())
-            .Argument("locale", _ => _.Type<StringType>())
+            .Argument("locale", _ => _.Type<LocaleType>())
             .Argument("first", _ => _.Type<NonNegativeIntType>())
             .Argument("after", _ => _.Type<StringType>())
             .Argument("last", _ => _.Type<NonNegativeIntType>())
@@ -158,7 +158,7 @@ public sealed class DatabaseType
         descriptor
             .Field(fieldName)
             .Argument("where", _ => _.Type<InputObjectType<TDataPropositionInput>>())
-            .Argument("locale", _ => _.Type<StringType>())
+            .Argument("locale", _ => _.Type<LocaleType>())
             .ResolveWith(resolverMethod);
     }
 }

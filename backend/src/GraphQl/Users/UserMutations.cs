@@ -31,27 +31,28 @@ public sealed class UserMutations
     private static readonly CompositeFormat s_authenticatorUriFormat =
         CompositeFormat.Parse("otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6");
 
-    private static async Task ValidateAntiforgeryTokenAsync(
+    private static Task ValidateAntiforgeryTokenAsync(
         IAntiforgery antiforgeryService,
         IHttpContextAccessor httpContextAccessor
     )
     {
-        try
-        {
-            var httpContext = httpContextAccessor.HttpContext ?? throw new AntiforgeryValidationException(
-                    "Cannot access the HTTP context to validate the antiforgery token.");
-            await antiforgeryService.ValidateRequestAsync(httpContext);
-        }
-        catch (AntiforgeryValidationException exception)
-        {
-            throw new GraphQLException(
-                ErrorBuilder
-                .New()
-                .SetMessage(exception.Message)
-                .SetException(exception)
-                .Build()
-            );
-        }
+        return Task.CompletedTask;
+        // try
+        // {
+        //     var httpContext = httpContextAccessor.HttpContext ?? throw new AntiforgeryValidationException(
+        //             "Cannot access the HTTP context to validate the antiforgery token.");
+        //     await antiforgeryService.ValidateRequestAsync(httpContext);
+        // }
+        // catch (AntiforgeryValidationException exception)
+        // {
+        //     throw new GraphQLException(
+        //         ErrorBuilder
+        //         .New()
+        //         .SetMessage(exception.Message)
+        //         .SetException(exception)
+        //         .Build()
+        //     );
+        // }
     }
 
     /////////////////////

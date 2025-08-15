@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Types;
+using HotChocolate.Types.Relay;
 using Metabase.Data;
 using Metabase.GraphQl.Components;
 using Metabase.GraphQl.Databases;
@@ -29,8 +32,12 @@ public abstract class Data(
     )
         : IData
 {
+    [ID]
     public string Id { get; } = id;
+
+    [GraphQLType<NonNullType<LocaleType>>]
     public string Locale { get; } = locale;
+
     public IReadOnlyList<string> Warnings { get; } = warnings;
     public Guid CreatorId { get; } = creatorId;
     public DateTime CreatedAt { get; } = createdAt;
