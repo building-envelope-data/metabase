@@ -259,6 +259,7 @@ type Component implements Node {
 type ComponentAssembledOfConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentAssembledOfEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentAssembledOfEdge {
@@ -272,6 +273,7 @@ type ComponentAssembledOfEdge {
 type ComponentConcretizationOfConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentConcretizationOfEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentConcretizationOfEdge {
@@ -282,6 +284,7 @@ type ComponentConcretizationOfEdge {
 type ComponentGeneralizationOfConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentGeneralizationOfEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentGeneralizationOfEdge {
@@ -292,6 +295,7 @@ type ComponentGeneralizationOfEdge {
 type ComponentManufacturerConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentManufacturerEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentManufacturerEdge {
@@ -303,6 +307,7 @@ type ComponentManufacturerEdge {
 type ComponentPartOfConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentPartOfEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentPartOfEdge {
@@ -316,6 +321,7 @@ type ComponentPartOfEdge {
 type ComponentVariantOfConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentVariantOfEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentVariantOfEdge {
@@ -858,6 +864,7 @@ type Institution implements Node {
 type InstitutionDevelopedMethodConnection {
   canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionDevelopedMethodEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type InstitutionDevelopedMethodEdge {
@@ -867,6 +874,7 @@ type InstitutionDevelopedMethodEdge {
 type InstitutionManagedDataFormatConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionManagedDataFormatEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type InstitutionManagedDataFormatEdge {
@@ -876,6 +884,7 @@ type InstitutionManagedDataFormatEdge {
 type InstitutionManagedInstitutionConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionManagedInstitutionEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type InstitutionManagedInstitutionEdge {
@@ -885,6 +894,7 @@ type InstitutionManagedInstitutionEdge {
 type InstitutionManagedMethodConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionManagedMethodEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type InstitutionManagedMethodEdge {
@@ -899,6 +909,7 @@ type InstitutionManufacturedComponentConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionManufacturedComponentEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type InstitutionManufacturedComponentEdge {
@@ -915,6 +926,7 @@ type InstitutionOpenIdConnectApplicationConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionOpenIdConnectApplicationEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type InstitutionOpenIdConnectApplicationEdge {
@@ -925,6 +937,7 @@ type InstitutionOpenIdConnectApplicationEdge {
 type InstitutionOperatedDatabaseConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionOperatedDatabaseEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type InstitutionOperatedDatabaseEdge {
@@ -945,6 +958,7 @@ type InstitutionRepresentative {
 type InstitutionRepresentativeConnection {
   canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionRepresentativeEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type InstitutionRepresentativeEdge {
@@ -1038,6 +1052,7 @@ type MethodDeveloperConnection {
   canCurrentUserAddInstitutionEdge: Boolean! @cost(weight: "10")
   canCurrentUserAddUserEdge: Boolean! @cost(weight: "10")
   edges: [MethodDeveloperEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type MethodDeveloperEdge {
@@ -1180,10 +1195,12 @@ type OpenIdConnectApplication implements Node {
   scopes: [OpenIdConnectScope!]! @cost(weight: "10")
   tokens: OpenIdConnectApplicationTokenConnection! @cost(weight: "10")
   uuid: Uuid! @cost(weight: "10")
+  version: NonNegativeInt!
 }
 
 type OpenIdConnectApplicationAuthorizationConnection {
   edges: [OpenIdConnectApplicationAuthorizationEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type OpenIdConnectApplicationAuthorizationEdge {
@@ -1192,6 +1209,7 @@ type OpenIdConnectApplicationAuthorizationEdge {
 
 type OpenIdConnectApplicationInstitutionConnection {
   edges: [OpenIdConnectApplicationInstitutionEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type OpenIdConnectApplicationInstitutionEdge {
@@ -1200,6 +1218,7 @@ type OpenIdConnectApplicationInstitutionEdge {
 
 type OpenIdConnectApplicationTokenConnection {
   edges: [OpenIdConnectApplicationTokenEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type OpenIdConnectApplicationTokenEdge {
@@ -1216,6 +1235,7 @@ type OpenIdConnectAuthorization implements Node {
   tokens: OpenIdConnectAuthorizationTokenConnection! @cost(weight: "10")
   type: String
   uuid: Uuid! @cost(weight: "10")
+  version: NonNegativeInt!
 }
 
 type OpenIdConnectAuthorizationApplicationEdge {
@@ -1224,6 +1244,7 @@ type OpenIdConnectAuthorizationApplicationEdge {
 
 type OpenIdConnectAuthorizationTokenConnection {
   edges: [OpenIdConnectAuthorizationTokenEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type OpenIdConnectAuthorizationTokenEdge {
@@ -1242,6 +1263,7 @@ type OpenIdConnectToken implements Node {
   subject: String
   type: String
   uuid: Uuid! @cost(weight: "10")
+  version: NonNegativeInt!
 }
 
 type OpenIdConnectTokenApplicationEdge {
@@ -1812,6 +1834,7 @@ type User implements Node {
 type UserDevelopedMethodConnection {
   canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   edges: [UserDevelopedMethodEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type UserDevelopedMethodEdge {
@@ -1827,6 +1850,7 @@ type UserMethodDeveloperEdge {
 type UserRepresentedInstitutionConnection {
   canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   edges: [UserRepresentedInstitutionEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type UserRepresentedInstitutionEdge {
@@ -2042,6 +2066,21 @@ input ComparableNullableOfDateTimeOperationFilterInput {
   notLessThan: DateTime @cost(weight: "10")
   lessThanOrEqualTo: DateTime @cost(weight: "10")
   notLessThanOrEqualTo: DateTime @cost(weight: "10")
+}
+
+input ComparableUInt32OperationFilterInput {
+  equalTo: NonNegativeInt @cost(weight: "10")
+  notEqualTo: NonNegativeInt @cost(weight: "10")
+  in: [NonNegativeInt!] @cost(weight: "10")
+  notIn: [NonNegativeInt!] @cost(weight: "10")
+  greaterThan: NonNegativeInt @cost(weight: "10")
+  notGreaterThan: NonNegativeInt @cost(weight: "10")
+  greaterThanOrEqualTo: NonNegativeInt @cost(weight: "10")
+  notGreaterThanOrEqualTo: NonNegativeInt @cost(weight: "10")
+  lessThan: NonNegativeInt @cost(weight: "10")
+  notLessThan: NonNegativeInt @cost(weight: "10")
+  lessThanOrEqualTo: NonNegativeInt @cost(weight: "10")
+  notLessThanOrEqualTo: NonNegativeInt @cost(weight: "10")
 }
 
 input ComponentAssembledOfFilterInput {
@@ -2688,6 +2727,7 @@ input OpenIdConnectApplicationFilterInput {
   displayName: StringOperationFilterInput
   institutionEdges: ListFilterInputTypeOfInstitutionOpenIdConnectApplicationFilterInput
   institutions: ListInstitutionFilterTypeFilterInput
+  version: ComparableUInt32OperationFilterInput
   authorizations: ListOpenIdConnectAuthorizationFilterTypeFilterInput
   clientSecret: StringOperationFilterInput
   clientType: StringOperationFilterInput
@@ -2712,6 +2752,7 @@ input OpenIdConnectAuthorizationFilterInput {
   subject: StringOperationFilterInput
   tokens: ListOpenIdConnectTokenFilterTypeFilterInput
   type: StringOperationFilterInput
+  version: ComparableUInt32OperationFilterInput
   application: OpenIdConnectApplicationFilterInput
   concurrencyToken: StringOperationFilterInput
   properties: StringOperationFilterInput
@@ -2728,6 +2769,7 @@ input OpenIdConnectTokenFilterInput {
   status: StringOperationFilterInput
   subject: StringOperationFilterInput
   type: StringOperationFilterInput
+  version: ComparableUInt32OperationFilterInput
   application: OpenIdConnectApplicationFilterInput
   authorization: OpenIdConnectAuthorizationFilterInput
   concurrencyToken: StringOperationFilterInput

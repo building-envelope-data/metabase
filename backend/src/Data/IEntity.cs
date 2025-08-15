@@ -1,4 +1,4 @@
-using Guid = System.Guid;
+using System;
 
 namespace Metabase.Data;
 

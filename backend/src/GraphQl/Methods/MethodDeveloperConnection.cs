@@ -20,6 +20,29 @@ public sealed class MethodDeveloperConnection(
     private readonly Method _subject = subject;
     private readonly QueryContext<IMethodDeveloper> _queryContext = queryContext;
 
+    public async Task<uint> GetTotalCountAsync(
+        InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
+        UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,
+        PendingInstitutionMethodDevelopersByMethodIdDataLoader pendingInstitutionMethodDevelopersDataLoader,
+        PendingUserMethodDevelopersByMethodIdDataLoader pendingUserMethodDevelopersDataLoader,
+        CancellationToken cancellationToken
+    )
+    {
+        return await new InstitutionMethodDeveloperConnection(_subject, _pending, _queryContext)
+            .GetTotalCountAsync(
+                pendingInstitutionMethodDevelopersDataLoader,
+                institutionMethodDevelopersDataLoader,
+                cancellationToken
+            )
+        +
+        await new UserMethodDeveloperConnection(_subject, _pending, _queryContext)
+            .GetTotalCountAsync(
+                pendingUserMethodDevelopersDataLoader,
+                userMethodDevelopersDataLoader,
+                cancellationToken
+            );
+    }
+
     public async IAsyncEnumerable<MethodDeveloperEdge> GetEdgesAsync(
         InstitutionMethodDevelopersByMethodIdDataLoader institutionMethodDevelopersDataLoader,
         UserMethodDevelopersByMethodIdDataLoader userMethodDevelopersDataLoader,

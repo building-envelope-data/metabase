@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using GreenDonut;
 using GreenDonut.Data;
 using Metabase.Data;
@@ -21,12 +23,20 @@ public abstract class Connection<TSubject, TAssociation, TAssociationsByAssociat
 
     protected TSubject Subject { get; } = subject;
 
+    public async Task<uint> GetTotalCountAsync(
+        TAssociationsByAssociateIdDataLoader dataLoader,
+        CancellationToken cancellationToken
+    )
+    {
+        return (uint)(await dataLoader.With(_queryContext).LoadRequiredAsync(Subject.Id, cancellationToken)).Length;
+    }
+
     public async IAsyncEnumerable<TEdge> GetEdgesAsync(
         TAssociationsByAssociateIdDataLoader dataLoader,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
-        foreach (var association in await dataLoader.With(_queryContext).LoadAsync(Subject.Id, cancellationToken) ?? [])
+        foreach (var association in await dataLoader.With(_queryContext).LoadRequiredAsync(Subject.Id, cancellationToken))
         {
             yield return _createEdge(association);
         }

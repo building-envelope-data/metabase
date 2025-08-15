@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using GreenDonut;
 using GreenDonut.Data;
 using Metabase.Data;
@@ -25,6 +26,17 @@ public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociation
 
     protected TSubject Subject { get; } = subject;
 
+    public Task<uint> GetTotalCountAsync(
+        TSomeAssociationsByAssociateIdDataLoader someDataLoader,
+        TOtherAssociationsByAssociateIdDataLoader otherDataLoader,
+        CancellationToken cancellationToken
+    )
+    {
+        return _useFirstDataLoader
+            ? GetTotalCountAsync(someDataLoader, cancellationToken)
+            : GetTotalCountAsync(otherDataLoader, cancellationToken);
+    }
+
     public IAsyncEnumerable<TEdge> GetEdgesAsync(
         TSomeAssociationsByAssociateIdDataLoader someDataLoader,
         TOtherAssociationsByAssociateIdDataLoader otherDataLoader,
@@ -36,13 +48,22 @@ public abstract class ForkingConnection<TSubject, TAssociation, TSomeAssociation
             : GetEdgesAsync(otherDataLoader, cancellationToken);
     }
 
+    private async Task<uint> GetTotalCountAsync<TDataLoader>(
+        TDataLoader dataLoader,
+        CancellationToken cancellationToken
+    )
+        where TDataLoader : IDataLoader<Guid, TAssociation[]>
+    {
+        return (uint)(await dataLoader.With(_queryContext).LoadRequiredAsync(Subject.Id, cancellationToken)).Length;
+    }
+
     private async IAsyncEnumerable<TEdge> GetEdgesAsync<TDataLoader>(
         TDataLoader dataLoader,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
         where TDataLoader : IDataLoader<Guid, TAssociation[]>
     {
-        foreach (var association in await dataLoader.With(_queryContext).LoadAsync(Subject.Id, cancellationToken) ?? [])
+        foreach (var association in await dataLoader.With(_queryContext).LoadRequiredAsync(Subject.Id, cancellationToken))
         {
             yield return _createEdge(association);
         }
