@@ -149,11 +149,16 @@ public sealed class InstitutionType
             );
         descriptor
             .Field(t => t.GnuPgKeyFingerprints)
+            .Type<NonNullType<ObjectType<InstitutionGnuPgKeyFingerprintConnection>>>()
             .UseFiltering<InstitutionGnuPgKeyFingerprintFilterType>()
-            .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
+            .Resolve(context =>
+                new InstitutionGnuPgKeyFingerprintConnection(
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<GnuPgKeyFingerprint>()
+                )
+            );
         descriptor
-            .Field("Has" + nameof(GnuPgKeyFingerprint))
+            .Field("has" + nameof(GnuPgKeyFingerprint))
             .UseFiltering<InstitutionGnuPgKeyFingerprintFilterType>()
             .ResolveWith<InstitutionResolvers>(x =>
                 InstitutionResolvers.GetHasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
@@ -176,18 +181,6 @@ public sealed class InstitutionType
 
     private sealed class InstitutionResolvers
     {
-        public static Task<GnuPgKeyFingerprint[]> GetGnuPgKeyFingerprintsAsync(
-            [Parent] Institution institution,
-            GnuPgKeyFingerprintsByInstitutionIdDataLoader dataLoader,
-            QueryContext<GnuPgKeyFingerprint> queryContext,
-            CancellationToken cancellationToken
-        )
-        {
-            return dataLoader
-                .With(queryContext)
-                .LoadRequiredAsync(institution.Id, cancellationToken);
-        }
-
         public static Task<bool> GetHasGnuPgKeyFingerprintsAsync(
             [Parent] Institution institution,
             ApplicationDbContext context,

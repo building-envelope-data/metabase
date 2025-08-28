@@ -32,6 +32,9 @@ public sealed class GnuPgKeyFingerprintQueries
         CancellationToken cancellationToken
     )
     {
-        return byFingerprint.LoadAsync(fingerprint, cancellationToken);
+        return byFingerprint.LoadAsync(
+            GnuPgKeyFingerprint.Normalize(fingerprint),
+            cancellationToken
+        );
     }
 }

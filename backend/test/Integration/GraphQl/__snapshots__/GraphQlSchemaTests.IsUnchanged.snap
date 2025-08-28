@@ -793,19 +793,27 @@ type GetHttpsResourceTreeRoot {
   vertexId: String!
 }
 
-type GnuPgKeyFingerprint {
+type GnuPgKeyFingerprint implements Node {
   allowedAt: DateTime
+  canCurrentUserAllowNode: Boolean! @cost(weight: "10")
+  canCurrentUserRevokeNode: Boolean! @cost(weight: "10")
   createdAt: DateTime!
   fingerprint: String!
-  id: Uuid!
-  institution: Institution
-  institutionId: Uuid!
+  id: ID!
+  institution: GnuPgKeyFingerprintInstitutionEdge! @cost(weight: "10")
   isAllowed: Boolean!
   isRevoked: Boolean!
   revokedAt: DateTime
-  user: User
-  userId: Uuid!
-  version: NonNegativeInt!
+  user: GnuPgKeyFingerprintUserEdge! @cost(weight: "10")
+  uuid: Uuid! @cost(weight: "10")
+}
+
+type GnuPgKeyFingerprintInstitutionEdge {
+  node: Institution! @cost(weight: "10")
+}
+
+type GnuPgKeyFingerprintUserEdge {
+  node: User! @cost(weight: "10")
 }
 
 "A connection to a list of items."
@@ -866,7 +874,7 @@ type Institution implements Node {
   description: String!
   developedMethods(pending: Boolean! = false where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
-  gnuPgKeyFingerprints(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): [GnuPgKeyFingerprint!]! @cost(weight: "10")
+  gnuPgKeyFingerprints(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): InstitutionGnuPgKeyFingerprintConnection! @cost(weight: "10")
   HasGnuPgKeyFingerprint(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   id: ID!
   managedDataFormats(where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")): InstitutionManagedDataFormatConnection! @cost(weight: "10")
@@ -893,6 +901,16 @@ type InstitutionDevelopedMethodConnection {
 
 type InstitutionDevelopedMethodEdge {
   node: Method! @cost(weight: "10")
+}
+
+type InstitutionGnuPgKeyFingerprintConnection {
+  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
+  edges: [InstitutionGnuPgKeyFingerprintEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type InstitutionGnuPgKeyFingerprintEdge {
+  node: GnuPgKeyFingerprint!
 }
 
 type InstitutionManagedDataFormatConnection {
@@ -1262,7 +1280,7 @@ type OpenIdConnectAuthorizationTokenEdge {
 type OpenIdConnectToken implements Node {
   application: OpenIdConnectTokenApplicationEdge! @cost(weight: "10")
   authorization: OpenIdConnectTokenAuthorizationEdge! @cost(weight: "10")
-  canCurrentUserRevokeToken: Boolean! @cost(weight: "10")
+  canCurrentUserRevokeNode: Boolean! @cost(weight: "10")
   creationDate: DateTime
   expirationDate: DateTime
   id: ID!
@@ -1837,7 +1855,7 @@ type User implements Node {
   canCurrentUserManageOpenIdConnect: Boolean! @cost(weight: "10")
   developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10")
-  gnuPgKeyFingerprints(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): [GnuPgKeyFingerprint!]! @cost(weight: "10")
+  gnuPgKeyFingerprints(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): UserGnuPgKeyFingerprintConnection! @cost(weight: "10")
   HasGnuPgKeyFingerprint(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
   id: ID!
@@ -1864,6 +1882,15 @@ type UserDevelopedMethodConnection {
 
 type UserDevelopedMethodEdge {
   node: Method! @cost(weight: "10")
+}
+
+type UserGnuPgKeyFingerprintConnection {
+  edges: [UserGnuPgKeyFingerprintEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type UserGnuPgKeyFingerprintEdge {
+  node: GnuPgKeyFingerprint!
 }
 
 type UserMethodDeveloperEdge {
@@ -2424,7 +2451,6 @@ input GnuPgKeyFingerprintFilterInput {
 input GnuPgKeyFingerprintInput {
   fingerprint: String!
   institutionId: Uuid!
-  userId: Uuid!
 }
 
 input GnuPgKeyFingerprintSortInput {
@@ -3253,8 +3279,8 @@ enum AddGnuPgKeyFingerprintErrorCode {
   UNKNOWN
   UNAUTHORIZED
   UNKNOWN_INSTITUTION
-  UNKNOWN_USER
   DUPLICATE_FINGERPRINT
+  UNKNOWN_KEY
 }
 
 enum AddInstitutionMethodDeveloperErrorCode {

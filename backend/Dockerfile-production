@@ -57,7 +57,8 @@ RUN \
   apt-get install \
     --assume-yes \
     --no-install-recommends \
-    curl && \
+    curl \
+    gnupg && \
   rm \
     --recursive \
     --force \

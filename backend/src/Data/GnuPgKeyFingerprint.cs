@@ -1,17 +1,29 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Data;
 
 [Index(nameof(Fingerprint), IsUnique = true)]
-public sealed class GnuPgKeyFingerprint(
+public sealed partial class GnuPgKeyFingerprint(
     string fingerprint
     )
         : Entity
 {
-    [Required][MinLength(1)] public string Fingerprint { get; private set; } = fingerprint;
+    [GeneratedRegex("[^A-F0-9]")]
+    private static partial Regex HexadecimalRegex();
+
+    public static string Normalize(string dirtyFingerprint)
+    {
+        return HexadecimalRegex().Replace(
+            dirtyFingerprint.ToUpperInvariant(),
+            string.Empty
+        );
+    }
+
+    [Required][MinLength(1)] public string Fingerprint { get; private set; } = Normalize(fingerprint);
 
     [Required] public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public DateTime? AllowedAt { get; private set; }
@@ -27,14 +39,14 @@ public sealed class GnuPgKeyFingerprint(
 
     public void Revoke()
     {
-        RevokedAt = DateTime.UtcNow;
+        RevokedAt ??= DateTime.UtcNow;
     }
 
     public bool IsRevoked => RevokedAt is not null;
 
     public void Allow()
     {
-        AllowedAt = DateTime.UtcNow;
+        AllowedAt ??= DateTime.UtcNow;
     }
 
     public bool IsAllowed => AllowedAt is not null;

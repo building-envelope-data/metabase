@@ -1,4 +1,5 @@
 #import "./openIdConnect.graphql"
+#import "./gnuPgKeyFingerprints.graphql"
 
 fragment InstitutionPartial on Institution {
   id
@@ -310,6 +311,14 @@ query Institution($uuid: Uuid!) {
         }
       }
       canCurrentUserConfirmEdge
+    }
+    gnuPgKeyFingerprints {
+      edges {
+        node {
+          ...GnuPgKeyFingerprintPartial
+        }
+      }
+      canCurrentUserAddEdge
     }
     openIdConnectApplications {
       edges {

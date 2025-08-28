@@ -19,13 +19,12 @@ public sealed class GnuPgKeyFingerprintAuthorization(
     internal Task<bool> IsAuthorizedToAdd(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        Guid userId,
         CancellationToken cancellationToken
     )
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            async user => IsSame(user, userId) && await IsAtLeastAssistantOfVerifiedInstitution(user, institutionId, cancellationToken),
+            user => IsAtLeastAssistantOfVerifiedInstitution(user, institutionId, cancellationToken),
             application => Task.FromResult(false),
             cancellationToken
         );
@@ -33,16 +32,16 @@ public sealed class GnuPgKeyFingerprintAuthorization(
 
     internal Task<bool> IsAuthorizedToAllow(
         ClaimsPrincipal claimsPrincipal,
-        Guid institutionId,
+        GnuPgKeyFingerprint fingerprint,
         CancellationToken cancellationToken
     )
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            async user => await IsOwnerOfVerifiedInstitution(user, institutionId, cancellationToken),
+            async user => await IsOwnerOfVerifiedInstitution(user, fingerprint.InstitutionId, cancellationToken),
             application => BelongsToInstitution(
                 application,
-                institutionId,
+                fingerprint.InstitutionId,
                 cancellationToken
             ),
             cancellationToken
@@ -51,17 +50,16 @@ public sealed class GnuPgKeyFingerprintAuthorization(
 
     internal Task<bool> IsAuthorizedToRevoke(
         ClaimsPrincipal claimsPrincipal,
-        Guid institutionId,
-        Guid userId,
+        GnuPgKeyFingerprint fingerprint,
         CancellationToken cancellationToken
     )
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            async user => IsSame(user, userId) || await IsOwnerOfVerifiedInstitution(user, institutionId, cancellationToken),
+            async user => IsSame(user, fingerprint.UserId) || await IsOwnerOfVerifiedInstitution(user, fingerprint.InstitutionId, cancellationToken),
             application => BelongsToInstitution(
                 application,
-                institutionId,
+                fingerprint.InstitutionId,
                 cancellationToken
             ),
             cancellationToken

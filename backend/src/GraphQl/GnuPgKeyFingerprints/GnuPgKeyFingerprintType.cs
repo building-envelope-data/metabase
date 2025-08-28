@@ -1,10 +1,11 @@
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
+using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Entities;
-using Metabase.GraphQl.Institutions;
 using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
@@ -20,35 +21,55 @@ public sealed class GnuPgKeyFingerprintType
         descriptor.Field(f => f.InstitutionId).Ignore();
         descriptor
             .Field(f => f.Institution)
-            .ResolveWith<GnuPgKeyFingerprintResolvers>(x =>
-                GnuPgKeyFingerprintResolvers.GetInstitutionAsync(default!, default!, default!)
+            .Type<NonNullType<ObjectType<GnuPgKeyFingerprintInstitutionEdge>>>()
+            .Resolve(context =>
+                new GnuPgKeyFingerprintInstitutionEdge(
+                    context.Parent<GnuPgKeyFingerprint>()
+                )
             );
         descriptor.Field(f => f.UserId).Ignore();
         descriptor
             .Field(f => f.User)
-            .ResolveWith<GnuPgKeyFingerprintResolvers>(x =>
-                GnuPgKeyFingerprintResolvers.GetUserAsync(default!, default!, default!)
+            .Type<NonNullType<ObjectType<GnuPgKeyFingerprintUserEdge>>>()
+            .Resolve(context =>
+                new GnuPgKeyFingerprintUserEdge(
+                    context.Parent<GnuPgKeyFingerprint>()
+                )
             );
+        descriptor
+            .Field("canCurrentUserAllowNode")
+            .ResolveWith<GnuPgKeyFingerprintResolvers>(x =>
+                GnuPgKeyFingerprintResolvers.GetCanCurrentUserAllowNodeAsync(default!, default!, default!, default!)
+            )
+            .UseUserManager();
+        descriptor
+            .Field("canCurrentUserRevokeNode")
+            .ResolveWith<GnuPgKeyFingerprintResolvers>(x =>
+                GnuPgKeyFingerprintResolvers.GetCanCurrentUserRevokeNodeAsync(default!, default!, default!, default!)
+            )
+            .UseUserManager();
     }
 
     private sealed class GnuPgKeyFingerprintResolvers
     {
-        public static async Task<Institution> GetInstitutionAsync(
+        public static Task<bool> GetCanCurrentUserAllowNodeAsync(
             [Parent] GnuPgKeyFingerprint gnuPgKeyFingerprint,
-            InstitutionByIdDataLoader dataLoader,
+            ClaimsPrincipal claimsPrincipal,
+            GnuPgKeyFingerprintAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return (await dataLoader.LoadAsync(gnuPgKeyFingerprint.InstitutionId, cancellationToken))!;
+            return authorization.IsAuthorizedToAllow(claimsPrincipal, gnuPgKeyFingerprint, cancellationToken);
         }
 
-        public static async Task<User> GetUserAsync(
+        public static Task<bool> GetCanCurrentUserRevokeNodeAsync(
             [Parent] GnuPgKeyFingerprint gnuPgKeyFingerprint,
-            UserByIdDataLoader dataLoader,
+            ClaimsPrincipal claimsPrincipal,
+            GnuPgKeyFingerprintAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return (await dataLoader.LoadAsync(gnuPgKeyFingerprint.UserId, cancellationToken))!;
+            return authorization.IsAuthorizedToRevoke(claimsPrincipal, gnuPgKeyFingerprint, cancellationToken);
         }
     }
 }

@@ -39,6 +39,9 @@ import DeleteInstitution from "./DeleteInstitution";
 import SwitchInstitutionOperatingState from "./SwitchInstitutionOperatingState";
 import ApplicationTable from "../openIdConnect/applications/ApplicationTable";
 import CreateApplication from "../openIdConnect/applications/CreateApplication";
+import GnuPgKeyFingerprintTable from "../gnuPgKeyFingerprints/GnuPgKeyFingerprintTable";
+import AddGnuPgKeyFingerprint from "../gnuPgKeyFingerprints/AddGnuPgKeyFingerprint";
+import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFingerprints.graphql";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
@@ -325,6 +328,16 @@ export default function Institution({ institutionId }: InstitutionProps) {
           )}
         />
       )}
+    <Divider />
+    <Typography.Title level={2}>GnuPG Key Fingerprints</Typography.Title>
+    <GnuPgKeyFingerprintTable
+      loading={false}
+      fingerprints={institution.gnuPgKeyFingerprints.edges.map(e => e.node) as GnuPgKeyFingerprintPartialFragment[]}
+      institutionId={institution.uuid}
+    />
+    {institution.gnuPgKeyFingerprints.canCurrentUserAddEdge && (
+      <AddGnuPgKeyFingerprint institutionId={institution.uuid} />
+    )}
     {institution.openIdConnectApplications.canCurrentUserAddEdge && (
       <>
         <Divider />

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -10,6 +11,7 @@ using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
+using Metabase.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
@@ -27,10 +29,10 @@ public sealed class GnuPgKeyFingerprintMutations
         CancellationToken cancellationToken
     )
     {
+        var normalizedFingerprint = GnuPgKeyFingerprint.Normalize(input.Fingerprint);
         if (!await authorization.IsAuthorizedToAdd(
                 claimsPrincipal,
                 input.InstitutionId,
-                input.UserId,
                 cancellationToken
             )
         )
@@ -59,29 +61,26 @@ public sealed class GnuPgKeyFingerprintMutations
             );
         }
 
-        if (!await context.Users.AsQueryable()
-                .Where(u => u.Id == input.UserId)
-                .AnyAsync(cancellationToken)
-           )
-        {
-            errors.Add(
-                new AddGnuPgKeyFingerprintError(
-                    AddGnuPgKeyFingerprintErrorCode.UNKNOWN_USER,
-                    "Unknown user.",
-                    [nameof(input), nameof(input.UserId).FirstCharToLower()]
-                )
-            );
-        }
-
-        if (!await context.GnuPgKeyFingerprints.AsQueryable()
-                .Where(f => f.Fingerprint == input.Fingerprint)
+        if (await context.GnuPgKeyFingerprints.AsQueryable()
+                .Where(f => f.Fingerprint == normalizedFingerprint)
                 .AnyAsync(cancellationToken)
            )
         {
             errors.Add(
                 new AddGnuPgKeyFingerprintError(
                     AddGnuPgKeyFingerprintErrorCode.DUPLICATE_FINGERPRINT,
-                    "The fingerprint does already exist.",
+                    $"The normalized fingerprint {normalizedFingerprint} does already exist.",
+                    [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
+                )
+            );
+        }
+
+        if (!await GnuPgService.DoesGnuPgKeyExist(normalizedFingerprint))
+        {
+            errors.Add(
+                new AddGnuPgKeyFingerprintError(
+                    AddGnuPgKeyFingerprintErrorCode.UNKNOWN_KEY,
+                    $"There is no non-revoked and non-disabled key in the keyserver {GnuPgService.KeyServerUrl} with the normalized fingerprint {normalizedFingerprint}.",
                     [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
                 )
             );
@@ -92,14 +91,16 @@ public sealed class GnuPgKeyFingerprintMutations
             return new AddGnuPgKeyFingerprintPayload(errors.AsReadOnly());
         }
 
-        var fingerprint = new GnuPgKeyFingerprint(input.Fingerprint)
+        var user = await authorization.GetUserAsync(claimsPrincipal)
+            ?? throw new InvalidOperationException("Could not obtain the current user.");
+        var fingerprint = new GnuPgKeyFingerprint(normalizedFingerprint)
         {
             InstitutionId = input.InstitutionId,
-            UserId = input.UserId,
+            UserId = user.Id,
         };
         if (await authorization.IsAuthorizedToAllow(
                 claimsPrincipal,
-                fingerprint.InstitutionId,
+                fingerprint,
                 cancellationToken
             )
         )
@@ -123,7 +124,7 @@ public sealed class GnuPgKeyFingerprintMutations
     {
         var fingerprint = await context.GnuPgKeyFingerprints.AsQueryable()
                 .SingleOrDefaultAsync(f =>
-                    f.Fingerprint == input.Fingerprint,
+                    f.Fingerprint == GnuPgKeyFingerprint.Normalize(input.Fingerprint),
                     cancellationToken
                 );
         if (fingerprint is null)
@@ -138,7 +139,7 @@ public sealed class GnuPgKeyFingerprintMutations
         }
         if (!await authorization.IsAuthorizedToAllow(
                 claimsPrincipal,
-                fingerprint.InstitutionId,
+                fingerprint,
                 cancellationToken
             )
            )
@@ -168,7 +169,7 @@ public sealed class GnuPgKeyFingerprintMutations
     {
         var fingerprint = await context.GnuPgKeyFingerprints.AsQueryable()
                 .SingleOrDefaultAsync(f =>
-                    f.Fingerprint == input.Fingerprint,
+                    f.Fingerprint == GnuPgKeyFingerprint.Normalize(input.Fingerprint),
                     cancellationToken
                 );
         if (fingerprint is null)
@@ -183,8 +184,7 @@ public sealed class GnuPgKeyFingerprintMutations
         }
         if (!await authorization.IsAuthorizedToRevoke(
                 claimsPrincipal,
-                fingerprint.InstitutionId,
-                fingerprint.UserId,
+                fingerprint,
                 cancellationToken
             )
            )

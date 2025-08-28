@@ -33,7 +33,7 @@ fragment TokenPartial on OpenIdConnectToken {
   status
   subject
   type
-  canCurrentUserRevokeToken
+  canCurrentUserRevokeNode
 }
 
 query Applications {

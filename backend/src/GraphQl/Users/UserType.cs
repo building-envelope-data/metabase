@@ -266,11 +266,16 @@ public sealed class UserType
             );
         descriptor
             .Field(t => t.GnuPgKeyFingerprints)
+            .Type<NonNullType<ObjectType<UserGnuPgKeyFingerprintConnection>>>()
             .UseFiltering<UserGnuPgKeyFingerprintFilterType>()
-            .ResolveWith<UserResolvers>(x =>
-                UserResolvers.GetGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
+            .Resolve(context =>
+                new UserGnuPgKeyFingerprintConnection(
+                    context.Parent<User>(),
+                    context.GetQueryContext<GnuPgKeyFingerprint>()
+                )
+            );
         descriptor
-            .Field("Has" + nameof(GnuPgKeyFingerprint))
+            .Field("has" + nameof(GnuPgKeyFingerprint))
             .UseFiltering<UserGnuPgKeyFingerprintFilterType>()
             .ResolveWith<UserResolvers>(x =>
                 UserResolvers.GetHasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
@@ -278,18 +283,6 @@ public sealed class UserType
 
     private sealed class UserResolvers
     {
-        public static Task<GnuPgKeyFingerprint[]> GetGnuPgKeyFingerprintsAsync(
-            [Parent] User user,
-            GnuPgKeyFingerprintsByUserIdDataLoader dataLoader,
-            QueryContext<GnuPgKeyFingerprint> queryContext,
-            CancellationToken cancellationToken
-        )
-        {
-            return dataLoader
-                .With(queryContext)
-                .LoadRequiredAsync(user.Id, cancellationToken);
-        }
-
         public static Task<bool> GetHasGnuPgKeyFingerprintsAsync(
             [Parent] User user,
             ApplicationDbContext context,
