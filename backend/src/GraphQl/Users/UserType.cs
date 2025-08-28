@@ -21,6 +21,10 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 using UserRole = Metabase.Enumerations.UserRole;
 using Metabase.GraphQl.UserMethodDevelopers;
 using GreenDonut;
+using Microsoft.EntityFrameworkCore;
+using HotChocolate.Data;
+using System.Linq;
+using Metabase.GraphQl.GnuPgKeyFingerprints;
 
 namespace Metabase.GraphQl.Users;
 
@@ -262,8 +266,14 @@ public sealed class UserType
             );
         descriptor
             .Field(t => t.GnuPgKeyFingerprints)
+            .UseFiltering<UserGnuPgKeyFingerprintFilterType>()
             .ResolveWith<UserResolvers>(x =>
-                UserResolvers.GetGnuPgKeyFingerprintsAsync(default!, default!, default!));
+                UserResolvers.GetGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
+        descriptor
+            .Field("Has" + nameof(GnuPgKeyFingerprint))
+            .UseFiltering<UserGnuPgKeyFingerprintFilterType>()
+            .ResolveWith<UserResolvers>(x =>
+                UserResolvers.GetHasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
     }
 
     private sealed class UserResolvers
@@ -271,10 +281,26 @@ public sealed class UserType
         public static Task<GnuPgKeyFingerprint[]> GetGnuPgKeyFingerprintsAsync(
             [Parent] User user,
             GnuPgKeyFingerprintsByUserIdDataLoader dataLoader,
+            QueryContext<GnuPgKeyFingerprint> queryContext,
             CancellationToken cancellationToken
         )
         {
-            return dataLoader.LoadRequiredAsync(user.Id, cancellationToken);
+            return dataLoader
+                .With(queryContext)
+                .LoadRequiredAsync(user.Id, cancellationToken);
+        }
+
+        public static Task<bool> GetHasGnuPgKeyFingerprintsAsync(
+            [Parent] User user,
+            ApplicationDbContext context,
+            IResolverContext resolverContext,
+            CancellationToken cancellationToken
+        )
+        {
+            return context.GnuPgKeyFingerprints.AsNoTracking()
+                .Filter(resolverContext)
+                .Where(f => f.UserId == user.Id)
+                .AnyAsync(cancellationToken);
         }
 
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml

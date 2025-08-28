@@ -13,7 +13,6 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.DataX;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace Metabase.GraphQl.Databases;

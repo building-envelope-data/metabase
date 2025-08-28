@@ -13,8 +13,9 @@ public sealed class GnuPgKeyFingerprint(
 {
     [Required][MinLength(1)] public string Fingerprint { get; private set; } = fingerprint;
 
-    [Required] public DateTime CreationDate { get; private set; } = DateTime.UtcNow;
-    public DateTime? RevocationDate { get; private set; }
+    [Required] public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+    public DateTime? AllowedAt { get; private set; }
+    public DateTime? RevokedAt { get; private set; }
 
     public Guid UserId { get; set; }
     [InverseProperty(nameof(User.GnuPgKeyFingerprints))]
@@ -26,8 +27,15 @@ public sealed class GnuPgKeyFingerprint(
 
     public void Revoke()
     {
-        RevocationDate = DateTime.UtcNow;
+        RevokedAt = DateTime.UtcNow;
     }
 
-    public bool IsRevoked => RevocationDate is not null;
+    public bool IsRevoked => RevokedAt is not null;
+
+    public void Allow()
+    {
+        AllowedAt = DateTime.UtcNow;
+    }
+
+    public bool IsAllowed => AllowedAt is not null;
 }

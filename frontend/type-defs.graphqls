@@ -140,6 +140,18 @@ type AddUserRolePayload {
   user: User
 }
 
+type AllowGnuPgKeyFingerprintError {
+  code: AllowGnuPgKeyFingerprintErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type AllowGnuPgKeyFingerprintPayload {
+  errors: [AllowGnuPgKeyFingerprintError!]
+  gnuPgKeyFingerprint: GnuPgKeyFingerprint
+  query: Query!
+}
+
 type AppliedMethod {
   arguments: [NamedMethodArgument!]!
   method: Method @cost(weight: "10")
@@ -782,16 +794,36 @@ type GetHttpsResourceTreeRoot {
 }
 
 type GnuPgKeyFingerprint {
-  creationDate: DateTime!
+  allowedAt: DateTime
+  createdAt: DateTime!
   fingerprint: String!
   id: Uuid!
   institution: Institution
   institutionId: Uuid!
+  isAllowed: Boolean!
   isRevoked: Boolean!
-  revocationDate: DateTime
+  revokedAt: DateTime
   user: User
   userId: Uuid!
   version: NonNegativeInt!
+}
+
+"A connection to a list of items."
+type GnuPgKeyFingerprintsConnection {
+  "A list of edges."
+  edges: [GnuPgKeyFingerprintsEdge!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type GnuPgKeyFingerprintsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: GnuPgKeyFingerprint!
 }
 
 type HygrothermalData implements Data {
@@ -834,7 +866,8 @@ type Institution implements Node {
   description: String!
   developedMethods(pending: Boolean! = false where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
-  gnuPgKeyFingerprints: [GnuPgKeyFingerprint!]! @cost(weight: "10")
+  gnuPgKeyFingerprints(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): [GnuPgKeyFingerprint!]! @cost(weight: "10")
+  HasGnuPgKeyFingerprint(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   id: ID!
   managedDataFormats(where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")): InstitutionManagedDataFormatConnection! @cost(weight: "10")
   managedInstitutions(where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")): InstitutionManagedInstitutionConnection! @cost(weight: "10")
@@ -1073,6 +1106,7 @@ type Mutation {
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload! @authorize(policy: "ManageUser") @cost(weight: "10")
+  allowGnuPgKeyFingerprint(input: AllowGnuPgKeyFingerprintInput!): AllowGnuPgKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "Write") @cost(weight: "10")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -1399,6 +1433,8 @@ type Query {
   databases("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DatabaseSortInput!] @cost(weight: "10") where: DatabaseFilterInput @cost(weight: "10")): DatabasesConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   dataFormat(uuid: Uuid!): DataFormat @cost(weight: "10")
   dataFormats("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DataFormatSortInput!] @cost(weight: "10") where: DataFormatFilterInput @cost(weight: "10")): DataFormatsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  gnuPgKeyFingerprint(fingerprint: String!): GnuPgKeyFingerprint @cost(weight: "10")
+  gnuPgKeyFingerprints("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [GnuPgKeyFingerprintSortInput!] @cost(weight: "10") where: GnuPgKeyFingerprintFilterInput @cost(weight: "10")): GnuPgKeyFingerprintsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   institution(uuid: Uuid!): Institution @cost(weight: "10")
   institutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionSortInput!] @cost(weight: "10") where: InstitutionFilterInput @cost(weight: "10")): InstitutionsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   method(uuid: Uuid!): Method @cost(weight: "10")
@@ -1801,7 +1837,8 @@ type User implements Node {
   canCurrentUserManageOpenIdConnect: Boolean! @cost(weight: "10")
   developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10")
-  gnuPgKeyFingerprints: [GnuPgKeyFingerprint!]! @cost(weight: "10")
+  gnuPgKeyFingerprints(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): [GnuPgKeyFingerprint!]! @cost(weight: "10")
+  HasGnuPgKeyFingerprint(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
   id: ID!
   isEmailConfirmed: Boolean @cost(weight: "10")
@@ -1935,6 +1972,10 @@ input AddUserRoleInput {
   userId: Uuid!
 }
 
+input AllowGnuPgKeyFingerprintInput {
+  fingerprint: String!
+}
+
 input BooleanOperationFilterInput {
   equalTo: Boolean @cost(weight: "10")
   notEqualTo: Boolean @cost(weight: "10")
@@ -1988,6 +2029,21 @@ input CoatedSidePropositionInput {
   in: [CoatedSide!]
   notEqualTo: CoatedSide
   notIn: [CoatedSide!]
+}
+
+input ComparableDateTimeOperationFilterInput {
+  equalTo: DateTime @cost(weight: "10")
+  notEqualTo: DateTime @cost(weight: "10")
+  in: [DateTime!] @cost(weight: "10")
+  notIn: [DateTime!] @cost(weight: "10")
+  greaterThan: DateTime @cost(weight: "10")
+  notGreaterThan: DateTime @cost(weight: "10")
+  greaterThanOrEqualTo: DateTime @cost(weight: "10")
+  notGreaterThanOrEqualTo: DateTime @cost(weight: "10")
+  lessThan: DateTime @cost(weight: "10")
+  notLessThan: DateTime @cost(weight: "10")
+  lessThanOrEqualTo: DateTime @cost(weight: "10")
+  notLessThanOrEqualTo: DateTime @cost(weight: "10")
 }
 
 input ComparableGuidOperationFilterInput {
@@ -2089,7 +2145,7 @@ input ComponentConcretizationOfFilterInput {
 input ComponentFilterInput {
   and: [ComponentFilterInput!]
   or: [ComponentFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2127,7 +2183,7 @@ input ComponentPartOfFilterInput {
 }
 
 input ComponentSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   abbreviation: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -2242,7 +2298,7 @@ input CreateOpenIdConnectApplicationInput {
 input DataFormatFilterInput {
   and: [DataFormatFilterInput!]
   or: [DataFormatFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   extension: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2252,7 +2308,7 @@ input DataFormatFilterInput {
 }
 
 input DataFormatSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   extension: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -2264,7 +2320,7 @@ input DataFormatSortInput {
 input DatabaseFilterInput {
   and: [DatabaseFilterInput!]
   or: [DatabaseFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   locator: UriFilterInput
@@ -2272,7 +2328,7 @@ input DatabaseFilterInput {
 }
 
 input DatabaseSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
   locator: UriSortInput @cost(weight: "10")
@@ -2351,10 +2407,36 @@ input GetHttpsResourcesPropositionInput {
   some: GetHttpsResourcePropositionInput
 }
 
+input GnuPgKeyFingerprintFilterInput {
+  and: [GnuPgKeyFingerprintFilterInput!]
+  or: [GnuPgKeyFingerprintFilterInput!]
+  id: ComparableGuidOperationFilterInput
+  fingerprint: StringOperationFilterInput
+  createdAt: ComparableDateTimeOperationFilterInput
+  allowedAt: ComparableNullableOfDateTimeOperationFilterInput
+  revokedAt: ComparableNullableOfDateTimeOperationFilterInput
+  user: UserFilterInput
+  institution: InstitutionFilterInput
+  isRevoked: BooleanOperationFilterInput
+  isAllowed: BooleanOperationFilterInput
+}
+
 input GnuPgKeyFingerprintInput {
   fingerprint: String!
   institutionId: Uuid!
   userId: Uuid!
+}
+
+input GnuPgKeyFingerprintSortInput {
+  id: SortEnumType @cost(weight: "10")
+  fingerprint: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  allowedAt: SortEnumType @cost(weight: "10")
+  revokedAt: SortEnumType @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
+  institution: InstitutionSortInput @cost(weight: "10")
+  isRevoked: SortEnumType @cost(weight: "10")
+  isAllowed: SortEnumType @cost(weight: "10")
 }
 
 input HygrothermalDataPropositionInput {
@@ -2373,7 +2455,7 @@ input IMethodDeveloperFilterInput {
 input InstitutionFilterInput {
   and: [InstitutionFilterInput!]
   or: [InstitutionFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2393,10 +2475,23 @@ input InstitutionFilterInput {
   representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
 }
 
+input InstitutionGnuPgKeyFingerprintFilterInput {
+  and: [InstitutionGnuPgKeyFingerprintFilterInput!]
+  or: [InstitutionGnuPgKeyFingerprintFilterInput!]
+  id: ComparableGuidOperationFilterInput
+  fingerprint: StringOperationFilterInput
+  createdAt: ComparableDateTimeOperationFilterInput
+  allowedAt: ComparableNullableOfDateTimeOperationFilterInput
+  revokedAt: ComparableNullableOfDateTimeOperationFilterInput
+  user: UserFilterInput
+  isRevoked: BooleanOperationFilterInput
+  isAllowed: BooleanOperationFilterInput
+}
+
 input InstitutionManagedDataFormatFilterInput {
   and: [InstitutionManagedDataFormatFilterInput!]
   or: [InstitutionManagedDataFormatFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   extension: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2407,7 +2502,7 @@ input InstitutionManagedDataFormatFilterInput {
 input InstitutionManagedInstitutionFilterInput {
   and: [InstitutionManagedInstitutionFilterInput!]
   or: [InstitutionManagedInstitutionFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2429,7 +2524,7 @@ input InstitutionManagedInstitutionFilterInput {
 input InstitutionManagedMethodFilterInput {
   and: [InstitutionManagedMethodFilterInput!]
   or: [InstitutionManagedMethodFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   calculationLocator: UriFilterInput
@@ -2454,7 +2549,7 @@ input InstitutionMethodDeveloperFilterInput {
 input InstitutionOperatedDatabaseFilterInput {
   and: [InstitutionOperatedDatabaseFilterInput!]
   or: [InstitutionOperatedDatabaseFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   locator: UriFilterInput
@@ -2500,7 +2595,7 @@ input InstitutionRepresentativeRoleOperationFilterInput {
 }
 
 input InstitutionSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   abbreviation: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -2665,7 +2760,7 @@ input MethodCategoryOperationFilterInput {
 input MethodFilterInput {
   and: [MethodFilterInput!]
   or: [MethodFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   calculationLocator: UriFilterInput
@@ -2678,7 +2773,7 @@ input MethodFilterInput {
 }
 
 input MethodSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
   calculationLocator: UriSortInput @cost(weight: "10")
@@ -3079,11 +3174,24 @@ input UserDevelopedMethodFilterInput {
 input UserFilterInput {
   and: [UserFilterInput!]
   or: [UserFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   developedMethods: ListMethodFilterTypeFilterInput
   developedMethodEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
   representedInstitutions: ListInstitutionFilterTypeFilterInput
   representedInstitutionEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
+}
+
+input UserGnuPgKeyFingerprintFilterInput {
+  and: [UserGnuPgKeyFingerprintFilterInput!]
+  or: [UserGnuPgKeyFingerprintFilterInput!]
+  id: ComparableGuidOperationFilterInput
+  fingerprint: StringOperationFilterInput
+  createdAt: ComparableDateTimeOperationFilterInput
+  allowedAt: ComparableNullableOfDateTimeOperationFilterInput
+  revokedAt: ComparableNullableOfDateTimeOperationFilterInput
+  institution: InstitutionFilterInput
+  isRevoked: BooleanOperationFilterInput
+  isAllowed: BooleanOperationFilterInput
 }
 
 input UserRepresentedInstitutionFilterInput {
@@ -3094,7 +3202,7 @@ input UserRepresentedInstitutionFilterInput {
 }
 
 input UserSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
 }
 
 input UuidPropositionInput {
@@ -3177,6 +3285,12 @@ enum AddUserRoleErrorCode {
   UNKNOWN
   UNKNOWN_USER
   UNAUTHORIZED
+}
+
+enum AllowGnuPgKeyFingerprintErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_FINGERPRINT
 }
 
 "Defines when a policy shall be executed."

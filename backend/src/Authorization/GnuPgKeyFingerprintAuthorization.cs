@@ -25,8 +25,26 @@ public sealed class GnuPgKeyFingerprintAuthorization(
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            async user => IsSame(user, userId) && await IsOwnerOfVerifiedInstitution(user, institutionId, cancellationToken),
+            async user => IsSame(user, userId) && await IsAtLeastAssistantOfVerifiedInstitution(user, institutionId, cancellationToken),
             application => Task.FromResult(false),
+            cancellationToken
+        );
+    }
+
+    internal Task<bool> IsAuthorizedToAllow(
+        ClaimsPrincipal claimsPrincipal,
+        Guid institutionId,
+        CancellationToken cancellationToken
+    )
+    {
+        return AuthorizeAsync(
+            claimsPrincipal,
+            async user => await IsOwnerOfVerifiedInstitution(user, institutionId, cancellationToken),
+            application => BelongsToInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }

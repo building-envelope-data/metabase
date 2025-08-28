@@ -1,8 +1,11 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Data;
+using HotChocolate.Data.Sorting;
 using HotChocolate.Types;
 using Metabase.Data;
+using Metabase.GraphQl.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
@@ -10,31 +13,25 @@ namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 [ExtendObjectType(nameof(Query))]
 public sealed class GnuPgKeyFingerprintQueries
 {
-    public Task<GnuPgKeyFingerprint?> GetGnuPgKeyFingerprintAsync(
-        string fingerprint,
+    [UsePaging]
+    // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
+    [UseFiltering]
+    [UseSorting]
+    public IQueryable<GnuPgKeyFingerprint> GetGnuPgKeyFingerprints(
         ApplicationDbContext context,
-        CancellationToken cancellationToken
+        ISortingContext sorting
     )
     {
-        return context.GnuPgKeyFingerprints.AsQueryable()
-            .SingleOrDefaultAsync(f =>
-                f.Fingerprint == fingerprint,
-                cancellationToken
-            );
+        sorting.StabilizeOrder<GnuPgKeyFingerprint>();
+        return context.GnuPgKeyFingerprints.AsNoTracking();
     }
 
-    public async Task<bool> VerifyGnuPgKeyFingerprintAsync(
-        string fingerpint,
-        ApplicationDbContext context,
+    public Task<GnuPgKeyFingerprint?> GetGnuPgKeyFingerprintAsync(
+        string fingerprint,
+        GnuPgKeyFingerprintByFingerprintDataLoader byFingerprint,
         CancellationToken cancellationToken
     )
     {
-        var fingerprint = await context.GnuPgKeyFingerprints.AsQueryable()
-                .SingleOrDefaultAsync(f =>
-                    f.Fingerprint == fingerpint,
-                    cancellationToken
-                );
-        return fingerprint is not null
-            && !fingerprint.IsRevoked;
+        return byFingerprint.LoadAsync(fingerprint, cancellationToken);
     }
 }
