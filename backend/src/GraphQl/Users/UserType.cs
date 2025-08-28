@@ -20,6 +20,7 @@ using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using UserRole = Metabase.Enumerations.UserRole;
 using Metabase.GraphQl.UserMethodDevelopers;
+using GreenDonut;
 
 namespace Metabase.GraphQl.Users;
 
@@ -259,10 +260,23 @@ public sealed class UserType
                     context.GetQueryContext<InstitutionRepresentative>()
                 )
             );
+        descriptor
+            .Field(t => t.GnuPgKeyFingerprints)
+            .ResolveWith<UserResolvers>(x =>
+                UserResolvers.GetGnuPgKeyFingerprintsAsync(default!, default!, default!));
     }
 
     private sealed class UserResolvers
     {
+        public static Task<GnuPgKeyFingerprint[]> GetGnuPgKeyFingerprintsAsync(
+            [Parent] User user,
+            GnuPgKeyFingerprintsByUserIdDataLoader dataLoader,
+            CancellationToken cancellationToken
+        )
+        {
+            return dataLoader.LoadRequiredAsync(user.Id, cancellationToken);
+        }
+
         // Inspired by https://github.com/dotnet/Scaffolding/blob/main/src/Scaffolding/VS.Web.CG.Mvc/Templates/Identity/Bootstrap4/Pages/Account/Manage/Account.Manage.TwoFactorAuthentication.cs.cshtml
         public static async Task<TwoFactorAuthentication?> GetTwoFactorAuthenticationAsync(
             [Parent] User user,

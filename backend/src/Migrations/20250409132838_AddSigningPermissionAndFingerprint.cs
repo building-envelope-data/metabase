@@ -9,6 +9,13 @@ namespace Metabase.Migrations;
 /// <inheritdoc />
 public partial class AddSigningPermissionAndFingerprint : Migration
 {
+    public enum DataSigningPermission
+    {
+        NEVER,
+        ALLOWED,
+        FORBIDDEN
+    }
+
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {

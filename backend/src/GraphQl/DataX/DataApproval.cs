@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Metabase.Data;
 using Metabase.GraphQl.Institutions;
 
@@ -11,6 +12,7 @@ public sealed class DataApproval(
     string signature,
     string keyFingerprint,
     string query,
+    JsonElement variables,
     string response,
     Guid approverId
     )
@@ -21,6 +23,7 @@ public sealed class DataApproval(
     public string Signature { get; } = signature;
     public string KeyFingerprint { get; } = keyFingerprint;
     public string Query { get; } = query;
+    public JsonElement Variables { get; } = variables;
     public string Response { get; } = response;
 
     public Task<Institution?> GetApproverAsync(

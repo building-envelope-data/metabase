@@ -103,8 +103,7 @@ public sealed class Institution
     [InverseProperty(nameof(Manager))]
     public ICollection<Institution> ManagedInstitutions { get; } = [];
 
-    public ICollection<InstitutionRepresentative> RepresentativeEdges { get; } =
-        [];
+    public ICollection<InstitutionRepresentative> RepresentativeEdges { get; } = [];
 
     public ICollection<User> Representatives { get; } = [];
 
@@ -112,6 +111,9 @@ public sealed class Institution
     public ICollection<OpenIdConnectApplication> OpenIdConnectApplications { get; } = [];
 
     [Required][MinLength(1)] public string Name { get; private set; }
+
+    [InverseProperty(nameof(GnuPgKeyFingerprint.Institution))]
+    public ICollection<GnuPgKeyFingerprint> GnuPgKeyFingerprints { get; } = [];
 
     public void Update(
         string name,

@@ -9,6 +9,5 @@ public enum VerifyGnuPgKeyFingerprintErrorCode
     UNAUTHORIZED,
     UNKNOWN_INSTITUTION,
     UNKNOWN_USER,
-    UNKNOWN_REPRESENTATIVE,
     UNKNOWN_FINGERPRINT,
 }

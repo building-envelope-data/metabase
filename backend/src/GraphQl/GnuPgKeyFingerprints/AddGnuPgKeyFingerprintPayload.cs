@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 
 public sealed class AddGnuPgKeyFingerprintPayload
 {
     public AddGnuPgKeyFingerprintPayload(
-        string gnuPgKeyFingerprint
+        GnuPgKeyFingerprint gnuPgKeyFingerprint
     )
     {
         GnuPgKeyFingerprint = gnuPgKeyFingerprint;
@@ -25,6 +26,6 @@ public sealed class AddGnuPgKeyFingerprintPayload
     {
     }
 
-    public string? GnuPgKeyFingerprint { get; }
+    public GnuPgKeyFingerprint? GnuPgKeyFingerprint { get; }
     public IReadOnlyCollection<AddGnuPgKeyFingerprintError>? Errors { get; }
 }

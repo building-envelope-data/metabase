@@ -15,6 +15,8 @@ using Metabase.GraphQl.DataFormats;
 using Metabase.GraphQl.InstitutionMethodDevelopers;
 using Metabase.GraphQl.OpenIdConnect.Applications;
 using Metabase.Data.OpenIdConnect;
+using System.Collections.Generic;
+using GreenDonut;
 
 namespace Metabase.GraphQl.Institutions;
 
@@ -141,6 +143,10 @@ public sealed class InstitutionType
                 )
             );
         descriptor
+            .Field(t => t.GnuPgKeyFingerprints)
+            .ResolveWith<InstitutionResolvers>(x =>
+                InstitutionResolvers.GetGnuPgKeyFingerprintsAsync(default!, default!, default!));
+        descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<InstitutionResolvers>(x =>
                 InstitutionResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
@@ -159,6 +165,15 @@ public sealed class InstitutionType
 
     private sealed class InstitutionResolvers
     {
+        public static Task<GnuPgKeyFingerprint[]> GetGnuPgKeyFingerprintsAsync(
+            [Parent] Institution institution,
+            GnuPgKeyFingerprintsByInstitutionIdDataLoader dataLoader,
+            CancellationToken cancellationToken
+        )
+        {
+            return dataLoader.LoadRequiredAsync(institution.Id, cancellationToken);
+        }
+
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,

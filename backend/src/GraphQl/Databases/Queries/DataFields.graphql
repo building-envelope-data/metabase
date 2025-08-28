@@ -29,6 +29,7 @@ fragment DataFields on Data {
     signature
     keyFingerprint
     query
+    variables
     response
     approverId
   }
@@ -80,8 +81,12 @@ fragment DataFields on Data {
     }
   }
   # approval {
+  #   timestamp
   #   signature
   #   keyFingerprint
+  #   query
+  #   variables
+  #   response
   # }
   locale
 }

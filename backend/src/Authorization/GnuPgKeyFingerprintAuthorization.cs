@@ -10,49 +10,42 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.Authorization;
 
-public sealed class InstitutionRepresentativeAuthorization(
+public sealed class GnuPgKeyFingerprintAuthorization(
     IDbContextFactory<ApplicationDbContext> dbContextFactory,
     UserManager<User> userManager,
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
 ) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
-    internal Task<bool> IsAuthorizedToManage(
+    internal Task<bool> IsAuthorizedToAdd(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,
-        CancellationToken cancellationToken
-    )
-    {
-        return AuthorizeAsync(
-            claimsPrincipal,
-            user => IsOwnerOfVerifiedInstitution(
-                   user,
-                   institutionId,
-                   cancellationToken
-               ),
-            application => BelongsToVerifiedInstitution(
-                application,
-                institutionId,
-                cancellationToken
-            ),
-            cancellationToken
-        );
-    }
-
-    internal Task<bool> IsAuthorizedToConfirm(
-        ClaimsPrincipal claimsPrincipal,
         Guid userId,
         CancellationToken cancellationToken
     )
     {
         return AuthorizeAsync(
             claimsPrincipal,
-            loggedInUser => Task.FromResult(
-                IsSame(
-                   loggedInUser,
-                   userId
-               )
-            ),
+            async user => IsSame(user, userId) && await IsOwnerOfVerifiedInstitution(user, institutionId, cancellationToken),
             application => Task.FromResult(false),
+            cancellationToken
+        );
+    }
+
+    internal Task<bool> IsAuthorizedToRevoke(
+        ClaimsPrincipal claimsPrincipal,
+        Guid institutionId,
+        Guid userId,
+        CancellationToken cancellationToken
+    )
+    {
+        return AuthorizeAsync(
+            claimsPrincipal,
+            async user => IsSame(user, userId) || await IsOwnerOfVerifiedInstitution(user, institutionId, cancellationToken),
+            application => BelongsToInstitution(
+                application,
+                institutionId,
+                cancellationToken
+            ),
             cancellationToken
         );
     }
