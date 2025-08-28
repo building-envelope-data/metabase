@@ -120,7 +120,7 @@ mutation SwitchInstitutionOperatingState($institutionId: Uuid!) {
 }
 
 query Institution($uuid: Uuid!) {
-  institution(uuid: $uuid) {
+  institution(id: $uuid) {
     ...InstitutionPartial
     extras
     canCurrentUserUpdateNode

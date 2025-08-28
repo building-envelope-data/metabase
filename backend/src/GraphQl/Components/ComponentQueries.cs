@@ -28,13 +28,13 @@ public sealed class ComponentQueries
     }
 
     public Task<Component?> GetComponentAsync(
-        Guid uuid,
+        Guid id,
         ComponentByIdDataLoader componentById,
         CancellationToken cancellationToken
     )
     {
         return componentById.LoadAsync(
-            uuid,
+            id,
             cancellationToken
         );
     }

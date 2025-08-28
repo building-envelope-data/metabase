@@ -48,7 +48,7 @@ query Components {
 }
 
 query Component($uuid: Uuid!) {
-  component(uuid: $uuid) {
+  component(id: $uuid) {
     id
     uuid
     name

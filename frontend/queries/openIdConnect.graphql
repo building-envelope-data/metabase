@@ -43,7 +43,7 @@ query Applications {
 }
 
 query Application($uuid: Uuid!) {
-  openIdConnectApplication(uuid: $uuid) {
+  openIdConnectApplication(id: $uuid) {
     ...ApplicationPartial
     authorizations {
       edges {

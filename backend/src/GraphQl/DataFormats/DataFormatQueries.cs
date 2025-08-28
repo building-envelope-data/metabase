@@ -28,13 +28,13 @@ public sealed class DataFormatQueries
     }
 
     public Task<DataFormat?> GetDataFormatAsync(
-        Guid uuid,
+        Guid id,
         DataFormatByIdDataLoader dataFormatById,
         CancellationToken cancellationToken
     )
     {
         return dataFormatById.LoadAsync(
-            uuid,
+            id,
             cancellationToken
         );
     }

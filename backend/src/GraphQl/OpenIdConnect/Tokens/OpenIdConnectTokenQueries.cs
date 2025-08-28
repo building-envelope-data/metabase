@@ -38,18 +38,18 @@ public sealed class OpenIdConnectTokenQueries
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async Task<OpenIdConnectToken?> GetOpenIdConnectTokenAsync(
-        Guid uuid,
+        Guid id,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         OpenIddictTokenManager<OpenIdConnectToken> tokenManager,
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToManageToken(claimsPrincipal, uuid, tokenManager, cancellationToken))
+        if (!await authorization.IsAuthorizedToManageToken(claimsPrincipal, id, tokenManager, cancellationToken))
         {
             return null;
         }
 
-        return await tokenManager.FindByIdAsync(uuid.ToString(), cancellationToken: cancellationToken);
+        return await tokenManager.FindByIdAsync(id.ToString(), cancellationToken: cancellationToken);
     }
 }

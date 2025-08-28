@@ -49,13 +49,13 @@ public sealed class InstitutionQueries
     }
 
     public Task<Institution?> GetInstitutionAsync(
-        Guid uuid,
+        Guid id,
         InstitutionByIdDataLoader institutionById,
         CancellationToken cancellationToken
     )
     {
         return institutionById.LoadAsync(
-            uuid,
+            id,
             cancellationToken
         );
     }

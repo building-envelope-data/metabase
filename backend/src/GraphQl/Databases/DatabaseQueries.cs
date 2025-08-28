@@ -46,13 +46,13 @@ public sealed class DatabaseQueries
     }
 
     public Task<Database?> GetDatabaseAsync(
-        Guid uuid,
+        Guid id,
         DatabaseByIdDataLoader databaseById,
         CancellationToken cancellationToken
     )
     {
         return databaseById.LoadAsync(
-            uuid,
+            id,
             cancellationToken
         );
     }

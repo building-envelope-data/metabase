@@ -36,7 +36,7 @@ query PendingDatabases {
 }
 
 query Database($uuid: Uuid!) {
-  database(uuid: $uuid) {
+  database(id: $uuid) {
     ...DatabasePartial
     canCurrentUserUpdateNode
     canCurrentUserVerifyNode
