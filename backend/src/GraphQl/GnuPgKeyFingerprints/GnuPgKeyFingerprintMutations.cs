@@ -73,6 +73,20 @@ public sealed class GnuPgKeyFingerprintMutations
             );
         }
 
+        if (!await context.GnuPgKeyFingerprints.AsQueryable()
+                .Where(f => f.Fingerprint == input.Fingerprint)
+                .AnyAsync(cancellationToken)
+           )
+        {
+            errors.Add(
+                new AddGnuPgKeyFingerprintError(
+                    AddGnuPgKeyFingerprintErrorCode.DUPLICATE_FINGERPRINT,
+                    "The fingerprint does already exist.",
+                    [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
+                )
+            );
+        }
+
         if (errors.Count is not 0)
         {
             return new AddGnuPgKeyFingerprintPayload(errors.AsReadOnly());

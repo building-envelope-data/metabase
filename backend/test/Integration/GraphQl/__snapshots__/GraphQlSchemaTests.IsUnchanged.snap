@@ -3146,6 +3146,7 @@ enum AddGnuPgKeyFingerprintErrorCode {
   UNAUTHORIZED
   UNKNOWN_INSTITUTION
   UNKNOWN_USER
+  DUPLICATE_FINGERPRINT
 }
 
 enum AddInstitutionMethodDeveloperErrorCode {
@@ -3648,8 +3649,6 @@ enum ResetUserTwoFactorAuthenticatorErrorCode {
 enum RevokeGnuPgKeyFingerprintErrorCode {
   UNKNOWN
   UNAUTHORIZED
-  UNKNOWN_INSTITUTION
-  UNKNOWN_USER
   UNKNOWN_FINGERPRINT
 }
 
