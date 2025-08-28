@@ -7,7 +7,5 @@ public enum RevokeGnuPgKeyFingerprintErrorCode
 {
     UNKNOWN,
     UNAUTHORIZED,
-    UNKNOWN_INSTITUTION,
-    UNKNOWN_USER,
     UNKNOWN_FINGERPRINT
 }

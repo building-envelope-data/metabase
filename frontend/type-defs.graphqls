@@ -85,7 +85,7 @@ type AddGnuPgKeyFingerprintError {
 
 type AddGnuPgKeyFingerprintPayload {
   errors: [AddGnuPgKeyFingerprintError!]
-  gnuPgKeyFingerprint: String
+  gnuPgKeyFingerprint: GnuPgKeyFingerprint
   query: Query!
 }
 
@@ -138,18 +138,6 @@ type AddUserRolePayload {
   errors: [AddUserRoleError!]
   query: Query!
   user: User
-}
-
-type AllowRepresentativeToSignDataError {
-  code: AllowRepresentativeToSignDataErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type AllowRepresentativeToSignDataPayload {
-  errors: [AllowRepresentativeToSignDataError!]
-  institutionRepresentative: InstitutionRepresentative
-  query: Query!
 }
 
 type AppliedMethod {
@@ -512,6 +500,7 @@ type DataApproval {
   response: String!
   signature: String!
   timestamp: DateTime!
+  variables: Any!
 }
 
 type DataFormat implements Node {
@@ -694,18 +683,6 @@ type FileMetaInformation {
   path: [String!]!
 }
 
-type ForbidRepresentativeToSignDataError {
-  code: ForbidRepresentativeToSignDataErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type ForbidRepresentativeToSignDataPayload {
-  errors: [ForbidRepresentativeToSignDataError!]
-  institutionRepresentative: InstitutionRepresentative
-  query: Query!
-}
-
 type ForgetUserTwoFactorAuthenticationClientError {
   code: ForgetUserTwoFactorAuthenticationClientErrorCode!
   message: String!
@@ -804,6 +781,19 @@ type GetHttpsResourceTreeRoot {
   vertexId: String!
 }
 
+type GnuPgKeyFingerprint {
+  creationDate: DateTime!
+  fingerprint: String!
+  id: Uuid!
+  institution: Institution
+  institutionId: Uuid!
+  isRevoked: Boolean!
+  revocationDate: DateTime
+  user: User
+  userId: Uuid!
+  version: NonNegativeInt!
+}
+
 type HygrothermalData implements Data {
   appliedMethod: AppliedMethod!
   approvals: [DataApproval!]!
@@ -844,6 +834,7 @@ type Institution implements Node {
   description: String!
   developedMethods(pending: Boolean! = false where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
+  gnuPgKeyFingerprints: [GnuPgKeyFingerprint!]! @cost(weight: "10")
   id: ID!
   managedDataFormats(where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")): InstitutionManagedDataFormatConnection! @cost(weight: "10")
   managedInstitutions(where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")): InstitutionManagedInstitutionConnection! @cost(weight: "10")
@@ -942,17 +933,6 @@ type InstitutionOwnedOpenIdConnectApplicationConnection {
 type InstitutionOwnedOpenIdConnectApplicationEdge {
   canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
   node: OpenIdConnectApplication!
-}
-
-type InstitutionRepresentative {
-  dataSigningPermission: DataSigningPermission!
-  gnuPgKeyFingerprints: [String!]!
-  institution: Institution!
-  institutionId: Uuid!
-  pending: Boolean!
-  role: InstitutionRepresentativeRole!
-  user: User!
-  userId: Uuid!
 }
 
 type InstitutionRepresentativeConnection {
@@ -1093,7 +1073,6 @@ type Mutation {
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload! @authorize(policy: "ManageUser") @cost(weight: "10")
-  allowRepresentativeToSignData(input: AllowRepresentativeToSignDataInput!): AllowRepresentativeToSignDataPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "Write") @cost(weight: "10")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -1116,7 +1095,6 @@ type Mutation {
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   enableUserTwoFactorAuthenticator(input: EnableUserTwoFactorAuthenticatorInput!): EnableUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
-  forbidRepresentativeToSignData(input: ForbidRepresentativeToSignDataInput!): ForbidRepresentativeToSignDataPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -1138,6 +1116,7 @@ type Mutation {
   resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload! @cost(weight: "10")
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
+  revokeGnuPgKeyFingerprint(input: RevokeGnuPgKeyFingerprintInput!): RevokeGnuPgKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   revokeOpenIdConnectToken(input: RevokeOpenIdConnectTokenInput!): RevokeOpenIdConnectTokenPayload! @authorize(policy: "Write") @cost(weight: "10")
   setComponentExtras(input: SetComponentExtrasInput!): SetComponentExtrasPayload! @authorize(policy: "Write") @cost(weight: "10")
   setInstitutionExtras(input: SetInstitutionExtrasInput!): SetInstitutionExtrasPayload! @authorize(policy: "Write") @cost(weight: "10")
@@ -1618,6 +1597,19 @@ type ResponseApproval {
   response: String!
   signature: String!
   timestamp: DateTime!
+  variables: Any!
+}
+
+type RevokeGnuPgKeyFingerprintError {
+  code: RevokeGnuPgKeyFingerprintErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type RevokeGnuPgKeyFingerprintPayload {
+  errors: [RevokeGnuPgKeyFingerprintError!]
+  gnuPgKeyFingerprint: GnuPgKeyFingerprint
+  query: Query!
 }
 
 type RevokeOpenIdConnectTokenError {
@@ -1809,6 +1801,7 @@ type User implements Node {
   canCurrentUserManageOpenIdConnect: Boolean! @cost(weight: "10")
   developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10")
+  gnuPgKeyFingerprints: [GnuPgKeyFingerprint!]! @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
   id: ID!
   isEmailConfirmed: Boolean @cost(weight: "10")
@@ -1849,7 +1842,6 @@ type UserRepresentedInstitutionConnection {
 }
 
 type UserRepresentedInstitutionEdge {
-  dataSigningPermission: DataSigningPermission!
   node: Institution! @cost(weight: "10")
   role: InstitutionRepresentativeRole!
 }
@@ -1940,11 +1932,6 @@ input AddUserMethodDeveloperInput {
 
 input AddUserRoleInput {
   role: UserRole!
-  userId: Uuid!
-}
-
-input AllowRepresentativeToSignDataInput {
-  institutionId: Uuid!
   userId: Uuid!
 }
 
@@ -2342,11 +2329,6 @@ input FloatsPropositionInput {
   all: FloatPropositionInput
   none: FloatPropositionInput
   some: FloatPropositionInput
-}
-
-input ForbidRepresentativeToSignDataInput {
-  institutionId: Uuid!
-  userId: Uuid!
 }
 
 input GeometricDataPropositionInput {
@@ -2902,6 +2884,10 @@ input ResetUserPasswordInput {
   resetCode: String!
 }
 
+input RevokeGnuPgKeyFingerprintInput {
+  fingerprint: String!
+}
+
 input RevokeOpenIdConnectTokenInput {
   tokenId: Uuid!
 }
@@ -3160,8 +3146,6 @@ enum AddGnuPgKeyFingerprintErrorCode {
   UNAUTHORIZED
   UNKNOWN_INSTITUTION
   UNKNOWN_USER
-  NOT_ALLOWED
-  UNKNOWN_REPRESENTATIVE
 }
 
 enum AddInstitutionMethodDeveloperErrorCode {
@@ -3191,13 +3175,6 @@ enum AddUserMethodDeveloperErrorCode {
 enum AddUserRoleErrorCode {
   UNKNOWN
   UNKNOWN_USER
-  UNAUTHORIZED
-}
-
-enum AllowRepresentativeToSignDataErrorCode {
-  UNKNOWN
-  UNKNOWN_USER
-  UNKNOWN_INSTITUTION
   UNAUTHORIZED
 }
 
@@ -3353,12 +3330,6 @@ enum DataKind {
   GEOMETRIC_DATA
 }
 
-enum DataSigningPermission {
-  NEVER
-  ALLOWED
-  FORBIDDEN
-}
-
 enum DatabaseVerificationState {
   PENDING
   VERIFIED
@@ -3406,13 +3377,6 @@ enum EnableUserTwoFactorAuthenticatorErrorCode {
   UNKNOWN_USER
   ENABLING_FAILED
   INVALID_VERIFICATION_CODE
-}
-
-enum ForbidRepresentativeToSignDataErrorCode {
-  UNKNOWN
-  UNKNOWN_USER
-  UNKNOWN_INSTITUTION
-  UNAUTHORIZED
 }
 
 enum ForgetUserTwoFactorAuthenticationClientErrorCode {
@@ -3679,6 +3643,14 @@ enum ResetUserTwoFactorAuthenticatorErrorCode {
   UNKNOWN_USER
   DISABLING_FAILED
   RESETTING_FAILED
+}
+
+enum RevokeGnuPgKeyFingerprintErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_INSTITUTION
+  UNKNOWN_USER
+  UNKNOWN_FINGERPRINT
 }
 
 enum RevokeOpenIdConnectTokenErrorCode {

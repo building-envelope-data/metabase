@@ -87,67 +87,16 @@ public sealed class GnuPgKeyFingerprintMutations
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<RevokeGnuPgKeyFingerprintPayload> RevokeGnuPgKeyFingerprintAsync(
-        GnuPgKeyFingerprintInput input,
+        RevokeGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
         GnuPgKeyFingerprintAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToRevoke(
-                claimsPrincipal,
-                input.InstitutionId,
-                input.UserId,
-                cancellationToken
-            )
-           )
-        {
-            return new RevokeGnuPgKeyFingerprintPayload(
-                new RevokeGnuPgKeyFingerprintError(
-                    RevokeGnuPgKeyFingerprintErrorCode.UNAUTHORIZED,
-                    "You are not authorized to revoke GnuPG key fingerprints.",
-                    []
-                )
-            );
-        }
-
-        var errors = new List<RevokeGnuPgKeyFingerprintError>();
-        if (!await context.Institutions.AsQueryable()
-                .Where(i => i.Id == input.InstitutionId)
-                .AnyAsync(cancellationToken)
-           )
-        {
-            errors.Add(
-                new RevokeGnuPgKeyFingerprintError(
-                    RevokeGnuPgKeyFingerprintErrorCode.UNKNOWN_INSTITUTION,
-                    "Unknown institution.",
-                    [nameof(input), nameof(input.InstitutionId).FirstCharToLower()]
-                )
-            );
-        }
-
-        if (!await context.Users.AsQueryable()
-                .Where(u => u.Id == input.UserId)
-                .AnyAsync(cancellationToken)
-           )
-        {
-            errors.Add(
-                new RevokeGnuPgKeyFingerprintError(
-                    RevokeGnuPgKeyFingerprintErrorCode.UNKNOWN_USER,
-                    "Unknown user.",
-                    [nameof(input), nameof(input.UserId).FirstCharToLower()]
-                )
-            );
-        }
-
-        if (errors.Count is not 0)
-        {
-            return new RevokeGnuPgKeyFingerprintPayload(errors.AsReadOnly());
-        }
-
         var fingerprint = await context.GnuPgKeyFingerprints.AsQueryable()
                 .SingleOrDefaultAsync(f =>
-                    f.InstitutionId == input.InstitutionId && f.UserId == input.UserId,
+                    f.Fingerprint == input.Fingerprint,
                     cancellationToken
                 );
         if (fingerprint is null)
@@ -160,7 +109,22 @@ public sealed class GnuPgKeyFingerprintMutations
                 )
             );
         }
-
+        if (!await authorization.IsAuthorizedToRevoke(
+                claimsPrincipal,
+                fingerprint.InstitutionId,
+                fingerprint.UserId,
+                cancellationToken
+            )
+           )
+        {
+            return new RevokeGnuPgKeyFingerprintPayload(
+                new RevokeGnuPgKeyFingerprintError(
+                    RevokeGnuPgKeyFingerprintErrorCode.UNAUTHORIZED,
+                    "You are not authorized to revoke the GnuPG key fingerprint.",
+                    [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
+                )
+            );
+        }
         fingerprint.Revoke();
         await context.SaveChangesAsync(cancellationToken);
         return new RevokeGnuPgKeyFingerprintPayload(fingerprint);
