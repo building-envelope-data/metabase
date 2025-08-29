@@ -25,7 +25,6 @@ namespace Metabase.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "component_category", new[] { "layer", "material", "unit" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "data_signing_permission", new[] { "allowed", "forbidden", "never" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "database_verification_state", new[] { "pending", "verified" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "institution_operating_state", new[] { "not_operating", "operating" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "metabase", "institution_representative_role", new[] { "assistant", "owner" });
@@ -227,6 +226,50 @@ namespace Metabase.Migrations
                     b.ToTable("database", "metabase");
                 });
 
+            modelBuilder.Entity("Metabase.Data.GnuPgKeyFingerprint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime?>("AllowedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Fingerprint")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ForbiddenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("InstitutionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Fingerprint")
+                        .IsUnique();
+
+                    b.HasIndex("InstitutionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("gnu_pg_fingerprint", "metabase");
+                });
+
             modelBuilder.Entity("Metabase.Data.Institution", b =>
                 {
                     b.Property<Guid>("Id")
@@ -301,13 +344,6 @@ namespace Metabase.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
-
-                    b.Property<DataSigningPermission>("DataSigningPermission")
-                        .HasColumnType("metabase.data_signing_permission");
-
-                    b.PrimitiveCollection<string[]>("GnuPgKeyFingerprints")
-                        .IsRequired()
-                        .HasColumnType("text[]");
 
                     b.Property<bool>("Pending")
                         .HasColumnType("boolean");
@@ -1465,6 +1501,25 @@ namespace Metabase.Migrations
                     b.Navigation("Operator");
                 });
 
+            modelBuilder.Entity("Metabase.Data.GnuPgKeyFingerprint", b =>
+                {
+                    b.HasOne("Metabase.Data.Institution", "Institution")
+                        .WithMany("GnuPgKeyFingerprints")
+                        .HasForeignKey("InstitutionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Metabase.Data.User", "User")
+                        .WithMany("GnuPgKeyFingerprints")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Institution");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Metabase.Data.Institution", b =>
                 {
                     b.HasOne("Metabase.Data.Institution", "Manager")
@@ -1749,6 +1804,8 @@ namespace Metabase.Migrations
                 {
                     b.Navigation("DevelopedMethodEdges");
 
+                    b.Navigation("GnuPgKeyFingerprints");
+
                     b.Navigation("ManagedDataFormats");
 
                     b.Navigation("ManagedInstitutions");
@@ -1786,6 +1843,8 @@ namespace Metabase.Migrations
             modelBuilder.Entity("Metabase.Data.User", b =>
                 {
                     b.Navigation("DevelopedMethodEdges");
+
+                    b.Navigation("GnuPgKeyFingerprints");
 
                     b.Navigation("RepresentedInstitutionEdges");
                 });

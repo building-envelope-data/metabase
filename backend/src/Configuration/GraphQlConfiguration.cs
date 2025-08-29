@@ -140,11 +140,12 @@ public static class GraphQlConfiguration
             .AddType(new UrlType("Url"))
             .AddType(new JsonType("Any", BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
             .AddType(new LocaleType())
-                                                                    // Query Types
+            // Query Types
             .AddQueryType(d => d.Name(nameof(Query)))
             .AddType<ComponentQueries>()
             .AddType<DataFormatQueries>()
             .AddType<DatabaseQueries>()
+            .AddType<GnuPgKeyFingerprintQueries>()
             .AddType<InstitutionQueries>()
             .AddType<MethodQueries>()
             .AddType<OpenIdConnectApplicationQueries>()
@@ -160,6 +161,7 @@ public static class GraphQlConfiguration
             .AddType<ComponentMutations>()
             .AddType<DataFormatMutations>()
             .AddType<DatabaseMutations>()
+            .AddType<GnuPgKeyFingerprintMutations>()
             .AddType<InstitutionMethodDeveloperMutations>()
             .AddType<InstitutionRepresentativeMutations>()
             .AddType<InstitutionMutations>()
@@ -169,7 +171,6 @@ public static class GraphQlConfiguration
             .AddType<OpenIdConnectApplicationMutations>()
             .AddType<OpenIdConnectAuthorizationMutations>()
             .AddType<OpenIdConnectTokenMutations>()
-            .AddType<GnuPgKeyFingerprintMutations>()
             /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
             /*     .AddType<ComponentSubscriptions>() */
             // Object Types
@@ -181,6 +182,7 @@ public static class GraphQlConfiguration
             .AddType<DataApproval>()
             .AddType<GetHttpsResourceTreeNonRootVertex>()
             .AddType<GetHttpsResourceTreeRoot>()
+            .AddType<GnuPgKeyFingerprintType>()
             .AddType<IData>()
             .AddType<HygrothermalData>()
             .AddType<OpticalData>()
@@ -368,6 +370,7 @@ public partial class CustomFilterConvention : FilterConvention
         descriptor.BindRuntimeType<DataFormat, DataFormatFilterType>();
         descriptor.BindRuntimeType<Database, DatabaseFilterType>();
         descriptor.BindRuntimeType<DescriptionOrReference, DescriptionOrReferenceFilterType>();
+        descriptor.BindRuntimeType<GnuPgKeyFingerprint, GnuPgKeyFingerprintFilterType>();
         descriptor.BindRuntimeType<Institution, InstitutionFilterType>();
         descriptor.BindRuntimeType<Method, MethodFilterType>();
         descriptor.BindRuntimeType<OpenIdConnectApplication, OpenIdConnectApplicationFilterType>();
@@ -499,6 +502,7 @@ public partial class CustomSortConvention : SortConvention
         descriptor.BindRuntimeType<DataFormat, DataFormatSortType>();
         descriptor.BindRuntimeType<Database, DatabaseSortType>();
         descriptor.BindRuntimeType<DescriptionOrReference, DescriptionOrReferenceSortType>();
+        descriptor.BindRuntimeType<GnuPgKeyFingerprint, GnuPgKeyFingerprintSortType>();
         descriptor.BindRuntimeType<Institution, InstitutionSortType>();
         descriptor.BindRuntimeType<InstitutionMethodDeveloper, InstitutionMethodDeveloperSortType>();
         descriptor.BindRuntimeType<InstitutionRepresentative, InstitutionRepresentativeSortType>();

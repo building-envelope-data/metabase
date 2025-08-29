@@ -13,6 +13,13 @@ using NpgsqlTypes;
 
 namespace Metabase.Migrations
 {
+    public enum DataSigningPermission
+    {
+        NEVER,
+        ALLOWED,
+        FORBIDDEN
+    }
+
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250409132838_AddSigningPermissionAndFingerprint")]
     partial class AddSigningPermissionAndFingerprint

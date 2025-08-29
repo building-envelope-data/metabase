@@ -55,6 +55,7 @@ RUN \
     curl \
     editorconfig \
     gawk \
+    gnupg \
     lldb \
     make \
     # npm \

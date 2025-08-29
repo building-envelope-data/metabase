@@ -80,6 +80,7 @@ public static class AuthConfiguration
         services.AddTransient<ComponentVariantAuthorization>();
         services.AddTransient<DataFormatAuthorization>();
         services.AddTransient<DatabaseAuthorization>();
+        services.AddTransient<GnuPgKeyFingerprintAuthorization>();
         services.AddTransient<InstitutionAuthorization>();
         services.AddTransient<InstitutionMethodDeveloperAuthorization>();
         services.AddTransient<InstitutionRepresentativeAuthorization>();

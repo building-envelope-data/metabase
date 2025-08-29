@@ -39,13 +39,13 @@ public sealed class UserQueries
     }
 
     public Task<User?> GetUserAsync(
-        Guid uuid,
+        Guid id,
         UserByIdDataLoader userById,
         CancellationToken cancellationToken
     )
     {
         return userById.LoadAsync(
-            uuid,
+            id,
             cancellationToken
         );
     }

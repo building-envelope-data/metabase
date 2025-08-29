@@ -51,7 +51,7 @@ query DataFormats {
 }
 
 query DataFormat($uuid: Uuid!) {
-  dataFormat(uuid: $uuid) {
+  dataFormat(id: $uuid) {
     ...DataFormatPartial
     canCurrentUserUpdateNode
   }

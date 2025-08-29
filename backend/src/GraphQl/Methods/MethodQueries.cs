@@ -28,13 +28,13 @@ public sealed class MethodQueries
     }
 
     public Task<Method?> GetMethodAsync(
-        Guid uuid,
+        Guid id,
         MethodByIdDataLoader methodById,
         CancellationToken cancellationToken
     )
     {
         return methodById.LoadAsync(
-            uuid,
+            id,
             cancellationToken
         );
     }

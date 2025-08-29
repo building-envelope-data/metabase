@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 
 namespace Metabase.GraphQl.DataX;
 
@@ -7,6 +8,7 @@ public sealed class ResponseApproval(
     string signature,
     string keyFingerprint,
     string query,
+    JsonElement variables,
     string response
     )
         : IApproval
@@ -15,5 +17,6 @@ public sealed class ResponseApproval(
     public string Signature { get; } = signature;
     public string KeyFingerprint { get; } = keyFingerprint;
     public string Query { get; } = query;
+    public JsonElement Variables { get; } = variables;
     public string Response { get; } = response;
 }

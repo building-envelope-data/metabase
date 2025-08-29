@@ -10,5 +10,4 @@ public sealed class UserRepresentedInstitutionEdge(
         : Edge<Institution, InstitutionByIdDataLoader>(association.InstitutionId)
 {
     public InstitutionRepresentativeRole Role { get; } = association.Role;
-    public DataSigningPermission DataSigningPermission { get; } = association.DataSigningPermission;
 }

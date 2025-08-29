@@ -85,7 +85,7 @@ type AddGnuPgKeyFingerprintError {
 
 type AddGnuPgKeyFingerprintPayload {
   errors: [AddGnuPgKeyFingerprintError!]
-  gnuPgKeyFingerprint: String
+  gnuPgKeyFingerprint: GnuPgKeyFingerprint
   query: Query!
 }
 
@@ -140,15 +140,15 @@ type AddUserRolePayload {
   user: User
 }
 
-type AllowRepresentativeToSignDataError {
-  code: AllowRepresentativeToSignDataErrorCode!
+type AllowGnuPgKeyFingerprintError {
+  code: AllowGnuPgKeyFingerprintErrorCode!
   message: String!
   path: [String!]!
 }
 
-type AllowRepresentativeToSignDataPayload {
-  errors: [AllowRepresentativeToSignDataError!]
-  institutionRepresentative: InstitutionRepresentative
+type AllowGnuPgKeyFingerprintPayload {
+  errors: [AllowGnuPgKeyFingerprintError!]
+  gnuPgKeyFingerprint: GnuPgKeyFingerprint
   query: Query!
 }
 
@@ -512,6 +512,7 @@ type DataApproval {
   response: String!
   signature: String!
   timestamp: DateTime!
+  variables: Any!
 }
 
 type DataFormat implements Node {
@@ -694,15 +695,15 @@ type FileMetaInformation {
   path: [String!]!
 }
 
-type ForbidRepresentativeToSignDataError {
-  code: ForbidRepresentativeToSignDataErrorCode!
+type ForbidGnuPgKeyFingerprintError {
+  code: ForbidGnuPgKeyFingerprintErrorCode!
   message: String!
   path: [String!]!
 }
 
-type ForbidRepresentativeToSignDataPayload {
-  errors: [ForbidRepresentativeToSignDataError!]
-  institutionRepresentative: InstitutionRepresentative
+type ForbidGnuPgKeyFingerprintPayload {
+  errors: [ForbidGnuPgKeyFingerprintError!]
+  gnuPgKeyFingerprint: GnuPgKeyFingerprint
   query: Query!
 }
 
@@ -804,6 +805,47 @@ type GetHttpsResourceTreeRoot {
   vertexId: String!
 }
 
+type GnuPgKeyFingerprint implements Node {
+  allowedAt: DateTime
+  canCurrentUserAllowNode: Boolean! @cost(weight: "10")
+  canCurrentUserForbidNode: Boolean! @cost(weight: "10")
+  createdAt: DateTime!
+  fingerprint: String!
+  forbiddenAt: DateTime
+  id: ID!
+  institution: GnuPgKeyFingerprintInstitutionEdge! @cost(weight: "10")
+  isAllowed: Boolean!
+  isForbidden: Boolean!
+  user: GnuPgKeyFingerprintUserEdge! @cost(weight: "10")
+  uuid: Uuid! @cost(weight: "10")
+}
+
+type GnuPgKeyFingerprintInstitutionEdge {
+  node: Institution! @cost(weight: "10")
+}
+
+type GnuPgKeyFingerprintUserEdge {
+  node: User! @cost(weight: "10")
+}
+
+"A connection to a list of items."
+type GnuPgKeyFingerprintsConnection {
+  "A list of edges."
+  edges: [GnuPgKeyFingerprintsEdge!]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type GnuPgKeyFingerprintsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: GnuPgKeyFingerprint!
+}
+
 type HygrothermalData implements Data {
   appliedMethod: AppliedMethod!
   approvals: [DataApproval!]!
@@ -844,6 +886,8 @@ type Institution implements Node {
   description: String!
   developedMethods(pending: Boolean! = false where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
+  gnuPgKeyFingerprints(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): InstitutionGnuPgKeyFingerprintConnection! @cost(weight: "10")
+  hasGnuPgKeyFingerprint(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   id: ID!
   managedDataFormats(where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")): InstitutionManagedDataFormatConnection! @cost(weight: "10")
   managedInstitutions(where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")): InstitutionManagedInstitutionConnection! @cost(weight: "10")
@@ -869,6 +913,16 @@ type InstitutionDevelopedMethodConnection {
 
 type InstitutionDevelopedMethodEdge {
   node: Method! @cost(weight: "10")
+}
+
+type InstitutionGnuPgKeyFingerprintConnection {
+  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
+  edges: [InstitutionGnuPgKeyFingerprintEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type InstitutionGnuPgKeyFingerprintEdge {
+  node: GnuPgKeyFingerprint!
 }
 
 type InstitutionManagedDataFormatConnection {
@@ -942,17 +996,6 @@ type InstitutionOwnedOpenIdConnectApplicationConnection {
 type InstitutionOwnedOpenIdConnectApplicationEdge {
   canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
   node: OpenIdConnectApplication!
-}
-
-type InstitutionRepresentative {
-  dataSigningPermission: DataSigningPermission!
-  gnuPgKeyFingerprints: [String!]!
-  institution: Institution!
-  institutionId: Uuid!
-  pending: Boolean!
-  role: InstitutionRepresentativeRole!
-  user: User!
-  userId: Uuid!
 }
 
 type InstitutionRepresentativeConnection {
@@ -1093,7 +1136,7 @@ type Mutation {
   addInstitutionRepresentative(input: AddInstitutionRepresentativeInput!): AddInstitutionRepresentativePayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserMethodDeveloper(input: AddUserMethodDeveloperInput!): AddUserMethodDeveloperPayload! @authorize(policy: "Write") @cost(weight: "10")
   addUserRole(input: AddUserRoleInput!): AddUserRolePayload! @authorize(policy: "ManageUser") @cost(weight: "10")
-  allowRepresentativeToSignData(input: AllowRepresentativeToSignDataInput!): AllowRepresentativeToSignDataPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
+  allowGnuPgKeyFingerprint(input: AllowGnuPgKeyFingerprintInput!): AllowGnuPgKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   changeInstitutionRepresentativeRole(input: ChangeInstitutionRepresentativeRoleInput!): ChangeInstitutionRepresentativeRolePayload! @authorize(policy: "Write") @cost(weight: "10")
   changeUserEmail(input: ChangeUserEmailInput!): ChangeUserEmailPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   changeUserPassword(input: ChangeUserPasswordInput!): ChangeUserPasswordPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -1116,7 +1159,7 @@ type Mutation {
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   enableUserTwoFactorAuthenticator(input: EnableUserTwoFactorAuthenticatorInput!): EnableUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
-  forbidRepresentativeToSignData(input: ForbidRepresentativeToSignDataInput!): ForbidRepresentativeToSignDataPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
+  forbidGnuPgKeyFingerprint(input: ForbidGnuPgKeyFingerprintInput!): ForbidGnuPgKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -1249,7 +1292,7 @@ type OpenIdConnectAuthorizationTokenEdge {
 type OpenIdConnectToken implements Node {
   application: OpenIdConnectTokenApplicationEdge! @cost(weight: "10")
   authorization: OpenIdConnectTokenAuthorizationEdge! @cost(weight: "10")
-  canCurrentUserRevokeToken: Boolean! @cost(weight: "10")
+  canCurrentUserRevokeNode: Boolean! @cost(weight: "10")
   creationDate: DateTime
   expirationDate: DateTime
   id: ID!
@@ -1413,30 +1456,32 @@ type Publication {
 }
 
 type Query {
-  component(uuid: Uuid!): Component @cost(weight: "10")
+  component(id: Uuid!): Component @cost(weight: "10")
   components("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [ComponentSortInput!] @cost(weight: "10") where: ComponentFilterInput @cost(weight: "10")): ComponentsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   currentUser: User @cost(weight: "10")
-  database(uuid: Uuid!): Database @cost(weight: "10")
+  database(id: Uuid!): Database @cost(weight: "10")
   databases("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DatabaseSortInput!] @cost(weight: "10") where: DatabaseFilterInput @cost(weight: "10")): DatabasesConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
-  dataFormat(uuid: Uuid!): DataFormat @cost(weight: "10")
+  dataFormat(id: Uuid!): DataFormat @cost(weight: "10")
   dataFormats("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DataFormatSortInput!] @cost(weight: "10") where: DataFormatFilterInput @cost(weight: "10")): DataFormatsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
-  institution(uuid: Uuid!): Institution @cost(weight: "10")
+  gnuPgKeyFingerprint(fingerprint: String!): GnuPgKeyFingerprint @cost(weight: "10")
+  gnuPgKeyFingerprints("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [GnuPgKeyFingerprintSortInput!] @cost(weight: "10") where: GnuPgKeyFingerprintFilterInput @cost(weight: "10")): GnuPgKeyFingerprintsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  institution(id: Uuid!): Institution @cost(weight: "10")
   institutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionSortInput!] @cost(weight: "10") where: InstitutionFilterInput @cost(weight: "10")): InstitutionsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
-  method(uuid: Uuid!): Method @cost(weight: "10")
+  method(id: Uuid!): Method @cost(weight: "10")
   methods("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [MethodSortInput!] @cost(weight: "10") where: MethodFilterInput @cost(weight: "10")): MethodsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   "Fetches an object given its ID."
   node("ID of the object." id: ID!): Node @cost(weight: "10")
   "Lookup nodes by a list of IDs."
   nodes("The list of node IDs." ids: [ID!]!): [Node]! @cost(weight: "10")
-  openIdConnectApplication(uuid: Uuid!): OpenIdConnectApplication @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectApplication(id: Uuid!): OpenIdConnectApplication @authorize(policy: "Read") @cost(weight: "10")
   openIdConnectApplications: [OpenIdConnectApplication!]! @authorize(policy: "Read") @cost(weight: "10")
-  openIdConnectAuthorization(uuid: Uuid!): OpenIdConnectAuthorization @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectAuthorization(id: Uuid!): OpenIdConnectAuthorization @authorize(policy: "Read") @cost(weight: "10")
   openIdConnectAuthorizations: [OpenIdConnectAuthorization!]! @authorize(policy: "Read") @cost(weight: "10")
-  openIdConnectToken(uuid: Uuid!): OpenIdConnectToken @authorize(policy: "Read") @cost(weight: "10")
+  openIdConnectToken(id: Uuid!): OpenIdConnectToken @authorize(policy: "Read") @cost(weight: "10")
   openIdConnectTokens: [OpenIdConnectToken!]! @authorize(policy: "Read") @cost(weight: "10")
   pendingDatabases("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [DatabaseSortInput!] @cost(weight: "10") where: DatabaseFilterInput @cost(weight: "10")): PendingDatabasesConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   pendingInstitutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionSortInput!] @cost(weight: "10") where: InstitutionFilterInput @cost(weight: "10")): PendingInstitutionsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
-  user(uuid: Uuid!): User @cost(weight: "10")
+  user(id: Uuid!): User @cost(weight: "10")
   users("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [UserSortInput!] @cost(weight: "10") where: UserFilterInput @cost(weight: "10")): UsersConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
 }
 
@@ -1618,6 +1663,7 @@ type ResponseApproval {
   response: String!
   signature: String!
   timestamp: DateTime!
+  variables: Any!
 }
 
 type RevokeOpenIdConnectTokenError {
@@ -1809,6 +1855,8 @@ type User implements Node {
   canCurrentUserManageOpenIdConnect: Boolean! @cost(weight: "10")
   developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10")
+  gnuPgKeyFingerprints(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): UserGnuPgKeyFingerprintConnection! @cost(weight: "10")
+  hasGnuPgKeyFingerprint(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
   id: ID!
   isEmailConfirmed: Boolean @cost(weight: "10")
@@ -1836,6 +1884,15 @@ type UserDevelopedMethodEdge {
   node: Method! @cost(weight: "10")
 }
 
+type UserGnuPgKeyFingerprintConnection {
+  edges: [UserGnuPgKeyFingerprintEdge!]! @cost(weight: "10")
+  totalCount: NonNegativeInt! @cost(weight: "10")
+}
+
+type UserGnuPgKeyFingerprintEdge {
+  node: GnuPgKeyFingerprint!
+}
+
 type UserMethodDeveloperEdge {
   canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
@@ -1849,7 +1906,6 @@ type UserRepresentedInstitutionConnection {
 }
 
 type UserRepresentedInstitutionEdge {
-  dataSigningPermission: DataSigningPermission!
   node: Institution! @cost(weight: "10")
   role: InstitutionRepresentativeRole!
 }
@@ -1943,9 +1999,8 @@ input AddUserRoleInput {
   userId: Uuid!
 }
 
-input AllowRepresentativeToSignDataInput {
-  institutionId: Uuid!
-  userId: Uuid!
+input AllowGnuPgKeyFingerprintInput {
+  fingerprint: String!
 }
 
 input BooleanOperationFilterInput {
@@ -2001,6 +2056,21 @@ input CoatedSidePropositionInput {
   in: [CoatedSide!]
   notEqualTo: CoatedSide
   notIn: [CoatedSide!]
+}
+
+input ComparableDateTimeOperationFilterInput {
+  equalTo: DateTime @cost(weight: "10")
+  notEqualTo: DateTime @cost(weight: "10")
+  in: [DateTime!] @cost(weight: "10")
+  notIn: [DateTime!] @cost(weight: "10")
+  greaterThan: DateTime @cost(weight: "10")
+  notGreaterThan: DateTime @cost(weight: "10")
+  greaterThanOrEqualTo: DateTime @cost(weight: "10")
+  notGreaterThanOrEqualTo: DateTime @cost(weight: "10")
+  lessThan: DateTime @cost(weight: "10")
+  notLessThan: DateTime @cost(weight: "10")
+  lessThanOrEqualTo: DateTime @cost(weight: "10")
+  notLessThanOrEqualTo: DateTime @cost(weight: "10")
 }
 
 input ComparableGuidOperationFilterInput {
@@ -2102,7 +2172,7 @@ input ComponentConcretizationOfFilterInput {
 input ComponentFilterInput {
   and: [ComponentFilterInput!]
   or: [ComponentFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2140,7 +2210,7 @@ input ComponentPartOfFilterInput {
 }
 
 input ComponentSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   abbreviation: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -2255,7 +2325,7 @@ input CreateOpenIdConnectApplicationInput {
 input DataFormatFilterInput {
   and: [DataFormatFilterInput!]
   or: [DataFormatFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   extension: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2265,7 +2335,7 @@ input DataFormatFilterInput {
 }
 
 input DataFormatSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   extension: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -2277,7 +2347,7 @@ input DataFormatSortInput {
 input DatabaseFilterInput {
   and: [DatabaseFilterInput!]
   or: [DatabaseFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   locator: UriFilterInput
@@ -2285,7 +2355,7 @@ input DatabaseFilterInput {
 }
 
 input DatabaseSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
   locator: UriSortInput @cost(weight: "10")
@@ -2344,9 +2414,8 @@ input FloatsPropositionInput {
   some: FloatPropositionInput
 }
 
-input ForbidRepresentativeToSignDataInput {
-  institutionId: Uuid!
-  userId: Uuid!
+input ForbidGnuPgKeyFingerprintInput {
+  fingerprint: String!
 }
 
 input GeometricDataPropositionInput {
@@ -2369,10 +2438,35 @@ input GetHttpsResourcesPropositionInput {
   some: GetHttpsResourcePropositionInput
 }
 
+input GnuPgKeyFingerprintFilterInput {
+  and: [GnuPgKeyFingerprintFilterInput!]
+  or: [GnuPgKeyFingerprintFilterInput!]
+  id: ComparableGuidOperationFilterInput
+  fingerprint: StringOperationFilterInput
+  createdAt: ComparableDateTimeOperationFilterInput
+  allowedAt: ComparableNullableOfDateTimeOperationFilterInput
+  forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
+  user: UserFilterInput
+  institution: InstitutionFilterInput
+  isForbidden: BooleanOperationFilterInput
+  isAllowed: BooleanOperationFilterInput
+}
+
 input GnuPgKeyFingerprintInput {
   fingerprint: String!
   institutionId: Uuid!
-  userId: Uuid!
+}
+
+input GnuPgKeyFingerprintSortInput {
+  id: SortEnumType @cost(weight: "10")
+  fingerprint: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  allowedAt: SortEnumType @cost(weight: "10")
+  forbiddenAt: SortEnumType @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
+  institution: InstitutionSortInput @cost(weight: "10")
+  isForbidden: SortEnumType @cost(weight: "10")
+  isAllowed: SortEnumType @cost(weight: "10")
 }
 
 input HygrothermalDataPropositionInput {
@@ -2391,7 +2485,7 @@ input IMethodDeveloperFilterInput {
 input InstitutionFilterInput {
   and: [InstitutionFilterInput!]
   or: [InstitutionFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2411,10 +2505,23 @@ input InstitutionFilterInput {
   representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
 }
 
+input InstitutionGnuPgKeyFingerprintFilterInput {
+  and: [InstitutionGnuPgKeyFingerprintFilterInput!]
+  or: [InstitutionGnuPgKeyFingerprintFilterInput!]
+  id: ComparableGuidOperationFilterInput
+  fingerprint: StringOperationFilterInput
+  createdAt: ComparableDateTimeOperationFilterInput
+  allowedAt: ComparableNullableOfDateTimeOperationFilterInput
+  forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
+  user: UserFilterInput
+  isForbidden: BooleanOperationFilterInput
+  isAllowed: BooleanOperationFilterInput
+}
+
 input InstitutionManagedDataFormatFilterInput {
   and: [InstitutionManagedDataFormatFilterInput!]
   or: [InstitutionManagedDataFormatFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   extension: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2425,7 +2532,7 @@ input InstitutionManagedDataFormatFilterInput {
 input InstitutionManagedInstitutionFilterInput {
   and: [InstitutionManagedInstitutionFilterInput!]
   or: [InstitutionManagedInstitutionFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
@@ -2447,7 +2554,7 @@ input InstitutionManagedInstitutionFilterInput {
 input InstitutionManagedMethodFilterInput {
   and: [InstitutionManagedMethodFilterInput!]
   or: [InstitutionManagedMethodFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   calculationLocator: UriFilterInput
@@ -2472,7 +2579,7 @@ input InstitutionMethodDeveloperFilterInput {
 input InstitutionOperatedDatabaseFilterInput {
   and: [InstitutionOperatedDatabaseFilterInput!]
   or: [InstitutionOperatedDatabaseFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   locator: UriFilterInput
@@ -2518,7 +2625,7 @@ input InstitutionRepresentativeRoleOperationFilterInput {
 }
 
 input InstitutionSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   abbreviation: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
@@ -2683,7 +2790,7 @@ input MethodCategoryOperationFilterInput {
 input MethodFilterInput {
   and: [MethodFilterInput!]
   or: [MethodFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   name: StringOperationFilterInput
   description: StringOperationFilterInput
   calculationLocator: UriFilterInput
@@ -2696,7 +2803,7 @@ input MethodFilterInput {
 }
 
 input MethodSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
   calculationLocator: UriSortInput @cost(weight: "10")
@@ -3093,11 +3200,24 @@ input UserDevelopedMethodFilterInput {
 input UserFilterInput {
   and: [UserFilterInput!]
   or: [UserFilterInput!]
-  uuid: ComparableGuidOperationFilterInput
+  id: ComparableGuidOperationFilterInput
   developedMethods: ListMethodFilterTypeFilterInput
   developedMethodEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
   representedInstitutions: ListInstitutionFilterTypeFilterInput
   representedInstitutionEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
+}
+
+input UserGnuPgKeyFingerprintFilterInput {
+  and: [UserGnuPgKeyFingerprintFilterInput!]
+  or: [UserGnuPgKeyFingerprintFilterInput!]
+  id: ComparableGuidOperationFilterInput
+  fingerprint: StringOperationFilterInput
+  createdAt: ComparableDateTimeOperationFilterInput
+  allowedAt: ComparableNullableOfDateTimeOperationFilterInput
+  forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
+  institution: InstitutionFilterInput
+  isForbidden: BooleanOperationFilterInput
+  isAllowed: BooleanOperationFilterInput
 }
 
 input UserRepresentedInstitutionFilterInput {
@@ -3108,7 +3228,7 @@ input UserRepresentedInstitutionFilterInput {
 }
 
 input UserSortInput {
-  uuid: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
 }
 
 input UuidPropositionInput {
@@ -3159,9 +3279,8 @@ enum AddGnuPgKeyFingerprintErrorCode {
   UNKNOWN
   UNAUTHORIZED
   UNKNOWN_INSTITUTION
-  UNKNOWN_USER
-  NOT_ALLOWED
-  UNKNOWN_REPRESENTATIVE
+  DUPLICATE_FINGERPRINT
+  UNKNOWN_KEY
 }
 
 enum AddInstitutionMethodDeveloperErrorCode {
@@ -3194,11 +3313,10 @@ enum AddUserRoleErrorCode {
   UNAUTHORIZED
 }
 
-enum AllowRepresentativeToSignDataErrorCode {
+enum AllowGnuPgKeyFingerprintErrorCode {
   UNKNOWN
-  UNKNOWN_USER
-  UNKNOWN_INSTITUTION
   UNAUTHORIZED
+  UNKNOWN_FINGERPRINT
 }
 
 "Defines when a policy shall be executed."
@@ -3353,12 +3471,6 @@ enum DataKind {
   GEOMETRIC_DATA
 }
 
-enum DataSigningPermission {
-  NEVER
-  ALLOWED
-  FORBIDDEN
-}
-
 enum DatabaseVerificationState {
   PENDING
   VERIFIED
@@ -3408,11 +3520,10 @@ enum EnableUserTwoFactorAuthenticatorErrorCode {
   INVALID_VERIFICATION_CODE
 }
 
-enum ForbidRepresentativeToSignDataErrorCode {
+enum ForbidGnuPgKeyFingerprintErrorCode {
   UNKNOWN
-  UNKNOWN_USER
-  UNKNOWN_INSTITUTION
   UNAUTHORIZED
+  UNKNOWN_FINGERPRINT
 }
 
 enum ForgetUserTwoFactorAuthenticationClientErrorCode {

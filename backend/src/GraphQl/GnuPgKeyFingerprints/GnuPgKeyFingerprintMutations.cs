@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -10,6 +11,7 @@ using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Users;
+using Metabase.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
@@ -22,23 +24,23 @@ public sealed class GnuPgKeyFingerprintMutations
     public async Task<AddGnuPgKeyFingerprintPayload> AddGnuPgKeyFingerprintAsync(
         GnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
-        InstitutionRepresentativeAuthorization authorization,
+        GnuPgKeyFingerprintAuthorization authorization,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
     {
-        if (!await authorization.IsAuthorizedToAddGnuPgKeyFingerprint(
+        var normalizedFingerprint = GnuPgKeyFingerprint.Normalize(input.Fingerprint);
+        if (!await authorization.IsAuthorizedToAdd(
                 claimsPrincipal,
                 input.InstitutionId,
-                input.UserId,
                 cancellationToken
             )
-           )
+        )
         {
             return new AddGnuPgKeyFingerprintPayload(
                 new AddGnuPgKeyFingerprintError(
                     AddGnuPgKeyFingerprintErrorCode.UNAUTHORIZED,
-                    "You are not authorized to add key fingerprints.",
+                    "You are not authorized to add GnuPG key fingerprints.",
                     []
                 )
             );
@@ -59,16 +61,27 @@ public sealed class GnuPgKeyFingerprintMutations
             );
         }
 
-        if (!await context.Users.AsQueryable()
-                .Where(u => u.Id == input.UserId)
+        if (await context.GnuPgKeyFingerprints.AsQueryable()
+                .Where(f => f.Fingerprint == normalizedFingerprint)
                 .AnyAsync(cancellationToken)
            )
         {
             errors.Add(
                 new AddGnuPgKeyFingerprintError(
-                    AddGnuPgKeyFingerprintErrorCode.UNKNOWN_USER,
-                    "Unknown user.",
-                    [nameof(input), nameof(input.UserId).FirstCharToLower()]
+                    AddGnuPgKeyFingerprintErrorCode.DUPLICATE_FINGERPRINT,
+                    $"The normalized fingerprint {normalizedFingerprint} does already exist.",
+                    [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
+                )
+            );
+        }
+
+        if (!await GnuPgService.DoesGnuPgKeyExist(normalizedFingerprint))
+        {
+            errors.Add(
+                new AddGnuPgKeyFingerprintError(
+                    AddGnuPgKeyFingerprintErrorCode.UNKNOWN_KEY,
+                    $"There is no non-revoked and non-disabled key in the keyserver {GnuPgService.KeyServerUrl} with the normalized fingerprint {normalizedFingerprint}.",
+                    [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
                 )
             );
         }
@@ -78,32 +91,114 @@ public sealed class GnuPgKeyFingerprintMutations
             return new AddGnuPgKeyFingerprintPayload(errors.AsReadOnly());
         }
 
-        var institutionRepresentative = await context.InstitutionRepresentatives
-                .FirstOrDefaultAsync(r =>
-                    r.InstitutionId == input.InstitutionId
-                    && r.UserId == input.UserId
-                , cancellationToken);
-
-        if (institutionRepresentative is null)
+        var user = await authorization.GetUserAsync(claimsPrincipal)
+            ?? throw new InvalidOperationException("Could not obtain the current user.");
+        var fingerprint = new GnuPgKeyFingerprint(normalizedFingerprint)
         {
-            return new AddGnuPgKeyFingerprintPayload(new AddGnuPgKeyFingerprintError(
-                    AddGnuPgKeyFingerprintErrorCode.UNKNOWN_REPRESENTATIVE,
-                    "Unknown representative.",
-                    [nameof(input), nameof(input.UserId).FirstCharToLower()]
-                ));
-        }
-
-        if (institutionRepresentative.DataSigningPermission is not Enumerations.DataSigningPermission.ALLOWED)
+            InstitutionId = input.InstitutionId,
+            UserId = user.Id,
+        };
+        if (await authorization.IsAuthorizedToAllow(
+                claimsPrincipal,
+                fingerprint,
+                cancellationToken
+            )
+        )
         {
-            return new AddGnuPgKeyFingerprintPayload(new AddGnuPgKeyFingerprintError(
-                    AddGnuPgKeyFingerprintErrorCode.NOT_ALLOWED,
-                    "Representative is not allowed to sign data.",
-                    [nameof(input), nameof(input.UserId).FirstCharToLower()]
-                ));
+            fingerprint.Allow();
         }
-
-        institutionRepresentative.GnuPgKeyFingerprints.Add(input.Fingerprint);
+        context.GnuPgKeyFingerprints.Add(fingerprint);
         await context.SaveChangesAsync(cancellationToken);
-        return new AddGnuPgKeyFingerprintPayload(input.Fingerprint);
+        return new AddGnuPgKeyFingerprintPayload(fingerprint);
+    }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    public async Task<AllowGnuPgKeyFingerprintPayload> AllowGnuPgKeyFingerprintAsync(
+        AllowGnuPgKeyFingerprintInput input,
+        ClaimsPrincipal claimsPrincipal,
+        GnuPgKeyFingerprintAuthorization authorization,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        var fingerprint = await context.GnuPgKeyFingerprints.AsQueryable()
+                .SingleOrDefaultAsync(f =>
+                    f.Fingerprint == GnuPgKeyFingerprint.Normalize(input.Fingerprint),
+                    cancellationToken
+                );
+        if (fingerprint is null)
+        {
+            return new AllowGnuPgKeyFingerprintPayload(
+                new AllowGnuPgKeyFingerprintError(
+                    AllowGnuPgKeyFingerprintErrorCode.UNKNOWN_FINGERPRINT,
+                    "Unknown GnuPG key fingerprint.",
+                    []
+                )
+            );
+        }
+        if (!await authorization.IsAuthorizedToAllow(
+                claimsPrincipal,
+                fingerprint,
+                cancellationToken
+            )
+           )
+        {
+            return new AllowGnuPgKeyFingerprintPayload(
+                new AllowGnuPgKeyFingerprintError(
+                    AllowGnuPgKeyFingerprintErrorCode.UNAUTHORIZED,
+                    "You are not authorized to allow the GnuPG key fingerprint for signing.",
+                    [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
+                )
+            );
+        }
+        fingerprint.Allow();
+        await context.SaveChangesAsync(cancellationToken);
+        return new AllowGnuPgKeyFingerprintPayload(fingerprint);
+    }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    public async Task<ForbidGnuPgKeyFingerprintPayload> ForbidGnuPgKeyFingerprintAsync(
+        ForbidGnuPgKeyFingerprintInput input,
+        ClaimsPrincipal claimsPrincipal,
+        GnuPgKeyFingerprintAuthorization authorization,
+        ApplicationDbContext context,
+        CancellationToken cancellationToken
+    )
+    {
+        var fingerprint = await context.GnuPgKeyFingerprints.AsQueryable()
+                .SingleOrDefaultAsync(f =>
+                    f.Fingerprint == GnuPgKeyFingerprint.Normalize(input.Fingerprint),
+                    cancellationToken
+                );
+        if (fingerprint is null)
+        {
+            return new ForbidGnuPgKeyFingerprintPayload(
+                new ForbidGnuPgKeyFingerprintError(
+                    ForbidGnuPgKeyFingerprintErrorCode.UNKNOWN_FINGERPRINT,
+                    "Unknown GnuPG key fingerprint.",
+                    []
+                )
+            );
+        }
+        if (!await authorization.IsAuthorizedToForbid(
+                claimsPrincipal,
+                fingerprint,
+                cancellationToken
+            )
+           )
+        {
+            return new ForbidGnuPgKeyFingerprintPayload(
+                new ForbidGnuPgKeyFingerprintError(
+                    ForbidGnuPgKeyFingerprintErrorCode.UNAUTHORIZED,
+                    "You are not authorized to forbid the GnuPG key fingerprint.",
+                    [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
+                )
+            );
+        }
+        fingerprint.Forbid();
+        await context.SaveChangesAsync(cancellationToken);
+        return new ForbidGnuPgKeyFingerprintPayload(fingerprint);
     }
 }

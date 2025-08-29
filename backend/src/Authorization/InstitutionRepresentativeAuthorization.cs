@@ -56,37 +56,4 @@ public sealed class InstitutionRepresentativeAuthorization(
             cancellationToken
         );
     }
-
-    internal Task<bool> IsAuthorizedToManageSigningPermission(
-        ClaimsPrincipal claimsPrincipal,
-        Guid institutionId,
-        CancellationToken cancellationToken
-    )
-    {
-        return AuthorizeAsync(
-            claimsPrincipal,
-            user => IsOwnerOfInstitution(user, institutionId, cancellationToken),
-            application => BelongsToInstitution(
-                application,
-                institutionId,
-                cancellationToken
-            ),
-            cancellationToken
-        );
-    }
-
-    internal Task<bool> IsAuthorizedToAddGnuPgKeyFingerprint(
-        ClaimsPrincipal claimsPrincipal,
-        Guid institutionId,
-        Guid userId,
-        CancellationToken cancellationToken
-    )
-    {
-        return AuthorizeAsync(
-            claimsPrincipal,
-            async user => IsSame(user, userId) && await IsAtLeastAssistantOfVerifiedInstitution(user, institutionId, cancellationToken),
-            application => Task.FromResult(false),
-            cancellationToken
-        );
-    }
 }

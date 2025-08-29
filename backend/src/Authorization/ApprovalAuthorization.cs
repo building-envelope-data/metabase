@@ -24,7 +24,7 @@ public sealed class ApprovalAuthorization(
             claimsPrincipal,
             async user => (await Context.InstitutionRepresentatives.AsQueryable()
                     .SingleOrDefaultAsync(
-                        x => x.UserId == user.Id && x.DataSigningPermission == Enumerations.DataSigningPermission.ALLOWED,
+                        x => x.UserId == user.Id,
                         cancellationToken
                     )) is not null,
             application => Task.FromResult(false),

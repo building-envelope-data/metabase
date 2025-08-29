@@ -16,7 +16,7 @@ query Users {
 }
 
 query User($uuid: Uuid!) {
-  user(uuid: $uuid) {
+  user(id: $uuid) {
     id
     uuid
     name

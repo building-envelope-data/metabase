@@ -12,8 +12,6 @@ public abstract class EntitySortType<TEntity>
     )
     {
         descriptor.BindFieldsExplicitly();
-        descriptor
-            .Field(x => x.Id)
-            .Name("uuid");
+        descriptor.Field(x => x.Id);
     }
 }

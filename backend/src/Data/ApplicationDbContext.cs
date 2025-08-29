@@ -21,7 +21,6 @@ public sealed class ApplicationDbContext
 
     internal const string ComponentCategoryTypeName = "component_category";
     internal const string DatabaseVerificationStateTypeName = "database_verification_state";
-    internal const string DataSigningPermissionTypeName = "data_signing_permission";
     internal const string InstitutionRepresentativeRoleTypeName = "institution_representative_role";
     internal const string InstitutionStateTypeName = "institution_state";
     internal const string InstitutionOperatingStateTypeName = "institution_operating_state";
@@ -55,6 +54,7 @@ public sealed class ApplicationDbContext
     public DbSet<DataFormat> DataFormats { get; private set; } = default!;
     public DbSet<DataProtectionKey> DataProtectionKeys { get; private set; } = default!;
     public DbSet<Database> Databases { get; private set; } = default!;
+    public DbSet<GnuPgKeyFingerprint> GnuPgKeyFingerprints { get; private set; } = default!;
     public DbSet<Institution> Institutions { get; private set; } = default!;
     public DbSet<InstitutionMethodDeveloper> InstitutionMethodDevelopers { get; private set; } = default!;
     public DbSet<InstitutionRepresentative> InstitutionRepresentatives { get; private set; } = default!;
@@ -362,6 +362,10 @@ public sealed class ApplicationDbContext
                 builder.Entity<Database>()
             )
             .ToTable("database");
+        ConfigureEntity(
+                builder.Entity<GnuPgKeyFingerprint>()
+            )
+            .ToTable("gnu_pg_fingerprint");
         ConfigureEntity(
                 builder.Entity<DataFormat>()
             )

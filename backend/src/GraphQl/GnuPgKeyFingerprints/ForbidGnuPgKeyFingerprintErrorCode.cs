@@ -3,12 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 
 [SuppressMessage("Naming", "CA1707")]
-public enum VerifyGnuPgKeyFingerprintErrorCode
+public enum ForbidGnuPgKeyFingerprintErrorCode
 {
     UNKNOWN,
     UNAUTHORIZED,
-    UNKNOWN_INSTITUTION,
-    UNKNOWN_USER,
-    UNKNOWN_REPRESENTATIVE,
-    UNKNOWN_FINGERPRINT,
+    UNKNOWN_FINGERPRINT
 }

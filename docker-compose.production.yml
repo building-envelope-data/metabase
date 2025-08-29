@@ -78,6 +78,8 @@ services:
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
       - XBASE_IgsdbApiToken=${IGSDB_API_TOKEN}
       - XBASE_IgsdbOpenIdConnectClientSecret=${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET}
+      # https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
+      - GPG_TTY=/dev/pts/0
     volumes:
       - backend_logs:/app/logs
       - ./secrets:/run/secrets:ro

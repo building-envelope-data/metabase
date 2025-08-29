@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using HotChocolate;
 using Microsoft.AspNetCore.Identity;
 using Guid = System.Guid;
@@ -57,10 +58,12 @@ public sealed class User
     public ICollection<UserMethodDeveloper> DevelopedMethodEdges { get; } = [];
     public ICollection<Method> DevelopedMethods { get; } = [];
 
-    public ICollection<InstitutionRepresentative> RepresentedInstitutionEdges { get; } =
-        [];
+    public ICollection<InstitutionRepresentative> RepresentedInstitutionEdges { get; } = [];
 
     public ICollection<Institution> RepresentedInstitutions { get; } = [];
+
+    [InverseProperty(nameof(GnuPgKeyFingerprint.User))]
+    public ICollection<GnuPgKeyFingerprint> GnuPgKeyFingerprints { get; } = [];
 
     public uint Version { get; private set; } // https://www.npgsql.org/efcore/modeling/concurrency.html
 }

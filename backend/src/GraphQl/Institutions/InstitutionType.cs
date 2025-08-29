@@ -15,6 +15,13 @@ using Metabase.GraphQl.DataFormats;
 using Metabase.GraphQl.InstitutionMethodDevelopers;
 using Metabase.GraphQl.OpenIdConnect.Applications;
 using Metabase.Data.OpenIdConnect;
+using System.Collections.Generic;
+using GreenDonut;
+using HotChocolate.Resolvers;
+using Microsoft.EntityFrameworkCore;
+using HotChocolate.Data;
+using System.Linq;
+using Metabase.GraphQl.GnuPgKeyFingerprints;
 
 namespace Metabase.GraphQl.Institutions;
 
@@ -141,6 +148,21 @@ public sealed class InstitutionType
                 )
             );
         descriptor
+            .Field(t => t.GnuPgKeyFingerprints)
+            .Type<NonNullType<ObjectType<InstitutionGnuPgKeyFingerprintConnection>>>()
+            .UseFiltering<InstitutionGnuPgKeyFingerprintFilterType>()
+            .Resolve(context =>
+                new InstitutionGnuPgKeyFingerprintConnection(
+                    context.Parent<Institution>(),
+                    context.GetQueryContext<GnuPgKeyFingerprint>()
+                )
+            );
+        descriptor
+            .Field("has" + nameof(GnuPgKeyFingerprint))
+            .UseFiltering<InstitutionGnuPgKeyFingerprintFilterType>()
+            .ResolveWith<InstitutionResolvers>(x =>
+                InstitutionResolvers.GetHasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
+        descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<InstitutionResolvers>(x =>
                 InstitutionResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
@@ -159,6 +181,19 @@ public sealed class InstitutionType
 
     private sealed class InstitutionResolvers
     {
+        public static Task<bool> GetHasGnuPgKeyFingerprintsAsync(
+            [Parent] Institution institution,
+            ApplicationDbContext context,
+            IResolverContext resolverContext,
+            CancellationToken cancellationToken
+        )
+        {
+            return context.GnuPgKeyFingerprints.AsNoTracking()
+                .Filter(resolverContext)
+                .Where(f => f.InstitutionId == institution.Id)
+                .AnyAsync(cancellationToken);
+        }
+
         public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
