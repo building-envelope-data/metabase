@@ -49,7 +49,7 @@ mutation AllowGnuPgKeyFingerprint($fingerprint: String!) {
 }
 
 mutation ForbidGnuPgKeyFingerprint($fingerprint: String!) {
-  revokeGnuPgKeyFingerprint(input: { fingerprint: $fingerprint }) {
+  forbidGnuPgKeyFingerprint(input: { fingerprint: $fingerprint }) {
     gnuPgKeyFingerprint {
       ...GnuPgKeyFingerprintPartial
     }

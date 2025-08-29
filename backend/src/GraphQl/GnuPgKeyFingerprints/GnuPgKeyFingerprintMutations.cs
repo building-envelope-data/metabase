@@ -192,7 +192,7 @@ public sealed class GnuPgKeyFingerprintMutations
             return new ForbidGnuPgKeyFingerprintPayload(
                 new ForbidGnuPgKeyFingerprintError(
                     ForbidGnuPgKeyFingerprintErrorCode.UNAUTHORIZED,
-                    "You are not authorized to revoke the GnuPG key fingerprint.",
+                    "You are not authorized to forbid the GnuPG key fingerprint.",
                     [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
                 )
             );

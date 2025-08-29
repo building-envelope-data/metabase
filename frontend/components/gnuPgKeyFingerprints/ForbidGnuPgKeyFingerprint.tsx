@@ -13,8 +13,8 @@ export type ForbidGnuPgKeyFingerprintProps = {
 };
 
 export default function ForbidGnuPgKeyFingerprint({ fingerprint, institutionId }: ForbidGnuPgKeyFingerprintProps) {
-    const [revokeGnuPgKeyFingerprintMutation] = useForbidGnuPgKeyFingerprintMutation({
-        // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-revokes
+    const [forbidGnuPgKeyFingerprintMutation] = useForbidGnuPgKeyFingerprintMutation({
+        // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-forbids
         // See https://www.apollographql.com/docs/react/data/mutations/#options
         refetchQueries: [
             {
@@ -25,35 +25,35 @@ export default function ForbidGnuPgKeyFingerprint({ fingerprint, institutionId }
             },
         ],
     });
-    const [revokeing, setForbiding] = useState(false);
+    const [forbidding, setForbidding] = useState(false);
 
-    const revoke = async () => {
+    const forbid = async () => {
         try {
-            setForbiding(true);
+            setForbidding(true);
             // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-            const { errors, data } = await revokeGnuPgKeyFingerprintMutation({
+            const { errors, data } = await forbidGnuPgKeyFingerprintMutation({
                 variables: {
                     fingerprint: fingerprint,
                 },
             });
             if (errors) {
                 console.log(errors); // TODO What to do?
-            } else if (data?.revokeGnuPgKeyFingerprint?.errors) {
+            } else if (data?.forbidGnuPgKeyFingerprint?.errors) {
                 // TODO Is this how we want to display errors?
                 message.error(
-                    data?.revokeGnuPgKeyFingerprint?.errors.map((error) => error.message).join(" ")
+                    data?.forbidGnuPgKeyFingerprint?.errors.map((error) => error.message).join(" ")
                 );
             }
         } catch (error) {
             // TODO Handle properly.
             console.log("Failed:", error);
         } finally {
-            setForbiding(false);
+            setForbidding(false);
         }
     };
 
     return (
-        <Button onClick={() => revoke()} loading={revokeing}>
+        <Button onClick={() => forbid()} loading={forbidding}>
             Forbid
         </Button>
     );

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Alert, Form, Input, Button } from "antd";
+import { Alert, Form, Input, Button, Typography } from "antd";
 import {
     useAddGnuPgKeyFingerprintMutation,
 } from "../../queries/gnuPgKeyFingerprints.graphql";
@@ -90,6 +90,20 @@ export default function AddGnuPgKeyFingerprint({ institutionId }: AddGnuPgKeyFin
             ) : (
                 <></>
             )}
+            <Typography.Paragraph>
+                Before adding the GnuPG fingerprint of your GnuPG key here,
+                you need to upload the GnuPG public key to the
+                <Typography.Link href="https://keys.openpgp.org/">OpenPGP Keyserver</Typography.Link>
+                and then verify the user ID of the key, which should be your
+                email address. You can add your key either by running
+                <Typography.Text code>gpg --keyserver hkps://keys.openpgp.org --send-keys $SIGNING_KEY_FINGERPRINT</Typography.Text>
+                or by exporting it with
+                <Typography.Text code>gpg --export --armor --output ./my.pub.asc $SIGNING_KEY_FINGERPRINT</Typography.Text>
+                and then uploading it via the form on
+                <Typography.Link href="https://keys.openpgp.org/upload">OpenPGP Key Upload</Typography.Link>
+                You can verify the user ID by following the link in the email
+                sent to you by the OpenPGP Keyserver.
+            </Typography.Paragraph>
             <Form
                 {...layout}
                 form={form}
