@@ -43,9 +43,9 @@ public sealed class GnuPgKeyFingerprintType
             )
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserRevokeNode")
+            .Field("canCurrentUserForbidNode")
             .ResolveWith<GnuPgKeyFingerprintResolvers>(x =>
-                GnuPgKeyFingerprintResolvers.GetCanCurrentUserRevokeNodeAsync(default!, default!, default!, default!)
+                GnuPgKeyFingerprintResolvers.GetCanCurrentUserForbidNodeAsync(default!, default!, default!, default!)
             )
             .UseUserManager();
     }
@@ -62,14 +62,14 @@ public sealed class GnuPgKeyFingerprintType
             return authorization.IsAuthorizedToAllow(claimsPrincipal, gnuPgKeyFingerprint, cancellationToken);
         }
 
-        public static Task<bool> GetCanCurrentUserRevokeNodeAsync(
+        public static Task<bool> GetCanCurrentUserForbidNodeAsync(
             [Parent] GnuPgKeyFingerprint gnuPgKeyFingerprint,
             ClaimsPrincipal claimsPrincipal,
             GnuPgKeyFingerprintAuthorization authorization,
             CancellationToken cancellationToken
         )
         {
-            return authorization.IsAuthorizedToRevoke(claimsPrincipal, gnuPgKeyFingerprint, cancellationToken);
+            return authorization.IsAuthorizedToForbid(claimsPrincipal, gnuPgKeyFingerprint, cancellationToken);
         }
     }
 }

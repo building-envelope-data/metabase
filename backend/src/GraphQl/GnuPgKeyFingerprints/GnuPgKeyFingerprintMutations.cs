@@ -159,8 +159,8 @@ public sealed class GnuPgKeyFingerprintMutations
 
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
-    public async Task<RevokeGnuPgKeyFingerprintPayload> RevokeGnuPgKeyFingerprintAsync(
-        RevokeGnuPgKeyFingerprintInput input,
+    public async Task<ForbidGnuPgKeyFingerprintPayload> ForbidGnuPgKeyFingerprintAsync(
+        ForbidGnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
         GnuPgKeyFingerprintAuthorization authorization,
         ApplicationDbContext context,
@@ -174,31 +174,31 @@ public sealed class GnuPgKeyFingerprintMutations
                 );
         if (fingerprint is null)
         {
-            return new RevokeGnuPgKeyFingerprintPayload(
-                new RevokeGnuPgKeyFingerprintError(
-                    RevokeGnuPgKeyFingerprintErrorCode.UNKNOWN_FINGERPRINT,
+            return new ForbidGnuPgKeyFingerprintPayload(
+                new ForbidGnuPgKeyFingerprintError(
+                    ForbidGnuPgKeyFingerprintErrorCode.UNKNOWN_FINGERPRINT,
                     "Unknown GnuPG key fingerprint.",
                     []
                 )
             );
         }
-        if (!await authorization.IsAuthorizedToRevoke(
+        if (!await authorization.IsAuthorizedToForbid(
                 claimsPrincipal,
                 fingerprint,
                 cancellationToken
             )
            )
         {
-            return new RevokeGnuPgKeyFingerprintPayload(
-                new RevokeGnuPgKeyFingerprintError(
-                    RevokeGnuPgKeyFingerprintErrorCode.UNAUTHORIZED,
+            return new ForbidGnuPgKeyFingerprintPayload(
+                new ForbidGnuPgKeyFingerprintError(
+                    ForbidGnuPgKeyFingerprintErrorCode.UNAUTHORIZED,
                     "You are not authorized to revoke the GnuPG key fingerprint.",
                     [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
                 )
             );
         }
-        fingerprint.Revoke();
+        fingerprint.Forbid();
         await context.SaveChangesAsync(cancellationToken);
-        return new RevokeGnuPgKeyFingerprintPayload(fingerprint);
+        return new ForbidGnuPgKeyFingerprintPayload(fingerprint);
     }
 }

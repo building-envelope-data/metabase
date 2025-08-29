@@ -1,9 +1,9 @@
 fragment GnuPgKeyFingerprintPartial on GnuPgKeyFingerprint {
   fingerprint
   allowedAt
-  revokedAt
+  forbiddenAt
   isAllowed
-  isRevoked
+  isForbidden
   user {
     node {
       uuid
@@ -11,7 +11,7 @@ fragment GnuPgKeyFingerprintPartial on GnuPgKeyFingerprint {
     }
   }
   canCurrentUserAllowNode
-  canCurrentUserRevokeNode
+  canCurrentUserForbidNode
 }
 
 mutation AddGnuPgKeyFingerprint(
@@ -48,7 +48,7 @@ mutation AllowGnuPgKeyFingerprint($fingerprint: String!) {
   }
 }
 
-mutation RevokeGnuPgKeyFingerprint($fingerprint: String!) {
+mutation ForbidGnuPgKeyFingerprint($fingerprint: String!) {
   revokeGnuPgKeyFingerprint(input: { fingerprint: $fingerprint }) {
     gnuPgKeyFingerprint {
       ...GnuPgKeyFingerprintPartial

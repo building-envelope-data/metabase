@@ -1,5 +1,5 @@
 namespace Metabase.GraphQl.GnuPgKeyFingerprints;
 
-public sealed record RevokeGnuPgKeyFingerprintInput(
+public sealed record ForbidGnuPgKeyFingerprintInput(
     string Fingerprint
 );

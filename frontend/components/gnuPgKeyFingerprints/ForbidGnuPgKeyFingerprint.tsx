@@ -1,19 +1,19 @@
 import * as React from "react";
 import { Button, message } from "antd";
 import {
-    useRevokeGnuPgKeyFingerprintMutation,
+    useForbidGnuPgKeyFingerprintMutation,
 } from "../../queries/gnuPgKeyFingerprints.graphql";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { InstitutionDocument } from "../../queries/institutions.graphql";
 
-export type RevokeGnuPgKeyFingerprintProps = {
+export type ForbidGnuPgKeyFingerprintProps = {
     fingerprint: string;
     institutionId: Scalars["Uuid"];
 };
 
-export default function RevokeGnuPgKeyFingerprint({ fingerprint, institutionId }: RevokeGnuPgKeyFingerprintProps) {
-    const [revokeGnuPgKeyFingerprintMutation] = useRevokeGnuPgKeyFingerprintMutation({
+export default function ForbidGnuPgKeyFingerprint({ fingerprint, institutionId }: ForbidGnuPgKeyFingerprintProps) {
+    const [revokeGnuPgKeyFingerprintMutation] = useForbidGnuPgKeyFingerprintMutation({
         // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-revokes
         // See https://www.apollographql.com/docs/react/data/mutations/#options
         refetchQueries: [
@@ -25,11 +25,11 @@ export default function RevokeGnuPgKeyFingerprint({ fingerprint, institutionId }
             },
         ],
     });
-    const [revokeing, setRevokeing] = useState(false);
+    const [revokeing, setForbiding] = useState(false);
 
     const revoke = async () => {
         try {
-            setRevokeing(true);
+            setForbiding(true);
             // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
             const { errors, data } = await revokeGnuPgKeyFingerprintMutation({
                 variables: {
@@ -48,13 +48,13 @@ export default function RevokeGnuPgKeyFingerprint({ fingerprint, institutionId }
             // TODO Handle properly.
             console.log("Failed:", error);
         } finally {
-            setRevokeing(false);
+            setForbiding(false);
         }
     };
 
     return (
         <Button onClick={() => revoke()} loading={revokeing}>
-            Revoke
+            Forbid
         </Button>
     );
 }

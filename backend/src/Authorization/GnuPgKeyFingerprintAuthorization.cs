@@ -48,7 +48,7 @@ public sealed class GnuPgKeyFingerprintAuthorization(
         );
     }
 
-    internal Task<bool> IsAuthorizedToRevoke(
+    internal Task<bool> IsAuthorizedToForbid(
         ClaimsPrincipal claimsPrincipal,
         GnuPgKeyFingerprint fingerprint,
         CancellationToken cancellationToken

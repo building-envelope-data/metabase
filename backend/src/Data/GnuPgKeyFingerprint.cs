@@ -27,7 +27,7 @@ public sealed partial class GnuPgKeyFingerprint(
 
     [Required] public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public DateTime? AllowedAt { get; private set; }
-    public DateTime? RevokedAt { get; private set; }
+    public DateTime? ForbiddenAt { get; private set; }
 
     public Guid UserId { get; set; }
     [InverseProperty(nameof(User.GnuPgKeyFingerprints))]
@@ -37,12 +37,12 @@ public sealed partial class GnuPgKeyFingerprint(
     [InverseProperty(nameof(Institution.GnuPgKeyFingerprints))]
     public Institution? Institution { get; set; }
 
-    public void Revoke()
+    public void Forbid()
     {
-        RevokedAt ??= DateTime.UtcNow;
+        ForbiddenAt ??= DateTime.UtcNow;
     }
 
-    public bool IsRevoked => RevokedAt is not null;
+    public bool IsForbidden => ForbiddenAt is not null;
 
     public void Allow()
     {

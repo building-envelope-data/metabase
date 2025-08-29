@@ -15,10 +15,10 @@ public class GnuPgKeyFingerprintSortType
         descriptor.Field(x => x.Fingerprint);
         descriptor.Field(x => x.CreatedAt);
         descriptor.Field(x => x.AllowedAt);
-        descriptor.Field(x => x.RevokedAt);
+        descriptor.Field(x => x.ForbiddenAt);
         descriptor.Field(x => x.User);
         descriptor.Field(x => x.Institution);
-        descriptor.Field(x => x.IsRevoked);
+        descriptor.Field(x => x.IsForbidden);
         descriptor.Field(x => x.IsAllowed);
     }
 }

@@ -695,6 +695,18 @@ type FileMetaInformation {
   path: [String!]!
 }
 
+type ForbidGnuPgKeyFingerprintError {
+  code: ForbidGnuPgKeyFingerprintErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ForbidGnuPgKeyFingerprintPayload {
+  errors: [ForbidGnuPgKeyFingerprintError!]
+  gnuPgKeyFingerprint: GnuPgKeyFingerprint
+  query: Query!
+}
+
 type ForgetUserTwoFactorAuthenticationClientError {
   code: ForgetUserTwoFactorAuthenticationClientErrorCode!
   message: String!
@@ -796,14 +808,14 @@ type GetHttpsResourceTreeRoot {
 type GnuPgKeyFingerprint implements Node {
   allowedAt: DateTime
   canCurrentUserAllowNode: Boolean! @cost(weight: "10")
-  canCurrentUserRevokeNode: Boolean! @cost(weight: "10")
+  canCurrentUserForbidNode: Boolean! @cost(weight: "10")
   createdAt: DateTime!
   fingerprint: String!
+  forbiddenAt: DateTime
   id: ID!
   institution: GnuPgKeyFingerprintInstitutionEdge! @cost(weight: "10")
   isAllowed: Boolean!
-  isRevoked: Boolean!
-  revokedAt: DateTime
+  isForbidden: Boolean!
   user: GnuPgKeyFingerprintUserEdge! @cost(weight: "10")
   uuid: Uuid! @cost(weight: "10")
 }
@@ -875,7 +887,7 @@ type Institution implements Node {
   developedMethods(pending: Boolean! = false where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
   gnuPgKeyFingerprints(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): InstitutionGnuPgKeyFingerprintConnection! @cost(weight: "10")
-  HasGnuPgKeyFingerprint(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
+  hasGnuPgKeyFingerprint(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   id: ID!
   managedDataFormats(where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")): InstitutionManagedDataFormatConnection! @cost(weight: "10")
   managedInstitutions(where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")): InstitutionManagedInstitutionConnection! @cost(weight: "10")
@@ -1147,6 +1159,7 @@ type Mutation {
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   disableUserTwoFactorAuthentication: DisableUserTwoFactorAuthenticationPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   enableUserTwoFactorAuthenticator(input: EnableUserTwoFactorAuthenticatorInput!): EnableUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
+  forbidGnuPgKeyFingerprint(input: ForbidGnuPgKeyFingerprintInput!): ForbidGnuPgKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   forgetUserTwoFactorAuthenticationClient: ForgetUserTwoFactorAuthenticationClientPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   generateUserTwoFactorRecoveryCodes: GenerateUserTwoFactorRecoveryCodesPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
@@ -1168,7 +1181,6 @@ type Mutation {
   resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload! @cost(weight: "10")
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
-  revokeGnuPgKeyFingerprint(input: RevokeGnuPgKeyFingerprintInput!): RevokeGnuPgKeyFingerprintPayload! @authorize(policy: "Write") @cost(weight: "10")
   revokeOpenIdConnectToken(input: RevokeOpenIdConnectTokenInput!): RevokeOpenIdConnectTokenPayload! @authorize(policy: "Write") @cost(weight: "10")
   setComponentExtras(input: SetComponentExtrasInput!): SetComponentExtrasPayload! @authorize(policy: "Write") @cost(weight: "10")
   setInstitutionExtras(input: SetInstitutionExtrasInput!): SetInstitutionExtrasPayload! @authorize(policy: "Write") @cost(weight: "10")
@@ -1654,18 +1666,6 @@ type ResponseApproval {
   variables: Any!
 }
 
-type RevokeGnuPgKeyFingerprintError {
-  code: RevokeGnuPgKeyFingerprintErrorCode!
-  message: String!
-  path: [String!]!
-}
-
-type RevokeGnuPgKeyFingerprintPayload {
-  errors: [RevokeGnuPgKeyFingerprintError!]
-  gnuPgKeyFingerprint: GnuPgKeyFingerprint
-  query: Query!
-}
-
 type RevokeOpenIdConnectTokenError {
   code: RevokeOpenIdConnectTokenErrorCode!
   message: String!
@@ -1856,7 +1856,7 @@ type User implements Node {
   developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10")
   gnuPgKeyFingerprints(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): UserGnuPgKeyFingerprintConnection! @cost(weight: "10")
-  HasGnuPgKeyFingerprint(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
+  hasGnuPgKeyFingerprint(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
   id: ID!
   isEmailConfirmed: Boolean @cost(weight: "10")
@@ -2414,6 +2414,10 @@ input FloatsPropositionInput {
   some: FloatPropositionInput
 }
 
+input ForbidGnuPgKeyFingerprintInput {
+  fingerprint: String!
+}
+
 input GeometricDataPropositionInput {
   and: [GeometricDataPropositionInput!]
   componentId: UuidPropositionInput
@@ -2441,10 +2445,10 @@ input GnuPgKeyFingerprintFilterInput {
   fingerprint: StringOperationFilterInput
   createdAt: ComparableDateTimeOperationFilterInput
   allowedAt: ComparableNullableOfDateTimeOperationFilterInput
-  revokedAt: ComparableNullableOfDateTimeOperationFilterInput
+  forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
   user: UserFilterInput
   institution: InstitutionFilterInput
-  isRevoked: BooleanOperationFilterInput
+  isForbidden: BooleanOperationFilterInput
   isAllowed: BooleanOperationFilterInput
 }
 
@@ -2458,10 +2462,10 @@ input GnuPgKeyFingerprintSortInput {
   fingerprint: SortEnumType @cost(weight: "10")
   createdAt: SortEnumType @cost(weight: "10")
   allowedAt: SortEnumType @cost(weight: "10")
-  revokedAt: SortEnumType @cost(weight: "10")
+  forbiddenAt: SortEnumType @cost(weight: "10")
   user: UserSortInput @cost(weight: "10")
   institution: InstitutionSortInput @cost(weight: "10")
-  isRevoked: SortEnumType @cost(weight: "10")
+  isForbidden: SortEnumType @cost(weight: "10")
   isAllowed: SortEnumType @cost(weight: "10")
 }
 
@@ -2508,9 +2512,9 @@ input InstitutionGnuPgKeyFingerprintFilterInput {
   fingerprint: StringOperationFilterInput
   createdAt: ComparableDateTimeOperationFilterInput
   allowedAt: ComparableNullableOfDateTimeOperationFilterInput
-  revokedAt: ComparableNullableOfDateTimeOperationFilterInput
+  forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
   user: UserFilterInput
-  isRevoked: BooleanOperationFilterInput
+  isForbidden: BooleanOperationFilterInput
   isAllowed: BooleanOperationFilterInput
 }
 
@@ -3005,10 +3009,6 @@ input ResetUserPasswordInput {
   resetCode: String!
 }
 
-input RevokeGnuPgKeyFingerprintInput {
-  fingerprint: String!
-}
-
 input RevokeOpenIdConnectTokenInput {
   tokenId: Uuid!
 }
@@ -3214,9 +3214,9 @@ input UserGnuPgKeyFingerprintFilterInput {
   fingerprint: StringOperationFilterInput
   createdAt: ComparableDateTimeOperationFilterInput
   allowedAt: ComparableNullableOfDateTimeOperationFilterInput
-  revokedAt: ComparableNullableOfDateTimeOperationFilterInput
+  forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
   institution: InstitutionFilterInput
-  isRevoked: BooleanOperationFilterInput
+  isForbidden: BooleanOperationFilterInput
   isAllowed: BooleanOperationFilterInput
 }
 
@@ -3520,6 +3520,12 @@ enum EnableUserTwoFactorAuthenticatorErrorCode {
   INVALID_VERIFICATION_CODE
 }
 
+enum ForbidGnuPgKeyFingerprintErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_FINGERPRINT
+}
+
 enum ForgetUserTwoFactorAuthenticationClientErrorCode {
   UNKNOWN
   UNKNOWN_USER
@@ -3784,12 +3790,6 @@ enum ResetUserTwoFactorAuthenticatorErrorCode {
   UNKNOWN_USER
   DISABLING_FAILED
   RESETTING_FAILED
-}
-
-enum RevokeGnuPgKeyFingerprintErrorCode {
-  UNKNOWN
-  UNAUTHORIZED
-  UNKNOWN_FINGERPRINT
 }
 
 enum RevokeOpenIdConnectTokenErrorCode {

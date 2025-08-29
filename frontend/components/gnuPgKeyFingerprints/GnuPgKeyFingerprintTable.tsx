@@ -2,7 +2,7 @@ import { Skeleton, Space, Table, TableProps } from "antd";
 import { GnuPgKeyFingerprintPartialFragment } from "../../queries/institutions.graphql";
 import Link from "next/link";
 import paths from "../../paths";
-import RevokeGnuPgKeyFingerprint from "./RevokeGnuPgKeyFingerprint";
+import ForbidGnuPgKeyFingerprint from "./ForbidGnuPgKeyFingerprint";
 import { Scalars } from "../../__generated__/__types__";
 
 export type GnuPgKeyFingerprintsProps = {
@@ -28,9 +28,9 @@ export default function GnuPgKeyFingerprintTable({ loading, fingerprints, instit
             key: "allowedAt",
         },
         {
-            title: "RevokedAt",
-            dataIndex: "revokedAt",
-            key: "revokedAt",
+            title: "ForbiddenAt",
+            dataIndex: "forbiddenAt",
+            key: "forbiddenAt",
         },
         {
             title: "User",
@@ -44,12 +44,12 @@ export default function GnuPgKeyFingerprintTable({ loading, fingerprints, instit
             key: "action",
             render: (_value, record, _index) => (
                 <Space size="middle">
-                    {record.canCurrentUserRevokeNode && !record.isAllowed
-                        ? <RevokeGnuPgKeyFingerprint fingerprint={record.fingerprint} institutionId={institutionId} />
+                    {record.canCurrentUserForbidNode && !record.isAllowed
+                        ? <ForbidGnuPgKeyFingerprint fingerprint={record.fingerprint} institutionId={institutionId} />
                         : <></>
                     }
-                    {record.canCurrentUserRevokeNode && !record.isRevoked
-                        ? <RevokeGnuPgKeyFingerprint fingerprint={record.fingerprint} institutionId={institutionId} />
+                    {record.canCurrentUserForbidNode && !record.isForbidden
+                        ? <ForbidGnuPgKeyFingerprint fingerprint={record.fingerprint} institutionId={institutionId} />
                         : <></>
                     }
                 </Space>
