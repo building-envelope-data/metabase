@@ -207,6 +207,15 @@ public sealed class InstitutionRepresentativeMutations
             );
         }
 
+        foreach (var fingerprint in
+            context.GnuPgKeyFingerprints.AsQueryable()
+            .Where(f =>
+                f.InstitutionId == input.InstitutionId
+                && f.UserId == input.UserId
+            ))
+        {
+            fingerprint.Forbid();
+        }
         context.InstitutionRepresentatives.Remove(institutionRepresentative);
         await context.SaveChangesAsync(cancellationToken);
         return new RemoveInstitutionRepresentativePayload(institutionRepresentative);
