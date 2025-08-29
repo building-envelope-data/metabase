@@ -37,17 +37,24 @@ public sealed partial class GnuPgKeyFingerprint(
     [InverseProperty(nameof(Institution.GnuPgKeyFingerprints))]
     public Institution? Institution { get; set; }
 
-    public void Forbid()
-    {
-        ForbiddenAt ??= DateTime.UtcNow;
-    }
-
-    public bool IsForbidden => ForbiddenAt is not null;
-
     public void Allow()
     {
         AllowedAt ??= DateTime.UtcNow;
     }
 
     public bool IsAllowed => AllowedAt is not null;
+
+    public void Forbid()
+    {
+        // If this fingerprint has not been allowed for approval yet before it
+        // shall be forbidden now, we set `AllowedAt` and `ForbiddenAt` to
+        // the present moment making its total validity range the half closed
+        // interval `[AllowedAt, ForbiddenAt)` empty. This makes sure that
+        // whenever `ForbiddenAt` is set, `AllowedAt` is also set.
+        var now = DateTime.UtcNow;
+        AllowedAt ??= now;
+        ForbiddenAt ??= now;
+    }
+
+    public bool IsForbidden => ForbiddenAt is not null;
 }
