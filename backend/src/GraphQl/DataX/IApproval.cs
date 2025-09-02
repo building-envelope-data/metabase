@@ -12,5 +12,5 @@ public interface IApproval
     string KeyFingerprint { get; }
     string Query { get; }
     JsonElement Variables { get; }
-    string Response { get; }
+    string Message { get; }
 }

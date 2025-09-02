@@ -13,8 +13,9 @@ public sealed class DataApproval(
     string keyFingerprint,
     string query,
     JsonElement variables,
-    string response,
-    Guid approverId
+    string message,
+    Guid approverId,
+    IReference statement
     )
         : IApproval
 {
@@ -24,7 +25,8 @@ public sealed class DataApproval(
     public string KeyFingerprint { get; } = keyFingerprint;
     public string Query { get; } = query;
     public JsonElement Variables { get; } = variables;
-    public string Response { get; } = response;
+    public string Message { get; } = message;
+    public IReference Statement { get; private set; } = statement;
 
     public Task<Institution?> GetApproverAsync(
         InstitutionByIdDataLoader institutionById,

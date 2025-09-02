@@ -508,9 +508,10 @@ type DataApproval {
   approver: Institution @cost(weight: "10")
   approverId: Uuid!
   keyFingerprint: String!
+  message: String!
   query: String!
-  response: String!
   signature: String!
+  statement: Reference!
   timestamp: DateTime!
   variables: Any!
 }
@@ -1659,8 +1660,8 @@ type ResetUserTwoFactorAuthenticatorPayload {
 
 type ResponseApproval {
   keyFingerprint: String!
+  message: String!
   query: String!
-  response: String!
   signature: String!
   timestamp: DateTime!
   variables: Any!
