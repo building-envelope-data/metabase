@@ -30,7 +30,33 @@ fragment DataFields on Data {
     keyFingerprint
     query
     variables
-    response
+    message
+    statement {
+      __typename
+      ... on Publication {
+        abstract
+        arXiv
+        authors
+        doi
+        section
+        title
+        urn
+        webAddress
+      }
+      ... on Standard {
+        abstract
+        locator
+        section
+        standardizers
+        title
+        year
+        numeration {
+          mainNumber
+          prefix
+          suffix
+        }
+      }
+    }
     approverId
   }
   resources {
