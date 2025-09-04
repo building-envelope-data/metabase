@@ -304,10 +304,8 @@ checkout-target : ## Fetch and checkout `${TARGET}`
 	git checkout --force "${TARGET}"
 .PHONY : checkout-target
 
-migrate : FROM = $(file < ./backend/src/Migrations/previous)
-migrate : TO = $(file < ./backend/src/Migrations/current)
-migrate : CONTAINER_NAME = migrate_${NAME}_database
-migrate : ## Migrate database (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
+sql : CONTAINER_NAME = sql_${NAME}_database
+sql : ## Run the SQL script in the file `${SQL}` in the database service, for example, `make SQL=./my.sql sql` (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
 	${docker_compose} down \
 		--remove-orphans \
 		database
@@ -318,7 +316,7 @@ migrate : ## Migrate database (down-ing and up-ing the database service before a
 		--detach \
 		database
 	while [ $$(docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}) != "healthy" ]; do sleep 1; done
-	cat ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql \
+	cat ${SQL} \
 	| docker exec \
 		--interactive \
 		${CONTAINER_NAME} \
@@ -333,6 +331,12 @@ migrate : ## Migrate database (down-ing and up-ing the database service before a
 		--remove-orphans \
 		--detach \
 		database
+.PHONY : migrate
+
+migrate : FROM = $(file < ./backend/src/Migrations/previous)
+migrate : TO = $(file < ./backend/src/Migrations/current)
+migrate : SQL = ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql
+migrate : sql ## Migrate database (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
 .PHONY : migrate
 
 # Note that NGINX is because of its dependencies taken down and up last and in
