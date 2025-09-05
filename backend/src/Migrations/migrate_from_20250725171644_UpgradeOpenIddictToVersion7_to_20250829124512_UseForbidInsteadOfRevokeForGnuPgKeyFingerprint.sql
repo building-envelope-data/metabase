@@ -8,9 +8,9 @@ ALTER TABLE metabase."OpenIddictApplications" ADD "OwnerId" uuid NOT NULL DEFAUL
 
 CREATE INDEX "IX_OpenIddictApplications_OwnerId" ON metabase."OpenIddictApplications" ("OwnerId");
 
-ALTER TABLE metabase."OpenIddictApplications" ADD CONSTRAINT "FK_OpenIddictApplications_institution_OwnerId" FOREIGN KEY ("OwnerId") REFERENCES metabase.institution ("Id") ON DELETE RESTRICT;
-
 UPDATE metabase."OpenIddictApplications" SET "OwnerId" = "InstitutionId" FROM metabase.institution_open_id_connect_application WHERE "ApplicationId" = "Id";
+
+ALTER TABLE metabase."OpenIddictApplications" ADD CONSTRAINT "FK_OpenIddictApplications_institution_OwnerId" FOREIGN KEY ("OwnerId") REFERENCES metabase.institution ("Id") ON DELETE RESTRICT;
 
 DROP TABLE metabase.institution_open_id_connect_application;
 
