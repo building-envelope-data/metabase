@@ -88,7 +88,7 @@ export default function Database({ databaseId }: DatabaseProps) {
           </Typography.Link>
         </Descriptions.Item>
         <Descriptions.Item label="Operated by">
-          <Link href={paths.database(database.operator.node.uuid)} legacyBehavior>
+          <Link href={paths.institution(database.operator.node.uuid)} legacyBehavior>
             {database.operator.node.name}
           </Link>
         </Descriptions.Item>
