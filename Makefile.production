@@ -279,6 +279,18 @@ end-maintenance : ## End maintenance
 	rm ./nginx/html/maintenance.html
 .PHONY : end-maintenance
 
+# To deploy `develop`, I usually just take all docker services down by running
+# `cd /app/machine; make down; cd /app/production; make --file=Makefile.production down; cd /app/staging; make --file=Makefile.production down;`
+# pull the latest code by running
+# `cd /app/machine; git pull -p; cd /app/production; git pull -p; cd /app/staging; git pull -p;`
+# redeploy the reverse proxy by running
+# `cd /app/machine; make deploy;`
+# backup, migrate, and deploy all services by running
+# `make --file=Makefile.production BACKUP_DIRECTORY=$(pwd)/backup down backup migrate deploy-services`
+# first in `cd /app/staging` and checking that everything works as expected,
+# and finally in `cd /app/production` and checking that everything works as
+# expected. Before trying it on staging, I usually play the database from
+# production into staging.
 deploy : BACKUP_DIRECTORY = $(shell pwd)/backup
 deploy : begin-maintenance store-commit backup fetch-all checkout-target migrate deploy-services run-tests end-maintenance ## Deploy tag, branch, or commit `${TARGET}`, for example, `make --file=Makefile.production TARGET=v1.0.0 deploy`
 .PHONY : deploy
