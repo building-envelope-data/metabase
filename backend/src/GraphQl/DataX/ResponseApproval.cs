@@ -9,7 +9,8 @@ public sealed class ResponseApproval(
     string keyFingerprint,
     string query,
     JsonElement variables,
-    string message
+    string message,
+    Guid approverId
     )
         : IApproval
 {
@@ -19,4 +20,5 @@ public sealed class ResponseApproval(
     public string Query { get; } = query;
     public JsonElement Variables { get; } = variables;
     public string Message { get; } = message;
+    public Guid ApproverId { get; } = approverId;
 }

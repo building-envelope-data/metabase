@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using HotChocolate.Types;
+using Metabase.Configuration;
 
 namespace Metabase.GraphQl.DataX;
 
@@ -13,4 +15,5 @@ public interface IApproval
     string Query { get; }
     JsonElement Variables { get; }
     string Message { get; }
+    Guid ApproverId { get; }
 }
