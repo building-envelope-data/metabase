@@ -93,9 +93,9 @@ public sealed class DataFormatAuthorization(
             .Where(f => f.Id == dataFormatId)
             .Where(f => f.Manager != null && f.Manager.State == InstitutionState.VERIFIED)
             .Where(d => d.Manager != null && (
-                d.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || d.Manager.Manager != null && d.Manager.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || d.Manager.Manager != null && d.Manager.Manager.Manager != null && d.Manager.Manager.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
+                d.Manager.Id == application.OwnerId
+                || d.Manager.ManagerId == application.OwnerId
+                || d.Manager.Manager != null && d.Manager.Manager.ManagerId == application.OwnerId
             ))
             .AnyAsync(cancellationToken);
     }

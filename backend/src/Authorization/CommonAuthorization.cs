@@ -213,9 +213,9 @@ public abstract class CommonAuthorization(
         return Context.Institutions.AsNoTracking()
             .Where(i => i.Id == institutionId)
             .Where(i =>
-                i.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || i.Manager != null && i.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || i.Manager != null && i.Manager.Manager != null && i.Manager.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
+                i.Id == application.OwnerId
+                || i.ManagerId == application.OwnerId
+                || i.Manager != null && i.Manager.ManagerId == application.OwnerId
             );
     }
 

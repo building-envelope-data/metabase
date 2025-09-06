@@ -54,9 +54,9 @@ public abstract class CommonComponentAuthorization(
             .Where(i => i.State == InstitutionState.VERIFIED)
             .Where(i => i.ManufacturedComponentEdges.Any(e => e.ComponentId == componentId && !e.Pending))
             .Where(manufacturer =>
-                manufacturer.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || manufacturer.Manager != null && manufacturer.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || manufacturer.Manager != null && manufacturer.Manager.Manager != null && manufacturer.Manager.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
+                manufacturer.Id == application.OwnerId
+                || manufacturer.ManagerId == application.OwnerId
+                || manufacturer.Manager != null && manufacturer.Manager.ManagerId == application.OwnerId
             )
             .AnyAsync(cancellationToken);
     }

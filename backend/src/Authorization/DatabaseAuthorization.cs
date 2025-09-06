@@ -115,9 +115,9 @@ public sealed class DatabaseAuthorization(
             .Where(d => d.Id == databaseId)
             .Where(d => d.Operator != null && d.Operator.State == InstitutionState.VERIFIED)
             .Where(d => d.Operator != null && (
-                d.Operator.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || d.Operator.Manager != null && d.Operator.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || d.Operator.Manager != null && d.Operator.Manager.Manager != null && d.Operator.Manager.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
+                d.Operator.Id == application.OwnerId
+                || d.Operator.ManagerId == application.OwnerId
+                || d.Operator.Manager != null && d.Operator.Manager.ManagerId == application.OwnerId
             ))
             .AnyAsync(cancellationToken);
     }

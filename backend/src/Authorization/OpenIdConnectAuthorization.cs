@@ -127,9 +127,9 @@ public sealed class OpenIdConnectAuthorization(
         return Context.OpenIdConnectApplications.AsNoTracking()
             .Where(a => a.Id == applicationId)
             .Where(a =>
-                a.Owner.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || a.Owner.Manager != null && a.Owner.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
-                || a.Owner.Manager != null && a.Owner.Manager.Manager != null && a.Owner.Manager.Manager.OpenIdConnectApplications.Any(e => e.Id == application.Id)
+                a.Owner.Id == application.OwnerId
+                || a.Owner.ManagerId == application.OwnerId
+                || a.Owner.Manager != null && a.Owner.Manager.ManagerId == application.OwnerId
             )
             .AnyAsync(cancellationToken);
     }
