@@ -1659,6 +1659,7 @@ type ResetUserTwoFactorAuthenticatorPayload {
 }
 
 type ResponseApproval {
+  approverId: Uuid!
   keyFingerprint: String!
   message: String!
   query: String!
