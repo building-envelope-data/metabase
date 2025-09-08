@@ -3360,8 +3360,8 @@ enum ChangeUserPasswordErrorCode {
 }
 
 enum CoatedSide {
-  FRONT
-  BACK
+  PRIME
+  NON_PRIME
   BOTH
   NEITHER
   UNKNOWN

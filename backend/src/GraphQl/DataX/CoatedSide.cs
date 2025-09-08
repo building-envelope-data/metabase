@@ -5,8 +5,8 @@ namespace Metabase.GraphQl.DataX;
 [SuppressMessage("Naming", "CA1707")]
 public enum CoatedSide
 {
-    FRONT,
-    BACK,
+    PRIME,
+    NON_PRIME,
     BOTH,
     NEITHER,
     UNKNOWN,
