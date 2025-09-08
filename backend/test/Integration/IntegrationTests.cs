@@ -545,20 +545,18 @@ public abstract partial class IntegrationTests
         object? variables = null
     )
     {
-        return (
-                await JsonDocument.ParseAsync(
-                        await (
-                                await SuccessfullyQueryGraphQlContent(
-                                        httpClient,
-                                        query,
-                                        operationName,
-                                        variables
-                                    )
-                            )
-                            .ReadAsStreamAsync()
-                    )
-            )
-            .RootElement;
+        using var document = await JsonDocument.ParseAsync(
+            await (
+                    await SuccessfullyQueryGraphQlContent(
+                            httpClient,
+                            query,
+                            operationName,
+                            variables
+                        )
+                )
+                .ReadAsStreamAsync()
+        );
+        return document.RootElement.Clone();
     }
 
     protected Task<string> UnsuccessfullyQueryGraphQlContentAsString(
