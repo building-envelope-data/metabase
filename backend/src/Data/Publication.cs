@@ -40,7 +40,7 @@ public sealed class Publication(
 
     [Url]
     [GraphQLDescription(
-        "If a persistent identifiert like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long.")]
+        "If a persistent identifier like DOI is defined above, this webAdress can define a convenient web address to access the publication. However, if no persistent identifier exist, this web address is the only identifier of this publication. In this case, it is important to choose a web address with a high probability to persist long.")]
     public Uri? WebAddress { get; private set; } = webAddress;
 
     [MinLength(1)] public string? Title { get; private set; } = title;
