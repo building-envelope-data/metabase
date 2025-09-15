@@ -24,6 +24,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi;
+using Scalar.AspNetCore;
 using Serilog;
 using Metabase.Data.OpenIdConnect;
 
@@ -36,6 +38,11 @@ public sealed class Startup(
 {
     private const string GraphQlCorsPolicy = "GraphQlCorsPolicy";
     private const string AntiforgeryHeaderName = "X-XSRF-TOKEN";
+
+    private const string OpenApiDocumentName = "v1";
+    private const string OpenApiRoutePattern = "/openapi/{documentName}.json";
+    private const string OpenApiDocsRoute = "/openapi/docs";
+
     private readonly AppSettings _appSettings = configuration.Get<AppSettings>() ??
                        throw new InvalidOperationException(
                            "Failed to get application settings from configuration.");
@@ -114,6 +121,11 @@ public sealed class Startup(
                 // TODO I consider the flattened structure a bug. How can we solve this?
             }
         );
+        services.AddOpenApi(OpenApiDocumentName, _ =>
+        {
+            _.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
+            _.AddScalarTransformers();
+        });
     }
 
     private void ConfigureMessageSenderServices(IServiceCollection services)
@@ -266,7 +278,14 @@ public sealed class Startup(
         app.UseSession();
         // app.UseResponseCompression(); // Done by Nginx
         // app.UseResponseCaching(); // Done by Nginx
-        /* app.UseWebSockets(); */
+        // app.UseWebSockets();
+        app.MapOpenApi(OpenApiRoutePattern);
+        app.MapScalarApiReference(OpenApiDocsRoute, _ =>
+        {
+            _.Servers = []; // https://github.com/dotnet/aspnetcore/issues/57332#issuecomment-2480939916
+            _.AddDocument(OpenApiDocumentName); // For multiple documents see https://guides.scalar.com/scalar/scalar-api-references/integrations/net-aspnet-core/integration#configuration-options__multiple-openapi-documents
+            _.WithOpenApiRoutePattern(OpenApiRoutePattern);
+        });
         app.MapGraphQL()
             .WithOptions(
                 // https://chillicream.com/docs/hotchocolate/server/middleware
@@ -294,7 +313,11 @@ public sealed class Startup(
             {
                 ResponseWriter = WriteJsonResponse
             }
-        ).DisableHttpMetrics();
+        )
+        .WithName("Health")
+        .WithDescription("Check the webserver health.")
+        .WithTags("Health")
+        .DisableHttpMetrics();
     }
 
     // Inspired by https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-7.0#customize-output
