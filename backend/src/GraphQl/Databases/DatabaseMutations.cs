@@ -210,7 +210,7 @@ public sealed class DatabaseMutations
             return new VerifyDatabasePayload(
                 new VerifyDatabaseError(
                     VerifyDatabaseErrorCode.WRONG_VERIFICATION_CODE,
-                    $"The verification code stored in the metabase {database.VerificationCode} does not match the one returned by the database {queriedVerificationCode}.",
+                    $"The verification code stored in the metabase '{database.VerificationCode}' does not match the one returned by the database '{queriedVerificationCode}'.",
                     [nameof(input)]
                 )
             );
@@ -243,8 +243,5 @@ public sealed class DatabaseMutations
             ).Data.VerificationCode;
     }
 
-    private sealed class VerificationCodeData
-    {
-        public string VerificationCode { get; } = default!;
-    }
+    private sealed record VerificationCodeData(string VerificationCode);
 }
