@@ -3,7 +3,7 @@ declare global {
     interface ProcessEnv {
       NEXT_PUBLIC_METABASE_URL: string;
       NEXT_WEBPACK_USEPOLLING: string;
-      NODE_ENV: "production";
+      NODE_ENV: "development" | "production";
     }
   }
 }
