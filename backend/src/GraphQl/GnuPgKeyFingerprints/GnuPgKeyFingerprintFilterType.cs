@@ -18,7 +18,5 @@ public class GnuPgKeyFingerprintFilterType
         descriptor.Field(x => x.ForbiddenAt);
         descriptor.Field(x => x.User);
         descriptor.Field(x => x.Institution);
-        descriptor.Field(x => x.IsForbidden);
-        descriptor.Field(x => x.IsAllowed);
     }
 }

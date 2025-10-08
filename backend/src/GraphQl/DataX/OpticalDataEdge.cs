@@ -2,13 +2,10 @@ using System;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class OpticalDataEdge(
-    string cursor,
-    OpticalData node
-    )
-        : DataEdgeBase<OpticalData>(
-        cursor,
-        node
-        )
-{
-}
+public sealed record OpticalDataEdge(
+    string Cursor,
+    OpticalData Node
+) : DataEdgeBase<OpticalData>(
+    Cursor,
+    Node
+);

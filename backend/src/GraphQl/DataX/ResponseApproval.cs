@@ -3,22 +3,12 @@ using System.Text.Json;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class ResponseApproval(
-    DateTime timestamp,
-    string signature,
-    string keyFingerprint,
-    string query,
-    JsonElement variables,
-    string message,
-    Guid approverId
-    )
-        : IApproval
-{
-    public DateTime Timestamp { get; } = timestamp;
-    public string Signature { get; } = signature;
-    public string KeyFingerprint { get; } = keyFingerprint;
-    public string Query { get; } = query;
-    public JsonElement Variables { get; } = variables;
-    public string Message { get; } = message;
-    public Guid ApproverId { get; } = approverId;
-}
+public sealed record ResponseApproval(
+    DateTime Timestamp,
+    string Signature,
+    string KeyFingerprint,
+    string Query,
+    JsonElement Variables,
+    string Message,
+    Guid ApproverId
+) : IApproval;

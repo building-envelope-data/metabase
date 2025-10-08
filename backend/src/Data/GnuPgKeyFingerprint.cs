@@ -42,8 +42,6 @@ public sealed partial class GnuPgKeyFingerprint(
         AllowedAt ??= DateTime.UtcNow;
     }
 
-    public bool IsAllowed => AllowedAt is not null;
-
     public void Forbid()
     {
         // If this fingerprint has not been allowed for approval yet before it
@@ -55,6 +53,4 @@ public sealed partial class GnuPgKeyFingerprint(
         AllowedAt ??= now;
         ForbiddenAt ??= now;
     }
-
-    public bool IsForbidden => ForbiddenAt is not null;
 }

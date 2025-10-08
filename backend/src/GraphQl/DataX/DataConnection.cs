@@ -5,15 +5,12 @@ using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class DataConnection(
-    IReadOnlyList<DataEdge> edges,
-    uint totalCount,
-    ConnectionPageInfo pageInfo
-    )
-        : DataConnectionBase<DataEdge>(
-        edges,
-        totalCount,
-        pageInfo
-        )
-{
-}
+public sealed record DataConnection(
+    IReadOnlyList<DataEdge> Edges,
+    uint TotalCount,
+    ConnectionPageInfo PageInfo
+) : DataConnectionBase<DataEdge>(
+    Edges,
+    TotalCount,
+    PageInfo
+);

@@ -44,11 +44,11 @@ export default function GnuPgKeyFingerprintTable({ loading, fingerprints, instit
             key: "action",
             render: (_value, record, _index) => (
                 <Space size="middle">
-                    {record.canCurrentUserForbidNode && !record.isAllowed
-                        ? <ForbidGnuPgKeyFingerprint fingerprint={record.fingerprint} institutionId={institutionId} />
+                    {record.canCurrentUserAllowNode && record.allowedAt != undefined
+                        ? <AllowGnuPgKeyFingerprint fingerprint={record.fingerprint} institutionId={institutionId} />
                         : <></>
                     }
-                    {record.canCurrentUserForbidNode && !record.isForbidden
+                    {record.canCurrentUserForbidNode && record.forbiddenAt != undefined
                         ? <ForbidGnuPgKeyFingerprint fingerprint={record.fingerprint} institutionId={institutionId} />
                         : <></>
                     }

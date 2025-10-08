@@ -2,8 +2,6 @@ fragment GnuPgKeyFingerprintPartial on GnuPgKeyFingerprint {
   fingerprint
   allowedAt
   forbiddenAt
-  isAllowed
-  isForbidden
   user {
     node {
       uuid

@@ -29,5 +29,6 @@ public class InstitutionFilterType
         descriptor.Field(x => x.ManagedInstitutions);
         descriptor.Field(x => x.Representatives);
         descriptor.Field(x => x.RepresentativeEdges);
+        descriptor.Field(x => x.GnuPgKeyFingerprints);
     }
 }

@@ -4,15 +4,12 @@ using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class PhotovoltaicDataConnection(
-    IReadOnlyList<PhotovoltaicDataEdge> edges,
-    uint totalCount,
-    ConnectionPageInfo pageInfo
-    )
-        : DataConnectionBase<PhotovoltaicDataEdge>(
-        edges,
-        totalCount,
-        pageInfo
-        )
-{
-}
+public sealed record PhotovoltaicDataConnection(
+    IReadOnlyList<PhotovoltaicDataEdge> Edges,
+    uint TotalCount,
+    ConnectionPageInfo PageInfo
+) : DataConnectionBase<PhotovoltaicDataEdge>(
+    Edges,
+    TotalCount,
+    PageInfo
+);

@@ -1,12 +1,9 @@
 namespace Metabase.GraphQl.DataX;
 
-public sealed class HygrothermalDataEdge(
-    string cursor,
-    HygrothermalData node
-    )
-        : DataEdgeBase<HygrothermalData>(
-        cursor,
-        node
-        )
-{
-}
+public sealed record HygrothermalDataEdge(
+    string Cursor,
+    HygrothermalData Node
+) : DataEdgeBase<HygrothermalData>(
+    Cursor,
+    Node
+);

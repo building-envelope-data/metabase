@@ -5,15 +5,12 @@ using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class OpticalDataConnection(
-    IReadOnlyList<OpticalDataEdge> edges,
-    uint totalCount,
-    ConnectionPageInfo pageInfo
-    )
-        : DataConnectionBase<OpticalDataEdge>(
-        edges,
-        totalCount,
-        pageInfo
-        )
-{
-}
+public sealed record OpticalDataConnection(
+    IReadOnlyList<OpticalDataEdge> Edges,
+    uint TotalCount,
+    ConnectionPageInfo PageInfo
+) : DataConnectionBase<OpticalDataEdge>(
+    Edges,
+    TotalCount,
+    PageInfo
+);

@@ -3,15 +3,12 @@ using HotChocolate.Types.Pagination;
 
 namespace Metabase.GraphQl.DataX;
 
-public sealed class GeometricDataConnection(
-    IReadOnlyList<GeometricDataEdge> edges,
-    uint totalCount,
-    ConnectionPageInfo pageInfo
-    )
-        : DataConnectionBase<GeometricDataEdge>(
-        edges,
-        totalCount,
-        pageInfo
-        )
-{
-}
+public sealed record GeometricDataConnection(
+    IReadOnlyList<GeometricDataEdge> Edges,
+    uint TotalCount,
+    ConnectionPageInfo PageInfo
+) : DataConnectionBase<GeometricDataEdge>(
+    Edges,
+    TotalCount,
+    PageInfo
+);

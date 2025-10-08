@@ -1,12 +1,9 @@
 namespace Metabase.GraphQl.DataX;
 
-public sealed class CalorimetricDataEdge(
-    string cursor,
-    CalorimetricData node
-    )
-        : DataEdgeBase<CalorimetricData>(
-        cursor,
-        node
-        )
-{
-}
+public sealed record CalorimetricDataEdge(
+    string Cursor,
+    CalorimetricData Node
+) : DataEdgeBase<CalorimetricData>(
+    Cursor,
+    Node
+);

@@ -815,8 +815,6 @@ type GnuPgKeyFingerprint implements Node {
   forbiddenAt: DateTime
   id: ID!
   institution: GnuPgKeyFingerprintInstitutionEdge! @cost(weight: "10")
-  isAllowed: Boolean!
-  isForbidden: Boolean!
   user: GnuPgKeyFingerprintUserEdge! @cost(weight: "10")
   uuid: Uuid! @cost(weight: "10")
 }
@@ -2450,8 +2448,6 @@ input GnuPgKeyFingerprintFilterInput {
   forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
   user: UserFilterInput
   institution: InstitutionFilterInput
-  isForbidden: BooleanOperationFilterInput
-  isAllowed: BooleanOperationFilterInput
 }
 
 input GnuPgKeyFingerprintInput {
@@ -2467,8 +2463,6 @@ input GnuPgKeyFingerprintSortInput {
   forbiddenAt: SortEnumType @cost(weight: "10")
   user: UserSortInput @cost(weight: "10")
   institution: InstitutionSortInput @cost(weight: "10")
-  isForbidden: SortEnumType @cost(weight: "10")
-  isAllowed: SortEnumType @cost(weight: "10")
 }
 
 input HygrothermalDataPropositionInput {
@@ -2505,6 +2499,7 @@ input InstitutionFilterInput {
   managedInstitutions: ListInstitutionFilterTypeFilterInput
   representatives: ListUserFilterTypeFilterInput
   representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
+  gnuPgKeyFingerprints: ListGnuPgKeyFingerprintFilterTypeFilterInput
 }
 
 input InstitutionGnuPgKeyFingerprintFilterInput {
@@ -2516,8 +2511,6 @@ input InstitutionGnuPgKeyFingerprintFilterInput {
   allowedAt: ComparableNullableOfDateTimeOperationFilterInput
   forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
   user: UserFilterInput
-  isForbidden: BooleanOperationFilterInput
-  isAllowed: BooleanOperationFilterInput
 }
 
 input InstitutionManagedDataFormatFilterInput {
@@ -2551,6 +2544,7 @@ input InstitutionManagedInstitutionFilterInput {
   managedInstitutions: ListInstitutionFilterTypeFilterInput
   representatives: ListUserFilterTypeFilterInput
   representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
+  gnuPgKeyFingerprints: ListGnuPgKeyFingerprintFilterTypeFilterInput
 }
 
 input InstitutionManagedMethodFilterInput {
@@ -2716,6 +2710,13 @@ input ListFilterInputTypeOfUserMethodDeveloperFilterInput {
   all: UserDevelopedMethodFilterInput @cost(weight: "10")
   none: UserDevelopedMethodFilterInput @cost(weight: "10")
   some: UserDevelopedMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListGnuPgKeyFingerprintFilterTypeFilterInput {
+  all: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  none: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  some: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
@@ -3218,8 +3219,6 @@ input UserGnuPgKeyFingerprintFilterInput {
   allowedAt: ComparableNullableOfDateTimeOperationFilterInput
   forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
   institution: InstitutionFilterInput
-  isForbidden: BooleanOperationFilterInput
-  isAllowed: BooleanOperationFilterInput
 }
 
 input UserRepresentedInstitutionFilterInput {
