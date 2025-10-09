@@ -4,63 +4,63 @@ namespace Metabase;
 
 public sealed class AppSettings
 {
-    public string Host { get; set; }
+    public string Host { get; private set; }
         = "";
 
-    public string TestlabSolarFacadesHost { get; set; }
+    public string TestlabSolarFacadesHost { get; private set; }
         = "";
 
-    public LoggingSettings Logging { get; set; } = new();
+    public LoggingSettings Logging { get; private set; } = new();
 
-    public JsonWebTokenSettings JsonWebToken { get; set; } = new();
+    public JsonWebTokenSettings JsonWebToken { get; private set; } = new();
 
-    public EmailSettings Email { get; set; } = new();
+    public EmailSettings Email { get; private set; } = new();
 
-    public string BootstrapUserPassword { get; set; }
+    public string BootstrapUserPassword { get; private set; }
         = "";
 
-    public string OpenIdConnectClientSecret { get; set; }
+    public string OpenIdConnectClientSecret { get; private set; }
         = "";
 
-    public string TestlabSolarFacadesOpenIdConnectClientSecret { get; set; }
+    public string TestlabSolarFacadesOpenIdConnectClientSecret { get; private set; }
         = "";
 
-    public string IgsdbOpenIdConnectClientSecret { get; set; }
+    public string IgsdbOpenIdConnectClientSecret { get; private set; }
         = "";
 
-    public string IgsdbApiToken { get; set; }
+    public string IgsdbApiToken { get; private set; }
         = "";
 
-    public DatabaseSettings Database { get; set; } = new();
+    public DatabaseSettings Database { get; private set; } = new();
 
     public sealed class LoggingSettings
     {
-        public bool EnableSensitiveDataLogging { get; set; }
+        public bool EnableSensitiveDataLogging { get; private set; }
     }
 
     public sealed class JsonWebTokenSettings
     {
-        public string EncryptionCertificatePassword { get; set; }
+        public string EncryptionCertificatePassword { get; private set; }
             = "";
 
-        public string SigningCertificatePassword { get; set; }
+        public string SigningCertificatePassword { get; private set; }
             = "";
     }
 
     public sealed class EmailSettings
     {
-        public string SmtpHost { get; set; }
+        public string SmtpHost { get; private set; }
             = "";
 
-        public int SmtpPort { get; set; }
+        public int SmtpPort { get; private set; }
     }
 
     public sealed class DatabaseSettings
     {
-        public string ConnectionString { get; set; }
+        public string ConnectionString { get; private set; }
             = "";
 
-        public string SchemaName { get; set; }
+        public string SchemaName { get; private set; }
             = "";
     }
 }

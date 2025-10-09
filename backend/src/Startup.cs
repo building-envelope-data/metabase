@@ -43,9 +43,13 @@ public sealed class Startup(
     private const string OpenApiRoutePattern = "/openapi/{documentName}.json";
     private const string OpenApiDocsRoute = "/openapi/docs";
 
-    private readonly AppSettings _appSettings = configuration.Get<AppSettings>() ??
-                       throw new InvalidOperationException(
-                           "Failed to get application settings from configuration.");
+    private readonly AppSettings _appSettings =
+        configuration.Get<AppSettings>(_ =>
+        {
+            _.BindNonPublicProperties = true;
+            _.ErrorOnUnknownConfiguration = false;
+        })
+        ?? throw new InvalidOperationException("Failed to get application settings from configuration.");
 
     private readonly IWebHostEnvironment _environment = environment;
 
