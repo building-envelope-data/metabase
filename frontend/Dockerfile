@@ -69,4 +69,11 @@ RUN \
   yarn install \
     --pure-lockfile
 
+# Create empty directories for user `me` and group `us` to make the respective
+# mounted volumes be owned by the user `me` and the group `us`.
+RUN \
+  mkdir --parents \
+    ./.next \
+    ./node_modules
+
 ENTRYPOINT ["/usr/bin/tini", "--"]

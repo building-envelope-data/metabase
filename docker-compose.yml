@@ -154,6 +154,7 @@ services:
       # specified path with the effect that the service does not write
       # temporary files into the corresponding directory on the host file
       # system that was bound by the `/app` binding.
+      - /app/.next
       - /app/node_modules
     extra_hosts:
       - ${HOST}:host-gateway
