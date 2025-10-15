@@ -119,7 +119,7 @@ format : ## Format code
 .PHONY : format
 
 update-packages : ## Update packages
-	for subproject in src test ; do ( \
+	for subproject in ./src ./test ; do ( \
 		cd ./$${subproject} && \
 		dotnet list package | \
 			awk '/>/ {print $$2}' | \
@@ -159,59 +159,51 @@ dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for exampl
 					}"
 .PHONY : dedup
 
-add-migration : ## Add migration with name `${NAME}`, for example, `make NAME=InitialCreate add-migration`
+has-pending-model-changes : ## Check whether there have been any model changes made since the last migration was added
 	dotnet ef \
-		--project src/Metabase.csproj \
+		--project ./src/Metabase.csproj \
 		migrations \
-		add \
-		${NAME}
-.PHONY : add-migration
-
-migrate : ## Migrate database
-	dotnet ef \
-		--project src/Metabase.csproj \
-		database \
-		update
-.PHONY : migrate
-
-prepare-release : find-latest-migration generate-migration-script switch-migrations ## Prepare release
-.PHONY : prepare-release
-
-find-latest-migration : ## Store name of latest migration in `./src/Migrations/new`
-	echo \
-		$(notdir \
-			$(basename \
-				$(lastword \
-					$(sort \
-						$(shell find ./src/Migrations/ -regex ".*/[^/.]*_[^/.]*\.cs") \
-					) \
-				) \
-			) \
-		) \
-	> ./src/Migrations/new
-.PHONY : find-latest-migration
+		has-pending-model-changes
+.PHONY : has-pending-model-changes
 
 # https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#sql-scripts
-generate-migration-script : FROM = $(file < ./src/Migrations/current)
-generate-migration-script : TO = $(file < ./src/Migrations/new)
-generate-migration-script : ## Generate migration and rollback scripts for upcoming release from the migration named by `./src/Migrations/current` to the one named by `./src/Migrations/new`
+migration : ## Add migration with name `${NAME}`, generate corresponding idempotent migration SQL script, and append it to ./src/Migrations/migrate.sql, for example, `make NAME=AddStatementToDataApproval migration`
+	old=$$(find ./src/Migrations/ -type f -regex ".*/[^/.]*_[^/.]*\.cs" -exec basename --suffix=.cs {} \; | sort | tail --lines=1 ) && \
+	echo old=$$old && \
+	dotnet ef \
+		--project ./src/Metabase.csproj \
+		migrations \
+		add \
+		${NAME} && \
+	new=$$(find ./src/Migrations/ -type f -regex ".*/[^/.]*_[^/.]*\.cs" -exec basename --suffix=.cs {} \; | sort | tail --lines=1 ) && \
+	echo new=$$new && \
+	migrate_path=./src/Migrations/migrate_from_$${old}_to_$${new}.sql && \
+	rollback_path=./src/Migrations/rollback_from_$${new}_to_$${old}.sql && \
 	dotnet ef \
 		--project ./src/Metabase.csproj \
 		migrations \
 		script \
-		${FROM} \
-		${TO} \
-		--output ./src/Migrations/migrate_from_${FROM}_to_${TO}.sql
+		--idempotent \
+		$${old} \
+		$${new} \
+		--output $${migrate_path} && \
 	dotnet ef \
 		--project ./src/Metabase.csproj \
 		migrations \
 		script \
-		${TO} \
-		${FROM} \
-		--output ./src/Migrations/rollback_from_${FROM}_to_${TO}.sql
-.PHONY : generate-migration-script
+		--idempotent \
+		$${new} \
+		$${old} \
+		--output $${rollback_path} && \
+	sed -i -e "$(shell printf '1s/^\357\273\277//')" -e "s/\r//" $${migrate_path} $${rollback_path} && \
+	cat $${migrate_path} >> ./src/Migrations/migrate.sql && \
+	echo "Review the generated C# and SQL files and make necessary adjusments consistenty across all the files. In particular, keep $${migrate_path} and ./src/Migrations/migrate.sql in sync."
+.PHONY : migration
 
-switch-migrations : ## Turn current into previous and new into current
-	mv ./src/Migrations/current ./src/Migrations/previous
-	mv ./src/Migrations/new ./src/Migrations/current
-.PHONY : switch-migrations
+# https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#command-line-tools
+# update-database : ## Update the database to the latest database schema
+# 	dotnet ef \
+# 		--project ./src/Metabase.csproj \
+# 		database \
+# 		update
+# .PHONY : update-database

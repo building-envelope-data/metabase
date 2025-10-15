@@ -240,6 +240,10 @@ sql : ## Run the SQL script in the file `${SQL}` in the running `database` servi
 			--dbname=${database_name}
 .PHONY : sql
 
+migrate : SQL = ./backend/src/Migrations/migrate.sql
+migrate : sql ## Migrate the database by running the idempotent SQL script ./backend/src/Migrations/migrate.sql
+.PHONY : migrate
+
 # Backup with `pg_dumpall`: https://www.postgresql.org/docs/13/backup-dump.html#BACKUP-DUMP-ALL
 # Command `pg_dumpall`: https://www.postgresql.org/docs/13/app-pg-dumpall.html
 backup : CONTAINER_NAME = backup_${NAME}_database
@@ -310,13 +314,6 @@ begin-maintenance : ## Begin maintenance
 end-maintenance : ## End maintenance
 	rm ./nginx/html/maintenance.html
 .PHONY : begin-maintenance
-
-prepare-release : ## Prepare release
-	${docker_compose} run \
-		--user $(shell id --user):$(shell id --group) \
-		backend \
-		make prepare-release
-.PHONY : prepare-release
 
 diagrams-plantuml : ## Draw images from textual UML diagrams
 	plantuml diagrams/plantuml/*.puml

@@ -345,9 +345,7 @@ sql : ## Run the SQL script in the file `${SQL}` in the database service, for ex
 		database
 .PHONY : migrate
 
-migrate : FROM = $(file < ./backend/src/Migrations/previous)
-migrate : TO = $(file < ./backend/src/Migrations/current)
-migrate : SQL = ./backend/src/Migrations/migrate_from_${FROM}_to_${TO}.sql
+migrate : SQL = ./backend/src/Migrations/migrate.sql
 migrate : sql ## Migrate database (down-ing and up-ing the database service before and after to prevent race conditions. In general, note that other PostgreSQL instances using the same data volume must not be used while migrating and need to be restarted afterwards to make migration results visible)
 .PHONY : migrate
 
