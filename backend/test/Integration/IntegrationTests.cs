@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using IdentityModel.Client;
 using Json.Path;
+using Metabase.Data;
 using NUnit.Framework;
 using Snapshooter;
 using TokenResponse = IdentityModel.Client.TokenResponse;
@@ -51,6 +52,8 @@ public abstract partial class IntegrationTests
 
     protected AppSettings AppSettings => Factory.AppSettings;
 
+    protected ApplicationDbContext DbContext => Factory.DbContext;
+
     protected HttpClient HttpClient { get; }
 
     public void Dispose()
@@ -82,6 +85,7 @@ public abstract partial class IntegrationTests
             {
                 Factory.Dispose();
                 HttpClient.Dispose();
+                DbContext.Dispose();
             }
 
             _disposed = true;

@@ -67,6 +67,17 @@ public sealed class CustomWebApplicationFactory
         }
     }
 
+    public ApplicationDbContext DbContext
+    {
+        get
+        {
+            return Get(
+                    services =>
+                        services.GetRequiredService<ApplicationDbContext>()
+                );
+        }
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment(Metabase.Program.TestEnvironment);
@@ -83,10 +94,26 @@ public sealed class CustomWebApplicationFactory
         builder.ConfigureServices(serviceCollection =>
             {
                 using var scope = serviceCollection.BuildServiceProvider().CreateScope();
-                var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
-                // appSettings.Database.SchemaName = $"metabase_{Guid.NewGuid().ToString().Replace("-", "")}";
-                appSettings.Database.ConnectionString =
-                    $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;";
+                // Configure `AppSettings`
+                var oldAppSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
+                var newAppSettings = oldAppSettings with
+                {
+                    Database = oldAppSettings.Database with
+                    {
+                        ConnectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;"
+                        // SchemaName = $"metabase_{Guid.NewGuid().ToString().Replace("-", "")}";
+                    }
+                }
+                ;
+                var appSettingsServiceDescriptor =
+                    serviceCollection.SingleOrDefault(d =>
+                        d.ServiceType == typeof(AppSettings)
+                    );
+                if (appSettingsServiceDescriptor is not null)
+                {
+                    serviceCollection.Remove(appSettingsServiceDescriptor);
+                }
+                serviceCollection.AddSingleton(newAppSettings);
                 // Configure `IEmailSender`
                 var emailSenderServiceDescriptor =
                     serviceCollection.SingleOrDefault(d =>
@@ -96,7 +123,6 @@ public sealed class CustomWebApplicationFactory
                 {
                     serviceCollection.Remove(emailSenderServiceDescriptor);
                 }
-
                 serviceCollection.AddTransient<IEmailSender>(_ => EmailSender);
             }
         );

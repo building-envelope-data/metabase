@@ -2,65 +2,36 @@
 
 namespace Metabase;
 
-public sealed class AppSettings
+public sealed record AppSettings
 {
-    public string Host { get; private set; }
-        = "";
+    public string Host { get; init; } = "";
+    public string TestlabSolarFacadesHost { get; init; } = "";
+    public string BootstrapUserPassword { get; init; } = "";
+    public string OpenIdConnectClientSecret { get; init; } = "";
+    public string TestlabSolarFacadesOpenIdConnectClientSecret { get; init; } = "";
+    public string IgsdbOpenIdConnectClientSecret { get; init; } = "";
+    public string IgsdbApiToken { get; init; } = "";
+    public LoggingSettings Logging { get; init; } = new();
+    public JsonWebTokenSettings JsonWebToken { get; init; } = new();
+    public EmailSettings Email { get; init; } = new();
+    public DatabaseSettings Database { get; init; } = new();
+};
 
-    public string TestlabSolarFacadesHost { get; private set; }
-        = "";
+public sealed record LoggingSettings(
+    bool EnableSensitiveDataLogging = false
+);
 
-    public LoggingSettings Logging { get; private set; } = new();
+public sealed record JsonWebTokenSettings(
+    string EncryptionCertificatePassword = "",
+    string SigningCertificatePassword = ""
+);
 
-    public JsonWebTokenSettings JsonWebToken { get; private set; } = new();
+public sealed record EmailSettings(
+    string SmtpHost = "",
+    int SmtpPort = 0
+);
 
-    public EmailSettings Email { get; private set; } = new();
-
-    public string BootstrapUserPassword { get; private set; }
-        = "";
-
-    public string OpenIdConnectClientSecret { get; private set; }
-        = "";
-
-    public string TestlabSolarFacadesOpenIdConnectClientSecret { get; private set; }
-        = "";
-
-    public string IgsdbOpenIdConnectClientSecret { get; private set; }
-        = "";
-
-    public string IgsdbApiToken { get; private set; }
-        = "";
-
-    public DatabaseSettings Database { get; private set; } = new();
-
-    public sealed class LoggingSettings
-    {
-        public bool EnableSensitiveDataLogging { get; private set; }
-    }
-
-    public sealed class JsonWebTokenSettings
-    {
-        public string EncryptionCertificatePassword { get; private set; }
-            = "";
-
-        public string SigningCertificatePassword { get; private set; }
-            = "";
-    }
-
-    public sealed class EmailSettings
-    {
-        public string SmtpHost { get; private set; }
-            = "";
-
-        public int SmtpPort { get; private set; }
-    }
-
-    public sealed class DatabaseSettings
-    {
-        public string ConnectionString { get; private set; }
-            = "";
-
-        public string SchemaName { get; private set; }
-            = "";
-    }
-}
+public sealed record DatabaseSettings(
+    string ConnectionString = "",
+    string SchemaName = ""
+);
