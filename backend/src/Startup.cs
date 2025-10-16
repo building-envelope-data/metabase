@@ -73,6 +73,7 @@ public sealed class Startup(
         services.AddSingleton(_appSettings);
         services.AddSingleton(_environment);
         // services.AddDatabaseDeveloperPageExceptionFilter();
+        ConfigureCustomServices(services);
     }
 
     private static void ConfigureRequestResponseServices(IServiceCollection services)
@@ -237,6 +238,12 @@ public sealed class Startup(
                 }
             );
         }
+    }
+
+
+    public static void ConfigureCustomServices(IServiceCollection services)
+    {
+        services.AddScoped<GnuPgService>();
     }
 
     public void Configure(WebApplication app)

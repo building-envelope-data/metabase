@@ -25,6 +25,7 @@ public sealed class GnuPgKeyFingerprintMutations
         GnuPgKeyFingerprintInput input,
         ClaimsPrincipal claimsPrincipal,
         GnuPgKeyFingerprintAuthorization authorization,
+        GnuPgService gnuPgService,
         ApplicationDbContext context,
         CancellationToken cancellationToken
     )
@@ -45,6 +46,9 @@ public sealed class GnuPgKeyFingerprintMutations
                 )
             );
         }
+
+        var user = await authorization.GetUserAsync(claimsPrincipal)
+            ?? throw new InvalidOperationException("Impossible! Could not obtain the current user.");
 
         var errors = new List<AddGnuPgKeyFingerprintError>();
         if (!await context.Institutions.AsQueryable()
@@ -75,15 +79,32 @@ public sealed class GnuPgKeyFingerprintMutations
             );
         }
 
-        if (!await GnuPgService.DoesGnuPgKeyExist(normalizedFingerprint))
+        var gnuPgKeyVerificationResult = await gnuPgService.VerifyGnuPgKey(
+            normalizedFingerprint,
+            user.Email ?? ""
+        );
+        if (gnuPgKeyVerificationResult is not GnuPgKeyVerificationResult.SUCCESS)
         {
-            errors.Add(
-                new AddGnuPgKeyFingerprintError(
-                    AddGnuPgKeyFingerprintErrorCode.UNKNOWN_KEY,
-                    $"There is no non-revoked and non-disabled key in the keyserver {GnuPgService.KeyServerUrl} with the normalized fingerprint {normalizedFingerprint}.",
-                    [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
-                )
-            );
+            if (gnuPgKeyVerificationResult is GnuPgKeyVerificationResult.UNKNOWN_FAILURE)
+            {
+                errors.Add(
+                    new AddGnuPgKeyFingerprintError(
+                        AddGnuPgKeyFingerprintErrorCode.UNKNOWN_KEY,
+                        $"Failed to verify the existence of the key with the normalized fingerprint '{normalizedFingerprint}' for an unknown reason. Try again later.",
+                        [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
+                    )
+                );
+            }
+            else
+            {
+                errors.Add(
+                    new AddGnuPgKeyFingerprintError(
+                        AddGnuPgKeyFingerprintErrorCode.UNKNOWN_KEY,
+                        $"There is no non-revoked and non-disabled key in the keyserver '{GnuPgService.KeyServerUrl}' with the normalized fingerprint '{normalizedFingerprint}' and user ID with the email address '{user.Email ?? ""}'. The verification result is '{gnuPgKeyVerificationResult}.",
+                        [nameof(input), nameof(input.Fingerprint).FirstCharToLower()]
+                    )
+                );
+            }
         }
 
         if (errors.Count is not 0)
@@ -91,8 +112,6 @@ public sealed class GnuPgKeyFingerprintMutations
             return new AddGnuPgKeyFingerprintPayload(errors.AsReadOnly());
         }
 
-        var user = await authorization.GetUserAsync(claimsPrincipal)
-            ?? throw new InvalidOperationException("Could not obtain the current user.");
         var fingerprint = new GnuPgKeyFingerprint(normalizedFingerprint)
         {
             InstitutionId = input.InstitutionId,
