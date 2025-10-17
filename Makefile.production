@@ -94,18 +94,22 @@ logs : ## Follow logs
 		--follow
 .PHONY : logs
 
-exec : up ## Execute the one-time command `${COMMAND}` against an existing `${CONTAINER}` container (after starting all containers if necessary)
+exec : ## Execute the one-time command `${COMMAND}` against the `${CONTAINER}` container
+	${docker_compose} up \
+		--remove-orphans \
+		--detach \
+		${CONTAINER}
 	${docker_compose} exec \
 		${CONTAINER} \
 		${COMMAND}
 .PHONY : exec
 
 execb : CONTAINER = backend
-execb : exec ## Execute the one-time command `${COMMAND}` against an existing `backend` container (after starting all containers if necessary)
+execb : exec ## Execute the one-time command `${COMMAND}` against the `backend` container
 .PHONY : execb
 
 execf : CONTAINER = frontend
-execf : exec ## Execute the one-time command `${COMMAND}` against an existing `frontend` container (after starting all containers if necessary)
+execf : exec ## Execute the one-time command `${COMMAND}` against the `frontend` container
 .PHONY : execf
 
 shellb : COMMAND = bash
@@ -113,17 +117,17 @@ shellb : execb ## Enter shell in a running `backend` container (to test database
 .PHONY : shellb
 
 shellf : COMMAND = bash
-shellf : execf ## Enter shell in a running `frontend` container (after starting all containers if necessary)
+shellf : execf ## Enter shell in a running `frontend` container
 .PHONY : shellf
 
 shelln : CONTAINER = nginx
 shelln : COMMAND = bash
-shelln : exec ## Enter shell in a running `nginx` container (after starting all containers if necessary)
+shelln : exec ## Enter shell in a running `nginx` container
 .PHONY : shelln
 
 shelld : CONTAINER = database
 shelld : COMMAND = bash
-shelld : exec ## Enter shell in a running `database` container (after starting all containers if necessary)
+shelld : exec ## Enter shell in a running `database` container
 .PHONY : shelld
 
 list : ## List all containers with health status
@@ -156,6 +160,10 @@ createdb : ## Create database
 .PHONY : createdb
 
 psql : ## Enter PostgreSQL interactive terminal in the running `database` service
+	${docker_compose} up \
+		--remove-orphans \
+		--detach \
+		database
 	${docker_compose} exec \
 		database \
 		psql \
@@ -363,8 +371,7 @@ run-tests : COMMAND = true
 run-tests : execb ## Run tests
 .PHONY : run-tests
 
-# TODO Pass passwords in a more secure way!
-jwt-certificates : ## Create JWT encryption and signing certificates if necessary
+build-bootstrap : ## Build the bootstrap image
 	DOCKER_BUILDKIT=1 \
 		docker build \
 			--pull \
@@ -373,12 +380,16 @@ jwt-certificates : ## Create JWT encryption and signing certificates if necessar
 			--tag ${NAME}_bootstrap \
 			--file ./backend/Dockerfile-bootstrap \
 			./backend
+.PHONY : build-bootstrap
+
+# TODO Pass passwords in a more secure way!
+jwt-certificates : build-bootstrap ## Create JWT encryption and signing certificates if necessary
 	docker run \
 		--rm \
 		--user $(shell id --user):$(shell id --group) \
 		--mount type=bind,source="$(shell pwd)/backend",target=/app \
 		${NAME}_bootstrap \
-		bash -cx " \
+		bash -ceux " \
 			dotnet-script \
 				./create-certificates.csx \
 				-- \

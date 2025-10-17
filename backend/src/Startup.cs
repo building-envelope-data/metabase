@@ -1,16 +1,10 @@
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Net.Http;
 using HotChocolate.AspNetCore;
-using Metabase.Configuration;
-using Metabase.Data;
-using Metabase.Data.Extensions;
-using Metabase.Enumerations;
-using Metabase.GraphQl.Databases;
-using Metabase.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -27,6 +21,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using Serilog;
+using Metabase.Configuration;
+using Metabase.Data;
+using Metabase.Data.Extensions;
+using Metabase.Enumerations;
+using Metabase.Services;
+using Metabase.GraphQl.Databases;
 using Metabase.Data.OpenIdConnect;
 
 namespace Metabase;
@@ -239,7 +239,6 @@ public sealed class Startup(
             );
         }
     }
-
 
     public static void ConfigureCustomServices(IServiceCollection services)
     {
