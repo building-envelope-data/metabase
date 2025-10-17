@@ -3,7 +3,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Metabase.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +14,7 @@ using Serilog.Events;
 using Serilog.Formatting.Compact;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Log = Serilog.Log;
+using Metabase.Data;
 
 namespace Metabase;
 
@@ -23,8 +23,8 @@ public static partial class LoggerExtensions
     [LoggerMessage(
         EventId = 0,
         Level = LogLevel.Error,
-        Message = "An error occurred creating and seeding the database.")]
-    public static partial void FailedToCreateOrSeedDatabase(
+        Message = "An error occurred seeding the database.")]
+    public static partial void FailedToSeedDatabase(
         this ILogger logger,
         // The first exception is implicitly taken care of as detailed in
         // https://learn.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator#log-method-anatomy
@@ -58,7 +58,7 @@ public sealed class Program
             {
                 EnsureDatabaseIsUpToDate(scope.ServiceProvider);
                 // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
-                await CreateAndSeedDatabase(scope.ServiceProvider);
+                await SeedDatabase(scope.ServiceProvider);
             }
 
             await application.RunAsync();
@@ -122,7 +122,7 @@ public sealed class Program
         }
     }
 
-    private static async Task CreateAndSeedDatabase(
+    private static async Task SeedDatabase(
         IServiceProvider services
     )
     {
@@ -131,13 +131,12 @@ public sealed class Program
             using var dbContext =
                 services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
                     .CreateDbContext();
-            dbContext.Database.EnsureCreated();
             await DbSeeder.DoAsync(services);
         }
         catch (Exception exception)
         {
             var logger = services.GetRequiredService<ILogger<Program>>();
-            logger.FailedToCreateOrSeedDatabase(exception);
+            logger.FailedToSeedDatabase(exception);
         }
     }
 

@@ -38,6 +38,7 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
 [Getting started](#getting-started)
 
 - [On your Linux machine](#on-your-linux-machine)
+- [Migrating the Database](#migrating-the-database)
 - [Developing with Visual Studio Code](#developing-with-visual-studio-code)
 - [Troubleshooting](#troubleshooting)
 
@@ -87,6 +88,8 @@ Conduct](https://github.com/building-envelope-data/metabase/blob/develop/CODE_OF
    by running `make ssl`.
 1. Generate JSON Web Token (JWT) encryption and signing certificates by running
    `make jwt-certificates`.
+1. Create the PostgreSQL database and schema by running
+   `make createdb migrate`.
 1. Start all services and follow their logs by running `make up logs`.
 1. To see the web frontend navigate to
    `https://local.buildingenvelopedata.org:4041` in your web browser, to see
@@ -113,13 +116,24 @@ In another shell
    IDs 0. If there is an ID collision, then you can either change the user and
    group ID on the host machine (for example by logging in as another user) or
    you can replace all occurrences of `shell id --group` and `shell id --user`
-   in `Makefile` and `Makefile.production` by fixed non-colliding IDs like 1000. If you know a better way, please
+   in `Makefile` and `Makefile.production` by fixed non-colliding IDs like
+   1000. If you know a better way, please
    [let use know on GitHub](https://github.com/building-envelope-data/metabase/issues/new).
 1. List all backend GNU Make targets by running `make help`.
 1. For example, update packages and tools by running `make update`.
 1. Drop out of the container by running `exit` or pressing `Ctrl-D`.
 
 The same works for frontend containers by running `make shellf`.
+
+### Migrating the Database
+
+After changing the domain model in `./backend/src/data`, you need to migrate
+the database by dropping into `make shellb`, adding a migration with `make
+NAME=${MIGRATION_NAME} migration`, verifying and if necessary adapting the new
+migration C# code and SQL scripts, exiting the container with `exit`, and
+applying the new migration to the PostgreSQL database with `make migrate`. See
+[Migrations Overview](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
+and the following pages for details.
 
 ### Developing with Visual Studio Code
 
@@ -209,10 +223,6 @@ by running `make down remove-data up`. Note that the latter will remove all
 data from PostgreSQL, recreate the database and its schema, and seed it
 freshly.
 
-After changing the domain model in `./backend/src/data`, you probably need to
-migrate the database by dropping into `make shellb`, adding a migration `make NAME=${MIGRATION_NAME} add-migration`, generating a migration script `make FROM=${PREVIOUS_MIGRATION} TO=${NEW_MIGRATION} generate-migration-script`, and
-executing it `make SQL=${SCRIPT_PATH} sql`.
-
 When your hard-disk starts to grow full, it may be the case that Docker does
 not clean-up anonymous volumes properly. You can do so manually by running
 `docker system prune` potentially with the arguments `--volumes` and/or
@@ -232,7 +242,8 @@ typescript: {
 },
 ```
 
-The same can happen in development when running `make build` (or `yarn run build`) in the shell entered by `make shellf`. In that case, remove the
+The same can happen in development when running `make build` (or `yarn run
+build`) in the shell entered by `make shellf`. In that case, remove the
 offending import manually in the file and try again, for example using tail
 like so `tail -n +5 ./__generated__/queries/... > x.tmp && mv x.tmp ...` . Do
 not disable build errors in development because when you do so, build errors in
@@ -292,12 +303,12 @@ and the pages following it.
       - `RELAY_SMTP_HOST`, `RELAY_SMTP_PORT`, and `RELAY_ALLOWED_EMAILS` are
         host and port of the message transfer agent and a list of allowed
         email addresses to send emails to even in the staging environment.
+   1. Generate JSON Web Token (JWT) encryption and signing certificates by running
+      `make --file=Makefile.production jwt-certificates`.
    1. Prepare PostgreSQL by generating new password files by running
       `make --file=Makefile.production postgres_passwords`
       and creating the database by running
       `make --file=Makefile.production createdb`.
-   1. Generate JSON Web Token (JWT) encryption and signing certificates by running
-      `make --file=Makefile.production jwt-certificates`.
 
 ### Creating a release
 
@@ -314,15 +325,11 @@ and the pages following it.
    [Releases](https://github.com/building-envelope-data/metabase/releases).
 1. Fetch the release branch by running `git fetch` and check it out by running
    `git checkout release/v*.*.*`, where `*.*.*` is the version.
-1. Prepare the release by running `make prepare-release` in your shell, review,
-   add, commit, and push the changes. In particular, migration and rollback SQL
-   files are created in `./backend/src/Migrations/` which need to be reviewed
-   --- see
-   [Migrations Overview](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli)
-   and following pages for details.
+1. Apply pending migrations with `make --file=Makefile.production migrate`.
+1. Make sure that all tests succeed and try out any new features manually.
 1. [Publish the new release](https://github.com/building-envelope-data/metabase/actions/workflows/publish-new-release.yml)
    by merging the release branch into `main` whereby a new pull request from
-   `main` into `develop` is created that you need to merge to finish off.
+   `main` into `develop` is created that you need to merge to finish of.
 
 ### Deploying a release
 
@@ -408,7 +415,8 @@ If the database container restarts indefinitely and its logs say
 PANIC:  could not locate a valid checkpoint record
 ```
 
-for example preceded by `LOG: invalid resource manager ID in primary checkpoint record` or `LOG: invalid primary checkpoint record`, then the database is
+for example preceded by `LOG: invalid resource manager ID in primary checkpoint
+record` or `LOG: invalid primary checkpoint record`, then the database is
 corrupt. For example, the write-ahead log (WAL) may be corrupt because the
 database was not shut down cleanly. One solution is to restore the database
 from a backup by running
@@ -538,6 +546,7 @@ We may add some error detection and correction capabilities by, for example, gen
 
 ## Useful Resources
 
+- [Set up a GraphQL client with Apollo](https://hasura.io/learn/graphql/typescript-react-apollo/apollo-client/)
 - [Designing GraphQL Mutations](https://www.apollographql.com/blog/graphql/basics/designing-graphql-mutations/)
 - [Updating Enum Values in PostgreSQL - The Safe and Easy Way](https://blog.yo1.dog/updating-enum-values-in-postgresql-the-safe-and-easy-way/)
 - [C# Coding Standards](https://www.dofactory.com/reference/csharp-coding-standards)
