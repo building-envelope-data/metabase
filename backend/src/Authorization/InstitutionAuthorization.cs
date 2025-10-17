@@ -16,6 +16,21 @@ public sealed class InstitutionAuthorization(
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
 ) : CommonAuthorization(dbContextFactory, userManager, applicationManager)
 {
+    internal Task<bool> IsAuthorizedToCreateInstitution(
+        ClaimsPrincipal claimsPrincipal,
+        CancellationToken cancellationToken
+    )
+    {
+        // Logged-in users or authenticated OpenId Connect client applications
+        // are authorized to create institutions.
+        return AuthorizeAsync(
+            claimsPrincipal,
+            _ => Task.FromResult(true),
+            _ => Task.FromResult(true),
+            cancellationToken
+        );
+    }
+
     internal Task<bool> IsAuthorizedToUpdateInstitution(
         ClaimsPrincipal claimsPrincipal,
         Guid institutionId,

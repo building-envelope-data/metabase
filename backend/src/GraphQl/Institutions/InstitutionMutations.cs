@@ -33,6 +33,21 @@ public sealed class InstitutionMutations
         CancellationToken cancellationToken
     )
     {
+        if (input.ManagerId is null && !await authorization
+                .IsAuthorizedToCreateInstitution(
+                    claimsPrincipal,
+                    cancellationToken
+                )
+           )
+        {
+            return new CreateInstitutionPayload(
+                new CreateInstitutionError(
+                    CreateInstitutionErrorCode.UNAUTHORIZED,
+                    "You are not authorized to create institutions.",
+                    []
+                )
+            );
+        }
         if (input.ManagerId is not null && !await authorization
                 .IsAuthorizedToCreateInstitutionManagedByInstitution(
                     claimsPrincipal,
