@@ -85,6 +85,13 @@
         "certificate-tool"
       ],
       "rollForward": false
+    },
+    "dotnet-retest": {
+      "version": "1.0.0",
+      "commands": [
+        "dotnet-retest"
+      ],
+      "rollForward": false
     }
   }
 }
