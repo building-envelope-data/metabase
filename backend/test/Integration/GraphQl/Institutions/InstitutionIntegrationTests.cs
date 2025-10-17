@@ -38,7 +38,8 @@ public abstract class InstitutionIntegrationTests
 
     internal static IEnumerable<CreateInstitutionInput> InstitutionInputs
     {
-        get {
+        get
+        {
             yield return PendingInstitutionInput;
             yield return CustomIdInstitutionInput;
         }
@@ -81,15 +82,15 @@ public abstract class InstitutionIntegrationTests
     }
 
     protected Task<string> GetInstitution(
-        string uuid
+        Guid id
     )
     {
-        return GetInstitution(HttpClient, uuid);
+        return GetInstitution(HttpClient, id);
     }
 
     internal static Task<string> GetInstitution(
         HttpClient httpClient,
-        string uuid
+        Guid id
     )
     {
         return SuccessfullyQueryGraphQlContentAsString(
@@ -97,7 +98,7 @@ public abstract class InstitutionIntegrationTests
             File.ReadAllText("Integration/GraphQl/Institutions/GetInstitution.graphql"),
             variables: new Dictionary<string, object?>
             {
-                ["uuid"] = uuid
+                ["id"] = id
             }
         );
     }

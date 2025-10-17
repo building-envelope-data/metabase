@@ -8,13 +8,13 @@ namespace Metabase.Tests.Integration.GraphQl.Users;
 public abstract class UserIntegrationTests
     : IntegrationTests
 {
-    protected Task<string> GetUser(Guid uuid)
+    protected Task<string> GetUser(Guid id)
     {
         return SuccessfullyQueryGraphQlContentAsString(
             File.ReadAllText("Integration/GraphQl/Users/GetUser.graphql"),
             variables: new Dictionary<string, object?>
             {
-                ["uuid"] = uuid
+                ["id"] = id
             }
         );
     }

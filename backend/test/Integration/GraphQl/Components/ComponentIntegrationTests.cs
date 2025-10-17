@@ -144,15 +144,15 @@ public abstract class ComponentIntegrationTests
     }
 
     protected Task<string> GetComponent(
-        string uuid
+        Guid id
     )
     {
-        return GetComponent(HttpClient, uuid);
+        return GetComponent(HttpClient, id);
     }
 
     internal static Task<string> GetComponent(
         HttpClient httpClient,
-        string uuid
+        Guid id
     )
     {
         return SuccessfullyQueryGraphQlContentAsString(
@@ -160,7 +160,7 @@ public abstract class ComponentIntegrationTests
             File.ReadAllText("Integration/GraphQl/Components/GetComponent.graphql"),
             variables: new Dictionary<string, object?>
             {
-                ["uuid"] = uuid
+                ["id"] = id
             }
         );
     }
@@ -195,7 +195,7 @@ public abstract class ComponentIntegrationTests
         );
     }
 
-    protected async Task<(string, string)> CreateComponentReturningIdAndUuid(
+    protected async Task<(string Id, Guid Uuid)> CreateComponentReturningIdAndUuid(
         CreateComponentInput input
     )
     {
@@ -205,7 +205,7 @@ public abstract class ComponentIntegrationTests
                 "$.data.createComponent.component.id",
                 response
             ),
-            ExtractString(
+            ExtractUuid(
                 "$.data.createComponent.component.uuid",
                 response
             )

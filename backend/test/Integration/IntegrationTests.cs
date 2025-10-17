@@ -611,6 +611,19 @@ public abstract partial class IntegrationTests
                ?? throw new ArgumentException("String is null");
     }
 
+    protected static Guid ExtractUuid(
+        string jsonPath,
+        JsonElement jsonElement
+    )
+    {
+        return new Guid(
+            ExtractString(
+                jsonPath,
+                jsonElement
+            )
+        );
+    }
+
     protected static string Base64Encode(string text)
     {
         return Convert.ToBase64String(

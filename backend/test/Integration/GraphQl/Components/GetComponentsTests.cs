@@ -74,7 +74,7 @@ public sealed class GetComponentsTests
                 OwnerIds = [userId]
             }
         );
-        var componentIdsAndUuids = new List<(string, string)>();
+        var componentIdsAndUuids = new List<(string Id, Guid Uuid)>();
         foreach (var input in ComponentInputs)
         {
             componentIdsAndUuids.Add(
@@ -95,7 +95,7 @@ public sealed class GetComponentsTests
             response,
             matchOptions =>
                 componentIdsAndUuids.Select(
-                    ((string componentId, string componentUuid) componentIdAndUuid, int index)
+                    ((string componentId, Guid componentUuid) componentIdAndUuid, int index)
                         => (componentIdAndUuid.componentId, componentIdAndUuid.componentUuid, index)
                 ).Aggregate(
                     matchOptions,

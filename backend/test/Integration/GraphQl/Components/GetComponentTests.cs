@@ -19,7 +19,7 @@ public sealed class GetComponentTests
     {
         // Act
         var response = await GetComponent(
-            "68ccd42538d8490095051f4d0beb2837"
+            new Guid("68ccd42538d8490095051f4d0beb2837")
         );
         // Assert
         Snapshot.Match(response);
@@ -50,7 +50,7 @@ public sealed class GetComponentTests
         // There is some tiny probability that the hard-coded identifier is
         // the one of the component in which case this test fails.
         var response = await GetComponent(
-            "68ccd42538d8490095051f4d0beb2837"
+            new Guid("68ccd42538d8490095051f4d0beb2837")
         );
         // Assert
         Snapshot.Match(response);
@@ -70,7 +70,7 @@ public sealed class GetComponentTests
                 OwnerIds = [userId]
             }
         );
-        var componentIdsAndUuids = new List<(string, string)>();
+        var componentIdsAndUuids = new List<(string Id, Guid Uuid)>();
         foreach (var input in ComponentInputs)
         {
             componentIdsAndUuids.Add(
@@ -85,16 +85,16 @@ public sealed class GetComponentTests
 
         await LogoutUser();
         // Act
-        var response = await GetComponent(componentIdsAndUuids[1].Item2);
+        var response = await GetComponent(componentIdsAndUuids[1].Uuid);
         // Assert
         Snapshot.Match(
             response,
             matchOptions => matchOptions
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<string>("data.component.id").Should().Be(componentIdsAndUuids[1].Item1)
+                    fieldOptions.Field<string>("data.component.id").Should().Be(componentIdsAndUuids[1].Id)
                 )
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<Guid>("data.component.uuid").Should().Be(componentIdsAndUuids[1].Item2)
+                    fieldOptions.Field<Guid>("data.component.uuid").Should().Be(componentIdsAndUuids[1].Uuid)
                 )
         );
     }
