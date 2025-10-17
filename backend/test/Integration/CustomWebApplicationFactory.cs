@@ -1,19 +1,14 @@
-// Inspired by
+﻿// Inspired by
 // https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-5.0#customize-webapplicationfactory
 // https://www.thinktecture.com/en/entity-framework-core/isolation-of-integration-tests-in-2-1/
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Metabase.Data;
 using Metabase.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Metabase.Tests.Integration;
@@ -26,10 +21,6 @@ public sealed class CustomWebApplicationFactory
     public CustomWebApplicationFactory()
     {
         EmailSender = new CollectingEmailSender();
-        Do(
-            services =>
-                SetUpDatabase(services.GetRequiredService<ApplicationDbContext>())
-        );
     }
 
     public CollectingEmailSender EmailSender { get; }
@@ -138,22 +129,6 @@ public sealed class CustomWebApplicationFactory
                 }
                 serviceCollection.AddTransient<IEmailSender>(_ => EmailSender);
             }
-        );
-    }
-
-    private void SetUpDatabase(DbContext dbContext)
-    {
-        // https://docs.microsoft.com/en-us/ef/core/managing-schemas/ensure-created#multiple-dbcontext-classes
-        var databaseCreator = dbContext.Database.GetService<IRelationalDatabaseCreator>();
-        databaseCreator.EnsureDeleted();
-        databaseCreator.EnsureCreated();
-        Task.Run(SeedDatabase).GetAwaiter().GetResult();
-    }
-
-    private async Task SeedDatabase()
-    {
-        await DoAsync(
-            DbSeeder.DoAsync
         );
     }
 
