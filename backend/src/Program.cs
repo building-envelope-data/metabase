@@ -24,6 +24,17 @@ public static partial class LoggerExtensions
     [LoggerMessage(
         EventId = 0,
         Level = LogLevel.Error,
+        Message = "An error occurred creating the database.")]
+    public static partial void FailedToCreateDatabase(
+        this ILogger logger,
+        // The first exception is implicitly taken care of as detailed in
+        // https://learn.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator#log-method-anatomy
+        Exception exception
+    );
+
+    [LoggerMessage(
+        EventId = 1,
+        Level = LogLevel.Error,
         Message = "An error occurred seeding the database.")]
     public static partial void FailedToSeedDatabase(
         this ILogger logger,
@@ -60,8 +71,12 @@ public sealed class Program
                 if (!builder.Environment.IsEnvironment(TestEnvironment))
                 {
                     EnsureDatabaseIsUpToDate(scope.ServiceProvider);
+                    // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
                 }
-                // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
+                if (builder.Environment.IsEnvironment(TestEnvironment))
+                {
+                    await CreateDatabase(scope.ServiceProvider);
+                }
                 await SeedDatabase(scope.ServiceProvider);
             }
 
@@ -126,7 +141,7 @@ public sealed class Program
         }
     }
 
-    private static async Task SeedDatabase(
+    private static async Task CreateDatabase(
         IServiceProvider services
     )
     {
@@ -135,6 +150,21 @@ public sealed class Program
             using var dbContext =
                 services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
                     .CreateDbContext();
+            await dbContext.Database.EnsureCreatedAsync();
+        }
+        catch (Exception exception)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.FailedToCreateDatabase(exception);
+        }
+    }
+
+    private static async Task SeedDatabase(
+        IServiceProvider services
+    )
+    {
+        try
+        {
             await DbSeeder.DoAsync(services);
         }
         catch (Exception exception)
