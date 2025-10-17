@@ -52,9 +52,12 @@ public abstract partial class IntegrationTests
 
     protected AppSettings AppSettings => Factory.AppSettings;
 
-    protected ApplicationDbContext DbContext => Factory.DbContext;
-
     protected HttpClient HttpClient { get; }
+
+    public Task DoAsync(Func<ApplicationDbContext, Task> what)
+    {
+        return Factory.DoAsync(what);
+    }
 
     public void Dispose()
     {
@@ -85,7 +88,6 @@ public abstract partial class IntegrationTests
             {
                 Factory.Dispose();
                 HttpClient.Dispose();
-                DbContext.Dispose();
             }
 
             _disposed = true;

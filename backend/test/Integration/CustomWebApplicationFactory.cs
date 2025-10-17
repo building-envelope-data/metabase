@@ -25,22 +25,29 @@ public sealed class CustomWebApplicationFactory
 
     public CollectingEmailSender EmailSender { get; }
 
-    private void Do(Action<IServiceProvider> what)
-    {
-        using var scope = Services.CreateScope();
-        what(scope.ServiceProvider);
-    }
-
     private T Get<T>(Func<IServiceProvider, T> what)
     {
         using var scope = Services.CreateScope();
         return what(scope.ServiceProvider);
     }
 
-    private async Task DoAsync(Func<IServiceProvider, Task> what)
+    private void Do(Action<IServiceProvider> what)
     {
         using var scope = Services.CreateScope();
-        await what(scope.ServiceProvider);
+        what(scope.ServiceProvider);
+    }
+
+    private Task DoAsync(Func<IServiceProvider, Task> what)
+    {
+        using var scope = Services.CreateScope();
+        return what(scope.ServiceProvider);
+    }
+
+    public Task DoAsync(Func<ApplicationDbContext, Task> what)
+    {
+        return DoAsync(services =>
+            what(services.GetRequiredService<ApplicationDbContext>())
+        );
     }
 
     // private TResult Get<TResult>(Func<IServiceProvider, TResult> what)
@@ -56,17 +63,6 @@ public sealed class CustomWebApplicationFactory
             return Get(
                     services =>
                         services.GetRequiredService<AppSettings>()
-                );
-        }
-    }
-
-    public ApplicationDbContext DbContext
-    {
-        get
-        {
-            return Get(
-                    services =>
-                        services.GetRequiredService<ApplicationDbContext>()
                 );
         }
     }

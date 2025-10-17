@@ -15,7 +15,6 @@ using Serilog.Formatting.Compact;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Log = Serilog.Log;
 using Metabase.Data;
-using Microsoft.AspNetCore.Hosting;
 
 namespace Metabase;
 
