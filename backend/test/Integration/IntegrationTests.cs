@@ -15,11 +15,11 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using IdentityModel.Client;
 using Json.Path;
-using Metabase.Data;
 using NUnit.Framework;
 using Snapshooter;
 using TokenResponse = IdentityModel.Client.TokenResponse;
 using WebApplicationFactoryClientOptions = Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions;
+using Metabase.Data;
 
 namespace Metabase.Tests.Integration;
 

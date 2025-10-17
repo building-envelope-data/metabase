@@ -3,6 +3,7 @@
 // https://www.thinktecture.com/en/entity-framework-core/isolation-of-integration-tests-in-2-1/
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Metabase.Data;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Metabase.Tests.Integration;
@@ -80,6 +82,9 @@ public sealed class CustomWebApplicationFactory
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        var connectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;";
+        // var schemaName = $"metabase_{Guid.NewGuid().ToString().Replace("-", "")}";
+        // builder.ConfigureAppConfiguration(_ => _.AddInMemoryCollection([new KeyValuePair<string, string?>("Database__ConnectionString", connectionString)])); // "Database__SchemaName"
         builder.UseEnvironment(Metabase.Program.TestEnvironment);
         builder.ConfigureAppConfiguration((webHostBuilderContext, configurationBuilder) =>
             {
@@ -95,25 +100,33 @@ public sealed class CustomWebApplicationFactory
             {
                 using var scope = serviceCollection.BuildServiceProvider().CreateScope();
                 // Configure `AppSettings`
-                var oldAppSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
-                var newAppSettings = oldAppSettings with
-                {
-                    Database = oldAppSettings.Database with
-                    {
-                        ConnectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;"
-                        // SchemaName = $"metabase_{Guid.NewGuid().ToString().Replace("-", "")}";
-                    }
-                }
-                ;
-                var appSettingsServiceDescriptor =
-                    serviceCollection.SingleOrDefault(d =>
-                        d.ServiceType == typeof(AppSettings)
-                    );
-                if (appSettingsServiceDescriptor is not null)
-                {
-                    serviceCollection.Remove(appSettingsServiceDescriptor);
-                }
-                serviceCollection.AddSingleton(newAppSettings);
+                var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
+                appSettings.Database.ConnectionString = connectionString;
+                // `appSettings.Database.ConnectionString` should readonly.
+                // However, the commented code below together with
+                // `AddInMemoryCollection` above, does not configure the
+                // `ConnectionString` in such a way, that Npgsql knows about it.
+                // It uses the empty connection string from the original app
+                // settings in `Startup.cs`. Why?
+                // var oldAppSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
+                // var newAppSettings = oldAppSettings with
+                // {
+                //     Database = oldAppSettings.Database with
+                //     {
+                //         ConnectionString = connectionString
+                //         // SchemaName = schemaName
+                //     }
+                // }
+                // ;
+                // var appSettingsServiceDescriptor =
+                //     serviceCollection.SingleOrDefault(d =>
+                //         d.ServiceType == typeof(AppSettings)
+                //     );
+                // if (appSettingsServiceDescriptor is not null)
+                // {
+                //     serviceCollection.Remove(appSettingsServiceDescriptor);
+                // }
+                // serviceCollection.AddSingleton(newAppSettings);
                 // Configure `IEmailSender`
                 var emailSenderServiceDescriptor =
                     serviceCollection.SingleOrDefault(d =>

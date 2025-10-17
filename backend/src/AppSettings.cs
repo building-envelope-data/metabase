@@ -17,21 +17,25 @@ public sealed record AppSettings
     public DatabaseSettings Database { get; init; } = new();
 };
 
-public sealed record LoggingSettings(
-    bool EnableSensitiveDataLogging = false
-);
+public sealed record LoggingSettings
+{
+    public bool EnableSensitiveDataLogging { get; init; }
+};
 
-public sealed record JsonWebTokenSettings(
-    string EncryptionCertificatePassword = "",
-    string SigningCertificatePassword = ""
-);
+public sealed record JsonWebTokenSettings
+{
+    public string EncryptionCertificatePassword { get; init; } = "";
+    public string SigningCertificatePassword { get; init; } = "";
+};
 
-public sealed record EmailSettings(
-    string SmtpHost = "",
-    int SmtpPort = 0
-);
+public sealed record EmailSettings
+{
+    public string SmtpHost { get; init; } = "";
+    public int SmtpPort { get; init; }
+};
 
-public sealed record DatabaseSettings(
-    string ConnectionString = "",
-    string SchemaName = ""
-);
+public sealed record DatabaseSettings
+{
+    public string ConnectionString { get; set; } = "";
+    public string SchemaName { get; init; } = "";
+};
