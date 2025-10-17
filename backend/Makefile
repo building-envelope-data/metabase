@@ -159,6 +159,14 @@ dedup : ## Dedeuplicate code lines matching the pattern `${PATTERN}`, for exampl
 					}"
 .PHONY : dedup
 
+# See https://github.com/hasura/graphqurl#export-schema
+schema : ## Fetch GraphQL schema using `hasura/graphqurl`
+	gq \
+		http://backend:8080/graphql/ \
+		--introspect \
+		> ./schema.graphql
+.PHONY : schema
+
 has-pending-model-changes : ## Check whether there have been any model changes made since the last migration was added
 	dotnet ef \
 		--project ./src/Metabase.csproj \
