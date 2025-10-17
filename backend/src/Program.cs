@@ -15,6 +15,7 @@ using Serilog.Formatting.Compact;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Log = Serilog.Log;
 using Metabase.Data;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Metabase;
 
@@ -56,7 +57,10 @@ public sealed class Program
             startup.Configure(application);
             using (var scope = application.Services.CreateScope())
             {
-                EnsureDatabaseIsUpToDate(scope.ServiceProvider);
+                if (!builder.Environment.IsEnvironment(TestEnvironment))
+                {
+                    EnsureDatabaseIsUpToDate(scope.ServiceProvider);
+                }
                 // Inspired by https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/intro#initialize-db-with-test-data
                 await SeedDatabase(scope.ServiceProvider);
             }
