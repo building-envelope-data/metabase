@@ -217,6 +217,7 @@ public static class GraphQlConfiguration
                     _.DefaultPageSize = 100;
                     _.IncludeTotalCount = true;
                     _.IncludeNodesField = false;
+                    _.InferConnectionNameFromField = true;
                 }
             )
             .UseAutomaticPersistedOperationPipeline()
