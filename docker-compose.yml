@@ -123,6 +123,8 @@ services:
       # - SSL_CERT_FILE=/app/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
       # - ASPNETCORE_DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_LOGGING=1
       # - ASPNETCORE_DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_LOGGING_SPECIFIER=all
+      # https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
+      - GPG_TTY=/dev/pts/0
     extra_hosts:
       - ${HOST}:host-gateway
       - ${TESTLAB_SOLAR_FACADES_HOST}:host-gateway
