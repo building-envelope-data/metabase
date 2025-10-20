@@ -1,15 +1,15 @@
 ﻿// Inspired by
-// https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-5.0#customize-webapplicationfactory
+// https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?customize-webapplicationfactory
 // https://www.thinktecture.com/en/entity-framework-core/isolation-of-integration-tests-in-2-1/
 
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Metabase.Data;
-using Metabase.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Metabase.Data;
+using Metabase.Services;
 
 namespace Metabase.Tests.Integration;
 
