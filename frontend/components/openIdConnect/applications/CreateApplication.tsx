@@ -93,7 +93,7 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
                 if (
                     !errors &&
                     !data?.createOpenIdConnectApplication?.errors &&
-                    data?.createOpenIdConnectApplication?.application
+                    data?.createOpenIdConnectApplication?.clientSecret
                 ) {
                     Modal.info({
                         title: "Application Client Secret",

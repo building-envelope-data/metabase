@@ -1178,6 +1178,7 @@ type Mutation {
   requestUserPasswordReset(input: RequestUserPasswordResetInput!): RequestUserPasswordResetPayload! @cost(weight: "10")
   resendUserEmailConfirmation(input: ResendUserEmailConfirmationInput!): ResendUserEmailConfirmationPayload! @cost(weight: "10")
   resendUserEmailVerification: ResendUserEmailVerificationPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
+  resetOpenIdConnectApplicationClientSecret(input: ResetOpenIdConnectApplicationClientSecretInput!): ResetOpenIdConnectApplicationClientSecretPayload! @authorize(policy: "Write") @cost(weight: "10")
   resetUserPassword(input: ResetUserPasswordInput!): ResetUserPasswordPayload! @cost(weight: "10")
   resetUserTwoFactorAuthenticator: ResetUserTwoFactorAuthenticatorPayload! @authorize(policy: "ManageUser") @cost(weight: "10")
   revokeOpenIdConnectToken(input: RevokeOpenIdConnectTokenInput!): RevokeOpenIdConnectTokenPayload! @authorize(policy: "Write") @cost(weight: "10")
@@ -1631,6 +1632,19 @@ type ResendUserEmailVerificationPayload {
   errors: [ResendUserEmailVerificationError!]
   query: Query!
   user: User
+}
+
+type ResetOpenIdConnectApplicationClientSecretError {
+  code: ResetOpenIdConnectApplicationClientSecretErrorCode!
+  message: String!
+  path: [String!]!
+}
+
+type ResetOpenIdConnectApplicationClientSecretPayload {
+  application: OpenIdConnectApplication
+  clientSecret: String
+  errors: [ResetOpenIdConnectApplicationClientSecretError!]
+  query: Query!
 }
 
 type ResetUserPasswordError {
@@ -3005,6 +3019,10 @@ input ResendUserEmailConfirmationInput {
   email: String!
 }
 
+input ResetOpenIdConnectApplicationClientSecretInput {
+  applicationId: Uuid!
+}
+
 input ResetUserPasswordInput {
   email: String!
   password: String!
@@ -3773,6 +3791,12 @@ enum ResendUserEmailVerificationErrorCode {
   UNKNOWN
   UNKNOWN_USER
   UNKNOWN_EMAIL
+}
+
+enum ResetOpenIdConnectApplicationClientSecretErrorCode {
+  UNKNOWN
+  UNAUTHORIZED
+  UNKNOWN_APPLICATION
 }
 
 enum ResetUserPasswordErrorCode {

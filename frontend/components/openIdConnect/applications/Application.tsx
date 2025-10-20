@@ -8,6 +8,7 @@ import TokenTable from "../tokens/TokenTable";
 import { PageHeader } from "@ant-design/pro-layout";
 import DeleteApplication from "./DeleteApplication";
 import { useApplicationQuery } from "../../../queries/openIdConnect.graphql";
+import ResetApplicationClientSecret from "./ResetApplicationClientSecret";
 
 export type ApplicationProps = {
     applicationId: Scalars["Uuid"];
@@ -52,6 +53,16 @@ export default function Application({ applicationId }: ApplicationProps) {
                             <UpdateApplication
                                 key="updateApplication"
                                 application={application}
+                            />,
+                        ]
+                        : []
+                )
+                .concat(
+                    application.canCurrentUserManageNode
+                        ? [
+                            <ResetApplicationClientSecret
+                                key="resetApplicationClientSecret"
+                                applicationId={application.uuid}
                             />,
                         ]
                         : []

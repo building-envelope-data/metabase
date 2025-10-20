@@ -137,6 +137,26 @@ mutation UpdateApplication(
   }
 }
 
+mutation ResetApplicationClientSecret(
+  $applicationId: Uuid!
+) {
+  resetOpenIdConnectApplicationClientSecret(
+    input: {
+      applicationId: $applicationId
+    }
+  ) {
+    application{
+      ...ApplicationPartial
+    }
+    clientSecret
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 mutation DeleteApplication($applicationId: Uuid!) {
   deleteOpenIdConnectApplication(input: { applicationId: $applicationId }) {
     errors {

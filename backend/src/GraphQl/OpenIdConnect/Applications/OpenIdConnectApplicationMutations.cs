@@ -20,6 +20,11 @@ namespace Metabase.GraphQl.OpenIdConnect.Applications;
 [ExtendObjectType(nameof(Mutation))]
 public sealed class OpenIdConnectApplicationMutations
 {
+    private static string GenerateClientSecret()
+    {
+        return RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+", 128);
+    }
+
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.WritePolicy)]
     public async Task<CreateOpenIdConnectApplicationPayload> CreateOpenIdConnectApplicationAsync(
@@ -66,7 +71,7 @@ public sealed class OpenIdConnectApplicationMutations
                 )
             );
         }
-        var clientSecret = RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+", 128);
+        var clientSecret = GenerateClientSecret();
         var descriptor = new OpenIddictApplicationDescriptor
         {
             ClientId = input.ClientId,
@@ -100,6 +105,46 @@ public sealed class OpenIdConnectApplicationMutations
         await applicationManager.PopulateAsync(application, descriptor, cancellationToken);
         await applicationManager.CreateAsync(application, clientSecret, cancellationToken);
         return new CreateOpenIdConnectApplicationPayload(application, clientSecret);
+    }
+
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.WritePolicy)]
+    public async Task<ResetOpenIdConnectApplicationClientSecretPayload> ResetOpenIdConnectApplicationClientSecretAsync(
+        ResetOpenIdConnectApplicationClientSecretInput input,
+        ClaimsPrincipal claimsPrincipal,
+        Authorization.OpenIdConnectAuthorization authorization,
+        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
+        CancellationToken cancellationToken
+    )
+    {
+        if (!await authorization.IsAuthorizedToManageApplication(
+                claimsPrincipal,
+                input.ApplicationId,
+                cancellationToken
+            ))
+        {
+            return new ResetOpenIdConnectApplicationClientSecretPayload(
+                new ResetOpenIdConnectApplicationClientSecretError(
+                    ResetOpenIdConnectApplicationClientSecretErrorCode.UNAUTHORIZED,
+                    "You are not authorized to reset the application secret.",
+                    [nameof(input), nameof(input.ApplicationId).FirstCharToLower()]
+                )
+            );
+        }
+        var application = await applicationManager.FindByIdAsync(input.ApplicationId.ToString(), cancellationToken);
+        if (application is null)
+        {
+            return new ResetOpenIdConnectApplicationClientSecretPayload(
+                new ResetOpenIdConnectApplicationClientSecretError(
+                    ResetOpenIdConnectApplicationClientSecretErrorCode.UNKNOWN_APPLICATION,
+                    "Unknown application.",
+                    [nameof(input), nameof(input.ApplicationId).FirstCharToLower()]
+                )
+            );
+        }
+        var clientSecret = GenerateClientSecret();
+        await applicationManager.UpdateAsync(application, clientSecret, cancellationToken);
+        return new ResetOpenIdConnectApplicationClientSecretPayload(application, clientSecret);
     }
 
     [UseUserManager]
