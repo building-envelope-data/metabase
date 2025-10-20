@@ -38,7 +38,18 @@ public sealed class CreateInstitutionTests
         );
         var response = await GetInstitutions();
         // Assert
-        Snapshot.Match(response);
+        // The existing institution was created by the database seeder run in `Program.cs`
+        Snapshot.Match(
+            response,
+            matchOptions => matchOptions
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<string>("data.createInstitution.institution.id").Should()
+                        .NotBeNullOrWhiteSpace()
+                )
+                .Assert(fieldOptions =>
+                    fieldOptions.Field<Guid>("data.createInstitution.institution.uuid").Should().NotBe(Guid.Empty)
+                )
+        );
     }
 
     [TestCaseSource(nameof(EnumerateInstitutionInputs))]
