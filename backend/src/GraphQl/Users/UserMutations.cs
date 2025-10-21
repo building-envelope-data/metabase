@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -11,6 +11,7 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Metabase.Authorization;
+using Metabase.Extensions;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
@@ -567,7 +568,7 @@ public sealed class UserMutations
             (user.Name, input.Email),
             await userManager.GenerateEmailConfirmationTokenAsync(user),
             emailSender,
-            appSettings.Host,
+            appSettings.HostUri,
             input.ReturnTo,
             urlEncoder
         );
@@ -595,7 +596,7 @@ public sealed class UserMutations
                 (user.Name, input.Email),
                 await userManager.GenerateEmailConfirmationTokenAsync(user),
                 emailSender,
-                appSettings.Host,
+                appSettings.HostUri,
                 null,
                 urlEncoder
             );
@@ -626,11 +627,15 @@ public sealed class UserMutations
             var resetCode = EncodeToken(
                 await userManager.GeneratePasswordResetTokenAsync(user)
             );
+            var resetUri = new UriBuilder(appSettings.HostUri) {
+                Path = "/users/reset-password",
+                Query = $"resetCode={resetCode}"
+                    + (input.ReturnTo is null ? "" : $"&returnTo={urlEncoder.Encode(input.ReturnTo.OriginalString)}")
+            }.Uri;
             await emailSender.SendAsync(
                 (user.Name, input.Email),
                 "Reset password",
-                $"Please reset your password by following the link {appSettings.Host}/users/reset-password?resetCode={resetCode}" +
-                (input.ReturnTo is null ? "" : $"&returnTo={urlEncoder.Encode(input.ReturnTo.OriginalString)}")
+                $"Please reset your password by following the link {resetUri.AbsoluteUri}"
             );
         }
 
@@ -1434,7 +1439,7 @@ public sealed class UserMutations
             input.NewEmail,
             await userManager.GenerateChangeEmailTokenAsync(user, input.NewEmail),
             emailSender,
-            appSettings.Host,
+            appSettings.HostUri,
             urlEncoder
         );
         return new ChangeUserEmailPayload(user);
@@ -1482,7 +1487,7 @@ public sealed class UserMutations
             (user.Name, email),
             await userManager.GenerateEmailConfirmationTokenAsync(user),
             emailSender,
-            appSettings.Host,
+            appSettings.HostUri,
             null,
             urlEncoder
         );
@@ -1855,17 +1860,22 @@ public sealed class UserMutations
         (string name, string address) recipient,
         string confirmationToken,
         IEmailSender emailSender,
-        string host,
+        Uri host,
         Uri? returnTo,
         UrlEncoder urlEncoder
     )
     {
         var confirmationCode = EncodeToken(confirmationToken);
+        var confirmationUri = new UriBuilder(host) {
+            Path = "/users/confirm-email",
+            Query = $"email={urlEncoder.Encode(recipient.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}"
+                + (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}")
+        }.Uri;
         await emailSender.SendAsync(
-                recipient,
-                "Confirm your email",
-                $"Please confirm your email address by following the link {host}/users/confirm-email?email={urlEncoder.Encode(recipient.address)}&confirmationCode={urlEncoder.Encode(confirmationCode)}" +
-                (returnTo is null ? "" : $"&returnTo={urlEncoder.Encode(returnTo.OriginalString)}"));
+            recipient,
+            "Confirm your email",
+            $"Please confirm your email address by following the link {confirmationUri.AbsoluteUri}"
+        );
     }
 
     private static async Task SendChangeUserEmailConfirmation(
@@ -1874,15 +1884,20 @@ public sealed class UserMutations
         string newEmail,
         string confirmationToken,
         IEmailSender emailSender,
-        string host,
+        Uri host,
         UrlEncoder urlEncoder
     )
     {
         var confirmationCode = EncodeToken(confirmationToken);
+        var confirmationUri = new UriBuilder(host) {
+            Path = "/users/confirm-email-change",
+            Query = $"currentEmail={urlEncoder.Encode(currentEmail)}&newEmail={urlEncoder.Encode(newEmail)}&confirmationCode={confirmationCode}"
+        }.Uri;
         await emailSender.SendAsync(
-                (name, newEmail),
-                "Confirm your email change",
-                $"Please confirm your email address change by following the link {host}/users/confirm-email-change?currentEmail={urlEncoder.Encode(currentEmail)}&newEmail={urlEncoder.Encode(newEmail)}&confirmationCode={confirmationCode}");
+            (name, newEmail),
+            "Confirm your email change",
+            $"Please confirm your email address change by following the link {confirmationUri.AbsoluteUri}"
+        );
     }
 
     private static string EncodeToken(string token)

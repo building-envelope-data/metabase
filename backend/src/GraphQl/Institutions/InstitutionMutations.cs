@@ -172,6 +172,9 @@ public sealed class InstitutionMutations
         if (institution.State == InstitutionState.PENDING)
         {
             var verifiers = await authorization.GetUsersInRoleAsync(UserRole.VERIFIER);
+            var institutionsUri = new UriBuilder(appSettings.HostUri) {
+                Path = "/institutions"
+            }.Uri;
             await Task.WhenAll(
                 verifiers.Select(verifier =>
                     verifier.Email is null
@@ -179,7 +182,7 @@ public sealed class InstitutionMutations
                         : emailSender.SendAsync(
                             (verifier.Name, verifier.Email),
                             $"New institution `{institution.Name}` in metabase awaits verification",
-                            $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID {institution.Id:D} on {appSettings.Host}/institutions Have a nice day! :-)"
+                            $"Dear {verifier.Name}, please verify institution '{institution.Name}' with UUID {institution.Id:D} on {institutionsUri.AbsoluteUri} Have a nice day! :-)"
                         )
                 )
             );

@@ -1,11 +1,15 @@
 // Inspired by https://weblog.west-wind.com/posts/2017/dec/12/easy-configuration-binding-in-aspnet-core-revisited
 
+using System;
+
 namespace Metabase;
 
 public sealed record AppSettings
 {
     public string Host { get; init; } = "";
+    public Uri HostUri { get => new(Host, UriKind.Absolute); }
     public string TestlabSolarFacadesHost { get; init; } = "";
+    public Uri TestlabSolarFacadesHostUri { get => new(TestlabSolarFacadesHost, UriKind.Absolute); }
     public string BootstrapUserPassword { get; init; } = "";
     public string OpenIdConnectClientSecret { get; init; } = "";
     public string TestlabSolarFacadesOpenIdConnectClientSecret { get; init; } = "";

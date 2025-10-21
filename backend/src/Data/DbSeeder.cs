@@ -266,7 +266,7 @@ public sealed class DbSeeder
             var context = services.GetRequiredService<ApplicationDbContext>();
             if (!await context.Databases.Where(x => x.Name == TestlabDatabaseName).AnyAsync())
             {
-                var uriBuilder = new UriBuilder(new Uri(appSettings.TestlabSolarFacadesHost, UriKind.Absolute))
+                var uriBuilder = new UriBuilder(appSettings.TestlabSolarFacadesHostUri)
                 {
                     Path = "/graphql/"
                 };
@@ -382,7 +382,7 @@ public sealed class DbSeeder
         if (await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId) is null)
         {
             logger.CreatingApplicationClient(MetabaseOpenIdConnectClientId);
-            var host = appSettings.Host;
+            var host = appSettings.HostUri;
             var descriptor = new OpenIddictApplicationDescriptor
             {
                 ClientId = MetabaseOpenIdConnectClientId,
@@ -397,17 +397,15 @@ public sealed class DbSeeder
                 },
                 RedirectUris =
                 {
-                    new Uri(environment.IsEnvironment(Program.TestEnvironment)
-                        ? "urn:test"
-                        : $"{host}/connect/callback/login/metabase",
-                        UriKind.Absolute)
+                    environment.IsEnvironment(Program.TestEnvironment)
+                    ? new Uri("urn:test", UriKind.Absolute)
+                    : new UriBuilder(host) { Path = "/connect/callback/login/metabase" }.Uri
                 },
                 PostLogoutRedirectUris =
                 {
-                    new Uri(environment.IsEnvironment(Program.TestEnvironment)
-                        ? "urn:test"
-                        : $"{host}/connect/callback/logout/metabase",
-                        UriKind.Absolute)
+                    environment.IsEnvironment(Program.TestEnvironment)
+                    ? new Uri("urn:test", UriKind.Absolute)
+                    : new UriBuilder(host) { Path = "/connect/callback/logout/metabase" }.Uri
                 },
                 Permissions =
                 {
@@ -438,7 +436,7 @@ public sealed class DbSeeder
                 },
                 Requirements =
                 {
-                    OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
+            OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange,
                     OpenIddictConstants.Requirements.Features.PushedAuthorizationRequests
                 }
             };
@@ -457,7 +455,7 @@ public sealed class DbSeeder
             if (await manager.FindByClientIdAsync(TestlabSolarFacadesOpenIdConnectClientId) is null)
             {
                 logger.CreatingApplicationClient(TestlabSolarFacadesOpenIdConnectClientId);
-                var host = appSettings.TestlabSolarFacadesHost;
+                var host = appSettings.TestlabSolarFacadesHostUri;
                 var descriptor = new OpenIddictApplicationDescriptor
                 {
                     ClientId = TestlabSolarFacadesOpenIdConnectClientId,
@@ -470,11 +468,11 @@ public sealed class DbSeeder
                     },
                     RedirectUris =
                     {
-                        new Uri($"{host}/connect/callback/login/metabase", UriKind.Absolute)
+                        new UriBuilder(host) { Path = "/connect/callback/login/metabase" }.Uri
                     },
                     PostLogoutRedirectUris =
                     {
-                        new Uri($"{host}/connect/callback/logout/metabase", UriKind.Absolute)
+                        new UriBuilder(host) { Path = "/connect/callback/logout/metabase" }.Uri
                     },
                     Permissions =
                     {
@@ -519,7 +517,6 @@ public sealed class DbSeeder
             if (await manager.FindByClientIdAsync(IgsdbOpenIdConnectClientId) is null)
             {
                 logger.CreatingApplicationClient(IgsdbOpenIdConnectClientId);
-                var host = appSettings.TestlabSolarFacadesHost;
                 var descriptor = new OpenIddictApplicationDescriptor
                 {
                     ClientId = IgsdbOpenIdConnectClientId,

@@ -300,7 +300,7 @@ public static class AuthConfiguration
             // Register the OpenIddict server components.
             .AddServer(options =>
                 {
-                    options.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
+                    options.SetIssuer(appSettings.HostUri);
                     options.SetAuthorizationEndpointUris("connect/authorize")
                         .SetPushedAuthorizationEndpointUris("connect/par")
                         // .SetDeviceAuthorizationEndpointUris("connect/device")
@@ -387,7 +387,7 @@ public static class AuthConfiguration
             // Register the OpenIddict validation components.
             .AddValidation(options =>
             {
-                options.SetIssuer(new Uri(appSettings.Host, UriKind.Absolute));
+                options.SetIssuer(appSettings.HostUri);
                 // Configure the audience accepted by this resource server.
                 options.AddAudiences(Audience);
                 // Import the configuration from the local OpenIddict server instance:
@@ -453,7 +453,7 @@ public static class AuthConfiguration
                 options.AddRegistration(
                     new OpenIddictClientRegistration
                     {
-                        Issuer = new Uri(appSettings.Host, UriKind.Absolute),
+                        Issuer = appSettings.HostUri,
 
                         // Note: these settings must match the application details inserted in the
                         // database at the server level.
