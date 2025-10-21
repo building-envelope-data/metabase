@@ -66,7 +66,6 @@ public static partial class Log
 
 public sealed class DbSeeder
 {
-    public const string MetabaseOpenIdConnectClientId = "metabase";
     public const string TestlabSolarFacadesOpenIdConnectClientId = "testlab-solar-facades";
     public const string IgsdbOpenIdConnectClientId = "igsdb";
 
@@ -200,7 +199,7 @@ public sealed class DbSeeder
                     Pending = false
                 }
             );
-            var application = await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId).AsTask();
+            var application = await manager.FindByClientIdAsync(AuthConfiguration.MetabaseOpenIdConnectClientId).AsTask();
             if (application is not null)
             {
                 iseInstitution.OpenIdConnectApplications.Add(application);
@@ -323,7 +322,7 @@ public sealed class DbSeeder
                     Name = AuthConfiguration.ReadApiScope,
                     Resources =
                     {
-                        AuthConfiguration.Audience
+                        AuthConfiguration.MetabaseOpenIdConnectClientId
                     }
                 }
             );
@@ -343,7 +342,7 @@ public sealed class DbSeeder
                     Name = AuthConfiguration.WriteApiScope,
                     Resources =
                     {
-                        AuthConfiguration.Audience
+                        AuthConfiguration.MetabaseOpenIdConnectClientId
                     }
                 }
             );
@@ -363,7 +362,7 @@ public sealed class DbSeeder
                     Name = AuthConfiguration.ManageUserApiScope,
                     Resources =
                     {
-                        AuthConfiguration.Audience
+                        AuthConfiguration.MetabaseOpenIdConnectClientId
                     }
                 }
             );
@@ -379,13 +378,13 @@ public sealed class DbSeeder
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         var manager = services.GetRequiredService<OpenIddictApplicationManager<OpenIdConnectApplication>>();
-        if (await manager.FindByClientIdAsync(MetabaseOpenIdConnectClientId) is null)
+        if (await manager.FindByClientIdAsync(AuthConfiguration.MetabaseOpenIdConnectClientId) is null)
         {
-            logger.CreatingApplicationClient(MetabaseOpenIdConnectClientId);
+            logger.CreatingApplicationClient(AuthConfiguration.MetabaseOpenIdConnectClientId);
             var host = appSettings.HostUri;
             var descriptor = new OpenIddictApplicationDescriptor
             {
-                ClientId = MetabaseOpenIdConnectClientId,
+                ClientId = AuthConfiguration.MetabaseOpenIdConnectClientId,
                 ClientSecret = null,
                 ConsentType = environment.IsEnvironment(Program.TestEnvironment)
                         ? OpenIddictConstants.ConsentTypes.Systematic

@@ -27,7 +27,7 @@ public static class AuthConfiguration
     // https://github.com/dotnet/aspnetcore/issues/20122 and un-merged pull request https://github.com/dotnet/aspnetcore/pull/21343/files
     public const string IdentityConstantsApplicationScheme = "Identity.Application";
 
-    public const string Audience = "metabase";
+    public const string MetabaseOpenIdConnectClientId = "metabase";
     public const string ReadPolicy = "Read";
     public const string WritePolicy = "Write";
     public const string ManageUserPolicy = "ManageUser";
@@ -389,7 +389,7 @@ public static class AuthConfiguration
             {
                 options.SetIssuer(appSettings.HostUri);
                 // Configure the audience accepted by this resource server.
-                options.AddAudiences(Audience);
+                options.AddAudiences(MetabaseOpenIdConnectClientId);
                 // Import the configuration from the local OpenIddict server instance:
                 // https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-the-optionsuselocalserver-integration
                 // Alternatively, OpenId Connect discovery can be used: https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#using-openid-connect-discovery-asymmetric-signing-keys-only
@@ -457,7 +457,7 @@ public static class AuthConfiguration
 
                         // Note: these settings must match the application details inserted in the
                         // database at the server level.
-                        ClientId = DbSeeder.MetabaseOpenIdConnectClientId,
+                        ClientId = MetabaseOpenIdConnectClientId,
                         ClientSecret = appSettings.OpenIdConnectClientSecret,
 
                         // https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims

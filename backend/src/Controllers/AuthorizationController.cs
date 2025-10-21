@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
@@ -35,13 +36,16 @@ public sealed class AuthorizationController(
     IOpenIddictAuthorizationManager authorizationManager,
     IOpenIddictScopeManager scopeManager,
     SignInManager<User> signInManager,
-    UserManager<User> userManager) : Controller
+    UserManager<User> userManager,
+    ApplicationDbContext dbContext
+) : Controller
 {
     private readonly IOpenIddictApplicationManager _applicationManager = applicationManager;
     private readonly IOpenIddictAuthorizationManager _authorizationManager = authorizationManager;
     private readonly IOpenIddictScopeManager _scopeManager = scopeManager;
     private readonly SignInManager<User> _signInManager = signInManager;
     private readonly UserManager<User> _userManager = userManager;
+    private readonly ApplicationDbContext _dbContext = dbContext;
     private bool _disposed;
 
     protected override void Dispose(bool disposing)
@@ -51,6 +55,7 @@ public sealed class AuthorizationController(
         {
             // Dispose of resources held by this instance.
             _userManager.Dispose();
+            _dbContext.Dispose();
             _disposed = true;
         }
     }
@@ -74,6 +79,14 @@ public sealed class AuthorizationController(
         return result;
     }
 
+    private async Task<ImmutableArray<string>> GetAudiencesAsync()
+    {
+        return _dbContext.OpenIdConnectApplications.AsNoTracking()
+            .Where(application => application.ClientId != null)
+            .Select(application => application.ClientId!) // using `!` is safe here because above we make sure that `ClientId` is non-null
+            .ToImmutableArray();
+    }
+
     private async Task<ClaimsPrincipal> CreateUserPrincipalAsync(
         User user,
         ImmutableArray<string> scopes,
@@ -94,10 +107,13 @@ public sealed class AuthorizationController(
         // audience of the identity token though is always the client (and
         // not the resource server).
         principal.SetResources(
-            await _scopeManager.ListResourcesAsync(
-                    principal.GetScopes()
-                )
-                .ToListAsync()
+            await GetAudiencesAsync()
+        // Instead, we could only use the resources of the requested scopes.
+        // Which is the minimal set of resources to satisfy the scopes.
+        // await _scopeManager.ListResourcesAsync(
+        //     principal.GetScopes()
+        // )
+        // .ToListAsync()
         );
         if (extend is not null)
         {
@@ -658,7 +674,14 @@ public sealed class AuthorizationController(
 
             // Set the list of scopes granted to the client application in access_token.
             identity.SetScopes(request.GetScopes());
-            identity.SetResources(await _scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
+            identity.SetResources(
+                await GetAudiencesAsync()
+            // Instead, we could only use the resources of the requested scopes.
+            // Which is the minimal set of resources to satisfy the scopes.
+            // await _scopeManager.ListResourcesAsync(
+            //     identity.GetScopes()
+            // ).ToListAsync()
+            );
             var principal = new ClaimsPrincipal(identity);
             identity.SetDestinations(claim => GetDestinations(claim, principal));
 
