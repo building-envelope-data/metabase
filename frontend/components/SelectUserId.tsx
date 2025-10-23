@@ -38,7 +38,7 @@ export function SelectUserId<ValueType extends string>({
       onChange={onChange}
       options={
         users?.map((user) => ({
-          label: user.name,
+          label: `${user.name} (${user.uuid})`,
           value: user.uuid,
         })) || []
       }
