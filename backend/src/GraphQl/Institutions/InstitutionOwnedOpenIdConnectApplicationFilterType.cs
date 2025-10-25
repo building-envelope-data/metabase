@@ -13,7 +13,7 @@ public sealed class InstitutionOwnedOpenIdConnectApplicationFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(InstitutionOwnedOpenIdConnectApplicationFilterType)[..^10] + GraphQlConfiguration.FilterInputSuffix);
+        descriptor.Name(nameof(InstitutionOwnedOpenIdConnectApplicationFilterType)[..^10] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.Owner).Ignore();
     }
 }

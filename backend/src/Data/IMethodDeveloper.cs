@@ -1,10 +1,10 @@
 using System;
 using System.Text.Json.Serialization;
-using Metabase.Configuration;
+using Metabase.GraphQl;
 
 namespace Metabase.Data;
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = GraphQlConfiguration.TypeDiscriminatorPropertyName)]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = GraphQlConstants.TypeDiscriminatorPropertyName)]
 [JsonDerivedType(typeof(UserMethodDeveloper), typeDiscriminator: nameof(UserMethodDeveloper))]
 [JsonDerivedType(typeof(InstitutionMethodDeveloper), typeDiscriminator: nameof(InstitutionMethodDeveloper))]
 public interface IMethodDeveloper

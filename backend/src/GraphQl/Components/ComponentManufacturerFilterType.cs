@@ -12,7 +12,7 @@ public sealed class ComponentManufacturerFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(ComponentManufacturerFilterType)[..^10] + GraphQlConfiguration.FilterInputSuffix);
+        descriptor.Name(nameof(ComponentManufacturerFilterType)[..^10] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.Component).Ignore();
     }
 }

@@ -12,7 +12,7 @@ public sealed class ComponentAssembledOfFilterType
     )
     {
         base.Configure(descriptor);
-        descriptor.Name(nameof(ComponentAssembledOfFilterType)[..^10] + GraphQlConfiguration.FilterInputSuffix);
+        descriptor.Name(nameof(ComponentAssembledOfFilterType)[..^10] + GraphQlConstants.FilterInputSuffix);
         descriptor.Field(x => x.AssembledComponent).Ignore();
     }
 }
