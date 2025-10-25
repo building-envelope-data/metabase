@@ -1,7 +1,6 @@
 using GreenDonut.Data;
 using HotChocolate.Data.Filters;
 using HotChocolate.Data.Sorting;
-using HotChocolate.Execution.Processing;
 using HotChocolate.Resolvers;
 
 namespace Metabase.GraphQl.Extensions;
