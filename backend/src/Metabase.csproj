@@ -30,6 +30,7 @@
     <PackageReference Include="HotChocolate.Data" Version="15.1.11" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.1.11" />
     <PackageReference Include="HotChocolate.PersistedOperations.InMemory" Version="15.1.11" />
+    <PackageReference Include="HotChocolate.Types.Analyzers" Version="15.1.11" />
     <PackageReference Include="HotChocolate.Types.Scalars" Version="15.1.11" />
     <PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="MailKit" Version="4.14.1" />

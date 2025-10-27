@@ -1,4 +1,8 @@
 using System;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using HotChocolate.Configuration;
 using HotChocolate.Data;
 using HotChocolate.Data.Filters;
@@ -9,37 +13,7 @@ using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl;
-using Metabase.GraphQl.Common;
-using Metabase.GraphQl.ComponentAssemblies;
-using Metabase.GraphQl.ComponentGeneralizations;
-using Metabase.GraphQl.ComponentManufacturers;
-using Metabase.GraphQl.Components;
-using Metabase.GraphQl.ComponentVariants;
-using Metabase.GraphQl.Databases;
-using Metabase.GraphQl.DataFormats;
 using Metabase.GraphQl.DataX;
-using Metabase.GraphQl.DescriptionOrReferences;
-using Metabase.GraphQl.InstitutionMethodDevelopers;
-using Metabase.GraphQl.InstitutionRepresentatives;
-using Metabase.GraphQl.Institutions;
-using Metabase.GraphQl.GnuPgKeyFingerprints;
-using Metabase.GraphQl.Methods;
-using Metabase.GraphQl.Numerations;
-using Metabase.GraphQl.OpenIdConnect.Applications;
-using Metabase.GraphQl.OpenIdConnect.Authorizations;
-using Metabase.GraphQl.OpenIdConnect.Tokens;
-using Metabase.GraphQl.Publications;
-using Metabase.GraphQl.References;
-using Metabase.GraphQl.Stakeholders;
-using Metabase.GraphQl.Standards;
-using Metabase.GraphQl.UserMethodDevelopers;
-using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using IServiceCollection = Microsoft.Extensions.DependencyInjection.IServiceCollection;
-using Metabase.Data.OpenIdConnect;
 
 namespace Metabase.Configuration;
 
@@ -57,6 +31,7 @@ public static class GraphQlConfiguration
         // GraphQL Server
         services
             .AddGraphQLServer()
+            .DisableIntrospection(false) // if the introspection result becomes too big we need to disable it in production
             .BindRuntimeType<uint, NonNegativeIntType>()
             // Services https://chillicream.com/docs/hotchocolate/v13/integrations/entity-framework#registerdbcontext
             .RegisterDbContextFactory<ApplicationDbContext>()
@@ -102,6 +77,7 @@ public static class GraphQlConfiguration
                     options.IncludeExceptionDetails = !environment.IsProduction(); // Default is `Debugger.IsAttached`.
                     /* options.QueryCacheSize = ...; */
                     /* options.UseComplexityMultipliers = ...; */
+                    options.EnableSchemaFileSupport = true;
                 }
             )
             // Configure
@@ -134,78 +110,19 @@ public static class GraphQlConfiguration
                 )
             )
             // Scalar Types
+            // TODO Use `MyUuidType` and `MyUrlType` (see code below)
             .AddType(new UuidType("Uuid", defaultFormat: 'D')) // https://chillicream.com/docs/hotchocolate/defining-a-schema/scalars#uuid-type
             .AddType(new UrlType("Url"))
             .AddType(new JsonType("Any", BindingBehavior.Implicit)) // https://chillicream.com/blog/2023/02/08/new-in-hot-chocolate-13#json-scalar
             .AddType(new LocaleType())
-            // Query Types
-            .AddQueryType(d => d.Name(nameof(Query)))
-            .AddType<ComponentQueries>()
-            .AddType<DataFormatQueries>()
-            .AddType<DatabaseQueries>()
-            .AddType<GnuPgKeyFingerprintQueries>()
-            .AddType<InstitutionQueries>()
-            .AddType<MethodQueries>()
-            .AddType<OpenIdConnectApplicationQueries>()
-            .AddType<OpenIdConnectAuthorizationQueries>()
-            .AddType<OpenIdConnectTokenQueries>()
-            .AddType<UserQueries>()
-            // Mutation Types
-            .AddMutationType(d => d.Name(nameof(Mutation)))
-            .AddType<ComponentAssemblyMutations>()
-            .AddType<ComponentGeneralizationMutations>()
-            .AddType<ComponentManufacturerMutations>()
-            .AddType<ComponentVariantMutations>()
-            .AddType<ComponentMutations>()
-            .AddType<DataFormatMutations>()
-            .AddType<DatabaseMutations>()
-            .AddType<GnuPgKeyFingerprintMutations>()
-            .AddType<InstitutionMethodDeveloperMutations>()
-            .AddType<InstitutionRepresentativeMutations>()
-            .AddType<InstitutionMutations>()
-            .AddType<MethodMutations>()
-            .AddType<UserMethodDeveloperMutations>()
-            .AddType<UserMutations>()
-            .AddType<OpenIdConnectApplicationMutations>()
-            .AddType<OpenIdConnectAuthorizationMutations>()
-            .AddType<OpenIdConnectTokenMutations>()
-            /* .AddSubscriptionType(d => d.Name(nameof(GraphQl.Subscription))) */
-            /*     .AddType<ComponentSubscriptions>() */
             // Object Types
-            .AddType<OpenEndedDateTimeRangeType>()
-            .AddType<ComponentType>()
-            .AddType<DataFormatType>()
-            .AddType<DescriptionOrReferenceType>()
-            .AddType<CalorimetricData>()
-            .AddType<DataApproval>()
-            .AddType<GetHttpsResourceTreeNonRootVertex>()
-            .AddType<GetHttpsResourceTreeRoot>()
-            .AddType<GnuPgKeyFingerprintType>()
-            .AddType<IData>()
-            .AddType<HygrothermalData>()
-            .AddType<OpticalData>()
-            .AddType<PhotovoltaicData>()
-            .AddType<GeometricData>()
-            .AddType<ResponseApproval>()
-            .AddType<DatabaseType>()
-            .AddType<InstitutionType>()
-            .AddType<MethodType>()
-            .AddType<NumerationType>()
-            .AddType<OpenIdConnectApplicationType>()
-            .AddType<OpenIdConnectAuthorizationType>()
-            .AddType<OpenIdConnectTokenType>()
-            .AddType<PublicationType>()
-            .AddType<ReferenceType>()
-            .AddType<StakeholderType>()
-            .AddType<StandardType>()
-            .AddType<UserType>()
-            // Data Loaders
-            .AddDataLoader<ComponentByIdDataLoader>()
-            .AddDataLoader<DataFormatByIdDataLoader>()
-            .AddDataLoader<DatabaseByIdDataLoader>()
-            .AddDataLoader<InstitutionByIdDataLoader>()
-            .AddDataLoader<InstitutionRepresentativesByInstitutionIdDataLoader>()
-            .AddDataLoader<MethodByIdDataLoader>()
+            .AddType<DataConnection>()
+            // Query, Mutation and Subscription Types
+            .AddQueryType(d => d.Name(nameof(Query)))
+            .AddMutationType(d => d.Name(nameof(Mutation)))
+            // .AddSubscriptionType(d => d.Name(nameof(Subscription)))
+            // auto-discover types using `HotChocolate.Types.Analyzers`
+            .AddTypes()
             // Paging
             .AddDbContextCursorPagingProvider()
             .ModifyPagingOptions(_ =>
@@ -217,41 +134,42 @@ public static class GraphQlConfiguration
                     _.InferConnectionNameFromField = true;
                 }
             )
+            // Automatic Peristed Queries
             .UseAutomaticPersistedOperationPipeline()
             .AddInMemoryOperationDocumentStorage(); // Needed by the automatic persisted operation pipeline
     }
 
-    private sealed class MyUuidType : UuidType
-    {
-        private const string SpecifiedByString = "https://tools.ietf.org/html/rfc4122";
+    // private sealed class MyUuidType : UuidType
+    // {
+    //     private const string SpecifiedByString = "https://tools.ietf.org/html/rfc4122";
+    //
+    //     public MyUuidType(
+    //         string name,
+    //         string? description = null,
+    //         char defaultFormat = '\0',
+    //         bool enforceFormat = false,
+    //         BindingBehavior bind = BindingBehavior.Explicit
+    //     )
+    //         : base(name, description, defaultFormat, enforceFormat,
+    //             bind)
+    //     {
+    //         SpecifiedBy = new Uri(SpecifiedByString, UriKind.Absolute);
+    //     }
+    // }
 
-        public MyUuidType(
-            string name,
-            string? description = null,
-            char defaultFormat = '\0',
-            bool enforceFormat = false,
-            BindingBehavior bind = BindingBehavior.Explicit
-        )
-            : base(name, description, defaultFormat, enforceFormat,
-                bind)
-        {
-            SpecifiedBy = new Uri(SpecifiedByString, UriKind.Absolute);
-        }
-    }
-
-    private sealed class MyUrlType : UrlType
-    {
-        private const string SpecifiedByString = "https://tools.ietf.org/html/rfc3986";
-
-        public MyUrlType(
-            string name,
-            string? description = null,
-            BindingBehavior bind = BindingBehavior.Explicit)
-            : base(name, description, bind)
-        {
-            SpecifiedBy = new Uri(SpecifiedByString, UriKind.Absolute);
-        }
-    }
+    // private sealed class MyUrlType : UrlType
+    // {
+    //     private const string SpecifiedByString = "https://tools.ietf.org/html/rfc3986";
+    //
+    //     public MyUrlType(
+    //         string name,
+    //         string? description = null,
+    //         BindingBehavior bind = BindingBehavior.Explicit)
+    //         : base(name, description, bind)
+    //     {
+    //         SpecifiedBy = new Uri(SpecifiedByString, UriKind.Absolute);
+    //     }
+    // }
 }
 
 // Inspired by https://chillicream.com/docs/hotchocolate/v15/api-reference/extending-filtering
@@ -363,18 +281,6 @@ public partial class CustomFilterConvention : FilterConvention
         // Allow conjunction and disjunction
         descriptor.AllowAnd();
         descriptor.AllowOr();
-        // Bind custom types
-        descriptor.BindRuntimeType<Component, ComponentFilterType>();
-        descriptor.BindRuntimeType<Data.OpenIdConnect.OpenIdConnectAuthorization, OpenIdConnectAuthorizationFilterType>();
-        descriptor.BindRuntimeType<DataFormat, DataFormatFilterType>();
-        descriptor.BindRuntimeType<Database, DatabaseFilterType>();
-        descriptor.BindRuntimeType<DescriptionOrReference, DescriptionOrReferenceFilterType>();
-        descriptor.BindRuntimeType<GnuPgKeyFingerprint, GnuPgKeyFingerprintFilterType>();
-        descriptor.BindRuntimeType<Institution, InstitutionFilterType>();
-        descriptor.BindRuntimeType<Method, MethodFilterType>();
-        descriptor.BindRuntimeType<OpenIdConnectApplication, OpenIdConnectApplicationFilterType>();
-        descriptor.BindRuntimeType<OpenIdConnectToken, OpenIdConnectTokenFilterType>();
-        descriptor.BindRuntimeType<User, UserFilterType>();
         // descriptor.BindRuntimeType<JsonElement, JsonElementFilterType>();
         // descriptor.Operation(CustomFilterOperations.InClosedInterval).Name("inClosedInterval");
         // descriptor.AddProviderExtension(
@@ -431,6 +337,7 @@ public static class FilterConventionDescriptorExtensions
         descriptor.Operation(DefaultFilterOperations.Like).Name("like");
         descriptor.Operation(DefaultFilterOperations.Data).Name("data");
         // TODO `descriptor.Operation(AdditionalFilterOperations.Not).Name("not");` as in the project `database`
+        // `inClosedInterval`
         return descriptor;
     }
 
@@ -494,19 +401,5 @@ public partial class CustomSortConvention : SortConvention
     protected override void Configure(ISortConventionDescriptor descriptor)
     {
         descriptor.AddDefaults();
-        // Bind custom types
-        descriptor.BindRuntimeType<Component, ComponentSortType>();
-        descriptor.BindRuntimeType<ComponentAssembly, ComponentAssemblySortType>();
-        descriptor.BindRuntimeType<ComponentManufacturer, ComponentManufacturerSortType>();
-        descriptor.BindRuntimeType<DataFormat, DataFormatSortType>();
-        descriptor.BindRuntimeType<Database, DatabaseSortType>();
-        descriptor.BindRuntimeType<DescriptionOrReference, DescriptionOrReferenceSortType>();
-        descriptor.BindRuntimeType<GnuPgKeyFingerprint, GnuPgKeyFingerprintSortType>();
-        descriptor.BindRuntimeType<Institution, InstitutionSortType>();
-        descriptor.BindRuntimeType<InstitutionMethodDeveloper, InstitutionMethodDeveloperSortType>();
-        descriptor.BindRuntimeType<InstitutionRepresentative, InstitutionRepresentativeSortType>();
-        descriptor.BindRuntimeType<Method, MethodSortType>();
-        descriptor.BindRuntimeType<User, UserSortType>();
-        descriptor.BindRuntimeType<UserMethodDeveloper, UserMethodDeveloperSortType>();
     }
 }

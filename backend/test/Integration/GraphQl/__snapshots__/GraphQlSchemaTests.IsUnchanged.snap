@@ -3,6 +3,16 @@ schema {
   mutation: Mutation
 }
 
+interface Approval {
+  approverId: Uuid!
+  keyFingerprint: String!
+  message: String!
+  query: String!
+  signature: String!
+  timestamp: DateTime!
+  variables: Any!
+}
+
 interface Data {
   appliedMethod: AppliedMethod!
   approvals: [DataApproval!]!
@@ -20,12 +30,21 @@ interface Data {
   warnings: [String!]!
 }
 
+interface GetHttpsResourceTreeVertex {
+  value: GetHttpsResource!
+}
+
 "The node interface is implemented by entities that have a global unique identifier."
 interface Node {
   id: ID!
 }
 
-type AddComponentAssemblyError {
+interface UserError {
+  message: String!
+  path: [String!]!
+}
+
+type AddComponentAssemblyError implements UserError {
   code: AddComponentAssemblyErrorCode!
   message: String!
   path: [String!]!
@@ -38,7 +57,7 @@ type AddComponentAssemblyPayload {
   query: Query!
 }
 
-type AddComponentGeneralizationError {
+type AddComponentGeneralizationError implements UserError {
   code: AddComponentGeneralizationErrorCode!
   message: String!
   path: [String!]!
@@ -51,7 +70,7 @@ type AddComponentGeneralizationPayload {
   query: Query!
 }
 
-type AddComponentManufacturerError {
+type AddComponentManufacturerError implements UserError {
   code: AddComponentManufacturerErrorCode!
   message: String!
   path: [String!]!
@@ -64,7 +83,7 @@ type AddComponentManufacturerPayload {
   query: Query!
 }
 
-type AddComponentVariantError {
+type AddComponentVariantError implements UserError {
   code: AddComponentVariantErrorCode!
   message: String!
   path: [String!]!
@@ -77,7 +96,7 @@ type AddComponentVariantPayload {
   variantOfEdge: ComponentVariantOfEdge
 }
 
-type AddGnuPgKeyFingerprintError {
+type AddGnuPgKeyFingerprintError implements UserError {
   code: AddGnuPgKeyFingerprintErrorCode!
   message: String!
   path: [String!]!
@@ -89,7 +108,7 @@ type AddGnuPgKeyFingerprintPayload {
   query: Query!
 }
 
-type AddInstitutionMethodDeveloperError {
+type AddInstitutionMethodDeveloperError implements UserError {
   code: AddInstitutionMethodDeveloperErrorCode!
   message: String!
   path: [String!]!
@@ -102,7 +121,7 @@ type AddInstitutionMethodDeveloperPayload {
   query: Query!
 }
 
-type AddInstitutionRepresentativeError {
+type AddInstitutionRepresentativeError implements UserError {
   code: AddInstitutionRepresentativeErrorCode!
   message: String!
   path: [String!]!
@@ -115,7 +134,7 @@ type AddInstitutionRepresentativePayload {
   representedInstitutionEdge: UserRepresentedInstitutionEdge
 }
 
-type AddUserMethodDeveloperError {
+type AddUserMethodDeveloperError implements UserError {
   code: AddUserMethodDeveloperErrorCode!
   message: String!
   path: [String!]!
@@ -128,7 +147,7 @@ type AddUserMethodDeveloperPayload {
   query: Query!
 }
 
-type AddUserRoleError {
+type AddUserRoleError implements UserError {
   code: AddUserRoleErrorCode!
   message: String!
   path: [String!]!
@@ -140,7 +159,7 @@ type AddUserRolePayload {
   user: User
 }
 
-type AllowGnuPgKeyFingerprintError {
+type AllowGnuPgKeyFingerprintError implements UserError {
   code: AllowGnuPgKeyFingerprintErrorCode!
   message: String!
   path: [String!]!
@@ -193,7 +212,7 @@ type CalorimetricDataEdge {
   node: CalorimetricData!
 }
 
-type ChangeInstitutionRepresentativeRoleError {
+type ChangeInstitutionRepresentativeRoleError implements UserError {
   code: ChangeInstitutionRepresentativeRoleErrorCode!
   message: String!
   path: [String!]!
@@ -206,7 +225,7 @@ type ChangeInstitutionRepresentativeRolePayload {
   representedInstitutionEdge: UserRepresentedInstitutionEdge
 }
 
-type ChangeUserEmailError {
+type ChangeUserEmailError implements UserError {
   code: ChangeUserEmailErrorCode!
   message: String!
   path: [String!]!
@@ -218,7 +237,7 @@ type ChangeUserEmailPayload {
   user: User
 }
 
-type ChangeUserPasswordError {
+type ChangeUserPasswordError implements UserError {
   code: ChangeUserPasswordErrorCode!
   message: String!
   path: [String!]!
@@ -347,7 +366,7 @@ type ComponentsEdge {
   node: Component!
 }
 
-type ConfirmComponentManufacturerError {
+type ConfirmComponentManufacturerError implements UserError {
   code: ConfirmComponentManufacturerErrorCode!
   message: String!
   path: [String!]!
@@ -360,7 +379,7 @@ type ConfirmComponentManufacturerPayload {
   query: Query!
 }
 
-type ConfirmInstitutionMethodDeveloperError {
+type ConfirmInstitutionMethodDeveloperError implements UserError {
   code: ConfirmInstitutionMethodDeveloperErrorCode!
   message: String!
   path: [String!]!
@@ -373,7 +392,7 @@ type ConfirmInstitutionMethodDeveloperPayload {
   query: Query!
 }
 
-type ConfirmInstitutionRepresentativeError {
+type ConfirmInstitutionRepresentativeError implements UserError {
   code: ConfirmInstitutionRepresentativeErrorCode!
   message: String!
   path: [String!]!
@@ -386,7 +405,7 @@ type ConfirmInstitutionRepresentativePayload {
   representedInstitutionEdge: UserRepresentedInstitutionEdge
 }
 
-type ConfirmUserEmailChangeError {
+type ConfirmUserEmailChangeError implements UserError {
   code: ConfirmUserEmailChangeErrorCode!
   message: String!
   path: [String!]!
@@ -398,7 +417,7 @@ type ConfirmUserEmailChangePayload {
   user: User
 }
 
-type ConfirmUserEmailError {
+type ConfirmUserEmailError implements UserError {
   code: ConfirmUserEmailErrorCode!
   message: String!
   path: [String!]!
@@ -410,7 +429,7 @@ type ConfirmUserEmailPayload {
   user: User
 }
 
-type ConfirmUserMethodDeveloperError {
+type ConfirmUserMethodDeveloperError implements UserError {
   code: ConfirmUserMethodDeveloperErrorCode!
   message: String!
   path: [String!]!
@@ -423,7 +442,7 @@ type ConfirmUserMethodDeveloperPayload {
   query: Query!
 }
 
-type CreateComponentError {
+type CreateComponentError implements UserError {
   code: CreateComponentErrorCode!
   message: String!
   path: [String!]!
@@ -435,7 +454,7 @@ type CreateComponentPayload {
   query: Query!
 }
 
-type CreateDataFormatError {
+type CreateDataFormatError implements UserError {
   code: CreateDataFormatErrorCode!
   message: String!
   path: [String!]!
@@ -447,7 +466,7 @@ type CreateDataFormatPayload {
   query: Query!
 }
 
-type CreateDatabaseError {
+type CreateDatabaseError implements UserError {
   code: CreateDatabaseErrorCode!
   message: String!
   path: [String!]!
@@ -459,7 +478,7 @@ type CreateDatabasePayload {
   query: Query!
 }
 
-type CreateInstitutionError {
+type CreateInstitutionError implements UserError {
   code: CreateInstitutionErrorCode!
   message: String!
   path: [String!]!
@@ -471,7 +490,7 @@ type CreateInstitutionPayload {
   query: Query!
 }
 
-type CreateMethodError {
+type CreateMethodError implements UserError {
   code: CreateMethodErrorCode!
   message: String!
   path: [String!]!
@@ -483,7 +502,7 @@ type CreateMethodPayload {
   query: Query!
 }
 
-type CreateOpenIdConnectApplicationError {
+type CreateOpenIdConnectApplicationError implements UserError {
   code: CreateOpenIdConnectApplicationErrorCode!
   message: String!
   path: [String!]!
@@ -504,7 +523,7 @@ type CrossDatabaseDataReference {
   dataTimestamp: DateTime!
 }
 
-type DataApproval {
+type DataApproval implements Approval {
   approver: Institution @cost(weight: "10")
   approverId: Uuid!
   keyFingerprint: String!
@@ -514,6 +533,17 @@ type DataApproval {
   statement: Reference!
   timestamp: DateTime!
   variables: Any!
+}
+
+type DataConnection {
+  edges: [DataEdge!]!
+  pageInfo: PageInfo!
+  totalCount: NonNegativeInt!
+}
+
+type DataEdge {
+  cursor: String!
+  node: Data!
 }
 
 type DataFormat implements Node {
@@ -601,7 +631,7 @@ type DatabasesEdge {
   node: Database!
 }
 
-type DeleteInstitutionError {
+type DeleteInstitutionError implements UserError {
   code: DeleteInstitutionErrorCode!
   message: String!
   path: [String!]!
@@ -612,7 +642,7 @@ type DeleteInstitutionPayload {
   query: Query!
 }
 
-type DeleteOpenIdConnectApplicationError {
+type DeleteOpenIdConnectApplicationError implements UserError {
   code: DeleteOpenIdConnectApplicationErrorCode!
   message: String!
   path: [String!]!
@@ -623,7 +653,7 @@ type DeleteOpenIdConnectApplicationPayload {
   query: Query!
 }
 
-type DeleteOpenIdConnectAuthorizationError {
+type DeleteOpenIdConnectAuthorizationError implements UserError {
   code: DeleteOpenIdConnectAuthorizationErrorCode!
   message: String!
   path: [String!]!
@@ -634,7 +664,7 @@ type DeleteOpenIdConnectAuthorizationPayload {
   query: Query!
 }
 
-type DeletePersonalUserDataError {
+type DeletePersonalUserDataError implements UserError {
   code: DeletePersonalUserDataErrorCode!
   message: String!
   path: [String!]!
@@ -646,7 +676,7 @@ type DeletePersonalUserDataPayload {
   user: User
 }
 
-type DeleteUserError {
+type DeleteUserError implements UserError {
   code: DeleteUserErrorCode!
   message: String!
   path: [String!]!
@@ -663,7 +693,7 @@ type DescriptionOrReference {
   reference: Reference @cost(weight: "10")
 }
 
-type DisableUserTwoFactorAuthenticationError {
+type DisableUserTwoFactorAuthenticationError implements UserError {
   code: DisableUserTwoFactorAuthenticationErrorCode!
   message: String!
   path: [String!]!
@@ -675,7 +705,7 @@ type DisableUserTwoFactorAuthenticationPayload {
   user: User
 }
 
-type EnableUserTwoFactorAuthenticatorError {
+type EnableUserTwoFactorAuthenticatorError implements UserError {
   code: EnableUserTwoFactorAuthenticatorErrorCode!
   message: String!
   path: [String!]!
@@ -696,7 +726,7 @@ type FileMetaInformation {
   path: [String!]!
 }
 
-type ForbidGnuPgKeyFingerprintError {
+type ForbidGnuPgKeyFingerprintError implements UserError {
   code: ForbidGnuPgKeyFingerprintErrorCode!
   message: String!
   path: [String!]!
@@ -708,7 +738,7 @@ type ForbidGnuPgKeyFingerprintPayload {
   query: Query!
 }
 
-type ForgetUserTwoFactorAuthenticationClientError {
+type ForgetUserTwoFactorAuthenticationClientError implements UserError {
   code: ForgetUserTwoFactorAuthenticationClientErrorCode!
   message: String!
   path: [String!]!
@@ -720,7 +750,7 @@ type ForgetUserTwoFactorAuthenticationClientPayload {
   user: User
 }
 
-type GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError {
+type GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriError implements UserError {
   code: GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriErrorCode!
   message: String!
   path: [String!]!
@@ -734,7 +764,7 @@ type GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriPayload {
   user: User
 }
 
-type GenerateUserTwoFactorRecoveryCodesError {
+type GenerateUserTwoFactorRecoveryCodesError implements UserError {
   code: GenerateUserTwoFactorRecoveryCodesErrorCode!
   message: String!
   path: [String!]!
@@ -794,14 +824,14 @@ type GetHttpsResourceTree {
   root: GetHttpsResourceTreeRoot!
 }
 
-type GetHttpsResourceTreeNonRootVertex {
+type GetHttpsResourceTreeNonRootVertex implements GetHttpsResourceTreeVertex {
   appliedConversionMethod: ToTreeVertexAppliedConversionMethod!
   parentId: String!
   value: GetHttpsResource!
   vertexId: String!
 }
 
-type GetHttpsResourceTreeRoot {
+type GetHttpsResourceTreeRoot implements GetHttpsResourceTreeVertex {
   value: GetHttpsResource!
   vertexId: String!
 }
@@ -1026,7 +1056,7 @@ type InstitutionsEdge {
   node: Institution!
 }
 
-type LoginUserError {
+type LoginUserError implements UserError {
   code: LoginUserErrorCode!
   message: String!
   path: [String!]!
@@ -1039,7 +1069,7 @@ type LoginUserPayload {
   user: User
 }
 
-type LoginUserWithRecoveryCodeError {
+type LoginUserWithRecoveryCodeError implements UserError {
   code: LoginUserWithRecoveryCodeErrorCode!
   message: String!
   path: [String!]!
@@ -1051,7 +1081,7 @@ type LoginUserWithRecoveryCodePayload {
   user: User
 }
 
-type LoginUserWithTwoFactorCodeError {
+type LoginUserWithTwoFactorCodeError implements UserError {
   code: LoginUserWithTwoFactorCodeErrorCode!
   message: String!
   path: [String!]!
@@ -1063,7 +1093,7 @@ type LoginUserWithTwoFactorCodePayload {
   user: User
 }
 
-type LogoutUserError {
+type LogoutUserError implements UserError {
   code: LogoutUserErrorCode!
   message: String!
   path: [String!]!
@@ -1468,7 +1498,7 @@ type Query {
   institution(id: Uuid!): Institution @cost(weight: "10")
   institutions("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [InstitutionSortInput!] @cost(weight: "10") where: InstitutionFilterInput @cost(weight: "10")): InstitutionsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   method(id: Uuid!): Method @cost(weight: "10")
-  methods("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [MethodSortInput!] @cost(weight: "10") where: MethodFilterInput @cost(weight: "10")): MethodsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  methods("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [MethodSortInput!] @cost(weight: "10") where: InstitutionManagedMethodFilterInput @cost(weight: "10")): MethodsConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   "Fetches an object given its ID."
   node("ID of the object." id: ID!): Node @cost(weight: "10")
   "Lookup nodes by a list of IDs."
@@ -1485,7 +1515,7 @@ type Query {
   users("Returns the elements in the list that come after the specified cursor." after: String "Returns the elements in the list that come before the specified cursor." before: String "Returns the first _n_ elements from the list." first: Int "Returns the last _n_ elements from the list." last: Int order: [UserSortInput!] @cost(weight: "10") where: UserFilterInput @cost(weight: "10")): UsersConnection @listSize(assumedSize: 2147483646, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 100, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
 }
 
-type RegisterUserError {
+type RegisterUserError implements UserError {
   code: RegisterUserErrorCode!
   message: String!
   path: [String!]!
@@ -1497,7 +1527,7 @@ type RegisterUserPayload {
   user: User
 }
 
-type RemoveComponentAssemblyError {
+type RemoveComponentAssemblyError implements UserError {
   code: RemoveComponentAssemblyErrorCode!
   message: String!
   path: [String!]!
@@ -1510,7 +1540,7 @@ type RemoveComponentAssemblyPayload {
   query: Query!
 }
 
-type RemoveComponentGeneralizationError {
+type RemoveComponentGeneralizationError implements UserError {
   code: RemoveComponentGeneralizationErrorCode!
   message: String!
   path: [String!]!
@@ -1523,7 +1553,7 @@ type RemoveComponentGeneralizationPayload {
   query: Query!
 }
 
-type RemoveComponentManufacturerError {
+type RemoveComponentManufacturerError implements UserError {
   code: RemoveComponentManufacturerErrorCode!
   message: String!
   path: [String!]!
@@ -1536,7 +1566,7 @@ type RemoveComponentManufacturerPayload {
   query: Query!
 }
 
-type RemoveComponentVariantError {
+type RemoveComponentVariantError implements UserError {
   code: RemoveComponentVariantErrorCode!
   message: String!
   path: [String!]!
@@ -1549,7 +1579,7 @@ type RemoveComponentVariantPayload {
   query: Query!
 }
 
-type RemoveInstitutionMethodDeveloperError {
+type RemoveInstitutionMethodDeveloperError implements UserError {
   code: RemoveInstitutionMethodDeveloperErrorCode!
   message: String!
   path: [String!]!
@@ -1562,7 +1592,7 @@ type RemoveInstitutionMethodDeveloperPayload {
   query: Query!
 }
 
-type RemoveInstitutionRepresentativeError {
+type RemoveInstitutionRepresentativeError implements UserError {
   code: RemoveInstitutionRepresentativeErrorCode!
   message: String!
   path: [String!]!
@@ -1575,7 +1605,7 @@ type RemoveInstitutionRepresentativePayload {
   user: User @cost(weight: "10")
 }
 
-type RemoveUserMethodDeveloperError {
+type RemoveUserMethodDeveloperError implements UserError {
   code: RemoveUserMethodDeveloperErrorCode!
   message: String!
   path: [String!]!
@@ -1588,7 +1618,7 @@ type RemoveUserMethodDeveloperPayload {
   query: Query!
 }
 
-type RemoveUserRoleError {
+type RemoveUserRoleError implements UserError {
   code: RemoveUserRoleErrorCode!
   message: String!
   path: [String!]!
@@ -1600,7 +1630,7 @@ type RemoveUserRolePayload {
   user: User
 }
 
-type RequestUserPasswordResetError {
+type RequestUserPasswordResetError implements UserError {
   code: RequestUserPasswordResetErrorCode!
   message: String!
   path: [String!]!
@@ -1611,7 +1641,7 @@ type RequestUserPasswordResetPayload {
   query: Query!
 }
 
-type ResendUserEmailConfirmationError {
+type ResendUserEmailConfirmationError implements UserError {
   code: ResendUserEmailConfirmationErrorCode!
   message: String!
   path: [String!]!
@@ -1622,7 +1652,7 @@ type ResendUserEmailConfirmationPayload {
   query: Query!
 }
 
-type ResendUserEmailVerificationError {
+type ResendUserEmailVerificationError implements UserError {
   code: ResendUserEmailVerificationErrorCode!
   message: String!
   path: [String!]!
@@ -1634,7 +1664,7 @@ type ResendUserEmailVerificationPayload {
   user: User
 }
 
-type ResetOpenIdConnectApplicationClientSecretError {
+type ResetOpenIdConnectApplicationClientSecretError implements UserError {
   code: ResetOpenIdConnectApplicationClientSecretErrorCode!
   message: String!
   path: [String!]!
@@ -1647,7 +1677,7 @@ type ResetOpenIdConnectApplicationClientSecretPayload {
   query: Query!
 }
 
-type ResetUserPasswordError {
+type ResetUserPasswordError implements UserError {
   code: ResetUserPasswordErrorCode!
   message: String!
   path: [String!]!
@@ -1658,7 +1688,7 @@ type ResetUserPasswordPayload {
   query: Query!
 }
 
-type ResetUserTwoFactorAuthenticatorError {
+type ResetUserTwoFactorAuthenticatorError implements UserError {
   code: ResetUserTwoFactorAuthenticatorErrorCode!
   message: String!
   path: [String!]!
@@ -1670,17 +1700,7 @@ type ResetUserTwoFactorAuthenticatorPayload {
   user: User
 }
 
-type ResponseApproval {
-  approverId: Uuid!
-  keyFingerprint: String!
-  message: String!
-  query: String!
-  signature: String!
-  timestamp: DateTime!
-  variables: Any!
-}
-
-type RevokeOpenIdConnectTokenError {
+type RevokeOpenIdConnectTokenError implements UserError {
   code: RevokeOpenIdConnectTokenErrorCode!
   message: String!
   path: [String!]!
@@ -1691,7 +1711,7 @@ type RevokeOpenIdConnectTokenPayload {
   query: Query!
 }
 
-type SetComponentExtrasError {
+type SetComponentExtrasError implements UserError {
   code: SetComponentExtrasErrorCode!
   message: String!
   path: [String!]!
@@ -1703,7 +1723,7 @@ type SetComponentExtrasPayload {
   query: Query!
 }
 
-type SetInstitutionExtrasError {
+type SetInstitutionExtrasError implements UserError {
   code: SetInstitutionExtrasErrorCode!
   message: String!
   path: [String!]!
@@ -1715,7 +1735,7 @@ type SetInstitutionExtrasPayload {
   query: Query!
 }
 
-type SetUserPasswordError {
+type SetUserPasswordError implements UserError {
   code: SetUserPasswordErrorCode!
   message: String!
   path: [String!]!
@@ -1727,7 +1747,7 @@ type SetUserPasswordPayload {
   user: User
 }
 
-type SetUserPhoneNumberError {
+type SetUserPhoneNumberError implements UserError {
   code: SetUserPhoneNumberErrorCode!
   message: String!
   path: [String!]!
@@ -1752,7 +1772,7 @@ type Standard {
   year: Int
 }
 
-type SwitchInstitutionOperatingStateError {
+type SwitchInstitutionOperatingStateError implements UserError {
   code: SwitchInstitutionOperatingStateErrorCode!
   message: String!
   path: [String!]!
@@ -1778,7 +1798,7 @@ type TwoFactorAuthentication {
   recoveryCodesLeftCount: Int!
 }
 
-type UpdateComponentAssemblyError {
+type UpdateComponentAssemblyError implements UserError {
   code: UpdateComponentAssemblyErrorCode!
   message: String!
   path: [String!]!
@@ -1791,7 +1811,7 @@ type UpdateComponentAssemblyPayload {
   query: Query!
 }
 
-type UpdateComponentError {
+type UpdateComponentError implements UserError {
   code: UpdateComponentErrorCode!
   message: String!
   path: [String!]!
@@ -1803,7 +1823,7 @@ type UpdateComponentPayload {
   query: Query!
 }
 
-type UpdateDataFormatError {
+type UpdateDataFormatError implements UserError {
   code: UpdateDataFormatErrorCode!
   message: String!
   path: [String!]!
@@ -1815,7 +1835,7 @@ type UpdateDataFormatPayload {
   query: Query!
 }
 
-type UpdateDatabaseError {
+type UpdateDatabaseError implements UserError {
   code: UpdateDatabaseErrorCode!
   message: String!
   path: [String!]!
@@ -1827,7 +1847,7 @@ type UpdateDatabasePayload {
   query: Query!
 }
 
-type UpdateInstitutionError {
+type UpdateInstitutionError implements UserError {
   code: UpdateInstitutionErrorCode!
   message: String!
   path: [String!]!
@@ -1839,7 +1859,7 @@ type UpdateInstitutionPayload {
   query: Query!
 }
 
-type UpdateMethodError {
+type UpdateMethodError implements UserError {
   code: UpdateMethodErrorCode!
   message: String!
   path: [String!]!
@@ -1851,7 +1871,7 @@ type UpdateMethodPayload {
   query: Query!
 }
 
-type UpdateOpenIdConnectApplicationError {
+type UpdateOpenIdConnectApplicationError implements UserError {
   code: UpdateOpenIdConnectApplicationErrorCode!
   message: String!
   path: [String!]!
@@ -1942,7 +1962,7 @@ type UsersEdge {
   node: User!
 }
 
-type VerifyDatabaseError {
+type VerifyDatabaseError implements UserError {
   code: VerifyDatabaseErrorCode!
   message: String!
   path: [String!]!
@@ -1954,7 +1974,7 @@ type VerifyDatabasePayload {
   query: Query!
 }
 
-type VerifyInstitutionError {
+type VerifyInstitutionError implements UserError {
   code: VerifyInstitutionErrorCode!
   message: String!
   path: [String!]!
@@ -2170,6 +2190,13 @@ input ComponentAssembledOfFilterInput {
   primeSurface: NullableOfPrimeSurfaceOperationFilterInput
 }
 
+input ComponentAssemblySortInput {
+  assembledComponent: ComponentSortInput @cost(weight: "10")
+  partComponent: ComponentSortInput @cost(weight: "10")
+  index: SortEnumType @cost(weight: "10")
+  primeSurface: SortEnumType @cost(weight: "10")
+}
+
 input ComponentCategoryOperationFilterInput {
   equalTo: ComponentCategory @cost(weight: "10")
   notEqualTo: ComponentCategory @cost(weight: "10")
@@ -2192,14 +2219,14 @@ input ComponentFilterInput {
   description: StringOperationFilterInput
   categories: ListComponentCategoryOperationFilterInput
   extras: JsonElementFilterInput
-  partOf: ListComponentFilterTypeFilterInput
-  parts: ListComponentFilterTypeFilterInput
+  partOf: ListFilterInputTypeOfComponentFilterInput
+  parts: ListFilterInputTypeOfComponentFilterInput
   partOfEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
   partEdges: ListFilterInputTypeOfComponentAssemblyFilterInput
-  concretizations: ListComponentFilterTypeFilterInput
-  generalizations: ListComponentFilterTypeFilterInput
-  variants: ListComponentFilterTypeFilterInput
-  manufacturers: ListInstitutionFilterTypeFilterInput
+  concretizations: ListFilterInputTypeOfComponentFilterInput
+  generalizations: ListFilterInputTypeOfComponentFilterInput
+  variants: ListFilterInputTypeOfComponentFilterInput
+  manufacturers: ListFilterInputTypeOfInstitutionFilterInput
   manufacturerEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
 }
 
@@ -2213,6 +2240,11 @@ input ComponentManufacturerFilterInput {
   and: [ComponentManufacturerFilterInput!]
   or: [ComponentManufacturerFilterInput!]
   institution: InstitutionFilterInput
+}
+
+input ComponentManufacturerSortInput {
+  component: ComponentSortInput @cost(weight: "10")
+  institution: InstitutionSortInput @cost(weight: "10")
 }
 
 input ComponentPartOfFilterInput {
@@ -2396,9 +2428,19 @@ input DeleteUserInput {
   userId: Uuid!
 }
 
+input DescriptionOrReferenceFilterInput {
+  and: [DescriptionOrReferenceFilterInput!]
+  or: [DescriptionOrReferenceFilterInput!]
+  description: StringOperationFilterInput
+}
+
 input DescriptionOrReferenceInput {
   description: String
   reference: ReferenceInput
+}
+
+input DescriptionOrReferenceSortInput {
+  description: SortEnumType @cost(weight: "10")
 }
 
 input EnableUserTwoFactorAuthenticatorInput {
@@ -2502,18 +2544,18 @@ input InstitutionFilterInput {
   websiteLocator: UriFilterInput
   state: InstitutionStateOperationFilterInput
   extras: JsonElementFilterInput
-  developedMethods: ListMethodFilterTypeFilterInput
+  developedMethods: ListFilterInputTypeOfMethodFilterInput
   developedMethodEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
-  managedMethods: ListMethodFilterTypeFilterInput
-  managedDataFormats: ListDataFormatFilterTypeFilterInput
-  manufacturedComponents: ListComponentFilterTypeFilterInput
+  managedMethods: ListFilterInputTypeOfMethodFilterInput
+  managedDataFormats: ListFilterInputTypeOfDataFormatFilterInput
+  manufacturedComponents: ListFilterInputTypeOfComponentFilterInput
   manufacturedComponentEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
-  operatedDatabases: ListDatabaseFilterTypeFilterInput
+  operatedDatabases: ListFilterInputTypeOfDatabaseFilterInput
   manager: InstitutionFilterInput
-  managedInstitutions: ListInstitutionFilterTypeFilterInput
-  representatives: ListUserFilterTypeFilterInput
+  managedInstitutions: ListFilterInputTypeOfInstitutionFilterInput
+  representatives: ListFilterInputTypeOfUserFilterInput
   representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
-  gnuPgKeyFingerprints: ListGnuPgKeyFingerprintFilterTypeFilterInput
+  gnuPgKeyFingerprints: ListFilterInputTypeOfGnuPgKeyFingerprintFilterInput
 }
 
 input InstitutionGnuPgKeyFingerprintFilterInput {
@@ -2548,17 +2590,17 @@ input InstitutionManagedInstitutionFilterInput {
   websiteLocator: UriFilterInput
   state: InstitutionStateOperationFilterInput
   extras: JsonElementFilterInput
-  developedMethods: ListMethodFilterTypeFilterInput
+  developedMethods: ListFilterInputTypeOfMethodFilterInput
   developedMethodEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
-  managedMethods: ListMethodFilterTypeFilterInput
-  managedDataFormats: ListDataFormatFilterTypeFilterInput
-  manufacturedComponents: ListComponentFilterTypeFilterInput
+  managedMethods: ListFilterInputTypeOfMethodFilterInput
+  managedDataFormats: ListFilterInputTypeOfDataFormatFilterInput
+  manufacturedComponents: ListFilterInputTypeOfComponentFilterInput
   manufacturedComponentEdges: ListFilterInputTypeOfComponentManufacturerFilterInput
-  operatedDatabases: ListDatabaseFilterTypeFilterInput
-  managedInstitutions: ListInstitutionFilterTypeFilterInput
-  representatives: ListUserFilterTypeFilterInput
+  operatedDatabases: ListFilterInputTypeOfDatabaseFilterInput
+  managedInstitutions: ListFilterInputTypeOfInstitutionFilterInput
+  representatives: ListFilterInputTypeOfUserFilterInput
   representativeEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
-  gnuPgKeyFingerprints: ListGnuPgKeyFingerprintFilterTypeFilterInput
+  gnuPgKeyFingerprints: ListFilterInputTypeOfGnuPgKeyFingerprintFilterInput
 }
 
 input InstitutionManagedMethodFilterInput {
@@ -2569,9 +2611,9 @@ input InstitutionManagedMethodFilterInput {
   description: StringOperationFilterInput
   calculationLocator: UriFilterInput
   categories: ListMethodCategoryOperationFilterInput
-  institutionDevelopers: ListInstitutionFilterTypeFilterInput
+  institutionDevelopers: ListFilterInputTypeOfInstitutionFilterInput
   institutionDeveloperEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
-  userDevelopers: ListUserFilterTypeFilterInput
+  userDevelopers: ListFilterInputTypeOfUserFilterInput
   userDeveloperEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
 }
 
@@ -2584,6 +2626,11 @@ input InstitutionManufacturedComponentFilterInput {
 input InstitutionMethodDeveloperFilterInput {
   and: [InstitutionMethodDeveloperFilterInput!]
   or: [InstitutionMethodDeveloperFilterInput!]
+}
+
+input InstitutionMethodDeveloperSortInput {
+  method: MethodSortInput @cost(weight: "10")
+  institution: InstitutionSortInput @cost(weight: "10")
 }
 
 input InstitutionOperatedDatabaseFilterInput {
@@ -2605,7 +2652,7 @@ input InstitutionOwnedOpenIdConnectApplicationFilterInput {
   displayName: StringOperationFilterInput
   ownerId: ComparableGuidOperationFilterInput
   version: ComparableUInt32OperationFilterInput
-  authorizations: ListOpenIdConnectAuthorizationFilterTypeFilterInput
+  authorizations: ListFilterInputTypeOfOpenIdConnectAuthorizationFilterInput
   clientSecret: StringOperationFilterInput
   clientType: StringOperationFilterInput
   concurrencyToken: StringOperationFilterInput
@@ -2617,7 +2664,7 @@ input InstitutionOwnedOpenIdConnectApplicationFilterInput {
   redirectUris: StringOperationFilterInput
   requirements: StringOperationFilterInput
   settings: StringOperationFilterInput
-  tokens: ListOpenIdConnectTokenFilterTypeFilterInput
+  tokens: ListFilterInputTypeOfOpenIdConnectTokenFilterInput
 }
 
 input InstitutionRepresentativeFilterInput {
@@ -2632,6 +2679,12 @@ input InstitutionRepresentativeRoleOperationFilterInput {
   notEqualTo: InstitutionRepresentativeRole @cost(weight: "10")
   in: [InstitutionRepresentativeRole!] @cost(weight: "10")
   notIn: [InstitutionRepresentativeRole!] @cost(weight: "10")
+}
+
+input InstitutionRepresentativeSortInput {
+  institution: InstitutionSortInput @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
+  role: SortEnumType @cost(weight: "10")
 }
 
 input InstitutionSortInput {
@@ -2671,27 +2724,6 @@ input ListComponentCategoryOperationFilterInput {
   any: Boolean @cost(weight: "10")
 }
 
-input ListComponentFilterTypeFilterInput {
-  all: ComponentFilterInput @cost(weight: "10")
-  none: ComponentFilterInput @cost(weight: "10")
-  some: ComponentFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListDataFormatFilterTypeFilterInput {
-  all: DataFormatFilterInput @cost(weight: "10")
-  none: DataFormatFilterInput @cost(weight: "10")
-  some: DataFormatFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListDatabaseFilterTypeFilterInput {
-  all: DatabaseFilterInput @cost(weight: "10")
-  none: DatabaseFilterInput @cost(weight: "10")
-  some: DatabaseFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
 input ListFilterInputTypeOfComponentAssemblyFilterInput {
   all: ComponentAssembledOfFilterInput @cost(weight: "10")
   none: ComponentAssembledOfFilterInput @cost(weight: "10")
@@ -2699,10 +2731,45 @@ input ListFilterInputTypeOfComponentAssemblyFilterInput {
   any: Boolean @cost(weight: "10")
 }
 
+input ListFilterInputTypeOfComponentFilterInput {
+  all: ComponentFilterInput @cost(weight: "10")
+  none: ComponentFilterInput @cost(weight: "10")
+  some: ComponentFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
 input ListFilterInputTypeOfComponentManufacturerFilterInput {
   all: ComponentManufacturerFilterInput @cost(weight: "10")
   none: ComponentManufacturerFilterInput @cost(weight: "10")
   some: ComponentManufacturerFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfDataFormatFilterInput {
+  all: DataFormatFilterInput @cost(weight: "10")
+  none: DataFormatFilterInput @cost(weight: "10")
+  some: DataFormatFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfDatabaseFilterInput {
+  all: DatabaseFilterInput @cost(weight: "10")
+  none: DatabaseFilterInput @cost(weight: "10")
+  some: DatabaseFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfGnuPgKeyFingerprintFilterInput {
+  all: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  none: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  some: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfInstitutionFilterInput {
+  all: InstitutionFilterInput @cost(weight: "10")
+  none: InstitutionFilterInput @cost(weight: "10")
+  some: InstitutionFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
@@ -2720,24 +2787,38 @@ input ListFilterInputTypeOfInstitutionRepresentativeFilterInput {
   any: Boolean @cost(weight: "10")
 }
 
+input ListFilterInputTypeOfMethodFilterInput {
+  all: InstitutionManagedMethodFilterInput @cost(weight: "10")
+  none: InstitutionManagedMethodFilterInput @cost(weight: "10")
+  some: InstitutionManagedMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfOpenIdConnectAuthorizationFilterInput {
+  all: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
+  none: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
+  some: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfOpenIdConnectTokenFilterInput {
+  all: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  none: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  some: OpenIdConnectTokenFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfUserFilterInput {
+  all: UserFilterInput @cost(weight: "10")
+  none: UserFilterInput @cost(weight: "10")
+  some: UserFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
 input ListFilterInputTypeOfUserMethodDeveloperFilterInput {
   all: UserDevelopedMethodFilterInput @cost(weight: "10")
   none: UserDevelopedMethodFilterInput @cost(weight: "10")
   some: UserDevelopedMethodFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListGnuPgKeyFingerprintFilterTypeFilterInput {
-  all: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
-  none: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
-  some: GnuPgKeyFingerprintFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListInstitutionFilterTypeFilterInput {
-  all: InstitutionFilterInput @cost(weight: "10")
-  none: InstitutionFilterInput @cost(weight: "10")
-  some: InstitutionFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
@@ -2748,38 +2829,10 @@ input ListMethodCategoryOperationFilterInput {
   any: Boolean @cost(weight: "10")
 }
 
-input ListMethodFilterTypeFilterInput {
-  all: MethodFilterInput @cost(weight: "10")
-  none: MethodFilterInput @cost(weight: "10")
-  some: MethodFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListOpenIdConnectAuthorizationFilterTypeFilterInput {
-  all: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
-  none: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
-  some: OpenIdConnectAuthorizationFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListOpenIdConnectTokenFilterTypeFilterInput {
-  all: OpenIdConnectTokenFilterInput @cost(weight: "10")
-  none: OpenIdConnectTokenFilterInput @cost(weight: "10")
-  some: OpenIdConnectTokenFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
 input ListStringOperationFilterInput {
   all: StringOperationFilterInput @cost(weight: "10")
   none: StringOperationFilterInput @cost(weight: "10")
   some: StringOperationFilterInput @cost(weight: "10")
-  any: Boolean @cost(weight: "10")
-}
-
-input ListUserFilterTypeFilterInput {
-  all: UserFilterInput @cost(weight: "10")
-  none: UserFilterInput @cost(weight: "10")
-  some: UserFilterInput @cost(weight: "10")
   any: Boolean @cost(weight: "10")
 }
 
@@ -2812,9 +2865,9 @@ input MethodFilterInput {
   description: StringOperationFilterInput
   calculationLocator: UriFilterInput
   categories: ListMethodCategoryOperationFilterInput
-  institutionDevelopers: ListInstitutionFilterTypeFilterInput
+  institutionDevelopers: ListFilterInputTypeOfInstitutionFilterInput
   institutionDeveloperEdges: ListFilterInputTypeOfInstitutionMethodDeveloperFilterInput
-  userDevelopers: ListUserFilterTypeFilterInput
+  userDevelopers: ListFilterInputTypeOfUserFilterInput
   userDeveloperEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
   manager: InstitutionFilterInput
 }
@@ -2856,7 +2909,7 @@ input OpenIdConnectApplicationFilterInput {
   ownerId: ComparableGuidOperationFilterInput
   owner: InstitutionFilterInput
   version: ComparableUInt32OperationFilterInput
-  authorizations: ListOpenIdConnectAuthorizationFilterTypeFilterInput
+  authorizations: ListFilterInputTypeOfOpenIdConnectAuthorizationFilterInput
   clientSecret: StringOperationFilterInput
   clientType: StringOperationFilterInput
   concurrencyToken: StringOperationFilterInput
@@ -2868,7 +2921,7 @@ input OpenIdConnectApplicationFilterInput {
   redirectUris: StringOperationFilterInput
   requirements: StringOperationFilterInput
   settings: StringOperationFilterInput
-  tokens: ListOpenIdConnectTokenFilterTypeFilterInput
+  tokens: ListFilterInputTypeOfOpenIdConnectTokenFilterInput
 }
 
 input OpenIdConnectAuthorizationFilterInput {
@@ -2878,10 +2931,10 @@ input OpenIdConnectAuthorizationFilterInput {
   creationDate: ComparableNullableOfDateTimeOperationFilterInput
   status: StringOperationFilterInput
   subject: StringOperationFilterInput
-  tokens: ListOpenIdConnectTokenFilterTypeFilterInput
+  tokens: ListFilterInputTypeOfOpenIdConnectTokenFilterInput
   type: StringOperationFilterInput
   version: ComparableUInt32OperationFilterInput
-  application: OpenIdConnectApplicationFilterInput
+  application: InstitutionOwnedOpenIdConnectApplicationFilterInput
   concurrencyToken: StringOperationFilterInput
   properties: StringOperationFilterInput
   scopes: StringOperationFilterInput
@@ -2898,7 +2951,7 @@ input OpenIdConnectTokenFilterInput {
   subject: StringOperationFilterInput
   type: StringOperationFilterInput
   version: ComparableUInt32OperationFilterInput
-  application: OpenIdConnectApplicationFilterInput
+  application: InstitutionOwnedOpenIdConnectApplicationFilterInput
   authorization: OpenIdConnectAuthorizationFilterInput
   concurrencyToken: StringOperationFilterInput
   payload: StringOperationFilterInput
@@ -3215,16 +3268,16 @@ input UriSortInput {
 input UserDevelopedMethodFilterInput {
   and: [UserDevelopedMethodFilterInput!]
   or: [UserDevelopedMethodFilterInput!]
-  method: MethodFilterInput
+  method: InstitutionManagedMethodFilterInput
 }
 
 input UserFilterInput {
   and: [UserFilterInput!]
   or: [UserFilterInput!]
   id: ComparableGuidOperationFilterInput
-  developedMethods: ListMethodFilterTypeFilterInput
+  developedMethods: ListFilterInputTypeOfMethodFilterInput
   developedMethodEdges: ListFilterInputTypeOfUserMethodDeveloperFilterInput
-  representedInstitutions: ListInstitutionFilterTypeFilterInput
+  representedInstitutions: ListFilterInputTypeOfInstitutionFilterInput
   representedInstitutionEdges: ListFilterInputTypeOfInstitutionRepresentativeFilterInput
 }
 
@@ -3237,6 +3290,11 @@ input UserGnuPgKeyFingerprintFilterInput {
   allowedAt: ComparableNullableOfDateTimeOperationFilterInput
   forbiddenAt: ComparableNullableOfDateTimeOperationFilterInput
   institution: InstitutionFilterInput
+}
+
+input UserMethodDeveloperSortInput {
+  method: MethodSortInput @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
 }
 
 input UserRepresentedInstitutionFilterInput {
