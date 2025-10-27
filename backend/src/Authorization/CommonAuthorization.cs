@@ -23,8 +23,7 @@ public abstract class CommonAuthorization(
     OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager
     )
 {
-    protected IDbContextFactory<ApplicationDbContext> IDbContextFactory { get; } = dbContextFactory;
-    protected ApplicationDbContext Context { get => IDbContextFactory.CreateDbContext(); }
+    protected ApplicationDbContext Context { get => dbContextFactory.CreateDbContext(); }
     protected UserManager<User> UserManager { get; } = userManager;
     protected OpenIddictApplicationManager<OpenIdConnectApplication> ApplicationManager { get; } = applicationManager;
 
