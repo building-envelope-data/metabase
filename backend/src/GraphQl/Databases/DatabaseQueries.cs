@@ -17,8 +17,8 @@ public sealed class DatabaseQueries
 {
     [UsePaging]
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
-    [UseFiltering(typeof(DatabaseFilterType))]
-    [UseSorting(typeof(DatabaseSortType))]
+    [UseFiltering<DatabaseFilterType>]
+    [UseSorting<DatabaseSortType>]
     public IQueryable<Database> GetDatabases(
         ApplicationDbContext context,
         ISortingContext sorting
@@ -32,8 +32,8 @@ public sealed class DatabaseQueries
 
     [UsePaging]
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
-    [UseFiltering(typeof(DatabaseFilterType))]
-    [UseSorting(typeof(DatabaseSortType))]
+    [UseFiltering<DatabaseFilterType>]
+    [UseSorting<DatabaseSortType>]
     public IQueryable<Database> GetPendingDatabases(
         ApplicationDbContext context,
         ISortingContext sorting

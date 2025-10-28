@@ -16,8 +16,8 @@ public sealed class MethodQueries
 {
     [UsePaging]
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
-    [UseFiltering(typeof(MethodFilterType))]
-    [UseSorting(typeof(MethodSortType))]
+    [UseFiltering<MethodFilterType>]
+    [UseSorting<MethodSortType>]
     public IQueryable<Method> GetMethods(
         ApplicationDbContext context,
         ISortingContext sorting

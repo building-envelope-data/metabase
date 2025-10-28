@@ -27,8 +27,8 @@ public sealed class UserQueries
 
     [UsePaging]
     /* [UseProjection] // fails without an explicit error message in the logs */
-    [UseFiltering(typeof(UserFilterType))]
-    [UseSorting(typeof(UserSortType))]
+    [UseFiltering<UserFilterType>]
+    [UseSorting<UserSortType>]
     public IQueryable<User> GetUsers(
         ApplicationDbContext context,
         ISortingContext sorting
