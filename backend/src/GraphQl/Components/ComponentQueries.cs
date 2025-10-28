@@ -16,8 +16,8 @@ public sealed class ComponentQueries
 {
     [UsePaging]
     // [UseProjection] // We disabled projections because when requesting `id` all results had the same `id` and when also requesting `uuid`, the latter was always the empty UUID `000...`.
-    [UseFiltering]
-    [UseSorting]
+    [UseFiltering(typeof(ComponentFilterType))]
+    [UseSorting(typeof(ComponentSortType))]
     public IQueryable<Component> GetComponents(
         ApplicationDbContext context,
         ISortingContext sorting
