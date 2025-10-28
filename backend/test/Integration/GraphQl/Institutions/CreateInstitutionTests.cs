@@ -43,11 +43,11 @@ public sealed class CreateInstitutionTests
             response,
             matchOptions => matchOptions
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<string>("data.createInstitution.institution.id").Should()
+                    fieldOptions.Field<string>("data.institutions.edges[0].node.id").Should()
                         .NotBeNullOrWhiteSpace()
                 )
                 .Assert(fieldOptions =>
-                    fieldOptions.Field<Guid>("data.createInstitution.institution.uuid").Should().NotBe(Guid.Empty)
+                    fieldOptions.Field<Guid>("data.institutions.edges[0].node.uuid").Should().NotBe(Guid.Empty)
                 )
         );
     }
