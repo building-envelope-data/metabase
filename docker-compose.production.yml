@@ -78,11 +78,14 @@ services:
       - XBASE_TestlabSolarFacadesOpenIdConnectClientSecret=${TESTLAB_SOLAR_FACADES_OPEN_ID_CONNECT_CLIENT_SECRET}
       - XBASE_IgsdbApiToken=${IGSDB_API_TOKEN}
       - XBASE_IgsdbOpenIdConnectClientSecret=${IGSDB_OPEN_ID_CONNECT_CLIENT_SECRET}
+      # The value `/dev/pts/0` is the output of running `tty` within `shellb`
       # https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
       - GPG_TTY=/dev/pts/0
     volumes:
       - backend_logs:/app/logs
       - ./secrets:/run/secrets:ro
+      # Create volume for GnuPG
+      - gnupg:/root/.gnupg
     depends_on:
       - database
       - email
@@ -129,4 +132,5 @@ services:
 volumes:
   data:
   emails:
+  gnupg:
   backend_logs:

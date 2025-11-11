@@ -84,6 +84,8 @@ services:
       - ./backend:/app
       - backend_vscode_server:/home/me/.vscode-server
       - backend_vscode_server_insiders:/home/me/.vscode-server-insiders
+      # Create volume for GnuPG
+      - gnupg:/home/me/.gnupg
       # The following items make the engine create anonymous volumes for the
       # specified path with the effect that the service does not write
       # temporary files into the corresponding directory on the host file
@@ -123,6 +125,7 @@ services:
       # - SSL_CERT_FILE=/app/ssl/${SSL_CERTIFICATE_BASE_FILE_NAME}.pfx
       # - ASPNETCORE_DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_LOGGING=1
       # - ASPNETCORE_DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_LOGGING_SPECIFIER=all
+      # The value `/dev/pts/0` is the output of running `tty` within `shellb`
       # https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
       - GPG_TTY=/dev/pts/0
     extra_hosts:
@@ -198,5 +201,6 @@ services:
 volumes:
   data:
   emails:
+  gnupg:
   backend_vscode_server:
   backend_vscode_server_insiders:

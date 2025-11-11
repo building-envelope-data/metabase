@@ -55,7 +55,7 @@ RUN \
     curl \
     editorconfig \
     gawk \
-    gnupg \
+    gnupg2 \
     lldb \
     make \
     # npm \
@@ -90,6 +90,51 @@ COPY \
   /usr/local/share/ca-certificates
 RUN \
   update-ca-certificates
+
+# Install up-to-date GnuPG from the official GnuPG repository.
+# For available versions see https://repos.gnupg.org/deb/gnupg/
+# The fingerprint was taken from https://repos.gnupg.org/deb/gnupg/bookworm/
+# Keep the version in sync with the one in the other Dockerfiles of this
+# repository and with the one of the `machine` repository specified in the
+# `local.yml` Ansible script.
+ENV GNUPG_VERSION=2.4.8-2
+ENV GNUPG_FINGERPRINT=32097B719B3745D6E61DDA1B85C45AE3E1A2B355
+RUN set -eux && \
+  version_codename=$(env --ignore-environment bash -c '. /etc/os-release; echo $VERSION_CODENAME') && \
+  apt-get update && \
+  apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+    curl \
+    gnupg2 && \
+  curl \
+    --silent \
+    --show-error \
+    https://repos.gnupg.org/deb/gnupg/${version_codename}/gnupg-signing-key.gpg \
+    | gpg --dearmor \
+    > /usr/share/keyrings/gnupg-keyring.gpg && \
+  fingerprint=$(gpg \
+    --batch \
+    --with-colons \
+    --import-options show-only \
+    --import /usr/share/keyrings/gnupg-keyring.gpg \
+    | awk -F':' '$1=="fpr"{print $10}') && \
+  if [ "${fingerprint}" != "${GNUPG_FINGERPRINT}" ]; then \
+      echo "Error: Key fingerprint mismatch, got ${fingerprint} and expected ${GNUPG_FINGERPRINT}"; \
+      exit 1; \
+  fi && \
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gnupg-keyring.gpg] https://repos.gnupg.org/deb/gnupg/${version_codename}/ ${version_codename} main" \
+    > /etc/apt/sources.list.d/gnupg.list && \
+  apt-get update && \
+  apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+    dirmngr \
+    gnupg2=${GNUPG_VERSION} && \
+  rm \
+    --recursive \
+    --force \
+    /var/lib/apt/lists/*
 
 ENV HOME=/home/me
 RUN \
@@ -334,7 +379,13 @@ RUN \
     ${HOME}/.vscode-server-insiders && \
   mkdir --parents \
     ${HOME}/.nuget \
-    ${HOME}/.dotnet
+    ${HOME}/.dotnet && \
+  mkdir --parents \
+    ${HOME}/.gnupg && \
+  chmod u=rwx,g=,o= \
+    ${HOME}/.gnupg && \
+  echo "allow-loopback-pinentry" \
+    > ${HOME}/.gnupg/gpg-agent.conf
 
 ENV SHELL=/bin/bash
 
