@@ -296,6 +296,22 @@ RUN \
       --store-name Root \
       --password ${CERTIFICATE_AUTHORITY_PASSWORD}
 
+# bash parameter completion for the dotnet CLI
+# see https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#bash
+# for the here-document syntax used to append to the ~/.bashrc file
+# see https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_07_04
+RUN \
+  cat <<-"EOT" >> ${HOME}/.bashrc
+		function _dotnet_bash_complete()
+		{
+		  local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n'
+		  local candidates
+		  read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
+		  read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
+		}
+		complete -f -F _dotnet_bash_complete dotnet
+EOT
+
 # COPY \
 #   --chown=me:us \
 #   ./package.json ./package-lock.json ./
