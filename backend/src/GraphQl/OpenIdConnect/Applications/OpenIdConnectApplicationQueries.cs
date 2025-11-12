@@ -16,12 +16,28 @@ namespace Metabase.GraphQl.OpenIdConnect.Applications;
 [ExtendObjectType(nameof(Query))]
 public sealed class OpenIdConnectApplicationQueries
 {
+    [UseUserManager]
+    [Authorize(Policy = AuthConfiguration.ReadPolicy)]
+    public Task<OpenIdConnectApplication?> GetCurrentOpenIdConnectApplicationAsync(
+        ClaimsPrincipal claimsPrincipal,
+        Authorization.OpenIdConnectAuthorization authorization,
+        CancellationToken cancellationToken
+    )
+    {
+        return authorization.UserOrApplicationAsync(
+            claimsPrincipal,
+            user => Task.FromResult<OpenIdConnectApplication?>(null),
+            application => Task.FromResult(application),
+            cancellationToken
+        );
+    }
+
     // TODO In all queries, instead of returning nothing, report as authentication error to client.
     // TODO Make the application manager use the scoped database context.
     [UseUserManager]
     [Authorize(Policy = AuthConfiguration.ReadPolicy)]
     public async IAsyncEnumerable<OpenIdConnectApplication> GetOpenIdConnectApplicationsAsync(
-        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager, // TODO Make the application manager use the scoped database context.
+        OpenIddictApplicationManager<OpenIdConnectApplication> applicationManager,
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         [EnumeratorCancellation] CancellationToken cancellationToken

@@ -7,8 +7,8 @@ using HotChocolate.Data;
 using HotChocolate.Data.Sorting;
 using HotChocolate.Types;
 using Metabase.Data;
+using Metabase.Authorization;
 using Metabase.GraphQl.Extensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Users;
@@ -17,12 +17,18 @@ namespace Metabase.GraphQl.Users;
 public sealed class UserQueries
 {
     [UseUserManager]
-    public async Task<User?> GetCurrentUserAsync(
+    public Task<User?> GetCurrentUserAsync(
         ClaimsPrincipal claimsPrincipal,
-        UserManager<User> userManager
+        UserAuthorization authorization,
+        CancellationToken cancellationToken
     )
     {
-        return await userManager.GetUserAsync(claimsPrincipal);
+        return authorization.UserOrApplicationAsync(
+            claimsPrincipal,
+            user => Task.FromResult(user),
+            application => Task.FromResult<User?>(null),
+            cancellationToken
+        );
     }
 
     [UsePaging]
