@@ -161,27 +161,27 @@ public sealed class InstitutionType
             .Field("has" + nameof(GnuPgKeyFingerprint))
             .UseFiltering<InstitutionGnuPgKeyFingerprintFilterType>()
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetHasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
+                InstitutionResolvers.HasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
         descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
+                InstitutionResolvers.CanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserDeleteNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!))
+                InstitutionResolvers.CanCurrentUserDeleteNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserSwitchOperatingStateOfNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.GetCanCurrentUserSwitchOperatingStateOfNodeAsync(default!, default!, default!, default!))
+                InstitutionResolvers.CanCurrentUserSwitchOperatingStateOfNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
     private sealed class InstitutionResolvers
     {
-        public static Task<bool> GetHasGnuPgKeyFingerprintsAsync(
+        public static Task<bool> HasGnuPgKeyFingerprintsAsync(
             [Parent] Institution institution,
             ApplicationDbContext context,
             IResolverContext resolverContext,
@@ -194,7 +194,7 @@ public sealed class InstitutionType
                 .AnyAsync(cancellationToken);
         }
 
-        public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
+        public static Task<bool> CanCurrentUserUpdateNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
             InstitutionAuthorization authorization,
@@ -204,7 +204,7 @@ public sealed class InstitutionType
             return authorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, cancellationToken);
         }
 
-        public static Task<bool> GetCanCurrentUserDeleteNodeAsync(
+        public static Task<bool> CanCurrentUserDeleteNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
             InstitutionAuthorization authorization,
@@ -214,7 +214,7 @@ public sealed class InstitutionType
             return authorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id, cancellationToken);
         }
 
-        public static Task<bool> GetCanCurrentUserSwitchOperatingStateOfNodeAsync(
+        public static Task<bool> CanCurrentUserSwitchOperatingStateOfNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
             InstitutionAuthorization authorization,

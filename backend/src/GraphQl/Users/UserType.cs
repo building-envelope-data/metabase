@@ -228,15 +228,15 @@ public sealed class UserType
             .UseUserManager();
         descriptor
             .Field("canCurrentUserDeleteUser")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserDeleteUserAsync(default!, default!, default!))
+            .ResolveWith<UserResolvers>(x => UserResolvers.CanCurrentUserDeleteUserAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserManageOpenIdConnect")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserManageOpenIdConnect(default!, default!, default!))
+            .ResolveWith<UserResolvers>(x => UserResolvers.CanCurrentUserManageOpenIdConnect(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserAddApprovals")
-            .ResolveWith<UserResolvers>(x => UserResolvers.GetCanCurrentUserAddApprovals(default!, default!, default!))
+            .ResolveWith<UserResolvers>(x => UserResolvers.CanCurrentUserAddApprovals(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field(t => t.DevelopedMethods)
@@ -278,12 +278,12 @@ public sealed class UserType
             .Field("has" + nameof(GnuPgKeyFingerprint))
             .UseFiltering<UserGnuPgKeyFingerprintFilterType>()
             .ResolveWith<UserResolvers>(x =>
-                UserResolvers.GetHasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
+                UserResolvers.HasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
     }
 
     private sealed class UserResolvers
     {
-        public static Task<bool> GetHasGnuPgKeyFingerprintsAsync(
+        public static Task<bool> HasGnuPgKeyFingerprintsAsync(
             [Parent] User user,
             ApplicationDbContext context,
             IResolverContext resolverContext,
@@ -324,7 +324,7 @@ public sealed class UserType
             );
         }
 
-        public static Task<bool> GetCanCurrentUserManageOpenIdConnect(
+        public static Task<bool> CanCurrentUserManageOpenIdConnect(
             ClaimsPrincipal claimsPrincipal,
             OpenIdConnectAuthorization authorization,
             CancellationToken cancellationToken
@@ -333,7 +333,7 @@ public sealed class UserType
             return authorization.IsAuthorizedToManage(claimsPrincipal, cancellationToken);
         }
 
-        public static Task<bool> GetCanCurrentUserAddApprovals(
+        public static Task<bool> CanCurrentUserAddApprovals(
             ClaimsPrincipal claimsPrincipal,
             ApprovalAuthorization authorization,
             CancellationToken cancellationToken
@@ -342,7 +342,7 @@ public sealed class UserType
             return authorization.IsAuthorizedToAddApprovals(claimsPrincipal, cancellationToken);
         }
 
-        public static Task<bool> GetCanCurrentUserDeleteUserAsync(
+        public static Task<bool> CanCurrentUserDeleteUserAsync(
             ClaimsPrincipal claimsPrincipal,
             UserAuthorization authorization,
             CancellationToken cancellationToken

@@ -41,7 +41,7 @@ public sealed class DatabaseType
         ConfigureHasDataField<OpticalDataPropositionInput>(
             descriptor,
             "hasOpticalData",
-            _ => _.GetHasOpticalDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasOpticalDataAsync(default!, default, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,
@@ -57,7 +57,7 @@ public sealed class DatabaseType
         ConfigureHasDataField<HygrothermalDataPropositionInput>(
             descriptor,
             "hasHygrothermalData",
-            _ => _.GetHasHygrothermalDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasHygrothermalDataAsync(default!, default, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,
@@ -73,7 +73,7 @@ public sealed class DatabaseType
         ConfigureHasDataField<CalorimetricDataPropositionInput>(
             descriptor,
             "hasCalorimetricData",
-            _ => _.GetHasCalorimetricDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasCalorimetricDataAsync(default!, default, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,
@@ -89,7 +89,7 @@ public sealed class DatabaseType
         ConfigureHasDataField<PhotovoltaicDataPropositionInput>(
             descriptor,
             "hasPhotovoltaicData",
-            _ => _.GetHasPhotovoltaicDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasPhotovoltaicDataAsync(default!, default, default, default!, default!, default)
         );
         ConfigureDataField(
             descriptor,
@@ -105,17 +105,17 @@ public sealed class DatabaseType
         ConfigureHasDataField<GeometricDataPropositionInput>(
             descriptor,
             "hasGeometricData",
-            _ => _.GetHasGeometricDataAsync(default!, default, default, default!, default!, default)
+            _ => _.HasGeometricDataAsync(default!, default, default, default!, default!, default)
         );
         descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<DatabaseResolvers>(x =>
-                x.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
+                x.CanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field("canCurrentUserVerifyNode")
             .ResolveWith<DatabaseResolvers>(x =>
-                x.GetCanCurrentUserVerifyNodeAsync(default!, default!, default!, default!))
+                x.CanCurrentUserVerifyNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 

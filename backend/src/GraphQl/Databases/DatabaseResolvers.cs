@@ -194,7 +194,7 @@ public sealed class DatabaseResolvers(
             .Contains(database.Locator.AbsoluteUri);
     }
 
-    public Task<bool> GetCanCurrentUserUpdateNodeAsync(
+    public Task<bool> CanCurrentUserUpdateNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
         DatabaseAuthorization authorization,
@@ -204,7 +204,7 @@ public sealed class DatabaseResolvers(
         return authorization.IsAuthorizedToUpdate(claimsPrincipal, database.Id, cancellationToken);
     }
 
-    public Task<bool> GetCanCurrentUserVerifyNodeAsync(
+    public Task<bool> CanCurrentUserVerifyNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
         DatabaseAuthorization authorization,
@@ -542,7 +542,7 @@ public sealed class DatabaseResolvers(
             )?.AllGeometricData;
     }
 
-    public async Task<bool?> GetHasOpticalDataAsync(
+    public async Task<bool?> HasOpticalDataAsync(
         [Parent] Database database,
         OpticalDataPropositionInput? where,
         string? locale,
@@ -571,7 +571,7 @@ public sealed class DatabaseResolvers(
             )?.HasOpticalData;
     }
 
-    public async Task<bool?> GetHasCalorimetricDataAsync(
+    public async Task<bool?> HasCalorimetricDataAsync(
         [Parent] Database database,
         CalorimetricDataPropositionInput? where,
         string? locale,
@@ -600,7 +600,7 @@ public sealed class DatabaseResolvers(
             )?.HasCalorimetricData;
     }
 
-    public async Task<bool?> GetHasHygrothermalDataAsync(
+    public async Task<bool?> HasHygrothermalDataAsync(
         [Parent] Database database,
         HygrothermalDataPropositionInput? where,
         string? locale,
@@ -629,7 +629,7 @@ public sealed class DatabaseResolvers(
             )?.HasHygrothermalData;
     }
 
-    public async Task<bool?> GetHasPhotovoltaicDataAsync(
+    public async Task<bool?> HasPhotovoltaicDataAsync(
         [Parent] Database database,
         PhotovoltaicDataPropositionInput? where,
         string? locale,
@@ -658,7 +658,7 @@ public sealed class DatabaseResolvers(
             )?.HasPhotovoltaicData;
     }
 
-    public async Task<bool?> GetHasGeometricDataAsync(
+    public async Task<bool?> HasGeometricDataAsync(
         [Parent] Database database,
         GeometricDataPropositionInput? where,
         string? locale,

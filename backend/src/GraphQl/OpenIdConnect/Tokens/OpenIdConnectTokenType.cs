@@ -56,13 +56,13 @@ public sealed class OpenIdConnectTokenType
         descriptor
                 .Field("canCurrentUserRevokeNode")
                 .ResolveWith<TokenResolvers>(x =>
-                    TokenResolvers.GetCanCurrentUserRevokeNodeAsync(default!, default!, default!, default!, default!))
+                    TokenResolvers.CanCurrentUserRevokeNodeAsync(default!, default!, default!, default!, default!))
                 .UseUserManager();
     }
 
     private sealed class TokenResolvers
     {
-        public static Task<bool> GetCanCurrentUserRevokeNodeAsync(
+        public static Task<bool> CanCurrentUserRevokeNodeAsync(
             [Parent] OpenIdConnectToken token,
             ClaimsPrincipal claimsPrincipal,
             Authorization.OpenIdConnectAuthorization authorization,

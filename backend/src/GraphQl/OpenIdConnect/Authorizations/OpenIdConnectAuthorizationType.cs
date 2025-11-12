@@ -55,13 +55,13 @@ public sealed class OpenIdConnectAuthorizationType
         descriptor
                 .Field("canCurrentUserDeleteNode")
                 .ResolveWith<AuthorizationResolvers>(x =>
-                    AuthorizationResolvers.GetCanCurrentUserDeleteNodeAsync(default!, default!, default!, default!, default!))
+                    AuthorizationResolvers.CanCurrentUserDeleteNodeAsync(default!, default!, default!, default!, default!))
                 .UseUserManager();
     }
 
     private sealed class AuthorizationResolvers
     {
-        public static Task<bool> GetCanCurrentUserDeleteNodeAsync(
+        public static Task<bool> CanCurrentUserDeleteNodeAsync(
             [Parent] OpenIdConnectAuthorization authorization,
             ClaimsPrincipal claimsPrincipal,
             Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,

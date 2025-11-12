@@ -222,7 +222,7 @@ public sealed class OpenIdConnectApplicationType
         descriptor
             .Field("canCurrentUserManageNode")
             .ResolveWith<ApplicationResolvers>(_ =>
-                ApplicationResolvers.GetCanCurrentUserManageNodeAsync(default!, default!, default!, default!))
+                ApplicationResolvers.CanCurrentUserManageNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
@@ -247,7 +247,7 @@ public sealed class OpenIdConnectApplicationType
 
     private sealed class ApplicationResolvers
     {
-        public static Task<bool> GetCanCurrentUserManageNodeAsync(
+        public static Task<bool> CanCurrentUserManageNodeAsync(
             [Parent] OpenIdConnectApplication application,
             ClaimsPrincipal claimsPrincipal,
             Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,

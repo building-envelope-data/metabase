@@ -127,13 +127,13 @@ public sealed class ComponentType
         descriptor
             .Field("canCurrentUserUpdateNode")
             .ResolveWith<ComponentResolvers>(x =>
-                ComponentResolvers.GetCanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
+                ComponentResolvers.CanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
     private sealed class ComponentResolvers
     {
-        public static Task<bool> GetCanCurrentUserUpdateNodeAsync(
+        public static Task<bool> CanCurrentUserUpdateNodeAsync(
             [Parent] Component component,
             ClaimsPrincipal claimsPrincipal,
             ComponentAuthorization authorization,

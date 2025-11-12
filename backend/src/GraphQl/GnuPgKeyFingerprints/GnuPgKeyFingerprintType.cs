@@ -39,20 +39,20 @@ public sealed class GnuPgKeyFingerprintType
         descriptor
             .Field("canCurrentUserAllowNode")
             .ResolveWith<GnuPgKeyFingerprintResolvers>(x =>
-                GnuPgKeyFingerprintResolvers.GetCanCurrentUserAllowNodeAsync(default!, default!, default!, default!)
+                GnuPgKeyFingerprintResolvers.CanCurrentUserAllowNodeAsync(default!, default!, default!, default!)
             )
             .UseUserManager();
         descriptor
             .Field("canCurrentUserForbidNode")
             .ResolveWith<GnuPgKeyFingerprintResolvers>(x =>
-                GnuPgKeyFingerprintResolvers.GetCanCurrentUserForbidNodeAsync(default!, default!, default!, default!)
+                GnuPgKeyFingerprintResolvers.CanCurrentUserForbidNodeAsync(default!, default!, default!, default!)
             )
             .UseUserManager();
     }
 
     private sealed class GnuPgKeyFingerprintResolvers
     {
-        public static Task<bool> GetCanCurrentUserAllowNodeAsync(
+        public static Task<bool> CanCurrentUserAllowNodeAsync(
             [Parent] GnuPgKeyFingerprint gnuPgKeyFingerprint,
             ClaimsPrincipal claimsPrincipal,
             GnuPgKeyFingerprintAuthorization authorization,
@@ -62,7 +62,7 @@ public sealed class GnuPgKeyFingerprintType
             return authorization.IsAuthorizedToAllow(claimsPrincipal, gnuPgKeyFingerprint, cancellationToken);
         }
 
-        public static Task<bool> GetCanCurrentUserForbidNodeAsync(
+        public static Task<bool> CanCurrentUserForbidNodeAsync(
             [Parent] GnuPgKeyFingerprint gnuPgKeyFingerprint,
             ClaimsPrincipal claimsPrincipal,
             GnuPgKeyFingerprintAuthorization authorization,
