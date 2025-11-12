@@ -45,7 +45,7 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
       title={dataFormat.name}
       subTitle={dataFormat.description}
       extra={
-        dataFormat.canCurrentUserUpdateNode
+        dataFormat.isAuthorizedToUpdateNode
           ? [
               <UpdateDataFormat
                 key="updateDataFormat"

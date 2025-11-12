@@ -27,7 +27,7 @@ public sealed class InstitutionOwnedOpenIdConnectApplicationConnection(
 )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         CancellationToken cancellationToken
@@ -41,7 +41,7 @@ public sealed class InstitutionOwnedOpenIdConnectApplicationConnection(
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         CancellationToken cancellationToken

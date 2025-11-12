@@ -50,7 +50,7 @@ export default function Database({ databaseId }: DatabaseProps) {
       subTitle={database.description}
       extra={([] as ReactNode[])
         .concat(
-          database.canCurrentUserUpdateNode
+          database.isAuthorizedToUpdateNode
             ? [
                 <UpdateDatabase
                   key="updateDatabase"
@@ -63,7 +63,7 @@ export default function Database({ databaseId }: DatabaseProps) {
             : []
         )
         .concat(
-          database.canCurrentUserVerifyNode &&
+          database.isAuthorizedToVerifyNode &&
             database.verificationState == DatabaseVerificationState.Pending
             ? [
                 <VerifyDatabase
@@ -94,7 +94,7 @@ export default function Database({ databaseId }: DatabaseProps) {
         </Descriptions.Item>
       </Descriptions>
     </PageHeader>
-    {database.canCurrentUserVerifyNode &&
+    {database.isAuthorizedToVerifyNode &&
       database.verificationState == DatabaseVerificationState.Pending && (
         <Typography.Paragraph>
           Have your database&apos;s GraphQL endpoint return the verification

@@ -124,9 +124,9 @@ query Institution($uuid: Uuid!) {
   institution(id: $uuid) {
     ...InstitutionPartial
     extras
-    canCurrentUserUpdateNode
-    canCurrentUserDeleteNode
-    canCurrentUserSwitchOperatingStateOfNode
+    isAuthorizedToUpdateNode
+    isAuthorizedToDeleteNode
+    isAuthorizedToSwitchOperatingStateOfNode
     manufacturedComponents {
       edges {
         node {
@@ -142,7 +142,7 @@ query Institution($uuid: Uuid!) {
           }
         }
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     pendingManufacturedComponents: manufacturedComponents(pending: true) {
       edges {
@@ -152,7 +152,7 @@ query Institution($uuid: Uuid!) {
           name
         }
       }
-      canCurrentUserConfirmEdge
+      isAuthorizedToConfirmEdge
     }
     operatedDatabases {
       edges {
@@ -171,7 +171,7 @@ query Institution($uuid: Uuid!) {
           }
         }
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     representatives {
       edges {
@@ -182,7 +182,7 @@ query Institution($uuid: Uuid!) {
         }
         role
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     pendingRepresentatives: representatives(pending: true) {
       edges {
@@ -245,7 +245,7 @@ query Institution($uuid: Uuid!) {
           }
         }
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     managedMethods {
       edges {
@@ -291,7 +291,7 @@ query Institution($uuid: Uuid!) {
           categories
         }
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     developedMethods {
       edges {
@@ -310,7 +310,7 @@ query Institution($uuid: Uuid!) {
           name
         }
       }
-      canCurrentUserConfirmEdge
+      isAuthorizedToConfirmEdge
     }
     gnuPgKeyFingerprints {
       edges {
@@ -318,7 +318,7 @@ query Institution($uuid: Uuid!) {
           ...GnuPgKeyFingerprintPartial
         }
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     openIdConnectApplications {
       edges {
@@ -326,7 +326,7 @@ query Institution($uuid: Uuid!) {
           ...ApplicationPartial
         }
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     managedInstitutions {
       edges {
@@ -336,7 +336,7 @@ query Institution($uuid: Uuid!) {
           name
         }
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
   }
 }

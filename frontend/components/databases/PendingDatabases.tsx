@@ -69,7 +69,7 @@ export default function PendingDatabases({}: PendingDatabasesProps) {
       renderItem={(item) => (
         <List.Item>
           <Link href={paths.database(item?.uuid)} legacyBehavior>{item?.name}</Link>
-          {item.canCurrentUserVerifyNode && (
+          {item.isAuthorizedToVerifyNode && (
             <Button
               onClick={() => verifyDatabase(item?.uuid)}
               loading={verifyingDatabase}

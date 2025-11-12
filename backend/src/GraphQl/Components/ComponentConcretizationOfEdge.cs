@@ -16,7 +16,7 @@ public sealed class ComponentConcretizationOfEdge(
     private readonly ComponentConcretizationAndGeneralization _association = association;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentGeneralizationAuthorization authorization,
         CancellationToken cancellationToken

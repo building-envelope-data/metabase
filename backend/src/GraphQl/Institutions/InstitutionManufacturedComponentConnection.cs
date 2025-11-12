@@ -24,7 +24,7 @@ public sealed class InstitutionManufacturedComponentConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentAuthorization authorization,
         CancellationToken cancellationToken
@@ -38,7 +38,7 @@ public sealed class InstitutionManufacturedComponentConnection(
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken

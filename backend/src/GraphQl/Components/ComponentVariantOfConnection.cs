@@ -20,7 +20,7 @@ public sealed class ComponentVariantOfConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentVariantAuthorization authorization,
         CancellationToken cancellationToken

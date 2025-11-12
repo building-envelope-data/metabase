@@ -24,7 +24,7 @@ public sealed class ComponentManufacturerConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken

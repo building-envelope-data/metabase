@@ -74,7 +74,7 @@ public sealed class MethodDeveloperConnection(
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddInstitutionEdgeAsync(
+    public Task<bool> IsAuthorizedToAddInstitutionEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
@@ -88,7 +88,7 @@ public sealed class MethodDeveloperConnection(
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddUserEdgeAsync(
+    public Task<bool> IsAuthorizedToAddUserEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken

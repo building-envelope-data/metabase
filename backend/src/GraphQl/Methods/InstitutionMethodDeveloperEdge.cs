@@ -17,7 +17,7 @@ public sealed class InstitutionMethodDeveloperEdge(
     private readonly InstitutionMethodDeveloper _association = association;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
@@ -31,7 +31,7 @@ public sealed class InstitutionMethodDeveloperEdge(
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken

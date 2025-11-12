@@ -21,7 +21,7 @@ public sealed class ComponentPartOfEdge(
     public PrimeSurface? PrimeSurface => _association.PrimeSurface;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserUpdateEdgeAsync(
+    public Task<bool> IsAuthorizedToUpdateEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken
@@ -36,7 +36,7 @@ public sealed class ComponentPartOfEdge(
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken

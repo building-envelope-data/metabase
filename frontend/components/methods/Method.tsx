@@ -169,7 +169,7 @@ export default function Method({ methodId }: MethodProps) {
         </Tag>
       ))}
       extra={
-        method.canCurrentUserUpdateNode
+        method.isAuthorizedToUpdateNode
           ? [
               <UpdateMethod
                 key="updateMethod"
@@ -212,18 +212,18 @@ export default function Method({ methodId }: MethodProps) {
       </Descriptions>
     </PageHeader>
     {(method.developers.edges.length >= 1 ||
-      method.developers.canCurrentUserAddInstitutionEdge ||
-      method.developers.canCurrentUserAddUserEdge) && (
+      method.developers.isAuthorizedToAddInstitutionEdge ||
+      method.developers.isAuthorizedToAddUserEdge) && (
       <Row gutter={[16, 16]}>
         <Col flex={1}>
           {(method.developers.edges.length >= 1 ||
-            method.developers.canCurrentUserAddInstitutionEdge) && (
+            method.developers.isAuthorizedToAddInstitutionEdge) && (
             <List
               header="Institution Developers"
               bordered={true}
               size="small"
               footer={
-                method.developers.canCurrentUserAddInstitutionEdge && (
+                method.developers.isAuthorizedToAddInstitutionEdge && (
                   <AddInstitutionMethodDeveloper methodId={method.uuid} />
                 )
               }
@@ -234,7 +234,7 @@ export default function Method({ methodId }: MethodProps) {
                   <List.Item
                     key={x.node.uuid}
                     actions={
-                      x.canCurrentUserRemoveEdge
+                      x.isAuthorizedToRemoveEdge
                         ? [
                             <Button
                               key="remove"
@@ -264,7 +264,7 @@ export default function Method({ methodId }: MethodProps) {
                   <List.Item
                     key={x.node.uuid}
                     actions={
-                      x.canCurrentUserRemoveEdge
+                      x.isAuthorizedToRemoveEdge
                         ? [
                             <Button
                               key="remove"
@@ -293,13 +293,13 @@ export default function Method({ methodId }: MethodProps) {
         </Col>
         <Col flex={1}>
           {(method.developers.edges.length >= 1 ||
-            method.developers.canCurrentUserAddUserEdge) && (
+            method.developers.isAuthorizedToAddUserEdge) && (
             <List
               header="User Developers"
               bordered={true}
               size="small"
               footer={
-                method.developers.canCurrentUserAddUserEdge && (
+                method.developers.isAuthorizedToAddUserEdge && (
                   <AddUserMethodDeveloper methodId={method.uuid} />
                 )
               }
@@ -310,7 +310,7 @@ export default function Method({ methodId }: MethodProps) {
                   <List.Item
                     key={x.node.uuid}
                     actions={
-                      x.canCurrentUserRemoveEdge
+                      x.isAuthorizedToRemoveEdge
                         ? [
                             <Button
                               key="remove"
@@ -340,7 +340,7 @@ export default function Method({ methodId }: MethodProps) {
                   <List.Item
                     key={x.node.uuid}
                     actions={
-                      x.canCurrentUserRemoveEdge
+                      x.isAuthorizedToRemoveEdge
                         ? [
                             <Button
                               key="remove"

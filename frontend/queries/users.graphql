@@ -26,8 +26,8 @@ query User($uuid: Uuid!) {
     roles
     rolesCurrentUserCanAdd
     rolesCurrentUserCanRemove
-    canCurrentUserDeleteUser
-    canCurrentUserManageOpenIdConnect
+    isAuthorizedToDeleteUser
+    isAuthorizedToManageOpenIdConnect
     developedMethods {
       edges {
         node {
@@ -45,7 +45,7 @@ query User($uuid: Uuid!) {
           name
         }
       }
-      canCurrentUserConfirmEdge
+      isAuthorizedToConfirmEdge
     }
     representedInstitutions {
       edges {
@@ -64,7 +64,7 @@ query User($uuid: Uuid!) {
           name
         }
       }
-      canCurrentUserConfirmEdge
+      isAuthorizedToConfirmEdge
     }
   }
 }

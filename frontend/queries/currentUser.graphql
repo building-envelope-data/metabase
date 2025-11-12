@@ -7,7 +7,7 @@ fragment CurrentUserPartial on User {
   isEmailConfirmed
   phoneNumber
   roles
-  canCurrentUserManageOpenIdConnect
+  isAuthorizedToManageOpenIdConnect
   representedInstitutions {
     edges {
       node {

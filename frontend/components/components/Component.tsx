@@ -277,7 +277,7 @@ export default function Component({ componentId }: ComponentProps) {
         </Tag>
       ))}
       extra={
-        component.canCurrentUserUpdateNode
+        component.isAuthorizedToUpdateNode
           ? [
               <UpdateComponent
                 key="updateComponent"
@@ -334,7 +334,7 @@ export default function Component({ componentId }: ComponentProps) {
             bordered={true}
             size="small"
             footer={
-              component.manufacturers.canCurrentUserAddEdge && (
+              component.manufacturers.isAuthorizedToAddEdge && (
                 <AddComponentManufacturer componentId={component.uuid} />
               )
             }
@@ -343,7 +343,7 @@ export default function Component({ componentId }: ComponentProps) {
               <List.Item
                 key={x.node.uuid}
                 actions={([] as ReactNode[]).concat(
-                  x.canCurrentUserRemoveEdge
+                  x.isAuthorizedToRemoveEdge
                     ? [
                         <Button
                           key="remove"
@@ -372,7 +372,7 @@ export default function Component({ componentId }: ComponentProps) {
               <List.Item
                 key={x.node.uuid}
                 actions={([] as ReactNode[]).concat(
-                  x.canCurrentUserRemoveEdge
+                  x.isAuthorizedToRemoveEdge
                     ? [
                         <Button
                           key="remove"
@@ -400,19 +400,19 @@ export default function Component({ componentId }: ComponentProps) {
         </Col>
       </Row>
       {(component.assembledOf.edges.length >= 1 ||
-        component.assembledOf.canCurrentUserAddEdge ||
+        component.assembledOf.isAuthorizedToAddEdge ||
         component.partOf.edges.length >= 1 ||
-        component.partOf.canCurrentUserAddEdge) && (
+        component.partOf.isAuthorizedToAddEdge) && (
         <Row gutter={[16, 16]}>
           <Col flex={1}>
             {(component.assembledOf.edges.length >= 1 ||
-              component.assembledOf.canCurrentUserAddEdge) && (
+              component.assembledOf.isAuthorizedToAddEdge) && (
               <List
                 header="Assembled Of"
                 bordered={true}
                 size="small"
                 footer={
-                  component.assembledOf.canCurrentUserAddEdge && (
+                  component.assembledOf.isAuthorizedToAddEdge && (
                     <AddPartOfComponent
                       assembledComponentId={component.uuid}
                     />
@@ -424,7 +424,7 @@ export default function Component({ componentId }: ComponentProps) {
                     key={x.node.uuid}
                     actions={([] as ReactNode[])
                       .concat(
-                        x.canCurrentUserUpdateEdge
+                        x.isAuthorizedToUpdateEdge
                           ? [
                               <UpdateComponentAssembly
                                 key="update"
@@ -443,7 +443,7 @@ export default function Component({ componentId }: ComponentProps) {
                           : []
                       )
                       .concat(
-                        x.canCurrentUserRemoveEdge
+                        x.isAuthorizedToRemoveEdge
                           ? [
                               <Button
                                 key="remove"
@@ -484,13 +484,13 @@ export default function Component({ componentId }: ComponentProps) {
           </Col>
           <Col flex={1}>
             {(component.partOf.edges.length >= 1 ||
-              component.partOf.canCurrentUserAddEdge) && (
+              component.partOf.isAuthorizedToAddEdge) && (
               <List
                 header="Part Of"
                 bordered={true}
                 size="small"
                 footer={
-                  component.partOf.canCurrentUserAddEdge && (
+                  component.partOf.isAuthorizedToAddEdge && (
                     <AddAssembledOfComponent
                       partComponentId={component.uuid}
                     />
@@ -502,7 +502,7 @@ export default function Component({ componentId }: ComponentProps) {
                     key={x.node.uuid}
                     actions={([] as ReactNode[])
                       .concat(
-                        x.canCurrentUserUpdateEdge
+                        x.isAuthorizedToUpdateEdge
                           ? [
                               <UpdateComponentAssembly
                                 key="update"
@@ -521,7 +521,7 @@ export default function Component({ componentId }: ComponentProps) {
                           : []
                       )
                       .concat(
-                        x.canCurrentUserRemoveEdge
+                        x.isAuthorizedToRemoveEdge
                           ? [
                               <Button
                                 key="remove"
@@ -563,19 +563,19 @@ export default function Component({ componentId }: ComponentProps) {
         </Row>
       )}
       {(component.concretizationOf.edges.length >= 1 ||
-        component.concretizationOf.canCurrentUserAddEdge ||
+        component.concretizationOf.isAuthorizedToAddEdge ||
         component.generalizationOf.edges.length >= 1 ||
-        component.generalizationOf.canCurrentUserAddEdge) && (
+        component.generalizationOf.isAuthorizedToAddEdge) && (
         <Row gutter={[16, 16]}>
           <Col flex={1}>
             {(component.concretizationOf.edges.length >= 1 ||
-              component.concretizationOf.canCurrentUserAddEdge) && (
+              component.concretizationOf.isAuthorizedToAddEdge) && (
               <List
                 header="Concretization Of"
                 bordered={true}
                 size="small"
                 footer={
-                  component.concretizationOf.canCurrentUserAddEdge && (
+                  component.concretizationOf.isAuthorizedToAddEdge && (
                     <AddGeneralizationOfComponent
                       concreteComponentId={component.uuid}
                     />
@@ -586,7 +586,7 @@ export default function Component({ componentId }: ComponentProps) {
                   <List.Item
                     key={x.node.uuid}
                     actions={([] as ReactNode[]).concat(
-                      x.canCurrentUserRemoveEdge
+                      x.isAuthorizedToRemoveEdge
                         ? [
                             <Button
                               key="remove"
@@ -619,13 +619,13 @@ export default function Component({ componentId }: ComponentProps) {
           </Col>
           <Col flex={1}>
             {(component.generalizationOf.edges.length >= 1 ||
-              component.generalizationOf.canCurrentUserAddEdge) && (
+              component.generalizationOf.isAuthorizedToAddEdge) && (
               <List
                 header="Generalization Of"
                 bordered={true}
                 size="small"
                 footer={
-                  component.generalizationOf.canCurrentUserAddEdge && (
+                  component.generalizationOf.isAuthorizedToAddEdge && (
                     <AddConcretizationOfComponent
                       generalComponentId={component.uuid}
                     />
@@ -636,7 +636,7 @@ export default function Component({ componentId }: ComponentProps) {
                   <List.Item
                     key={x.node.uuid}
                     actions={([] as ReactNode[]).concat(
-                      x.canCurrentUserRemoveEdge
+                      x.isAuthorizedToRemoveEdge
                         ? [
                             <Button
                               key="remove"
@@ -670,7 +670,7 @@ export default function Component({ componentId }: ComponentProps) {
         </Row>
       )}
       {(component.variantOf.edges.length >= 1 ||
-        component.variantOf.canCurrentUserAddEdge) && (
+        component.variantOf.isAuthorizedToAddEdge) && (
         <Row gutter={[16, 16]}>
           <Col flex={1}>
             <List
@@ -678,7 +678,7 @@ export default function Component({ componentId }: ComponentProps) {
               bordered={true}
               size="small"
               footer={
-                component.variantOf.canCurrentUserAddEdge && (
+                component.variantOf.isAuthorizedToAddEdge && (
                   <AddVariantOfComponent componentId={component.uuid} />
                 )
               }
@@ -687,7 +687,7 @@ export default function Component({ componentId }: ComponentProps) {
                 <List.Item
                   key={x.node.uuid}
                   actions={([] as ReactNode[]).concat(
-                    x.canCurrentUserRemoveEdge
+                    x.isAuthorizedToRemoveEdge
                       ? [
                           <Button
                             key="remove"

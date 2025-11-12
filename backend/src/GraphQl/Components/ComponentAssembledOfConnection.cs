@@ -20,7 +20,7 @@ public sealed class ComponentAssembledOfConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken

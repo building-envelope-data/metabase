@@ -220,9 +220,9 @@ public sealed class OpenIdConnectApplicationType
             );
 
         descriptor
-            .Field("canCurrentUserManageNode")
+            .Field("isAuthorizedToManageNode")
             .ResolveWith<ApplicationResolvers>(_ =>
-                ApplicationResolvers.CanCurrentUserManageNodeAsync(default!, default!, default!, default!))
+                ApplicationResolvers.IsAuthorizedToManageNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
@@ -247,7 +247,7 @@ public sealed class OpenIdConnectApplicationType
 
     private sealed class ApplicationResolvers
     {
-        public static Task<bool> CanCurrentUserManageNodeAsync(
+        public static Task<bool> IsAuthorizedToManageNodeAsync(
             [Parent] OpenIdConnectApplication application,
             ClaimsPrincipal claimsPrincipal,
             Authorization.OpenIdConnectAuthorization openIdConnectAuthorization,

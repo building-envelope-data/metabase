@@ -31,7 +31,7 @@ export default function AutorizationTable({ applicationId, authorizations }: Aut
             key: 'action',
             render: (_, authorization) => (
                 <Space size="middle">
-                    {authorization.canCurrentUserDeleteNode ? (
+                    {authorization.isAuthorizedToDeleteNode ? (
                         <>
                             <DeleteAuthorization
                                 authorizationId={authorization.uuid}

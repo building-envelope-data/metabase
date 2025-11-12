@@ -108,14 +108,14 @@ public sealed class DatabaseType
             _ => _.HasGeometricDataAsync(default!, default, default, default!, default!, default)
         );
         descriptor
-            .Field("canCurrentUserUpdateNode")
+            .Field("isAuthorizedToUpdateNode")
             .ResolveWith<DatabaseResolvers>(x =>
-                x.CanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
+                x.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserVerifyNode")
+            .Field("isAuthorizedToVerifyNode")
             .ResolveWith<DatabaseResolvers>(x =>
-                x.CanCurrentUserVerifyNodeAsync(default!, default!, default!, default!))
+                x.IsAuthorizedToVerifyNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 

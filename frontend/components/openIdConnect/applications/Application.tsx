@@ -48,7 +48,7 @@ export default function Application({ applicationId }: ApplicationProps) {
             tags={[]}
             extra={([] as ReactNode[])
                 .concat(
-                    application.canCurrentUserManageNode
+                    application.isAuthorizedToManageNode
                         ? [
                             <UpdateApplication
                                 key="updateApplication"
@@ -58,7 +58,7 @@ export default function Application({ applicationId }: ApplicationProps) {
                         : []
                 )
                 .concat(
-                    application.canCurrentUserManageNode
+                    application.isAuthorizedToManageNode
                         ? [
                             <ResetApplicationClientSecret
                                 key="resetApplicationClientSecret"
@@ -68,7 +68,7 @@ export default function Application({ applicationId }: ApplicationProps) {
                         : []
                 )
                 .concat(
-                    application.canCurrentUserManageNode
+                    application.isAuthorizedToManageNode
                         ? [
                             <DeleteApplication
                                 key="deleteApplication"

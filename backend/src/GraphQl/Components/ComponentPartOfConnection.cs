@@ -21,7 +21,7 @@ public sealed class ComponentPartOfConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken

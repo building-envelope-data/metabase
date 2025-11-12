@@ -8,8 +8,8 @@ fragment GnuPgKeyFingerprintPartial on GnuPgKeyFingerprint {
       name
     }
   }
-  canCurrentUserAllowNode
-  canCurrentUserForbidNode
+  isAuthorizedToAllowNode
+  isAuthorizedToForbidNode
 }
 
 mutation AddGnuPgKeyFingerprint(

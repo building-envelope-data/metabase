@@ -46,7 +46,7 @@ public sealed class MethodDeveloperEdge
     }
 
     [UseUserManager]
-    public async Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public async Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization institutionMethodDeveloperAuthorization,
         UserMethodDeveloperAuthorization userMethodDeveloperAuthorization,
@@ -55,17 +55,17 @@ public sealed class MethodDeveloperEdge
     {
         if (_institutionMethodDeveloperEdge is not null)
         {
-            return await _institutionMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken);
+            return await _institutionMethodDeveloperEdge.IsAuthorizedToConfirmEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken);
         }
         if (_userMethodDeveloperEdge is not null)
         {
-            return await _userMethodDeveloperEdge.CanCurrentUserConfirmEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization, cancellationToken);
+            return await _userMethodDeveloperEdge.IsAuthorizedToConfirmEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization, cancellationToken);
         }
         throw new ArgumentException("Impossible!");
     }
 
     [UseUserManager]
-    public async Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public async Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization institutionMethodDeveloperAuthorization,
         UserMethodDeveloperAuthorization userMethodDeveloperAuthorization,
@@ -75,12 +75,12 @@ public sealed class MethodDeveloperEdge
         if (_institutionMethodDeveloperEdge is not null)
         {
             return await _institutionMethodDeveloperEdge
-                .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken);
+                .IsAuthorizedToRemoveEdgeAsync(claimsPrincipal, institutionMethodDeveloperAuthorization, cancellationToken);
         }
         if (_userMethodDeveloperEdge is not null)
         {
             return await _userMethodDeveloperEdge
-                .CanCurrentUserRemoveEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization, cancellationToken);
+                .IsAuthorizedToRemoveEdgeAsync(claimsPrincipal, userMethodDeveloperAuthorization, cancellationToken);
         }
         throw new ArgumentException("Impossible!");
     }

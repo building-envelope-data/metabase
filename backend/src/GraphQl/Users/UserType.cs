@@ -227,16 +227,16 @@ public sealed class UserType
                 UserResolvers.GetRolesCurrentUserCanAddOrRemoveAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserDeleteUser")
-            .ResolveWith<UserResolvers>(x => UserResolvers.CanCurrentUserDeleteUserAsync(default!, default!, default!))
+            .Field("isAuthorizedToDeleteUser")
+            .ResolveWith<UserResolvers>(x => UserResolvers.IsAuthorizedToDeleteUserAsync(default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserManageOpenIdConnect")
-            .ResolveWith<UserResolvers>(x => UserResolvers.CanCurrentUserManageOpenIdConnect(default!, default!, default!))
+            .Field("isAuthorizedToManageOpenIdConnect")
+            .ResolveWith<UserResolvers>(x => UserResolvers.IsAuthorizedToManageOpenIdConnect(default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserAddApprovals")
-            .ResolveWith<UserResolvers>(x => UserResolvers.CanCurrentUserAddApprovals(default!, default!, default!))
+            .Field("isAuthorizedToAddApprovals")
+            .ResolveWith<UserResolvers>(x => UserResolvers.IsAuthorizedToAddApprovals(default!, default!, default!))
             .UseUserManager();
         descriptor
             .Field(t => t.DevelopedMethods)
@@ -324,7 +324,7 @@ public sealed class UserType
             );
         }
 
-        public static Task<bool> CanCurrentUserManageOpenIdConnect(
+        public static Task<bool> IsAuthorizedToManageOpenIdConnect(
             ClaimsPrincipal claimsPrincipal,
             OpenIdConnectAuthorization authorization,
             CancellationToken cancellationToken
@@ -333,7 +333,7 @@ public sealed class UserType
             return authorization.IsAuthorizedToManage(claimsPrincipal, cancellationToken);
         }
 
-        public static Task<bool> CanCurrentUserAddApprovals(
+        public static Task<bool> IsAuthorizedToAddApprovals(
             ClaimsPrincipal claimsPrincipal,
             ApprovalAuthorization authorization,
             CancellationToken cancellationToken
@@ -342,7 +342,7 @@ public sealed class UserType
             return authorization.IsAuthorizedToAddApprovals(claimsPrincipal, cancellationToken);
         }
 
-        public static Task<bool> CanCurrentUserDeleteUserAsync(
+        public static Task<bool> IsAuthorizedToDeleteUserAsync(
             ClaimsPrincipal claimsPrincipal,
             UserAuthorization authorization,
             CancellationToken cancellationToken

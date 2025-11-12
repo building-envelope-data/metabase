@@ -17,7 +17,7 @@ public sealed class ComponentManufacturerEdge(
     private readonly ComponentManufacturer _association = association;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken
@@ -31,7 +31,7 @@ public sealed class ComponentManufacturerEdge(
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentManufacturerAuthorization authorization,
         CancellationToken cancellationToken

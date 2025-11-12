@@ -186,7 +186,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
       ]}
       extra={([] as ReactNode[])
         .concat(
-          institution.canCurrentUserUpdateNode
+          institution.isAuthorizedToUpdateNode
             ? [
               <UpdateInstitution
                 key="updateInstitution"
@@ -200,7 +200,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             : []
         )
         .concat(
-          institution.canCurrentUserDeleteNode
+          institution.isAuthorizedToDeleteNode
             ? [
               <DeleteInstitution
                 key="deleteInstitution"
@@ -210,7 +210,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
             : []
         )
         .concat(
-          institution.canCurrentUserSwitchOperatingStateOfNode
+          institution.isAuthorizedToSwitchOperatingStateOfNode
             ? [
               <SwitchInstitutionOperatingState
                 key="switchInstitutionOperatingState"
@@ -243,7 +243,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
       loading={loading}
       components={institution.manufacturedComponents.edges.map((x) => x.node)}
     />
-    {institution.pendingManufacturedComponents.canCurrentUserConfirmEdge &&
+    {institution.pendingManufacturedComponents.isAuthorizedToConfirmEdge &&
       institution.pendingManufacturedComponents.edges.length >= 1 && (
         <List
           size="small"
@@ -264,7 +264,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
           )}
         />
       )}
-    {institution.manufacturedComponents.canCurrentUserAddEdge && (
+    {institution.manufacturedComponents.isAuthorizedToAddEdge && (
       <CreateComponent manufacturerId={institution.uuid} />
     )}
     <Divider />
@@ -273,7 +273,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
       loading={loading}
       databases={institution.operatedDatabases.edges.map((x) => x.node)}
     />
-    {institution.operatedDatabases.canCurrentUserAddEdge && (
+    {institution.operatedDatabases.isAuthorizedToAddEdge && (
       <CreateDatabase operatorId={institution.uuid} />
     )}
     <Divider />
@@ -282,7 +282,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
       loading={loading}
       dataFormats={institution.managedDataFormats.edges.map((x) => x.node)}
     />
-    {institution.managedDataFormats.canCurrentUserAddEdge && (
+    {institution.managedDataFormats.isAuthorizedToAddEdge && (
       <CreateDataFormat managerId={institution.uuid} />
     )}
     <Divider />
@@ -291,7 +291,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
       loading={loading}
       methods={institution.managedMethods.edges.map((x) => x.node)}
     />
-    {institution.managedMethods.canCurrentUserAddEdge && (
+    {institution.managedMethods.isAuthorizedToAddEdge && (
       <CreateMethod managerId={institution.uuid} />
     )}
     <Divider />
@@ -305,7 +305,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         </List.Item>
       )}
     />
-    {institution.pendingDevelopedMethods.canCurrentUserConfirmEdge &&
+    {institution.pendingDevelopedMethods.isAuthorizedToConfirmEdge &&
       institution.pendingDevelopedMethods.edges.length >= 1 && (
         <List
           size="small"
@@ -335,10 +335,10 @@ export default function Institution({ institutionId }: InstitutionProps) {
       fingerprints={institution.gnuPgKeyFingerprints.edges.map(e => e.node) as GnuPgKeyFingerprintPartialFragment[]}
       institutionId={institution.uuid}
     />
-    {institution.gnuPgKeyFingerprints.canCurrentUserAddEdge && (
+    {institution.gnuPgKeyFingerprints.isAuthorizedToAddEdge && (
       <AddGnuPgKeyFingerprint institutionId={institution.uuid} />
     )}
-    {institution.openIdConnectApplications.canCurrentUserAddEdge && (
+    {institution.openIdConnectApplications.isAuthorizedToAddEdge && (
       <>
         <Divider />
         <Typography.Title level={2}>OpenId Connect Applications</Typography.Title>
@@ -348,7 +348,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         />
       </>
     )}
-    {institution.openIdConnectApplications.canCurrentUserAddEdge && (
+    {institution.openIdConnectApplications.isAuthorizedToAddEdge && (
       <CreateApplication institutionId={institution.uuid} />
     )}
     <Divider />
@@ -362,7 +362,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         </List.Item>
       )}
     />
-    {institution.managedInstitutions.canCurrentUserAddEdge && (
+    {institution.managedInstitutions.isAuthorizedToAddEdge && (
       <CreateInstitution managerId={institution.uuid} />
     )}
     <Divider />
@@ -377,7 +377,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
         </List.Item>
       )}
     />
-    {institution.representatives.canCurrentUserAddEdge &&
+    {institution.representatives.isAuthorizedToAddEdge &&
       institution.pendingRepresentatives.edges.length >= 1 && (
         <List
           size="small"
@@ -391,7 +391,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
           )}
         />
       )}
-    {institution.representatives.canCurrentUserAddEdge && (
+    {institution.representatives.isAuthorizedToAddEdge && (
       <AddInstitutionRepresentative institutionId={institution.uuid} />
     )}
     {institution.manager?.node && (

@@ -21,7 +21,7 @@ public sealed class InstitutionManagedInstitutionConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionAuthorization authorization,
         CancellationToken cancellationToken

@@ -20,7 +20,7 @@ public sealed class InstitutionOperatedDatabaseConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         DatabaseAuthorization authorization,
         CancellationToken cancellationToken

@@ -21,7 +21,7 @@ public sealed class ComponentGeneralizationOfConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentGeneralizationAuthorization authorization,
         CancellationToken cancellationToken

@@ -163,19 +163,19 @@ public sealed class InstitutionType
             .ResolveWith<InstitutionResolvers>(x =>
                 InstitutionResolvers.HasGnuPgKeyFingerprintsAsync(default!, default!, default!, default!));
         descriptor
-            .Field("canCurrentUserUpdateNode")
+            .Field("isAuthorizedToUpdateNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.CanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
+                InstitutionResolvers.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserDeleteNode")
+            .Field("isAuthorizedToDeleteNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.CanCurrentUserDeleteNodeAsync(default!, default!, default!, default!))
+                InstitutionResolvers.IsAuthorizedToDeleteNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
         descriptor
-            .Field("canCurrentUserSwitchOperatingStateOfNode")
+            .Field("isAuthorizedToSwitchOperatingStateOfNode")
             .ResolveWith<InstitutionResolvers>(x =>
-                InstitutionResolvers.CanCurrentUserSwitchOperatingStateOfNodeAsync(default!, default!, default!, default!))
+                InstitutionResolvers.IsAuthorizedToSwitchOperatingStateOfNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
@@ -194,7 +194,7 @@ public sealed class InstitutionType
                 .AnyAsync(cancellationToken);
         }
 
-        public static Task<bool> CanCurrentUserUpdateNodeAsync(
+        public static Task<bool> IsAuthorizedToUpdateNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
             InstitutionAuthorization authorization,
@@ -204,7 +204,7 @@ public sealed class InstitutionType
             return authorization.IsAuthorizedToUpdateInstitution(claimsPrincipal, institution.Id, cancellationToken);
         }
 
-        public static Task<bool> CanCurrentUserDeleteNodeAsync(
+        public static Task<bool> IsAuthorizedToDeleteNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
             InstitutionAuthorization authorization,
@@ -214,7 +214,7 @@ public sealed class InstitutionType
             return authorization.IsAuthorizedToDeleteInstitution(claimsPrincipal, institution.Id, cancellationToken);
         }
 
-        public static Task<bool> CanCurrentUserSwitchOperatingStateOfNodeAsync(
+        public static Task<bool> IsAuthorizedToSwitchOperatingStateOfNodeAsync(
             [Parent] Institution institution,
             ClaimsPrincipal claimsPrincipal,
             InstitutionAuthorization authorization,

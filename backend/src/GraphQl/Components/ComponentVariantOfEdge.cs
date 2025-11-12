@@ -16,7 +16,7 @@ public sealed class ComponentVariantOfEdge(
     private readonly ComponentVariant _association = association;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         ComponentAssemblyAuthorization authorization,
         CancellationToken cancellationToken

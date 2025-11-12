@@ -63,15 +63,15 @@ public sealed class MethodType
             .Field(t => t.UserDeveloperEdges)
             .Ignore();
         descriptor
-            .Field("canCurrentUserUpdateNode")
+            .Field("isAuthorizedToUpdateNode")
             .ResolveWith<MethodResolvers>(x =>
-                MethodResolvers.CanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
+                MethodResolvers.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
     private sealed class MethodResolvers
     {
-        public static Task<bool> CanCurrentUserUpdateNodeAsync(
+        public static Task<bool> IsAuthorizedToUpdateNodeAsync(
             [Parent] Method method,
             ClaimsPrincipal claimsPrincipal,
             MethodAuthorization authorization,

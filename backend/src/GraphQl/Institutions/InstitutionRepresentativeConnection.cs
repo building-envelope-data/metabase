@@ -23,7 +23,7 @@ public sealed class InstitutionRepresentativeConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionRepresentativeAuthorization authorization,
         CancellationToken cancellationToken

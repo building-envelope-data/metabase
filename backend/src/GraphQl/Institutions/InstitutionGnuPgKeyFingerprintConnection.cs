@@ -24,7 +24,7 @@ public sealed class InstitutionGnuPgKeyFingerprintConnection(
 )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         GnuPgKeyFingerprintAuthorization authorization,
         CancellationToken cancellationToken

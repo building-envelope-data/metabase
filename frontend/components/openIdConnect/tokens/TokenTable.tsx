@@ -35,7 +35,7 @@ export default function TokenTable({ applicationId, tokens }: TokenTableProps) {
             key: 'action',
             render: (_, token) => (
                 <Space size="middle">
-                    {token.canCurrentUserRevokeToken ? (
+                    {token.isAuthorizedToRevokeToken ? (
                         <>
                             <RevokeToken
                                 tokenId={token.uuid}

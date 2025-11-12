@@ -247,7 +247,7 @@ export default function User({ userId }: UserProps) {
         </Tag>
       ))}
       extra={[
-        user.canCurrentUserDeleteUser && (
+        user.isAuthorizedToDeleteUser && (
           <Button
             danger
             type="primary"
@@ -303,7 +303,7 @@ export default function User({ userId }: UserProps) {
           </List.Item>
         )}
       />
-      {user.pendingRepresentedInstitutions.canCurrentUserConfirmEdge &&
+      {user.pendingRepresentedInstitutions.isAuthorizedToConfirmEdge &&
         user.pendingRepresentedInstitutions.edges.length >= 1 && (
           <List
             size="small"
@@ -338,7 +338,7 @@ export default function User({ userId }: UserProps) {
           </List.Item>
         )}
       />
-      {user.pendingDevelopedMethods.canCurrentUserConfirmEdge &&
+      {user.pendingDevelopedMethods.isAuthorizedToConfirmEdge &&
         user.pendingDevelopedMethods.edges.length >= 1 && (
           <List
             size="small"

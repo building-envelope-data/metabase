@@ -21,7 +21,7 @@ public sealed class UserDevelopedMethodConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         UserMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken

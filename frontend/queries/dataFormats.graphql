@@ -53,7 +53,7 @@ query DataFormats {
 query DataFormat($uuid: Uuid!) {
   dataFormat(id: $uuid) {
     ...DataFormatPartial
-    canCurrentUserUpdateNode
+    isAuthorizedToUpdateNode
   }
 }
 

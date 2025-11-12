@@ -23,7 +23,7 @@ public sealed class InstitutionDevelopedMethodConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken

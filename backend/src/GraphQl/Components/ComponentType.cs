@@ -125,15 +125,15 @@ public sealed class ComponentType
         descriptor
             .Field(t => t.VariantOfEdges).Ignore();
         descriptor
-            .Field("canCurrentUserUpdateNode")
+            .Field("isAuthorizedToUpdateNode")
             .ResolveWith<ComponentResolvers>(x =>
-                ComponentResolvers.CanCurrentUserUpdateNodeAsync(default!, default!, default!, default!))
+                ComponentResolvers.IsAuthorizedToUpdateNodeAsync(default!, default!, default!, default!))
             .UseUserManager();
     }
 
     private sealed class ComponentResolvers
     {
-        public static Task<bool> CanCurrentUserUpdateNodeAsync(
+        public static Task<bool> IsAuthorizedToUpdateNodeAsync(
             [Parent] Component component,
             ClaimsPrincipal claimsPrincipal,
             ComponentAuthorization authorization,

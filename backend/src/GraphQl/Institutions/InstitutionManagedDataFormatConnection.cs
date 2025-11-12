@@ -21,7 +21,7 @@ public sealed class InstitutionManagedDataFormatConnection(
         )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserAddEdgeAsync(
+    public Task<bool> IsAuthorizedToAddEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         DataFormatAuthorization authorization,
         CancellationToken cancellationToken

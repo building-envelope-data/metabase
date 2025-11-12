@@ -194,7 +194,7 @@ public sealed class DatabaseResolvers(
             .Contains(database.Locator.AbsoluteUri);
     }
 
-    public Task<bool> CanCurrentUserUpdateNodeAsync(
+    public Task<bool> IsAuthorizedToUpdateNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
         DatabaseAuthorization authorization,
@@ -204,7 +204,7 @@ public sealed class DatabaseResolvers(
         return authorization.IsAuthorizedToUpdate(claimsPrincipal, database.Id, cancellationToken);
     }
 
-    public Task<bool> CanCurrentUserVerifyNodeAsync(
+    public Task<bool> IsAuthorizedToVerifyNodeAsync(
         [Parent] Database database,
         ClaimsPrincipal claimsPrincipal,
         DatabaseAuthorization authorization,

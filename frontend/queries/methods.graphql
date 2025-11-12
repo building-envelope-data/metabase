@@ -53,11 +53,11 @@ fragment MethodPartial on Method {
           name
         }
       }
-      canCurrentUserConfirmEdge
-      canCurrentUserRemoveEdge
+      isAuthorizedToConfirmEdge
+      isAuthorizedToRemoveEdge
     }
-    canCurrentUserAddInstitutionEdge
-    canCurrentUserAddUserEdge
+    isAuthorizedToAddInstitutionEdge
+    isAuthorizedToAddUserEdge
   }
   pendingDevelopers: developers(pending: true) {
     edges {
@@ -74,8 +74,8 @@ fragment MethodPartial on Method {
           name
         }
       }
-      canCurrentUserConfirmEdge
-      canCurrentUserRemoveEdge
+      isAuthorizedToConfirmEdge
+      isAuthorizedToRemoveEdge
     }
   }
   manager {
@@ -100,7 +100,7 @@ query Methods {
 query Method($uuid: Uuid!) {
   method(id: $uuid) {
     ...MethodPartial
-    canCurrentUserUpdateNode
+    isAuthorizedToUpdateNode
   }
 }
 

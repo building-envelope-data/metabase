@@ -26,7 +26,7 @@ public sealed class UserRepresentedInstitutionConnection(
     )
 {
     [UseUserManager]
-    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         InstitutionRepresentativeAuthorization authorization,
         CancellationToken cancellationToken

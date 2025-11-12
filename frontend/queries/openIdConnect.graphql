@@ -11,7 +11,7 @@ fragment ApplicationPartial on OpenIdConnectApplication {
   requirements
   postLogoutRedirectUri
   redirectUri
-  canCurrentUserManageNode
+  isAuthorizedToManageNode
 }
 
 fragment AuthorizationPartial on OpenIdConnectAuthorization {
@@ -21,7 +21,7 @@ fragment AuthorizationPartial on OpenIdConnectAuthorization {
   status
   subject
   type
-  canCurrentUserDeleteNode
+  isAuthorizedToDeleteNode
 }
 
 fragment TokenPartial on OpenIdConnectToken {
@@ -33,7 +33,7 @@ fragment TokenPartial on OpenIdConnectToken {
   status
   subject
   type
-  canCurrentUserRevokeNode
+  isAuthorizedToRevokeNode
 }
 
 query Applications {

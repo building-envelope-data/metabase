@@ -259,13 +259,13 @@ type Component implements Node {
   abbreviation: String
   assembledOf(where: ComponentAssembledOfFilterInput @cost(weight: "10")): ComponentAssembledOfConnection! @cost(weight: "10")
   availability: OpenEndedDateTimeRange
-  canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   categories: [ComponentCategory!]!
   concretizationOf(where: ComponentConcretizationOfFilterInput @cost(weight: "10")): ComponentConcretizationOfConnection! @cost(weight: "10")
   description: String!
   extras: Any
   generalizationOf(where: ComponentGeneralizationOfFilterInput @cost(weight: "10")): ComponentGeneralizationOfConnection! @cost(weight: "10")
   id: ID!
+  isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
   manufacturers(pending: Boolean! = false where: ComponentManufacturerFilterInput @cost(weight: "10")): ComponentManufacturerConnection! @cost(weight: "10")
   name: String!
   partOf(where: ComponentPartOfFilterInput @cost(weight: "10")): ComponentPartOfConnection! @cost(weight: "10")
@@ -276,75 +276,75 @@ type Component implements Node {
 }
 
 type ComponentAssembledOfConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentAssembledOfEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentAssembledOfEdge {
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
-  canCurrentUserUpdateEdge: Boolean! @cost(weight: "10")
   index: Byte
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToUpdateEdge: Boolean! @cost(weight: "10")
   node: Component! @cost(weight: "10")
   primeSurface: PrimeSurface
 }
 
 type ComponentConcretizationOfConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentConcretizationOfEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentConcretizationOfEdge {
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: Component! @cost(weight: "10")
 }
 
 type ComponentGeneralizationOfConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentGeneralizationOfEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentGeneralizationOfEdge {
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: Component! @cost(weight: "10")
 }
 
 type ComponentManufacturerConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentManufacturerEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentManufacturerEdge {
-  canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: Institution! @cost(weight: "10")
 }
 
 type ComponentPartOfConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentPartOfEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentPartOfEdge {
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
-  canCurrentUserUpdateEdge: Boolean! @cost(weight: "10")
   index: Byte
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToUpdateEdge: Boolean! @cost(weight: "10")
   node: Component! @cost(weight: "10")
   primeSurface: PrimeSurface
 }
 
 type ComponentVariantOfConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [ComponentVariantOfEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type ComponentVariantOfEdge {
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: Component! @cost(weight: "10")
 }
 
@@ -547,10 +547,10 @@ type DataEdge {
 }
 
 type DataFormat implements Node {
-  canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   description: String!
   extension: String
   id: ID!
+  isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
   manager: DataFormatManagerEdge! @cost(weight: "10")
   mediaType: String!
   name: String!
@@ -588,8 +588,6 @@ type Database implements Node {
   allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: OpticalDataPropositionInput): OpticalDataConnection @cost(weight: "10")
   allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection @cost(weight: "10")
   calorimetricData(id: Uuid! locale: Locale): CalorimetricData @cost(weight: "10")
-  canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
-  canCurrentUserVerifyNode: Boolean! @cost(weight: "10")
   description: String!
   geometricData(id: Uuid! locale: Locale): GeometricData @cost(weight: "10")
   hasCalorimetricData(locale: Locale where: CalorimetricDataPropositionInput): Boolean @cost(weight: "10")
@@ -599,6 +597,8 @@ type Database implements Node {
   hasPhotovoltaicData(locale: Locale where: PhotovoltaicDataPropositionInput): Boolean @cost(weight: "10")
   hygrothermalData(id: Uuid! locale: Locale): HygrothermalData @cost(weight: "10")
   id: ID!
+  isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
+  isAuthorizedToVerifyNode: Boolean! @cost(weight: "10")
   locator: Url!
   name: String!
   operator: DatabaseOperatorEdge! @cost(weight: "10")
@@ -838,13 +838,13 @@ type GetHttpsResourceTreeRoot implements GetHttpsResourceTreeVertex {
 
 type GnuPgKeyFingerprint implements Node {
   allowedAt: DateTime
-  canCurrentUserAllowNode: Boolean! @cost(weight: "10")
-  canCurrentUserForbidNode: Boolean! @cost(weight: "10")
   createdAt: DateTime!
   fingerprint: String!
   forbiddenAt: DateTime
   id: ID!
   institution: GnuPgKeyFingerprintInstitutionEdge! @cost(weight: "10")
+  isAuthorizedToAllowNode: Boolean! @cost(weight: "10")
+  isAuthorizedToForbidNode: Boolean! @cost(weight: "10")
   user: GnuPgKeyFingerprintUserEdge! @cost(weight: "10")
   uuid: Uuid! @cost(weight: "10")
 }
@@ -909,15 +909,15 @@ type HygrothermalDataEdge {
 
 type Institution implements Node {
   abbreviation: String
-  canCurrentUserDeleteNode: Boolean! @cost(weight: "10")
-  canCurrentUserSwitchOperatingStateOfNode: Boolean! @cost(weight: "10")
-  canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   description: String!
   developedMethods(pending: Boolean! = false where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
   gnuPgKeyFingerprints(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): InstitutionGnuPgKeyFingerprintConnection! @cost(weight: "10")
   hasGnuPgKeyFingerprint(where: InstitutionGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   id: ID!
+  isAuthorizedToDeleteNode: Boolean! @cost(weight: "10")
+  isAuthorizedToSwitchOperatingStateOfNode: Boolean! @cost(weight: "10")
+  isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
   managedDataFormats(where: InstitutionManagedDataFormatFilterInput @cost(weight: "10")): InstitutionManagedDataFormatConnection! @cost(weight: "10")
   managedInstitutions(where: InstitutionManagedInstitutionFilterInput @cost(weight: "10")): InstitutionManagedInstitutionConnection! @cost(weight: "10")
   managedMethods(where: InstitutionManagedMethodFilterInput @cost(weight: "10")): InstitutionManagedMethodConnection! @cost(weight: "10")
@@ -935,8 +935,8 @@ type Institution implements Node {
 }
 
 type InstitutionDevelopedMethodConnection {
-  canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionDevelopedMethodEdge!]! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -945,8 +945,8 @@ type InstitutionDevelopedMethodEdge {
 }
 
 type InstitutionGnuPgKeyFingerprintConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionGnuPgKeyFingerprintEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -955,8 +955,8 @@ type InstitutionGnuPgKeyFingerprintEdge {
 }
 
 type InstitutionManagedDataFormatConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionManagedDataFormatEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -965,8 +965,8 @@ type InstitutionManagedDataFormatEdge {
 }
 
 type InstitutionManagedInstitutionConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionManagedInstitutionEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -975,8 +975,8 @@ type InstitutionManagedInstitutionEdge {
 }
 
 type InstitutionManagedMethodConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionManagedMethodEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -989,9 +989,9 @@ type InstitutionManagerEdge {
 }
 
 type InstitutionManufacturedComponentConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
-  canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionManufacturedComponentEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -1000,14 +1000,14 @@ type InstitutionManufacturedComponentEdge {
 }
 
 type InstitutionMethodDeveloperEdge {
-  canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: Institution! @cost(weight: "10")
 }
 
 type InstitutionOperatedDatabaseConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionOperatedDatabaseEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -1016,20 +1016,20 @@ type InstitutionOperatedDatabaseEdge {
 }
 
 type InstitutionOwnedOpenIdConnectApplicationConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionOwnedOpenIdConnectApplicationEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type InstitutionOwnedOpenIdConnectApplicationEdge {
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: OpenIdConnectApplication!
 }
 
 type InstitutionRepresentativeConnection {
-  canCurrentUserAddEdge: Boolean! @cost(weight: "10")
   edges: [InstitutionRepresentativeEdge!]! @cost(weight: "10")
+  isAuthorizedToAddEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -1108,11 +1108,11 @@ type LogoutUserPayload {
 type Method implements Node {
   availability: OpenEndedDateTimeRange
   calculationLocator: Url
-  canCurrentUserUpdateNode: Boolean! @cost(weight: "10")
   categories: [MethodCategory!]!
   description: String!
   developers(pending: Boolean! = false where: IMethodDeveloperFilterInput @cost(weight: "10")): MethodDeveloperConnection! @cost(weight: "10")
   id: ID!
+  isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
   manager: MethodManagerEdge! @cost(weight: "10")
   name: String!
   reference: Reference
@@ -1121,15 +1121,15 @@ type Method implements Node {
 }
 
 type MethodDeveloperConnection {
-  canCurrentUserAddInstitutionEdge: Boolean! @cost(weight: "10")
-  canCurrentUserAddUserEdge: Boolean! @cost(weight: "10")
   edges: [MethodDeveloperEdge!]! @cost(weight: "10")
+  isAuthorizedToAddInstitutionEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToAddUserEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
 type MethodDeveloperEdge {
-  canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: Stakeholder! @cost(weight: "10")
 }
 
@@ -1252,7 +1252,6 @@ type OpenEndedDateTimeRange {
 type OpenIdConnectApplication implements Node {
   applicationType: String
   authorizations: OpenIdConnectApplicationAuthorizationConnection! @cost(weight: "10")
-  canCurrentUserManageNode: Boolean! @cost(weight: "10")
   clientId: String! @cost(weight: "10")
   clientType: String
   consentType: OpenIdConnectConsentType! @cost(weight: "10")
@@ -1260,6 +1259,7 @@ type OpenIdConnectApplication implements Node {
   endpoints: [OpenIdConnectEndpoint!]! @cost(weight: "10")
   grantTypes: [OpenIdConnectGrantType!]! @cost(weight: "10")
   id: ID!
+  isAuthorizedToManageNode: Boolean! @cost(weight: "10")
   owner: OpenIdConnectApplicationOwnerEdge! @cost(weight: "10")
   postLogoutRedirectUri: Url @cost(weight: "10")
   redirectUri: Url @cost(weight: "10")
@@ -1295,9 +1295,9 @@ type OpenIdConnectApplicationTokenEdge {
 
 type OpenIdConnectAuthorization implements Node {
   application: OpenIdConnectAuthorizationApplicationEdge! @cost(weight: "10")
-  canCurrentUserDeleteNode: Boolean! @cost(weight: "10")
   creationDate: DateTime
   id: ID!
+  isAuthorizedToDeleteNode: Boolean! @cost(weight: "10")
   status: String
   subject: String
   tokens: OpenIdConnectAuthorizationTokenConnection! @cost(weight: "10")
@@ -1322,10 +1322,10 @@ type OpenIdConnectAuthorizationTokenEdge {
 type OpenIdConnectToken implements Node {
   application: OpenIdConnectTokenApplicationEdge! @cost(weight: "10")
   authorization: OpenIdConnectTokenAuthorizationEdge! @cost(weight: "10")
-  canCurrentUserRevokeNode: Boolean! @cost(weight: "10")
   creationDate: DateTime
   expirationDate: DateTime
   id: ID!
+  isAuthorizedToRevokeNode: Boolean! @cost(weight: "10")
   redemptionDate: DateTime
   status: String
   subject: String
@@ -1885,15 +1885,15 @@ type UpdateOpenIdConnectApplicationPayload {
 }
 
 type User implements Node {
-  canCurrentUserAddApprovals: Boolean! @cost(weight: "10")
-  canCurrentUserDeleteUser: Boolean! @cost(weight: "10")
-  canCurrentUserManageOpenIdConnect: Boolean! @cost(weight: "10")
   developedMethods(pending: Boolean! = false where: UserDevelopedMethodFilterInput @cost(weight: "10")): UserDevelopedMethodConnection! @cost(weight: "10")
   email: String @cost(weight: "10")
   gnuPgKeyFingerprints(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): UserGnuPgKeyFingerprintConnection! @cost(weight: "10")
   hasGnuPgKeyFingerprint(where: UserGnuPgKeyFingerprintFilterInput @cost(weight: "10")): Boolean! @cost(weight: "10")
   hasPassword: Boolean @cost(weight: "10")
   id: ID!
+  isAuthorizedToAddApprovals: Boolean! @cost(weight: "10")
+  isAuthorizedToDeleteUser: Boolean! @cost(weight: "10")
+  isAuthorizedToManageOpenIdConnect: Boolean! @cost(weight: "10")
   isEmailConfirmed: Boolean @cost(weight: "10")
   isPhoneNumberConfirmed: Boolean @cost(weight: "10")
   "Full name"
@@ -1910,8 +1910,8 @@ type User implements Node {
 }
 
 type UserDevelopedMethodConnection {
-  canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   edges: [UserDevelopedMethodEdge!]! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 
@@ -1929,14 +1929,14 @@ type UserGnuPgKeyFingerprintEdge {
 }
 
 type UserMethodDeveloperEdge {
-  canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
-  canCurrentUserRemoveEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: User! @cost(weight: "10")
 }
 
 type UserRepresentedInstitutionConnection {
-  canCurrentUserConfirmEdge: Boolean! @cost(weight: "10")
   edges: [UserRepresentedInstitutionEdge!]! @cost(weight: "10")
+  isAuthorizedToConfirmEdge: Boolean! @cost(weight: "10")
   totalCount: NonNegativeInt! @cost(weight: "10")
 }
 

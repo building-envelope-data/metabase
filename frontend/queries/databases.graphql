@@ -29,7 +29,7 @@ query PendingDatabases {
     edges {
       node {
         ...DatabasePartial
-        canCurrentUserVerifyNode
+        isAuthorizedToVerifyNode
       }
     }
   }
@@ -38,8 +38,8 @@ query PendingDatabases {
 query Database($uuid: Uuid!) {
   database(id: $uuid) {
     ...DatabasePartial
-    canCurrentUserUpdateNode
-    canCurrentUserVerifyNode
+    isAuthorizedToUpdateNode
+    isAuthorizedToVerifyNode
   }
 }
 

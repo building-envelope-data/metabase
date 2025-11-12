@@ -16,7 +16,7 @@ public sealed class UserMethodDeveloperEdge(
     private readonly UserMethodDeveloper _association = association;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserConfirmEdgeAsync(
+    public Task<bool> IsAuthorizedToConfirmEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         UserMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken
@@ -30,7 +30,7 @@ public sealed class UserMethodDeveloperEdge(
     }
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         UserMethodDeveloperAuthorization authorization,
         CancellationToken cancellationToken

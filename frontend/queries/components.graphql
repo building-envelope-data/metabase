@@ -88,9 +88,9 @@ query Component($uuid: Uuid!) {
           name
           description
         }
-        canCurrentUserRemoveEdge
+        isAuthorizedToRemoveEdge
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     pendingManufacturers: manufacturers(pending: true) {
       edges {
@@ -99,7 +99,7 @@ query Component($uuid: Uuid!) {
           uuid
           name
         }
-        canCurrentUserRemoveEdge
+        isAuthorizedToRemoveEdge
       }
     }
     assembledOf {
@@ -112,10 +112,10 @@ query Component($uuid: Uuid!) {
         }
         index
         primeSurface
-        canCurrentUserUpdateEdge
-        canCurrentUserRemoveEdge
+        isAuthorizedToUpdateEdge
+        isAuthorizedToRemoveEdge
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     partOf {
       edges {
@@ -127,10 +127,10 @@ query Component($uuid: Uuid!) {
         }
         index
         primeSurface
-        canCurrentUserUpdateEdge
-        canCurrentUserRemoveEdge
+        isAuthorizedToUpdateEdge
+        isAuthorizedToRemoveEdge
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     concretizationOf {
       edges {
@@ -140,9 +140,9 @@ query Component($uuid: Uuid!) {
           name
           description
         }
-        canCurrentUserRemoveEdge
+        isAuthorizedToRemoveEdge
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     generalizationOf {
       edges {
@@ -152,9 +152,9 @@ query Component($uuid: Uuid!) {
           name
           description
         }
-        canCurrentUserRemoveEdge
+        isAuthorizedToRemoveEdge
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
     variantOf {
       edges {
@@ -164,11 +164,11 @@ query Component($uuid: Uuid!) {
           name
           description
         }
-        canCurrentUserRemoveEdge
+        isAuthorizedToRemoveEdge
       }
-      canCurrentUserAddEdge
+      isAuthorizedToAddEdge
     }
-    canCurrentUserUpdateNode
+    isAuthorizedToUpdateNode
   }
 }
 

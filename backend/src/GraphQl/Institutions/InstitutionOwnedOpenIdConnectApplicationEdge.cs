@@ -13,7 +13,7 @@ public sealed class InstitutionOwnedOpenIdConnectApplicationEdge(
     public OpenIdConnectApplication Node { get; } = node;
 
     [UseUserManager]
-    public Task<bool> CanCurrentUserRemoveEdgeAsync(
+    public Task<bool> IsAuthorizedToRemoveEdgeAsync(
         ClaimsPrincipal claimsPrincipal,
         Authorization.OpenIdConnectAuthorization authorization,
         CancellationToken cancellationToken
