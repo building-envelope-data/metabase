@@ -515,18 +515,18 @@ ALTER TABLE metabase.method ALTER COLUMN "Validity" TYPE tstzrange USING tstzran
 );
 
 ALTER TABLE metabase.method ALTER COLUMN "Availability" TYPE tstzrange USING tstzrange(
-  lower("Validity"), upper("Validity"),
+  lower("Availability"), upper("Availability"),
   concat(
-    CASE WHEN lower_inc("Validity") THEN '[' else '(' END,
-    CASE WHEN upper_inc("Validity") THEN ']' ELSE ')' END
+    CASE WHEN lower_inc("Availability") THEN '[' else '(' END,
+    CASE WHEN upper_inc("Availability") THEN ']' ELSE ')' END
   )
 );
 
 ALTER TABLE metabase.component ALTER COLUMN "Availability" TYPE tstzrange USING tstzrange(
-  lower("Validity"), upper("Validity"),
+  lower("Availability"), upper("Availability"),
   concat(
-    CASE WHEN lower_inc("Validity") THEN '[' else '(' END,
-    CASE WHEN upper_inc("Validity") THEN ']' ELSE ')' END
+    CASE WHEN lower_inc("Availability") THEN '[' else '(' END,
+    CASE WHEN upper_inc("Availability") THEN ']' ELSE ')' END
   )
 );
 
