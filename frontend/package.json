@@ -40,7 +40,7 @@
     "@graphql-tools/load-files": "^6.6.1",
     "@graphql-tools/merge": "^8.3.18",
     "@graphql-tools/schema": "^9.0.16",
-    "@types/node": "^22.9.0",
+    "@types/node": "^24.10.1",
     "@types/qrcode.react": "^1.0",
     "@types/react": "^18.0",
     "@types/react-dom": "^18.0",

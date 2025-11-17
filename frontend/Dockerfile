@@ -7,7 +7,7 @@
 # Inspired by https://mherman.org/blog/dockerizing-a-react-app/
 
 # https://hub.docker.com/_/node
-FROM node:22.14-bookworm-slim
+FROM node:24.11-bookworm-slim
 
 ARG CERTIFICATE_AUTHORITY_BASE_FILE_NAME
 
