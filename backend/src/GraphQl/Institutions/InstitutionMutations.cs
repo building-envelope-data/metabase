@@ -141,6 +141,9 @@ public sealed class InstitutionMutations
                 InstitutionOperatingState.OPERATING,
                 input.Extras
             )
+            {
+                ManagerId = input.ManagerId
+            }
             : new Institution(
                 input.InstitutionId ?? Guid.Empty,
                 input.Name,
