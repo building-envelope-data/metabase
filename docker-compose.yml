@@ -2,7 +2,7 @@
 services:
   database: # https://hub.docker.com/_/postgres
     # Keep version in sync with the one in ./backend/src/Startup.cs set by calling `SetPostgresVersion`
-    image: postgres:13.13-bookworm
+    image: postgres:13.23-trixie
     # ports:
     #   - 5432:5432
     # For possible command-line arguments see
@@ -30,7 +30,7 @@ services:
       - data:/var/lib/postgresql/data
 
   email: # https://hub.docker.com/r/rnwood/smtp4dev
-    image: rnwood/smtp4dev:v3.1
+    image: rnwood/smtp4dev:v3.10
     # For all configuration options see
     # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
     # ports:
@@ -169,7 +169,7 @@ services:
       - backend
 
   nginx: # https://hub.docker.com/_/nginx
-    image: nginx:1.27-bookworm
+    image: nginx:1.29-trixie-otel
     command: [
       "nginx-debug",
       "-g", "daemon off;"

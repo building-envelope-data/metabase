@@ -3,7 +3,7 @@ services:
   database: # https://hub.docker.com/_/postgres
     restart: always
     # Keep version in sync with the one in ./backend/src/Startup.cs set by calling `SetPostgresVersion`
-    image: postgres:13.13-bookworm
+    image: postgres:13.23-trixie
     # For possible command-line arguments see
     # https://www.postgresql.org/docs/current/app-postgres.html
     # and for possible configuration parameters like `max_connections` see
@@ -28,7 +28,7 @@ services:
 
   email: # https://hub.docker.com/r/rnwood/smtp4dev
     restart: always
-    image: rnwood/smtp4dev:v3.1
+    image: rnwood/smtp4dev:v3.10
     # For all configuration options see
     # https://github.com/rnwood/smtp4dev/blob/master/docker-compose.yml
     healthcheck:
@@ -108,7 +108,7 @@ services:
 
   nginx: # https://hub.docker.com/_/nginx
     restart: always
-    image: nginx:1.27-bookworm
+    image: nginx:1.29-trixie-otel
     command: [
       "nginx",
       "-g", "daemon off;"
