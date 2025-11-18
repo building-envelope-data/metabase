@@ -1,7 +1,6 @@
 # https://docs.docker.com/engine/reference/builder/#dockerignore-file
 
 **/.*
-!.graphql-let.yml
 !.env.local
 **/*.md
 **/*.bak
@@ -40,7 +39,6 @@ yarn-error.log*
 # vercel
 .vercel
 
-# graphql-let
+# graphql-codegen
 __generated__
-*.graphql.d.ts
-*.graphqls.d.ts
+*.generated.ts
