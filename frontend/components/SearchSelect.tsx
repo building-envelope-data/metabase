@@ -7,7 +7,7 @@ export type SearchSelectProps<ValueType> = {
   onChange?: (value: ValueType) => void;
 };
 
-export function SearchSelect<ValueType extends string>({
+export function SearchSelect<ValueType>({
   options,
   mode,
   value,
@@ -26,8 +26,8 @@ export function SearchSelect<ValueType extends string>({
       filterSort={(optionA, optionB) =>
         optionA.label != null && optionB.label != null
           ? optionA.label
-              .toLocaleString()
-              .localeCompare(optionB.label.toLocaleString(), "en")
+            .toLocaleString()
+            .localeCompare(optionB.label.toLocaleString(), "en")
           : 0
       }
       value={value}

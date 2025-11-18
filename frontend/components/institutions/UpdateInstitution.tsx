@@ -1,7 +1,8 @@
+import { useMutation } from '@apollo/client/react';
 import {
   InstitutionsDocument,
-  useUpdateInstitutionMutation,
-} from "../../queries/institutions.graphql";
+  UpdateInstitutionDocument,
+} from "../../queries/institutions.generated";
 import { Alert, Form, Input, Button, Modal } from "antd";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
@@ -27,7 +28,7 @@ export type UpdateInstitutionProps = {
   name: string;
   abbreviation: string | null | undefined;
   description: string;
-  websiteLocator: string;
+  websiteLocator: string | null | undefined;
 };
 
 export default function UpdateInstitution({
@@ -38,7 +39,7 @@ export default function UpdateInstitution({
   websiteLocator,
 }: UpdateInstitutionProps) {
   const [open, setOpen] = useState(false);
-  const [updateInstitutionMutation] = useUpdateInstitutionMutation({
+  const [updateInstitutionMutation] = useMutation(UpdateInstitutionDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -63,7 +64,7 @@ export default function UpdateInstitution({
       try {
         setUpdating(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await updateInstitutionMutation({
+        const { error, data } = await updateInstitutionMutation({
           variables: {
             institutionId: institutionId,
             name: newName,
@@ -73,7 +74,7 @@ export default function UpdateInstitution({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.updateInstitution?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
@@ -81,7 +82,7 @@ export default function UpdateInstitution({
           form
         );
         if (
-          !errors &&
+          !error &&
           !data?.updateInstitution?.errors &&
           data?.updateInstitution?.institution
         ) {

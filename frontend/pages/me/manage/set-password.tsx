@@ -1,6 +1,7 @@
+import { useMutation } from '@apollo/client/react';
 import ManageLayout from "../../../components/me/ManageLayout";
 import { Alert, Input, Button, message, Form, Typography } from "antd";
-import { useSetUserPasswordMutation } from "../../../queries/currentUser.graphql";
+import { SetUserPasswordDocument } from "../../../queries/currentUser.generated";
 import { handleFormErrors } from "../../../lib/form";
 import { useState } from "react";
 
@@ -13,7 +14,7 @@ const tailLayout = {
 };
 
 function Page() {
-  const [setUserPasswordMutation] = useSetUserPasswordMutation();
+  const [setUserPasswordMutation] = useMutation(SetUserPasswordDocument);
 
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
@@ -32,21 +33,21 @@ function Page() {
       try {
         setSetting(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await setUserPasswordMutation({
+        const { error, data } = await setUserPasswordMutation({
           variables: {
             password: password,
             passwordConfirmation: passwordConfirmation,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.setUserPassword?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.setUserPassword?.errors) {
+        if (!error && !data?.setUserPassword?.errors) {
           message.success("Your password has been set.");
           form.resetFields();
         }

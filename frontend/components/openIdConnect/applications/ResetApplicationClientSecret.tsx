@@ -1,10 +1,11 @@
+import { useMutation } from '@apollo/client/react';
 import { Button, message, Modal, Typography } from "antd";
 import { useState } from "react";
 import {
   ApplicationDocument,
   ApplicationsDocument,
-  useResetApplicationClientSecretMutation,
-} from "../../../queries/openIdConnect.graphql";
+  ResetApplicationClientSecretDocument,
+} from "../../../queries/openIdConnect.generated";
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
 import { Scalars } from "../../../__generated__/__types__";
 
@@ -17,7 +18,7 @@ export default function ResetApplicationClientSecret({
 }: ResetApplicationClientSecretProps) {
   const [resetting, setResetting] = useState(false);
 
-  const [resetApplicationClientSecretMutation] = useResetApplicationClientSecretMutation({
+  const [resetApplicationClientSecretMutation] = useMutation(ResetApplicationClientSecretDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -36,13 +37,13 @@ export default function ResetApplicationClientSecret({
   const reset = async () => {
     try {
       setResetting(true);
-      const { errors, data } = await resetApplicationClientSecretMutation({
+      const { error, data } = await resetApplicationClientSecretMutation({
         variables: {
           applicationId: applicationId,
         },
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.resetOpenIdConnectApplicationClientSecret?.errors) {
         // TODO Is this how we want to display errors?
         message.error(

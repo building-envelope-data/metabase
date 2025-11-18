@@ -1,7 +1,8 @@
+import { useQuery } from '@apollo/client/react';
 import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import { Typography } from "antd";
-import { useDataFormatsQuery } from "../../queries/dataFormats.graphql";
+import { DataFormatsDocument } from "../../queries/dataFormats.generated";
 import { useEffect } from "react";
 import Link from "next/link";
 import paths from "../../paths";
@@ -10,7 +11,7 @@ import { DataFormatTable } from "../../components/dataFormats/DataFormatTable";
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-  const { loading, error, data } = useDataFormatsQuery();
+  const { loading, error, data } = useQuery(DataFormatsDocument);
 
   useEffect(() => {
     if (error) {

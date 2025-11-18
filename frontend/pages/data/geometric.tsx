@@ -1,14 +1,13 @@
 import Layout from "../../components/Layout";
 import {
     Table,
-    message,
     Form,
     Button,
     Alert,
     Typography,
     Descriptions,
 } from "antd";
-import { useAllGeometricDataQuery } from "../../queries/data.graphql";
+import { AllGeometricDataDocument } from "../../queries/data.generated";
 import {
     Scalars,
     GeometricDataPropositionInput,
@@ -32,6 +31,7 @@ import {
     UuidPropositionComparator,
     UuidPropositionFormList,
 } from "../../components/UuidPropositionFormList";
+import { useQuery } from "@apollo/client/react";
 
 const layout = {
     labelCol: { span: 8 },
@@ -105,7 +105,7 @@ function Page() {
     );
     const [data, setData] = useState<PartialGeometricData[]>([]);
 
-    const allGeometricDataQuery = useAllGeometricDataQuery({
+    const allGeometricDataQuery = useQuery(AllGeometricDataDocument, {
         skip: true,
         errorPolicy: "all",
     });
@@ -189,9 +189,6 @@ function Page() {
                 );
                 if (error) {
                     console.log(error);
-                    message.error(
-                        error.graphQLErrors.map((error) => error.message).join(" ")
-                    );
                 }
                 const nestedData =
                     data?.databases?.edges?.map(

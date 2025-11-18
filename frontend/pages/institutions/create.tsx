@@ -1,10 +1,11 @@
+import { useQuery } from '@apollo/client/react';
 import { messageApolloError } from "../../lib/apollo";
 import { NextRouter, useRouter } from "next/router";
 import { Skeleton, Row, Col, Card } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { useEffect } from "react";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
+import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import CreateInstitution from "../../components/institutions/CreateInstitution";
 
 function redirectToLoginPage(router: NextRouter): void {
@@ -17,7 +18,7 @@ function redirectToLoginPage(router: NextRouter): void {
 function Page() {
   const router = useRouter();
 
-  const { loading, data, error } = useCurrentUserQuery();
+  const { loading, data, error } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
   const shouldRedirect = !(loading || error || currentUser);
 

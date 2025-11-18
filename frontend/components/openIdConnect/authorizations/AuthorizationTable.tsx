@@ -1,7 +1,7 @@
 import { Space, Table, TableProps } from "antd";
-import { AuthorizationPartialFragment } from "../../../queries/openIdConnect.graphql";
+import { AuthorizationPartialFragment } from "../../../queries/openIdConnect.generated";
 import DeleteAuthorization from "./DeleteAuthorization";
-import { ApplicationDocument } from "../../../queries/openIdConnect.graphql";
+import { ApplicationDocument } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/__types__";
 
 export type AuthorizationTableProps = {

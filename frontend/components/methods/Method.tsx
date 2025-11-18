@@ -1,9 +1,10 @@
+import { useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 import { Scalars } from "../../__generated__/__types__";
 import {
-  MethodDocument,
   MethodsDocument,
-  useMethodQuery,
-} from "../../queries/methods.graphql";
+  MethodDocument,
+} from "../../queries/methods.generated";
 import {
   Tag,
   Skeleton,
@@ -24,19 +25,19 @@ import { Reference } from "../Reference";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
 import { messageApolloError } from "../../lib/apollo";
 import UpdateMethod from "./UpdateMethod";
-import { useRemoveInstitutionMethodDeveloperMutation } from "../../queries/institutionMethodDevelopers.graphql";
-import { useRemoveUserMethodDeveloperMutation } from "../../queries/userMethodDevelopers.graphql";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { RemoveInstitutionMethodDeveloperDocument } from "../../queries/institutionMethodDevelopers.generated";
+import { RemoveUserMethodDeveloperDocument } from "../../queries/userMethodDevelopers.generated";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import AddInstitutionMethodDeveloper from "./AddInstitutionMethodDeveloper";
 import AddUserMethodDeveloper from "./AddUserMethodDeveloper";
-import { UserDocument } from "../../queries/users.graphql";
+import { UserDocument } from "../../queries/users.generated";
 
 export type MethodProps = {
   methodId: Scalars["Uuid"];
 };
 
 export default function Method({ methodId }: MethodProps) {
-  const { loading, error, data } = useMethodQuery({
+  const { loading, error, data } = useQuery(MethodDocument, {
     variables: {
       uuid: methodId,
     },
@@ -49,8 +50,7 @@ export default function Method({ methodId }: MethodProps) {
     }
   }, [error]);
 
-  const [removeInstitutionMethodDeveloperMutation] =
-    useRemoveInstitutionMethodDeveloperMutation();
+  const [removeInstitutionMethodDeveloperMutation] = useMutation(RemoveInstitutionMethodDeveloperDocument);
   const [
     removingInstitutionMethodDeveloper,
     setRemovingInstitutionMethodDeveloper,
@@ -61,7 +61,7 @@ export default function Method({ methodId }: MethodProps) {
   ) => {
     try {
       setRemovingInstitutionMethodDeveloper(true);
-      const { errors, data } = await removeInstitutionMethodDeveloperMutation({
+      const { error, data } = await removeInstitutionMethodDeveloperMutation({
         variables: {
           methodId: methodId,
           institutionId: institutionId,
@@ -84,8 +84,8 @@ export default function Method({ methodId }: MethodProps) {
           },
         ],
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.removeInstitutionMethodDeveloper?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
@@ -99,15 +99,14 @@ export default function Method({ methodId }: MethodProps) {
     }
   };
 
-  const [removeUserMethodDeveloperMutation] =
-    useRemoveUserMethodDeveloperMutation();
+  const [removeUserMethodDeveloperMutation] = useMutation(RemoveUserMethodDeveloperDocument);
   const [removingUserMethodDeveloper, setRemovingUserMethodDeveloper] =
     useState(false);
 
   const removeUserMethodDeveloper = async (userId: Scalars["Uuid"]) => {
     try {
       setRemovingUserMethodDeveloper(true);
-      const { errors, data } = await removeUserMethodDeveloperMutation({
+      const { error, data } = await removeUserMethodDeveloperMutation({
         variables: {
           methodId: methodId,
           userId: userId,
@@ -130,8 +129,8 @@ export default function Method({ methodId }: MethodProps) {
           },
         ],
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.removeUserMethodDeveloper?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
@@ -171,19 +170,19 @@ export default function Method({ methodId }: MethodProps) {
       extra={
         method.isAuthorizedToUpdateNode
           ? [
-              <UpdateMethod
-                key="updateMethod"
-                methodId={method.uuid}
-                name={method.name}
-                description={method.description}
-                validity={method.validity}
-                availability={method.availability}
-                reference={method.reference}
-                calculationLocator={method.calculationLocator}
-                categories={method.categories}
-                managerId={method.manager.node.uuid}
-              />,
-            ]
+            <UpdateMethod
+              key="updateMethod"
+              methodId={method.uuid}
+              name={method.name}
+              description={method.description}
+              validity={method.validity}
+              availability={method.availability}
+              reference={method.reference}
+              calculationLocator={method.calculationLocator}
+              categories={method.categories}
+              managerId={method.manager.node.uuid}
+            />,
+          ]
           : []
       }
       backIcon={false}
@@ -196,11 +195,12 @@ export default function Method({ methodId }: MethodProps) {
         <Descriptions.Item label="Available">
           <OpenEndedDateTimeRangeX range={method.availability} />
         </Descriptions.Item>
-        <Descriptions.Item label="Calculation">
-          <Typography.Link href={method.calculationLocator}>
-            {method.calculationLocator}
-          </Typography.Link>
-        </Descriptions.Item>
+        {method.calculationLocator &&
+          <Descriptions.Item label="Calculation">
+            <Typography.Link href={method.calculationLocator}>
+              {method.calculationLocator}
+            </Typography.Link>
+          </Descriptions.Item>}
         <Descriptions.Item label="Reference">
           <Reference reference={method.reference} />
         </Descriptions.Item>
@@ -214,160 +214,160 @@ export default function Method({ methodId }: MethodProps) {
     {(method.developers.edges.length >= 1 ||
       method.developers.isAuthorizedToAddInstitutionEdge ||
       method.developers.isAuthorizedToAddUserEdge) && (
-      <Row gutter={[16, 16]}>
-        <Col flex={1}>
-          {(method.developers.edges.length >= 1 ||
-            method.developers.isAuthorizedToAddInstitutionEdge) && (
-            <List
-              header="Institution Developers"
-              bordered={true}
-              size="small"
-              footer={
-                method.developers.isAuthorizedToAddInstitutionEdge && (
-                  <AddInstitutionMethodDeveloper methodId={method.uuid} />
-                )
-              }
-            >
-              {method.developers.edges
-                .filter((x) => x.node.__typename == "Institution")
-                .map((x) => (
-                  <List.Item
-                    key={x.node.uuid}
-                    actions={
-                      x.isAuthorizedToRemoveEdge
-                        ? [
-                            <Button
-                              key="remove"
-                              onClick={() =>
-                                removeInstitutionMethodDeveloper(x.node.uuid)
-                              }
-                              loading={removingInstitutionMethodDeveloper}
-                            >
-                              Remove
-                            </Button>,
-                          ]
-                        : []
-                    }
-                  >
-                    <List.Item.Meta
-                      title={
-                        <Link href={paths.institution(x.node.uuid)} legacyBehavior>
-                          {x.node.name}
-                        </Link>
-                      }
-                    />
-                  </List.Item>
-                ))}
-              {method.pendingDevelopers.edges
-                .filter((x) => x.node.__typename == "Institution")
-                .map((x) => (
-                  <List.Item
-                    key={x.node.uuid}
-                    actions={
-                      x.isAuthorizedToRemoveEdge
-                        ? [
-                            <Button
-                              key="remove"
-                              onClick={() =>
-                                removeInstitutionMethodDeveloper(x.node.uuid)
-                              }
-                              loading={removingInstitutionMethodDeveloper}
-                            >
-                              Remove
-                            </Button>,
-                          ]
-                        : []
-                    }
-                  >
-                    <List.Item.Meta
-                      title={
-                        <Link href={paths.institution(x.node.uuid)} legacyBehavior>
-                          {x.node.name} (Pending)
-                        </Link>
-                      }
-                    />
-                  </List.Item>
-                ))}
-            </List>
-          )}
-        </Col>
-        <Col flex={1}>
-          {(method.developers.edges.length >= 1 ||
-            method.developers.isAuthorizedToAddUserEdge) && (
-            <List
-              header="User Developers"
-              bordered={true}
-              size="small"
-              footer={
-                method.developers.isAuthorizedToAddUserEdge && (
-                  <AddUserMethodDeveloper methodId={method.uuid} />
-                )
-              }
-            >
-              {method.developers.edges
-                .filter((x) => x.node.__typename == "User")
-                .map((x) => (
-                  <List.Item
-                    key={x.node.uuid}
-                    actions={
-                      x.isAuthorizedToRemoveEdge
-                        ? [
-                            <Button
-                              key="remove"
-                              onClick={() =>
-                                removeUserMethodDeveloper(x.node.uuid)
-                              }
-                              loading={removingUserMethodDeveloper}
-                            >
-                              Remove
-                            </Button>,
-                          ]
-                        : []
-                    }
-                  >
-                    <List.Item.Meta
-                      title={
-                        <Link href={paths.user(x.node.uuid)} legacyBehavior>
-                          {x.node.name}
-                        </Link>
-                      }
-                    />
-                  </List.Item>
-                ))}
-              {method.pendingDevelopers.edges
-                .filter((x) => x.node.__typename == "User")
-                .map((x) => (
-                  <List.Item
-                    key={x.node.uuid}
-                    actions={
-                      x.isAuthorizedToRemoveEdge
-                        ? [
-                            <Button
-                              key="remove"
-                              onClick={() =>
-                                removeUserMethodDeveloper(x.node.uuid)
-                              }
-                              loading={removingUserMethodDeveloper}
-                            >
-                              Remove
-                            </Button>,
-                          ]
-                        : []
-                    }
-                  >
-                    <List.Item.Meta
-                      title={
-                        <Link href={paths.user(x.node.uuid)} legacyBehavior>
-                          {x.node.name} (Pending)
-                        </Link>
-                      }
-                    />
-                  </List.Item>
-                ))}
-            </List>
-          )}
-        </Col>
-      </Row>
-    )}
+        <Row gutter={[16, 16]}>
+          <Col flex={1}>
+            {(method.developers.edges.length >= 1 ||
+              method.developers.isAuthorizedToAddInstitutionEdge) && (
+                <List
+                  header="Institution Developers"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    method.developers.isAuthorizedToAddInstitutionEdge && (
+                      <AddInstitutionMethodDeveloper methodId={method.uuid} />
+                    )
+                  }
+                >
+                  {method.developers.edges
+                    .filter((x) => x.node.__typename == "Institution")
+                    .map((x) => (
+                      <List.Item
+                        key={x.node.uuid}
+                        actions={
+                          x.isAuthorizedToRemoveEdge
+                            ? [
+                              <Button
+                                key="remove"
+                                onClick={() =>
+                                  removeInstitutionMethodDeveloper(x.node.uuid)
+                                }
+                                loading={removingInstitutionMethodDeveloper}
+                              >
+                                Remove
+                              </Button>,
+                            ]
+                            : []
+                        }
+                      >
+                        <List.Item.Meta
+                          title={
+                            <Link href={paths.institution(x.node.uuid)} legacyBehavior>
+                              {x.node.name}
+                            </Link>
+                          }
+                        />
+                      </List.Item>
+                    ))}
+                  {method.pendingDevelopers.edges
+                    .filter((x) => x.node.__typename == "Institution")
+                    .map((x) => (
+                      <List.Item
+                        key={x.node.uuid}
+                        actions={
+                          x.isAuthorizedToRemoveEdge
+                            ? [
+                              <Button
+                                key="remove"
+                                onClick={() =>
+                                  removeInstitutionMethodDeveloper(x.node.uuid)
+                                }
+                                loading={removingInstitutionMethodDeveloper}
+                              >
+                                Remove
+                              </Button>,
+                            ]
+                            : []
+                        }
+                      >
+                        <List.Item.Meta
+                          title={
+                            <Link href={paths.institution(x.node.uuid)} legacyBehavior>
+                              {x.node.name} (Pending)
+                            </Link>
+                          }
+                        />
+                      </List.Item>
+                    ))}
+                </List>
+              )}
+          </Col>
+          <Col flex={1}>
+            {(method.developers.edges.length >= 1 ||
+              method.developers.isAuthorizedToAddUserEdge) && (
+                <List
+                  header="User Developers"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    method.developers.isAuthorizedToAddUserEdge && (
+                      <AddUserMethodDeveloper methodId={method.uuid} />
+                    )
+                  }
+                >
+                  {method.developers.edges
+                    .filter((x) => x.node.__typename == "User")
+                    .map((x) => (
+                      <List.Item
+                        key={x.node.uuid}
+                        actions={
+                          x.isAuthorizedToRemoveEdge
+                            ? [
+                              <Button
+                                key="remove"
+                                onClick={() =>
+                                  removeUserMethodDeveloper(x.node.uuid)
+                                }
+                                loading={removingUserMethodDeveloper}
+                              >
+                                Remove
+                              </Button>,
+                            ]
+                            : []
+                        }
+                      >
+                        <List.Item.Meta
+                          title={
+                            <Link href={paths.user(x.node.uuid)} legacyBehavior>
+                              {x.node.name}
+                            </Link>
+                          }
+                        />
+                      </List.Item>
+                    ))}
+                  {method.pendingDevelopers.edges
+                    .filter((x) => x.node.__typename == "User")
+                    .map((x) => (
+                      <List.Item
+                        key={x.node.uuid}
+                        actions={
+                          x.isAuthorizedToRemoveEdge
+                            ? [
+                              <Button
+                                key="remove"
+                                onClick={() =>
+                                  removeUserMethodDeveloper(x.node.uuid)
+                                }
+                                loading={removingUserMethodDeveloper}
+                              >
+                                Remove
+                              </Button>,
+                            ]
+                            : []
+                        }
+                      >
+                        <List.Item.Meta
+                          title={
+                            <Link href={paths.user(x.node.uuid)} legacyBehavior>
+                              {x.node.name} (Pending)
+                            </Link>
+                          }
+                        />
+                      </List.Item>
+                    ))}
+                </List>
+              )}
+          </Col>
+        </Row>
+      )}
   </>;
 }

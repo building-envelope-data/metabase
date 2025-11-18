@@ -1,17 +1,22 @@
-import { GraphQLFormattedError } from "graphql";
 import { FormInstance } from "antd";
 import { Dispatch, SetStateAction } from "react";
+import { CombinedGraphQLErrors, ErrorLike } from "@apollo/client";
 
 export function handleFormErrors(
-  graphQlErrors: readonly GraphQLFormattedError[] | undefined,
+  apolloError: ErrorLike | undefined,
   userErrors: { code: string; message: string; path: string[] }[] | undefined,
   setGlobalErrorMessages: Dispatch<SetStateAction<string[]>>,
   form: FormInstance<any>
 ) {
   const globalErrorMessages = new Array<string>();
-  if (graphQlErrors) {
+  if (apolloError) {
     // TODO Is this how we want to handle GraphQl errors?
-    globalErrorMessages.push(...graphQlErrors.map((e) => e.message));
+    globalErrorMessages.push(...`${apolloError.name}: ${apolloError.message}`);
+    if (CombinedGraphQLErrors.is(apolloError)) {
+      globalErrorMessages.push(...apolloError.errors.map((e) =>
+        `${e.message} at path ${e.path?.join(", ")} and locations ${e.locations?.join(", ")}`
+      ));
+    }
   }
   if (userErrors) {
     const errorPathToMessage = userErrors.reduce((a, x) => {

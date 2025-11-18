@@ -1,22 +1,23 @@
+import { useQuery } from '@apollo/client/react';
 import { Skeleton, Result } from "antd";
 import { SearchSelect } from "./SearchSelect";
 import { notEmpty } from "../lib/array";
-import { useComponentsQuery } from "../queries/components.graphql";
+import { ComponentsDocument } from "../queries/components.generated";
 
-export type SelectComponentIdProps<ValueType> = {
+export type SelectComponentIdProps = {
   mode?: "multiple" | "tags";
-  value?: ValueType;
-  onChange?: (value: ValueType) => void;
+  value?: string;
+  onChange?: (value: string) => void;
 };
 
-export function SelectComponentId<ValueType extends string>({
+export function SelectComponentId({
   mode,
   value,
   onChange,
-}: SelectComponentIdProps<ValueType>) {
+}: SelectComponentIdProps) {
   // TODO Only fetch `name` and `uuid` because nothing more is needed.
   // TODO Use search instead of drop-down with all users/components preloaded. Be inspired by https://ant.design/components/select/#components-select-demo-select-users
-  const { loading, data, error } = useComponentsQuery();
+  const { loading, data, error } = useQuery(ComponentsDocument);
   const components = data?.components?.edges?.map((e) => e.node).filter(notEmpty);
 
   if (loading) {

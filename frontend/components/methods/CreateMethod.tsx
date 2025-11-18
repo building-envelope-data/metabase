@@ -1,9 +1,9 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { DatePicker, Select, Alert, Form, Input, Button, Divider } from "antd";
 import {
-  useCreateMethodMutation,
+  CreateMethodDocument,
   MethodsDocument,
-} from "../../queries/methods.graphql";
+} from "../../queries/methods.generated";
 import {
   MethodCategory,
   Scalars,
@@ -11,7 +11,7 @@ import {
 } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import { SelectInstitutionId } from "../SelectInstitutionId";
 import { SelectUserId } from "../SelectUserId";
 import { ReferenceForm } from "../ReferenceForm";
@@ -48,7 +48,7 @@ export type CreateMethodProps = {
 };
 
 export default function CreateMethod({ managerId }: CreateMethodProps) {
-  const [createMethodMutation] = useCreateMethodMutation({
+  const [createMethodMutation] = useMutation(CreateMethodDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -88,7 +88,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createMethodMutation({
+        const { error, data } = await createMethodMutation({
           variables: {
             name: name,
             description: description,
@@ -103,14 +103,14 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.createMethod?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.createMethod?.errors) {
+        if (!error && !data?.createMethod?.errors) {
           form.resetFields();
         }
       } catch (error) {

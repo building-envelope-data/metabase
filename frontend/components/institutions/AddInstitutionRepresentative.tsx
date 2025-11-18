@@ -1,11 +1,11 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Select, Alert, Form, Button } from "antd";
-import { useAddInstitutionRepresentativeMutation } from "../../queries/institutionRepresentatives.graphql";
+import { AddInstitutionRepresentativeDocument } from "../../queries/institutionRepresentatives.generated";
 import { InstitutionRepresentativeRole } from "../../__generated__/__types__";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import { SelectUserId } from "../SelectUserId";
 
 const layout = {
@@ -28,8 +28,7 @@ export type AddInstitutionRepresentativeProps = {
 export default function AddInstitutionRepresentative({
   institutionId,
 }: AddInstitutionRepresentativeProps) {
-  const [addInstitutionRepresentativeMutation] =
-    useAddInstitutionRepresentativeMutation({
+  const [addInstitutionRepresentativeMutation] = useMutation(AddInstitutionRepresentativeDocument, {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
@@ -52,7 +51,7 @@ export default function AddInstitutionRepresentative({
       try {
         setAdding(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addInstitutionRepresentativeMutation({
+        const { error, data } = await addInstitutionRepresentativeMutation({
           variables: {
             institutionId: institutionId,
             userId: userId,
@@ -60,14 +59,14 @@ export default function AddInstitutionRepresentative({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.addInstitutionRepresentative?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.addInstitutionRepresentative?.errors) {
+        if (!error && !data?.addInstitutionRepresentative?.errors) {
           form.resetFields();
         }
       } catch (error) {

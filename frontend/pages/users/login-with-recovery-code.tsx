@@ -1,6 +1,7 @@
+import { useMutation } from '@apollo/client/react';
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
-import { useLoginUserWithRecoveryCodeMutation } from "../../queries/currentUser.graphql";
+import { LoginUserWithRecoveryCodeDocument } from "../../queries/currentUser.generated";
 import { Alert, Form, Input, Button, Row, Col, Card, Typography } from "antd";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import paths from "../../paths";
@@ -13,8 +14,7 @@ function LoginWithRecoveryCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
   const apolloClient = initializeApollo();
-  const [loginUserWithRecoveryCodeMutation] =
-    useLoginUserWithRecoveryCodeMutation();
+  const [loginUserWithRecoveryCodeMutation] = useMutation(LoginUserWithRecoveryCodeDocument);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -25,13 +25,13 @@ function LoginWithRecoveryCode() {
     const loginWithRecoveryCode = async () => {
       try {
         setLoggingIn(true);
-        const { errors, data } = await loginUserWithRecoveryCodeMutation({
+        const { error, data } = await loginUserWithRecoveryCodeMutation({
           variables: {
             recoveryCode: recoveryCode,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.loginUserWithRecoveryCode?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
@@ -39,7 +39,7 @@ function LoginWithRecoveryCode() {
           form
         );
         if (
-          !errors &&
+          !error &&
           !data?.loginUserWithRecoveryCode?.errors &&
           data?.loginUserWithRecoveryCode?.user
         ) {

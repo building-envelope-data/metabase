@@ -1,11 +1,12 @@
+import { useQuery } from '@apollo/client/react';
 import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import paths from "../../paths";
 import { Table, Typography, Divider } from "antd";
-import { useInstitutionsQuery } from "../../queries/institutions.graphql";
+import { InstitutionsDocument } from "../../queries/institutions.generated";
 import { useEffect, useState } from "react";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
+import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import PendingInstitutions from "../../components/institutions/PendingInstitutions";
 import { UserRole } from "../../__generated__/__types__";
 import { setMapValue } from "../../lib/freeTextFilter";
@@ -21,13 +22,13 @@ import { notEmpty } from "../../lib/array";
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-  const { loading, error, data } = useInstitutionsQuery();
+  const { loading, error, data } = useQuery(InstitutionsDocument);
   const nodes = data?.institutions?.edges?.map((e) => e.node).filter(notEmpty) || [];
 
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
   const onFilterTextChange = setMapValue(filterText, setFilterText);
 
-  const currentUser = useCurrentUserQuery()?.data?.currentUser;
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
 
   useEffect(() => {
     if (error) {

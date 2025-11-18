@@ -1,3 +1,5 @@
+import { useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 import {
   Form,
   Typography,
@@ -12,10 +14,9 @@ import ManageLayout from "../../../components/me/ManageLayout";
 import { handleFormErrors } from "../../../lib/form";
 import {
   CurrentUserDocument,
-  useCurrentUserQuery,
-  useChangeUserEmailMutation,
-  useResendUserEmailVerificationMutation,
-} from "../../../queries/currentUser.graphql";
+  ChangeUserEmailDocument,
+  ResendUserEmailVerificationDocument,
+} from "../../../queries/currentUser.generated";
 
 const layout = {
   labelCol: { span: 8 },
@@ -26,10 +27,10 @@ const tailLayout = {
 };
 
 function Page() {
-  const { data } = useCurrentUserQuery();
+  const { data } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
 
-  const [changeUserEmailMutation] = useChangeUserEmailMutation({
+  const [changeUserEmailMutation] = useMutation(ChangeUserEmailDocument, {
     update(cache, { data }) {
       // Read the data from our cache for this query.
       /* const { currentUser } = cache.readQuery({ query: CurrentUserDocument }) */
@@ -46,8 +47,7 @@ function Page() {
         });
     },
   });
-  const [resendUserEmailVerificationMutation] =
-    useResendUserEmailVerificationMutation();
+  const [resendUserEmailVerificationMutation] = useMutation(ResendUserEmailVerificationDocument);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -58,9 +58,9 @@ function Page() {
   const resendUserEmailVerification = async () => {
     try {
       setResending(true);
-      const { errors, data } = await resendUserEmailVerificationMutation();
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      const { error, data } = await resendUserEmailVerificationMutation();
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.resendUserEmailVerification?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
@@ -81,20 +81,20 @@ function Page() {
       try {
         setChanging(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await changeUserEmailMutation({
+        const { error, data } = await changeUserEmailMutation({
           variables: {
             newEmail: newEmail,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.changeUserEmail?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.changeUserEmail?.errors) {
+        if (!error && !data?.changeUserEmail?.errors) {
           message.success(
             "Verification link to change email sent. Please check your email."
           );

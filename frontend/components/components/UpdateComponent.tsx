@@ -1,8 +1,9 @@
+import { useMutation } from '@apollo/client/react';
 import {
   ComponentsDocument,
   ComponentDocument,
-  useUpdateComponentMutation,
-} from "../../queries/components.graphql";
+  UpdateComponentDocument,
+} from "../../queries/components.generated";
 import dayjs from "dayjs";
 import { Alert, Form, Input, Button, Modal, DatePicker, Select, Divider } from "antd";
 import { useState } from "react";
@@ -29,9 +30,9 @@ type FormValues = {
   newAbbreviation: string | null | undefined;
   newDescription: string;
   newAvailability:
-    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-    | null
-    | undefined;
+  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+  | null
+  | undefined;
   newCategories: ComponentCategory[] | null | undefined;
   newPrimeSurface: DescriptionOrReferenceInput | null | undefined;
   newPrimeDirection: DescriptionOrReferenceInput | null | undefined;
@@ -62,7 +63,7 @@ export default function UpdateComponent({
   switchableLayers,
 }: UpdateComponentProps) {
   const [open, setOpen] = useState(false);
-  const [updateComponentMutation] = useUpdateComponentMutation({
+  const [updateComponentMutation] = useMutation(UpdateComponentDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -107,7 +108,7 @@ export default function UpdateComponent({
           newSwitchableLayers.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await updateComponentMutation({
+        const { error, data } = await updateComponentMutation({
           variables: {
             componentId: componentId,
             name: newName,
@@ -124,7 +125,7 @@ export default function UpdateComponent({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.updateComponent?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
@@ -132,7 +133,7 @@ export default function UpdateComponent({
           form
         );
         if (
-          !errors &&
+          !error &&
           !data?.updateComponent?.errors &&
           data?.updateComponent?.component
         ) {

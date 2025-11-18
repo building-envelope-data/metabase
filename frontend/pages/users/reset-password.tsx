@@ -1,5 +1,6 @@
+import { useMutation } from '@apollo/client/react';
 import { useRouter } from "next/router";
-import { useResetUserPasswordMutation } from "../../queries/users.graphql";
+import { ResetUserPasswordDocument } from "../../queries/users.generated";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import paths from "../../paths";
 import { Button, Alert, Form, Input, message, Card, Col, Row } from "antd";
@@ -17,7 +18,7 @@ const tailSingleSignOnLayout = {
 function Page() {
   const router = useRouter();
   const { resetCode, returnTo } = router.query;
-  const [resetUserPasswordMutation] = useResetUserPasswordMutation();
+  const [resetUserPasswordMutation] = useMutation(ResetUserPasswordDocument);
 
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
@@ -39,7 +40,7 @@ function Page() {
       if (typeof resetCode == "string") {
         try {
           setResetting(true);
-          const { errors, data } = await resetUserPasswordMutation({
+          const { error, data } = await resetUserPasswordMutation({
             variables: {
               email: email,
               resetCode: resetCode,
@@ -48,14 +49,14 @@ function Page() {
             },
           });
           handleFormErrors(
-            errors,
+            error,
             data?.resetUserPassword?.errors?.map((x) => {
               return { code: x.code, message: x.message, path: x.path };
             }),
             setGlobalErrorMessages,
             form
           );
-          if (!errors && !data?.resetUserPassword?.errors) {
+          if (!error && !data?.resetUserPassword?.errors) {
             message.success("Your password was reset.");
             await router.push({
               pathname: paths.userLogin,

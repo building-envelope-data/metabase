@@ -1,12 +1,13 @@
+import { useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 import { message, List, Button } from "antd";
 import { useEffect, useState } from "react";
 import {
   DatabaseDocument,
   DatabasesDocument,
   PendingDatabasesDocument,
-  usePendingDatabasesQuery,
-  useVerifyDatabaseMutation,
-} from "../../queries/databases.graphql";
+  VerifyDatabaseDocument,
+} from "../../queries/databases.generated";
 import { Scalars } from "../../__generated__/__types__";
 import Link from "next/link";
 import paths from "../../paths";
@@ -14,8 +15,8 @@ import { messageApolloError } from "../../lib/apollo";
 
 export type PendingDatabasesProps = {};
 
-export default function PendingDatabases({}: PendingDatabasesProps) {
-  const { data, loading, error } = usePendingDatabasesQuery();
+export default function PendingDatabases({ }: PendingDatabasesProps) {
+  const { data, loading, error } = useQuery(PendingDatabasesDocument);
 
   useEffect(() => {
     if (error) {
@@ -23,13 +24,13 @@ export default function PendingDatabases({}: PendingDatabasesProps) {
     }
   }, [error]);
 
-  const [verifyDatabaseMutation] = useVerifyDatabaseMutation();
+  const [verifyDatabaseMutation] = useMutation(VerifyDatabaseDocument);
   const [verifyingDatabase, setVerifyingDatabase] = useState(false);
 
   const verifyDatabase = async (databaseId: Scalars["Uuid"]) => {
     try {
       setVerifyingDatabase(true);
-      const { errors, data } = await verifyDatabaseMutation({
+      const { error, data } = await verifyDatabaseMutation({
         variables: {
           databaseId: databaseId,
         },
@@ -48,8 +49,8 @@ export default function PendingDatabases({}: PendingDatabasesProps) {
           },
         ],
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.verifyDatabase?.errors) {
         // TODO Is this how we want to display errors?
         message.error(

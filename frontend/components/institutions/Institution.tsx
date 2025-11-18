@@ -1,3 +1,5 @@
+import { useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 import {
   Divider,
   List,
@@ -11,10 +13,8 @@ import {
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import {
-  ApplicationPartialFragment,
   InstitutionDocument,
-  useInstitutionQuery,
-} from "../../queries/institutions.graphql";
+} from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/__types__";
 import CreateComponent from "../components/CreateComponent";
 import CreateMethod from "../methods/CreateMethod";
@@ -25,10 +25,10 @@ import AddInstitutionRepresentative from "./AddInstitutionRepresentative";
 import Link from "next/link";
 import paths from "../../paths";
 import { ReactNode, useEffect, useState } from "react";
-import { useConfirmInstitutionMethodDeveloperMutation } from "../../queries/institutionMethodDevelopers.graphql";
-import { MethodDocument } from "../../queries/methods.graphql";
-import { useConfirmComponentManufacturerMutation } from "../../queries/componentManufacturers.graphql";
-import { ComponentDocument } from "../../queries/components.graphql";
+import { ConfirmInstitutionMethodDeveloperDocument } from "../../queries/institutionMethodDevelopers.generated";
+import { MethodDocument } from "../../queries/methods.generated";
+import { ConfirmComponentManufacturerDocument } from "../../queries/componentManufacturers.generated";
+import { ComponentDocument } from "../../queries/components.generated";
 import { DataFormatTable } from "../dataFormats/DataFormatTable";
 import { ComponentTable } from "../components/ComponentTable";
 import DatabaseTable from "../databases/DatabaseTable";
@@ -41,22 +41,22 @@ import ApplicationTable from "../openIdConnect/applications/ApplicationTable";
 import CreateApplication from "../openIdConnect/applications/CreateApplication";
 import GnuPgKeyFingerprintTable from "../gnuPgKeyFingerprints/GnuPgKeyFingerprintTable";
 import AddGnuPgKeyFingerprint from "../gnuPgKeyFingerprints/AddGnuPgKeyFingerprint";
-import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFingerprints.graphql";
+import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
+import { ApplicationPartialFragment } from '../../queries/openIdConnect.generated';
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"];
 };
 
 export default function Institution({ institutionId }: InstitutionProps) {
-  const { loading, error, data } = useInstitutionQuery({
+  const { loading, error, data } = useQuery(InstitutionDocument, {
     variables: {
       uuid: institutionId,
     },
   });
   const institution = data?.institution;
 
-  const [confirmInstitutionMethodDeveloperMutation] =
-    useConfirmInstitutionMethodDeveloperMutation();
+  const [confirmInstitutionMethodDeveloperMutation] = useMutation(ConfirmInstitutionMethodDeveloperDocument);
   const [
     confirmingInstitutionMethodDeveloper,
     setConfirmingInstitutionMethodDeveloper,
@@ -67,7 +67,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
   ) => {
     try {
       setConfirmingInstitutionMethodDeveloper(true);
-      const { errors, data } = await confirmInstitutionMethodDeveloperMutation({
+      const { error, data } = await confirmInstitutionMethodDeveloperMutation({
         variables: {
           methodId: methodId,
           institutionId: institutionId,
@@ -87,8 +87,8 @@ export default function Institution({ institutionId }: InstitutionProps) {
           },
         ],
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.confirmInstitutionMethodDeveloper?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
@@ -102,15 +102,14 @@ export default function Institution({ institutionId }: InstitutionProps) {
     }
   };
 
-  const [confirmComponentManufacturerMutation] =
-    useConfirmComponentManufacturerMutation();
+  const [confirmComponentManufacturerMutation] = useMutation(ConfirmComponentManufacturerDocument);
   const [confirmingComponentManufacturer, setConfirmingComponentManufacturer] =
     useState(false);
 
   const confirmComponentManufacturer = async (componentId: Scalars["Uuid"]) => {
     try {
       setConfirmingComponentManufacturer(true);
-      const { errors, data } = await confirmComponentManufacturerMutation({
+      const { error, data } = await confirmComponentManufacturerMutation({
         variables: {
           componentId: componentId,
           institutionId: institutionId,
@@ -130,8 +129,8 @@ export default function Institution({ institutionId }: InstitutionProps) {
           },
         ],
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.confirmComponentManufacturer?.errors) {
         // TODO Is this how we want to display errors?
         message.error(

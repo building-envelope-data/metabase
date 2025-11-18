@@ -1,11 +1,11 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Button } from "antd";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { MethodDocument } from "../../queries/methods.graphql";
+import { MethodDocument } from "../../queries/methods.generated";
 import { SelectInstitutionId } from "../SelectInstitutionId";
-import { useAddInstitutionMethodDeveloperMutation } from "../../queries/institutionMethodDevelopers.graphql";
+import { AddInstitutionMethodDeveloperDocument } from "../../queries/institutionMethodDevelopers.generated";
 
 const layout = {
   labelCol: { span: 8 },
@@ -24,8 +24,7 @@ export type AddInstitutionMethodDeveloperProps = {
 export default function AddInstitutionMethodDeveloper({
   methodId,
 }: AddInstitutionMethodDeveloperProps) {
-  const [addInstitutionMethodDeveloperMutation] =
-    useAddInstitutionMethodDeveloperMutation({
+  const [addInstitutionMethodDeveloperMutation] = useMutation(AddInstitutionMethodDeveloperDocument, {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
@@ -48,21 +47,21 @@ export default function AddInstitutionMethodDeveloper({
       try {
         setAdding(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addInstitutionMethodDeveloperMutation({
+        const { error, data } = await addInstitutionMethodDeveloperMutation({
           variables: {
             methodId: methodId,
             institutionId: institutionId,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.addInstitutionMethodDeveloper?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.addInstitutionMethodDeveloper?.errors) {
+        if (!error && !data?.addInstitutionMethodDeveloper?.errors) {
           form.resetFields();
         }
       } catch (error) {

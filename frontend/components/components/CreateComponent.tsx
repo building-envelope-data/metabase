@@ -1,14 +1,14 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { DatePicker, Alert, Select, Form, Input, Button, Divider } from "antd";
 import {
-  useCreateComponentMutation,
+  CreateComponentDocument,
   ComponentsDocument,
-} from "../../queries/components.graphql";
+} from "../../queries/components.generated";
 import { ComponentCategory, DescriptionOrReferenceInput, Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import dayjs from "dayjs";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 
 const layout = {
@@ -40,7 +40,7 @@ export type CreateComponentProps = {
 export default function CreateComponent({
   manufacturerId,
 }: CreateComponentProps) {
-  const [createComponentMutation] = useCreateComponentMutation({
+  const [createComponentMutation] = useMutation(CreateComponentDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -85,7 +85,7 @@ export default function CreateComponent({
           switchableLayers.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createComponentMutation({
+        const { error, data } = await createComponentMutation({
           variables: {
             name: name,
             abbreviation: abbreviation,
@@ -99,14 +99,14 @@ export default function CreateComponent({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.createComponent?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.createComponent?.errors) {
+        if (!error && !data?.createComponent?.errors) {
           form.resetFields();
         }
       } catch (error) {

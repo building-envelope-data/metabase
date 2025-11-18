@@ -1,8 +1,9 @@
+import { useMutation } from '@apollo/client/react';
 import {
   UserDocument,
   UsersDocument,
-  useAddUserRoleMutation,
-} from "../../queries/users.graphql";
+  AddUserRoleDocument,
+} from "../../queries/users.generated";
 import { Scalars, UserRole } from "../../__generated__/__types__";
 import { Alert, Form, Button, Select } from "antd";
 import { useState } from "react";
@@ -24,7 +25,7 @@ export type AddUserRoleProps = {
 };
 
 export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
-  const [addUserRoleMutation] = useAddUserRoleMutation({
+  const [addUserRoleMutation] = useMutation(AddUserRoleDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -47,21 +48,21 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
     const add = async () => {
       try {
         setAdding(true);
-        const { errors, data } = await addUserRoleMutation({
+        const { error, data } = await addUserRoleMutation({
           variables: {
             userId: userId,
             role: role,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.addUserRole?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.addUserRole?.errors) {
+        if (!error && !data?.addUserRole?.errors) {
           form.resetFields();
         }
       } catch (error) {

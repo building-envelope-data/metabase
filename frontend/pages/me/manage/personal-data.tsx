@@ -1,4 +1,6 @@
-import { useApolloClient } from "@apollo/client";
+import { useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
+import { useApolloClient } from "@apollo/client/react";
 import {
   Form,
   Typography,
@@ -14,9 +16,9 @@ import ManageLayout from "../../../components/me/ManageLayout";
 import { handleFormErrors } from "../../../lib/form";
 import paths from "../../../paths";
 import {
-  useCurrentUserQuery,
-  useDeletePersonalUserDataMutation,
-} from "../../../queries/currentUser.graphql";
+  CurrentUserDocument,
+  DeletePersonalUserDataDocument,
+} from "../../../queries/currentUser.generated";
 
 const layout = {
   labelCol: { span: 8 },
@@ -29,12 +31,12 @@ const tailLayout = {
 function Page() {
   const router = useRouter();
 
-  const { data } = useCurrentUserQuery();
+  const { data } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
 
   const apolloClient = useApolloClient();
 
-  const [deletePersoanlUserDataMutation] = useDeletePersonalUserDataMutation();
+  const [deletePersoanlUserDataMutation] = useMutation(DeletePersonalUserDataDocument);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -46,20 +48,20 @@ function Page() {
       try {
         setDeleting(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await deletePersoanlUserDataMutation({
+        const { error, data } = await deletePersoanlUserDataMutation({
           variables: {
             password: password,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.deletePersonalUserData?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.deletePersonalUserData?.errors) {
+        if (!error && !data?.deletePersonalUserData?.errors) {
           message.success("Your user data was deleted and account closed.");
           await apolloClient.resetStore();
           await router.push(paths.userLogin);

@@ -1,5 +1,6 @@
+import { useMutation } from '@apollo/client/react';
 import { useState } from "react";
-import { useUpdateApplicationMutation, ApplicationPartialFragment, ApplicationDocument, ApplicationsDocument } from "../../../queries/openIdConnect.graphql";
+import { UpdateApplicationDocument, ApplicationPartialFragment, ApplicationDocument, ApplicationsDocument } from "../../../queries/openIdConnect.generated";
 import { Alert, Button, Form, Input, message, Modal, Select } from "antd";
 import { handleFormErrors } from "../../../lib/form";
 import { OpenIdConnectConsentType, OpenIdConnectEndpoint, OpenIdConnectGrantType, OpenIdConnectResponseType, OpenIdConnectScope, OpenIdConnectRequirement } from "../../../__generated__/__types__";
@@ -34,7 +35,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
   const [updating, setUpdating] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(new Array<string>());
 
-  const [updateApplicationMutation] = useUpdateApplicationMutation({
+  const [updateApplicationMutation] = useMutation(UpdateApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -64,7 +65,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
     const update = async () => {
       try {
         setUpdating(true);
-        const { errors, data } = await updateApplicationMutation({
+        const { error, data } = await updateApplicationMutation({
           variables: {
             applicationId: application.uuid,
             clientId: newClientId,
@@ -79,7 +80,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.updateOpenIdConnectApplication?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
@@ -87,7 +88,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
           form
         );
         if (
-          !errors &&
+          !error &&
           !data?.updateOpenIdConnectApplication?.errors &&
           data?.updateOpenIdConnectApplication?.application
         ) {

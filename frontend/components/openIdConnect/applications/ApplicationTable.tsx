@@ -1,6 +1,6 @@
 import { Skeleton, Table, TableProps } from "antd";
 import paths from "../../../paths";
-import { ApplicationPartialFragment } from "../../../queries/openIdConnect.graphql";
+import { ApplicationPartialFragment } from "../../../queries/openIdConnect.generated";
 import { getUuidColumnProps } from "../../../lib/table";
 import { useState } from "react";
 import { setMapValue } from "../../../lib/freeTextFilter";

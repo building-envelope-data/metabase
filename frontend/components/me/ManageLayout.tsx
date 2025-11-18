@@ -1,7 +1,8 @@
+import { useQuery } from '@apollo/client/react';
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
+import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import { Skeleton, Layout as AntLayout, Menu, Result } from "antd";
 import Layout from "../Layout";
 import paths from "../../paths";
@@ -32,7 +33,7 @@ type ManageLayoutProps = {
 export default function ManageLayout({ children }: ManageLayoutProps) {
   const router = useRouter();
 
-  const { loading, error, data } = useCurrentUserQuery();
+  const { loading, error, data } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
   const shouldRedirect = !(loading || error || currentUser);
 

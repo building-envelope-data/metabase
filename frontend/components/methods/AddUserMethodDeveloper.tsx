@@ -1,11 +1,11 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Button } from "antd";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { MethodDocument } from "../../queries/methods.graphql";
+import { MethodDocument } from "../../queries/methods.generated";
 import { SelectUserId } from "../SelectUserId";
-import { useAddUserMethodDeveloperMutation } from "../../queries/userMethodDevelopers.graphql";
+import { AddUserMethodDeveloperDocument } from "../../queries/userMethodDevelopers.generated";
 
 const layout = {
   labelCol: { span: 8 },
@@ -24,7 +24,7 @@ export type AddUserMethodDeveloperProps = {
 export default function AddUserMethodDeveloper({
   methodId,
 }: AddUserMethodDeveloperProps) {
-  const [addUserMethodDeveloperMutation] = useAddUserMethodDeveloperMutation({
+  const [addUserMethodDeveloperMutation] = useMutation(AddUserMethodDeveloperDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -47,21 +47,21 @@ export default function AddUserMethodDeveloper({
       try {
         setAdding(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addUserMethodDeveloperMutation({
+        const { error, data } = await addUserMethodDeveloperMutation({
           variables: {
             methodId: methodId,
             userId: userId,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.addUserMethodDeveloper?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.addUserMethodDeveloper?.errors) {
+        if (!error && !data?.addUserMethodDeveloper?.errors) {
           form.resetFields();
         }
       } catch (error) {

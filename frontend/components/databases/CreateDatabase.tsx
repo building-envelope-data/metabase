@@ -1,13 +1,13 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Input, Button } from "antd";
 import {
-  useCreateDatabaseMutation,
+  CreateDatabaseDocument,
   DatabasesDocument,
-} from "../../queries/databases.graphql";
+} from "../../queries/databases.generated";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 
 const layout = {
   labelCol: { span: 8 },
@@ -28,7 +28,7 @@ export type CreateDatabaseProps = {
 };
 
 export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
-  const [createDatabaseMutation] = useCreateDatabaseMutation({
+  const [createDatabaseMutation] = useMutation(CreateDatabaseDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -54,7 +54,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
       try {
         setCreating(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createDatabaseMutation({
+        const { error, data } = await createDatabaseMutation({
           variables: {
             name: name,
             description: description,
@@ -63,7 +63,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.createDatabase?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
@@ -71,7 +71,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
           form
         );
         if (
-          !errors &&
+          !error &&
           !data?.createDatabase?.errors &&
           data?.createDatabase?.database
         ) {

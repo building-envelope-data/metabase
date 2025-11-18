@@ -1,6 +1,7 @@
+import { useMutation } from '@apollo/client/react';
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { useLogoutUserMutation } from "../../queries/currentUser.graphql";
+import { LogoutUserDocument } from "../../queries/currentUser.generated";
 import { initializeApollo } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
@@ -8,7 +9,7 @@ import paths from "../../paths";
 function Logout() {
   const router = useRouter();
   const apolloClient = initializeApollo();
-  const [logoutUserMutation] = useLogoutUserMutation();
+  const [logoutUserMutation] = useMutation(LogoutUserDocument);
 
   useEffect(() => {
     const logout = async () => {

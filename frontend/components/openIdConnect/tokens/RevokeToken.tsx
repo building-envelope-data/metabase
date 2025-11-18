@@ -1,8 +1,9 @@
+import { useMutation } from '@apollo/client/react';
 import { Button, message } from "antd";
 import { useState } from "react";
 import {
-  useRevokeTokenMutation,
-} from "../../../queries/openIdConnect.graphql";
+  RevokeTokenDocument,
+} from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/__types__";
 import { DocumentNode } from "graphql";
 
@@ -17,7 +18,7 @@ export default function RevokeToken({
 }: RevokeTokenProps) {
   const [revoking, setRevoking] = useState(false);
 
-  const [revokeTokenMutation] = useRevokeTokenMutation({
+  const [revokeTokenMutation] = useMutation(RevokeTokenDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: refetchQueries,
@@ -26,13 +27,13 @@ export default function RevokeToken({
   const revokeToken = async () => {
     try {
       setRevoking(true);
-      const { errors, data } = await revokeTokenMutation({
+      const { error, data } = await revokeTokenMutation({
         variables: {
           tokenId: tokenId,
         },
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.revokeOpenIdConnectToken?.errors) {
         // TODO Is this how we want to display errors?
         message.error(

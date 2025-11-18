@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client/react';
 import ManageLayout from "../../../components/me/ManageLayout";
 import {
   Input,
@@ -10,9 +11,9 @@ import {
   Skeleton,
 } from "antd";
 import {
-  useGenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation,
-  useEnableUserTwoFactorAuthenticatorMutation,
-} from "../../../queries/currentUser.graphql";
+  GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriDocument,
+  EnableUserTwoFactorAuthenticatorDocument,
+} from "../../../queries/currentUser.generated";
 import { useRouter } from "next/router";
 import paths from "../../../paths";
 import { handleFormErrors } from "../../../lib/form";
@@ -30,10 +31,8 @@ const tailLayout = {
 
 function Page() {
   const router = useRouter();
-  const [generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation] =
-    useGenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
-  const [enableUserTwoFactorAuthenticatorMutation] =
-    useEnableUserTwoFactorAuthenticatorMutation();
+  const [generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation] = useMutation(GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriDocument);
+  const [enableUserTwoFactorAuthenticatorMutation] = useMutation(EnableUserTwoFactorAuthenticatorDocument);
   const [sharedKey, setSharedKey] = useState<string | null | undefined>(
     undefined
   );
@@ -53,7 +52,7 @@ function Page() {
       try {
         setEnabling(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await enableUserTwoFactorAuthenticatorMutation(
+        const { error, data } = await enableUserTwoFactorAuthenticatorMutation(
           {
             variables: {
               verificationCode: verificationCode,
@@ -61,7 +60,7 @@ function Page() {
           }
         );
         handleFormErrors(
-          errors,
+          error,
           data?.enableUserTwoFactorAuthenticator?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
@@ -81,7 +80,7 @@ function Page() {
             data.enableUserTwoFactorAuthenticator.twoFactorRecoveryCodes
           );
         }
-        if (!errors && !data?.enableUserTwoFactorAuthenticator?.errors) {
+        if (!error && !data?.enableUserTwoFactorAuthenticator?.errors) {
           message.success("Your authenticator app has been verified.");
           await router.push(paths.me.manage.twoFactorAuthentication);
         }
@@ -102,10 +101,10 @@ function Page() {
   useEffect(() => {
     const generate = async () => {
       if (router.isReady) {
-        const { errors, data } =
+        const { error, data } =
           await generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation();
-        if (errors) {
-          messageApi.error(errors.map((error) => error.message));
+        if (error) {
+          messageApi.error(`${error.name}: ${error.message}`);
         }
         if (data) {
           setSharedKey(

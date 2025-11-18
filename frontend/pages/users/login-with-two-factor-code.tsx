@@ -1,6 +1,7 @@
+import { useMutation } from '@apollo/client/react';
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
-import { useLoginUserWithTwoFactorCodeMutation } from "../../queries/currentUser.graphql";
+import { LoginUserWithTwoFactorCodeDocument } from "../../queries/currentUser.generated";
 import {
   Alert,
   Form,
@@ -23,8 +24,7 @@ function LoginWithTwoFactorCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
   const apolloClient = initializeApollo();
-  const [loginUserWithTwoFactorCodeMutation] =
-    useLoginUserWithTwoFactorCodeMutation();
+  const [loginUserWithTwoFactorCodeMutation] = useMutation(LoginUserWithTwoFactorCodeDocument);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -41,14 +41,14 @@ function LoginWithTwoFactorCode() {
     const loginWithTwoFactorCode = async () => {
       try {
         setLoggingIn(true);
-        const { errors, data } = await loginUserWithTwoFactorCodeMutation({
+        const { error, data } = await loginUserWithTwoFactorCodeMutation({
           variables: {
             authenticatorCode: authenticatorCode,
             rememberMachine: rememberMachine,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.loginUserWithTwoFactorCode?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
@@ -56,7 +56,7 @@ function LoginWithTwoFactorCode() {
           form
         );
         if (
-          !errors &&
+          !error &&
           !data?.loginUserWithTwoFactorCode?.errors &&
           data?.loginUserWithTwoFactorCode?.user
         ) {

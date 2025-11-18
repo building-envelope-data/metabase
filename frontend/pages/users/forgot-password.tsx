@@ -1,4 +1,5 @@
-import { useRequestUserPasswordResetMutation } from "../../queries/users.graphql";
+import { useMutation } from '@apollo/client/react';
+import { RequestUserPasswordResetDocument } from "../../queries/users.generated";
 import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import { UserOutlined } from "@ant-design/icons";
@@ -11,8 +12,7 @@ import { useRouter } from "next/router";
 function Page() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const [requestUserPasswordResetMutation] =
-    useRequestUserPasswordResetMutation();
+  const [requestUserPasswordResetMutation] = useMutation(RequestUserPasswordResetDocument);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -23,21 +23,21 @@ function Page() {
     const login = async () => {
       try {
         setLoggingIn(true);
-        const { errors, data } = await requestUserPasswordResetMutation({
+        const { error, data } = await requestUserPasswordResetMutation({
           variables: {
             email: email,
             returnTo: returnTo,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.requestUserPasswordReset?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.requestUserPasswordReset?.errors) {
+        if (!error && !data?.requestUserPasswordReset?.errors) {
           await router.push({
             pathname: paths.userCheckYourInboxAfterPasswordResetRequest,
             query: returnTo ? { returnTo: returnTo } : {},

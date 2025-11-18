@@ -1,6 +1,7 @@
+import { useMutation } from '@apollo/client/react';
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
-import { useLoginUserMutation } from "../../queries/currentUser.graphql";
+import { LoginUserDocument } from "../../queries/currentUser.generated";
 import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
 import Link from "next/link";
@@ -14,7 +15,7 @@ function Login() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
   const apolloClient = initializeApollo();
-  const [loginUserMutation] = useLoginUserMutation();
+  const [loginUserMutation] = useMutation(LoginUserDocument);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
@@ -31,21 +32,21 @@ function Login() {
     const login = async () => {
       try {
         setLoggingIn(true);
-        const { errors, data } = await loginUserMutation({
+        const { error, data } = await loginUserMutation({
           variables: {
             email: email,
             password: password,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.loginUser?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.loginUser?.errors) {
+        if (!error && !data?.loginUser?.errors) {
           if (data?.loginUser?.requiresTwoFactor) {
             await router.push({
               pathname: paths.userLoginWithTwoFactorCode,

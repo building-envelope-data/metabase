@@ -1,3 +1,4 @@
+import { useQuery, useMutation } from '@apollo/client/react';
 import {
   Tag,
   Button,
@@ -13,15 +14,14 @@ import { PageHeader } from "@ant-design/pro-layout";
 import { SyncOutlined } from "@ant-design/icons";
 import {
   UsersDocument,
-  useUserQuery,
-  useDeleteUserMutation,
   UserDocument,
-  useRemoveUserRoleMutation,
-} from "../../queries/users.graphql";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
-import { MethodDocument } from "../../queries/methods.graphql";
-import { useConfirmInstitutionRepresentativeMutation } from "../../queries/institutionRepresentatives.graphql";
-import { useConfirmUserMethodDeveloperMutation } from "../../queries/userMethodDevelopers.graphql";
+  DeleteUserDocument,
+  RemoveUserRoleDocument,
+} from "../../queries/users.generated";
+import { InstitutionDocument } from "../../queries/institutions.generated";
+import { MethodDocument } from "../../queries/methods.generated";
+import { ConfirmInstitutionRepresentativeDocument } from "../../queries/institutionRepresentatives.generated";
+import { ConfirmUserMethodDeveloperDocument } from "../../queries/userMethodDevelopers.generated";
 import { Scalars, UserRole } from "../../__generated__/__types__";
 import { useRouter } from "next/router";
 import paths from "../../paths";
@@ -36,7 +36,7 @@ export type UserProps = {
 
 export default function User({ userId }: UserProps) {
   const router = useRouter();
-  const { loading, error, data } = useUserQuery({
+  const { loading, error, data } = useQuery(UserDocument, {
     variables: {
       uuid: userId,
     },
@@ -45,8 +45,7 @@ export default function User({ userId }: UserProps) {
   const rolesCurrentUserCanAndMayWantToAdd =
     user?.rolesCurrentUserCanAdd?.filter((role) => !user.roles?.includes(role));
 
-  const [confirmInstitutionRepresentativeMutation] =
-    useConfirmInstitutionRepresentativeMutation();
+  const [confirmInstitutionRepresentativeMutation] = useMutation(ConfirmInstitutionRepresentativeDocument);
   const [
     confirmingInstitutionRepresentative,
     setConfirmingInstitutionRepresentative,
@@ -57,7 +56,7 @@ export default function User({ userId }: UserProps) {
   ) => {
     try {
       setConfirmingInstitutionRepresentative(true);
-      const { errors, data } = await confirmInstitutionRepresentativeMutation({
+      const { error, data } = await confirmInstitutionRepresentativeMutation({
         variables: {
           institutionId: institutionId,
           userId: userId,
@@ -77,8 +76,8 @@ export default function User({ userId }: UserProps) {
           },
         ],
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.confirmInstitutionRepresentative?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
@@ -92,15 +91,14 @@ export default function User({ userId }: UserProps) {
     }
   };
 
-  const [confirmUserMethodDeveloperMutation] =
-    useConfirmUserMethodDeveloperMutation();
+  const [confirmUserMethodDeveloperMutation] = useMutation(ConfirmUserMethodDeveloperDocument);
   const [confirmingUserMethodDeveloper, setConfirmingUserMethodDeveloper] =
     useState(false);
 
   const confirmUserMethodDeveloper = async (methodId: Scalars["Uuid"]) => {
     try {
       setConfirmingUserMethodDeveloper(true);
-      const { errors, data } = await confirmUserMethodDeveloperMutation({
+      const { error, data } = await confirmUserMethodDeveloperMutation({
         variables: {
           methodId: methodId,
           userId: userId,
@@ -120,8 +118,8 @@ export default function User({ userId }: UserProps) {
           },
         ],
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.confirmUserMethodDeveloper?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
@@ -135,7 +133,7 @@ export default function User({ userId }: UserProps) {
     }
   };
 
-  const [deleteUserMutation] = useDeleteUserMutation({
+  const [deleteUserMutation] = useMutation(DeleteUserDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -149,13 +147,13 @@ export default function User({ userId }: UserProps) {
   const deleteUser = async () => {
     try {
       setDeletingUser(true);
-      const { errors, data } = await deleteUserMutation({
+      const { error, data } = await deleteUserMutation({
         variables: {
           userId: userId,
         },
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.deleteUser?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
@@ -169,7 +167,7 @@ export default function User({ userId }: UserProps) {
     }
   };
 
-  const [removeUserRoleMutation] = useRemoveUserRoleMutation({
+  const [removeUserRoleMutation] = useMutation(RemoveUserRoleDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -189,14 +187,14 @@ export default function User({ userId }: UserProps) {
   const removeUserRole = async (role: UserRole) => {
     try {
       setRemovingUserRole(true);
-      const { errors, data } = await removeUserRoleMutation({
+      const { error, data } = await removeUserRoleMutation({
         variables: {
           userId: userId,
           role: role,
         },
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.removeUserRole?.errors) {
         // TODO Is this how we want to display errors?
         message.error(

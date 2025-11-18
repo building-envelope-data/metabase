@@ -1,3 +1,5 @@
+import { useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 import {
   Form,
   Typography,
@@ -12,9 +14,8 @@ import ManageLayout from "../../../components/me/ManageLayout";
 import { handleFormErrors } from "../../../lib/form";
 import {
   CurrentUserDocument,
-  useCurrentUserQuery,
-  useSetUserPhoneNumberMutation,
-} from "../../../queries/currentUser.graphql";
+  SetUserPhoneNumberDocument,
+} from "../../../queries/currentUser.generated";
 
 const layout = {
   labelCol: { span: 8 },
@@ -25,10 +26,10 @@ const tailLayout = {
 };
 
 function Page() {
-  const { data } = useCurrentUserQuery();
+  const { data } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
 
-  const [setUserPhoneNumberMutation] = useSetUserPhoneNumberMutation({
+  const [setUserPhoneNumberMutation] = useMutation(SetUserPhoneNumberDocument, {
     update(cache, { data }) {
       // Read the data from our cache for this query.
       /* const { currentUser } = cache.readQuery({ query: CurrentUserDocument }) */
@@ -56,20 +57,20 @@ function Page() {
       try {
         setSetting(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await setUserPhoneNumberMutation({
+        const { error, data } = await setUserPhoneNumberMutation({
           variables: {
             phoneNumber: phoneNumber,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.setUserPhoneNumber?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.setUserPhoneNumber?.errors) {
+        if (!error && !data?.setUserPhoneNumber?.errors) {
           message.success("Your new phone number was set.");
         }
       } catch (error) {

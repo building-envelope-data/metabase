@@ -1,10 +1,11 @@
+import { useMutation } from '@apollo/client/react';
 import { useState } from "react";
-import { ApplicationsDocument, useCreateApplicationMutation } from "../../../queries/openIdConnect.graphql";
+import { ApplicationsDocument, CreateApplicationDocument } from "../../../queries/openIdConnect.generated";
 import { Alert, Button, Form, Input, message, Modal, Select, Typography } from "antd";
 import { handleFormErrors } from "../../../lib/form";
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
 import { OpenIdConnectConsentType, OpenIdConnectEndpoint, OpenIdConnectGrantType, OpenIdConnectResponseType, OpenIdConnectScope, OpenIdConnectRequirement, Scalars } from "../../../__generated__/__types__";
-import { InstitutionDocument } from "../../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../../queries/institutions.generated";
 
 const layout = {
     labelCol: { span: 8 },
@@ -31,7 +32,7 @@ export type CreateApplicationProps = {
 };
 
 export default function CreateApplication({ institutionId }: CreateApplicationProps) {
-    const [createApplicationMutation] = useCreateApplicationMutation({
+    const [createApplicationMutation] = useMutation(CreateApplicationDocument, {
         // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
         // See https://www.apollographql.com/docs/react/data/mutations/#options
         refetchQueries: [
@@ -68,7 +69,7 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
                 setCreating(true);
                 // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
 
-                const { errors, data } = await createApplicationMutation({
+                const { error, data } = await createApplicationMutation({
                     variables: {
                         institutionId: institutionId,
                         clientId: clientId,
@@ -83,7 +84,7 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
                     },
                 });
                 handleFormErrors(
-                    errors,
+                    error,
                     data?.createOpenIdConnectApplication?.errors?.map((x) => {
                         return { code: x.code, message: x.message, path: x.path };
                     }),
@@ -91,7 +92,7 @@ export default function CreateApplication({ institutionId }: CreateApplicationPr
                     form
                 );
                 if (
-                    !errors &&
+                    !error &&
                     !data?.createOpenIdConnectApplication?.errors &&
                     data?.createOpenIdConnectApplication?.clientSecret
                 ) {

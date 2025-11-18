@@ -1,8 +1,8 @@
-import * as React from "react";
+import { useQuery } from '@apollo/client/react';
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Menu, Button } from "antd";
-import { useCurrentUserQuery } from "../queries/currentUser.graphql";
+import { CurrentUserDocument } from "../queries/currentUser.generated";
 import paths from "../paths";
 import { getXsrfToken } from "../lib/apollo";
 import { UserOutlined } from "@ant-design/icons";
@@ -21,7 +21,7 @@ export type NavBarProps = {
 
 export default function NavBar({ items }: NavBarProps) {
   const router = useRouter();
-  const currentUser = useCurrentUserQuery()?.data?.currentUser;
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
 
   return <>
     <Menu mode="horizontal" selectedKeys={[router.pathname]} theme="dark" >

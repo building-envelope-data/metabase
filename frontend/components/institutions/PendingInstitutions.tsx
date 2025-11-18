@@ -1,12 +1,13 @@
+import { useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 import { message, List, Button } from "antd";
 import { useEffect, useState } from "react";
 import {
   InstitutionDocument,
   InstitutionsDocument,
   PendingInstitutionsDocument,
-  usePendingInstitutionsQuery,
-  useVerifyInstitutionMutation,
-} from "../../queries/institutions.graphql";
+  VerifyInstitutionDocument,
+} from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/__types__";
 import Link from "next/link";
 import paths from "../../paths";
@@ -14,8 +15,8 @@ import { messageApolloError } from "../../lib/apollo";
 
 export type PendingInstitutionsProps = {};
 
-export default function PendingInstitutions({}: PendingInstitutionsProps) {
-  const { data, loading, error } = usePendingInstitutionsQuery();
+export default function PendingInstitutions({ }: PendingInstitutionsProps) {
+  const { data, loading, error } = useQuery(PendingInstitutionsDocument);
 
   useEffect(() => {
     if (error) {
@@ -23,13 +24,13 @@ export default function PendingInstitutions({}: PendingInstitutionsProps) {
     }
   }, [error]);
 
-  const [verifyInstitutionMutation] = useVerifyInstitutionMutation();
+  const [verifyInstitutionMutation] = useMutation(VerifyInstitutionDocument);
   const [verifyingInstitution, setVerifyingInstitution] = useState(false);
 
   const verifyInstitution = async (institutionId: Scalars["Uuid"]) => {
     try {
       setVerifyingInstitution(true);
-      const { errors, data } = await verifyInstitutionMutation({
+      const { error, data } = await verifyInstitutionMutation({
         variables: {
           institutionId: institutionId,
         },
@@ -48,8 +49,8 @@ export default function PendingInstitutions({}: PendingInstitutionsProps) {
           },
         ],
       });
-      if (errors) {
-        console.log(errors); // TODO What to do?
+      if (error) {
+        console.log(error); // TODO What to do?
       } else if (data?.verifyInstitution?.errors) {
         // TODO Is this how we want to display errors?
         message.error(

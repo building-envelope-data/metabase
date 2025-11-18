@@ -1,10 +1,10 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Button } from "antd";
-import { useAddComponentVariantMutation } from "../../queries/componentVariants.graphql";
+import { AddComponentVariantDocument } from "../../queries/componentVariants.generated";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { ComponentDocument } from "../../queries/components.graphql";
+import { ComponentDocument } from "../../queries/components.generated";
 import { SelectComponentId } from "../SelectComponentId";
 
 const layout = {
@@ -26,7 +26,7 @@ export type AddVariantOfComponentProps = {
 export default function AddVariantOfComponent({
   componentId,
 }: AddVariantOfComponentProps) {
-  const [addComponentVariantMutation] = useAddComponentVariantMutation({
+  const [addComponentVariantMutation] = useMutation(AddComponentVariantDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -49,21 +49,21 @@ export default function AddVariantOfComponent({
       try {
         setAdding(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addComponentVariantMutation({
+        const { error, data } = await addComponentVariantMutation({
           variables: {
             oneComponentId: componentId,
             otherComponentId: variantComponentId,
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.addComponentVariant?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.addComponentVariant?.errors) {
+        if (!error && !data?.addComponentVariant?.errors) {
           form.resetFields();
         }
       } catch (error) {

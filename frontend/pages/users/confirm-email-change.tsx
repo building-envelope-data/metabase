@@ -1,6 +1,7 @@
+import { useMutation } from '@apollo/client/react';
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { useConfirmUserEmailChangeMutation } from "../../queries/users.graphql";
+import { ConfirmUserEmailChangeDocument } from "../../queries/users.generated";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { message, Typography } from "antd";
@@ -8,7 +9,7 @@ import { message, Typography } from "antd";
 function Page() {
   const router = useRouter();
   const { currentEmail, newEmail, confirmationCode } = router.query;
-  const [confirmUserEmailChangeMutation] = useConfirmUserEmailChangeMutation();
+  const [confirmUserEmailChangeMutation] = useMutation(ConfirmUserEmailChangeDocument);
 
   useEffect(() => {
     const confirm = async () => {
@@ -18,16 +19,16 @@ function Page() {
           typeof newEmail === "string" &&
           typeof confirmationCode === "string"
         ) {
-          const { errors, data } = await confirmUserEmailChangeMutation({
+          const { error, data } = await confirmUserEmailChangeMutation({
             variables: {
               currentEmail: currentEmail,
               newEmail: newEmail,
               confirmationCode: confirmationCode,
             },
           });
-          if (errors) {
+          if (error) {
             // TODO Report errors properly.
-            console.log(errors);
+            console.log(error);
           } else if (data?.confirmUserEmailChange?.errors) {
             // TODO Is this how we want to display errors?
             message.error(

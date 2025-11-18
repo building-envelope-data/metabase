@@ -2,7 +2,7 @@ import {
   DatabaseVerificationState,
   Scalars,
 } from "../../__generated__/__types__";
-import { useDatabaseQuery } from "../../queries/databases.graphql";
+import { DatabaseDocument } from "../../queries/databases.generated";
 import { Skeleton, Result, Descriptions, Typography, Tag } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { ReactNode, useEffect } from "react";
@@ -11,13 +11,14 @@ import paths from "../../paths";
 import { messageApolloError } from "../../lib/apollo";
 import UpdateDatabase from "./UpdateDatabase";
 import VerifyDatabase from "./VerifyDatabase";
+import { useQuery } from "@apollo/client/react";
 
 export type DatabaseProps = {
   databaseId: Scalars["Uuid"];
 };
 
 export default function Database({ databaseId }: DatabaseProps) {
-  const { loading, error, data } = useDatabaseQuery({
+  const { loading, error, data } = useQuery(DatabaseDocument, {
     variables: {
       uuid: databaseId,
     },
@@ -52,25 +53,25 @@ export default function Database({ databaseId }: DatabaseProps) {
         .concat(
           database.isAuthorizedToUpdateNode
             ? [
-                <UpdateDatabase
-                  key="updateDatabase"
-                  databaseId={database.uuid}
-                  name={database.name}
-                  description={database.description}
-                  locator={database.locator}
-                />,
-              ]
+              <UpdateDatabase
+                key="updateDatabase"
+                databaseId={database.uuid}
+                name={database.name}
+                description={database.description}
+                locator={database.locator}
+              />,
+            ]
             : []
         )
         .concat(
           database.isAuthorizedToVerifyNode &&
             database.verificationState == DatabaseVerificationState.Pending
             ? [
-                <VerifyDatabase
-                  key="verifyDatabase"
-                  databaseId={database.uuid}
-                />,
-              ]
+              <VerifyDatabase
+                key="verifyDatabase"
+                databaseId={database.uuid}
+              />,
+            ]
             : []
         )}
       tags={[

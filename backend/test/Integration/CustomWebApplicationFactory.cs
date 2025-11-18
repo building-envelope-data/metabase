@@ -1,4 +1,4 @@
-﻿// Inspired by
+// Inspired by
 // https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?customize-webapplicationfactory
 // https://www.thinktecture.com/en/entity-framework-core/isolation-of-integration-tests-in-2-1/
 
@@ -69,7 +69,7 @@ public sealed class CustomWebApplicationFactory
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var connectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=postgres; Maximum Pool Size=90;";
+        var connectionString = $"Host=database; Port=5432; Database=xbase_test_{Guid.NewGuid().ToString().Replace("-", "")}; User Id=postgres; Password=+iUv9drsFZuuFIK/3WuBEd0HshaPqz8qks62cWwF3BM=; Maximum Pool Size=90;";
         // var schemaName = $"metabase_{Guid.NewGuid().ToString().Replace("-", "")}";
         // builder.ConfigureAppConfiguration(_ => _.AddInMemoryCollection([new KeyValuePair<string, string?>("Database__ConnectionString", connectionString)])); // "Database__SchemaName"
         builder.UseEnvironment(Metabase.Program.TestEnvironment);

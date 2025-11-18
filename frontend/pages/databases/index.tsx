@@ -1,10 +1,11 @@
+import { useQuery } from '@apollo/client/react';
 import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { Divider, Table, Typography } from "antd";
-import { useDatabasesQuery } from "../../queries/databases.graphql";
+import { DatabasesDocument } from "../../queries/databases.generated";
 import { useEffect, useState } from "react";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
+import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import { setMapValue } from "../../lib/freeTextFilter";
 import PendingDatabases from "../../components/databases/PendingDatabases";
 import {
@@ -20,13 +21,13 @@ import { UserRole } from "../../__generated__/__types__";
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-  const { loading, error, data } = useDatabasesQuery();
+  const { loading, error, data } = useQuery(DatabasesDocument);
   const nodes = data?.databases?.edges?.map((e) => e.node) || [];
 
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
   const onFilterTextChange = setMapValue(filterText, setFilterText);
 
-  const currentUser = useCurrentUserQuery()?.data?.currentUser;
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
 
   useEffect(() => {
     if (error) {

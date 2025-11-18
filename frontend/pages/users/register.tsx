@@ -1,6 +1,7 @@
+import { useMutation } from '@apollo/client/react';
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
-import { useRegisterUserMutation } from "../../queries/users.graphql";
+import { RegisterUserDocument } from "../../queries/users.generated";
 import { Alert, Form, Input, Button, Row, Col, Card, Typography } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
@@ -19,7 +20,7 @@ const tailLayout = {
 function Register() {
   const router = useRouter();
   const apolloClient = initializeApollo();
-  const [registerUserMutation] = useRegisterUserMutation();
+  const [registerUserMutation] = useMutation(RegisterUserDocument);
   const returnTo = router.query.returnTo;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
@@ -43,7 +44,7 @@ function Register() {
         setRegistering(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
         await apolloClient.resetStore();
-        const { errors, data } = await registerUserMutation({
+        const { error, data } = await registerUserMutation({
           variables: {
             name: name,
             email: email,
@@ -53,7 +54,7 @@ function Register() {
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.registerUser?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
@@ -61,7 +62,7 @@ function Register() {
           form
         );
         if (
-          !errors &&
+          !error &&
           !data?.registerUser?.errors &&
           data?.registerUser?.user
         ) {

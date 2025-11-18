@@ -1,6 +1,7 @@
+import { useQuery } from '@apollo/client/react';
 import Layout from "../../components/Layout";
 import { Table, Typography } from "antd";
-import { useUsersQuery } from "../../queries/users.graphql";
+import { UsersDocument } from "../../queries/users.generated";
 import paths from "../../paths";
 import { useEffect, useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
@@ -15,7 +16,7 @@ import { messageApolloError } from "../../lib/apollo";
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-  const { loading, error, data } = useUsersQuery();
+  const { loading, error, data } = useQuery(UsersDocument);
   const nodes = data?.users?.edges?.map((e) => e.node) || [];
 
   const [filterText, setFilterText] = useState(() => new Map<string, string>());

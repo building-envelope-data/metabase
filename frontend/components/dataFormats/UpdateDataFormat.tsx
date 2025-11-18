@@ -1,9 +1,9 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Input, Button, Divider, Modal } from "antd";
 import {
-  useUpdateDataFormatMutation,
+  UpdateDataFormatDocument,
   DataFormatsDocument,
-} from "../../queries/dataFormats.graphql";
+} from "../../queries/dataFormats.generated";
 import {
   ReferenceInput,
   Scalars,
@@ -12,7 +12,7 @@ import {
 } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 
 const layout = {
@@ -54,7 +54,7 @@ export default function UpdateDataFormat({
   managerId,
 }: UpdateDataFormatProps) {
   const [open, setOpen] = useState(false);
-  const [updateDataFormatMutation] = useUpdateDataFormatMutation({
+  const [updateDataFormatMutation] = useMutation(UpdateDataFormatDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -91,7 +91,7 @@ export default function UpdateDataFormat({
           newReference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await updateDataFormatMutation({
+        const { error, data } = await updateDataFormatMutation({
           variables: {
             dataFormatId: dataFormatId,
             name: newName,
@@ -103,14 +103,14 @@ export default function UpdateDataFormat({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.updateDataFormat?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.updateDataFormat?.errors) {
+        if (!error && !data?.updateDataFormat?.errors) {
           setOpen(false);
         }
       } catch (error) {

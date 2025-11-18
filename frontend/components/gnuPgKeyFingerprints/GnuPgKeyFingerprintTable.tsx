@@ -1,10 +1,10 @@
 import { Skeleton, Space, Table, TableProps } from "antd";
-import { GnuPgKeyFingerprintPartialFragment } from "../../queries/institutions.graphql";
 import Link from "next/link";
 import paths from "../../paths";
 import AllowGnuPgKeyFingerprint from "./AllowGnuPgKeyFingerprint"
 import ForbidGnuPgKeyFingerprint from "./ForbidGnuPgKeyFingerprint";
 import { Scalars } from "../../__generated__/__types__";
+import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
 
 export type GnuPgKeyFingerprintsProps = {
     loading: boolean;

@@ -1,16 +1,18 @@
+import { useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 import { NextRouter, useRouter } from "next/router";
 import {
   InstitutionDocument,
   InstitutionsDocument,
-  useCreateInstitutionMutation,
-} from "../../queries/institutions.graphql";
+  CreateInstitutionDocument,
+} from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/__types__";
 import { Skeleton, Alert, Form, Input, Button } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { useState, useEffect } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
+import { CurrentUserDocument } from "../../queries/currentUser.generated";
 
 const layout = {
   labelCol: { span: 8 },
@@ -45,7 +47,7 @@ export default function CreateInstitution({
 }: CreateInstitutionProps) {
   const router = useRouter();
 
-  const currentUserQuery = useCurrentUserQuery();
+  const currentUserQuery = useQuery(CurrentUserDocument);
   const currentUserLoading = currentUserQuery.loading;
   const currentUser = currentUserQuery.data?.currentUser;
   const shouldRedirect = !(
@@ -54,7 +56,7 @@ export default function CreateInstitution({
     currentUser
   );
 
-  const [createInstitutionMutation] = useCreateInstitutionMutation({
+  const [createInstitutionMutation] = useMutation(CreateInstitutionDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -63,11 +65,11 @@ export default function CreateInstitution({
       },
       ...(managerId
         ? [
-            {
-              query: InstitutionDocument,
-              variables: { uuid: managerId },
-            },
-          ]
+          {
+            query: InstitutionDocument,
+            variables: { uuid: managerId },
+          },
+        ]
         : []),
     ],
   });
@@ -96,7 +98,7 @@ export default function CreateInstitution({
         }
         setCreating(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createInstitutionMutation({
+        const { error, data } = await createInstitutionMutation({
           variables: {
             name: name,
             abbreviation: abbreviation,
@@ -107,7 +109,7 @@ export default function CreateInstitution({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.createInstitution?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
@@ -116,7 +118,7 @@ export default function CreateInstitution({
         );
         if (
           !managerId &&
-          !errors &&
+          !error &&
           !data?.createInstitution?.errors &&
           data?.createInstitution?.institution
         ) {

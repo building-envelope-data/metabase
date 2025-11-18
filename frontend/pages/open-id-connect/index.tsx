@@ -1,15 +1,16 @@
+import { useQuery } from '@apollo/client/react';
 import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import { useEffect } from "react";
-import { useCurrentUserQuery } from "../../queries/currentUser.graphql";
+import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import ApplicationTable from "../../components/openIdConnect/applications/ApplicationTable";
 import { useRouter } from "next/router";
 import paths, { redirectToLoginPage } from "../../paths";
-import { ApplicationPartialFragment, useApplicationsQuery } from "../../queries/openIdConnect.graphql";
+import { ApplicationPartialFragment, ApplicationsDocument } from "../../queries/openIdConnect.generated";
 
 function Page() {
-  const { loading, error, data } = useApplicationsQuery();
-  const currentUser = useCurrentUserQuery()?.data?.currentUser;
+  const { loading, error, data } = useQuery(ApplicationsDocument);
+  const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
   const router = useRouter();
   const shouldRedirect = !(loading || error || currentUser);
 

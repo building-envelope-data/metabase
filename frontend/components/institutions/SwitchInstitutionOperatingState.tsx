@@ -1,10 +1,11 @@
+import { useMutation } from '@apollo/client/react';
 import { Button, message } from "antd";
 import { useState } from "react";
 import {
   InstitutionDocument,
   InstitutionsDocument,
-  useSwitchInstitutionOperatingStateMutation,
-} from "../../queries/institutions.graphql";
+  SwitchInstitutionOperatingStateDocument,
+} from "../../queries/institutions.generated";
 import { Scalars } from "../../__generated__/__types__";
 
 export type switchInstitutionOperatingStateProps = {
@@ -16,12 +17,12 @@ export default function SwitchInstitutionOperatingState({
 }: switchInstitutionOperatingStateProps) {
   const [switching, setSwitching] = useState(false);
 
-  const [switchInstitutionOperatingStateMutation] = useSwitchInstitutionOperatingStateMutation();
+  const [switchInstitutionOperatingStateMutation] = useMutation(SwitchInstitutionOperatingStateDocument);
 
   const switchInstitutionOperatingState = async () => {
     try {
       setSwitching(true);
-      const { errors, data } = await switchInstitutionOperatingStateMutation({
+      const { error, data } = await switchInstitutionOperatingStateMutation({
         variables: {
           institutionId: institutionId,
         },
@@ -37,8 +38,8 @@ export default function SwitchInstitutionOperatingState({
           },
         ],
       });
-      if (errors) {
-        console.log(errors);
+      if (error) {
+        console.log(error);
       } else if (data?.switchInstitutionOperatingState?.errors) {
         message.error(
           data?.switchInstitutionOperatingState?.errors

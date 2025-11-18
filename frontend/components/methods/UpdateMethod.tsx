@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import {
   DatePicker,
   Select,
@@ -10,9 +10,9 @@ import {
   Modal,
 } from "antd";
 import {
-  useUpdateMethodMutation,
+  UpdateMethodDocument,
   MethodsDocument,
-} from "../../queries/methods.graphql";
+} from "../../queries/methods.generated";
 import {
   MethodCategory,
   Scalars,
@@ -23,7 +23,7 @@ import {
 } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 import * as dayjs from "dayjs";
 
@@ -75,7 +75,7 @@ export default function UpdateMethod({
   managerId,
 }: UpdateMethodProps) {
   const [open, setOpen] = useState(false);
-  const [updateMethodMutation] = useUpdateMethodMutation({
+  const [updateMethodMutation] = useMutation(UpdateMethodDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -113,7 +113,7 @@ export default function UpdateMethod({
           newReference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await updateMethodMutation({
+        const { error, data } = await updateMethodMutation({
           variables: {
             methodId: methodId,
             name: newName,
@@ -129,14 +129,14 @@ export default function UpdateMethod({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.updateMethod?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.updateMethod?.errors) {
+        if (!error && !data?.updateMethod?.errors) {
           setOpen(false);
         }
       } catch (error) {

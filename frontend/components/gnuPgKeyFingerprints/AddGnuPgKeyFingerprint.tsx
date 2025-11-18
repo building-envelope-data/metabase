@@ -1,12 +1,12 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Input, Button, Typography } from "antd";
 import {
-    useAddGnuPgKeyFingerprintMutation,
-} from "../../queries/gnuPgKeyFingerprints.graphql";
+    AddGnuPgKeyFingerprintDocument,
+} from "../../queries/gnuPgKeyFingerprints.generated";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 
 const layout = {
     labelCol: { span: 8 },
@@ -25,7 +25,7 @@ export type AddGnuPgKeyFingerprintProps = {
 };
 
 export default function AddGnuPgKeyFingerprint({ institutionId }: AddGnuPgKeyFingerprintProps) {
-    const [addGnuPgKeyFingerprintMutation] = useAddGnuPgKeyFingerprintMutation({
+    const [addGnuPgKeyFingerprintMutation] = useMutation(AddGnuPgKeyFingerprintDocument, {
         // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
         // See https://www.apollographql.com/docs/react/data/mutations/#options
         refetchQueries: [
@@ -48,14 +48,14 @@ export default function AddGnuPgKeyFingerprint({ institutionId }: AddGnuPgKeyFin
             try {
                 setCreating(true);
                 // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-                const { errors, data } = await addGnuPgKeyFingerprintMutation({
+                const { error, data } = await addGnuPgKeyFingerprintMutation({
                     variables: {
                         fingerprint: fingerprint,
                         institutionId: institutionId,
                     },
                 });
                 handleFormErrors(
-                    errors,
+                    error,
                     data?.addGnuPgKeyFingerprint?.errors?.map((x) => {
                         return { code: x.code, message: x.message, path: x.path };
                     }),
@@ -63,7 +63,7 @@ export default function AddGnuPgKeyFingerprint({ institutionId }: AddGnuPgKeyFin
                     form
                 );
                 if (
-                    !errors &&
+                    !error &&
                     !data?.addGnuPgKeyFingerprint?.errors &&
                     data?.addGnuPgKeyFingerprint?.gnuPgKeyFingerprint
                 ) {

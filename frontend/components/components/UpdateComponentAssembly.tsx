@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import {
   Alert,
   Form,
@@ -9,11 +9,11 @@ import {
   Modal,
   Space,
 } from "antd";
-import { useUpdateComponentAssemblyMutation } from "../../queries/componentAssemblies.graphql";
+import { UpdateComponentAssemblyDocument } from "../../queries/componentAssemblies.generated";
 import { PrimeSurface, Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { ComponentDocument } from "../../queries/components.graphql";
+import { ComponentDocument } from "../../queries/components.generated";
 
 const layout = {
   labelCol: { span: 8 },
@@ -42,7 +42,7 @@ export default function UpdateComponentAssembly({
   primeSurface,
 }: UpdateComponentAssemblyProps) {
   const [open, setOpen] = useState(false);
-  const [updateComponentAssemblyMutation] = useUpdateComponentAssemblyMutation({
+  const [updateComponentAssemblyMutation] = useMutation(UpdateComponentAssemblyDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -71,7 +71,7 @@ export default function UpdateComponentAssembly({
       try {
         setUpdating(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await updateComponentAssemblyMutation({
+        const { error, data } = await updateComponentAssemblyMutation({
           variables: {
             assembledComponentId: assembledComponent.uuid,
             partComponentId: partComponent.uuid,
@@ -80,14 +80,14 @@ export default function UpdateComponentAssembly({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.updateComponentAssembly?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.updateComponentAssembly?.errors) {
+        if (!error && !data?.updateComponentAssembly?.errors) {
           setOpen(false);
         }
       } catch (error) {

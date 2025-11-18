@@ -1,16 +1,16 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Input, Button, Divider } from "antd";
 import {
-  useCreateDataFormatMutation,
+  CreateDataFormatDocument,
   DataFormatsDocument,
-} from "../../queries/dataFormats.graphql";
+} from "../../queries/dataFormats.generated";
 import {
   ReferenceInput,
   Scalars,
 } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 import { ReferenceForm } from "../ReferenceForm";
 
 const layout = {
@@ -35,7 +35,7 @@ export type CreateDataFormatProps = {
 };
 
 export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
-  const [createDataFormatMutation] = useCreateDataFormatMutation({
+  const [createDataFormatMutation] = useMutation(CreateDataFormatDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -72,7 +72,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
           reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await createDataFormatMutation({
+        const { error, data } = await createDataFormatMutation({
           variables: {
             name: name,
             extension: extension,
@@ -84,14 +84,14 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.createDataFormat?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.createDataFormat?.errors) {
+        if (!error && !data?.createDataFormat?.errors) {
           form.resetFields();
         }
       } catch (error) {

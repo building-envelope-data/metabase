@@ -1,10 +1,10 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Input, Button, Modal } from "antd";
 import {
-  useUpdateDatabaseMutation,
+  UpdateDatabaseDocument,
   DatabasesDocument,
   DatabaseDocument,
-} from "../../queries/databases.graphql";
+} from "../../queries/databases.generated";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
@@ -37,7 +37,7 @@ export default function UpdateDatabase({
   locator,
 }: UpdateDatabaseProps) {
   const [open, setOpen] = useState(false);
-  const [updateDatabaseMutation] = useUpdateDatabaseMutation({
+  const [updateDatabaseMutation] = useMutation(UpdateDatabaseDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -63,7 +63,7 @@ export default function UpdateDatabase({
       try {
         setUpdating(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await updateDatabaseMutation({
+        const { error, data } = await updateDatabaseMutation({
           variables: {
             databaseId: databaseId,
             name: newName,
@@ -72,14 +72,14 @@ export default function UpdateDatabase({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.updateDatabase?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.updateDatabase?.errors)
+        if (!error && !data?.updateDatabase?.errors)
           data?.updateDatabase?.database;
         {
           setOpen(false);

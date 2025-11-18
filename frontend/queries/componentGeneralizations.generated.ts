@@ -1,0 +1,22 @@
+import type * as Types from '../__generated__/graphql';
+
+import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+export type AddComponentGeneralizationMutationVariables = Types.Exact<{
+  generalComponentId: Types.Scalars['Uuid']['input'];
+  concreteComponentId: Types.Scalars['Uuid']['input'];
+}>;
+
+
+export type AddComponentGeneralizationMutation = { addComponentGeneralization: { __typename: 'AddComponentGeneralizationPayload', errors: Array<{ __typename: 'AddComponentGeneralizationError', code: Types.AddComponentGeneralizationErrorCode, message: string, path: Array<string> }> | null } };
+
+export type RemoveComponentGeneralizationMutationVariables = Types.Exact<{
+  generalComponentId: Types.Scalars['Uuid']['input'];
+  concreteComponentId: Types.Scalars['Uuid']['input'];
+}>;
+
+
+export type RemoveComponentGeneralizationMutation = { removeComponentGeneralization: { __typename: 'RemoveComponentGeneralizationPayload', errors: Array<{ __typename: 'RemoveComponentGeneralizationError', code: Types.RemoveComponentGeneralizationErrorCode, message: string, path: Array<string> }> | null } };
+
+
+export const AddComponentGeneralizationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddComponentGeneralization"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"generalComponentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Uuid"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"concreteComponentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Uuid"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addComponentGeneralization"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"generalComponentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"generalComponentId"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"concreteComponentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"concreteComponentId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"path"}}]}}]}}]}}]} as unknown as DocumentNode<AddComponentGeneralizationMutation, AddComponentGeneralizationMutationVariables>;
+export const RemoveComponentGeneralizationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveComponentGeneralization"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"generalComponentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Uuid"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"concreteComponentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Uuid"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeComponentGeneralization"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"generalComponentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"generalComponentId"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"concreteComponentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"concreteComponentId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"path"}}]}}]}}]}}]} as unknown as DocumentNode<RemoveComponentGeneralizationMutation, RemoveComponentGeneralizationMutationVariables>;

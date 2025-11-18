@@ -1,11 +1,11 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Button, message } from "antd";
 import {
-    useForbidGnuPgKeyFingerprintMutation,
-} from "../../queries/gnuPgKeyFingerprints.graphql";
+    ForbidGnuPgKeyFingerprintDocument,
+} from "../../queries/gnuPgKeyFingerprints.generated";
 import { Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
-import { InstitutionDocument } from "../../queries/institutions.graphql";
+import { InstitutionDocument } from "../../queries/institutions.generated";
 
 export type ForbidGnuPgKeyFingerprintProps = {
     fingerprint: string;
@@ -13,7 +13,7 @@ export type ForbidGnuPgKeyFingerprintProps = {
 };
 
 export default function ForbidGnuPgKeyFingerprint({ fingerprint, institutionId }: ForbidGnuPgKeyFingerprintProps) {
-    const [forbidGnuPgKeyFingerprintMutation] = useForbidGnuPgKeyFingerprintMutation({
+    const [forbidGnuPgKeyFingerprintMutation] = useMutation(ForbidGnuPgKeyFingerprintDocument, {
         // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-forbids
         // See https://www.apollographql.com/docs/react/data/mutations/#options
         refetchQueries: [
@@ -31,13 +31,13 @@ export default function ForbidGnuPgKeyFingerprint({ fingerprint, institutionId }
         try {
             setForbidding(true);
             // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-            const { errors, data } = await forbidGnuPgKeyFingerprintMutation({
+            const { error, data } = await forbidGnuPgKeyFingerprintMutation({
                 variables: {
                     fingerprint: fingerprint,
                 },
             });
-            if (errors) {
-                console.log(errors); // TODO What to do?
+            if (error) {
+                console.log(error); // TODO What to do?
             } else if (data?.forbidGnuPgKeyFingerprint?.errors) {
                 // TODO Is this how we want to display errors?
                 message.error(

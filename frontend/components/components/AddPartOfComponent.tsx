@@ -1,10 +1,10 @@
-import * as React from "react";
+import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Button, InputNumber, Select } from "antd";
-import { useAddComponentAssemblyMutation } from "../../queries/componentAssemblies.graphql";
+import { AddComponentAssemblyDocument } from "../../queries/componentAssemblies.generated";
 import { PrimeSurface, Scalars } from "../../__generated__/__types__";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { ComponentDocument } from "../../queries/components.graphql";
+import { ComponentDocument } from "../../queries/components.generated";
 import { SelectComponentId } from "../SelectComponentId";
 
 const layout = {
@@ -28,7 +28,7 @@ export type AddPartOfComponentProps = {
 export default function AddPartOfComponent({
   assembledComponentId,
 }: AddPartOfComponentProps) {
-  const [addComponentAssemblyMutation] = useAddComponentAssemblyMutation({
+  const [addComponentAssemblyMutation] = useMutation(AddComponentAssemblyDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     // See https://www.apollographql.com/docs/react/data/mutations/#options
     refetchQueries: [
@@ -51,7 +51,7 @@ export default function AddPartOfComponent({
       try {
         setAdding(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await addComponentAssemblyMutation({
+        const { error, data } = await addComponentAssemblyMutation({
           variables: {
             assembledComponentId: assembledComponentId,
             partComponentId: partComponentId,
@@ -60,14 +60,14 @@ export default function AddPartOfComponent({
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.addComponentAssembly?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.addComponentAssembly?.errors) {
+        if (!error && !data?.addComponentAssembly?.errors) {
           form.resetFields();
         }
       } catch (error) {

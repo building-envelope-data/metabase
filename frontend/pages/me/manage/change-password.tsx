@@ -1,6 +1,7 @@
+import { useMutation } from '@apollo/client/react';
 import ManageLayout from "../../../components/me/ManageLayout";
 import { Alert, Input, Button, message, Form } from "antd";
-import { useChangeUserPasswordMutation } from "../../../queries/currentUser.graphql";
+import { ChangeUserPasswordDocument } from "../../../queries/currentUser.generated";
 import { handleFormErrors } from "../../../lib/form";
 import { useState } from "react";
 
@@ -13,7 +14,7 @@ const tailLayout = {
 };
 
 function Page() {
-  const [changeUserPasswordMutation] = useChangeUserPasswordMutation();
+  const [changeUserPasswordMutation] = useMutation(ChangeUserPasswordDocument);
 
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
@@ -34,7 +35,7 @@ function Page() {
       try {
         setChanging(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { errors, data } = await changeUserPasswordMutation({
+        const { error, data } = await changeUserPasswordMutation({
           variables: {
             currentPassword: currentPassword,
             newPassword: newPassword,
@@ -42,14 +43,14 @@ function Page() {
           },
         });
         handleFormErrors(
-          errors,
+          error,
           data?.changeUserPassword?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
           form
         );
-        if (!errors && !data?.changeUserPassword?.errors) {
+        if (!error && !data?.changeUserPassword?.errors) {
           message.success("Your password has been changed.");
           form.resetFields();
         }

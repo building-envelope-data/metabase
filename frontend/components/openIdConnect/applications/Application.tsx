@@ -7,15 +7,16 @@ import AutorizationTable from "../authorizations/AuthorizationTable";
 import TokenTable from "../tokens/TokenTable";
 import { PageHeader } from "@ant-design/pro-layout";
 import DeleteApplication from "./DeleteApplication";
-import { useApplicationQuery } from "../../../queries/openIdConnect.graphql";
+import { ApplicationDocument } from "../../../queries/openIdConnect.generated";
 import ResetApplicationClientSecret from "./ResetApplicationClientSecret";
+import { useQuery } from "@apollo/client/react";
 
 export type ApplicationProps = {
     applicationId: Scalars["Uuid"];
 };
 
 export default function Application({ applicationId }: ApplicationProps) {
-    const { loading, error, data } = useApplicationQuery({
+    const { loading, error, data } = useQuery(ApplicationDocument, {
         variables: {
             uuid: applicationId,
         },

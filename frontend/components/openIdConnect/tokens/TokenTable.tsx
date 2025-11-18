@@ -1,5 +1,5 @@
 import { Space, Table, TableProps } from "antd";
-import { ApplicationDocument, TokenPartialFragment } from "../../../queries/openIdConnect.graphql";
+import { ApplicationDocument, TokenPartialFragment } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/__types__";
 import RevokeToken from "./RevokeToken";
 
@@ -35,7 +35,7 @@ export default function TokenTable({ applicationId, tokens }: TokenTableProps) {
             key: 'action',
             render: (_, token) => (
                 <Space size="middle">
-                    {token.isAuthorizedToRevokeToken ? (
+                    {token.isAuthorizedToRevokeNode ? (
                         <>
                             <RevokeToken
                                 tokenId={token.uuid}

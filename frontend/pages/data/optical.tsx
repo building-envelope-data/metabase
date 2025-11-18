@@ -1,14 +1,13 @@
 import Layout from "../../components/Layout";
 import {
   Table,
-  message,
   Form,
   Button,
   Alert,
   Typography,
   Descriptions,
 } from "antd";
-import { useAllOpticalDataQuery } from "../../queries/data.graphql";
+import { AllOpticalDataDocument } from "../../queries/data.generated";
 import {
   Scalars,
   OpticalDataPropositionInput,
@@ -34,6 +33,7 @@ import {
   UuidPropositionComparator,
   UuidPropositionFormList,
 } from "../../components/UuidPropositionFormList";
+import { useQuery } from "@apollo/client/react";
 
 const layout = {
   labelCol: { span: 8 },
@@ -126,7 +126,7 @@ function Page() {
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
   // For error policies see https://www.apollographql.com/docs/react/v2/data/error-handling/#error-policies
-  const allOpticalDataQuery = useAllOpticalDataQuery({
+  const allOpticalDataQuery = useQuery(AllOpticalDataDocument, {
     skip: true,
     errorPolicy: "all",
   });
@@ -144,54 +144,54 @@ function Page() {
     nearnormalHemisphericalVisibleTransmittances,
   }: {
     componentIds:
-      | {
-          negator: Negator;
-          comparator: UuidPropositionComparator;
-          value: Scalars["Uuid"] | undefined;
-        }[]
-      | undefined;
+    | {
+      negator: Negator;
+      comparator: UuidPropositionComparator;
+      value: Scalars["Uuid"] | undefined;
+    }[]
+    | undefined;
     dataFormatIds:
-      | {
-          negator: Negator;
-          comparator: UuidPropositionComparator;
-          value: Scalars["Uuid"] | undefined;
-        }[]
-      | undefined;
+    | {
+      negator: Negator;
+      comparator: UuidPropositionComparator;
+      value: Scalars["Uuid"] | undefined;
+    }[]
+    | undefined;
     infraredEmittances:
-      | {
-          negator: Negator;
-          comparator: FloatPropositionComparator;
-          value: number | undefined;
-        }[]
-      | undefined;
+    | {
+      negator: Negator;
+      comparator: FloatPropositionComparator;
+      value: number | undefined;
+    }[]
+    | undefined;
     nearnormalHemisphericalSolarReflectances:
-      | {
-          negator: Negator;
-          comparator: FloatPropositionComparator;
-          value: number | undefined;
-        }[]
-      | undefined;
+    | {
+      negator: Negator;
+      comparator: FloatPropositionComparator;
+      value: number | undefined;
+    }[]
+    | undefined;
     nearnormalHemisphericalSolarTransmittances:
-      | {
-          negator: Negator;
-          comparator: FloatPropositionComparator;
-          value: number | undefined;
-        }[]
-      | undefined;
+    | {
+      negator: Negator;
+      comparator: FloatPropositionComparator;
+      value: number | undefined;
+    }[]
+    | undefined;
     nearnormalHemisphericalVisibleReflectances:
-      | {
-          negator: Negator;
-          comparator: FloatPropositionComparator;
-          value: number | undefined;
-        }[]
-      | undefined;
+    | {
+      negator: Negator;
+      comparator: FloatPropositionComparator;
+      value: number | undefined;
+    }[]
+    | undefined;
     nearnormalHemisphericalVisibleTransmittances:
-      | {
-          negator: Negator;
-          comparator: FloatPropositionComparator;
-          value: number | undefined;
-        }[]
-      | undefined;
+    | {
+      negator: Negator;
+      comparator: FloatPropositionComparator;
+      value: number | undefined;
+    }[]
+    | undefined;
   }) => {
     const filter = async () => {
       try {
@@ -317,15 +317,12 @@ function Page() {
           propositions.length == 0
             ? {}
             : {
-                where: conjunct(propositions),
-              }
+              where: conjunct(propositions),
+            }
         );
         if (error) {
           // TODO Handle properly.
           console.log(error);
-          message.error(
-            error.graphQLErrors.map((error) => error.message).join(" ")
-          );
         }
         // TODO Add `edge.node.databaseId to nodes?
         const nestedData =

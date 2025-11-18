@@ -1,7 +1,8 @@
+import { useQuery } from '@apollo/client/react';
 import { messageApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import { Typography } from "antd";
-import { useMethodsQuery } from "../../queries/methods.graphql";
+import { MethodsDocument } from "../../queries/methods.generated";
 import { useEffect } from "react";
 import paths from "../../paths";
 import Link from "next/link";
@@ -10,7 +11,7 @@ import MethodTable from "../../components/methods/MethodTable";
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
 function Page() {
-  const { loading, error, data } = useMethodsQuery();
+  const { loading, error, data } = useQuery(MethodsDocument);
   const nodes = data?.methods?.edges?.map((e) => e.node) || [];
 
   useEffect(() => {
