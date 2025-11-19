@@ -8,7 +8,7 @@ import {
   MethodCategory,
   Scalars,
   ReferenceInput,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -37,14 +37,14 @@ type FormValues = {
     | null
     | undefined;
   reference: ReferenceInput | null | undefined;
-  calculationLocator: Scalars["Url"] | null | undefined;
+  calculationLocator: Scalars["Url"]["input"] | null | undefined;
   categories: MethodCategory[] | null | undefined;
-  institutionDeveloperIds: Scalars["Uuid"][] | null | undefined;
-  userDeveloperIds: Scalars["Uuid"][] | null | undefined;
+  institutionDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
+  userDeveloperIds: Scalars["Uuid"]["input"][] | null | undefined;
 };
 
 export type CreateMethodProps = {
-  managerId: Scalars["Uuid"];
+  managerId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateMethod({ managerId }: CreateMethodProps) {

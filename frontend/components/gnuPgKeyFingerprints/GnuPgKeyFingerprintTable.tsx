@@ -3,13 +3,13 @@ import Link from "next/link";
 import paths from "../../paths";
 import AllowGnuPgKeyFingerprint from "./AllowGnuPgKeyFingerprint"
 import ForbidGnuPgKeyFingerprint from "./ForbidGnuPgKeyFingerprint";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
 
 export type GnuPgKeyFingerprintsProps = {
     loading: boolean;
     fingerprints: GnuPgKeyFingerprintPartialFragment[];
-    institutionId: Scalars["Uuid"];
+    institutionId: Scalars["Uuid"]["input"];
 };
 
 export default function GnuPgKeyFingerprintTable({ loading, fingerprints, institutionId }: GnuPgKeyFingerprintsProps) {

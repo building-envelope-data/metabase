@@ -3,13 +3,13 @@ import { Button, message } from "antd";
 import {
     ForbidGnuPgKeyFingerprintDocument,
 } from "../../queries/gnuPgKeyFingerprints.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { InstitutionDocument } from "../../queries/institutions.generated";
 
 export type ForbidGnuPgKeyFingerprintProps = {
     fingerprint: string;
-    institutionId: Scalars["Uuid"];
+    institutionId: Scalars["Uuid"]["input"];
 };
 
 export default function ForbidGnuPgKeyFingerprint({ fingerprint, institutionId }: ForbidGnuPgKeyFingerprintProps) {

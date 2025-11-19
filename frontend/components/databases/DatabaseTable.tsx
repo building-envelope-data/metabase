@@ -9,7 +9,7 @@ import {
   getInternallyLinkedFilterableStringColumnProps,
   getUuidColumnProps,
 } from "../../lib/table";
-import { Database, Institution } from "../../__generated__/__types__";
+import { Database, Institution } from "../../__generated__/graphql";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 export type DatabaseTableProps = {

@@ -18,7 +18,7 @@ import { useRouter } from "next/router";
 import paths from "../../../paths";
 import { handleFormErrors } from "../../../lib/form";
 import { useEffect, useState } from "react";
-import QRCode from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
 import { recoveryCodesModal } from "../../../lib/recoveryCodesModal";
 
 const layout = {
@@ -162,7 +162,7 @@ function Page() {
               your two factor authenticator app. Spaces and casing do not
               matter.
             </Typography.Paragraph>
-            <QRCode value={authenticatorUri} />
+            <QRCodeSVG value={authenticatorUri} />
           </List>
           <List>
             <Typography.Paragraph>

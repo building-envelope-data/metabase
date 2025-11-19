@@ -6,11 +6,11 @@ import {
   PendingDatabasesDocument,
   DatabaseDocument,
 } from "../../queries/databases.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 
 export type VerifyDatabaseProps = {
-  databaseId: Scalars["Uuid"];
+  databaseId: Scalars["Uuid"]["input"];
 };
 
 export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {

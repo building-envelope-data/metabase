@@ -22,7 +22,7 @@ import { InstitutionDocument } from "../../queries/institutions.generated";
 import { MethodDocument } from "../../queries/methods.generated";
 import { ConfirmInstitutionRepresentativeDocument } from "../../queries/institutionRepresentatives.generated";
 import { ConfirmUserMethodDeveloperDocument } from "../../queries/userMethodDevelopers.generated";
-import { Scalars, UserRole } from "../../__generated__/__types__";
+import { Scalars, UserRole } from "../../__generated__/graphql";
 import { useRouter } from "next/router";
 import paths from "../../paths";
 import { useEffect, useState } from "react";
@@ -31,7 +31,7 @@ import AddUserRole from "./AddUserRole";
 import { messageApolloError } from "../../lib/apollo";
 
 export type UserProps = {
-  userId: Scalars["Uuid"];
+  userId: Scalars["Uuid"]["input"];
 };
 
 export default function User({ userId }: UserProps) {
@@ -52,7 +52,7 @@ export default function User({ userId }: UserProps) {
   ] = useState(false);
 
   const confirmInstitutionRepresentative = async (
-    institutionId: Scalars["Uuid"]
+    institutionId: Scalars["Uuid"]["input"]
   ) => {
     try {
       setConfirmingInstitutionRepresentative(true);
@@ -95,7 +95,7 @@ export default function User({ userId }: UserProps) {
   const [confirmingUserMethodDeveloper, setConfirmingUserMethodDeveloper] =
     useState(false);
 
-  const confirmUserMethodDeveloper = async (methodId: Scalars["Uuid"]) => {
+  const confirmUserMethodDeveloper = async (methodId: Scalars["Uuid"]["input"]) => {
     try {
       setConfirmingUserMethodDeveloper(true);
       const { error, data } = await confirmUserMethodDeveloperMutation({

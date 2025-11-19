@@ -14,7 +14,7 @@ import {
   DescriptionOrReferenceInput,
   OpenEndedDateTimeRange,
   Scalars,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { ReferenceForm } from "../ReferenceForm";
 
 const layout = {
@@ -40,7 +40,7 @@ type FormValues = {
 };
 
 export type UpdateComponentProps = {
-  componentId: Scalars["Uuid"];
+  componentId: Scalars["Uuid"]["input"];
   name: string;
   abbreviation: string | null | undefined;
   description: string;

@@ -6,7 +6,7 @@ import {
 import { Alert, Form, Input, Button, Modal } from "antd";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 
 const layout = {
   labelCol: { span: 8 },
@@ -24,7 +24,7 @@ type FormValues = {
 };
 
 export type UpdateInstitutionProps = {
-  institutionId: Scalars["Uuid"];
+  institutionId: Scalars["Uuid"]["input"];
   name: string;
   abbreviation: string | null | undefined;
   description: string;

@@ -5,7 +5,7 @@ import {
   Standardizer,
   Standard,
   Publication,
-} from "../__generated__/__types__";
+} from "../__generated__/graphql";
 
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },

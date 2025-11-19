@@ -6,10 +6,10 @@ import {
   ApplicationsDocument,
   DeleteApplicationDocument,
 } from "../../../queries/openIdConnect.generated";
-import { Scalars } from "../../../__generated__/__types__";
+import { Scalars } from "../../../__generated__/graphql";
 
 export type DeleteApplicationProps = {
-  applicationId: Scalars["Uuid"];
+  applicationId: Scalars["Uuid"]["input"];
 };
 
 export default function DeleteApplication({

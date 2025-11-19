@@ -8,7 +8,7 @@ import { InstitutionsDocument } from "../../queries/institutions.generated";
 import { useEffect, useState } from "react";
 import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import PendingInstitutions from "../../components/institutions/PendingInstitutions";
-import { UserRole } from "../../__generated__/__types__";
+import { UserRole } from "../../__generated__/graphql";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
   getExternallyLinkedFilterableLocatorColumnProps,

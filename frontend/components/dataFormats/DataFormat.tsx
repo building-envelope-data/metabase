@@ -1,4 +1,4 @@
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { DataFormatDocument } from "../../queries/dataFormats.generated";
 import { Skeleton, Result, Descriptions, Typography } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
@@ -10,7 +10,7 @@ import UpdateDataFormat from "./UpdateDataFormat";
 import { useQuery } from "@apollo/client/react";
 
 export type DataFormatProps = {
-  dataFormatId: Scalars["Uuid"];
+  dataFormatId: Scalars["Uuid"]["input"];
 };
 
 export default function DataFormat({ dataFormatId }: DataFormatProps) {

@@ -15,7 +15,7 @@ import { PageHeader } from "@ant-design/pro-layout";
 import {
   InstitutionDocument,
 } from "../../queries/institutions.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import CreateComponent from "../components/CreateComponent";
 import CreateMethod from "../methods/CreateMethod";
 import CreateDataFormat from "../dataFormats/CreateDataFormat";
@@ -45,7 +45,7 @@ import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFinger
 import { ApplicationPartialFragment } from '../../queries/openIdConnect.generated';
 
 export type InstitutionProps = {
-  institutionId: Scalars["Uuid"];
+  institutionId: Scalars["Uuid"]["input"];
 };
 
 export default function Institution({ institutionId }: InstitutionProps) {
@@ -63,7 +63,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
   ] = useState(false);
 
   const confirmInstitutionMethodDeveloper = async (
-    methodId: Scalars["Uuid"]
+    methodId: Scalars["Uuid"]["input"]
   ) => {
     try {
       setConfirmingInstitutionMethodDeveloper(true);
@@ -106,7 +106,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
   const [confirmingComponentManufacturer, setConfirmingComponentManufacturer] =
     useState(false);
 
-  const confirmComponentManufacturer = async (componentId: Scalars["Uuid"]) => {
+  const confirmComponentManufacturer = async (componentId: Scalars["Uuid"]["input"]) => {
     try {
       setConfirmingComponentManufacturer(true);
       const { error, data } = await confirmComponentManufacturerMutation({

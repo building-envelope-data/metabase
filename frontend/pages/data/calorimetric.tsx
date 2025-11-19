@@ -7,11 +7,11 @@ import {
   Typography,
   Descriptions,
 } from "antd";
-import { AllCalorimetricDataDocument } from "../../queries/data.generated";
+import { AllCalorimetricDataDocument, CalorimetricDataPartialFragment } from "../../queries/data.generated";
 import {
   Scalars,
   CalorimetricDataPropositionInput,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
@@ -83,41 +83,13 @@ const conjunct = (
 //   return { or: propositions };
 // };
 
-type PartialCalorimetricData = {
-  __typename?: "CalorimetricData";
-  gValues: Array<number>;
-  uValues: Array<number>;
-  uuid: Scalars["Uuid"];
-  timestamp: Scalars["DateTime"];
-  componentId: Scalars["Uuid"];
-  name?: string | null | undefined;
-  description?: string | null | undefined;
-  appliedMethod: {
-    __typename?: "AppliedMethod";
-    methodId: Scalars["Uuid"];
-  };
-  resourceTree: {
-    __typename?: "GetHttpsResourceTree";
-    root: {
-      __typename?: "GetHttpsResourceTreeRoot";
-      value: {
-        __typename?: "GetHttpsResource";
-        description?: string | null | undefined;
-        hashValue: string;
-        locator: Scalars["Url"];
-        dataFormatId: Scalars["Uuid"];
-      };
-    };
-  };
-};
-
 function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [data, setData] = useState<PartialCalorimetricData[]>([]);
+  const [data, setData] = useState<CalorimetricDataPartialFragment[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
@@ -239,7 +211,7 @@ function Page() {
           data?.databases?.edges?.map(
             (edge) => edge?.node?.allCalorimetricData?.edges?.map((e) => e.node) || []
           ) || [];
-        const flatData = ([] as PartialCalorimetricData[]).concat(
+        const flatData = ([] as CalorimetricDataPartialFragment[]).concat(
           ...nestedData
         );
         setData(flatData);

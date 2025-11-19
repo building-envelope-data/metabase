@@ -6,7 +6,7 @@ import {
   InstitutionsDocument,
   CreateInstitutionDocument,
 } from "../../queries/institutions.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { Skeleton, Alert, Form, Input, Button } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
@@ -30,8 +30,8 @@ type FormValues = {
 };
 
 export type CreateInstitutionProps = {
-  ownerIds?: Scalars["Uuid"][];
-  managerId?: Scalars["Uuid"];
+  ownerIds?: Scalars["Uuid"]["input"][];
+  managerId?: Scalars["Uuid"]["input"];
 };
 
 function redirectToLoginPage(router: NextRouter): void {

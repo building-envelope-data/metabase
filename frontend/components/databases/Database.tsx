@@ -1,7 +1,7 @@
 import {
   DatabaseVerificationState,
   Scalars,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { DatabaseDocument } from "../../queries/databases.generated";
 import { Skeleton, Result, Descriptions, Typography, Tag } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
@@ -14,7 +14,7 @@ import VerifyDatabase from "./VerifyDatabase";
 import { useQuery } from "@apollo/client/react";
 
 export type DatabaseProps = {
-  databaseId: Scalars["Uuid"];
+  databaseId: Scalars["Uuid"]["input"];
 };
 
 export default function Database({ databaseId }: DatabaseProps) {

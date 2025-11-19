@@ -8,7 +8,7 @@ import {
   PendingDatabasesDocument,
   VerifyDatabaseDocument,
 } from "../../queries/databases.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import Link from "next/link";
 import paths from "../../paths";
 import { messageApolloError } from "../../lib/apollo";
@@ -27,7 +27,7 @@ export default function PendingDatabases({ }: PendingDatabasesProps) {
   const [verifyDatabaseMutation] = useMutation(VerifyDatabaseDocument);
   const [verifyingDatabase, setVerifyingDatabase] = useState(false);
 
-  const verifyDatabase = async (databaseId: Scalars["Uuid"]) => {
+  const verifyDatabase = async (databaseId: Scalars["Uuid"]["input"]) => {
     try {
       setVerifyingDatabase(true);
       const { error, data } = await verifyDatabaseMutation({

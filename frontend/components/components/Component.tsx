@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client/react';
 import { useQuery } from '@apollo/client/react';
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import {
   ComponentsDocument,
   ComponentDocument,
@@ -38,7 +38,7 @@ import { RemoveComponentManufacturerDocument } from "../../queries/componentManu
 import { InstitutionDocument } from "../../queries/institutions.generated";
 
 export type ComponentProps = {
-  componentId: Scalars["Uuid"];
+  componentId: Scalars["Uuid"]["input"];
 };
 
 export default function Component({ componentId }: ComponentProps) {
@@ -60,7 +60,7 @@ export default function Component({ componentId }: ComponentProps) {
     useState(false);
 
   const removeComponentManufacturer = async (
-    institutionId: Scalars["Uuid"]
+    institutionId: Scalars["Uuid"]["input"]
   ) => {
     try {
       setRemovingComponentManufacturer(true);
@@ -107,8 +107,8 @@ export default function Component({ componentId }: ComponentProps) {
     useState(false);
 
   const removeComponentAssembly = async (
-    assembledComponentId: Scalars["Uuid"],
-    partComponentId: Scalars["Uuid"]
+    assembledComponentId: Scalars["Uuid"]["input"],
+    partComponentId: Scalars["Uuid"]["input"]
   ) => {
     try {
       setRemovingComponentAssembly(true);
@@ -155,8 +155,8 @@ export default function Component({ componentId }: ComponentProps) {
     useState(false);
 
   const removeComponentVariant = async (
-    oneComponentId: Scalars["Uuid"],
-    otherComponentId: Scalars["Uuid"]
+    oneComponentId: Scalars["Uuid"]["input"],
+    otherComponentId: Scalars["Uuid"]["input"]
   ) => {
     try {
       setRemovingComponentVariant(true);
@@ -203,8 +203,8 @@ export default function Component({ componentId }: ComponentProps) {
     useState(false);
 
   const removeComponentGeneralization = async (
-    generalComponentId: Scalars["Uuid"],
-    concreteComponentId: Scalars["Uuid"]
+    generalComponentId: Scalars["Uuid"]["input"],
+    concreteComponentId: Scalars["Uuid"]["input"]
   ) => {
     try {
       setRemovingComponentGeneralization(true);

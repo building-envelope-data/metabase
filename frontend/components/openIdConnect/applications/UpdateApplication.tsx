@@ -3,7 +3,7 @@ import { useState } from "react";
 import { UpdateApplicationDocument, ApplicationPartialFragment, ApplicationDocument, ApplicationsDocument } from "../../../queries/openIdConnect.generated";
 import { Alert, Button, Form, Input, message, Modal, Select } from "antd";
 import { handleFormErrors } from "../../../lib/form";
-import { OpenIdConnectConsentType, OpenIdConnectEndpoint, OpenIdConnectGrantType, OpenIdConnectResponseType, OpenIdConnectScope, OpenIdConnectRequirement } from "../../../__generated__/__types__";
+import { OpenIdConnectConsentType, OpenIdConnectEndpoint, OpenIdConnectGrantType, OpenIdConnectResponseType, OpenIdConnectScope, OpenIdConnectRequirement } from "../../../__generated__/graphql";
 
 const layout = {
   labelCol: { span: 8 },

@@ -6,13 +6,14 @@ import {
 } from "./freeTextFilter";
 import Link from "next/link";
 import {
-  Publication,
   Scalars,
+  Publication,
   Standard,
-} from "../__generated__/__types__";
+} from "../__generated__/graphql";
 import { Highlight } from "../components/Highlight";
 import paths from "../paths";
 import { JSX } from "react";
+import { Route } from "next";
 
 const sortDirections: SortOrder[] = ["ascend", "descend"];
 
@@ -63,7 +64,7 @@ export function getColumnProps<RecordType>(
 export function getDateTimeColumnProps<RecordType>(
   title: string,
   key: keyof RecordType,
-  getValue: (record: RecordType) => Scalars["DateTime"] | null | undefined
+  getValue: (record: RecordType) => Scalars["DateTime"]["output"] | null | undefined
 ) {
   return {
     ...getColumnProps(title, key),
@@ -78,7 +79,7 @@ export function getDateTimeColumnProps<RecordType>(
 }
 
 export function getTimestampColumnProps<
-  RecordType extends { timestamp: string }
+  RecordType extends { timestamp: Scalars["DateTime"]["output"] }
 >() {
   return {
     ...getDateTimeColumnProps<RecordType>(
@@ -136,7 +137,7 @@ export function getInternallyLinkedFilterableStringColumnProps<RecordType>(
     key: keyof RecordType
   ) => (newFilterText: string) => void,
   getFilterText: (key: keyof RecordType) => string | undefined,
-  getPath: (record: RecordType) => string
+  getPath: (record: RecordType) => Route
 ) {
   return getFilterableStringColumnProps(
     title,
@@ -151,6 +152,33 @@ export function getInternallyLinkedFilterableStringColumnProps<RecordType>(
       ) : (
         <></>
       )
+  );
+}
+
+export function getExternallyLinkedFilterableStringColumnProps<RecordType>(
+  title: string,
+  key: keyof RecordType,
+  getValue: (record: RecordType) => string | null | undefined,
+  onFilterTextChange: (
+    key: keyof RecordType
+  ) => (newFilterText: string) => void,
+  getFilterText: (key: keyof RecordType) => string | undefined,
+  getPath: (record: RecordType) => string
+) {
+  return getFilterableStringColumnProps(
+    title,
+    key,
+    getValue,
+    onFilterTextChange,
+    getFilterText,
+    (record, highlightedValue, _value) => {
+      const href = getPath(record);
+      return href ? (
+        <Typography.Link href={href}>{highlightedValue}</Typography.Link>
+      ) : (
+        <></>
+      );
+    }
   );
 }
 
@@ -180,12 +208,12 @@ export function getExternallyLinkedFilterableLocatorColumnProps<RecordType>(
   );
 }
 
-export function getUuidColumnProps<RecordType extends { uuid: string }>(
+export function getUuidColumnProps<RecordType extends { uuid: Scalars["Uuid"]["output"] }>(
   onFilterTextChange: (
     key: keyof RecordType
   ) => (newFilterText: string) => void,
   getFilterText: (key: keyof RecordType) => string | undefined,
-  getPath: (uuid: string) => string
+  getPath: (uuid: Scalars["Uuid"]["output"]) => Route
 ) {
   return getInternallyLinkedFilterableStringColumnProps(
     "UUID",
@@ -542,7 +570,7 @@ export function getReferenceColumnProps<
 }
 
 export function getComponentUuidColumnProps<
-  RecordType extends { componentId: Scalars["Uuid"] }
+  RecordType extends { componentId: Scalars["Uuid"]["output"] }
 >(
   onFilterTextChange: (
     key: keyof RecordType
@@ -560,7 +588,7 @@ export function getComponentUuidColumnProps<
 }
 
 export function getAppliedMethodColumnProps<
-  RecordType extends { appliedMethod: { methodId: Scalars["Uuid"] } }
+  RecordType extends { appliedMethod: { methodId: Scalars["Uuid"]["output"] } }
 >(
   onFilterTextChange: (
     key: keyof RecordType
@@ -597,7 +625,7 @@ export function getAppliedMethodColumnProps<
 }
 
 export function getResourceTreeColumnProps<
-  RecordType extends { resourceTree: { root: { value: { description?: string | null | undefined, hashValue: string, locator: Scalars["Url"], dataFormatId: Scalars["Uuid"] } } } }
+  RecordType extends { resourceTree: { root: { value: { description?: string | null | undefined, hashValue: string, locator: Scalars["Url"]["output"], dataFormatId: Scalars["Uuid"]["output"] } } } }
 >(
   onFilterTextChange: (
     key: keyof RecordType

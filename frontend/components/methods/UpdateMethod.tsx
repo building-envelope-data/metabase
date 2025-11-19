@@ -20,7 +20,7 @@ import {
   Publication,
   Standard,
   ReferenceInput,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -47,20 +47,20 @@ type FormValues = {
     | null
     | undefined;
   newReference: ReferenceInput | null | undefined;
-  newCalculationLocator: Scalars["Url"] | null | undefined;
+  newCalculationLocator: Scalars["Url"]["input"] | null | undefined;
   newCategories: MethodCategory[] | null | undefined;
 };
 
 export type UpdateMethodProps = {
-  methodId: Scalars["Uuid"];
+  methodId: Scalars["Uuid"]["input"];
   name: string;
   description: string;
   validity: OpenEndedDateTimeRange | null | undefined;
   availability: OpenEndedDateTimeRange | null | undefined;
   reference: Publication | Standard | null | undefined;
-  calculationLocator: Scalars["Url"] | null | undefined;
+  calculationLocator: Scalars["Url"]["input"] | null | undefined;
   categories: MethodCategory[] | null | undefined;
-  managerId: Scalars["Uuid"];
+  managerId: Scalars["Uuid"]["input"];
 };
 
 export default function UpdateMethod({

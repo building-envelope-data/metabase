@@ -1,4 +1,4 @@
-import { DataFormat, Institution } from "../../__generated__/__types__";
+import { DataFormat, Institution } from "../../__generated__/graphql";
 import { Table } from "antd";
 import {
   getExternallyLinkedFilterableLocatorColumnProps,

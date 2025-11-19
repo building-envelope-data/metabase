@@ -4,7 +4,7 @@ import {
   UsersDocument,
   AddUserRoleDocument,
 } from "../../queries/users.generated";
-import { Scalars, UserRole } from "../../__generated__/__types__";
+import { Scalars, UserRole } from "../../__generated__/graphql";
 import { Alert, Form, Button, Select } from "antd";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
@@ -20,7 +20,7 @@ const tailLayout = {
 type FormValues = { role: UserRole };
 
 export type AddUserRoleProps = {
-  userId: Scalars["Uuid"];
+  userId: Scalars["Uuid"]["input"];
   roles: UserRole[];
 };
 

@@ -34,11 +34,15 @@ const config: CodegenConfig = {
         // don't generate a type for the `__typename` for root operation types.
         skipTypeNameForRoot: true,
         // ...
-        // strictScalars: true,
+        strictScalars: true,
         scalars: {
-          Any: 'any',
+          ID: {
+            input: 'string',
+            output: 'string | number'
+          },
+          Any: 'unknown',
           Byte: 'number',
-          DateTime: 'Date',
+          DateTime: 'string',
           Locale: 'string',
           NonNegativeInt: 'number',
           Url: 'string',

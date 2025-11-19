@@ -1,8 +1,8 @@
-import { Component } from "../../__generated__/__types__";
+import { Component } from "../../__generated__/graphql";
 import { Table } from "antd";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
-import { ComponentCategory } from "../../__generated__/__types__";
+import { ComponentCategory } from "../../__generated__/graphql";
 import paths from "../../paths";
 import {
   getAbbreviationColumnProps,

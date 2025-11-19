@@ -1,8 +1,8 @@
 import { useMutation } from '@apollo/client/react';
 import { Select, Alert, Form, Button } from "antd";
 import { AddInstitutionRepresentativeDocument } from "../../queries/institutionRepresentatives.generated";
-import { InstitutionRepresentativeRole } from "../../__generated__/__types__";
-import { Scalars } from "../../__generated__/__types__";
+import { InstitutionRepresentativeRole } from "../../__generated__/graphql";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -17,12 +17,12 @@ const tailLayout = {
 };
 
 type FormValues = {
-  userId: Scalars["Uuid"];
+  userId: Scalars["Uuid"]["input"];
   role: InstitutionRepresentativeRole;
 };
 
 export type AddInstitutionRepresentativeProps = {
-  institutionId: Scalars["Uuid"];
+  institutionId: Scalars["Uuid"]["input"];
 };
 
 export default function AddInstitutionRepresentative({

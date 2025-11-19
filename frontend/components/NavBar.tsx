@@ -6,14 +6,15 @@ import { CurrentUserDocument } from "../queries/currentUser.generated";
 import paths from "../paths";
 import { getXsrfToken } from "../lib/apollo";
 import { UserOutlined } from "@ant-design/icons";
+import type { Route } from 'next';
 
 type NavItemProps =
   | {
-    path: string;
+    path: Route;
     label: string;
     subitems: null;
   }
-  | { label: string; subitems: { path: string; label: string }[] };
+  | { label: string; subitems: { path: Route; label: string }[] };
 
 export type NavBarProps = {
   items: NavItemProps[];

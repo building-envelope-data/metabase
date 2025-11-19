@@ -6,10 +6,10 @@ import {
   InstitutionsDocument,
   SwitchInstitutionOperatingStateDocument,
 } from "../../queries/institutions.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 
 export type switchInstitutionOperatingStateProps = {
-  institutionId: Scalars["Uuid"];
+  institutionId: Scalars["Uuid"]["input"];
 };
 
 export default function SwitchInstitutionOperatingState({

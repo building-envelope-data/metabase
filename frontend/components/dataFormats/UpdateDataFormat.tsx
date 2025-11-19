@@ -9,7 +9,7 @@ import {
   Scalars,
   Publication,
   Standard,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -28,19 +28,19 @@ type FormValues = {
   newExtension: string | null | undefined;
   newDescription: string;
   newMediaType: string;
-  newSchemaLocator: Scalars["Url"] | null | undefined;
+  newSchemaLocator: Scalars["Url"]["input"] | null | undefined;
   newReference: ReferenceInput | null | undefined;
 };
 
 export type UpdateDataFormatProps = {
-  dataFormatId: Scalars["Uuid"];
+  dataFormatId: Scalars["Uuid"]["input"];
   name: string;
   extension: string | null | undefined;
   description: string;
   mediaType: string;
-  schemaLocator: Scalars["Url"] | null | undefined;
+  schemaLocator: Scalars["Url"]["input"] | null | undefined;
   reference: Publication | Standard | null | undefined;
-  managerId: Scalars["Uuid"];
+  managerId: Scalars["Uuid"]["input"];
 };
 
 export default function UpdateDataFormat({

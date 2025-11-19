@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { Scalars } from "../../../__generated__/__types__";
+import { Scalars } from "../../../__generated__/graphql";
 import { Descriptions, Divider, Result, Skeleton, Typography } from "antd";
 import { messageApolloError } from "../../../lib/apollo";
 import UpdateApplication from "./UpdateApplication";
@@ -12,7 +12,7 @@ import ResetApplicationClientSecret from "./ResetApplicationClientSecret";
 import { useQuery } from "@apollo/client/react";
 
 export type ApplicationProps = {
-    applicationId: Scalars["Uuid"];
+    applicationId: Scalars["Uuid"]["input"];
 };
 
 export default function Application({ applicationId }: ApplicationProps) {

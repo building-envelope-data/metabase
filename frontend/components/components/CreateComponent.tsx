@@ -4,7 +4,7 @@ import {
   CreateComponentDocument,
   ComponentsDocument,
 } from "../../queries/components.generated";
-import { ComponentCategory, DescriptionOrReferenceInput, Scalars } from "../../__generated__/__types__";
+import { ComponentCategory, DescriptionOrReferenceInput, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import dayjs from "dayjs";
@@ -34,7 +34,7 @@ type FormValues = {
 };
 
 export type CreateComponentProps = {
-  manufacturerId: Scalars["Uuid"];
+  manufacturerId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateComponent({

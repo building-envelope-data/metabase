@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client/react';
 import { useQuery } from '@apollo/client/react';
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import {
   MethodsDocument,
   MethodDocument,
@@ -33,7 +33,7 @@ import AddUserMethodDeveloper from "./AddUserMethodDeveloper";
 import { UserDocument } from "../../queries/users.generated";
 
 export type MethodProps = {
-  methodId: Scalars["Uuid"];
+  methodId: Scalars["Uuid"]["input"];
 };
 
 export default function Method({ methodId }: MethodProps) {
@@ -57,7 +57,7 @@ export default function Method({ methodId }: MethodProps) {
   ] = useState(false);
 
   const removeInstitutionMethodDeveloper = async (
-    institutionId: Scalars["Uuid"]
+    institutionId: Scalars["Uuid"]["input"]
   ) => {
     try {
       setRemovingInstitutionMethodDeveloper(true);
@@ -103,7 +103,7 @@ export default function Method({ methodId }: MethodProps) {
   const [removingUserMethodDeveloper, setRemovingUserMethodDeveloper] =
     useState(false);
 
-  const removeUserMethodDeveloper = async (userId: Scalars["Uuid"]) => {
+  const removeUserMethodDeveloper = async (userId: Scalars["Uuid"]["input"]) => {
     try {
       setRemovingUserMethodDeveloper(true);
       const { error, data } = await removeUserMethodDeveloperMutation({

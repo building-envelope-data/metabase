@@ -7,10 +7,10 @@ import {
   ResetApplicationClientSecretDocument,
 } from "../../../queries/openIdConnect.generated";
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
-import { Scalars } from "../../../__generated__/__types__";
+import { Scalars } from "../../../__generated__/graphql";
 
 export type ResetApplicationClientSecretProps = {
-  applicationId: Scalars["Uuid"];
+  applicationId: Scalars["Uuid"]["input"];
 };
 
 export default function ResetApplicationClientSecret({

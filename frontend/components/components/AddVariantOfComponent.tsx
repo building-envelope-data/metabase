@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Button } from "antd";
 import { AddComponentVariantDocument } from "../../queries/componentVariants.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { ComponentDocument } from "../../queries/components.generated";
@@ -16,11 +16,11 @@ const tailLayout = {
 };
 
 type FormValues = {
-  variantComponentId: Scalars["Uuid"];
+  variantComponentId: Scalars["Uuid"]["input"];
 };
 
 export type AddVariantOfComponentProps = {
-  componentId: Scalars["Uuid"];
+  componentId: Scalars["Uuid"]["input"];
 };
 
 export default function AddVariantOfComponent({

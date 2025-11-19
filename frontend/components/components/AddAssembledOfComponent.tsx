@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Button, InputNumber, Select } from "antd";
 import { AddComponentAssemblyDocument } from "../../queries/componentAssemblies.generated";
-import { PrimeSurface, Scalars } from "../../__generated__/__types__";
+import { PrimeSurface, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { ComponentDocument } from "../../queries/components.generated";
@@ -16,13 +16,13 @@ const tailLayout = {
 };
 
 type FormValues = {
-  assembledComponentId: Scalars["Uuid"];
-  index: Scalars["Byte"] | null | undefined;
+  assembledComponentId: Scalars["Uuid"]["input"];
+  index: Scalars["Byte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 };
 
 export type AddAssembledOfComponentProps = {
-  partComponentId: Scalars["Uuid"];
+  partComponentId: Scalars["Uuid"]["input"];
 };
 
 export default function AddAssembledOfComponent({

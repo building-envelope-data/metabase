@@ -7,7 +7,7 @@ import {
 import {
   ReferenceInput,
   Scalars,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -26,12 +26,12 @@ type FormValues = {
   extension: string | null | undefined;
   description: string;
   mediaType: string;
-  schemaLocator: Scalars["Url"] | null | undefined;
+  schemaLocator: Scalars["Url"]["input"] | null | undefined;
   reference: ReferenceInput | null | undefined;
 };
 
 export type CreateDataFormatProps = {
-  managerId: Scalars["Uuid"];
+  managerId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {

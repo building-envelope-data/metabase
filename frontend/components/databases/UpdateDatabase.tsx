@@ -5,7 +5,7 @@ import {
   DatabasesDocument,
   DatabaseDocument,
 } from "../../queries/databases.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 
@@ -20,14 +20,14 @@ const tailLayout = {
 type FormValues = {
   newName: string;
   newDescription: string;
-  newLocator: Scalars["Url"];
+  newLocator: Scalars["Url"]["input"];
 };
 
 export type UpdateDatabaseProps = {
-  databaseId: Scalars["Uuid"];
+  databaseId: Scalars["Uuid"]["input"];
   name: string;
   description: string;
-  locator: Scalars["Url"];
+  locator: Scalars["Url"]["input"];
 };
 
 export default function UpdateDatabase({

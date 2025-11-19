@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client/react';
 import { Alert, Form, Button } from "antd";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { MethodDocument } from "../../queries/methods.generated";
@@ -15,10 +15,10 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-type FormValues = { institutionId: Scalars["Uuid"] };
+type FormValues = { institutionId: Scalars["Uuid"]["input"] };
 
 export type AddInstitutionMethodDeveloperProps = {
-  methodId: Scalars["Uuid"];
+  methodId: Scalars["Uuid"]["input"];
 };
 
 export default function AddInstitutionMethodDeveloper({

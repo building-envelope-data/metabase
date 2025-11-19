@@ -1,77 +1,78 @@
+import type { Route } from "next";
 import { NextRouter } from "next/router";
 
 export default {
-  home: "/",
-  antiforgeryToken: "/antiforgery/token",
-  legalNotice: "/legal-notice",
-  dataProtectionInformation: "/data-protection-information",
-  databases: "/databases",
+  home: "/" as Route,
+  antiforgeryToken: "/antiforgery/token" as Route,
+  legalNotice: "/legal-notice" as Route,
+  dataProtectionInformation: "/data-protection-information" as Route,
+  databases: "/databases" as Route,
   database(uuid: string) {
-    return `/databases/${encodeURIComponent(uuid)}`;
+    return `/databases/${encodeURIComponent(uuid)}` as Route;
   },
-  institutions: "/institutions",
+  institutions: "/institutions" as Route,
   institution(uuid: string) {
-    return `/institutions/${encodeURIComponent(uuid)}`;
+    return `/institutions/${encodeURIComponent(uuid)}` as Route;
   },
-  institutionCreate: "/institutions/create",
-  users: "/users",
+  institutionCreate: "/institutions/create" as Route,
+  users: "/users" as Route,
   user(uuid: string) {
-    return `/users/${encodeURIComponent(uuid)}`;
+    return `/users/${encodeURIComponent(uuid)}` as Route;
   },
-  userCurrent: "me",
+  userCurrent: "me" as Route,
   me: {
     manage: {
-      home: "/me/manage",
-      profile: "/me/manage/profile",
-      email: "/me/manage/email",
-      changePassword: "/me/manage/change-password",
-      setPassword: "/me/manage/set-password",
-      twoFactorAuthentication: "/me/manage/two-factor-authentication",
-      enableAuthenticator: "/me/manage/enable-authenticator",
-      personalData: "/me/manage/personal-data",
+      home: "/me/manage" as Route,
+      profile: "/me/manage/profile" as Route,
+      email: "/me/manage/email" as Route,
+      changePassword: "/me/manage/change-password" as Route,
+      setPassword: "/me/manage/set-password" as Route,
+      twoFactorAuthentication: "/me/manage/two-factor-authentication" as Route,
+      enableAuthenticator: "/me/manage/enable-authenticator" as Route,
+      personalData: "/me/manage/personal-data" as Route,
     },
   },
-  personalUserData: "/personal-user-data",
-  userLogin: "/users/login",
-  userRegister: "/users/register",
-  userConfirmEmail: "/users/confirm-email",
-  userForgotPassword: "/users/forgot-password",
-  userLoginWithTwoFactorCode: "/users/login-with-two-factor-code",
-  userLoginWithRecoveryCode: "/users/login-with-recovery-code",
+  personalUserData: "/personal-user-data" as Route,
+  userLogin: "/users/login" as Route,
+  userRegister: "/users/register" as Route,
+  userConfirmEmail: "/users/confirm-email" as Route,
+  userForgotPassword: "/users/forgot-password" as Route,
+  userLoginWithTwoFactorCode: "/users/login-with-two-factor-code" as Route,
+  userLoginWithRecoveryCode: "/users/login-with-recovery-code" as Route,
   userCheckYourInboxAfterRegistration:
-    "/users/check-your-inbox-after-registration",
+    "/users/check-your-inbox-after-registration" as Route,
   userCheckYourInboxAfterPasswordResetRequest:
-    "/users/check-your-inbox-after-password-reset-request",
-  dataFormats: "/data-formats",
+    "/users/check-your-inbox-after-password-reset-request" as Route,
+  dataFormats: "/data-formats" as Route,
   dataFormat(uuid: string) {
-    return `/data-formats/${encodeURIComponent(uuid)}`;
+    return `/data-formats/${encodeURIComponent(uuid)}` as Route;
   },
-  methods: "/methods",
+  methods: "/methods" as Route,
   method(uuid: string) {
-    return `/methods/${encodeURIComponent(uuid)}`;
+    return `/methods/${encodeURIComponent(uuid)}` as Route;
   },
-  components: "/components",
+  components: "/components" as Route,
   component(uuid: string) {
-    return `/components/${encodeURIComponent(uuid)}`;
+    return `/components/${encodeURIComponent(uuid)}` as Route;
   },
-  data: "/data",
-  calorimetricData: "/data/calorimetric",
-  hygrothermalData: "/data/hygrothermal",
-  opticalData: "/data/optical",
-  photovoltaicData: "/data/photovoltaic",
-  geometricData: "/data/geometric",
+  data: "/data" as Route,
+  calorimetricData: "/data/calorimetric" as Route,
+  hygrothermalData: "/data/hygrothermal" as Route,
+  opticalData: "/data/optical" as Route,
+  photovoltaicData: "/data/photovoltaic" as Route,
+  geometricData: "/data/geometric" as Route,
   openIdConnectApplication(uuid: string) {
-    return `/open-id-connect/application/${encodeURIComponent(uuid)}`;
+    return `/open-id-connect/application/${encodeURIComponent(uuid)}` as Route;
   },
-  openIdConnectApplicationCreate: "/open-id-connect/application/create",
-  openIdConnect: "/open-id-connect",
-  openIdConnectClientLogin: "/connect/client/login",
-  openIdConnectClientLogout: "/connect/client/logout",
+  openIdConnectApplicationCreate: "/open-id-connect/application/create" as Route,
+  openIdConnect: "/open-id-connect" as Route,
+  openIdConnectClientLogin: "/connect/client/login" as Route,
+  openIdConnectClientLogout: "/connect/client/logout" as Route,
 };
 
 export function redirectToLoginPage(router: NextRouter, returnToPage: string): void {
   router.push({
-    pathname: "/users/login",
+    pathname: "/users/login" as Route,
     query: { returnTo: returnToPage },
   });
 }

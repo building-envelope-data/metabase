@@ -1,10 +1,10 @@
 import { Space, Table, TableProps } from "antd";
 import { ApplicationDocument, TokenPartialFragment } from "../../../queries/openIdConnect.generated";
-import { Scalars } from "../../../__generated__/__types__";
+import { Scalars } from "../../../__generated__/graphql";
 import RevokeToken from "./RevokeToken";
 
 export type TokenTableProps = {
-    applicationId: Scalars["Uuid"];
+    applicationId: Scalars["Uuid"]["input"];
     tokens: TokenPartialFragment[];
 };
 

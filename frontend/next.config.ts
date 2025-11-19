@@ -1,13 +1,21 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
   reactStrictMode: true,
-  allowedDevOrigins: [new URL(process.env.NEXT_PUBLIC_METABASE_URL).hostname],
+  typedRoutes: true,
+  allowedDevOrigins:
+    process.env.NEXT_PUBLIC_METABASE_URL == null
+      ? []
+      : [new URL(process.env.NEXT_PUBLIC_METABASE_URL).hostname],
   turbopack: {
     rules: {
       '/\.(yml|yaml$)/': [
         'yaml-loader',
       ],
     },
+  },
+  experimental: {
+    typedEnv: true,
   },
   // experimental: {
   //   swcPlugins: [
@@ -22,4 +30,4 @@ const nextConfig = {
   // },
 }
 
-module.exports = nextConfig;
+export default nextConfig

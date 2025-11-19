@@ -4,7 +4,7 @@ import { ApplicationsDocument, CreateApplicationDocument } from "../../../querie
 import { Alert, Button, Form, Input, message, Modal, Select, Typography } from "antd";
 import { handleFormErrors } from "../../../lib/form";
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
-import { OpenIdConnectConsentType, OpenIdConnectEndpoint, OpenIdConnectGrantType, OpenIdConnectResponseType, OpenIdConnectScope, OpenIdConnectRequirement, Scalars } from "../../../__generated__/__types__";
+import { OpenIdConnectConsentType, OpenIdConnectEndpoint, OpenIdConnectGrantType, OpenIdConnectResponseType, OpenIdConnectScope, OpenIdConnectRequirement, Scalars } from "../../../__generated__/graphql";
 import { InstitutionDocument } from "../../../queries/institutions.generated";
 
 const layout = {
@@ -19,8 +19,8 @@ type FormValues = {
     clientId: string;
     displayName: string;
     consentType: OpenIdConnectConsentType;
-    redirectUri: Scalars["Url"] | null | undefined;
-    postLogoutRedirectUri: Scalars["Url"] | null | undefined;
+    redirectUri: Scalars["Url"]["input"] | null | undefined;
+    postLogoutRedirectUri: Scalars["Url"]["input"] | null | undefined;
     endpoints: OpenIdConnectEndpoint[];
     grantTypes: OpenIdConnectGrantType[];
     responseTypes: OpenIdConnectResponseType[];
@@ -28,7 +28,7 @@ type FormValues = {
 };
 
 export type CreateApplicationProps = {
-    institutionId: Scalars["Uuid"];
+    institutionId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateApplication({ institutionId }: CreateApplicationProps) {

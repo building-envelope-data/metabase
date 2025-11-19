@@ -4,11 +4,11 @@ import { useState } from "react";
 import {
   DeleteAuthorizationDocument,
 } from "../../../queries/openIdConnect.generated";
-import { Scalars } from "../../../__generated__/__types__";
+import { Scalars } from "../../../__generated__/graphql";
 import { DocumentNode } from "graphql";
 
 export type DeleteAuthorizationProps = {
-  authorizationId: Scalars["Uuid"];
+  authorizationId: Scalars["Uuid"]["input"];
   refetchQueries: { query: DocumentNode, variables: { [key: string]: any } }[];
 };
 

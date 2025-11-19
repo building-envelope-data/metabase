@@ -7,11 +7,11 @@ import {
     Typography,
     Descriptions,
 } from "antd";
-import { AllGeometricDataDocument } from "../../queries/data.generated";
+import { AllGeometricDataDocument, GeometricDataPartialFragment } from "../../queries/data.generated";
 import {
     Scalars,
     GeometricDataPropositionInput,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
@@ -70,40 +70,13 @@ const conjunct = (
     return { and: propositions };
 };
 
-type PartialGeometricData = {
-    __typename?: "GeometricData";
-    thicknesses: Array<number>;
-    uuid: any;
-    timestamp: any;
-    componentId: any;
-    name?: string | null | undefined;
-    description?: string | null | undefined;
-    appliedMethod: {
-        __typename?: "AppliedMethod";
-        methodId: any;
-    };
-    resourceTree: {
-        __typename?: "GetHttpsResourceTree";
-        root: {
-            __typename?: "GetHttpsResourceTreeRoot";
-            value: {
-                __typename?: "GetHttpsResource";
-                description?: string | null | undefined;
-                hashValue: string;
-                locator: any;
-                dataFormatId: any;
-            };
-        };
-    };
-};
-
 function Page() {
     const [form] = Form.useForm();
     const [filtering, setFiltering] = useState(false);
     const [globalErrorMessages, setGlobalErrorMessages] = useState(
         new Array<string>()
     );
-    const [data, setData] = useState<PartialGeometricData[]>([]);
+    const [data, setData] = useState<GeometricDataPartialFragment[]>([]);
 
     const allGeometricDataQuery = useQuery(AllGeometricDataDocument, {
         skip: true,
@@ -194,7 +167,7 @@ function Page() {
                     data?.databases?.edges?.map(
                         (edge) => edge?.node?.allGeometricData?.edges?.map((e) => e.node) || []
                     ) || [];
-                const flatData = ([] as PartialGeometricData[]).concat(
+                const flatData = ([] as GeometricDataPartialFragment[]).concat(
                     ...nestedData
                 );
                 setData(flatData);

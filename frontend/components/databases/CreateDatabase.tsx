@@ -4,7 +4,7 @@ import {
   CreateDatabaseDocument,
   DatabasesDocument,
 } from "../../queries/databases.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -20,11 +20,11 @@ const tailLayout = {
 type FormValues = {
   name: string;
   description: string;
-  locator: Scalars["Url"];
+  locator: Scalars["Url"]["input"];
 };
 
 export type CreateDatabaseProps = {
-  operatorId: Scalars["Uuid"];
+  operatorId: Scalars["Uuid"]["input"];
 };
 
 export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {

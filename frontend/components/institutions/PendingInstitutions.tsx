@@ -8,7 +8,7 @@ import {
   PendingInstitutionsDocument,
   VerifyInstitutionDocument,
 } from "../../queries/institutions.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import Link from "next/link";
 import paths from "../../paths";
 import { messageApolloError } from "../../lib/apollo";
@@ -27,7 +27,7 @@ export default function PendingInstitutions({ }: PendingInstitutionsProps) {
   const [verifyInstitutionMutation] = useMutation(VerifyInstitutionDocument);
   const [verifyingInstitution, setVerifyingInstitution] = useState(false);
 
-  const verifyInstitution = async (institutionId: Scalars["Uuid"]) => {
+  const verifyInstitution = async (institutionId: Scalars["Uuid"]["input"]) => {
     try {
       setVerifyingInstitution(true);
       const { error, data } = await verifyInstitutionMutation({

@@ -7,11 +7,11 @@ import {
   Typography,
   Descriptions,
 } from "antd";
-import { AllOpticalDataDocument } from "../../queries/data.generated";
+import { AllOpticalDataDocument, OpticalDataPartialFragment } from "../../queries/data.generated";
 import {
   Scalars,
   OpticalDataPropositionInput,
-} from "../../__generated__/__types__";
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import Link from "next/link";
 import paths from "../../paths";
@@ -84,44 +84,13 @@ const conjunct = (
 //   return { or: propositions };
 // };
 
-type PartialOpticalData = {
-  __typename?: "OpticalData";
-  infraredEmittances: Array<number>;
-  nearnormalHemisphericalSolarReflectances: Array<number>;
-  nearnormalHemisphericalSolarTransmittances: Array<number>;
-  nearnormalHemisphericalVisibleReflectances: Array<number>;
-  nearnormalHemisphericalVisibleTransmittances: Array<number>;
-  uuid: Scalars["Uuid"];
-  timestamp: Scalars["DateTime"];
-  componentId: Scalars["Uuid"];
-  name?: string | null | undefined;
-  description?: string | null | undefined;
-  appliedMethod: {
-    __typename?: "AppliedMethod";
-    methodId: Scalars["Uuid"];
-  };
-  resourceTree: {
-    __typename?: "GetHttpsResourceTree";
-    root: {
-      __typename?: "GetHttpsResourceTreeRoot";
-      value: {
-        __typename?: "GetHttpsResource";
-        description?: string | null | undefined;
-        hashValue: string;
-        locator: Scalars["Url"];
-        dataFormatId: Scalars["Uuid"];
-      };
-    };
-  };
-};
-
 function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>()
   );
-  const [data, setData] = useState<PartialOpticalData[]>([]);
+  const [data, setData] = useState<OpticalDataPartialFragment[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
   // An alternative would be `useLazy...` as told in https://github.com/apollographql/apollo-client/issues/5268#issuecomment-527727653
   // `useLazy...` does not return a `Promise` though as `use...Query.refetch` does which is used below.
@@ -329,7 +298,7 @@ function Page() {
           data?.databases?.edges?.map(
             (edge) => edge?.node?.allOpticalData?.edges?.map((e) => e.node) || []
           ) || [];
-        const flatData = ([] as PartialOpticalData[]).concat(...nestedData);
+        const flatData = ([] as OpticalDataPartialFragment[]).concat(...nestedData);
         setData(flatData);
       } catch (error) {
         // TODO Handle properly.

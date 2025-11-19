@@ -10,7 +10,7 @@ import {
   Space,
 } from "antd";
 import { UpdateComponentAssemblyDocument } from "../../queries/componentAssemblies.generated";
-import { PrimeSurface, Scalars } from "../../__generated__/__types__";
+import { PrimeSurface, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { ComponentDocument } from "../../queries/components.generated";
@@ -24,14 +24,14 @@ const tailLayout = {
 };
 
 type FormValues = {
-  newIndex: Scalars["Byte"] | null | undefined;
+  newIndex: Scalars["Byte"]["input"] | null | undefined;
   newPrimeSurface: PrimeSurface | null | undefined;
 };
 
 export type UpdateComponentAssemblyProps = {
-  assembledComponent: { uuid: Scalars["Uuid"]; name: string };
-  partComponent: { uuid: Scalars["Uuid"]; name: string };
-  index: Scalars["Byte"] | null | undefined;
+  assembledComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
+  partComponent: { uuid: Scalars["Uuid"]["input"]; name: string };
+  index: Scalars["Byte"]["input"] | null | undefined;
   primeSurface: PrimeSurface | null | undefined;
 };
 

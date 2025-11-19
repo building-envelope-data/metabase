@@ -3,7 +3,7 @@ import { Alert, Form, Input, Button, Typography } from "antd";
 import {
     AddGnuPgKeyFingerprintDocument,
 } from "../../queries/gnuPgKeyFingerprints.generated";
-import { Scalars } from "../../__generated__/__types__";
+import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -21,7 +21,7 @@ type FormValues = {
 };
 
 export type AddGnuPgKeyFingerprintProps = {
-    institutionId: Scalars["Uuid"];
+    institutionId: Scalars["Uuid"]["input"];
 };
 
 export default function AddGnuPgKeyFingerprint({ institutionId }: AddGnuPgKeyFingerprintProps) {
