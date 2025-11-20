@@ -23,7 +23,7 @@ import Link from "next/link";
 import paths from "../../paths";
 import { Reference } from "../Reference";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 import UpdateMethod from "./UpdateMethod";
 import { RemoveInstitutionMethodDeveloperDocument } from "../../queries/institutionMethodDevelopers.generated";
 import { RemoveUserMethodDeveloperDocument } from "../../queries/userMethodDevelopers.generated";
@@ -43,10 +43,11 @@ export default function Method({ methodId }: MethodProps) {
     },
   });
   const method = data?.method;
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (error) {
-      messageApolloError(error);
+      messageApi.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -159,6 +160,7 @@ export default function Method({ methodId }: MethodProps) {
   }
 
   return <>
+    {contextHolder}
     <PageHeader
       title={method.name}
       subTitle={method.description}

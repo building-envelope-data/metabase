@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client/react';
 import { useQuery } from '@apollo/client/react';
-import { messageApolloError } from "../../../lib/apollo";
+import { stringifyApolloError } from "../../../lib/apollo";
 import ManageLayout from "../../../components/me/ManageLayout";
 import {
   GenerateUserTwoFactorRecoveryCodesDocument,
@@ -9,7 +9,7 @@ import {
   ForgetUserTwoFactorAuthenticationClientDocument,
   TwoFactorAuthenticationDocument,
 } from "../../../queries/currentUser.generated";
-import { Button, Alert, message, Skeleton, Typography } from "antd";
+import { Button, Alert, Skeleton, Typography, message } from "antd";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import paths from "../../../paths";
@@ -167,10 +167,11 @@ function Page() {
       setGeneratingUserTwoFactorRecoveryCodes(false);
     }
   };
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (error) {
-      messageApolloError(error);
+      messageApi.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -184,6 +185,7 @@ function Page() {
 
   return (
     <ManageLayout>
+      {contextHolder}
       <Typography.Title level={1}>Two-factor authentication</Typography.Title>
       {twoFactorAuthentication.isEnabled ? (
         <>

@@ -14,17 +14,17 @@ import {
   Tag,
   List,
   Button,
-  message,
   Row,
   Col,
   Space,
+  message
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { ReactNode, useEffect, useState } from "react";
 import paths from "../../paths";
 import Link from "next/link";
 import OpenEndedDateTimeRangeX from "../OpenEndedDateTimeRangeX";
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 import AddPartOfComponent from "./AddPartOfComponent";
 import AddAssembledOfComponent from "./AddAssembledOfComponent";
 import UpdateComponentAssembly from "./UpdateComponentAssembly";
@@ -48,10 +48,11 @@ export default function Component({ componentId }: ComponentProps) {
     },
   });
   const component = data?.component;
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (error) {
-      messageApolloError(error);
+      messageApi.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -261,6 +262,7 @@ export default function Component({ componentId }: ComponentProps) {
   }
 
   return <>
+    {contextHolder}
     <PageHeader
       title={[
         component.name,

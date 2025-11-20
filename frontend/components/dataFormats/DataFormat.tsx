@@ -1,11 +1,11 @@
 import { Scalars } from "../../__generated__/graphql";
 import { DataFormatDocument } from "../../queries/dataFormats.generated";
-import { Skeleton, Result, Descriptions, Typography } from "antd";
+import { Skeleton, Result, Descriptions, Typography, message } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { useEffect } from "react";
 import paths from "../../paths";
 import { Reference } from "../Reference";
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 import UpdateDataFormat from "./UpdateDataFormat";
 import { useQuery } from "@apollo/client/react";
 
@@ -20,10 +20,11 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
     },
   });
   const dataFormat = data?.dataFormat;
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (error) {
-      messageApolloError(error);
+      messageApi.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -42,6 +43,8 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
   }
 
   return (
+    <>
+    {contextHolder}
     <PageHeader
       title={dataFormat.name}
       subTitle={dataFormat.description}
@@ -93,5 +96,6 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
         </Descriptions.Item>
       </Descriptions>
     </PageHeader>
+    </>
   );
 }

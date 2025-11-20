@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client/react';
 import Layout from "../../components/Layout";
-import { Table, Typography } from "antd";
+import { Table, Typography, message } from "antd";
 import { UsersDocument } from "../../queries/users.generated";
 import paths from "../../paths";
 import { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import {
   getUuidColumnProps,
 } from "../../lib/table";
 import Link from "next/link";
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 
 // TODO Pagination. See https://www.apollographql.com/docs/react/pagination/core-api/
 
@@ -22,14 +22,17 @@ function Page() {
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
   const onFilterTextChange = setMapValue(filterText, setFilterText);
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   useEffect(() => {
     if (error) {
-      messageApolloError(error);
+      messageApi.error(stringifyApolloError(error));
     }
   }, [error]);
 
   return (
     <Layout>
+      {contextHolder}
       <Typography.Paragraph style={{ maxWidth: 768 }}>
         A user is usually affiliated to an{" "}
         <Link href={paths.institutions}>institution</Link>. In further steps,

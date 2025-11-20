@@ -4,11 +4,11 @@ import {
   Button,
   Divider,
   Typography,
-  message,
   Skeleton,
   Descriptions,
   List,
   Result,
+  message,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { SyncOutlined } from "@ant-design/icons";
@@ -28,7 +28,7 @@ import paths from "../../paths";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AddUserRole from "./AddUserRole";
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 
 export type UserProps = {
   userId: Scalars["Uuid"]["input"];
@@ -206,9 +206,11 @@ export default function User({ userId }: UserProps) {
     }
   };
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   useEffect(() => {
     if (error) {
-      messageApolloError(error);
+      messageApi.error(stringifyApolloError(error));
     }
   }, [error]);
 
@@ -227,6 +229,8 @@ export default function User({ userId }: UserProps) {
   }
 
   return (
+    <>
+    {contextHolder}
     <PageHeader
       title={user.name}
       tags={user.roles?.map((x) => (
@@ -358,5 +362,6 @@ export default function User({ userId }: UserProps) {
           />
         )}
     </PageHeader>
+    </>
   );
 }

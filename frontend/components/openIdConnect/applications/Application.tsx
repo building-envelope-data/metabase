@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { Scalars } from "../../../__generated__/graphql";
-import { Descriptions, Divider, Result, Skeleton, Typography } from "antd";
-import { messageApolloError } from "../../../lib/apollo";
+import { Descriptions, Divider, Result, Skeleton, Typography, message } from "antd";
+import { stringifyApolloError } from "../../../lib/apollo";
 import UpdateApplication from "./UpdateApplication";
 import AutorizationTable from "../authorizations/AuthorizationTable";
 import TokenTable from "../tokens/TokenTable";
@@ -22,10 +22,11 @@ export default function Application({ applicationId }: ApplicationProps) {
         },
     });
     const application = data?.openIdConnectApplication;
+    const [messageApi, contextHolder] = message.useMessage();
 
     useEffect(() => {
         if (error) {
-            messageApolloError(error);
+            messageApi.error(stringifyApolloError(error));
         }
     }, [error]);
 
@@ -44,6 +45,7 @@ export default function Application({ applicationId }: ApplicationProps) {
     }
 
     return <>
+        {contextHolder}
         <PageHeader
             title={application.displayName}
             tags={[]}

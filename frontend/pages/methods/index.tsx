@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client/react';
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
-import { Typography } from "antd";
+import { Typography, message } from "antd";
 import { MethodsDocument } from "../../queries/methods.generated";
 import { useEffect } from "react";
 import paths from "../../paths";
@@ -13,15 +13,17 @@ import MethodTable from "../../components/methods/MethodTable";
 function Page() {
   const { loading, error, data } = useQuery(MethodsDocument);
   const nodes = data?.methods?.edges?.map((e) => e.node) || [];
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (error) {
-      messageApolloError(error);
+      messageApi.error(stringifyApolloError(error));
     }
   }, [error]);
 
   return (
     <Layout>
+      {contextHolder}
       <Typography.Paragraph style={{ maxWidth: 768 }}>
         <Link href={paths.data}>Data</Link> is created by applying a method.
         Methods can be defined for example by a standard.

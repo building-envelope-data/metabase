@@ -4,12 +4,12 @@ import {
   Divider,
   List,
   Typography,
-  message,
   Skeleton,
   Button,
   Result,
   Descriptions,
   Tag,
+  message,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import {
@@ -33,7 +33,7 @@ import { DataFormatTable } from "../dataFormats/DataFormatTable";
 import { ComponentTable } from "../components/ComponentTable";
 import DatabaseTable from "../databases/DatabaseTable";
 import MethodTable from "../methods/MethodTable";
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 import UpdateInstitution from "./UpdateInstitution";
 import DeleteInstitution from "./DeleteInstitution";
 import SwitchInstitutionOperatingState from "./SwitchInstitutionOperatingState";
@@ -55,6 +55,14 @@ export default function Institution({ institutionId }: InstitutionProps) {
     },
   });
   const institution = data?.institution;
+
+  const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    if (error) {
+      messageApi.error(stringifyApolloError(error));
+    }
+  }, [error]);
 
   const [confirmInstitutionMethodDeveloperMutation] = useMutation(ConfirmInstitutionMethodDeveloperDocument);
   const [
@@ -144,12 +152,6 @@ export default function Institution({ institutionId }: InstitutionProps) {
     }
   };
 
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
-
   if (loading) {
     return <Skeleton active avatar title />;
   }
@@ -165,6 +167,7 @@ export default function Institution({ institutionId }: InstitutionProps) {
   }
 
   return <>
+    {contextHolder}
     <PageHeader
       title={[
         institution.name,

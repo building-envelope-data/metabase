@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client/react';
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
-import { Typography } from "antd";
+import { Typography, message } from "antd";
 import { DataFormatsDocument } from "../../queries/dataFormats.generated";
 import { useEffect } from "react";
 import Link from "next/link";
@@ -12,15 +12,17 @@ import { DataFormatTable } from "../../components/dataFormats/DataFormatTable";
 
 function Page() {
   const { loading, error, data } = useQuery(DataFormatsDocument);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (error) {
-      messageApolloError(error);
+      messageApi.error(stringifyApolloError(error));
     }
   }, [error]);
 
   return (
     <Layout>
+      {contextHolder}
       <Typography.Paragraph style={{ maxWidth: 768 }}>
         <Link href={paths.data}>Data</Link> is shared as resources. Each
         resource has one of the following data formats:

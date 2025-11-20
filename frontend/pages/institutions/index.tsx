@@ -1,9 +1,9 @@
 import { useQuery } from '@apollo/client/react';
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import paths from "../../paths";
-import { Table, Typography, Divider } from "antd";
+import { Table, Typography, Divider, message } from "antd";
 import { InstitutionsDocument } from "../../queries/institutions.generated";
 import { useEffect, useState } from "react";
 import { CurrentUserDocument } from "../../queries/currentUser.generated";
@@ -30,14 +30,17 @@ function Page() {
 
   const currentUser = useQuery(CurrentUserDocument)?.data?.currentUser;
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   useEffect(() => {
     if (error) {
-      messageApolloError(error);
+      messageApi.error(stringifyApolloError(error));
     }
   }, [error]);
 
   return (
     <Layout>
+      {contextHolder}
       <Typography.Paragraph style={{ maxWidth: 768 }}>
         Institutions can manufacture{" "}
         <Link href={paths.components}>components</Link>, operate{" "}

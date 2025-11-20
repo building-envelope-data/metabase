@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client/react';
-import { messageApolloError } from "../../lib/apollo";
+import { stringifyApolloError } from "../../lib/apollo";
 import { NextRouter, useRouter } from "next/router";
-import { Skeleton, Row, Col, Card } from "antd";
+import { Skeleton, Row, Col, Card, message } from "antd";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
 import { useEffect } from "react";
@@ -21,18 +21,19 @@ function Page() {
   const { loading, data, error } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
   const shouldRedirect = !(loading || error || currentUser);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    if (error) {
+      messageApi.error(stringifyApolloError(error));
+    }
+  }, [error]);
 
   useEffect(() => {
     if (router.isReady && shouldRedirect) {
       redirectToLoginPage(router);
     }
   }, [shouldRedirect, router]);
-
-  useEffect(() => {
-    if (error) {
-      messageApolloError(error);
-    }
-  }, [error]);
 
   if (loading || !currentUser) {
     // TODO Handle this case properly.
@@ -45,6 +46,7 @@ function Page() {
 
   return (
     <Layout>
+      {contextHolder}
       <Row justify="center">
         <Col>
           <Card title="Create">
