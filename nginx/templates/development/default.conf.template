@@ -21,10 +21,20 @@ proxy_busy_buffers_size 256k;
 
 add_header X-Frame-Options "SAMEORIGIN"; # Secure from clickjacking: https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-3.1#secure-nginx-from-clickjacking
 
-limit_req_zone $binary_remote_addr zone=one:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=frontend:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=graphql:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=connect:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=antiforgery:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=wellknown:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=personaluserdata:30m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=openapi:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=health:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=email:10m rate=30r/s;
+
 server_tokens  off;
 
 sendfile              on;
+# sendfile_max_chunk 1m;
 keepalive_timeout     29; # Adjust to the lowest possible value that makes sense for your use case.
 client_body_timeout   10;
 client_header_timeout 10;
@@ -87,54 +97,55 @@ server {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
     proxy_cache_bypass $http_upgrade;
-    limit_req zone=one burst=30 nodelay;
+    limit_req zone=frontend burst=100 nodelay;
   }
 
   location /graphql {
     proxy_pass http://backend;
-    limit_req  zone=one burst=10 nodelay;
-  }
-
-  location /openapi {
-    proxy_pass http://backend;
-    limit_req  zone=one burst=10 nodelay;
+    limit_req  zone=graphql burst=12 delay=6;
   }
 
   location /connect {
     proxy_pass http://backend;
-    limit_req  zone=one burst=10 nodelay;
+    limit_req  zone=connect burst=6 nodelay;
   }
 
   location /antiforgery {
     proxy_pass http://backend;
-    limit_req  zone=one burst=10 nodelay;
+    limit_req  zone=antiforgery burst=2 nodelay;
   }
 
   location /.well-known {
     proxy_pass http://backend;
-    limit_req  zone=one burst=1 nodelay;
+    limit_req  zone=wellknown burst=2 nodelay;
   }
 
   location /personal-user-data {
     proxy_pass http://backend;
-    limit_req  zone=one burst=1 nodelay;
+    limit_req  zone=personaluserdata burst=2 nodelay;
+  }
+
+  location /openapi {
+    proxy_pass http://backend;
+    limit_req  zone=openapi burst=10 nodelay;
   }
 
   location /health {
     proxy_pass http://backend;
-    limit_req  zone=one burst=20 nodelay;
+    limit_req  zone=health burst=2 nodelay;
   }
 
   location /email {
     proxy_pass http://email;
-    limit_req  zone=one burst=20 nodelay;
+    limit_req  zone=email burst=20 nodelay;
   }
 
   location /email/hubs {
     proxy_pass http://email;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
-    limit_req zone=one burst=20 nodelay;
+    proxy_cache_bypass $http_upgrade;
+    limit_req zone=email burst=20 nodelay;
   }
 
   error_page 503 @maintenance;
