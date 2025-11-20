@@ -74,6 +74,7 @@ RUN \
 RUN \
   mkdir --parents \
     ./.next \
+    ./__generated__ \
     ./node_modules
 
 ENTRYPOINT ["/usr/bin/tini", "--"]

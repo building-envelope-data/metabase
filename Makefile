@@ -125,7 +125,7 @@ up : build ## (Re)create, and start containers (after building images if necessa
 down : ## Stop containers and remove containers and networks created by `up` and clear backend logs
 	${docker_compose} down \
 		--remove-orphans
-	-rm ./backend/src/logs/*
+	-rm ./frontend/queries/*.generated.ts
 .PHONY : down
 
 restart : ## Restart all stopped and running containers
