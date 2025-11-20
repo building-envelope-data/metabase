@@ -233,7 +233,7 @@ that the log files grew huge. You can delete them by running
 When the `frontend` Docker image does not build in production because of an
 unused import in an automatically generated file, for example, one in the
 directory `./frontend/__generated__`, then **temporarily** ignore TypeScript
-build errors by adding the following lines to `./frontend/next.config.js`, for
+build errors by adding the following lines to `./frontend/next.config.ts`, for
 example with `vi` or `nano` in a shell on the deployment machine:
 
 ```
