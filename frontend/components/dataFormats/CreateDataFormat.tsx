@@ -1,13 +1,10 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Alert, Form, Input, Button, Divider } from "antd";
 import {
   CreateDataFormatDocument,
   DataFormatsDocument,
 } from "../../queries/dataFormats.generated";
-import {
-  ReferenceInput,
-  Scalars,
-} from "../../__generated__/graphql";
+import { ReferenceInput, Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import { InstitutionDocument } from "../../queries/institutions.generated";
@@ -51,7 +48,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
     ],
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
@@ -68,7 +65,10 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
       try {
         setCreating(true);
         // TODO Why does `initialValue` not set standardizers to `[]`?
-        if (reference?.standard != null && reference.standard.standardizers == undefined) {
+        if (
+          reference?.standard != null &&
+          reference.standard.standardizers == undefined
+        ) {
           reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
@@ -89,7 +89,7 @@ export default function CreateDataFormat({ managerId }: CreateDataFormatProps) {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.createDataFormat?.errors) {
           form.resetFields();

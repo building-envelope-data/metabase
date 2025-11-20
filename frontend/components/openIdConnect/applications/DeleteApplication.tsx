@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Button, message } from "antd";
 import { useState } from "react";
 import {
@@ -13,7 +13,7 @@ export type DeleteApplicationProps = {
 };
 
 export default function DeleteApplication({
-  applicationId
+  applicationId,
 }: DeleteApplicationProps) {
   const [deleting, setDeleting] = useState(false);
 
@@ -28,9 +28,9 @@ export default function DeleteApplication({
         query: ApplicationDocument,
         variables: {
           uuid: applicationId,
-        }
+        },
       },
-    ]
+    ],
   });
 
   const deleteApplication = async () => {
@@ -48,7 +48,7 @@ export default function DeleteApplication({
         message.error(
           data?.deleteOpenIdConnectApplication?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       }
     } finally {

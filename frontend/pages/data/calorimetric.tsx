@@ -1,13 +1,9 @@
 import Layout from "../../components/Layout";
+import { Table, Form, Button, Alert, Typography, Descriptions } from "antd";
 import {
-  Table,
-  Form,
-  Button,
-  Alert,
-  Typography,
-  Descriptions,
-} from "antd";
-import { AllCalorimetricDataDocument, CalorimetricDataPartialFragment } from "../../queries/data.generated";
+  AllCalorimetricDataDocument,
+  CalorimetricDataPartialFragment,
+} from "../../queries/data.generated";
 import {
   Scalars,
   CalorimetricDataPropositionInput,
@@ -48,7 +44,7 @@ enum Negator {
 
 const negateIfNecessary = (
   negator: Negator,
-  proposition: CalorimetricDataPropositionInput
+  proposition: CalorimetricDataPropositionInput,
 ): CalorimetricDataPropositionInput => {
   switch (negator) {
     case Negator.Is:
@@ -60,7 +56,7 @@ const negateIfNecessary = (
 };
 
 const conjunct = (
-  propositions: CalorimetricDataPropositionInput[]
+  propositions: CalorimetricDataPropositionInput[],
 ): CalorimetricDataPropositionInput => {
   if (propositions.length == 0) {
     return {};
@@ -87,7 +83,7 @@ function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [data, setData] = useState<CalorimetricDataPartialFragment[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
@@ -109,33 +105,33 @@ function Page() {
     dataFormatIds,
   }: {
     componentIds:
-    | {
-      negator: Negator;
-      comparator: UuidPropositionComparator;
-      value: Scalars["Uuid"] | undefined;
-    }[]
-    | undefined;
+      | {
+          negator: Negator;
+          comparator: UuidPropositionComparator;
+          value: Scalars["Uuid"] | undefined;
+        }[]
+      | undefined;
     dataFormatIds:
-    | {
-      negator: Negator;
-      comparator: UuidPropositionComparator;
-      value: Scalars["Uuid"] | undefined;
-    }[]
-    | undefined;
+      | {
+          negator: Negator;
+          comparator: UuidPropositionComparator;
+          value: Scalars["Uuid"] | undefined;
+        }[]
+      | undefined;
     gValues:
-    | {
-      negator: Negator;
-      comparator: FloatPropositionComparator;
-      value: number | undefined;
-    }[]
-    | undefined;
+      | {
+          negator: Negator;
+          comparator: FloatPropositionComparator;
+          value: number | undefined;
+        }[]
+      | undefined;
     uValues:
-    | {
-      negator: Negator;
-      comparator: FloatPropositionComparator;
-      value: number | undefined;
-    }[]
-    | undefined;
+      | {
+          negator: Negator;
+          comparator: FloatPropositionComparator;
+          value: number | undefined;
+        }[]
+      | undefined;
   }) => {
     const filter = async () => {
       try {
@@ -147,7 +143,7 @@ function Page() {
             propositions.push(
               negateIfNecessary(negator, {
                 componentId: { [comparator]: value },
-              })
+              }),
             );
           }
         }
@@ -160,7 +156,7 @@ function Page() {
                     dataFormatId: { [comparator]: value },
                   },
                 },
-              })
+              }),
             );
           }
         }
@@ -176,7 +172,7 @@ function Page() {
                       [comparator]: value,
                     },
                   },
-                })
+                }),
               );
             }
           }
@@ -191,7 +187,7 @@ function Page() {
                       [comparator]: value,
                     },
                   },
-                })
+                }),
               );
             }
           }
@@ -200,8 +196,8 @@ function Page() {
           propositions.length == 0
             ? {}
             : {
-              where: conjunct(propositions),
-            }
+                where: conjunct(propositions),
+              },
         );
         if (error) {
           // TODO Handle properly.
@@ -209,10 +205,11 @@ function Page() {
         }
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allCalorimetricData?.edges?.map((e) => e.node) || []
+            (edge) =>
+              edge?.node?.allCalorimetricData?.edges?.map((e) => e.node) || [],
           ) || [];
         const flatData = ([] as CalorimetricDataPartialFragment[]).concat(
-          ...nestedData
+          ...nestedData,
         );
         setData(flatData);
       } catch (error) {
@@ -245,8 +242,18 @@ function Page() {
       >
         <UuidPropositionFormList name="componentIds" label="Component Id" />
         <UuidPropositionFormList name="dataFormatIds" label="Data Format Id" />
-        <FloatPropositionFormList name="gValues" label="g Value" minimum={0} maximum={1} />
-        <FloatPropositionFormList name="uValues" label="u Value" minimum={0} maximum={1} />
+        <FloatPropositionFormList
+          name="gValues"
+          label="g Value"
+          minimum={0}
+          maximum={1}
+        />
+        <FloatPropositionFormList
+          name="uValues"
+          label="u Value"
+          minimum={0}
+          maximum={1}
+        />
 
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={filtering}>
@@ -261,18 +268,18 @@ function Page() {
             ...getUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              (_uuid) => "/" // TODO Link somewhere useful!
+              (_uuid) => "/", // TODO Link somewhere useful!
             ),
           },
           {
             ...getNameColumnProps<(typeof data)[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
+              filterText.get(x),
             ),
           },
           {
             ...getDescriptionColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -281,7 +288,7 @@ function Page() {
           {
             ...getComponentUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           // {
@@ -297,13 +304,13 @@ function Page() {
           {
             ...getAppliedMethodColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
             ...getResourceTreeColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {

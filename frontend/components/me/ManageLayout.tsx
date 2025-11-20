@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useQuery } from "@apollo/client/react";
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -77,7 +77,9 @@ export default function ManageLayout({ children }: ManageLayoutProps) {
           >
             {navItems.map(({ path, label }) => (
               <Menu.Item key={path}>
-                <Link href={path} legacyBehavior>{label}</Link>
+                <Link href={path} legacyBehavior>
+                  {label}
+                </Link>
               </Menu.Item>
             ))}
             {currentUser.hasPassword ? (

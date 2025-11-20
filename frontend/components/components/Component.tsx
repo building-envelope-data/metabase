@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client/react';
-import { useQuery } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { Scalars } from "../../__generated__/graphql";
 import {
   ComponentsDocument,
@@ -17,7 +17,7 @@ import {
   Row,
   Col,
   Space,
-  message
+  message,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import { ReactNode, useEffect, useState } from "react";
@@ -56,12 +56,14 @@ export default function Component({ componentId }: ComponentProps) {
     }
   }, [error]);
 
-  const [removeComponentManufacturerMutation] = useMutation(RemoveComponentManufacturerDocument);
+  const [removeComponentManufacturerMutation] = useMutation(
+    RemoveComponentManufacturerDocument,
+  );
   const [removingComponentManufacturer, setRemovingComponentManufacturer] =
     useState(false);
 
   const removeComponentManufacturer = async (
-    institutionId: Scalars["Uuid"]["input"]
+    institutionId: Scalars["Uuid"]["input"],
   ) => {
     try {
       setRemovingComponentManufacturer(true);
@@ -95,7 +97,7 @@ export default function Component({ componentId }: ComponentProps) {
         message.error(
           data?.removeComponentManufacturer?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       }
     } finally {
@@ -103,13 +105,15 @@ export default function Component({ componentId }: ComponentProps) {
     }
   };
 
-  const [removeComponentAssemblyMutation] = useMutation(RemoveComponentAssemblyDocument);
+  const [removeComponentAssemblyMutation] = useMutation(
+    RemoveComponentAssemblyDocument,
+  );
   const [removingComponentAssembly, setRemovingComponentAssembly] =
     useState(false);
 
   const removeComponentAssembly = async (
     assembledComponentId: Scalars["Uuid"]["input"],
-    partComponentId: Scalars["Uuid"]["input"]
+    partComponentId: Scalars["Uuid"]["input"],
   ) => {
     try {
       setRemovingComponentAssembly(true);
@@ -143,7 +147,7 @@ export default function Component({ componentId }: ComponentProps) {
         message.error(
           data?.removeComponentAssembly?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       }
     } finally {
@@ -151,13 +155,15 @@ export default function Component({ componentId }: ComponentProps) {
     }
   };
 
-  const [removeComponentVariantMutation] = useMutation(RemoveComponentVariantDocument);
+  const [removeComponentVariantMutation] = useMutation(
+    RemoveComponentVariantDocument,
+  );
   const [removingComponentVariant, setRemovingComponentVariant] =
     useState(false);
 
   const removeComponentVariant = async (
     oneComponentId: Scalars["Uuid"]["input"],
-    otherComponentId: Scalars["Uuid"]["input"]
+    otherComponentId: Scalars["Uuid"]["input"],
   ) => {
     try {
       setRemovingComponentVariant(true);
@@ -191,7 +197,7 @@ export default function Component({ componentId }: ComponentProps) {
         message.error(
           data?.removeComponentVariant?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       }
     } finally {
@@ -199,13 +205,15 @@ export default function Component({ componentId }: ComponentProps) {
     }
   };
 
-  const [removeComponentGeneralizationMutation] = useMutation(RemoveComponentGeneralizationDocument);
+  const [removeComponentGeneralizationMutation] = useMutation(
+    RemoveComponentGeneralizationDocument,
+  );
   const [removingComponentGeneralization, setRemovingComponentGeneralization] =
     useState(false);
 
   const removeComponentGeneralization = async (
     generalComponentId: Scalars["Uuid"]["input"],
-    concreteComponentId: Scalars["Uuid"]["input"]
+    concreteComponentId: Scalars["Uuid"]["input"],
   ) => {
     try {
       setRemovingComponentGeneralization(true);
@@ -239,7 +247,7 @@ export default function Component({ componentId }: ComponentProps) {
         message.error(
           data?.removeComponentGeneralization?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       }
     } finally {
@@ -261,171 +269,178 @@ export default function Component({ componentId }: ComponentProps) {
     );
   }
 
-  return <>
-    {contextHolder}
-    <PageHeader
-      title={[
-        component.name,
-        component.abbreviation == null ? null : `(${component.abbreviation})`,
-      ]
-        .filter((x) => x != null)
-        .join(" ")}
-      subTitle={component.description}
-      tags={component.categories.map((x) => (
-        <Tag key={x} color="magenta">
-          {x}
-        </Tag>
-      ))}
-      extra={
-        component.isAuthorizedToUpdateNode
-          ? [
-            <UpdateComponent
-              key="updateComponent"
-              componentId={component.uuid}
-              name={component.name}
-              abbreviation={component.abbreviation}
-              description={component.description}
-              availability={component.availability}
-              categories={component.categories}
-              primeSurface={component.prime?.surface}
-              primeDirection={component.prime?.direction}
-              switchableLayers={component.switchableLayers}
-            />,
-          ]
-          : []
-      }
-      backIcon={false}
-    >
-      <Descriptions size="small" column={1}>
-        <Descriptions.Item label="UUID">{component.uuid}</Descriptions.Item>
-        <Descriptions.Item label="Available">
-          <OpenEndedDateTimeRangeX range={component.availability} />
-        </Descriptions.Item>
-        {component.prime?.surface && (
-          <Descriptions.Item label="Prime Surface">
-            {component.prime?.surface?.description}{" "}
-            {component.prime?.surface?.reference?.title}
+  return (
+    <>
+      {contextHolder}
+      <PageHeader
+        title={[
+          component.name,
+          component.abbreviation == null ? null : `(${component.abbreviation})`,
+        ]
+          .filter((x) => x != null)
+          .join(" ")}
+        subTitle={component.description}
+        tags={component.categories.map((x) => (
+          <Tag key={x} color="magenta">
+            {x}
+          </Tag>
+        ))}
+        extra={
+          component.isAuthorizedToUpdateNode
+            ? [
+                <UpdateComponent
+                  key="updateComponent"
+                  componentId={component.uuid}
+                  name={component.name}
+                  abbreviation={component.abbreviation}
+                  description={component.description}
+                  availability={component.availability}
+                  categories={component.categories}
+                  primeSurface={component.prime?.surface}
+                  primeDirection={component.prime?.direction}
+                  switchableLayers={component.switchableLayers}
+                />,
+              ]
+            : []
+        }
+        backIcon={false}
+      >
+        <Descriptions size="small" column={1}>
+          <Descriptions.Item label="UUID">{component.uuid}</Descriptions.Item>
+          <Descriptions.Item label="Available">
+            <OpenEndedDateTimeRangeX range={component.availability} />
           </Descriptions.Item>
-        )}
-        {component.prime?.direction && (
-          <Descriptions.Item label="Prime Direction">
-            {component.prime?.direction?.description}{" "}
-            {component.prime?.direction?.reference?.title}
-          </Descriptions.Item>
-        )}
-        {component.switchableLayers && (
-          <Descriptions.Item label="Switchable Layers">
-            {component.switchableLayers?.description}{" "}
-            {component.switchableLayers?.reference?.title}
-          </Descriptions.Item>
-        )}
-        {component.extras != undefined && (
-          <Descriptions.Item label="Extras">
-            {JSON.stringify(component.extras, null, "\t")}
-          </Descriptions.Item>
-        )}
-      </Descriptions>
-    </PageHeader>
-    <Space direction="vertical" style={{ display: "flex" }}>
-      <Row gutter={[16, 16]}>
-        <Col flex={1}>
-          <List
-            header="Manufacturers"
-            bordered={true}
-            size="small"
-            footer={
-              component.manufacturers.isAuthorizedToAddEdge && (
-                <AddComponentManufacturer componentId={component.uuid} />
-              )
-            }
-          >
-            {component.manufacturers.edges.map((x) => (
-              <List.Item
-                key={x.node.uuid}
-                actions={([] as ReactNode[]).concat(
-                  x.isAuthorizedToRemoveEdge
-                    ? [
-                      <Button
-                        key="remove"
-                        onClick={() =>
-                          removeComponentManufacturer(x.node.uuid)
-                        }
-                        loading={removingComponentManufacturer}
+          {component.prime?.surface && (
+            <Descriptions.Item label="Prime Surface">
+              {component.prime?.surface?.description}{" "}
+              {component.prime?.surface?.reference?.title}
+            </Descriptions.Item>
+          )}
+          {component.prime?.direction && (
+            <Descriptions.Item label="Prime Direction">
+              {component.prime?.direction?.description}{" "}
+              {component.prime?.direction?.reference?.title}
+            </Descriptions.Item>
+          )}
+          {component.switchableLayers && (
+            <Descriptions.Item label="Switchable Layers">
+              {component.switchableLayers?.description}{" "}
+              {component.switchableLayers?.reference?.title}
+            </Descriptions.Item>
+          )}
+          {component.extras != undefined && (
+            <Descriptions.Item label="Extras">
+              {JSON.stringify(component.extras, null, "\t")}
+            </Descriptions.Item>
+          )}
+        </Descriptions>
+      </PageHeader>
+      <Space direction="vertical" style={{ display: "flex" }}>
+        <Row gutter={[16, 16]}>
+          <Col flex={1}>
+            <List
+              header="Manufacturers"
+              bordered={true}
+              size="small"
+              footer={
+                component.manufacturers.isAuthorizedToAddEdge && (
+                  <AddComponentManufacturer componentId={component.uuid} />
+                )
+              }
+            >
+              {component.manufacturers.edges.map((x) => (
+                <List.Item
+                  key={x.node.uuid}
+                  actions={([] as ReactNode[]).concat(
+                    x.isAuthorizedToRemoveEdge
+                      ? [
+                          <Button
+                            key="remove"
+                            onClick={() =>
+                              removeComponentManufacturer(x.node.uuid)
+                            }
+                            loading={removingComponentManufacturer}
+                          >
+                            Remove
+                          </Button>,
+                        ]
+                      : [],
+                  )}
+                >
+                  <List.Item.Meta
+                    title={
+                      <Link
+                        href={paths.institution(x.node.uuid)}
+                        legacyBehavior
                       >
-                        Remove
-                      </Button>,
-                    ]
-                    : []
-                )}
-              >
-                <List.Item.Meta
-                  title={
-                    <Link href={paths.institution(x.node.uuid)} legacyBehavior>
-                      {x.node.name}
-                    </Link>
-                  }
-                  description={x.node.description}
-                />
-              </List.Item>
-            ))}
-            {component.pendingManufacturers.edges.map((x) => (
-              <List.Item
-                key={x.node.uuid}
-                actions={([] as ReactNode[]).concat(
-                  x.isAuthorizedToRemoveEdge
-                    ? [
-                      <Button
-                        key="remove"
-                        onClick={() =>
-                          removeComponentManufacturer(x.node.uuid)
-                        }
-                        loading={removingComponentManufacturer}
+                        {x.node.name}
+                      </Link>
+                    }
+                    description={x.node.description}
+                  />
+                </List.Item>
+              ))}
+              {component.pendingManufacturers.edges.map((x) => (
+                <List.Item
+                  key={x.node.uuid}
+                  actions={([] as ReactNode[]).concat(
+                    x.isAuthorizedToRemoveEdge
+                      ? [
+                          <Button
+                            key="remove"
+                            onClick={() =>
+                              removeComponentManufacturer(x.node.uuid)
+                            }
+                            loading={removingComponentManufacturer}
+                          >
+                            Remove
+                          </Button>,
+                        ]
+                      : [],
+                  )}
+                >
+                  <List.Item.Meta
+                    title={
+                      <Link
+                        href={paths.institution(x.node.uuid)}
+                        legacyBehavior
                       >
-                        Remove
-                      </Button>,
-                    ]
-                    : []
-                )}
-              >
-                <List.Item.Meta
-                  title={
-                    <Link href={paths.institution(x.node.uuid)} legacyBehavior>
-                      {x.node.name} (Pending)
-                    </Link>
-                  }
-                />
-              </List.Item>
-            ))}
-          </List>
-        </Col>
-      </Row>
-      {(component.assembledOf.edges.length >= 1 ||
-        component.assembledOf.isAuthorizedToAddEdge ||
-        component.partOf.edges.length >= 1 ||
-        component.partOf.isAuthorizedToAddEdge) && (
+                        {x.node.name} (Pending)
+                      </Link>
+                    }
+                  />
+                </List.Item>
+              ))}
+            </List>
+          </Col>
+        </Row>
+        {(component.assembledOf.edges.length >= 1 ||
+          component.assembledOf.isAuthorizedToAddEdge ||
+          component.partOf.edges.length >= 1 ||
+          component.partOf.isAuthorizedToAddEdge) && (
           <Row gutter={[16, 16]}>
             <Col flex={1}>
               {(component.assembledOf.edges.length >= 1 ||
                 component.assembledOf.isAuthorizedToAddEdge) && (
-                  <List
-                    header="Assembled Of"
-                    bordered={true}
-                    size="small"
-                    footer={
-                      component.assembledOf.isAuthorizedToAddEdge && (
-                        <AddPartOfComponent
-                          assembledComponentId={component.uuid}
-                        />
-                      )
-                    }
-                  >
-                    {component.assembledOf.edges.map((x) => (
-                      <List.Item
-                        key={x.node.uuid}
-                        actions={([] as ReactNode[])
-                          .concat(
-                            x.isAuthorizedToUpdateEdge
-                              ? [
+                <List
+                  header="Assembled Of"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    component.assembledOf.isAuthorizedToAddEdge && (
+                      <AddPartOfComponent
+                        assembledComponentId={component.uuid}
+                      />
+                    )
+                  }
+                >
+                  {component.assembledOf.edges.map((x) => (
+                    <List.Item
+                      key={x.node.uuid}
+                      actions={([] as ReactNode[])
+                        .concat(
+                          x.isAuthorizedToUpdateEdge
+                            ? [
                                 <UpdateComponentAssembly
                                   key="update"
                                   assembledComponent={{
@@ -440,17 +455,17 @@ export default function Component({ componentId }: ComponentProps) {
                                   primeSurface={x.primeSurface}
                                 />,
                               ]
-                              : []
-                          )
-                          .concat(
-                            x.isAuthorizedToRemoveEdge
-                              ? [
+                            : [],
+                        )
+                        .concat(
+                          x.isAuthorizedToRemoveEdge
+                            ? [
                                 <Button
                                   key="remove"
                                   onClick={() =>
                                     removeComponentAssembly(
                                       component.uuid,
-                                      x.node.uuid
+                                      x.node.uuid,
                                     )
                                   }
                                   loading={removingComponentAssembly}
@@ -458,52 +473,55 @@ export default function Component({ componentId }: ComponentProps) {
                                   Remove
                                 </Button>,
                               ]
-                              : []
-                          )}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <Space>
-                              <Link href={paths.component(x.node.uuid)} legacyBehavior>
-                                {x.node.name}
-                              </Link>
-                              <div>
-                                <Tag color="purple">Layer {x.index}</Tag>
-                                <Tag color="volcano">
-                                  Prime Surface {x.primeSurface}
-                                </Tag>
-                              </div>
-                            </Space>
-                          }
-                          description={x.node.description}
-                        />
-                      </List.Item>
-                    ))}
-                  </List>
-                )}
+                            : [],
+                        )}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Space>
+                            <Link
+                              href={paths.component(x.node.uuid)}
+                              legacyBehavior
+                            >
+                              {x.node.name}
+                            </Link>
+                            <div>
+                              <Tag color="purple">Layer {x.index}</Tag>
+                              <Tag color="volcano">
+                                Prime Surface {x.primeSurface}
+                              </Tag>
+                            </div>
+                          </Space>
+                        }
+                        description={x.node.description}
+                      />
+                    </List.Item>
+                  ))}
+                </List>
+              )}
             </Col>
             <Col flex={1}>
               {(component.partOf.edges.length >= 1 ||
                 component.partOf.isAuthorizedToAddEdge) && (
-                  <List
-                    header="Part Of"
-                    bordered={true}
-                    size="small"
-                    footer={
-                      component.partOf.isAuthorizedToAddEdge && (
-                        <AddAssembledOfComponent
-                          partComponentId={component.uuid}
-                        />
-                      )
-                    }
-                  >
-                    {component.partOf.edges.map((x) => (
-                      <List.Item
-                        key={x.node.uuid}
-                        actions={([] as ReactNode[])
-                          .concat(
-                            x.isAuthorizedToUpdateEdge
-                              ? [
+                <List
+                  header="Part Of"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    component.partOf.isAuthorizedToAddEdge && (
+                      <AddAssembledOfComponent
+                        partComponentId={component.uuid}
+                      />
+                    )
+                  }
+                >
+                  {component.partOf.edges.map((x) => (
+                    <List.Item
+                      key={x.node.uuid}
+                      actions={([] as ReactNode[])
+                        .concat(
+                          x.isAuthorizedToUpdateEdge
+                            ? [
                                 <UpdateComponentAssembly
                                   key="update"
                                   assembledComponent={{
@@ -518,17 +536,17 @@ export default function Component({ componentId }: ComponentProps) {
                                   primeSurface={x.primeSurface}
                                 />,
                               ]
-                              : []
-                          )
-                          .concat(
-                            x.isAuthorizedToRemoveEdge
-                              ? [
+                            : [],
+                        )
+                        .concat(
+                          x.isAuthorizedToRemoveEdge
+                            ? [
                                 <Button
                                   key="remove"
                                   onClick={() =>
                                     removeComponentAssembly(
                                       x.node.uuid,
-                                      component.uuid
+                                      component.uuid,
                                     )
                                   }
                                   loading={removingComponentAssembly}
@@ -536,64 +554,67 @@ export default function Component({ componentId }: ComponentProps) {
                                   Remove
                                 </Button>,
                               ]
-                              : []
-                          )}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <Space>
-                              <Link href={paths.component(x.node.uuid)} legacyBehavior>
-                                {x.node.name}
-                              </Link>
-                              <div>
-                                <Tag color="purple">Layer {x.index}</Tag>
-                                <Tag color="volcano">
-                                  Prime Surface {x.primeSurface}
-                                </Tag>
-                              </div>
-                            </Space>
-                          }
-                          description={x.node.description}
-                        />
-                      </List.Item>
-                    ))}
-                  </List>
-                )}
+                            : [],
+                        )}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Space>
+                            <Link
+                              href={paths.component(x.node.uuid)}
+                              legacyBehavior
+                            >
+                              {x.node.name}
+                            </Link>
+                            <div>
+                              <Tag color="purple">Layer {x.index}</Tag>
+                              <Tag color="volcano">
+                                Prime Surface {x.primeSurface}
+                              </Tag>
+                            </div>
+                          </Space>
+                        }
+                        description={x.node.description}
+                      />
+                    </List.Item>
+                  ))}
+                </List>
+              )}
             </Col>
           </Row>
         )}
-      {(component.concretizationOf.edges.length >= 1 ||
-        component.concretizationOf.isAuthorizedToAddEdge ||
-        component.generalizationOf.edges.length >= 1 ||
-        component.generalizationOf.isAuthorizedToAddEdge) && (
+        {(component.concretizationOf.edges.length >= 1 ||
+          component.concretizationOf.isAuthorizedToAddEdge ||
+          component.generalizationOf.edges.length >= 1 ||
+          component.generalizationOf.isAuthorizedToAddEdge) && (
           <Row gutter={[16, 16]}>
             <Col flex={1}>
               {(component.concretizationOf.edges.length >= 1 ||
                 component.concretizationOf.isAuthorizedToAddEdge) && (
-                  <List
-                    header="Concretization Of"
-                    bordered={true}
-                    size="small"
-                    footer={
-                      component.concretizationOf.isAuthorizedToAddEdge && (
-                        <AddGeneralizationOfComponent
-                          concreteComponentId={component.uuid}
-                        />
-                      )
-                    }
-                  >
-                    {component.concretizationOf.edges.map((x) => (
-                      <List.Item
-                        key={x.node.uuid}
-                        actions={([] as ReactNode[]).concat(
-                          x.isAuthorizedToRemoveEdge
-                            ? [
+                <List
+                  header="Concretization Of"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    component.concretizationOf.isAuthorizedToAddEdge && (
+                      <AddGeneralizationOfComponent
+                        concreteComponentId={component.uuid}
+                      />
+                    )
+                  }
+                >
+                  {component.concretizationOf.edges.map((x) => (
+                    <List.Item
+                      key={x.node.uuid}
+                      actions={([] as ReactNode[]).concat(
+                        x.isAuthorizedToRemoveEdge
+                          ? [
                               <Button
                                 key="remove"
                                 onClick={() =>
                                   removeComponentGeneralization(
                                     x.node.uuid,
-                                    component.uuid
+                                    component.uuid,
                                   )
                                 }
                                 loading={removingComponentGeneralization}
@@ -601,49 +622,52 @@ export default function Component({ componentId }: ComponentProps) {
                                 Remove
                               </Button>,
                             ]
-                            : []
-                        )}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <Link href={paths.component(x.node.uuid)} legacyBehavior>
-                              {x.node.name}
-                            </Link>
-                          }
-                          description={x.node.description}
-                        />
-                      </List.Item>
-                    ))}
-                  </List>
-                )}
+                          : [],
+                      )}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Link
+                            href={paths.component(x.node.uuid)}
+                            legacyBehavior
+                          >
+                            {x.node.name}
+                          </Link>
+                        }
+                        description={x.node.description}
+                      />
+                    </List.Item>
+                  ))}
+                </List>
+              )}
             </Col>
             <Col flex={1}>
               {(component.generalizationOf.edges.length >= 1 ||
                 component.generalizationOf.isAuthorizedToAddEdge) && (
-                  <List
-                    header="Generalization Of"
-                    bordered={true}
-                    size="small"
-                    footer={
-                      component.generalizationOf.isAuthorizedToAddEdge && (
-                        <AddConcretizationOfComponent
-                          generalComponentId={component.uuid}
-                        />
-                      )
-                    }
-                  >
-                    {component.generalizationOf.edges.map((x) => (
-                      <List.Item
-                        key={x.node.uuid}
-                        actions={([] as ReactNode[]).concat(
-                          x.isAuthorizedToRemoveEdge
-                            ? [
+                <List
+                  header="Generalization Of"
+                  bordered={true}
+                  size="small"
+                  footer={
+                    component.generalizationOf.isAuthorizedToAddEdge && (
+                      <AddConcretizationOfComponent
+                        generalComponentId={component.uuid}
+                      />
+                    )
+                  }
+                >
+                  {component.generalizationOf.edges.map((x) => (
+                    <List.Item
+                      key={x.node.uuid}
+                      actions={([] as ReactNode[]).concat(
+                        x.isAuthorizedToRemoveEdge
+                          ? [
                               <Button
                                 key="remove"
                                 onClick={() =>
                                   removeComponentGeneralization(
                                     component.uuid,
-                                    x.node.uuid
+                                    x.node.uuid,
                                   )
                                 }
                                 loading={removingComponentGeneralization}
@@ -651,26 +675,29 @@ export default function Component({ componentId }: ComponentProps) {
                                 Remove
                               </Button>,
                             ]
-                            : []
-                        )}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <Link href={paths.component(x.node.uuid)} legacyBehavior>
-                              {x.node.name}
-                            </Link>
-                          }
-                          description={x.node.description}
-                        />
-                      </List.Item>
-                    ))}
-                  </List>
-                )}
+                          : [],
+                      )}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Link
+                            href={paths.component(x.node.uuid)}
+                            legacyBehavior
+                          >
+                            {x.node.name}
+                          </Link>
+                        }
+                        description={x.node.description}
+                      />
+                    </List.Item>
+                  ))}
+                </List>
+              )}
             </Col>
           </Row>
         )}
-      {(component.variantOf.edges.length >= 1 ||
-        component.variantOf.isAuthorizedToAddEdge) && (
+        {(component.variantOf.edges.length >= 1 ||
+          component.variantOf.isAuthorizedToAddEdge) && (
           <Row gutter={[16, 16]}>
             <Col flex={1}>
               <List
@@ -689,25 +716,28 @@ export default function Component({ componentId }: ComponentProps) {
                     actions={([] as ReactNode[]).concat(
                       x.isAuthorizedToRemoveEdge
                         ? [
-                          <Button
-                            key="remove"
-                            onClick={() =>
-                              removeComponentVariant(
-                                component.uuid,
-                                x.node.uuid
-                              )
-                            }
-                            loading={removingComponentVariant}
-                          >
-                            Remove
-                          </Button>,
-                        ]
-                        : []
+                            <Button
+                              key="remove"
+                              onClick={() =>
+                                removeComponentVariant(
+                                  component.uuid,
+                                  x.node.uuid,
+                                )
+                              }
+                              loading={removingComponentVariant}
+                            >
+                              Remove
+                            </Button>,
+                          ]
+                        : [],
                     )}
                   >
                     <List.Item.Meta
                       title={
-                        <Link href={paths.component(x.node.uuid)} legacyBehavior>
+                        <Link
+                          href={paths.component(x.node.uuid)}
+                          legacyBehavior
+                        >
                           {x.node.name}
                         </Link>
                       }
@@ -719,6 +749,7 @@ export default function Component({ componentId }: ComponentProps) {
             </Col>
           </Row>
         )}
-    </Space>
-  </>;
+      </Space>
+    </>
+  );
 }

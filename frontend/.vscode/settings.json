@@ -1,5 +1,5 @@
 {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": null,
-    "typescript.tsserver.experimental.enableProjectDiagnostics": true
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": null,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true
 }

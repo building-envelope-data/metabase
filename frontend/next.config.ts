@@ -1,4 +1,4 @@
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -9,9 +9,7 @@ const nextConfig: NextConfig = {
       : [new URL(process.env.NEXT_PUBLIC_METABASE_URL).hostname],
   turbopack: {
     rules: {
-      '/\.(yml|yaml$)/': [
-        'yaml-loader',
-      ],
+      "/\.(yml|yaml$)/": ["yaml-loader"],
     },
   },
   experimental: {
@@ -28,6 +26,6 @@ const nextConfig: NextConfig = {
   //     ]
   //   ]
   // },
-}
+};
 
-export default nextConfig
+export default nextConfig;

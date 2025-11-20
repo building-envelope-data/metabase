@@ -6,10 +6,12 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export default defineConfig([{
+export default defineConfig([
+  {
     extends: [...next],
 
     rules: {
-        "react/display-name": "off",
+      "react/display-name": "off",
     },
-}]);
+  },
+]);

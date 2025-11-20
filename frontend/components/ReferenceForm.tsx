@@ -1,11 +1,7 @@
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { InputNumber, Select, Form, Input, Button, FormInstance } from "antd";
 import { useState } from "react";
-import {
-  Standardizer,
-  Standard,
-  Publication,
-} from "../__generated__/graphql";
+import { Standardizer, Standard, Publication } from "../__generated__/graphql";
 
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
@@ -18,7 +14,7 @@ enum ReferenceKind {
 }
 
 function referenceToKind(
-  reference: Publication | Standard | null | undefined
+  reference: Publication | Standard | null | undefined,
 ): ReferenceKind {
   switch (reference?.__typename) {
     case null:
@@ -36,14 +32,15 @@ function referenceToKind(
 }
 
 function removeTypenames(
-  reference: Publication | Standard | null | undefined
+  reference: Publication | Standard | null | undefined,
 ): Publication | Standard | null {
   if (reference == null) {
     return null;
   }
   const { __typename, ...referenceWithoutTypename } = reference;
   if ("numeration" in referenceWithoutTypename) {
-    const { __typename, ...numerationWithoutTypename } = referenceWithoutTypename.numeration;
+    const { __typename, ...numerationWithoutTypename } =
+      referenceWithoutTypename.numeration;
     referenceWithoutTypename.numeration = numerationWithoutTypename;
   }
   return referenceWithoutTypename;
@@ -61,7 +58,11 @@ export type ReferenceFormProps<Values> = {
 };
 
 // TODO Why does the following not work? export function ReferenceForm<Values extends HasStandardAndPublication>({form}: ReferenceFormProps<Values>) {
-export function ReferenceForm({ form, initialValue, namespace }: ReferenceFormProps<any>) {
+export function ReferenceForm({
+  form,
+  initialValue,
+  namespace,
+}: ReferenceFormProps<any>) {
   const initialKind = referenceToKind(initialValue);
   const initialReference = removeTypenames(initialValue);
   const [selectedReferenceOption, setSelectedReferenceOption] =
@@ -77,7 +78,10 @@ export function ReferenceForm({ form, initialValue, namespace }: ReferenceFormPr
         case ReferenceKind.Publication:
           form.setFieldValue(namespace.concat("standard"), null);
           if (initialKind == ReferenceKind.Publication) {
-            form.setFieldValue(namespace.concat("publication"), initialReference);
+            form.setFieldValue(
+              namespace.concat("publication"),
+              initialReference,
+            );
           }
           break;
         case ReferenceKind.Standard:
@@ -95,7 +99,11 @@ export function ReferenceForm({ form, initialValue, namespace }: ReferenceFormPr
 
   return (
     <>
-      <Form.Item label="Reference" name={["unmapped"].concat(namespace)} initialValue={initialKind}>
+      <Form.Item
+        label="Reference"
+        name={["unmapped"].concat(namespace)}
+        initialValue={initialKind}
+      >
         <Select
           options={[
             { label: "None", value: ReferenceKind.None },
@@ -107,28 +115,80 @@ export function ReferenceForm({ form, initialValue, namespace }: ReferenceFormPr
       </Form.Item>
       {selectedReferenceOption === ReferenceKind.Publication && (
         <>
-          <Form.Item label="Title" name={namespace.concat("publication", "title")} initialValue={initialValue?.__typename == "Publication" ? initialValue.title : null}>
+          <Form.Item
+            label="Title"
+            name={namespace.concat("publication", "title")}
+            initialValue={
+              initialValue?.__typename == "Publication"
+                ? initialValue.title
+                : null
+            }
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Abstract" name={namespace.concat("publication", "abstract")} initialValue={initialValue?.__typename == "Publication" ? initialValue.abstract : null}>
+          <Form.Item
+            label="Abstract"
+            name={namespace.concat("publication", "abstract")}
+            initialValue={
+              initialValue?.__typename == "Publication"
+                ? initialValue.abstract
+                : null
+            }
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Section" name={namespace.concat("publication", "section")} initialValue={initialValue?.__typename == "Publication" ? initialValue.section : null}>
+          <Form.Item
+            label="Section"
+            name={namespace.concat("publication", "section")}
+            initialValue={
+              initialValue?.__typename == "Publication"
+                ? initialValue.section
+                : null
+            }
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="arXiv" name={namespace.concat("publication", "arXiv")} initialValue={initialValue?.__typename == "Publication" ? initialValue.arXiv : null}>
+          <Form.Item
+            label="arXiv"
+            name={namespace.concat("publication", "arXiv")}
+            initialValue={
+              initialValue?.__typename == "Publication"
+                ? initialValue.arXiv
+                : null
+            }
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="DOI" name={namespace.concat("publication", "doi")} initialValue={initialValue?.__typename == "Publication" ? initialValue.doi : null}>
+          <Form.Item
+            label="DOI"
+            name={namespace.concat("publication", "doi")}
+            initialValue={
+              initialValue?.__typename == "Publication"
+                ? initialValue.doi
+                : null
+            }
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="URN" name={namespace.concat("publication", "urn")} initialValue={initialValue?.__typename == "Publication" ? initialValue.urn : null}>
+          <Form.Item
+            label="URN"
+            name={namespace.concat("publication", "urn")}
+            initialValue={
+              initialValue?.__typename == "Publication"
+                ? initialValue.urn
+                : null
+            }
+          >
             <Input />
           </Form.Item>
           <Form.Item
             label="WebAddress"
             name={namespace.concat("publication", "webAddress")}
-            initialValue={initialValue?.__typename == "Publication" ? initialValue.webAddress : null}
+            initialValue={
+              initialValue?.__typename == "Publication"
+                ? initialValue.webAddress
+                : null
+            }
             rules={[
               {
                 type: "url",
@@ -137,7 +197,16 @@ export function ReferenceForm({ form, initialValue, namespace }: ReferenceFormPr
           >
             <Input />
           </Form.Item>
-          <Form.List name={namespace.concat("publication", "authors")} initialValue={initialValue?.__typename == "Publication" ? (initialValue.authors == null ? undefined : initialValue.authors) : undefined}>
+          <Form.List
+            name={namespace.concat("publication", "authors")}
+            initialValue={
+              initialValue?.__typename == "Publication"
+                ? initialValue.authors == null
+                  ? undefined
+                  : initialValue.authors
+                : undefined
+            }
+          >
             {(fields, { add, remove }, { errors }) => (
               <>
                 {fields.map((field, index) => (
@@ -174,13 +243,35 @@ export function ReferenceForm({ form, initialValue, namespace }: ReferenceFormPr
       )}
       {selectedReferenceOption === ReferenceKind.Standard && (
         <>
-          <Form.Item label="Title" name={namespace.concat("standard", "title")} initialValue={initialValue?.__typename == "Standard" ? initialValue.title : null}>
+          <Form.Item
+            label="Title"
+            name={namespace.concat("standard", "title")}
+            initialValue={
+              initialValue?.__typename == "Standard" ? initialValue.title : null
+            }
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Abstract" name={namespace.concat("standard", "abstract")} initialValue={initialValue?.__typename == "Standard" ? initialValue.abstract : null}>
+          <Form.Item
+            label="Abstract"
+            name={namespace.concat("standard", "abstract")}
+            initialValue={
+              initialValue?.__typename == "Standard"
+                ? initialValue.abstract
+                : null
+            }
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Section" name={namespace.concat("standard", "section")} initialValue={initialValue?.__typename == "Standard" ? initialValue.section : null}>
+          <Form.Item
+            label="Section"
+            name={namespace.concat("standard", "section")}
+            initialValue={
+              initialValue?.__typename == "Standard"
+                ? initialValue.section
+                : null
+            }
+          >
             <Input />
           </Form.Item>
           <Form.Item label="Numeration">
@@ -188,7 +279,11 @@ export function ReferenceForm({ form, initialValue, namespace }: ReferenceFormPr
               <Form.Item
                 noStyle
                 name={namespace.concat("standard", "numeration", "mainNumber")}
-                initialValue={initialValue?.__typename == "Standard" ? initialValue.numeration.mainNumber : null}
+                initialValue={
+                  initialValue?.__typename == "Standard"
+                    ? initialValue.numeration.mainNumber
+                    : null
+                }
                 rules={[
                   {
                     required: true,
@@ -197,21 +292,47 @@ export function ReferenceForm({ form, initialValue, namespace }: ReferenceFormPr
               >
                 <Input placeholder="Main Number" />
               </Form.Item>
-              <Form.Item noStyle name={namespace.concat("standard", "numeration", "prefix")} initialValue={initialValue?.__typename == "Standard" ? initialValue.numeration.prefix : null}>
+              <Form.Item
+                noStyle
+                name={namespace.concat("standard", "numeration", "prefix")}
+                initialValue={
+                  initialValue?.__typename == "Standard"
+                    ? initialValue.numeration.prefix
+                    : null
+                }
+              >
                 <Input placeholder="Prefix" />
               </Form.Item>
-              <Form.Item noStyle name={namespace.concat("standard", "numeration", "suffix")} initialValue={initialValue?.__typename == "Standard" ? initialValue.numeration.suffix : null}>
+              <Form.Item
+                noStyle
+                name={namespace.concat("standard", "numeration", "suffix")}
+                initialValue={
+                  initialValue?.__typename == "Standard"
+                    ? initialValue.numeration.suffix
+                    : null
+                }
+              >
                 <Input placeholder="Suffix" />
               </Form.Item>
             </Input.Group>
           </Form.Item>
-          <Form.Item label="Year" name={namespace.concat("standard", "year")} initialValue={initialValue?.__typename == "Standard" ? initialValue.year : null}>
+          <Form.Item
+            label="Year"
+            name={namespace.concat("standard", "year")}
+            initialValue={
+              initialValue?.__typename == "Standard" ? initialValue.year : null
+            }
+          >
             <InputNumber />
           </Form.Item>
           <Form.Item
             label="Locator"
             name={namespace.concat("standard", "locator")}
-            initialValue={initialValue?.__typename == "Standard" ? initialValue.locator : null}
+            initialValue={
+              initialValue?.__typename == "Standard"
+                ? initialValue.locator
+                : null
+            }
             rules={[
               {
                 type: "url",
@@ -220,7 +341,15 @@ export function ReferenceForm({ form, initialValue, namespace }: ReferenceFormPr
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Standardizers" name={namespace.concat("standard", "standardizers")} initialValue={initialValue?.__typename == "Standard" ? initialValue.standardizers : null}>
+          <Form.Item
+            label="Standardizers"
+            name={namespace.concat("standard", "standardizers")}
+            initialValue={
+              initialValue?.__typename == "Standard"
+                ? initialValue.standardizers
+                : null
+            }
+          >
             <Select
               mode="multiple"
               placeholder="Please select"

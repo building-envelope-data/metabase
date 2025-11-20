@@ -5,56 +5,64 @@ import { ApplicationDocument } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/graphql";
 
 export type AuthorizationTableProps = {
-    applicationId: Scalars["Uuid"]["input"];
-    authorizations: AuthorizationPartialFragment[];
+  applicationId: Scalars["Uuid"]["input"];
+  authorizations: AuthorizationPartialFragment[];
 };
 
-export default function AutorizationTable({ applicationId, authorizations }: AuthorizationTableProps) {
-    const authorizationColumns: TableProps<AuthorizationPartialFragment>['columns'] = [
-        {
-            title: "Satus",
-            dataIndex: "status",
-            key: "status",
-        },
-        {
-            title: "Type",
-            dataIndex: "type",
-            key: "type",
-        },
-        {
-            title: "Subject",
-            dataIndex: "subject",
-            key: "subject",
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, authorization) => (
-                <Space size="middle">
-                    {authorization.isAuthorizedToDeleteNode ? (
-                        <>
-                            <DeleteAuthorization
-                                authorizationId={authorization.uuid}
-                                refetchQueries={[{
-                                    query: ApplicationDocument,
-                                    variables: {
-                                        uuid: applicationId,
-                                    }
-                                }]}
-                            />
-                        </>
-                    )
-                        : <></>}
-
-                </Space>
-            ),
-        },
+export default function AutorizationTable({
+  applicationId,
+  authorizations,
+}: AuthorizationTableProps) {
+  const authorizationColumns: TableProps<AuthorizationPartialFragment>["columns"] =
+    [
+      {
+        title: "Satus",
+        dataIndex: "status",
+        key: "status",
+      },
+      {
+        title: "Type",
+        dataIndex: "type",
+        key: "type",
+      },
+      {
+        title: "Subject",
+        dataIndex: "subject",
+        key: "subject",
+      },
+      {
+        title: "Action",
+        key: "action",
+        render: (_, authorization) => (
+          <Space size="middle">
+            {authorization.isAuthorizedToDeleteNode ? (
+              <>
+                <DeleteAuthorization
+                  authorizationId={authorization.uuid}
+                  refetchQueries={[
+                    {
+                      query: ApplicationDocument,
+                      variables: {
+                        uuid: applicationId,
+                      },
+                    },
+                  ]}
+                />
+              </>
+            ) : (
+              <></>
+            )}
+          </Space>
+        ),
+      },
     ];
 
-    return <>
-        <Table<AuthorizationPartialFragment>
-            columns={authorizationColumns}
-            dataSource={authorizations}
-        />
-    </>;
+  return (
+    <>
+      <Table<AuthorizationPartialFragment>
+        columns={authorizationColumns}
+        dataSource={authorizations}
+      />
+    </>
+  );
 }

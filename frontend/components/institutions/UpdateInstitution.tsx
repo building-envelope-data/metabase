@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import {
   InstitutionsDocument,
   UpdateInstitutionDocument,
@@ -49,7 +49,7 @@ export default function UpdateInstitution({
     ],
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
@@ -79,7 +79,7 @@ export default function UpdateInstitution({
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (
           !error &&

@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client/react';
-import { useQuery } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import {
   Form,
   Typography,
@@ -47,7 +47,7 @@ function Page() {
     },
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [setting, setSetting] = useState(false);
@@ -68,7 +68,7 @@ function Page() {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.setUserPhoneNumber?.errors) {
           message.success("Your new phone number was set.");

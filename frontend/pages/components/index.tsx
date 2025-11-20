@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useQuery } from "@apollo/client/react";
 import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import { Typography, message } from "antd";

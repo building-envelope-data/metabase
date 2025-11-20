@@ -15,5 +15,5 @@ export const Highlight = forwardRef<Highlighter, HighlightProps>(
       autoEscape
       textToHighlight={text || ""}
     />
-  )
+  ),
 );

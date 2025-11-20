@@ -126,7 +126,7 @@ mutation UpdateApplication(
       postLogoutRedirectUri: $postLogoutRedirectUri
     }
   ) {
-    application{
+    application {
       ...ApplicationPartial
     }
     errors {
@@ -137,15 +137,11 @@ mutation UpdateApplication(
   }
 }
 
-mutation ResetApplicationClientSecret(
-  $applicationId: Uuid!
-) {
+mutation ResetApplicationClientSecret($applicationId: Uuid!) {
   resetOpenIdConnectApplicationClientSecret(
-    input: {
-      applicationId: $applicationId
-    }
+    input: { applicationId: $applicationId }
   ) {
-    application{
+    application {
       ...ApplicationPartial
     }
     clientSecret
@@ -168,7 +164,9 @@ mutation DeleteApplication($applicationId: Uuid!) {
 }
 
 mutation DeleteAuthorization($authorizationId: Uuid!) {
-  deleteOpenIdConnectAuthorization(input: { authorizationId: $authorizationId }) {
+  deleteOpenIdConnectAuthorization(
+    input: { authorizationId: $authorizationId }
+  ) {
     errors {
       code
       message

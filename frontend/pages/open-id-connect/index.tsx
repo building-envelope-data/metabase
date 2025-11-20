@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useQuery } from "@apollo/client/react";
 import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import { useEffect } from "react";
@@ -6,7 +6,10 @@ import { CurrentUserDocument } from "../../queries/currentUser.generated";
 import ApplicationTable from "../../components/openIdConnect/applications/ApplicationTable";
 import { useRouter } from "next/router";
 import paths, { redirectToLoginPage } from "../../paths";
-import { ApplicationPartialFragment, ApplicationsDocument } from "../../queries/openIdConnect.generated";
+import {
+  ApplicationPartialFragment,
+  ApplicationsDocument,
+} from "../../queries/openIdConnect.generated";
 import { message } from "antd";
 
 function Page() {
@@ -33,7 +36,10 @@ function Page() {
       {contextHolder}
       <ApplicationTable
         loading={loading}
-        applications={data?.openIdConnectApplications as ApplicationPartialFragment[] || []}
+        applications={
+          (data?.openIdConnectApplications as ApplicationPartialFragment[]) ||
+          []
+        }
       />
     </Layout>
   );

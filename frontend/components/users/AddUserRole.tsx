@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import {
   UserDocument,
   UsersDocument,
@@ -39,7 +39,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
     ],
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
@@ -60,7 +60,7 @@ export default function AddUserRole({ userId, roles }: AddUserRoleProps) {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.addUserRole?.errors) {
           form.resetFields();

@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { ConfirmUserEmailDocument } from "../../queries/users.generated";
@@ -29,7 +29,7 @@ function ConfirmUserEmail() {
             message.error(
               data?.confirmUserEmail?.errors
                 .map((error) => error.message)
-                .join(" ")
+                .join(" "),
             );
           } else {
             message.success("Email address confirmed!");

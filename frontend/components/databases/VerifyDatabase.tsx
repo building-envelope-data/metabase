@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Button, message } from "antd";
 import {
   VerifyDatabaseDocument,
@@ -48,7 +48,7 @@ export default function VerifyDatabase({ databaseId }: VerifyDatabaseProps) {
       } else if (data?.verifyDatabase?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
-          data?.verifyDatabase?.errors.map((error) => error.message).join(" ")
+          data?.verifyDatabase?.errors.map((error) => error.message).join(" "),
         );
       }
     } catch (error) {

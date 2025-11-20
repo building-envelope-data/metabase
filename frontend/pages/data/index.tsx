@@ -31,15 +31,17 @@ function Page() {
     <Layout>
       <Flex justify="center">
         <div style={{ maxWidth: 768 }}>
-        <List
-      bordered
-      dataSource={navItems}
-      renderItem={(item) => (
-        <List.Item>
-          <Link href={item.path} legacyBehavior>{item.label}</Link>
-        </List.Item>
-      )}
-    />
+          <List
+            bordered
+            dataSource={navItems}
+            renderItem={(item) => (
+              <List.Item>
+                <Link href={item.path} legacyBehavior>
+                  {item.label}
+                </Link>
+              </List.Item>
+            )}
+          />
         </div>
       </Flex>
     </Layout>

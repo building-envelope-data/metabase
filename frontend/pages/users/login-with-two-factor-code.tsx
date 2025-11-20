@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
 import { LoginUserWithTwoFactorCodeDocument } from "../../queries/currentUser.generated";
@@ -24,9 +24,11 @@ function LoginWithTwoFactorCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
   const apolloClient = initializeApollo();
-  const [loginUserWithTwoFactorCodeMutation] = useMutation(LoginUserWithTwoFactorCodeDocument);
+  const [loginUserWithTwoFactorCodeMutation] = useMutation(
+    LoginUserWithTwoFactorCodeDocument,
+  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [loggingIn, setLoggingIn] = useState(false);
@@ -53,7 +55,7 @@ function LoginWithTwoFactorCode() {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (
           !error &&
@@ -65,7 +67,7 @@ function LoginWithTwoFactorCode() {
           await router.push(
             typeof returnTo === "string" && isLocalUrl(returnTo)
               ? returnTo
-              : paths.home
+              : paths.home,
           );
         }
       } catch (error) {

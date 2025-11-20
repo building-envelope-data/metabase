@@ -31,19 +31,19 @@ export function DatabaseTable({ loading, databases }: DatabaseTableProps) {
           ...getUuidColumnProps<(typeof databases)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x),
-            paths.database
+            paths.database,
           ),
         },
         {
           ...getNameColumnProps<(typeof databases)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
           ...getDescriptionColumnProps<(typeof databases)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -54,7 +54,7 @@ export function DatabaseTable({ loading, databases }: DatabaseTableProps) {
             "locator",
             (record) => record.locator,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -66,7 +66,7 @@ export function DatabaseTable({ loading, databases }: DatabaseTableProps) {
             (record) => record.operator.node.name,
             onFilterTextChange,
             (x) => filterText.get(x),
-            (x) => paths.institution(x.operator.node.uuid)
+            (x) => paths.institution(x.operator.node.uuid),
           ),
         },
       ]}

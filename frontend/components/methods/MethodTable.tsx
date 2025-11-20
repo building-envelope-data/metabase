@@ -39,18 +39,18 @@ export function MethodTable({ loading, methods }: MethodTableProps) {
           ...getUuidColumnProps<(typeof methods)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x),
-            paths.method
+            paths.method,
           ),
         },
         {
           ...getNameColumnProps<(typeof methods)[0]>(onFilterTextChange, (x) =>
-            filterText.get(x)
+            filterText.get(x),
           ),
         },
         {
           ...getDescriptionColumnProps<(typeof methods)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -63,7 +63,7 @@ export function MethodTable({ loading, methods }: MethodTableProps) {
             Object.entries(MethodCategory),
             (record) => record.categories,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -74,13 +74,13 @@ export function MethodTable({ loading, methods }: MethodTableProps) {
             "calculationLocator",
             (record) => record.calculationLocator,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
           ...getReferenceColumnProps<(typeof methods)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
       ]}

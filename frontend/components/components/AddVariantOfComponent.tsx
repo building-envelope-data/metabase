@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Alert, Form, Button } from "antd";
 import { AddComponentVariantDocument } from "../../queries/componentVariants.generated";
 import { Scalars } from "../../__generated__/graphql";
@@ -26,20 +26,23 @@ export type AddVariantOfComponentProps = {
 export default function AddVariantOfComponent({
   componentId,
 }: AddVariantOfComponentProps) {
-  const [addComponentVariantMutation] = useMutation(AddComponentVariantDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ComponentDocument,
-        variables: {
-          uuid: componentId,
+  const [addComponentVariantMutation] = useMutation(
+    AddComponentVariantDocument,
+    {
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: ComponentDocument,
+          variables: {
+            uuid: componentId,
+          },
         },
-      },
-    ],
-  });
+      ],
+    },
+  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
@@ -61,7 +64,7 @@ export default function AddVariantOfComponent({
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.addComponentVariant?.errors) {
           form.resetFields();

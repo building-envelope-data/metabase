@@ -8,7 +8,7 @@ import React, { Dispatch, Key, SetStateAction } from "react";
 
 export function setMapValue(
   map: Map<string, string>,
-  setMap: Dispatch<SetStateAction<Map<string, string>>>
+  setMap: Dispatch<SetStateAction<Map<string, string>>>,
 ) {
   return (key: string) => {
     return (newValue: string) => {
@@ -23,22 +23,22 @@ export function setMapValue(
 
 export function doesFieldIncludeFilterValue(
   field: string,
-  value: React.Key | boolean
+  value: React.Key | boolean,
 ) {
   return field.toLowerCase().includes(value.toString().toLowerCase());
 }
 
 export function getFreeTextFilterProps<RecordType>(
   getField: (record: RecordType) => string | null | undefined,
-  onFilterTextChange: (newFilterText: string) => void
+  onFilterTextChange: (newFilterText: string) => void,
 ) {
   const filter = (
     selectedKeys: Key[],
-    confirm: (param?: FilterConfirmProps | undefined) => void
+    confirm: (param?: FilterConfirmProps | undefined) => void,
   ) => {
     confirm();
     onFilterTextChange(
-      selectedKeys.length === 0 ? "" : selectedKeys[0].toString()
+      selectedKeys.length === 0 ? "" : selectedKeys[0].toString(),
     );
   };
 

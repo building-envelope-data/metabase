@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { RequestUserPasswordResetDocument } from "../../queries/users.generated";
 import { Alert, Form, Input, Button, Row, Col, Card } from "antd";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
@@ -12,9 +12,11 @@ import { useRouter } from "next/router";
 function Page() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
-  const [requestUserPasswordResetMutation] = useMutation(RequestUserPasswordResetDocument);
+  const [requestUserPasswordResetMutation] = useMutation(
+    RequestUserPasswordResetDocument,
+  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [requesting, setLoggingIn] = useState(false);
@@ -35,7 +37,7 @@ function Page() {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.requestUserPasswordReset?.errors) {
           await router.push({

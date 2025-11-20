@@ -1,11 +1,20 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import {
   ComponentsDocument,
   ComponentDocument,
   UpdateComponentDocument,
 } from "../../queries/components.generated";
 import dayjs from "dayjs";
-import { Alert, Form, Input, Button, Modal, DatePicker, Select, Divider } from "antd";
+import {
+  Alert,
+  Form,
+  Input,
+  Button,
+  Modal,
+  DatePicker,
+  Select,
+  Divider,
+} from "antd";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import {
@@ -30,9 +39,9 @@ type FormValues = {
   newAbbreviation: string | null | undefined;
   newDescription: string;
   newAvailability:
-  | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
-  | null
-  | undefined;
+    | [dayjs.Dayjs | null | undefined, dayjs.Dayjs | null | undefined]
+    | null
+    | undefined;
   newCategories: ComponentCategory[] | null | undefined;
   newPrimeSurface: DescriptionOrReferenceInput | null | undefined;
   newPrimeDirection: DescriptionOrReferenceInput | null | undefined;
@@ -79,7 +88,7 @@ export default function UpdateComponent({
     ],
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
@@ -98,13 +107,22 @@ export default function UpdateComponent({
       try {
         setUpdating(true);
         // TODO Why does `initialValue` not set standardizers to `[]`?
-        if (newPrimeSurface?.reference?.standard != null && newPrimeSurface.reference.standard.standardizers == undefined) {
+        if (
+          newPrimeSurface?.reference?.standard != null &&
+          newPrimeSurface.reference.standard.standardizers == undefined
+        ) {
           newPrimeSurface.reference.standard.standardizers = [];
         }
-        if (newPrimeDirection?.reference?.standard != null && newPrimeDirection.reference.standard.standardizers == undefined) {
+        if (
+          newPrimeDirection?.reference?.standard != null &&
+          newPrimeDirection.reference.standard.standardizers == undefined
+        ) {
           newPrimeDirection.reference.standard.standardizers = [];
         }
-        if (newSwitchableLayers?.reference?.standard != null && newSwitchableLayers.reference.standard.standardizers == undefined) {
+        if (
+          newSwitchableLayers?.reference?.standard != null &&
+          newSwitchableLayers.reference.standard.standardizers == undefined
+        ) {
           newSwitchableLayers.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
@@ -130,7 +148,7 @@ export default function UpdateComponent({
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (
           !error &&
@@ -229,7 +247,7 @@ export default function UpdateComponent({
                 ([_key, value]) => ({
                   label: value,
                   value: value,
-                })
+                }),
               )}
             />
           </Form.Item>
@@ -242,7 +260,11 @@ export default function UpdateComponent({
             >
               <Input />
             </Form.Item>
-            <ReferenceForm form={form} namespace={["newPrimeSurface", "reference"]} initialValue={primeSurface?.reference} />
+            <ReferenceForm
+              form={form}
+              namespace={["newPrimeSurface", "reference"]}
+              initialValue={primeSurface?.reference}
+            />
           </Form.Item>
           <Form.Item label="Prime Direction" name="newPrimeDirection">
             <Form.Item
@@ -252,7 +274,11 @@ export default function UpdateComponent({
             >
               <Input />
             </Form.Item>
-            <ReferenceForm form={form} namespace={["newPrimeDirection", "reference"]} initialValue={primeDirection?.reference} />
+            <ReferenceForm
+              form={form}
+              namespace={["newPrimeDirection", "reference"]}
+              initialValue={primeDirection?.reference}
+            />
           </Form.Item>
           <Form.Item label="Switchable Layers" name="newSwitchableLayers">
             <Form.Item
@@ -262,7 +288,11 @@ export default function UpdateComponent({
             >
               <Input />
             </Form.Item>
-            <ReferenceForm form={form} namespace={["newSwitchableLayers", "reference"]} initialValue={switchableLayers?.reference} />
+            <ReferenceForm
+              form={form}
+              namespace={["newSwitchableLayers", "reference"]}
+              initialValue={switchableLayers?.reference}
+            />
           </Form.Item>
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={updating}>

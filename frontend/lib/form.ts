@@ -6,16 +6,19 @@ export function handleFormErrors(
   apolloError: ErrorLike | undefined,
   userErrors: { code: string; message: string; path: string[] }[] | undefined,
   setGlobalErrorMessages: Dispatch<SetStateAction<string[]>>,
-  form: FormInstance<any>
+  form: FormInstance<any>,
 ) {
   const globalErrorMessages = new Array<string>();
   if (apolloError) {
     // TODO Is this how we want to handle GraphQl errors?
     globalErrorMessages.push(...`${apolloError.name}: ${apolloError.message}`);
     if (CombinedGraphQLErrors.is(apolloError)) {
-      globalErrorMessages.push(...apolloError.errors.map((e) =>
-        `${e.message} at path ${e.path?.join(", ")} and locations ${e.locations?.join(", ")}`
-      ));
+      globalErrorMessages.push(
+        ...apolloError.errors.map(
+          (e) =>
+            `${e.message} at path ${e.path?.join(", ")} and locations ${e.locations?.join(", ")}`,
+        ),
+      );
     }
   }
   if (userErrors) {

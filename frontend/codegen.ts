@@ -1,4 +1,4 @@
-import type { CodegenConfig } from '@graphql-codegen/cli';
+import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
   overwrite: true,
@@ -37,16 +37,16 @@ const config: CodegenConfig = {
         strictScalars: true,
         scalars: {
           ID: {
-            input: 'string',
-            output: 'string | number'
+            input: "string",
+            output: "string | number",
           },
-          Any: 'unknown',
-          Byte: 'number',
-          DateTime: 'string',
-          Locale: 'string',
-          NonNegativeInt: 'number',
-          Url: 'string',
-          Uuid: 'string',
+          Any: "unknown",
+          Byte: "number",
+          DateTime: "string",
+          Locale: "string",
+          NonNegativeInt: "number",
+          Url: "string",
+          Uuid: "string",
         },
         useTypeImports: true,
         // immutableTypes: true,

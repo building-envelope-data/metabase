@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client/react';
-import { useQuery } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import {
   Form,
   Typography,
@@ -47,9 +47,11 @@ function Page() {
         });
     },
   });
-  const [resendUserEmailVerificationMutation] = useMutation(ResendUserEmailVerificationDocument);
+  const [resendUserEmailVerificationMutation] = useMutation(
+    ResendUserEmailVerificationDocument,
+  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [changing, setChanging] = useState(false);
@@ -66,7 +68,7 @@ function Page() {
         message.error(
           data?.resendUserEmailVerification?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       } else {
         message.success("Verification email sent. Please check your email.");
@@ -92,11 +94,11 @@ function Page() {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.changeUserEmail?.errors) {
           message.success(
-            "Verification link to change email sent. Please check your email."
+            "Verification link to change email sent. Please check your email.",
           );
         }
       } catch (error) {

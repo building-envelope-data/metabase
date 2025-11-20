@@ -26,8 +26,8 @@ export function SearchSelect<ValueType>({
       filterSort={(optionA, optionB) =>
         optionA.label != null && optionB.label != null
           ? optionA.label
-            .toLocaleString()
-            .localeCompare(optionB.label.toLocaleString(), "en")
+              .toLocaleString()
+              .localeCompare(optionB.label.toLocaleString(), "en")
           : 0
       }
       value={value}

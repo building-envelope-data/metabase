@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
 import { LoginUserWithRecoveryCodeDocument } from "../../queries/currentUser.generated";
@@ -14,9 +14,11 @@ function LoginWithRecoveryCode() {
   const router = useRouter();
   const returnTo = router.query.returnTo;
   const apolloClient = initializeApollo();
-  const [loginUserWithRecoveryCodeMutation] = useMutation(LoginUserWithRecoveryCodeDocument);
+  const [loginUserWithRecoveryCodeMutation] = useMutation(
+    LoginUserWithRecoveryCodeDocument,
+  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [loggingIn, setLoggingIn] = useState(false);
@@ -36,7 +38,7 @@ function LoginWithRecoveryCode() {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (
           !error &&
@@ -48,7 +50,7 @@ function LoginWithRecoveryCode() {
           await router.push(
             typeof returnTo === "string" && isLocalUrl(returnTo)
               ? returnTo
-              : paths.home
+              : paths.home,
           );
         }
       } catch (error) {

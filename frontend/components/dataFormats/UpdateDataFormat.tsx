@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Alert, Form, Input, Button, Divider, Modal } from "antd";
 import {
   UpdateDataFormatDocument,
@@ -70,7 +70,7 @@ export default function UpdateDataFormat({
     ],
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
@@ -87,7 +87,10 @@ export default function UpdateDataFormat({
       try {
         setUpdating(true);
         // TODO Why does `initialValue` not set standardizers to `[]`?
-        if (newReference?.standard != null && newReference?.standard.standardizers == undefined) {
+        if (
+          newReference?.standard != null &&
+          newReference?.standard.standardizers == undefined
+        ) {
           newReference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
@@ -108,7 +111,7 @@ export default function UpdateDataFormat({
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.updateDataFormat?.errors) {
           setOpen(false);
@@ -213,7 +216,11 @@ export default function UpdateDataFormat({
             <Input />
           </Form.Item>
           <Divider />
-          <ReferenceForm form={form} namespace={["newReference"]} initialValue={reference} />
+          <ReferenceForm
+            form={form}
+            namespace={["newReference"]}
+            initialValue={reference}
+          />
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit" loading={updating}>
               Update

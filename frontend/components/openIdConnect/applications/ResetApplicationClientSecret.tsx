@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Button, message, Modal, Typography } from "antd";
 import { useState } from "react";
 import {
@@ -6,7 +6,7 @@ import {
   ApplicationsDocument,
   ResetApplicationClientSecretDocument,
 } from "../../../queries/openIdConnect.generated";
-import { ExclamationCircleTwoTone } from '@ant-design/icons';
+import { ExclamationCircleTwoTone } from "@ant-design/icons";
 import { Scalars } from "../../../__generated__/graphql";
 
 export type ResetApplicationClientSecretProps = {
@@ -14,25 +14,28 @@ export type ResetApplicationClientSecretProps = {
 };
 
 export default function ResetApplicationClientSecret({
-  applicationId
+  applicationId,
 }: ResetApplicationClientSecretProps) {
   const [resetting, setResetting] = useState(false);
 
-  const [resetApplicationClientSecretMutation] = useMutation(ResetApplicationClientSecretDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ApplicationsDocument,
-      },
-      {
-        query: ApplicationDocument,
-        variables: {
-          uuid: applicationId,
-        }
-      },
-    ]
-  });
+  const [resetApplicationClientSecretMutation] = useMutation(
+    ResetApplicationClientSecretDocument,
+    {
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: ApplicationsDocument,
+        },
+        {
+          query: ApplicationDocument,
+          variables: {
+            uuid: applicationId,
+          },
+        },
+      ],
+    },
+  );
 
   const reset = async () => {
     try {
@@ -49,19 +52,26 @@ export default function ResetApplicationClientSecret({
         message.error(
           data?.resetOpenIdConnectApplicationClientSecret?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
-      } else if (data?.resetOpenIdConnectApplicationClientSecret?.clientSecret) {
+      } else if (
+        data?.resetOpenIdConnectApplicationClientSecret?.clientSecret
+      ) {
         Modal.info({
           title: "Reset Client Secret",
           centered: true,
           width: 500,
           content: (
             <Typography.Paragraph>
-              <span><ExclamationCircleTwoTone twoToneColor="#f9b02e" /> </span>
-              Please copy an save the client secret now, you will not be able to access it later.
+              <span>
+                <ExclamationCircleTwoTone twoToneColor="#f9b02e" />{" "}
+              </span>
+              Please copy an save the client secret now, you will not be able to
+              access it later.
               <p />
-              <Typography.Paragraph copyable>{data.resetOpenIdConnectApplicationClientSecret.clientSecret}</Typography.Paragraph>
+              <Typography.Paragraph copyable>
+                {data.resetOpenIdConnectApplicationClientSecret.clientSecret}
+              </Typography.Paragraph>
             </Typography.Paragraph>
           ),
         });
@@ -72,12 +82,7 @@ export default function ResetApplicationClientSecret({
   };
 
   return (
-    <Button
-      danger
-      type="default"
-      onClick={reset}
-      loading={resetting}
-    >
+    <Button danger type="default" onClick={reset} loading={resetting}>
       Reset Client Secret
     </Button>
   );

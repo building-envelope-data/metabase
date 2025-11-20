@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from '@apollo/client/react';
+import { useQuery, useMutation } from "@apollo/client/react";
 import {
   Tag,
   Button,
@@ -45,14 +45,16 @@ export default function User({ userId }: UserProps) {
   const rolesCurrentUserCanAndMayWantToAdd =
     user?.rolesCurrentUserCanAdd?.filter((role) => !user.roles?.includes(role));
 
-  const [confirmInstitutionRepresentativeMutation] = useMutation(ConfirmInstitutionRepresentativeDocument);
+  const [confirmInstitutionRepresentativeMutation] = useMutation(
+    ConfirmInstitutionRepresentativeDocument,
+  );
   const [
     confirmingInstitutionRepresentative,
     setConfirmingInstitutionRepresentative,
   ] = useState(false);
 
   const confirmInstitutionRepresentative = async (
-    institutionId: Scalars["Uuid"]["input"]
+    institutionId: Scalars["Uuid"]["input"],
   ) => {
     try {
       setConfirmingInstitutionRepresentative(true);
@@ -83,7 +85,7 @@ export default function User({ userId }: UserProps) {
         message.error(
           data?.confirmInstitutionRepresentative?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       }
     } finally {
@@ -91,11 +93,15 @@ export default function User({ userId }: UserProps) {
     }
   };
 
-  const [confirmUserMethodDeveloperMutation] = useMutation(ConfirmUserMethodDeveloperDocument);
+  const [confirmUserMethodDeveloperMutation] = useMutation(
+    ConfirmUserMethodDeveloperDocument,
+  );
   const [confirmingUserMethodDeveloper, setConfirmingUserMethodDeveloper] =
     useState(false);
 
-  const confirmUserMethodDeveloper = async (methodId: Scalars["Uuid"]["input"]) => {
+  const confirmUserMethodDeveloper = async (
+    methodId: Scalars["Uuid"]["input"],
+  ) => {
     try {
       setConfirmingUserMethodDeveloper(true);
       const { error, data } = await confirmUserMethodDeveloperMutation({
@@ -125,7 +131,7 @@ export default function User({ userId }: UserProps) {
         message.error(
           data?.confirmUserMethodDeveloper?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       }
     } finally {
@@ -157,7 +163,7 @@ export default function User({ userId }: UserProps) {
       } else if (data?.deleteUser?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
-          data?.deleteUser?.errors.map((error) => error.message).join(" ")
+          data?.deleteUser?.errors.map((error) => error.message).join(" "),
         );
       } else {
         await router.push(paths.users);
@@ -198,7 +204,7 @@ export default function User({ userId }: UserProps) {
       } else if (data?.removeUserRole?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
-          data?.removeUserRole?.errors.map((error) => error.message).join(" ")
+          data?.removeUserRole?.errors.map((error) => error.message).join(" "),
         );
       }
     } finally {
@@ -230,138 +236,140 @@ export default function User({ userId }: UserProps) {
 
   return (
     <>
-    {contextHolder}
-    <PageHeader
-      title={user.name}
-      tags={user.roles?.map((x) => (
-        <Tag
-          key={x}
-          icon={removingUserRole && <SyncOutlined spin />}
-          closable={
-            (!removingUserRole &&
-              user.rolesCurrentUserCanRemove?.includes(x)) ||
-            false
-          }
-          onClose={() => removeUserRole(x)}
-          color="magenta"
-        >
-          {x}
-        </Tag>
-      ))}
-      extra={[
-        user.isAuthorizedToDeleteUser && (
-          <Button
-            danger
-            type="primary"
-            onClick={deleteUser}
-            loading={deletingUser}
+      {contextHolder}
+      <PageHeader
+        title={user.name}
+        tags={user.roles?.map((x) => (
+          <Tag
+            key={x}
+            icon={removingUserRole && <SyncOutlined spin />}
+            closable={
+              (!removingUserRole &&
+                user.rolesCurrentUserCanRemove?.includes(x)) ||
+              false
+            }
+            onClose={() => removeUserRole(x)}
+            color="magenta"
           >
-            Delete User
-          </Button>
-        ),
-      ].filter((x) => x != null)}
-      backIcon={false}
-    >
-      <Descriptions column={1}>
-        <Descriptions.Item label="UUID">{user.uuid}</Descriptions.Item>
-        {user.email && (
-          <Descriptions.Item label="Email Address">
-            <Typography.Link href={`mailto:${user.email}`}>
-              {user.email}
-            </Typography.Link>
-          </Descriptions.Item>
-        )}
-        {user.phoneNumber && (
-          <Descriptions.Item label="Phone Number">
-            {user.phoneNumber}
-          </Descriptions.Item>
-        )}
-        {user.websiteLocator && (
-          <Descriptions.Item label="Website">
-            <Typography.Link href={user.websiteLocator}>
-              {user.websiteLocator}
-            </Typography.Link>
-          </Descriptions.Item>
-        )}
-      </Descriptions>
-      {rolesCurrentUserCanAndMayWantToAdd &&
-        rolesCurrentUserCanAndMayWantToAdd.length >= 1 && (
-          <AddUserRole
-            userId={user.uuid}
-            roles={rolesCurrentUserCanAndMayWantToAdd}
-          />
-        )}
+            {x}
+          </Tag>
+        ))}
+        extra={[
+          user.isAuthorizedToDeleteUser && (
+            <Button
+              danger
+              type="primary"
+              onClick={deleteUser}
+              loading={deletingUser}
+            >
+              Delete User
+            </Button>
+          ),
+        ].filter((x) => x != null)}
+        backIcon={false}
+      >
+        <Descriptions column={1}>
+          <Descriptions.Item label="UUID">{user.uuid}</Descriptions.Item>
+          {user.email && (
+            <Descriptions.Item label="Email Address">
+              <Typography.Link href={`mailto:${user.email}`}>
+                {user.email}
+              </Typography.Link>
+            </Descriptions.Item>
+          )}
+          {user.phoneNumber && (
+            <Descriptions.Item label="Phone Number">
+              {user.phoneNumber}
+            </Descriptions.Item>
+          )}
+          {user.websiteLocator && (
+            <Descriptions.Item label="Website">
+              <Typography.Link href={user.websiteLocator}>
+                {user.websiteLocator}
+              </Typography.Link>
+            </Descriptions.Item>
+          )}
+        </Descriptions>
+        {rolesCurrentUserCanAndMayWantToAdd &&
+          rolesCurrentUserCanAndMayWantToAdd.length >= 1 && (
+            <AddUserRole
+              userId={user.uuid}
+              roles={rolesCurrentUserCanAndMayWantToAdd}
+            />
+          )}
 
-      <Divider />
-      <Typography.Title level={2}>Represented Institutions</Typography.Title>
-      <List
-        size="small"
-        dataSource={user.representedInstitutions.edges}
-        renderItem={(item) => (
-          <List.Item key={item.node.uuid}>
-            <Link href={paths.institution(item.node.uuid)} legacyBehavior>
-              {item.node.name}
-            </Link>
-          </List.Item>
-        )}
-      />
-      {user.pendingRepresentedInstitutions.isAuthorizedToConfirmEdge &&
-        user.pendingRepresentedInstitutions.edges.length >= 1 && (
-          <List
-            size="small"
-            header="Pending"
-            dataSource={user.pendingRepresentedInstitutions.edges}
-            renderItem={(item) => (
-              <List.Item key={item.node.uuid}>
-                <Link href={paths.institution(item.node.uuid)} legacyBehavior>
-                  {item.node.name}
-                </Link>
-                <Button
-                  onClick={() =>
-                    confirmInstitutionRepresentative(item.node.uuid)
-                  }
-                  loading={confirmingInstitutionRepresentative}
-                >
-                  Confirm
-                </Button>
-              </List.Item>
-            )}
-          />
-        )}
+        <Divider />
+        <Typography.Title level={2}>Represented Institutions</Typography.Title>
+        <List
+          size="small"
+          dataSource={user.representedInstitutions.edges}
+          renderItem={(item) => (
+            <List.Item key={item.node.uuid}>
+              <Link href={paths.institution(item.node.uuid)} legacyBehavior>
+                {item.node.name}
+              </Link>
+            </List.Item>
+          )}
+        />
+        {user.pendingRepresentedInstitutions.isAuthorizedToConfirmEdge &&
+          user.pendingRepresentedInstitutions.edges.length >= 1 && (
+            <List
+              size="small"
+              header="Pending"
+              dataSource={user.pendingRepresentedInstitutions.edges}
+              renderItem={(item) => (
+                <List.Item key={item.node.uuid}>
+                  <Link href={paths.institution(item.node.uuid)} legacyBehavior>
+                    {item.node.name}
+                  </Link>
+                  <Button
+                    onClick={() =>
+                      confirmInstitutionRepresentative(item.node.uuid)
+                    }
+                    loading={confirmingInstitutionRepresentative}
+                  >
+                    Confirm
+                  </Button>
+                </List.Item>
+              )}
+            />
+          )}
 
-      <Divider />
-      <Typography.Title level={2}>Developed Methods</Typography.Title>
-      <List
-        size="small"
-        dataSource={user.developedMethods.edges}
-        renderItem={(item) => (
-          <List.Item key={item.node.uuid}>
-            <Link href={paths.method(item.node.uuid)} legacyBehavior>{item.node.name}</Link>
-          </List.Item>
-        )}
-      />
-      {user.pendingDevelopedMethods.isAuthorizedToConfirmEdge &&
-        user.pendingDevelopedMethods.edges.length >= 1 && (
-          <List
-            size="small"
-            header="Pending"
-            dataSource={user.pendingDevelopedMethods.edges}
-            renderItem={(item) => (
-              <List.Item key={item.node.uuid}>
-                <Link href={paths.method(item.node.uuid)} legacyBehavior>
-                  {item.node.name}
-                </Link>
-                <Button
-                  onClick={() => confirmUserMethodDeveloper(item.node.uuid)}
-                  loading={confirmingUserMethodDeveloper}
-                >
-                  Confirm
-                </Button>
-              </List.Item>
-            )}
-          />
-        )}
-    </PageHeader>
+        <Divider />
+        <Typography.Title level={2}>Developed Methods</Typography.Title>
+        <List
+          size="small"
+          dataSource={user.developedMethods.edges}
+          renderItem={(item) => (
+            <List.Item key={item.node.uuid}>
+              <Link href={paths.method(item.node.uuid)} legacyBehavior>
+                {item.node.name}
+              </Link>
+            </List.Item>
+          )}
+        />
+        {user.pendingDevelopedMethods.isAuthorizedToConfirmEdge &&
+          user.pendingDevelopedMethods.edges.length >= 1 && (
+            <List
+              size="small"
+              header="Pending"
+              dataSource={user.pendingDevelopedMethods.edges}
+              renderItem={(item) => (
+                <List.Item key={item.node.uuid}>
+                  <Link href={paths.method(item.node.uuid)} legacyBehavior>
+                    {item.node.name}
+                  </Link>
+                  <Button
+                    onClick={() => confirmUserMethodDeveloper(item.node.uuid)}
+                    loading={confirmingUserMethodDeveloper}
+                  >
+                    Confirm
+                  </Button>
+                </List.Item>
+              )}
+            />
+          )}
+      </PageHeader>
     </>
   );
 }

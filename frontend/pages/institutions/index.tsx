@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useQuery } from "@apollo/client/react";
 import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import Link from "next/link";
@@ -23,7 +23,8 @@ import { notEmpty } from "../../lib/array";
 
 function Page() {
   const { loading, error, data } = useQuery(InstitutionsDocument);
-  const nodes = data?.institutions?.edges?.map((e) => e.node).filter(notEmpty) || [];
+  const nodes =
+    data?.institutions?.edges?.map((e) => e.node).filter(notEmpty) || [];
 
   const [filterText, setFilterText] = useState(() => new Map<string, string>());
   const onFilterTextChange = setMapValue(filterText, setFilterText);
@@ -55,24 +56,24 @@ function Page() {
             ...getUuidColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              paths.institution
+              paths.institution,
             ),
           },
           {
             ...getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
+              filterText.get(x),
             ),
           },
           {
             ...getAbbreviationColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
             ...getDescriptionColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -83,7 +84,7 @@ function Page() {
               "websiteLocator",
               (record) => record.websiteLocator,
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
         ]}

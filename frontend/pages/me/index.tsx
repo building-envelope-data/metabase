@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useQuery } from "@apollo/client/react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { CurrentUserDocument } from "../../queries/currentUser.generated";

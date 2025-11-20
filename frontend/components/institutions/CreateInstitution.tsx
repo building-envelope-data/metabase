@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client/react';
-import { useQuery } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { NextRouter, useRouter } from "next/router";
 import {
   InstitutionDocument,
@@ -65,16 +65,16 @@ export default function CreateInstitution({
       },
       ...(managerId
         ? [
-          {
-            query: InstitutionDocument,
-            variables: { uuid: managerId },
-          },
-        ]
+            {
+              query: InstitutionDocument,
+              variables: { uuid: managerId },
+            },
+          ]
         : []),
     ],
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
@@ -114,7 +114,7 @@ export default function CreateInstitution({
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (
           !managerId &&
@@ -123,7 +123,7 @@ export default function CreateInstitution({
           data?.createInstitution?.institution
         ) {
           await router.push(
-            paths.institution(data.createInstitution.institution.uuid)
+            paths.institution(data.createInstitution.institution.uuid),
           );
         }
       } catch (error) {

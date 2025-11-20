@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Select, Alert, Form, Button } from "antd";
 import { AddInstitutionRepresentativeDocument } from "../../queries/institutionRepresentatives.generated";
 import { InstitutionRepresentativeRole } from "../../__generated__/graphql";
@@ -28,7 +28,9 @@ export type AddInstitutionRepresentativeProps = {
 export default function AddInstitutionRepresentative({
   institutionId,
 }: AddInstitutionRepresentativeProps) {
-  const [addInstitutionRepresentativeMutation] = useMutation(AddInstitutionRepresentativeDocument, {
+  const [addInstitutionRepresentativeMutation] = useMutation(
+    AddInstitutionRepresentativeDocument,
+    {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
@@ -39,9 +41,10 @@ export default function AddInstitutionRepresentative({
           },
         },
       ],
-    });
+    },
+  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
@@ -64,7 +67,7 @@ export default function AddInstitutionRepresentative({
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.addInstitutionRepresentative?.errors) {
           form.resetFields();
@@ -120,7 +123,7 @@ export default function AddInstitutionRepresentative({
           <Select
             placeholder="Please select"
             options={Object.entries(InstitutionRepresentativeRole).map(
-              ([_key, value]) => ({ label: value, value: value })
+              ([_key, value]) => ({ label: value, value: value }),
             )}
           />
         </Form.Item>

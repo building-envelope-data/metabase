@@ -5,11 +5,7 @@ import {
   getFreeTextFilterProps,
 } from "./freeTextFilter";
 import Link from "next/link";
-import {
-  Scalars,
-  Publication,
-  Standard,
-} from "../__generated__/graphql";
+import { Scalars, Publication, Standard } from "../__generated__/graphql";
 import { Highlight } from "../components/Highlight";
 import paths from "../paths";
 import { JSX } from "react";
@@ -20,7 +16,7 @@ const sortDirections: SortOrder[] = ["ascend", "descend"];
 function compare<ValueType>(
   x: ValueType | null | undefined,
   y: ValueType | null | undefined,
-  nonNullCompare: (a: ValueType, b: ValueType) => number
+  nonNullCompare: (a: ValueType, b: ValueType) => number,
 ) {
   if (x != null && y != null) {
     return nonNullCompare(x, y);
@@ -37,7 +33,7 @@ function compare<ValueType>(
 function compareLexicographically<ValueType>(
   xs: (ValueType | null | undefined)[],
   ys: (ValueType | null | undefined)[],
-  elementCompare: (x: ValueType, y: ValueType) => number
+  elementCompare: (x: ValueType, y: ValueType) => number,
 ) {
   let i = 0;
   while (i < xs.length && i < ys.length) {
@@ -52,7 +48,7 @@ function compareLexicographically<ValueType>(
 
 export function getColumnProps<RecordType>(
   title: string,
-  key: keyof RecordType
+  key: keyof RecordType,
 ) {
   return {
     title: title,
@@ -64,7 +60,9 @@ export function getColumnProps<RecordType>(
 export function getDateTimeColumnProps<RecordType>(
   title: string,
   key: keyof RecordType,
-  getValue: (record: RecordType) => Scalars["DateTime"]["output"] | null | undefined
+  getValue: (
+    record: RecordType,
+  ) => Scalars["DateTime"]["output"] | null | undefined,
 ) {
   return {
     ...getColumnProps(title, key),
@@ -72,20 +70,20 @@ export function getDateTimeColumnProps<RecordType>(
       compare(
         getValue(a),
         getValue(b),
-        (x, y) => Date.parse(y) - Date.parse(x)
+        (x, y) => Date.parse(y) - Date.parse(x),
       ),
     sortDirections: sortDirections,
   };
 }
 
 export function getTimestampColumnProps<
-  RecordType extends { timestamp: Scalars["DateTime"]["output"] }
+  RecordType extends { timestamp: Scalars["DateTime"]["output"] },
 >() {
   return {
     ...getDateTimeColumnProps<RecordType>(
       "Timestamp",
       "timestamp",
-      (record) => record.timestamp
+      (record) => record.timestamp,
     ),
   };
 }
@@ -93,7 +91,7 @@ export function getTimestampColumnProps<
 export function getStringColumnProps<RecordType>(
   title: string,
   key: keyof RecordType,
-  getValue: (record: RecordType) => string | null | undefined
+  getValue: (record: RecordType) => string | null | undefined,
 ) {
   return {
     ...getColumnProps(title, key),
@@ -108,14 +106,14 @@ export function getFilterableStringColumnProps<RecordType>(
   key: keyof RecordType,
   getValue: (record: RecordType) => string | null | undefined,
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
   getFilterText: (key: keyof RecordType) => string | undefined,
   doRender: (
     record: RecordType,
     highlightedValue: JSX.Element,
-    value: string | null | undefined
-  ) => JSX.Element = (_record, highlightedValue, _value) => highlightedValue
+    value: string | null | undefined,
+  ) => JSX.Element = (_record, highlightedValue, _value) => highlightedValue,
 ) {
   return {
     ...getStringColumnProps(title, key, getValue),
@@ -124,7 +122,7 @@ export function getFilterableStringColumnProps<RecordType>(
       doRender(
         record,
         <Highlight text={getValue(record)} snippet={getFilterText(key)} />,
-        getValue(record)
+        getValue(record),
       ),
   };
 }
@@ -134,10 +132,10 @@ export function getInternallyLinkedFilterableStringColumnProps<RecordType>(
   key: keyof RecordType,
   getValue: (record: RecordType) => string | null | undefined,
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
   getFilterText: (key: keyof RecordType) => string | undefined,
-  getPath: (record: RecordType) => Route
+  getPath: (record: RecordType) => Route,
 ) {
   return getFilterableStringColumnProps(
     title,
@@ -148,10 +146,12 @@ export function getInternallyLinkedFilterableStringColumnProps<RecordType>(
     (record, _highlightedValue, value) =>
       value ? (
         // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
-        (<Link href={getPath(record)} legacyBehavior>{value}</Link>)
+        <Link href={getPath(record)} legacyBehavior>
+          {value}
+        </Link>
       ) : (
         <></>
-      )
+      ),
   );
 }
 
@@ -160,10 +160,10 @@ export function getExternallyLinkedFilterableStringColumnProps<RecordType>(
   key: keyof RecordType,
   getValue: (record: RecordType) => string | null | undefined,
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
   getFilterText: (key: keyof RecordType) => string | undefined,
-  getPath: (record: RecordType) => string
+  getPath: (record: RecordType) => string,
 ) {
   return getFilterableStringColumnProps(
     title,
@@ -178,7 +178,7 @@ export function getExternallyLinkedFilterableStringColumnProps<RecordType>(
       ) : (
         <></>
       );
-    }
+    },
   );
 }
 
@@ -187,9 +187,9 @@ export function getExternallyLinkedFilterableLocatorColumnProps<RecordType>(
   key: keyof RecordType,
   getValue: (record: RecordType) => string | null | undefined,
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
-  getFilterText: (key: keyof RecordType) => string | undefined
+  getFilterText: (key: keyof RecordType) => string | undefined,
 ) {
   return getFilterableStringColumnProps(
     title,
@@ -204,16 +204,18 @@ export function getExternallyLinkedFilterableLocatorColumnProps<RecordType>(
       ) : (
         <></>
       );
-    }
+    },
   );
 }
 
-export function getUuidColumnProps<RecordType extends { uuid: Scalars["Uuid"]["output"] }>(
+export function getUuidColumnProps<
+  RecordType extends { uuid: Scalars["Uuid"]["output"] },
+>(
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
   getFilterText: (key: keyof RecordType) => string | undefined,
-  getPath: (uuid: Scalars["Uuid"]["output"]) => Route
+  getPath: (uuid: Scalars["Uuid"]["output"]) => Route,
 ) {
   return getInternallyLinkedFilterableStringColumnProps(
     "UUID",
@@ -221,56 +223,56 @@ export function getUuidColumnProps<RecordType extends { uuid: Scalars["Uuid"]["o
     (record) => record.uuid,
     onFilterTextChange,
     getFilterText,
-    (record) => getPath(record.uuid)
+    (record) => getPath(record.uuid),
   );
 }
 
 export function getNameColumnProps<RecordType extends { name?: string | null }>(
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
-  getFilterText: (key: keyof RecordType) => string | undefined
+  getFilterText: (key: keyof RecordType) => string | undefined,
 ) {
   return getFilterableStringColumnProps(
     "Name",
     "name",
     (record) => record.name,
     onFilterTextChange,
-    getFilterText
+    getFilterText,
   );
 }
 
 export function getDescriptionColumnProps<
-  RecordType extends { description?: string | null }
+  RecordType extends { description?: string | null },
 >(
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
-  getFilterText: (key: keyof RecordType) => string | undefined
+  getFilterText: (key: keyof RecordType) => string | undefined,
 ) {
   return getFilterableStringColumnProps(
     "Description",
     "description",
     (record) => record.description,
     onFilterTextChange,
-    getFilterText
+    getFilterText,
   );
 }
 
 export function getAbbreviationColumnProps<
-  RecordType extends { abbreviation?: string | null }
+  RecordType extends { abbreviation?: string | null },
 >(
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
-  getFilterText: (key: keyof RecordType) => string | undefined
+  getFilterText: (key: keyof RecordType) => string | undefined,
 ) {
   return getFilterableStringColumnProps(
     "Abbreviation",
     "abbreviation",
     (record) => record.abbreviation,
     onFilterTextChange,
-    getFilterText
+    getFilterText,
   );
 }
 
@@ -278,13 +280,13 @@ export function getAbbreviationColumnProps<
 export function getEnumListColumnProps<RecordType, EnumType extends string>(
   title: string,
   key: keyof RecordType,
-  getValues: (record: RecordType) => EnumType[] | null | undefined
+  getValues: (record: RecordType) => EnumType[] | null | undefined,
 ) {
   return {
     ...getColumnProps(title, key),
     sorter: (a: RecordType, b: RecordType) =>
       compare(getValues(a), getValues(b), (xs, ys) =>
-        compareLexicographically(xs, ys, (x, y) => x.localeCompare(y, "en"))
+        compareLexicographically(xs, ys, (x, y) => x.localeCompare(y, "en")),
       ),
     sortDirections: sortDirections,
   };
@@ -292,7 +294,7 @@ export function getEnumListColumnProps<RecordType, EnumType extends string>(
 
 export function getFilterableEnumListColumnProps<
   RecordType,
-  EnumType extends string
+  EnumType extends string,
 >(
   title: string,
   key: keyof RecordType,
@@ -300,14 +302,14 @@ export function getFilterableEnumListColumnProps<
   getValues: (record: RecordType) => EnumType[] | null | undefined,
   // TODO Call `onFilterTextChange` when the filter text changes (that is not done right now and that is the reason why matches are not highlighted). Note though that it cannot be called inside `onFilter` because that function is being called on render and we may not change state on render!
   _onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
   getFilterText: (key: keyof RecordType) => string | undefined,
   doRender: (
     record: RecordType,
     highlightedValue: JSX.Element,
-    value: EnumType
-  ) => JSX.Element = (_record, highlightedValue, _value) => highlightedValue
+    value: EnumType,
+  ) => JSX.Element = (_record, highlightedValue, _value) => highlightedValue,
 ) {
   return {
     ...getEnumListColumnProps(title, key, getValues),
@@ -339,7 +341,7 @@ export function getFilterableEnumListColumnProps<
                 {doRender(
                   record,
                   <Highlight text={value} snippet={getFilterText(key)} />,
-                  value
+                  value,
                 )}
               </List.Item>
             ))}
@@ -355,12 +357,12 @@ export function getDescriptionListColumnProps<RecordType>(
   key: keyof RecordType,
   getEntries: (record: RecordType) =>
     | {
-      key: string;
-      title: string;
-      value: string | null | undefined;
-    }[]
+        key: string;
+        title: string;
+        value: string | null | undefined;
+      }[]
     | null
-    | undefined
+    | undefined,
 ) {
   return {
     ...getColumnProps(title, key),
@@ -368,7 +370,7 @@ export function getDescriptionListColumnProps<RecordType>(
       const aValues = getEntries(a)?.map((x) => x.value);
       const bValues = getEntries(b)?.map((x) => x.value);
       return compare(aValues, bValues, (xs, ys) =>
-        compareLexicographically(xs, ys, (x, y) => x.localeCompare(y, "en"))
+        compareLexicographically(xs, ys, (x, y) => x.localeCompare(y, "en")),
       );
     },
     sortDirections: sortDirections,
@@ -401,21 +403,21 @@ export function getFilterableDescriptionListColumnProps<RecordType>(
   key: keyof RecordType,
   getEntries: (record: RecordType) =>
     | {
-      key: string;
-      title: string;
-      value: string | null | undefined;
-      render?: (
-        record: RecordType,
-        highlightedValue: JSX.Element,
-        value: string | null | undefined
-      ) => JSX.Element;
-    }[]
+        key: string;
+        title: string;
+        value: string | null | undefined;
+        render?: (
+          record: RecordType,
+          highlightedValue: JSX.Element,
+          value: string | null | undefined,
+        ) => JSX.Element;
+      }[]
     | null
     | undefined,
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
-  getFilterText: (key: keyof RecordType) => string | undefined
+  getFilterText: (key: keyof RecordType) => string | undefined,
 ) {
   return {
     ...getDescriptionListColumnProps(title, key, getEntries),
@@ -424,10 +426,10 @@ export function getFilterableDescriptionListColumnProps<RecordType>(
         getEntries(record)
           ?.map(
             ({ title, value }) =>
-              `${title}${titleValueDescriptionListSeparator}${value}`
+              `${title}${titleValueDescriptionListSeparator}${value}`,
           )
           ?.join("\n"),
-      onFilterTextChange(key)
+      onFilterTextChange(key),
     ),
     render: (_value: string, record: RecordType, _index: number) => {
       const titlesAndValues = getEntries(record);
@@ -459,11 +461,11 @@ export function getFilterableDescriptionListColumnProps<RecordType>(
                       ) : (
                         <Highlight text={value} snippet={null} />
                       ),
-                      value
+                      value,
                     )}
                   </Descriptions.Item>
                 );
-              }
+              },
             )}
           </Descriptions>
         );
@@ -473,12 +475,12 @@ export function getFilterableDescriptionListColumnProps<RecordType>(
 }
 
 export function getReferenceColumnProps<
-  RecordType extends { reference?: Publication | Standard | null }
+  RecordType extends { reference?: Publication | Standard | null },
 >(
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
-  getFilterText: (key: keyof RecordType) => string | undefined
+  getFilterText: (key: keyof RecordType) => string | undefined,
 ) {
   return getFilterableDescriptionListColumnProps(
     "Reference",
@@ -503,79 +505,79 @@ export function getReferenceColumnProps<
         ...(record.reference.__typename !== "Standard"
           ? []
           : [
-            {
-              key: "numeration",
-              title: "Numeration",
-              value: `${record.reference.numeration.prefix} ${record.reference.numeration.mainNumber} ${record.reference.numeration.suffix}`,
-            },
-            {
-              key: "year",
-              title: "Year",
-              value: record.reference.year,
-            },
-            {
-              key: "locator",
-              title: "Locator",
-              value: record.reference.locator,
-              render: (
-                _record: RecordType,
-                hightlightedValue: JSX.Element,
-                value: string | null | undefined
-              ) => (
-                // TODO Actually, `value` is neither `null` nor `undefined` but the type system does not know about it. How can we make it know about it so we don't need `|| ""` here?
-                (<Typography.Link href={value || ""}>
-                  {hightlightedValue}
-                </Typography.Link>)
-              ),
-            },
-            {
-              key: "Standardizers",
-              title: "Standardizers",
-              value: record.reference.standardizers.join(", "),
-            },
-          ]),
+              {
+                key: "numeration",
+                title: "Numeration",
+                value: `${record.reference.numeration.prefix} ${record.reference.numeration.mainNumber} ${record.reference.numeration.suffix}`,
+              },
+              {
+                key: "year",
+                title: "Year",
+                value: record.reference.year,
+              },
+              {
+                key: "locator",
+                title: "Locator",
+                value: record.reference.locator,
+                render: (
+                  _record: RecordType,
+                  hightlightedValue: JSX.Element,
+                  value: string | null | undefined,
+                ) => (
+                  // TODO Actually, `value` is neither `null` nor `undefined` but the type system does not know about it. How can we make it know about it so we don't need `|| ""` here?
+                  <Typography.Link href={value || ""}>
+                    {hightlightedValue}
+                  </Typography.Link>
+                ),
+              },
+              {
+                key: "Standardizers",
+                title: "Standardizers",
+                value: record.reference.standardizers.join(", "),
+              },
+            ]),
         ...(record.reference.__typename !== "Publication"
           ? []
           : [
-            {
-              key: "arXiv",
-              title: "arXiv",
-              value: record.reference.arXiv,
-            },
-            {
-              key: "doi",
-              title: "DOI",
-              value: record.reference.doi,
-            },
-            {
-              key: "urn",
-              title: "URN",
-              value: record.reference.urn,
-            },
-            {
-              key: "webAddress",
-              title: "Website",
-              value: record.reference.webAddress,
-            },
-            {
-              key: "authors",
-              title: "Authors",
-              value: record.reference.authors?.join(", "),
-            },
-          ]),
+              {
+                key: "arXiv",
+                title: "arXiv",
+                value: record.reference.arXiv,
+              },
+              {
+                key: "doi",
+                title: "DOI",
+                value: record.reference.doi,
+              },
+              {
+                key: "urn",
+                title: "URN",
+                value: record.reference.urn,
+              },
+              {
+                key: "webAddress",
+                title: "Website",
+                value: record.reference.webAddress,
+              },
+              {
+                key: "authors",
+                title: "Authors",
+                value: record.reference.authors?.join(", "),
+              },
+            ]),
       ],
     onFilterTextChange,
-    getFilterText
+    getFilterText,
   );
 }
 
 export function getComponentUuidColumnProps<
-  RecordType extends { componentId: Scalars["Uuid"]["output"] }
+  RecordType extends { componentId: Scalars["Uuid"]["output"] },
 >(
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
-  getFilterText: (key: keyof RecordType) => string | undefined
+  getFilterText: (key: keyof RecordType) => string | undefined,
 ) {
   return getInternallyLinkedFilterableStringColumnProps(
     "Component UUID",
@@ -583,17 +585,17 @@ export function getComponentUuidColumnProps<
     (x) => x.componentId,
     onFilterTextChange,
     getFilterText,
-    (x) => paths.component(x.componentId)
+    (x) => paths.component(x.componentId),
   );
 }
 
 export function getAppliedMethodColumnProps<
-  RecordType extends { appliedMethod: { methodId: Scalars["Uuid"]["output"] } }
+  RecordType extends { appliedMethod: { methodId: Scalars["Uuid"]["output"] } },
 >(
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
-  getFilterText: (key: keyof RecordType) => string | undefined
+  getFilterText: (key: keyof RecordType) => string | undefined,
 ) {
   return getFilterableDescriptionListColumnProps(
     "Applied Method",
@@ -605,7 +607,9 @@ export function getAppliedMethodColumnProps<
         value: x.appliedMethod.methodId,
         render: (_record, _highlightedValue, value) => (
           // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
-          (<Link href={paths.method(x.appliedMethod.methodId)} legacyBehavior>{value}</Link>)
+          <Link href={paths.method(x.appliedMethod.methodId)} legacyBehavior>
+            {value}
+          </Link>
         ),
       },
       // {
@@ -620,17 +624,28 @@ export function getAppliedMethodColumnProps<
       // },
     ],
     onFilterTextChange,
-    getFilterText
+    getFilterText,
   );
 }
 
 export function getResourceTreeColumnProps<
-  RecordType extends { resourceTree: { root: { value: { description?: string | null | undefined, hashValue: string, locator: Scalars["Url"]["output"], dataFormatId: Scalars["Uuid"]["output"] } } } }
+  RecordType extends {
+    resourceTree: {
+      root: {
+        value: {
+          description?: string | null | undefined;
+          hashValue: string;
+          locator: Scalars["Url"]["output"];
+          dataFormatId: Scalars["Uuid"]["output"];
+        };
+      };
+    };
+  },
 >(
   onFilterTextChange: (
-    key: keyof RecordType
+    key: keyof RecordType,
   ) => (newFilterText: string) => void,
-  getFilterText: (key: keyof RecordType) => string | undefined
+  getFilterText: (key: keyof RecordType) => string | undefined,
 ) {
   return getFilterableDescriptionListColumnProps(
     "Resource Tree Root",
@@ -662,15 +677,16 @@ export function getResourceTreeColumnProps<
         value: x.resourceTree.root.value.dataFormatId,
         render: (_record, _hightlightedValue, value) => (
           // TODO Why does this not work with `_highlightedValue`? An error is raised saying "Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?": https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component or https://reactjs.org/docs/forwarding-refs.html or https://deepscan.io/docs/rules/react-func-component-invalid-ref-prop or https://www.carlrippon.com/react-forwardref-typescript/
-          (<Link
+          <Link
             href={paths.dataFormat(x.resourceTree.root.value.dataFormatId)}
-            legacyBehavior>
+            legacyBehavior
+          >
             {value}
-          </Link>)
+          </Link>
         ),
       },
     ],
     onFilterTextChange,
-    getFilterText
+    getFilterText,
   );
 }

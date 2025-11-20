@@ -44,58 +44,58 @@ export default function DataFormat({ dataFormatId }: DataFormatProps) {
 
   return (
     <>
-    {contextHolder}
-    <PageHeader
-      title={dataFormat.name}
-      subTitle={dataFormat.description}
-      extra={
-        dataFormat.isAuthorizedToUpdateNode
-          ? [
-            <UpdateDataFormat
-              key="updateDataFormat"
-              dataFormatId={dataFormat.uuid}
-              name={dataFormat.name}
-              extension={dataFormat.extension}
-              description={dataFormat.description}
-              mediaType={dataFormat.mediaType}
-              schemaLocator={dataFormat.schemaLocator}
-              reference={dataFormat.reference}
-              managerId={dataFormat.manager.node.uuid}
-            />,
-          ]
-          : []
-      }
-      backIcon={false}
-    >
-      <Descriptions size="small" column={1}>
-        <Descriptions.Item label="UUID">{dataFormat.uuid}</Descriptions.Item>
-        <Descriptions.Item label="Extension">
-          {dataFormat.extension}
-        </Descriptions.Item>
-        <Descriptions.Item label="Media Type">
-          <Typography.Link href="http://www.iana.org/assignments/media-types/media-types.xhtml">
-            {dataFormat.mediaType}
-          </Typography.Link>
-        </Descriptions.Item>
-        {dataFormat.schemaLocator &&
-          <Descriptions.Item label="Schema">
-            <Typography.Link href={dataFormat.schemaLocator}>
-              {dataFormat.schemaLocator}
+      {contextHolder}
+      <PageHeader
+        title={dataFormat.name}
+        subTitle={dataFormat.description}
+        extra={
+          dataFormat.isAuthorizedToUpdateNode
+            ? [
+                <UpdateDataFormat
+                  key="updateDataFormat"
+                  dataFormatId={dataFormat.uuid}
+                  name={dataFormat.name}
+                  extension={dataFormat.extension}
+                  description={dataFormat.description}
+                  mediaType={dataFormat.mediaType}
+                  schemaLocator={dataFormat.schemaLocator}
+                  reference={dataFormat.reference}
+                  managerId={dataFormat.manager.node.uuid}
+                />,
+              ]
+            : []
+        }
+        backIcon={false}
+      >
+        <Descriptions size="small" column={1}>
+          <Descriptions.Item label="UUID">{dataFormat.uuid}</Descriptions.Item>
+          <Descriptions.Item label="Extension">
+            {dataFormat.extension}
+          </Descriptions.Item>
+          <Descriptions.Item label="Media Type">
+            <Typography.Link href="http://www.iana.org/assignments/media-types/media-types.xhtml">
+              {dataFormat.mediaType}
             </Typography.Link>
           </Descriptions.Item>
-        }
-        <Descriptions.Item label="Reference">
-          <Reference reference={dataFormat.reference} />
-        </Descriptions.Item>
-        <Descriptions.Item label="Managed by">
-          <Typography.Link
-            href={paths.institution(dataFormat.manager.node.uuid)}
-          >
-            {dataFormat.manager.node.name}
-          </Typography.Link>
-        </Descriptions.Item>
-      </Descriptions>
-    </PageHeader>
+          {dataFormat.schemaLocator && (
+            <Descriptions.Item label="Schema">
+              <Typography.Link href={dataFormat.schemaLocator}>
+                {dataFormat.schemaLocator}
+              </Typography.Link>
+            </Descriptions.Item>
+          )}
+          <Descriptions.Item label="Reference">
+            <Reference reference={dataFormat.reference} />
+          </Descriptions.Item>
+          <Descriptions.Item label="Managed by">
+            <Typography.Link
+              href={paths.institution(dataFormat.manager.node.uuid)}
+            >
+              {dataFormat.manager.node.name}
+            </Typography.Link>
+          </Descriptions.Item>
+        </Descriptions>
+      </PageHeader>
     </>
   );
 }

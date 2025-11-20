@@ -1,9 +1,21 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { useState } from "react";
-import { UpdateApplicationDocument, ApplicationPartialFragment, ApplicationDocument, ApplicationsDocument } from "../../../queries/openIdConnect.generated";
+import {
+  UpdateApplicationDocument,
+  ApplicationPartialFragment,
+  ApplicationDocument,
+  ApplicationsDocument,
+} from "../../../queries/openIdConnect.generated";
 import { Alert, Button, Form, Input, message, Modal, Select } from "antd";
 import { handleFormErrors } from "../../../lib/form";
-import { OpenIdConnectConsentType, OpenIdConnectEndpoint, OpenIdConnectGrantType, OpenIdConnectResponseType, OpenIdConnectScope, OpenIdConnectRequirement } from "../../../__generated__/graphql";
+import {
+  OpenIdConnectConsentType,
+  OpenIdConnectEndpoint,
+  OpenIdConnectGrantType,
+  OpenIdConnectResponseType,
+  OpenIdConnectScope,
+  OpenIdConnectRequirement,
+} from "../../../__generated__/graphql";
 
 const layout = {
   labelCol: { span: 8 },
@@ -20,7 +32,7 @@ export type UpdateApplicationProps = {
 type FormValues = {
   newClientId: string;
   newDisplayName: string;
-  newConsentType: OpenIdConnectConsentType
+  newConsentType: OpenIdConnectConsentType;
   newRedirectUri: string | null | undefined;
   newPostLogoutRedirectUri: string | null | undefined;
   newEndpoints: OpenIdConnectEndpoint[];
@@ -29,11 +41,15 @@ type FormValues = {
   newScopes: OpenIdConnectScope[];
 };
 
-export default function UpdateApplication({ application }: UpdateApplicationProps) {
+export default function UpdateApplication({
+  application,
+}: UpdateApplicationProps) {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
-  const [globalErrorMessages, setGlobalErrorMessages] = useState(new Array<string>());
+  const [globalErrorMessages, setGlobalErrorMessages] = useState(
+    new Array<string>(),
+  );
 
   const [updateApplicationMutation] = useMutation(UpdateApplicationDocument, {
     // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
@@ -85,7 +101,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (
           !error &&
@@ -155,14 +171,14 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
             <Select
               placeholder="Please select"
               options={Object.entries(OpenIdConnectConsentType).map(
-                ([_key, value]) => ({ label: value, value: value })
+                ([_key, value]) => ({ label: value, value: value }),
               )}
             />
           </Form.Item>
           <Form.Item
             label="Login Redirect URL"
             name="newRedirectUri"
-            rules={[{ type: 'url' }]}
+            rules={[{ type: "url" }]}
             initialValue={application.redirectUri}
           >
             <Input />
@@ -170,7 +186,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
           <Form.Item
             label="Logout Redirect URL"
             name="newPostLogoutRedirectUri"
-            rules={[{ type: 'url' }]}
+            rules={[{ type: "url" }]}
             initialValue={application.postLogoutRedirectUri}
           >
             <Input />
@@ -186,7 +202,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
               allowClear
               placeholder="Please select"
               options={Object.entries(OpenIdConnectEndpoint).map(
-                ([_key, value]) => ({ label: value, value: value })
+                ([_key, value]) => ({ label: value, value: value }),
               )}
             />
           </Form.Item>
@@ -201,7 +217,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
               allowClear
               placeholder="Please select"
               options={Object.entries(OpenIdConnectGrantType).map(
-                ([_key, value]) => ({ label: value, value: value })
+                ([_key, value]) => ({ label: value, value: value }),
               )}
             />
           </Form.Item>
@@ -216,7 +232,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
               allowClear
               placeholder="Please select"
               options={Object.entries(OpenIdConnectResponseType).map(
-                ([_key, value]) => ({ label: value, value: value })
+                ([_key, value]) => ({ label: value, value: value }),
               )}
             />
           </Form.Item>
@@ -231,7 +247,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
               allowClear
               placeholder="Please select"
               options={Object.entries(OpenIdConnectScope).map(
-                ([_key, value]) => ({ label: value, value: value })
+                ([_key, value]) => ({ label: value, value: value }),
               )}
             />
           </Form.Item>
@@ -239,7 +255,9 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
             label="Requirements"
             name="newRequirements"
             rules={[{ required: true }]}
-            initialValue={Object.entries(OpenIdConnectRequirement).map(([_key, value]) => ({ label: value, value: value }))}
+            initialValue={Object.entries(OpenIdConnectRequirement).map(
+              ([_key, value]) => ({ label: value, value: value }),
+            )}
           >
             <Select
               disabled
@@ -247,7 +265,7 @@ export default function UpdateApplication({ application }: UpdateApplicationProp
               allowClear
               placeholder="Please select"
               options={Object.entries(OpenIdConnectRequirement).map(
-                ([_key, value]) => ({ label: value, value: value })
+                ([_key, value]) => ({ label: value, value: value }),
               )}
             />
           </Form.Item>

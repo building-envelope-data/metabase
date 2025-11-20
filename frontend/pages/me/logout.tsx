@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { LogoutUserDocument } from "../../queries/currentUser.generated";

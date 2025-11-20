@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client/react';
-import { useQuery } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { List, Button, message } from "antd";
 import { useEffect, useState } from "react";
 import {
@@ -15,7 +15,7 @@ import { stringifyApolloError } from "../../lib/apollo";
 
 export type PendingInstitutionsProps = {};
 
-export default function PendingInstitutions({ }: PendingInstitutionsProps) {
+export default function PendingInstitutions({}: PendingInstitutionsProps) {
   const { data, loading, error } = useQuery(PendingInstitutionsDocument);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -57,7 +57,7 @@ export default function PendingInstitutions({ }: PendingInstitutionsProps) {
         message.error(
           data?.verifyInstitution?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       }
     } finally {
@@ -67,23 +67,25 @@ export default function PendingInstitutions({ }: PendingInstitutionsProps) {
 
   return (
     <>
-    {contextHolder}
-    <List
-      size="small"
-      loading={loading}
-      dataSource={data?.pendingInstitutions?.edges?.map((e) => e.node) || []}
-      renderItem={(item) => (
-        <List.Item>
-          <Link href={paths.institution(item?.uuid)} legacyBehavior>{item?.name}</Link>
-          <Button
-            onClick={() => verifyInstitution(item?.uuid)}
-            loading={verifyingInstitution}
-          >
-            Verify
-          </Button>
-        </List.Item>
-      )}
-    />
+      {contextHolder}
+      <List
+        size="small"
+        loading={loading}
+        dataSource={data?.pendingInstitutions?.edges?.map((e) => e.node) || []}
+        renderItem={(item) => (
+          <List.Item>
+            <Link href={paths.institution(item?.uuid)} legacyBehavior>
+              {item?.name}
+            </Link>
+            <Button
+              onClick={() => verifyInstitution(item?.uuid)}
+              loading={verifyingInstitution}
+            >
+              Verify
+            </Button>
+          </List.Item>
+        )}
+      />
     </>
   );
 }

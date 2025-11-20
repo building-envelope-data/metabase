@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Button, message } from "antd";
 import { useState } from "react";
 import {
@@ -17,7 +17,9 @@ export default function SwitchInstitutionOperatingState({
 }: switchInstitutionOperatingStateProps) {
   const [switching, setSwitching] = useState(false);
 
-  const [switchInstitutionOperatingStateMutation] = useMutation(SwitchInstitutionOperatingStateDocument);
+  const [switchInstitutionOperatingStateMutation] = useMutation(
+    SwitchInstitutionOperatingStateDocument,
+  );
 
   const switchInstitutionOperatingState = async () => {
     try {
@@ -43,8 +45,8 @@ export default function SwitchInstitutionOperatingState({
       } else if (data?.switchInstitutionOperatingState?.errors) {
         message.error(
           data?.switchInstitutionOperatingState?.errors
-            .map((error: { message: any; }) => error.message)
-            .join(" ")
+            .map((error: { message: any }) => error.message)
+            .join(" "),
         );
       }
     } finally {
@@ -61,5 +63,4 @@ export default function SwitchInstitutionOperatingState({
       Switch Operating State
     </Button>
   );
-
 }

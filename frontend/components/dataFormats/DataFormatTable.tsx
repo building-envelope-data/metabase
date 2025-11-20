@@ -41,19 +41,19 @@ export function DataFormatTable({
           ...getUuidColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x),
-            paths.dataFormat
+            paths.dataFormat,
           ),
         },
         {
           ...getNameColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
           ...getDescriptionColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -62,7 +62,7 @@ export function DataFormatTable({
             "mediaType",
             (record) => record.mediaType,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -71,7 +71,7 @@ export function DataFormatTable({
             "extension",
             (record) => record.extension,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
@@ -82,13 +82,13 @@ export function DataFormatTable({
             "schemaLocator",
             (record) => record.schemaLocator,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
         {
           ...getReferenceColumnProps<(typeof dataFormats)[0]>(
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         },
       ]}

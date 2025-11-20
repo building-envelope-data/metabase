@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client/react';
-import { useQuery } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { stringifyApolloError } from "../../../lib/apollo";
 import ManageLayout from "../../../components/me/ManageLayout";
 import {
@@ -19,15 +19,18 @@ function Page() {
   const { error, data } = useQuery(TwoFactorAuthenticationDocument);
   const twoFactorAuthentication = data?.currentUser?.twoFactorAuthentication;
 
-  const [forgetUserTwoFactorAuthenticationClientMutation] = useMutation(ForgetUserTwoFactorAuthenticationClientDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: TwoFactorAuthenticationDocument,
-      },
-    ],
-  });
+  const [forgetUserTwoFactorAuthenticationClientMutation] = useMutation(
+    ForgetUserTwoFactorAuthenticationClientDocument,
+    {
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: TwoFactorAuthenticationDocument,
+        },
+      ],
+    },
+  );
   const [
     forgettingUserTwoFactorAuthenticationClient,
     setForgettingUserTwoFactorAuthenticationClient,
@@ -44,11 +47,11 @@ function Page() {
         message.error(
           data?.forgetUserTwoFactorAuthenticationClient?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       } else {
         message.success(
-          "The current browser has been forgotten. When you login again from this browser you will be prompted for your two-factor authentication code."
+          "The current browser has been forgotten. When you login again from this browser you will be prompted for your two-factor authentication code.",
         );
       }
     } finally {
@@ -56,15 +59,18 @@ function Page() {
     }
   };
 
-  const [disableUserTwoFactorAuthenticationMutation] = useMutation(DisableUserTwoFactorAuthenticationDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: TwoFactorAuthenticationDocument,
-      },
-    ],
-  });
+  const [disableUserTwoFactorAuthenticationMutation] = useMutation(
+    DisableUserTwoFactorAuthenticationDocument,
+    {
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: TwoFactorAuthenticationDocument,
+        },
+      ],
+    },
+  );
   const [
     disablingUserTwoFactorAuthentication,
     setDisablingUserTwoFactorAuthentication,
@@ -81,11 +87,11 @@ function Page() {
         message.error(
           data?.disableUserTwoFactorAuthentication?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       } else {
         message.success(
-          "Two-factor authentication has been disabled. You can reenable it when you setup an authenticator app."
+          "Two-factor authentication has been disabled. You can reenable it when you setup an authenticator app.",
         );
       }
     } finally {
@@ -93,8 +99,9 @@ function Page() {
     }
   };
 
-  const [resetUserTwoFactorAuthenticatorMutation] =
-    useMutation(ResetUserTwoFactorAuthenticatorDocument, {
+  const [resetUserTwoFactorAuthenticatorMutation] = useMutation(
+    ResetUserTwoFactorAuthenticatorDocument,
+    {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
@@ -102,7 +109,8 @@ function Page() {
           query: TwoFactorAuthenticationDocument,
         },
       ],
-    });
+    },
+  );
   const [
     resettingUserTwoFactorAuthenticator,
     setResettingUserTwoFactorAuthenticator,
@@ -118,11 +126,11 @@ function Page() {
         message.error(
           data?.resetUserTwoFactorAuthenticator?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       } else {
         message.success(
-          "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key."
+          "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.",
         );
       }
     } finally {
@@ -130,8 +138,9 @@ function Page() {
     }
   };
 
-  const [generateUserTwoFactorRecoveryCodesMutation] =
-    useMutation(GenerateUserTwoFactorRecoveryCodesDocument, {
+  const [generateUserTwoFactorRecoveryCodesMutation] = useMutation(
+    GenerateUserTwoFactorRecoveryCodesDocument,
+    {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
@@ -139,7 +148,8 @@ function Page() {
           query: TwoFactorAuthenticationDocument,
         },
       ],
-    });
+    },
+  );
   const [
     generatingUserTwoFactorRecoveryCodes,
     setGeneratingUserTwoFactorRecoveryCodes,
@@ -156,11 +166,12 @@ function Page() {
         message.error(
           data?.generateUserTwoFactorRecoveryCodes?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       } else {
         recoveryCodesModal(
-          data?.generateUserTwoFactorRecoveryCodes?.twoFactorRecoveryCodes || []
+          data?.generateUserTwoFactorRecoveryCodes?.twoFactorRecoveryCodes ||
+            [],
         );
       }
     } finally {

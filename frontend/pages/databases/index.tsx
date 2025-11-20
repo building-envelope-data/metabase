@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useQuery } from "@apollo/client/react";
 import { stringifyApolloError } from "../../lib/apollo";
 import Layout from "../../components/Layout";
 import paths from "../../paths";
@@ -53,18 +53,18 @@ function Page() {
             ...getUuidColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              paths.database
+              paths.database,
             ),
           },
           {
             ...getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
+              filterText.get(x),
             ),
           },
           {
             ...getDescriptionColumnProps<(typeof nodes)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -75,7 +75,7 @@ function Page() {
               "locator",
               (record) => record.locator,
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -87,7 +87,7 @@ function Page() {
               (record) => record.operator.node.name,
               onFilterTextChange,
               (x) => filterText.get(x),
-              (x) => paths.institution(x.operator.node.uuid)
+              (x) => paths.institution(x.operator.node.uuid),
             ),
           },
         ]}

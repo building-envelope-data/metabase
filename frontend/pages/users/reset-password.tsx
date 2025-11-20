@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { ResetUserPasswordDocument } from "../../queries/users.generated";
 import SingleSignOnLayout from "../../components/SingleSignOnLayout";
@@ -21,7 +21,7 @@ function Page() {
   const [resetUserPasswordMutation] = useMutation(ResetUserPasswordDocument);
 
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [resetting, setResetting] = useState(false);
@@ -54,7 +54,7 @@ function Page() {
               return { code: x.code, message: x.message, path: x.path };
             }),
             setGlobalErrorMessages,
-            form
+            form,
           );
           if (!error && !data?.resetUserPassword?.errors) {
             message.success("Your password was reset.");
@@ -141,7 +141,7 @@ function Page() {
                         return Promise.resolve();
                       }
                       return Promise.reject(
-                        "Password and confirmation do not match!"
+                        "Password and confirmation do not match!",
                       );
                     },
                   }),

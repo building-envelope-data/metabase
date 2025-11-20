@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { ConfirmUserEmailChangeDocument } from "../../queries/users.generated";
@@ -9,7 +9,9 @@ import { message, Typography } from "antd";
 function Page() {
   const router = useRouter();
   const { currentEmail, newEmail, confirmationCode } = router.query;
-  const [confirmUserEmailChangeMutation] = useMutation(ConfirmUserEmailChangeDocument);
+  const [confirmUserEmailChangeMutation] = useMutation(
+    ConfirmUserEmailChangeDocument,
+  );
 
   useEffect(() => {
     const confirm = async () => {
@@ -34,7 +36,7 @@ function Page() {
             message.error(
               data?.confirmUserEmailChange?.errors
                 .map((error) => error.message)
-                .join(" ")
+                .join(" "),
             );
           } else {
             message.success("Email address change confirmed!");

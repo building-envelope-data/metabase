@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useQuery } from "@apollo/client/react";
 import Layout from "../../components/Layout";
 import { Table, Typography, message } from "antd";
 import { UsersDocument } from "../../queries/users.generated";
@@ -46,17 +46,17 @@ function Page() {
           getUuidColumnProps<(typeof nodes)[0]>(
             onFilterTextChange,
             (x) => filterText.get(x),
-            paths.user
+            paths.user,
           ),
           getNameColumnProps<(typeof nodes)[0]>(onFilterTextChange, (x) =>
-            filterText.get(x)
+            filterText.get(x),
           ),
           getFilterableStringColumnProps<(typeof nodes)[0]>(
             "Email",
             "email",
             (record) => record.email,
             onFilterTextChange,
-            (x) => filterText.get(x)
+            (x) => filterText.get(x),
           ),
         ]}
         dataSource={nodes}

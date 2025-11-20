@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useQuery } from "@apollo/client/react";
 import { stringifyApolloError } from "../../lib/apollo";
 import { NextRouter, useRouter } from "next/router";
 import { Skeleton, Row, Col, Card, message } from "antd";

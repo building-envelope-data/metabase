@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client/react';
-import { useQuery } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { List, Button, message } from "antd";
 import { useEffect, useState } from "react";
 import {
@@ -15,7 +15,7 @@ import { stringifyApolloError } from "../../lib/apollo";
 
 export type PendingDatabasesProps = {};
 
-export default function PendingDatabases({ }: PendingDatabasesProps) {
+export default function PendingDatabases({}: PendingDatabasesProps) {
   const { data, loading, error } = useQuery(PendingDatabasesDocument);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -55,7 +55,7 @@ export default function PendingDatabases({ }: PendingDatabasesProps) {
       } else if (data?.verifyDatabase?.errors) {
         // TODO Is this how we want to display errors?
         message.error(
-          data?.verifyDatabase?.errors.map((error) => error.message).join(" ")
+          data?.verifyDatabase?.errors.map((error) => error.message).join(" "),
         );
       }
     } finally {
@@ -65,25 +65,27 @@ export default function PendingDatabases({ }: PendingDatabasesProps) {
 
   return (
     <>
-    {contextHolder}
-    <List
-      size="small"
-      loading={loading}
-      dataSource={data?.pendingDatabases?.edges?.map((e) => e.node) || []}
-      renderItem={(item) => (
-        <List.Item>
-          <Link href={paths.database(item?.uuid)} legacyBehavior>{item?.name}</Link>
-          {item.isAuthorizedToVerifyNode && (
-            <Button
-              onClick={() => verifyDatabase(item?.uuid)}
-              loading={verifyingDatabase}
-            >
-              Verify
-            </Button>
-          )}
-        </List.Item>
-      )}
-    />
+      {contextHolder}
+      <List
+        size="small"
+        loading={loading}
+        dataSource={data?.pendingDatabases?.edges?.map((e) => e.node) || []}
+        renderItem={(item) => (
+          <List.Item>
+            <Link href={paths.database(item?.uuid)} legacyBehavior>
+              {item?.name}
+            </Link>
+            {item.isAuthorizedToVerifyNode && (
+              <Button
+                onClick={() => verifyDatabase(item?.uuid)}
+                loading={verifyingDatabase}
+              >
+                Verify
+              </Button>
+            )}
+          </List.Item>
+        )}
+      />
     </>
   );
 }

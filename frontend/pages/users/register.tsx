@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { initializeApollo } from "../../lib/apollo";
 import { RegisterUserDocument } from "../../queries/users.generated";
@@ -23,7 +23,7 @@ function Register() {
   const [registerUserMutation] = useMutation(RegisterUserDocument);
   const returnTo = router.query.returnTo;
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [registering, setRegistering] = useState(false);
@@ -59,13 +59,9 @@ function Register() {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
-        if (
-          !error &&
-          !data?.registerUser?.errors &&
-          data?.registerUser?.user
-        ) {
+        if (!error && !data?.registerUser?.errors && data?.registerUser?.user) {
           await router.push({
             pathname: paths.userCheckYourInboxAfterRegistration,
             query: returnTo ? { returnTo: returnTo } : {},
@@ -171,7 +167,7 @@ function Register() {
                         return Promise.resolve();
                       }
                       return Promise.reject(
-                        "Password and confirmation do not match!"
+                        "Password and confirmation do not match!",
                       );
                     },
                   }),

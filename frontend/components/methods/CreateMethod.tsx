@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { DatePicker, Select, Alert, Form, Input, Button, Divider } from "antd";
 import {
   CreateMethodDocument,
@@ -64,7 +64,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
     ],
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
@@ -84,7 +84,10 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
       try {
         setCreating(true);
         // TODO Why does `initialValue` not set standardizers to `[]`?
-        if (reference?.standard != null && reference.standard.standardizers == undefined) {
+        if (
+          reference?.standard != null &&
+          reference.standard.standardizers == undefined
+        ) {
           reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
@@ -108,7 +111,7 @@ export default function CreateMethod({ managerId }: CreateMethodProps) {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.createMethod?.errors) {
           form.resetFields();

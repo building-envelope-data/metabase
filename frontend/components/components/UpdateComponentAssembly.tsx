@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import {
   Alert,
   Form,
@@ -42,26 +42,29 @@ export default function UpdateComponentAssembly({
   primeSurface,
 }: UpdateComponentAssemblyProps) {
   const [open, setOpen] = useState(false);
-  const [updateComponentAssemblyMutation] = useMutation(UpdateComponentAssemblyDocument, {
-    // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    // See https://www.apollographql.com/docs/react/data/mutations/#options
-    refetchQueries: [
-      {
-        query: ComponentDocument,
-        variables: {
-          uuid: assembledComponent.uuid,
+  const [updateComponentAssemblyMutation] = useMutation(
+    UpdateComponentAssemblyDocument,
+    {
+      // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
+      // See https://www.apollographql.com/docs/react/data/mutations/#options
+      refetchQueries: [
+        {
+          query: ComponentDocument,
+          variables: {
+            uuid: assembledComponent.uuid,
+          },
         },
-      },
-      {
-        query: ComponentDocument,
-        variables: {
-          uuid: partComponent.uuid,
+        {
+          query: ComponentDocument,
+          variables: {
+            uuid: partComponent.uuid,
+          },
         },
-      },
-    ],
-  });
+      ],
+    },
+  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [updating, setUpdating] = useState(false);
@@ -85,7 +88,7 @@ export default function UpdateComponentAssembly({
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.updateComponentAssembly?.errors) {
           setOpen(false);

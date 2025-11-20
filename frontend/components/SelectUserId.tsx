@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client/react';
+import { useQuery } from "@apollo/client/react";
 import { Skeleton, Result } from "antd";
 import { SearchSelect } from "./SearchSelect";
 import { notEmpty } from "../lib/array";
@@ -10,11 +10,7 @@ export type SelectUserIdProps = {
   onChange?: (value: string) => void;
 };
 
-export function SelectUserId({
-  mode,
-  value,
-  onChange,
-}: SelectUserIdProps) {
+export function SelectUserId({ mode, value, onChange }: SelectUserIdProps) {
   // TODO Only fetch `name` and `uuid` because nothing more is needed.
   // TODO Use search instead of drop-down with all users/users preloaded. Be inspired by https://ant.design/components/select/#components-select-demo-select-users
   const { loading, data, error } = useQuery(UsersDocument);

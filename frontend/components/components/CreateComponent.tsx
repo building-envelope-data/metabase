@@ -1,10 +1,14 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { DatePicker, Alert, Select, Form, Input, Button, Divider } from "antd";
 import {
   CreateComponentDocument,
   ComponentsDocument,
 } from "../../queries/components.generated";
-import { ComponentCategory, DescriptionOrReferenceInput, Scalars } from "../../__generated__/graphql";
+import {
+  ComponentCategory,
+  DescriptionOrReferenceInput,
+  Scalars,
+} from "../../__generated__/graphql";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
 import dayjs from "dayjs";
@@ -56,7 +60,7 @@ export default function CreateComponent({
     ],
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
@@ -75,13 +79,22 @@ export default function CreateComponent({
       try {
         setCreating(true);
         // TODO Why does `initialValue` not set standardizers to `[]`?
-        if (primeSurface?.reference?.standard != null && primeSurface.reference.standard.standardizers == undefined) {
+        if (
+          primeSurface?.reference?.standard != null &&
+          primeSurface.reference.standard.standardizers == undefined
+        ) {
           primeSurface.reference.standard.standardizers = [];
         }
-        if (primeDirection?.reference?.standard != null && primeDirection.reference.standard.standardizers == undefined) {
+        if (
+          primeDirection?.reference?.standard != null &&
+          primeDirection.reference.standard.standardizers == undefined
+        ) {
           primeDirection.reference.standard.standardizers = [];
         }
-        if (switchableLayers?.reference?.standard != null && switchableLayers.reference.standard.standardizers == undefined) {
+        if (
+          switchableLayers?.reference?.standard != null &&
+          switchableLayers.reference.standard.standardizers == undefined
+        ) {
           switchableLayers.reference.standard.standardizers = [];
         }
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
@@ -104,7 +117,7 @@ export default function CreateComponent({
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.createComponent?.errors) {
           form.resetFields();
@@ -177,13 +190,13 @@ export default function CreateComponent({
         </Form.Item>
         <Divider />
         <Form.Item label="Prime Surface" name="primeSurface">
-          <Form.Item
-            label="Description"
-            name={["primeSurface", "description"]}
-          >
+          <Form.Item label="Description" name={["primeSurface", "description"]}>
             <Input />
           </Form.Item>
-          <ReferenceForm form={form} namespace={["primeSurface", "reference"]} />
+          <ReferenceForm
+            form={form}
+            namespace={["primeSurface", "reference"]}
+          />
         </Form.Item>
         <Form.Item label="Prime Direction" name="primeDirection">
           <Form.Item
@@ -192,7 +205,10 @@ export default function CreateComponent({
           >
             <Input />
           </Form.Item>
-          <ReferenceForm form={form} namespace={["primeDirection", "reference"]} />
+          <ReferenceForm
+            form={form}
+            namespace={["primeDirection", "reference"]}
+          />
         </Form.Item>
         <Form.Item label="Switchable Layers" name="switchableLayers">
           <Form.Item
@@ -201,7 +217,10 @@ export default function CreateComponent({
           >
             <Input />
           </Form.Item>
-          <ReferenceForm form={form} namespace={["switchableLayers", "reference"]} />
+          <ReferenceForm
+            form={form}
+            namespace={["switchableLayers", "reference"]}
+          />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit" loading={creating}>

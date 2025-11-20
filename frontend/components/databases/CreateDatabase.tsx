@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Alert, Form, Input, Button } from "antd";
 import {
   CreateDatabaseDocument,
@@ -44,7 +44,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
     ],
   });
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [creating, setCreating] = useState(false);
@@ -68,7 +68,7 @@ export default function CreateDatabase({ operatorId }: CreateDatabaseProps) {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (
           !error &&

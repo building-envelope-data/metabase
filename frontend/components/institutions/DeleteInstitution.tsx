@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Button, message } from "antd";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -45,7 +45,7 @@ export default function DeleteInstitution({
         message.error(
           data?.deleteInstitution?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       } else {
         await router.push(paths.institutions);

@@ -64,13 +64,17 @@ export default {
   openIdConnectApplication(uuid: string) {
     return `/open-id-connect/application/${encodeURIComponent(uuid)}` as Route;
   },
-  openIdConnectApplicationCreate: "/open-id-connect/application/create" as Route,
+  openIdConnectApplicationCreate:
+    "/open-id-connect/application/create" as Route,
   openIdConnect: "/open-id-connect" as Route,
   openIdConnectClientLogin: "/connect/client/login" as Route,
   openIdConnectClientLogout: "/connect/client/logout" as Route,
 };
 
-export function redirectToLoginPage(router: NextRouter, returnToPage: string): void {
+export function redirectToLoginPage(
+  router: NextRouter,
+  returnToPage: string,
+): void {
   router.push({
     pathname: "/users/login" as Route,
     query: { returnTo: returnToPage },

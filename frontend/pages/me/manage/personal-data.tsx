@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client/react';
-import { useQuery } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { useApolloClient } from "@apollo/client/react";
 import {
   Form,
@@ -36,9 +36,11 @@ function Page() {
 
   const apolloClient = useApolloClient();
 
-  const [deletePersoanlUserDataMutation] = useMutation(DeletePersonalUserDataDocument);
+  const [deletePersoanlUserDataMutation] = useMutation(
+    DeletePersonalUserDataDocument,
+  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [deleting, setDeleting] = useState(false);
@@ -59,7 +61,7 @@ function Page() {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.deletePersonalUserData?.errors) {
           message.success("Your user data was deleted and account closed.");

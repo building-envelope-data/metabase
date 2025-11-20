@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Alert, Form, Button } from "antd";
 import { Scalars } from "../../__generated__/graphql";
 import { useState } from "react";
@@ -24,7 +24,9 @@ export type AddInstitutionMethodDeveloperProps = {
 export default function AddInstitutionMethodDeveloper({
   methodId,
 }: AddInstitutionMethodDeveloperProps) {
-  const [addInstitutionMethodDeveloperMutation] = useMutation(AddInstitutionMethodDeveloperDocument, {
+  const [addInstitutionMethodDeveloperMutation] = useMutation(
+    AddInstitutionMethodDeveloperDocument,
+    {
       // TODO Update the cache more efficiently as explained on https://www.apollographql.com/docs/react/caching/cache-interaction/ and https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       // See https://www.apollographql.com/docs/react/data/mutations/#options
       refetchQueries: [
@@ -35,9 +37,10 @@ export default function AddInstitutionMethodDeveloper({
           },
         },
       ],
-    });
+    },
+  );
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm<FormValues>();
   const [adding, setAdding] = useState(false);
@@ -59,7 +62,7 @@ export default function AddInstitutionMethodDeveloper({
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.addInstitutionMethodDeveloper?.errors) {
           form.resetFields();

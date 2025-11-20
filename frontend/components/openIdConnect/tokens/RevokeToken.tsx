@@ -1,15 +1,13 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import { Button, message } from "antd";
 import { useState } from "react";
-import {
-  RevokeTokenDocument,
-} from "../../../queries/openIdConnect.generated";
+import { RevokeTokenDocument } from "../../../queries/openIdConnect.generated";
 import { Scalars } from "../../../__generated__/graphql";
 import { DocumentNode } from "graphql";
 
 export type RevokeTokenProps = {
   tokenId: Scalars["Uuid"]["input"];
-  refetchQueries: { query: DocumentNode, variables: { [key: string]: any } }[];
+  refetchQueries: { query: DocumentNode; variables: { [key: string]: any } }[];
 };
 
 export default function RevokeToken({
@@ -39,7 +37,7 @@ export default function RevokeToken({
         message.error(
           data?.revokeOpenIdConnectToken?.errors
             .map((error) => error.message)
-            .join(" ")
+            .join(" "),
         );
       }
     } finally {
@@ -48,12 +46,7 @@ export default function RevokeToken({
   };
 
   return (
-    <Button
-      danger
-      type="primary"
-      onClick={revokeToken}
-      loading={revoking}
-    >
+    <Button danger type="primary" onClick={revokeToken} loading={revoking}>
       Revoke
     </Button>
   );

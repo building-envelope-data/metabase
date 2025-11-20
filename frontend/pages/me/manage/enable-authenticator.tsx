@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import ManageLayout from "../../../components/me/ManageLayout";
 import {
   Input,
@@ -31,10 +31,15 @@ const tailLayout = {
 
 function Page() {
   const router = useRouter();
-  const [generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation] = useMutation(GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriDocument);
-  const [enableUserTwoFactorAuthenticatorMutation] = useMutation(EnableUserTwoFactorAuthenticatorDocument);
+  const [generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriMutation] =
+    useMutation(
+      GenerateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUriDocument,
+    );
+  const [enableUserTwoFactorAuthenticatorMutation] = useMutation(
+    EnableUserTwoFactorAuthenticatorDocument,
+  );
   const [sharedKey, setSharedKey] = useState<string | null | undefined>(
-    undefined
+    undefined,
   );
   const [authenticatorUri, setAuthenticatorUri] = useState<
     string | null | undefined
@@ -42,7 +47,7 @@ function Page() {
 
   const [messageApi, contextHolder] = message.useMessage();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [enabling, setEnabling] = useState(false);
@@ -52,32 +57,30 @@ function Page() {
       try {
         setEnabling(true);
         // https://www.apollographql.com/docs/react/networking/authentication/#reset-store-on-logout
-        const { error, data } = await enableUserTwoFactorAuthenticatorMutation(
-          {
-            variables: {
-              verificationCode: verificationCode,
-            },
-          }
-        );
+        const { error, data } = await enableUserTwoFactorAuthenticatorMutation({
+          variables: {
+            verificationCode: verificationCode,
+          },
+        });
         handleFormErrors(
           error,
           data?.enableUserTwoFactorAuthenticator?.errors?.map((x) => {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (data?.enableUserTwoFactorAuthenticator?.sharedKey) {
           setSharedKey(data.enableUserTwoFactorAuthenticator.sharedKey);
         }
         if (data?.enableUserTwoFactorAuthenticator?.authenticatorUri) {
           setAuthenticatorUri(
-            data.enableUserTwoFactorAuthenticator.authenticatorUri
+            data.enableUserTwoFactorAuthenticator.authenticatorUri,
           );
         }
         if (data?.enableUserTwoFactorAuthenticator?.twoFactorRecoveryCodes) {
           recoveryCodesModal(
-            data.enableUserTwoFactorAuthenticator.twoFactorRecoveryCodes
+            data.enableUserTwoFactorAuthenticator.twoFactorRecoveryCodes,
           );
         }
         if (!error && !data?.enableUserTwoFactorAuthenticator?.errors) {
@@ -109,11 +112,11 @@ function Page() {
         if (data) {
           setSharedKey(
             data?.generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri
-              ?.sharedKey
+              ?.sharedKey,
           );
           setAuthenticatorUri(
             data?.generateUserTwoFactorAuthenticatorSharedKeyAndQrCodeUri
-              ?.authenticatorUri
+              ?.authenticatorUri,
           );
         }
       }

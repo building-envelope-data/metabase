@@ -1,6 +1,11 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { useMemo } from "react";
-import { ApolloClient, InMemoryCache, HttpLink, ErrorLike } from "@apollo/client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  HttpLink,
+  ErrorLike,
+} from "@apollo/client";
 import { Defer20220824Handler } from "@apollo/client/incremental";
 import { LocalState } from "@apollo/client/local-state";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
@@ -65,7 +70,7 @@ function createIsomorphLink(context: ResolverContext = {}) {
       useGETForQueries: false, // Use `POST` for queries to avoid "414 Request-URI Too Large" errors
       credentials: "same-origin",
       headers: headers,
-    })
+    }),
   );
 }
 
@@ -77,7 +82,7 @@ function createApolloClient(context?: ResolverContext) {
       possibleTypes: fragmentMatcherTypes.possibleTypes,
     }),
     localState: new LocalState({}),
-    incrementalHandler: new Defer20220824Handler()
+    incrementalHandler: new Defer20220824Handler(),
   });
 }
 
@@ -85,7 +90,7 @@ export function initializeApollo(
   initialState: any = null,
   // Pages with Next.js data fetching methods, like `getStaticProps`, can send
   // a custom context which will be used by `SchemaLink` to server render pages
-  context?: ResolverContext
+  context?: ResolverContext,
 ) {
   const _apolloClient = apolloClient ?? createApolloClient(context);
 
@@ -110,18 +115,18 @@ export function initializeApollo(
 // See https://www.apollographql.com/docs/react/data/error-handling
 export function stringifyApolloError(error: ErrorLike) {
   if (CombinedGraphQLErrors.is(error)) {
-    return `Name(${error.name
-      }); Message(${error.message
-      }); Extensions(${error.extensions
-      }); Stack(${error.stack
-      }); GraphQL Errors(${error.errors
-        .map((e) => `[Message(${e.message
-          }); Path(${e.path?.join(".")
-          }); Locations(${e.locations?.join(", ")
-          }); Extensions(${e.extensions
-          })]`)
-        .join(", ")
-      })`;
+    return `Name(${error.name}); Message(${error.message}); Extensions(${
+      error.extensions
+    }); Stack(${error.stack}); GraphQL Errors(${error.errors
+      .map(
+        (e) =>
+          `[Message(${e.message}); Path(${e.path?.join(
+            ".",
+          )}); Locations(${e.locations?.join(", ")}); Extensions(${
+            e.extensions
+          })]`,
+      )
+      .join(", ")})`;
     // } if (CombinedProtocolErrors.is(error)) {
     // Handle multipart subscription protocol errors
     // } if (LocalStateError.is(error)) {

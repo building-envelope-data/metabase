@@ -1,6 +1,9 @@
 import Layout from "../../components/Layout";
 import { Table, Form, Button, Alert, Typography } from "antd";
-import { AllHygrothermalDataDocument, HygrothermalDataPartialFragment } from "../../queries/data.generated";
+import {
+  AllHygrothermalDataDocument,
+  HygrothermalDataPartialFragment,
+} from "../../queries/data.generated";
 import {
   Scalars,
   HygrothermalDataPropositionInput,
@@ -37,7 +40,7 @@ enum Negator {
 
 const negateIfNecessary = (
   negator: Negator,
-  proposition: HygrothermalDataPropositionInput
+  proposition: HygrothermalDataPropositionInput,
 ): HygrothermalDataPropositionInput => {
   switch (negator) {
     case Negator.Is:
@@ -49,7 +52,7 @@ const negateIfNecessary = (
 };
 
 const conjunct = (
-  propositions: HygrothermalDataPropositionInput[]
+  propositions: HygrothermalDataPropositionInput[],
 ): HygrothermalDataPropositionInput => {
   if (propositions.length == 0) {
     return {};
@@ -76,7 +79,7 @@ function Page() {
   const [form] = Form.useForm();
   const [filtering, setFiltering] = useState(false);
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [data, setData] = useState<HygrothermalDataPartialFragment[]>([]);
   // Using `skip` is inspired by https://github.com/apollographql/apollo-client/issues/5268#issuecomment-749501801
@@ -96,19 +99,19 @@ function Page() {
     dataFormatIds,
   }: {
     componentIds:
-    | {
-      negator: Negator;
-      comparator: UuidPropositionComparator;
-      value: Scalars["Uuid"] | undefined;
-    }[]
-    | undefined;
+      | {
+          negator: Negator;
+          comparator: UuidPropositionComparator;
+          value: Scalars["Uuid"] | undefined;
+        }[]
+      | undefined;
     dataFormatIds:
-    | {
-      negator: Negator;
-      comparator: UuidPropositionComparator;
-      value: Scalars["Uuid"] | undefined;
-    }[]
-    | undefined;
+      | {
+          negator: Negator;
+          comparator: UuidPropositionComparator;
+          value: Scalars["Uuid"] | undefined;
+        }[]
+      | undefined;
   }) => {
     const filter = async () => {
       try {
@@ -120,7 +123,7 @@ function Page() {
             propositions.push(
               negateIfNecessary(negator, {
                 componentId: { [comparator]: value },
-              })
+              }),
             );
           }
         }
@@ -133,7 +136,7 @@ function Page() {
                     dataFormatId: { [comparator]: value },
                   },
                 },
-              })
+              }),
             );
           }
         }
@@ -141,8 +144,8 @@ function Page() {
           propositions.length == 0
             ? {}
             : {
-              where: conjunct(propositions),
-            }
+                where: conjunct(propositions),
+              },
         );
         if (error) {
           // TODO Handle properly.
@@ -150,10 +153,11 @@ function Page() {
         }
         const nestedData =
           data?.databases?.edges?.map(
-            (edge) => edge?.node?.allHygrothermalData?.edges?.map((e) => e.node) || []
+            (edge) =>
+              edge?.node?.allHygrothermalData?.edges?.map((e) => e.node) || [],
           ) || [];
         const flatData = ([] as HygrothermalDataPartialFragment[]).concat(
-          ...nestedData
+          ...nestedData,
         );
         setData(flatData);
       } catch (error) {
@@ -200,18 +204,18 @@ function Page() {
             ...getUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
               (x) => filterText.get(x),
-              (_uuid) => "/" // TODO Link somewhere useful!
+              (_uuid) => "/", // TODO Link somewhere useful!
             ),
           },
           {
             ...getNameColumnProps<(typeof data)[0]>(onFilterTextChange, (x) =>
-              filterText.get(x)
+              filterText.get(x),
             ),
           },
           {
             ...getDescriptionColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
@@ -220,7 +224,7 @@ function Page() {
           {
             ...getComponentUuidColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           // {
@@ -236,13 +240,13 @@ function Page() {
           {
             ...getAppliedMethodColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
           {
             ...getResourceTreeColumnProps<(typeof data)[0]>(
               onFilterTextChange,
-              (x) => filterText.get(x)
+              (x) => filterText.get(x),
             ),
           },
         ]}

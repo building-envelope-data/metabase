@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from "@apollo/client/react";
 import ManageLayout from "../../../components/me/ManageLayout";
 import { Alert, Input, Button, message, Form, Typography } from "antd";
 import { SetUserPasswordDocument } from "../../../queries/currentUser.generated";
@@ -17,7 +17,7 @@ function Page() {
   const [setUserPasswordMutation] = useMutation(SetUserPasswordDocument);
 
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
-    new Array<string>()
+    new Array<string>(),
   );
   const [form] = Form.useForm();
   const [setting, setSetting] = useState(false);
@@ -45,7 +45,7 @@ function Page() {
             return { code: x.code, message: x.message, path: x.path };
           }),
           setGlobalErrorMessages,
-          form
+          form,
         );
         if (!error && !data?.setUserPassword?.errors) {
           message.success("Your password has been set.");
@@ -110,7 +110,7 @@ function Page() {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  "password and confirmation do not match!"
+                  "password and confirmation do not match!",
                 );
               },
             }),
