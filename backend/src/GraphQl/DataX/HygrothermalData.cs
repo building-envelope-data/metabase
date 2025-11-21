@@ -39,4 +39,5 @@ public sealed class HygrothermalData(
     approvals
     )
 {
+    public override DataKind Kind { get => DataKind.HYGROTHERMAL_DATA; }
 }

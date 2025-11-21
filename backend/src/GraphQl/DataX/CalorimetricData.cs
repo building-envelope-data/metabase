@@ -41,6 +41,7 @@ public sealed class CalorimetricData(
     approvals
     )
 {
+    public override DataKind Kind { get => DataKind.CALORIMETRIC_DATA; }
     public IReadOnlyList<double> GValues { get; } = gValues;
     public IReadOnlyList<double> UValues { get; } = uValues;
 }

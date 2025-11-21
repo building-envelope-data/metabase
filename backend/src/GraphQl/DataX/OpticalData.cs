@@ -49,6 +49,7 @@ public sealed class OpticalData(
     approvals
     )
 {
+    public override DataKind Kind { get => DataKind.OPTICAL_DATA; }
     public OpticalComponentType? Type { get; } = type;
     public OpticalComponentSubtype? Subtype { get; } = subtype;
     public CoatedSide? CoatedSide { get; } = coatedSide;

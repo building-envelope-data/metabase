@@ -21,6 +21,7 @@ interface Data {
   creatorId: Uuid!
   databaseId: Uuid!
   description: String
+  kind: DataKind!
   locale: Locale!
   name: String
   resources: [GetHttpsResource!]!
@@ -191,6 +192,7 @@ type CalorimetricData implements Data {
   description: String
   gValues: [Float!]!
   id: ID!
+  kind: DataKind!
   locale: Locale!
   name: String
   resources: [GetHttpsResource!]!
@@ -791,6 +793,7 @@ type GeometricData implements Data {
   databaseId: Uuid!
   description: String
   id: ID!
+  kind: DataKind!
   locale: Locale!
   name: String
   resources: [GetHttpsResource!]!
@@ -889,6 +892,7 @@ type HygrothermalData implements Data {
   databaseId: Uuid!
   description: String
   id: ID!
+  kind: DataKind!
   locale: Locale!
   name: String
   resources: [GetHttpsResource!]!
@@ -1360,6 +1364,7 @@ type OpticalData implements Data {
   description: String
   id: ID!
   infraredEmittances: [Float!]!
+  kind: DataKind!
   locale: Locale!
   name: String
   nearnormalHemisphericalSolarReflectances: [Float!]!
@@ -1446,6 +1451,7 @@ type PhotovoltaicData implements Data {
   databaseId: Uuid!
   description: String
   id: ID!
+  kind: DataKind!
   locale: Locale!
   name: String
   resources: [GetHttpsResource!]!

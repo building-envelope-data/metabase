@@ -39,4 +39,5 @@ public sealed class PhotovoltaicData(
     approvals
     )
 {
+    public override DataKind Kind { get => DataKind.PHOTOVOLTAIC_DATA; }
 }

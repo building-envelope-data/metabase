@@ -35,6 +35,8 @@ public abstract class Data(
     [ID]
     public string Id { get; } = id;
 
+    public abstract DataKind Kind { get; }
+
     [GraphQLType<NonNullType<LocaleType>>]
     public string Locale { get; } = locale;
 

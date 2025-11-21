@@ -41,5 +41,6 @@ public sealed class GeometricData(
     // approval
     )
 {
+    public override DataKind Kind { get => DataKind.GEOMETRIC_DATA; }
     public IReadOnlyList<double> Thicknesses { get; } = thicknesses;
 }
