@@ -1,6 +1,0 @@
-query HasData(
-  $where: DataPropositionInput
-  $locale: Locale
-) {
-  hasData(where: $where, locale: $locale)
-}

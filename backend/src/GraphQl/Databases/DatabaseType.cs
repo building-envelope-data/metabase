@@ -29,6 +29,63 @@ public sealed class DatabaseType
             .Ignore();
         ConfigureDataField(
             descriptor,
+            "data",
+            _ => _.GetDataAsync(default!, default!, default, default, default!, default!, default)
+        )
+            .Argument("dataKind", _ => _.Type<NonNullType<EnumType<DataKind>>>());
+        ConfigureHasDataField<DataPropositionInput>(
+            descriptor,
+            "hasData",
+            _ => _.HasDataAsync(default!, default!, default!, default, default!, default!, default)
+        )
+            .Argument("dataKind", _ => _.Type<NonNullType<EnumType<DataKind>>>());
+        ConfigureDataField(
+            descriptor,
+            "calorimetricData",
+            _ => _.GetCalorimetricDataAsync(default!, default, default, default!, default!, default)
+        );
+        ConfigureAllDataField<CalorimetricDataPropositionInput>(
+            descriptor,
+            "allCalorimetricData",
+            _ => _.GetAllCalorimetricDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
+        );
+        ConfigureHasDataField<CalorimetricDataPropositionInput>(
+            descriptor,
+            "hasCalorimetricData",
+            _ => _.HasCalorimetricDataAsync(default!, default, default, default!, default!, default)
+        );
+        ConfigureDataField(
+            descriptor,
+            "geometricData",
+            _ => _.GetGeometricDataAsync(default!, default, default, default!, default!, default)
+        );
+        ConfigureAllDataField<GeometricDataPropositionInput>(
+            descriptor,
+            "allGeometricData",
+            _ => _.GetAllGeometricDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
+        );
+        ConfigureHasDataField<GeometricDataPropositionInput>(
+            descriptor,
+            "hasGeometricData",
+            _ => _.HasGeometricDataAsync(default!, default, default, default!, default!, default)
+        );
+        ConfigureDataField(
+            descriptor,
+            "hygrothermalData",
+            _ => _.GetHygrothermalDataAsync(default!, default, default, default!, default!, default)
+        );
+        ConfigureAllDataField<HygrothermalDataPropositionInput>(
+            descriptor,
+            "allHygrothermalData",
+            _ => _.GetAllHygrothermalDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
+        );
+        ConfigureHasDataField<HygrothermalDataPropositionInput>(
+            descriptor,
+            "hasHygrothermalData",
+            _ => _.HasHygrothermalDataAsync(default!, default, default, default!, default!, default)
+        );
+        ConfigureDataField(
+            descriptor,
             "opticalData",
             _ => _.GetOpticalDataAsync(default!, default, default, default!, default!, default)
         );
@@ -45,67 +102,18 @@ public sealed class DatabaseType
         );
         ConfigureDataField(
             descriptor,
-            "hygrothermalData",
-            _ => _.GetHygrothermalDataAsync(default!, default, default, default!, default!, default)
-        );
-        ConfigureAllDataField<HygrothermalDataPropositionInput>(
-            descriptor,
-            "allHygrothermalData",
-            _ => _.GetAllHygrothermalDataAsync(default!, default, default, default, default, default,
-                default, default!, default!, default)
-        );
-        ConfigureHasDataField<HygrothermalDataPropositionInput>(
-            descriptor,
-            "hasHygrothermalData",
-            _ => _.HasHygrothermalDataAsync(default!, default, default, default!, default!, default)
-        );
-        ConfigureDataField(
-            descriptor,
-            "calorimetricData",
-            _ => _.GetCalorimetricDataAsync(default!, default, default, default!, default!, default)
-        );
-        ConfigureAllDataField<CalorimetricDataPropositionInput>(
-            descriptor,
-            "allCalorimetricData",
-            _ => _.GetAllCalorimetricDataAsync(default!, default, default, default, default, default,
-                default, default!, default!, default)
-        );
-        ConfigureHasDataField<CalorimetricDataPropositionInput>(
-            descriptor,
-            "hasCalorimetricData",
-            _ => _.HasCalorimetricDataAsync(default!, default, default, default!, default!, default)
-        );
-        ConfigureDataField(
-            descriptor,
             "photovoltaicData",
             _ => _.GetPhotovoltaicDataAsync(default!, default, default, default!, default!, default)
         );
         ConfigureAllDataField<PhotovoltaicDataPropositionInput>(
             descriptor,
             "allPhotovoltaicData",
-            _ => _.GetAllPhotovoltaicDataAsync(default!, default, default, default, default, default,
-                default, default!, default!, default)
+            _ => _.GetAllPhotovoltaicDataAsync(default!, default, default, default, default, default, default, default!, default!, default)
         );
         ConfigureHasDataField<PhotovoltaicDataPropositionInput>(
             descriptor,
             "hasPhotovoltaicData",
             _ => _.HasPhotovoltaicDataAsync(default!, default, default, default!, default!, default)
-        );
-        ConfigureDataField(
-            descriptor,
-            "geometricData",
-            _ => _.GetGeometricDataAsync(default!, default, default, default!, default!, default)
-        );
-        ConfigureAllDataField<GeometricDataPropositionInput>(
-            descriptor,
-            "allGeometricData",
-            _ => _.GetAllGeometricDataAsync(default!, default, default, default, default, default,
-                default, default!, default!, default)
-        );
-        ConfigureHasDataField<GeometricDataPropositionInput>(
-            descriptor,
-            "hasGeometricData",
-            _ => _.HasGeometricDataAsync(default!, default, default, default!, default!, default)
         );
         descriptor
             .Field("isAuthorizedToUpdateNode")
@@ -119,13 +127,13 @@ public sealed class DatabaseType
             .UseUserManager();
     }
 
-    private static void ConfigureDataField(
+    private static IObjectFieldDescriptor ConfigureDataField(
         IObjectTypeDescriptor<Database> descriptor,
         string fieldName,
         Expression<Func<DatabaseResolvers, object?>> resolverMethod
     )
     {
-        descriptor
+        return descriptor
             .Field(fieldName)
             .Argument("id", _ => _.Type<NonNullType<UuidType>>())
             .Argument("locale", _ => _.Type<LocaleType>())
@@ -149,13 +157,13 @@ public sealed class DatabaseType
             .ResolveWith(resolverMethod);
     }
 
-    private static void ConfigureHasDataField<TDataPropositionInput>(
+    private static IObjectFieldDescriptor ConfigureHasDataField<TDataPropositionInput>(
         IObjectTypeDescriptor<Database> descriptor,
         string fieldName,
         Expression<Func<DatabaseResolvers, object?>> resolverMethod
     )
     {
-        descriptor
+        return descriptor
             .Field(fieldName)
             .Argument("where", _ => _.Type<InputObjectType<TDataPropositionInput>>())
             .Argument("locale", _ => _.Type<LocaleType>())

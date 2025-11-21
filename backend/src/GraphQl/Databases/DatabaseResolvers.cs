@@ -214,6 +214,48 @@ public sealed class DatabaseResolvers(
         return authorization.IsAuthorizedToVerify(claimsPrincipal, database.Id, cancellationToken);
     }
 
+    public async Task<IData?> GetDataAsync(
+        [Parent] Database database,
+        Guid id,
+        DataKind dataKind,
+        string? locale,
+        IHttpContextAccessor httpContextAccessor,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return dataKind switch
+        {
+            DataKind.CALORIMETRIC_DATA => await GetCalorimetricDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.GEOMETRIC_DATA => await GetGeometricDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.HYGROTHERMAL_DATA => await GetHygrothermalDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.OPTICAL_DATA => await GetOpticalDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.PHOTOVOLTAIC_DATA => await GetPhotovoltaicDataAsync(database, id, locale, httpContextAccessor, resolverContext, cancellationToken),
+            _ => throw new ArgumentOutOfRangeException($"The data kind {dataKind} is not supported.")
+        };
+    }
+
+    public async Task<bool?> HasDataAsync(
+        [Parent] Database database,
+        DataKind dataKind,
+        DataPropositionInput dataPropositionInput,
+        string? locale,
+        IHttpContextAccessor httpContextAccessor,
+        IResolverContext resolverContext,
+        CancellationToken cancellationToken
+    )
+    {
+        return dataKind switch
+        {
+            DataKind.CALORIMETRIC_DATA => await HasCalorimetricDataAsync(database, dataPropositionInput.ToCalorimetricInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.GEOMETRIC_DATA => await HasGeometricDataAsync(database, dataPropositionInput.ToGeometricInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.HYGROTHERMAL_DATA => await HasHygrothermalDataAsync(database, dataPropositionInput.ToHygrothermalInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.OPTICAL_DATA => await HasOpticalDataAsync(database, dataPropositionInput.ToOpticalInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
+            DataKind.PHOTOVOLTAIC_DATA => await HasPhotovoltaicDataAsync(database, dataPropositionInput.ToPhotovoltaiInput(), locale, httpContextAccessor, resolverContext, cancellationToken),
+            _ => throw new ArgumentOutOfRangeException($"The data kind {dataKind} is not supported.")
+        };
+    }
+
     public async Task<OpticalData?> GetOpticalDataAsync(
         [Parent] Database database,
         Guid id,
