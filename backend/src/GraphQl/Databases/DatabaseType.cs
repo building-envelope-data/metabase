@@ -32,13 +32,13 @@ public sealed class DatabaseType
             "data",
             _ => _.GetDataAsync(default!, default!, default, default, default!, default!, default)
         )
-            .Argument("dataKind", _ => _.Type<NonNullType<EnumType<DataKind>>>());
+            .Argument("kind", _ => _.Type<NonNullType<EnumType<DataKind>>>());
         ConfigureHasDataField<DataPropositionInput>(
             descriptor,
             "hasData",
             _ => _.HasDataAsync(default!, default!, default!, default, default!, default!, default)
         )
-            .Argument("dataKind", _ => _.Type<NonNullType<EnumType<DataKind>>>());
+            .Argument("kind", _ => _.Type<NonNullType<EnumType<DataKind>>>());
         ConfigureDataField(
             descriptor,
             "calorimetricData",

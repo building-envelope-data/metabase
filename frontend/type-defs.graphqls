@@ -590,11 +590,11 @@ type Database implements Node {
   allOpticalData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: OpticalDataPropositionInput): OpticalDataConnection @cost(weight: "10")
   allPhotovoltaicData(after: String before: String first: NonNegativeInt last: NonNegativeInt locale: Locale where: PhotovoltaicDataPropositionInput): PhotovoltaicDataConnection @cost(weight: "10")
   calorimetricData(id: Uuid! locale: Locale): CalorimetricData @cost(weight: "10")
-  data(dataKind: DataKind! id: Uuid! locale: Locale): Data @cost(weight: "10")
+  data(id: Uuid! kind: DataKind! locale: Locale): Data @cost(weight: "10")
   description: String!
   geometricData(id: Uuid! locale: Locale): GeometricData @cost(weight: "10")
   hasCalorimetricData(locale: Locale where: CalorimetricDataPropositionInput): Boolean @cost(weight: "10")
-  hasData(dataKind: DataKind! locale: Locale where: DataPropositionInput): Boolean @cost(weight: "10")
+  hasData(kind: DataKind! locale: Locale where: DataPropositionInput): Boolean @cost(weight: "10")
   hasGeometricData(locale: Locale where: GeometricDataPropositionInput): Boolean @cost(weight: "10")
   hasHygrothermalData(locale: Locale where: HygrothermalDataPropositionInput): Boolean @cost(weight: "10")
   hasOpticalData(locale: Locale where: OpticalDataPropositionInput): Boolean @cost(weight: "10")
