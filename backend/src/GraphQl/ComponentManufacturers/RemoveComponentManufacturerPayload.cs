@@ -43,8 +43,7 @@ public sealed class RemoveComponentManufacturerPayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_association.ComponentId, cancellationToken)!;
+        return await byId.LoadAsync(_association.ComponentId, cancellationToken);
     }
 
     public async Task<Institution?> GetInstitutionAsync(
@@ -56,7 +55,6 @@ public sealed class RemoveComponentManufacturerPayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_association.InstitutionId, cancellationToken)!;
+        return await byId.LoadAsync(_association.InstitutionId, cancellationToken);
     }
 }

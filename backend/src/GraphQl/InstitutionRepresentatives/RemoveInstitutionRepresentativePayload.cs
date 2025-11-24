@@ -43,8 +43,7 @@ public sealed class RemoveInstitutionRepresentativePayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_association.InstitutionId, cancellationToken)!;
+        return await byId.LoadAsync(_association.InstitutionId, cancellationToken);
     }
 
     public async Task<User?> GetUser(
@@ -56,7 +55,6 @@ public sealed class RemoveInstitutionRepresentativePayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_association.UserId, cancellationToken)!;
+        return await byId.LoadAsync(_association.UserId, cancellationToken);
     }
 }

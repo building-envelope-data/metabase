@@ -42,8 +42,7 @@ public sealed class RemoveComponentGeneralizationPayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_association.GeneralComponentId, cancellationToken)!;
+        return await byId.LoadAsync(_association.GeneralComponentId, cancellationToken);
     }
 
     public async Task<Component?> GetConcreteComponentAsync(
@@ -55,7 +54,6 @@ public sealed class RemoveComponentGeneralizationPayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_association.ConcreteComponentId, cancellationToken)!;
+        return await byId.LoadAsync(_association.ConcreteComponentId, cancellationToken);
     }
 }

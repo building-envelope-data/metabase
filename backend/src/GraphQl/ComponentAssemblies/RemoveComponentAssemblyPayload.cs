@@ -42,8 +42,7 @@ public sealed class RemoveComponentAssemblyPayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_association.AssembledComponentId, cancellationToken)!;
+        return await byId.LoadAsync(_association.AssembledComponentId, cancellationToken);
     }
 
     public async Task<Component?> GetPartComponentAsync(
@@ -55,7 +54,6 @@ public sealed class RemoveComponentAssemblyPayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_association.PartComponentId, cancellationToken)!;
+        return await byId.LoadAsync(_association.PartComponentId, cancellationToken);
     }
 }

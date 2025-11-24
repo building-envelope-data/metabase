@@ -46,8 +46,7 @@ public sealed class RemoveComponentVariantPayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_oneComponentId.GetValueOrDefault(), cancellationToken)!;
+        return await byId.LoadAsync(_oneComponentId ?? Guid.Empty, cancellationToken);
     }
 
     public async Task<Component?> GetOtherComponentAsync(
@@ -59,7 +58,6 @@ public sealed class RemoveComponentVariantPayload
         {
             return null;
         }
-
-        return await byId.LoadAsync(_otherComponentId.GetValueOrDefault(), cancellationToken)!;
+        return await byId.LoadAsync(_otherComponentId ?? Guid.Empty, cancellationToken);
     }
 }
