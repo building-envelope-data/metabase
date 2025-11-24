@@ -1,13 +1,22 @@
 #import "./openIdConnect.graphql"
 #import "./gnuPgKeyFingerprints.graphql"
 
+fragment ContactInformationPartial on ContactInformation {
+  phoneNumber
+  postalAddress
+  emailAddress
+  websiteLocator
+}
+
 fragment InstitutionPartial on Institution {
   id
   uuid
   name
   abbreviation
   description
-  websiteLocator
+  contact {
+    ...ContactInformationPartial
+  }
   state
   operatingState
 }
@@ -36,18 +45,18 @@ mutation CreateInstitution(
   $name: String!
   $abbreviation: String
   $description: String!
+  $contact: ContactInformationInput
   $ownerIds: [Uuid!]!
   $managerId: Uuid
-  $websiteLocator: Url
 ) {
   createInstitution(
     input: {
       name: $name
       abbreviation: $abbreviation
       description: $description
+      contact: $contact
       ownerIds: $ownerIds
       managerId: $managerId
-      websiteLocator: $websiteLocator
     }
   ) {
     institution {
@@ -66,7 +75,7 @@ mutation UpdateInstitution(
   $name: String!
   $abbreviation: String
   $description: String!
-  $websiteLocator: Url
+  $contact: ContactInformationInput
 ) {
   updateInstitution(
     input: {
@@ -74,7 +83,7 @@ mutation UpdateInstitution(
       name: $name
       abbreviation: $abbreviation
       description: $description
-      websiteLocator: $websiteLocator
+      contact: $contact
     }
   ) {
     institution {

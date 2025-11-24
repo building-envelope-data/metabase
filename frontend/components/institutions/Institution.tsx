@@ -195,45 +195,66 @@ export default function Institution({ institutionId }: InstitutionProps) {
           .concat(
             institution.isAuthorizedToUpdateNode
               ? [
-                  <UpdateInstitution
-                    key="updateInstitution"
-                    institutionId={institution.uuid}
-                    name={institution.name}
-                    abbreviation={institution.abbreviation}
-                    description={institution.description}
-                    websiteLocator={institution.websiteLocator}
-                  />,
-                ]
+                <UpdateInstitution
+                  key="updateInstitution"
+                  institutionId={institution.uuid}
+                  name={institution.name}
+                  abbreviation={institution.abbreviation}
+                  description={institution.description}
+                  contact={institution.contact}
+                />,
+              ]
               : [],
           )
           .concat(
             institution.isAuthorizedToDeleteNode
               ? [
-                  <DeleteInstitution
-                    key="deleteInstitution"
-                    institutionId={institution.uuid}
-                  />,
-                ]
+                <DeleteInstitution
+                  key="deleteInstitution"
+                  institutionId={institution.uuid}
+                />,
+              ]
               : [],
           )
           .concat(
             institution.isAuthorizedToSwitchOperatingStateOfNode
               ? [
-                  <SwitchInstitutionOperatingState
-                    key="switchInstitutionOperatingState"
-                    institutionId={institution.uuid}
-                  />,
-                ]
+                <SwitchInstitutionOperatingState
+                  key="switchInstitutionOperatingState"
+                  institutionId={institution.uuid}
+                />,
+              ]
               : [],
           )}
         backIcon={false}
       >
         <Descriptions size="small" column={1}>
           <Descriptions.Item label="UUID">{institution.uuid}</Descriptions.Item>
-          {institution.websiteLocator && (
+          {institution.contact?.phoneNumber && (
+            <Descriptions.Item label="Phone">
+              <Typography.Link href={institution.contact.phoneNumber}>
+                {institution.contact.phoneNumber}
+              </Typography.Link>
+            </Descriptions.Item>
+          )}
+          {institution.contact?.postalAddress && (
+            <Descriptions.Item label="Postal Address">
+              <Typography.Link href={institution.contact.postalAddress}>
+                {institution.contact.postalAddress}
+              </Typography.Link>
+            </Descriptions.Item>
+          )}
+          {institution.contact?.emailAddress && (
+            <Descriptions.Item label="E-Mail">
+              <Typography.Link href={institution.contact.emailAddress}>
+                {institution.contact.emailAddress}
+              </Typography.Link>
+            </Descriptions.Item>
+          )}
+          {institution.contact?.websiteLocator && (
             <Descriptions.Item label="Website">
-              <Typography.Link href={institution.websiteLocator}>
-                {institution.websiteLocator}
+              <Typography.Link href={institution.contact.websiteLocator}>
+                {institution.contact.websiteLocator}
               </Typography.Link>
             </Descriptions.Item>
           )}

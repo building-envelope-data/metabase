@@ -79,12 +79,12 @@ public sealed class AuthorizationController(
         return result;
     }
 
-    private async Task<ImmutableArray<string>> GetAudiencesAsync()
+    private async Task<string[]> GetAudiencesAsync()
     {
-        return _dbContext.OpenIdConnectApplications.AsNoTracking()
+        return await _dbContext.OpenIdConnectApplications.AsNoTracking()
             .Where(application => application.ClientId != null)
             .Select(application => application.ClientId!) // using `!` is safe here because above we make sure that `ClientId` is non-null
-            .ToImmutableArray();
+            .ToArrayAsync();
     }
 
     private async Task<ClaimsPrincipal> CreateUserPrincipalAsync(

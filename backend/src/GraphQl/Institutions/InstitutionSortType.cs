@@ -12,11 +12,11 @@ public sealed class InstitutionSortType
     )
     {
         base.Configure(descriptor);
-        descriptor.Field(x => x.Name);
-        descriptor.Field(x => x.Abbreviation);
-        descriptor.Field(x => x.Description);
-        descriptor.Field(x => x.WebsiteLocator);
-        descriptor.Field(x => x.State);
-        descriptor.Field(x => x.Manager);
+        descriptor.Field(_ => _.Name);
+        descriptor.Field(_ => _.Abbreviation);
+        descriptor.Field(_ => _.Description);
+        descriptor.Field(_ => _.Contact);
+        descriptor.Field(_ => _.State);
+        descriptor.Field(_ => _.Manager);
     }
 }

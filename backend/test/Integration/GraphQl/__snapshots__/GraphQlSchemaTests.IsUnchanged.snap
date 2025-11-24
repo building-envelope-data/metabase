@@ -444,6 +444,13 @@ type ConfirmUserMethodDeveloperPayload {
   query: Query!
 }
 
+type ContactInformation {
+  emailAddress: String
+  phoneNumber: String
+  postalAddress: String
+  websiteLocator: Url
+}
+
 type CreateComponentError implements UserError {
   code: CreateComponentErrorCode!
   message: String!
@@ -915,6 +922,7 @@ type HygrothermalDataEdge {
 
 type Institution implements Node {
   abbreviation: String
+  contact: ContactInformation
   description: String!
   developedMethods(pending: Boolean! = false where: InstitutionMethodDeveloperFilterInput @cost(weight: "10")): InstitutionDevelopedMethodConnection! @cost(weight: "10")
   extras: Any
@@ -933,11 +941,9 @@ type Institution implements Node {
   openIdConnectApplications(where: InstitutionOwnedOpenIdConnectApplicationFilterInput @cost(weight: "10")): InstitutionOwnedOpenIdConnectApplicationConnection! @cost(weight: "10")
   operatedDatabases(where: InstitutionOperatedDatabaseFilterInput @cost(weight: "10")): InstitutionOperatedDatabaseConnection! @cost(weight: "10")
   operatingState: InstitutionOperatingState!
-  publicKey: String
   representatives(pending: Boolean! = false where: InstitutionRepresentativeFilterInput @cost(weight: "10")): InstitutionRepresentativeConnection! @cost(weight: "10")
   state: InstitutionState!
   uuid: Uuid! @cost(weight: "10")
-  websiteLocator: Url
 }
 
 type InstitutionDevelopedMethodConnection {
@@ -2308,6 +2314,29 @@ input ConfirmUserMethodDeveloperInput {
   userId: Uuid!
 }
 
+input ContactInformationFilterInput {
+  and: [ContactInformationFilterInput!]
+  or: [ContactInformationFilterInput!]
+  phoneNumber: StringOperationFilterInput
+  postalAddress: StringOperationFilterInput
+  emailAddress: StringOperationFilterInput
+  websiteLocator: UriFilterInput
+}
+
+input ContactInformationInput {
+  emailAddress: String
+  phoneNumber: String
+  postalAddress: String
+  websiteLocator: Url
+}
+
+input ContactInformationSortInput {
+  phoneNumber: SortEnumType @cost(weight: "10")
+  postalAddress: SortEnumType @cost(weight: "10")
+  emailAddress: SortEnumType @cost(weight: "10")
+  websiteLocator: UriSortInput @cost(weight: "10")
+}
+
 input CreateComponentInput {
   abbreviation: String
   availability: OpenEndedDateTimeRangeInput
@@ -2341,14 +2370,13 @@ input CreateDatabaseInput {
 
 input CreateInstitutionInput {
   abbreviation: String
+  contact: ContactInformationInput
   description: String!
   extras: Any
   institutionId: Uuid
   managerId: Uuid
   name: String!
   ownerIds: [Uuid!]!
-  publicKey: String
-  websiteLocator: Url
 }
 
 input CreateMethodInput {
@@ -2558,7 +2586,7 @@ input InstitutionFilterInput {
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
-  websiteLocator: UriFilterInput
+  contact: ContactInformationFilterInput
   state: InstitutionStateOperationFilterInput
   extras: JsonElementFilterInput
   developedMethods: ListFilterInputTypeOfMethodFilterInput
@@ -2604,7 +2632,7 @@ input InstitutionManagedInstitutionFilterInput {
   name: StringOperationFilterInput
   abbreviation: StringOperationFilterInput
   description: StringOperationFilterInput
-  websiteLocator: UriFilterInput
+  contact: ContactInformationFilterInput
   state: InstitutionStateOperationFilterInput
   extras: JsonElementFilterInput
   developedMethods: ListFilterInputTypeOfMethodFilterInput
@@ -2709,7 +2737,7 @@ input InstitutionSortInput {
   name: SortEnumType @cost(weight: "10")
   abbreviation: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
-  websiteLocator: UriSortInput @cost(weight: "10")
+  contact: ContactInformationSortInput @cost(weight: "10")
   state: SortEnumType @cost(weight: "10")
   manager: InstitutionSortInput @cost(weight: "10")
 }
@@ -3192,12 +3220,11 @@ input UpdateDatabaseInput {
 
 input UpdateInstitutionInput {
   abbreviation: String
+  contact: ContactInformationInput
   description: String!
   extras: Any
   institutionId: Uuid!
   name: String!
-  publicKey: String
-  websiteLocator: Url
 }
 
 input UpdateMethodInput {

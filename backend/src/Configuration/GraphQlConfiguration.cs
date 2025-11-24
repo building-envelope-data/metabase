@@ -14,6 +14,7 @@ using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl;
 using Metabase.GraphQl.DataX;
+using Metabase.GraphQl.ContactInformations;
 
 namespace Metabase.Configuration;
 

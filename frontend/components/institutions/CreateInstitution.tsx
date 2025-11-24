@@ -24,9 +24,12 @@ const tailLayout = {
 
 type FormValues = {
   name: string;
-  abbreviation: string;
+  abbreviation: string | null | undefined;
   description: string;
-  websiteLocator: string;
+  phoneNumber: string | null | undefined;
+  postalAddress: string | null | undefined;
+  emailAddress: string | null | undefined;
+  websiteLocator: string | null | undefined;
 };
 
 export type CreateInstitutionProps = {
@@ -65,11 +68,11 @@ export default function CreateInstitution({
       },
       ...(managerId
         ? [
-            {
-              query: InstitutionDocument,
-              variables: { uuid: managerId },
-            },
-          ]
+          {
+            query: InstitutionDocument,
+            variables: { uuid: managerId },
+          },
+        ]
         : []),
     ],
   });
@@ -89,6 +92,9 @@ export default function CreateInstitution({
     name,
     abbreviation,
     description,
+    phoneNumber,
+    postalAddress,
+    emailAddress,
     websiteLocator,
   }: FormValues) => {
     const create = async () => {
@@ -103,7 +109,12 @@ export default function CreateInstitution({
             name: name,
             abbreviation: abbreviation,
             description: description,
-            websiteLocator: websiteLocator,
+            contact: {
+              phoneNumber: phoneNumber,
+              postalAddress: postalAddress,
+              emailAddress: emailAddress,
+              websiteLocator: websiteLocator,
+            },
             ownerIds: ownerIds || [],
             managerId: managerId,
           },
@@ -190,7 +201,30 @@ export default function CreateInstitution({
           <Input />
         </Form.Item>
         <Form.Item
-          label="Website"
+          label="Phone Number"
+          name="phoneNumber"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Postal Address"
+          name="postalAddress"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="E-Mail Address"
+          name="emailAddress"
+          rules={[
+            {
+              type: "email",
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Website Locator"
           name="websiteLocator"
           rules={[
             {

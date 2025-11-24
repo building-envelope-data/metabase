@@ -135,8 +135,7 @@ public sealed class InstitutionMutations
                 input.Name,
                 input.Abbreviation,
                 input.Description,
-                input.WebsiteLocator,
-                input.PublicKey,
+                input.Contact?.ToDomainModel(),
                 institutionState,
                 InstitutionOperatingState.OPERATING,
                 input.Extras
@@ -149,8 +148,7 @@ public sealed class InstitutionMutations
                 input.Name,
                 input.Abbreviation,
                 input.Description,
-                input.WebsiteLocator,
-                input.PublicKey,
+                input.Contact?.ToDomainModel(),
                 institutionState,
                 InstitutionOperatingState.OPERATING,
                 input.Extras
@@ -175,7 +173,8 @@ public sealed class InstitutionMutations
         if (institution.State == InstitutionState.PENDING)
         {
             var verifiers = await authorization.GetUsersInRoleAsync(UserRole.VERIFIER);
-            var institutionsUri = new UriBuilder(appSettings.HostUri) {
+            var institutionsUri = new UriBuilder(appSettings.HostUri)
+            {
                 Path = "/institutions"
             }.Uri;
             await Task.WhenAll(
@@ -308,8 +307,7 @@ public sealed class InstitutionMutations
             input.Name,
             input.Abbreviation,
             input.Description,
-            input.WebsiteLocator,
-            input.PublicKey,
+            input.Contact?.ToDomainModel(),
             input.Extras
         );
         await context.SaveChangesAsync(cancellationToken);

@@ -5,7 +5,12 @@ query institution($id: Uuid!) {
     name
     abbreviation
     description
-    websiteLocator
+    contact {
+      phoneNumber
+      postalAddress
+      emailAddress
+      websiteLocator
+    }
     state
   }
 }

@@ -11,7 +11,6 @@ import PendingInstitutions from "../../components/institutions/PendingInstitutio
 import { UserRole } from "../../__generated__/graphql";
 import { setMapValue } from "../../lib/freeTextFilter";
 import {
-  getExternallyLinkedFilterableLocatorColumnProps,
   getNameColumnProps,
   getAbbreviationColumnProps,
   getDescriptionColumnProps,
@@ -72,17 +71,6 @@ function Page() {
           },
           {
             ...getDescriptionColumnProps<(typeof nodes)[0]>(
-              onFilterTextChange,
-              (x) => filterText.get(x),
-            ),
-          },
-          {
-            ...getExternallyLinkedFilterableLocatorColumnProps<
-              (typeof nodes)[0]
-            >(
-              "Website",
-              "websiteLocator",
-              (record) => record.websiteLocator,
               onFilterTextChange,
               (x) => filterText.get(x),
             ),

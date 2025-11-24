@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Metabase.Data;
+using Metabase.GraphQl.ContactInformations;
 using Metabase.GraphQl.Institutions;
 
 namespace Metabase.Tests.Integration.GraphQl.Institutions;
@@ -17,8 +18,12 @@ public abstract class InstitutionIntegrationTests
         "Institution A",
         "I!A",
         "Best institution ever!",
-        new Uri("https://institution-a.com", UriKind.Absolute),
-        null,
+        new ContactInformationInput(
+            PhoneNumber: "(999) 9999-9999",
+            PostalAddress: "Street 9, 7777 Town",
+            EmailAddress: "aaa@institution.com",
+            WebsiteLocator: new Uri("https://institution-a.com", UriKind.Absolute)
+        ),
         null,
         [],
         null
@@ -29,8 +34,12 @@ public abstract class InstitutionIntegrationTests
         "Institution B",
         "I!B",
         "Custom ID institution.",
-        new Uri("https://institution-b.com", UriKind.Absolute),
-        null,
+        new ContactInformationInput(
+            PhoneNumber: null,
+            PostalAddress: null,
+            EmailAddress: "bbb@institution.com",
+            WebsiteLocator: new Uri("https://institution-b.com", UriKind.Absolute)
+        ),
         null,
         [],
         null

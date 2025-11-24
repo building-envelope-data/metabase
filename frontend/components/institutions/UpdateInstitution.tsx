@@ -6,7 +6,7 @@ import {
 import { Alert, Form, Input, Button, Modal } from "antd";
 import { useState } from "react";
 import { handleFormErrors } from "../../lib/form";
-import { Scalars } from "../../__generated__/graphql";
+import { ContactInformation, Scalars } from "../../__generated__/graphql";
 
 const layout = {
   labelCol: { span: 8 },
@@ -20,7 +20,10 @@ type FormValues = {
   newName: string;
   newAbbreviation: string | null | undefined;
   newDescription: string;
-  newWebsiteLocator: string;
+  newPhoneNumber: string | null | undefined;
+  newPostalAddress: string | null | undefined;
+  newEmailAddress: string | null | undefined;
+  newWebsiteLocator: string | null | undefined;
 };
 
 export type UpdateInstitutionProps = {
@@ -28,7 +31,7 @@ export type UpdateInstitutionProps = {
   name: string;
   abbreviation: string | null | undefined;
   description: string;
-  websiteLocator: string | null | undefined;
+  contact: ContactInformation | null | undefined;
 };
 
 export default function UpdateInstitution({
@@ -36,7 +39,7 @@ export default function UpdateInstitution({
   name,
   abbreviation,
   description,
-  websiteLocator,
+  contact,
 }: UpdateInstitutionProps) {
   const [open, setOpen] = useState(false);
   const [updateInstitutionMutation] = useMutation(UpdateInstitutionDocument, {
@@ -58,6 +61,9 @@ export default function UpdateInstitution({
     newName,
     newAbbreviation,
     newDescription,
+    newPhoneNumber,
+    newPostalAddress,
+    newEmailAddress,
     newWebsiteLocator,
   }: FormValues) => {
     const update = async () => {
@@ -70,7 +76,12 @@ export default function UpdateInstitution({
             name: newName,
             abbreviation: newAbbreviation,
             description: newDescription,
-            websiteLocator: newWebsiteLocator,
+            contact: {
+              phoneNumber: newPhoneNumber,
+              postalAddress: newPostalAddress,
+              emailAddress: newEmailAddress,
+              websiteLocator: newWebsiteLocator,
+            },
           },
         });
         handleFormErrors(
@@ -157,6 +168,32 @@ export default function UpdateInstitution({
             <Input />
           </Form.Item>
           <Form.Item
+            label="Phone Number"
+            name="phoneNumber"
+            initialValue={contact?.phoneNumber}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Postal Address"
+            name="postalAddress"
+            initialValue={contact?.postalAddress}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="E-Mail Address"
+            name="emailAddress"
+            rules={[
+              {
+                type: "email",
+              },
+            ]}
+            initialValue={contact?.emailAddress}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
             label="Website"
             name="newWebsiteLocator"
             rules={[
@@ -164,7 +201,7 @@ export default function UpdateInstitution({
                 type: "url",
               },
             ]}
-            initialValue={websiteLocator}
+            initialValue={contact?.websiteLocator}
           >
             <Input />
           </Form.Item>
