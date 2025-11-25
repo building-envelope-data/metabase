@@ -22,6 +22,21 @@ mutation AddInstitutionRepresentative(
   }
 }
 
+mutation RemoveInstitutionRepresentative(
+  $institutionId: Uuid!
+  $userId: Uuid!
+) {
+  removeInstitutionRepresentative(
+    input: { institutionId: $institutionId, userId: $userId }
+  ) {
+    errors {
+      code
+      message
+      path
+    }
+  }
+}
+
 mutation ConfirmInstitutionRepresentative(
   $institutionId: Uuid!
   $userId: Uuid!

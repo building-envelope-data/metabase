@@ -29,6 +29,8 @@ function Page() {
   const { data } = useQuery(CurrentUserDocument);
   const currentUser = data?.currentUser;
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   const [setUserPhoneNumberMutation] = useMutation(SetUserPhoneNumberDocument, {
     update(cache, { data }) {
       // Read the data from our cache for this query.
@@ -71,7 +73,7 @@ function Page() {
           form,
         );
         if (!error && !data?.setUserPhoneNumber?.errors) {
-          message.success("Your new phone number was set.");
+          messageApi.success("Your new phone number was set.");
         }
       } catch (error) {
         // TODO Handle properly.
@@ -97,6 +99,7 @@ function Page() {
 
   return (
     <ManageLayout>
+      {contextHolder}
       <Typography.Paragraph>Hello {currentUser.name}!</Typography.Paragraph>
       {/* TODO Change name, postal address, and website locator */}
       {globalErrorMessages.length > 0 && (

@@ -22,6 +22,8 @@ function Page() {
   const [form] = Form.useForm();
   const [setting, setSetting] = useState(false);
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   const onFinish = ({
     password,
     passwordConfirmation,
@@ -48,7 +50,7 @@ function Page() {
           form,
         );
         if (!error && !data?.setUserPassword?.errors) {
-          message.success("Your password has been set.");
+          messageApi.success("Your password has been set.");
           form.resetFields();
         }
       } catch (error) {
@@ -67,6 +69,7 @@ function Page() {
 
   return (
     <ManageLayout>
+      {contextHolder}
       <Typography.Paragraph>
         You do not have a local username/password for this site. Add a local
         account so you can log in without an external login.

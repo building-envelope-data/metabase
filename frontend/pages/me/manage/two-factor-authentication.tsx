@@ -19,6 +19,8 @@ function Page() {
   const { error, data } = useQuery(TwoFactorAuthenticationDocument);
   const twoFactorAuthentication = data?.currentUser?.twoFactorAuthentication;
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   const [forgetUserTwoFactorAuthenticationClientMutation] = useMutation(
     ForgetUserTwoFactorAuthenticationClientDocument,
     {
@@ -44,13 +46,13 @@ function Page() {
         console.log(error); // TODO What to do?
       } else if (data?.forgetUserTwoFactorAuthenticationClient?.errors) {
         // TODO Is this how we want to display errors?
-        message.error(
+        messageApi.error(
           data?.forgetUserTwoFactorAuthenticationClient?.errors
             .map((error) => error.message)
             .join(" "),
         );
       } else {
-        message.success(
+        messageApi.success(
           "The current browser has been forgotten. When you login again from this browser you will be prompted for your two-factor authentication code.",
         );
       }
@@ -84,13 +86,13 @@ function Page() {
         console.log(error); // TODO What to do?
       } else if (data?.disableUserTwoFactorAuthentication?.errors) {
         // TODO Is this how we want to display errors?
-        message.error(
+        messageApi.error(
           data?.disableUserTwoFactorAuthentication?.errors
             .map((error) => error.message)
             .join(" "),
         );
       } else {
-        message.success(
+        messageApi.success(
           "Two-factor authentication has been disabled. You can reenable it when you setup an authenticator app.",
         );
       }
@@ -123,13 +125,13 @@ function Page() {
         console.log(error); // TODO What to do?
       } else if (data?.resetUserTwoFactorAuthenticator?.errors) {
         // TODO Is this how we want to display errors?
-        message.error(
+        messageApi.error(
           data?.resetUserTwoFactorAuthenticator?.errors
             .map((error) => error.message)
             .join(" "),
         );
       } else {
-        message.success(
+        messageApi.success(
           "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.",
         );
       }
@@ -163,7 +165,7 @@ function Page() {
         console.log(error); // TODO What to do?
       } else if (data?.generateUserTwoFactorRecoveryCodes?.errors) {
         // TODO Is this how we want to display errors?
-        message.error(
+        messageApi.error(
           data?.generateUserTwoFactorRecoveryCodes?.errors
             .map((error) => error.message)
             .join(" "),
@@ -178,7 +180,6 @@ function Page() {
       setGeneratingUserTwoFactorRecoveryCodes(false);
     }
   };
-  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (error) {

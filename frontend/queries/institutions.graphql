@@ -190,6 +190,7 @@ query Institution($uuid: Uuid!) {
           name
         }
         role
+        isAuthorizedToRemoveEdge
       }
       isAuthorizedToAddEdge
     }

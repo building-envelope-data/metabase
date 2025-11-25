@@ -26,6 +26,8 @@ function Page() {
   const [form] = Form.useForm();
   const [resetting, setResetting] = useState(false);
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   const onFinish = ({
     email,
     password,
@@ -57,7 +59,7 @@ function Page() {
             form,
           );
           if (!error && !data?.resetUserPassword?.errors) {
-            message.success("Your password was reset.");
+            messageApi.success("Your password was reset.");
             await router.push({
               pathname: paths.userLogin,
               query: returnTo ? { returnTo: returnTo } : {},
@@ -80,6 +82,7 @@ function Page() {
 
   return (
     <SingleSignOnLayout>
+      {contextHolder}
       <Row justify="center">
         <Col>
           <Card title="Register">

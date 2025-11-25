@@ -45,12 +45,13 @@ function Page() {
     string | null | undefined
   >(undefined);
 
-  const [messageApi, contextHolder] = message.useMessage();
   const [globalErrorMessages, setGlobalErrorMessages] = useState(
     new Array<string>(),
   );
   const [form] = Form.useForm();
   const [enabling, setEnabling] = useState(false);
+
+  const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = ({ verificationCode }: { verificationCode: string }) => {
     const enable = async () => {
@@ -84,7 +85,7 @@ function Page() {
           );
         }
         if (!error && !data?.enableUserTwoFactorAuthenticator?.errors) {
-          message.success("Your authenticator app has been verified.");
+          messageApi.success("Your authenticator app has been verified.");
           await router.push(paths.me.manage.twoFactorAuthentication);
         }
       } catch (error) {

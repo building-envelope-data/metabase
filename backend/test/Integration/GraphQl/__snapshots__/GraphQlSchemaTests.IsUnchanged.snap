@@ -1046,6 +1046,7 @@ type InstitutionRepresentativeConnection {
 }
 
 type InstitutionRepresentativeEdge {
+  isAuthorizedToRemoveEdge: Boolean! @cost(weight: "10")
   node: User! @cost(weight: "10")
   role: InstitutionRepresentativeRole!
 }

@@ -41,6 +41,7 @@ import GnuPgKeyFingerprintTable from "../gnuPgKeyFingerprints/GnuPgKeyFingerprin
 import AddGnuPgKeyFingerprint from "../gnuPgKeyFingerprints/AddGnuPgKeyFingerprint";
 import { GnuPgKeyFingerprintPartialFragment } from "../../queries/gnuPgKeyFingerprints.generated";
 import { ApplicationPartialFragment } from "../../queries/openIdConnect.generated";
+import RemoveInstitutionRepresentative from "./RemoveInstitutionRepresentative";
 
 export type InstitutionProps = {
   institutionId: Scalars["Uuid"]["input"];
@@ -232,23 +233,17 @@ export default function Institution({ institutionId }: InstitutionProps) {
           <Descriptions.Item label="UUID">{institution.uuid}</Descriptions.Item>
           {institution.contact?.phoneNumber && (
             <Descriptions.Item label="Phone">
-              <Typography.Link href={institution.contact.phoneNumber}>
-                {institution.contact.phoneNumber}
-              </Typography.Link>
+              {institution.contact.phoneNumber}
             </Descriptions.Item>
           )}
           {institution.contact?.postalAddress && (
             <Descriptions.Item label="Postal Address">
-              <Typography.Link href={institution.contact.postalAddress}>
-                {institution.contact.postalAddress}
-              </Typography.Link>
+              {institution.contact.postalAddress}
             </Descriptions.Item>
           )}
           {institution.contact?.emailAddress && (
             <Descriptions.Item label="E-Mail">
-              <Typography.Link href={institution.contact.emailAddress}>
-                {institution.contact.emailAddress}
-              </Typography.Link>
+              {institution.contact.emailAddress}
             </Descriptions.Item>
           )}
           {institution.contact?.websiteLocator && (
@@ -418,6 +413,9 @@ export default function Institution({ institutionId }: InstitutionProps) {
               {item.node.name}
             </Link>
             <Typography.Text>{item.role}</Typography.Text>
+            {item.isAuthorizedToRemoveEdge && (
+              <RemoveInstitutionRepresentative institutionId={institution.uuid} userId={item.node.uuid} />
+            )}
           </List.Item>
         )}
       />

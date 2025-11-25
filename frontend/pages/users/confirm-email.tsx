@@ -11,6 +11,8 @@ function ConfirmUserEmail() {
   const { email, confirmationCode, returnTo } = router.query;
   const [confirmUserEmailMutation] = useMutation(ConfirmUserEmailDocument);
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   useEffect(() => {
     const confirmUserEmail = async () => {
       if (router.isReady) {
@@ -26,13 +28,13 @@ function ConfirmUserEmail() {
             console.log(error);
           } else if (data?.confirmUserEmail?.errors) {
             // TODO Is this how we want to display errors?
-            message.error(
+            messageApi.error(
               data?.confirmUserEmail?.errors
                 .map((error) => error.message)
                 .join(" "),
             );
           } else {
-            message.success("Email address confirmed!");
+            messageApi.success("Email address confirmed!");
             await router.push({
               pathname: paths.userLogin,
               query: returnTo ? { returnTo: returnTo } : {},
@@ -46,6 +48,7 @@ function ConfirmUserEmail() {
 
   return (
     <Layout>
+      {contextHolder}
       <Typography.Paragraph>Confirming email ...</Typography.Paragraph>
     </Layout>
   );

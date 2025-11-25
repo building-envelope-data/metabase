@@ -22,6 +22,8 @@ function Page() {
   const [form] = Form.useForm();
   const [changing, setChanging] = useState(false);
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   const onFinish = ({
     currentPassword,
     newPassword,
@@ -51,7 +53,7 @@ function Page() {
           form,
         );
         if (!error && !data?.changeUserPassword?.errors) {
-          message.success("Your password has been changed.");
+          messageApi.success("Your password has been changed.");
           form.resetFields();
         }
       } catch (error) {
@@ -70,6 +72,7 @@ function Page() {
 
   return (
     <ManageLayout>
+      {contextHolder}
       {globalErrorMessages.length > 0 ? (
         <Alert type="error" message={globalErrorMessages.join(" ")} />
       ) : (

@@ -45,6 +45,8 @@ function Page() {
   const [form] = Form.useForm();
   const [deleting, setDeleting] = useState(false);
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   const onFinish = ({ password }: { password?: string }) => {
     const del = async () => {
       try {
@@ -64,7 +66,7 @@ function Page() {
           form,
         );
         if (!error && !data?.deletePersonalUserData?.errors) {
-          message.success("Your user data was deleted and account closed.");
+          messageApi.success("Your user data was deleted and account closed.");
           await apolloClient.resetStore();
           await router.push(paths.userLogin);
         }
@@ -92,6 +94,7 @@ function Page() {
 
   return (
     <ManageLayout>
+      {contextHolder}
       <Typography.Paragraph>
         Your account contains personal data that you have given us. This page
         allows you to download or delete that data in accordance with the{" "}
