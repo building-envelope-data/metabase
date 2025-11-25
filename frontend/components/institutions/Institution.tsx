@@ -431,6 +431,9 @@ export default function Institution({ institutionId }: InstitutionProps) {
                   {item.node.name}
                 </Link>
                 <Typography.Text>{item.role}</Typography.Text>
+                {item.isAuthorizedToRemoveEdge && (
+                  <RemoveInstitutionRepresentative institutionId={institution.uuid} userId={item.node.uuid} />
+                )}
               </List.Item>
             )}
           />
