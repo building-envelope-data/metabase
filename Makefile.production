@@ -60,14 +60,14 @@ build : check pull ## Build images
 			DOCKER_BUILDKIT=1 \
 				${docker_compose} build \
 					--pull \
-					backend
+					frontend
 					# --no-cache
 	COMPOSE_BAKE=true \
 		COMPOSE_DOCKER_CLI_BUILD=1 \
 			DOCKER_BUILDKIT=1 \
 				${docker_compose} build \
 					--pull \
-					frontend
+					backend
 					# --no-cache
 .PHONY : build
 
