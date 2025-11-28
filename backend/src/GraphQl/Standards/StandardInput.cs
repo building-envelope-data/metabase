@@ -1,4 +1,5 @@
 using System;
+using Metabase.Data;
 using Metabase.Enumerations;
 using Metabase.GraphQl.Numerations;
 
@@ -12,4 +13,20 @@ public sealed record StandardInput(
     NumerationInput Numeration,
     Standardizer[] Standardizers,
     Uri? Locator
-);
+)
+{
+    public Standard ToDomainModel()
+    {
+        return new(
+            Title,
+            Abstract,
+            Section,
+            Year,
+            Standardizers,
+            Locator
+        )
+        {
+            Numeration = Numeration.ToDomainModel()
+        };
+    }
+};

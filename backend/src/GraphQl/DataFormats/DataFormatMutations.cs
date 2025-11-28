@@ -8,10 +8,7 @@ using Metabase.Authorization;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
-using Metabase.GraphQl.Publications;
-using Metabase.GraphQl.Standards;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.DataFormats;
@@ -83,14 +80,7 @@ public sealed class DataFormatMutations
         )
         {
             ManagerId = input.ManagerId,
-            Standard =
-                input.Reference?.Standard is null
-                    ? null
-                    : StandardType.FromInput(input.Reference.Standard),
-            Publication =
-                input.Reference?.Publication is null
-                    ? null
-                    : PublicationType.FromInput(input.Reference.Publication)
+            Reference = input.Reference?.ToDomainModel()
         };
         context.DataFormats.Add(dataFormat);
         await context.SaveChangesAsync(cancellationToken);
@@ -158,14 +148,7 @@ public sealed class DataFormatMutations
             input.MediaType,
             input.SchemaLocator
         );
-        dataFormat.Standard =
-            input.Reference?.Standard is null
-                ? null
-                : StandardType.FromInput(input.Reference.Standard);
-        dataFormat.Publication =
-            input.Reference?.Publication is null
-                ? null
-                : PublicationType.FromInput(input.Reference.Publication);
+        dataFormat.Reference = input.Reference?.ToDomainModel();
         await context.SaveChangesAsync(cancellationToken);
         return new UpdateDataFormatPayload(dataFormat);
     }

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -8,11 +9,7 @@ using Metabase.Authorization;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
-using Metabase.GraphQl.Common;
-using Metabase.GraphQl.Publications;
-using Metabase.GraphQl.Standards;
 using Metabase.GraphQl.Users;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Metabase.GraphQl.Methods;
@@ -116,25 +113,16 @@ public sealed class MethodMutations
         var method = new Method(
             input.Name,
             input.Description,
-            input.Validity is null
-                ? null
-                : OpenEndedDateTimeRangeType.FromInput(input.Validity),
-            input.Availability is null
-                ? null
-                : OpenEndedDateTimeRangeType.FromInput(input.Availability),
+            input.Validity?.ToDomainModel(),
+            input.Availability?.ToDomainModel(),
             input.CalculationLocator,
+            input.Parameters.Select(_ => _.ToDomainModel()).ToArray(),
+            input.Sources.Select(_ => _.ToDomainModel()).ToArray(),
             input.Categories
         )
         {
             ManagerId = input.ManagerId,
-            Standard =
-                input.Reference?.Standard is null
-                    ? null
-                    : StandardType.FromInput(input.Reference.Standard),
-            Publication =
-                input.Reference?.Publication is null
-                    ? null
-                    : PublicationType.FromInput(input.Reference.Publication),
+            Reference = input.Reference?.ToDomainModel()
         };
         foreach (var institutionDeveloperId in input.InstitutionDeveloperIds.Distinct())
         {
@@ -220,23 +208,14 @@ public sealed class MethodMutations
         method.Update(
             input.Name,
             input.Description,
-            input.Validity is null
-                ? null
-                : OpenEndedDateTimeRangeType.FromInput(input.Validity),
-            input.Availability is null
-                ? null
-                : OpenEndedDateTimeRangeType.FromInput(input.Availability),
+            input.Validity?.ToDomainModel(),
+            input.Availability?.ToDomainModel(),
             input.CalculationLocator,
+            input.Parameters.Select(_ => _.ToDomainModel()).ToArray(),
+            input.Sources.Select(_ => _.ToDomainModel()).ToArray(),
             input.Categories
         );
-        method.Standard =
-            input.Reference?.Standard is null
-                ? null
-                : StandardType.FromInput(input.Reference.Standard);
-        method.Publication =
-            input.Reference?.Publication is null
-                ? null
-                : PublicationType.FromInput(input.Reference.Publication);
+        method.Reference = input.Reference?.ToDomainModel();
         await context.SaveChangesAsync(cancellationToken);
         return new UpdateMethodPayload(method);
     }

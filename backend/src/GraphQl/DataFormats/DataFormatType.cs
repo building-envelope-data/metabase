@@ -6,6 +6,7 @@ using HotChocolate.Types;
 using Metabase.Authorization;
 using Metabase.Data;
 using Metabase.GraphQl.Entities;
+using Metabase.GraphQl.References;
 using Metabase.GraphQl.Users;
 using Microsoft.AspNetCore.Identity;
 
@@ -20,11 +21,13 @@ public sealed class DataFormatType
     {
         base.Configure(descriptor);
         descriptor
-            .Field(t => t.Standard)
-            .Ignore();
-        descriptor
-            .Field(t => t.Publication)
-            .Ignore();
+            .Field(t => t.Reference)
+            .Type<ReferenceType>()
+            .Resolve(context => context
+                .Parent<DataFormat>()
+                .Reference?
+                .TheReference
+            );
         descriptor
             .Field(t => t.Manager)
             .Type<NonNullType<ObjectType<DataFormatManagerEdge>>>()

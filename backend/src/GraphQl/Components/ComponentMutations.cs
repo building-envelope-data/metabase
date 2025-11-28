@@ -9,8 +9,6 @@ using Metabase.Authorization;
 using Metabase.Configuration;
 using Metabase.Data;
 using Metabase.Extensions;
-using Metabase.GraphQl.Common;
-using Metabase.GraphQl.DescriptionOrReferences;
 using Metabase.GraphQl.Users;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
@@ -115,14 +113,11 @@ public sealed class ComponentMutations
             );
         }
 
-        NpgsqlRange<DateTime>? availability =
-            input.Availability is null
-            ? null
-            : OpenEndedDateTimeRangeType.FromInput(input.Availability);
+        NpgsqlRange<DateTime>? availability = input.Availability?.ToDomainModel();
         // Note that above we make sure that, for each reference, standard and publication are *not* both non-null.
-        var primeSurface = DescriptionOrReferenceType.FromInput(input.PrimeSurface);
-        var primeDirection = DescriptionOrReferenceType.FromInput(input.PrimeDirection);
-        var switchableLayers = DescriptionOrReferenceType.FromInput(input.SwitchableLayers);
+        var primeSurface = input.PrimeSurface?.ToDomainModel();
+        var primeDirection = input.PrimeDirection?.ToDomainModel();
+        var switchableLayers = input.SwitchableLayers?.ToDomainModel();
         var component =
             input.ComponentId is null
             ? new Component(
@@ -305,17 +300,15 @@ public sealed class ComponentMutations
             input.Name,
             input.Abbreviation,
             input.Description,
-            input.Availability is null
-                ? null
-                : OpenEndedDateTimeRangeType.FromInput(input.Availability),
+            input.Availability?.ToDomainModel(),
             input.Categories,
             input.Extras
         );
 
         // Note that above we make sure that, for each reference, standard and publication are *not* both non-null.
-        component.PrimeSurface = DescriptionOrReferenceType.FromInput(input.PrimeSurface);
-        component.PrimeDirection = DescriptionOrReferenceType.FromInput(input.PrimeDirection);
-        component.SwitchableLayers = DescriptionOrReferenceType.FromInput(input.SwitchableLayers);
+        component.PrimeSurface = input.PrimeSurface?.ToDomainModel();
+        component.PrimeDirection = input.PrimeDirection?.ToDomainModel();
+        component.SwitchableLayers = input.SwitchableLayers?.ToDomainModel();
 
         if (input.ManufacturerId is not null)
         {

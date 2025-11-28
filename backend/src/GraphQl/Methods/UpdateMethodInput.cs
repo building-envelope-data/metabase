@@ -13,5 +13,7 @@ public sealed record UpdateMethodInput(
     OpenEndedDateTimeRangeInput? Availability,
     ReferenceInput? Reference,
     Uri? CalculationLocator,
+    MethodParameterInput[] Parameters,
+    MethodSourceInput[] Sources,
     MethodCategory[] Categories
 );

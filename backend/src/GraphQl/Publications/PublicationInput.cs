@@ -1,4 +1,5 @@
 using System;
+using Metabase.Data;
 
 namespace Metabase.GraphQl.Publications;
 
@@ -11,4 +12,19 @@ public sealed record PublicationInput(
     string? ArXiv,
     string? Urn,
     Uri? WebAddress
-);
+)
+{
+    public Publication ToDomainModel()
+    {
+        return new(
+            Title,
+            Abstract,
+            Section,
+            Authors,
+            Doi,
+            ArXiv,
+            Urn,
+            WebAddress
+        );
+    }
+};

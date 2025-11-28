@@ -8,6 +8,7 @@ using Metabase.Data;
 using Metabase.Extensions;
 using Metabase.GraphQl.Entities;
 using Metabase.GraphQl.Extensions;
+using Metabase.GraphQl.References;
 using Metabase.GraphQl.Users;
 
 namespace Metabase.GraphQl.Methods;
@@ -21,11 +22,13 @@ public sealed class MethodType
     {
         base.Configure(descriptor);
         descriptor
-            .Field(t => t.Standard)
-            .Ignore();
-        descriptor
-            .Field(t => t.Publication)
-            .Ignore();
+            .Field(t => t.Reference)
+            .Type<ReferenceType>()
+            .Resolve(context => context
+                .Parent<Method>()
+                .Reference?
+                .TheReference
+            );
         descriptor
             .Field(t => t.Manager)
             .Type<NonNullType<ObjectType<MethodManagerEdge>>>()

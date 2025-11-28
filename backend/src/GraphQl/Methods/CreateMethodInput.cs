@@ -1,4 +1,5 @@
 using System;
+using Metabase.Data;
 using Metabase.Enumerations;
 using Metabase.GraphQl.Common;
 using Metabase.GraphQl.References;
@@ -12,6 +13,8 @@ public sealed record CreateMethodInput(
     OpenEndedDateTimeRangeInput? Availability,
     ReferenceInput? Reference,
     Uri? CalculationLocator,
+    MethodParameterInput[] Parameters,
+    MethodSourceInput[] Sources,
     MethodCategory[] Categories,
     Guid ManagerId,
     Guid[] InstitutionDeveloperIds,

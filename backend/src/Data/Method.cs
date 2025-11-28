@@ -24,6 +24,8 @@ public sealed class Method
         NpgsqlRange<DateTime>? validity,
         NpgsqlRange<DateTime>? availability,
         Uri? calculationLocator,
+        ICollection<MethodParameter> parameters,
+        ICollection<MethodSource> sources,
         MethodCategory[] categories
     )
     {
@@ -32,6 +34,8 @@ public sealed class Method
         Validity = validity;
         Availability = availability;
         CalculationLocator = calculationLocator;
+        Parameters = parameters;
+        Sources = sources;
         Categories = categories;
     }
 
@@ -39,18 +43,11 @@ public sealed class Method
 
     [Required][MinLength(1)] public string Description { get; private set; }
 
-    // Standard, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
-    public Standard? Standard { get; set; }
-
-    // Publication, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
-    public Publication? Publication { get; set; }
-
-    // TODO Make sure that either `Standard` or `Publication` is set but never both!
-    [NotMapped] public IReference? Reference => Standard is not null ? Standard : Publication;
+    // Reference, being an owned type, is included by default as told on https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities#querying-owned-types
+    public Reference? Reference { get; set; }
 
     // TODO additionalReferences (that is, standards or publications)
     // TODO service
-    // TODO Description of named parameters and sources?
 
     public NpgsqlRange<DateTime>?
         Validity
@@ -68,10 +65,12 @@ public sealed class Method
 
     [Url] public Uri? CalculationLocator { get; private set; }
 
+    public ICollection<MethodParameter> Parameters { get; private set; } = [];
+    public ICollection<MethodSource> Sources { get; private set; } = [];
+
     [Required] public MethodCategory[] Categories { get; private set; }
 
-    public ICollection<InstitutionMethodDeveloper> InstitutionDeveloperEdges { get; } =
-        [];
+    public ICollection<InstitutionMethodDeveloper> InstitutionDeveloperEdges { get; } = [];
 
     public ICollection<Institution> InstitutionDevelopers { get; } = [];
 
@@ -95,6 +94,8 @@ public sealed class Method
         NpgsqlRange<DateTime>? validity,
         NpgsqlRange<DateTime>? availability,
         Uri? calculationLocator,
+        ICollection<MethodParameter> parameters,
+        ICollection<MethodSource> sources,
         MethodCategory[] categories
     )
     {
@@ -103,6 +104,8 @@ public sealed class Method
         Validity = validity;
         Availability = availability;
         CalculationLocator = calculationLocator;
+        Parameters = parameters;
+        Sources = sources;
         Categories = categories;
     }
 }

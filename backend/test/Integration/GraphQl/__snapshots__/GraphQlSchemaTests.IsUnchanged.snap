@@ -563,7 +563,7 @@ type DataFormat implements Node {
   manager: DataFormatManagerEdge! @cost(weight: "10")
   mediaType: String!
   name: String!
-  reference: Reference
+  reference: Reference @cost(weight: "10")
   schemaLocator: Url
   uuid: Uuid! @cost(weight: "10")
 }
@@ -1128,7 +1128,9 @@ type Method implements Node {
   isAuthorizedToUpdateNode: Boolean! @cost(weight: "10")
   manager: MethodManagerEdge! @cost(weight: "10")
   name: String!
-  reference: Reference
+  parameters: [MethodParameter!]!
+  reference: Reference @cost(weight: "10")
+  sources: [MethodSource!]!
   uuid: Uuid! @cost(weight: "10")
   validity: OpenEndedDateTimeRange
 }
@@ -1148,6 +1150,18 @@ type MethodDeveloperEdge {
 
 type MethodManagerEdge {
   node: Institution! @cost(weight: "10")
+}
+
+"A parameter given as a primitive or complex JSON value when this method is applied."
+type MethodParameter {
+  name: String!
+  type: Any!
+}
+
+"A data source given as a cross-database data reference when this method is applied."
+type MethodSource {
+  description: String!
+  name: String!
 }
 
 "A connection to a list of items."
@@ -2388,7 +2402,9 @@ input CreateMethodInput {
   institutionDeveloperIds: [Uuid!]!
   managerId: Uuid!
   name: String!
+  parameters: [MethodParameterInput!]!
   reference: ReferenceInput
+  sources: [MethodSourceInput!]!
   userDeveloperIds: [Uuid!]!
   validity: OpenEndedDateTimeRangeInput
 }
@@ -2918,12 +2934,23 @@ input MethodFilterInput {
   manager: InstitutionFilterInput
 }
 
+input MethodParameterInput {
+  name: String!
+  type: Any!
+}
+
 input MethodSortInput {
   id: SortEnumType @cost(weight: "10")
   name: SortEnumType @cost(weight: "10")
   description: SortEnumType @cost(weight: "10")
   calculationLocator: UriSortInput @cost(weight: "10")
   manager: InstitutionSortInput @cost(weight: "10")
+}
+
+"A data source given as a cross-database data reference when this method is applied."
+input MethodSourceInput {
+  description: String!
+  name: String!
 }
 
 input NullableOfPrimeSurfaceOperationFilterInput {
@@ -3235,7 +3262,9 @@ input UpdateMethodInput {
   description: String!
   methodId: Uuid!
   name: String!
+  parameters: [MethodParameterInput!]!
   reference: ReferenceInput
+  sources: [MethodSourceInput!]!
   validity: OpenEndedDateTimeRangeInput
 }
 
